@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -54,6 +55,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.SyntaxDecorator;
 import jfx.incubator.scene.control.richtext.TextPos;
+import jfx.incubator.scene.control.richtext.model.StyledTextModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +64,8 @@ public class SourceTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final FieldPreferences fieldPreferences;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
-    private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
-    private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
+    private final InvalidationListener entryTypeListener = _ -> refreshCodeAreaForEntryChange();
+    private final InvalidationListener entryFieldsListener = _ -> refreshCodeAreaForEntryChange();
     private final Subscription activeDatabaseSubscription;
     private final Subscription searchQuerySubscription;
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
@@ -77,6 +79,19 @@ public class SourceTab extends EntryEditorTab {
     private BibTeXCodeArea codeArea;
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
+
+    private boolean writingSource;
+    private long sourceRevision;
+    private long lastScheduledErrorRevision = -1;
+    private final StyledTextModel.Listener sourceChangeListener = change -> {
+        if (change.isEdit()) {
+            sourceRevision++;
+        }
+    };
+    private final InvalidationListener currentEntryChangeListener = _ -> {
+        currentEntryProperty().get();
+        sourceRevision++;
+    };
 
     public SourceTab(
             FieldPreferences fieldPreferences,
@@ -96,6 +111,8 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
+
+        currentEntryProperty().addListener(currentEntryChangeListener);
 
         activeDatabaseSubscription = EasyBind.subscribe(stateManager.activeDatabaseProperty(), database -> database.ifPresentOrElse(context -> {
             BibDatabaseMode mode = context.getMode();
@@ -131,6 +148,7 @@ public class SourceTab extends EntryEditorTab {
 
     private void setupSourceEditor() {
         codeArea = new BibTeXCodeArea(stateManager, bibTeXSyntaxHighlighter);
+        codeArea.getModel().addListener(sourceChangeListener);
         codeArea.setFieldPositionsProvider(() -> fieldPositions != null ? fieldPositions : Map.of());
         codeArea.setOnInputMethodTextChanged(event -> {
             String committed = event.getCommitted();
@@ -166,6 +184,14 @@ public class SourceTab extends EntryEditorTab {
         this.setContent(codeArea);
     }
 
+    /// Entry listeners run synchronously during write-back. Replacing the document there can reenter
+    /// JavaFX accessibility's selection handling.
+    private void refreshCodeAreaForEntryChange() {
+        if (!writingSource) {
+            updateCodeArea();
+        }
+    }
+
     private void updateCodeArea() {
         UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
             if (codeArea == null) {
@@ -197,10 +223,14 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        if (writingSource && previousEntry == entry) {
+            return;
+        }
         if (previousEntry != null) {
             removeEntryListeners(previousEntry);
             storeVisibleSource();
         }
+        sourceRevision++;
         this.previousEntry = entry;
 
         updateCodeArea();
@@ -211,6 +241,10 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void dispose() {
+        sourceRevision++;
+        currentEntryProperty().removeListener(currentEntryChangeListener);
+        Optional.ofNullable(codeArea)
+                .ifPresent(editor -> editor.getModel().removeListener(sourceChangeListener));
         if (previousEntry != null) {
             removeEntryListeners(previousEntry);
             previousEntry = null;
@@ -233,6 +267,26 @@ public class SourceTab extends EntryEditorTab {
         storeSource(previousEntry, codeArea.getText());
     }
 
+    private void showSourceDialogLater(BibEntry entry, Runnable showDialog) {
+        long revision = sourceRevision;
+        if (lastScheduledErrorRevision == revision) {
+            return;
+        }
+
+        lastScheduledErrorRevision = revision;
+        Platform.runLater(() -> {
+            if (sourceRevision == revision
+                    && previousEntry == entry
+                    && currentEntryProperty().get() == entry) {
+                showDialog.run();
+            }
+        });
+    }
+
+    private void showSourceErrorLater(BibEntry entry, String errors) {
+        showSourceDialogLater(entry, () -> dialogService.showErrorDialogAndWait(errors));
+    }
+
     private void storeSource(BibEntry outOfFocusEntry, String text) {
         if ((outOfFocusEntry == null) || text.isEmpty()) {
             return;
@@ -252,10 +306,11 @@ public class SourceTab extends EntryEditorTab {
         if (database.getEntryCount() > 1) {
             LOGGER.error("More than one entry found.");
             // We use the error dialog as the notification is hidden
-            dialogService.showWarningDialogAndWait(
-                    Localization.lang("Problem with parsing entry"),
-                    Localization.lang("Parsing failed because more than one entry was found. Please check your BibTeX syntax.")
-            );
+            showSourceDialogLater(outOfFocusEntry, () ->
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Problem with parsing entry"),
+                            Localization.lang("Parsing failed because more than one entry was found. Please check your BibTeX syntax.")
+                    ));
             return;
         }
 
@@ -263,75 +318,83 @@ public class SourceTab extends EntryEditorTab {
             if (parserResult.hasWarnings()) {
                 LOGGER.warn("Could not store entry: {}", parserResult.warnings());
                 String errors = parserResult.getErrorMessage();
-                dialogService.showErrorDialogAndWait(errors);
+                showSourceErrorLater(outOfFocusEntry, errors);
                 validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
                 return;
             } else {
                 LOGGER.warn("No entries found.");
                 String errors = Localization.lang("No entries available");
-                dialogService.showErrorDialogAndWait(errors);
+                showSourceErrorLater(outOfFocusEntry, errors);
                 validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
                 return;
             }
         }
 
+        String parserWarnings = parserResult.hasWarnings() ? parserResult.getErrorMessage() : "";
         if (parserResult.hasWarnings()) {
             LOGGER.warn("Failed to parse Bib(La)TeX: {}", parserResult.warnings());
-            String errors = parserResult.getErrorMessage();
-            dialogService.showErrorDialogAndWait(errors);
-            validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
+            validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", parserWarnings)));
         }
 
         CompoundEdit compound = new CompoundEdit(Localization.lang("source edit"));
         BibEntry newEntry = database.getEntries().getFirst();
-        newEntry.getCitationKey()
-                .ifPresentOrElse(
-                        outOfFocusEntry::setCitationKey,
-                        outOfFocusEntry::clearCitationKey);
+        boolean wasWritingSource = writingSource;
+        writingSource = true;
+        try {
+            newEntry.getCitationKey()
+                    .ifPresentOrElse(
+                            outOfFocusEntry::setCitationKey,
+                            outOfFocusEntry::clearCitationKey);
 
-        // First, remove fields that the user has removed.
-        for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
-            Field fieldName = field.getKey();
-            String fieldValue = field.getValue();
+            // First, remove fields that the user has removed.
+            for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
+                String fieldValue = field.getValue();
 
-            if (!newEntry.hasField(fieldName)) {
-                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
-            }
-        }
-
-        // Then set all fields that have been set by the user.
-        for (Map.Entry<Field, String> field : newEntry.getFieldMap().entrySet()) {
-            Field fieldName = field.getKey();
-            String oldValue = outOfFocusEntry.getField(fieldName).orElse(null);
-            String newValue = field.getValue();
-            if (!Objects.equals(oldValue, newValue)) {
-                // Test if the field is legally set.
-                List<String> errors = FieldWriter.checkBalancedBraces(newValue);
-                if (!errors.isEmpty()) {
-                    validationMessage.setValue(ValidationMessage.error(
-                            Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors))));
-                    return;
+                if (!newEntry.hasField(fieldName)) {
+                    compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
                 }
-
-                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
             }
-        }
 
-        // See if the user has changed the entry type:
-        if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
-        }
-        stateManager.getActiveDatabase().ifPresent(databaseContext ->
-                stateManager.getUndoManager(databaseContext).addEdit(compound.toChangeSet()));
+            // Then set all fields that have been set by the user.
+            for (Map.Entry<Field, String> field : newEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
+                String oldValue = outOfFocusEntry.getField(fieldName).orElse(null);
+                String newValue = field.getValue();
+                if (!Objects.equals(oldValue, newValue)) {
+                    // Test if the field is legally set.
+                    List<String> errors = FieldWriter.checkBalancedBraces(newValue);
+                    if (!errors.isEmpty()) {
+                        validationMessage.setValue(ValidationMessage.error(
+                                Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors))));
+                        return;
+                    }
 
-        ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        if (selectedEntries == null || selectedEntries.isEmpty()) {
-            stateManager.activeTabProperty().get().ifPresent(libraryTab ->
-                    libraryTab.getMainTable().clearAndSelect(outOfFocusEntry)
-            );
+                    compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                }
+            }
+
+            // See if the user has changed the entry type:
+            if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
+                compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+            }
+            stateManager.getActiveDatabase().ifPresent(databaseContext ->
+                    stateManager.getUndoManager(databaseContext).addEdit(compound.toChangeSet()));
+
+            ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+            if (selectedEntries == null || selectedEntries.isEmpty()) {
+                stateManager.activeTabProperty().get().ifPresent(libraryTab ->
+                        libraryTab.getMainTable().clearAndSelect(outOfFocusEntry)
+                );
+            }
+        } finally {
+            writingSource = wasWritingSource;
         }
 
         validationMessage.setValue(null);
+        if (!parserWarnings.isEmpty()) {
+            showSourceErrorLater(outOfFocusEntry, parserWarnings);
+        }
     }
 
     private void listenForSaveKeybinding(KeyEvent event) {
