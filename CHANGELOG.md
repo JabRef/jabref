@@ -109,6 +109,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Backup found" dialog appeared while another library's tab was selected. [#16919](https://github.com/JabRef/jabref/pull/16919)
 - We fixed custom terminal and file browser commands failing when library directories contain spaces. [#12531](https://github.com/JabRef/jabref/issues/12531)
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
+- We fixed an issue where backups skipped typed edits and changes merged from a backup were lost on closing. [#16890](https://github.com/JabRef/jabref/pull/16890)
 
 ### Removed
 
