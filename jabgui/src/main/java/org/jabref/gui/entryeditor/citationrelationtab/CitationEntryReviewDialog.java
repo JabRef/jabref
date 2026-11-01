@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,6 +22,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -28,12 +31,13 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -41,9 +45,12 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.entryeditor.FieldListSections;
+import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.fieldeditors.LinkedFilesEditor;
+import org.jabref.gui.fieldeditors.TagsEditor;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.JabRefGuiUndoManager;
@@ -90,8 +97,8 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
 
     private static final double LABEL_COLUMN_MIN_WIDTH = 110;
     private static final double EDITOR_COLUMN_MIN_WIDTH = 360;
-    private static final double ROW_HEIGHT = 32;
-    private static final double MULTILINE_ROW_HEIGHT = 96;
+    private static final int COLLAPSED_MULTILINE_ROWS = 5;
+    private static final double HEIGHT_PER_WEIGHT = 60;
     private static final double FIELDS_DIVIDER_POSITION = 0.55;
     private static final double DIALOG_PREF_WIDTH = 1100;
     private static final double DIALOG_PREF_HEIGHT = 650;
@@ -104,6 +111,13 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
 
     /// Characters not allowed in the name of the user specific comment field.
     private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]");
+
+    /// Multiline fields the user has focused, and thereby expanded. The rows are rebuilt after a chip
+    /// click or a type change, so the expansion must outlive the editors.
+    private final Set<Field> expandedFields = new HashSet<>();
+
+    /// Last laid-out width of each field's growing text area
+    private final Map<Field, Double> textAreaWidths = new HashMap<>();
 
     private final BibEntry entry;
     private final BibDatabaseContext databaseContext;
@@ -267,7 +281,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         editors.clear();
         fieldGrid.getChildren().clear();
         fieldGrid.getColumnConstraints().clear();
-        fieldGrid.getRowConstraints().clear();
 
         Map<FieldListSections.SectionType, List<FieldRow>> rowsPerSection =
                 new EnumMap<>(FieldListSections.SectionType.class);
@@ -284,6 +297,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                         createSectionPane(type, rowsPerSection.getOrDefault(type, List.of())));
             }
         }
+        editors.forEach(this::applyNaturalHeight);
     }
 
     /// Function to determine the fields to show, and in which order, as the entry editor's "Main" tab does
@@ -308,6 +322,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     }
 
     /// Function to create the label and the editor of one field, and to remember the editor
+    ///
     /// @param field field the label and the editor belong to
     private FieldRow createFieldRow(Field field) {
         FieldEditorFX fieldEditor = FieldEditors.getForField(
@@ -332,13 +347,12 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         configureFieldGrid(fieldGrid);
         fieldGrid.add(new Label(Localization.lang("Entry type")), 0, 0);
         fieldGrid.add(entryTypeCombo, 1, 0);
-        fieldGrid.getRowConstraints().add(new RowConstraints());
         addFieldRows(fieldGrid, rows, 1);
     }
 
     /// Function to create the collapsible pane of one field group
     ///
-    /// Holds the rows of the group and, below them, the chips for its fields without a row. 
+    /// Holds the rows of the group and, below them, the chips for its fields without a row.
     /// Collapsed by default while the group has no row.
     ///
     /// @param type section the fields belong to
@@ -403,10 +417,61 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     private static void addFieldRows(GridPane grid, List<FieldRow> rows, int firstRow) {
         int row = firstRow;
         for (FieldRow fieldRow : rows) {
+            // FieldNameLabel asks for unlimited height, which would make every row sized to its content unlimited too
+            fieldRow.label().setPrefHeight(Region.USE_COMPUTED_SIZE);
+            GridPane.setValignment(fieldRow.label(), VPos.TOP);
             grid.add(fieldRow.label(), 0, row);
             grid.add(fieldRow.editor().getNode(), 1, row);
-            grid.getRowConstraints().add(createFieldRowConstraints(fieldRow.field(), fieldRow.editor()));
             row++;
+        }
+    }
+
+    /// Function to let an editor take the height of its content, as the entry editor's "Main" tab does
+    ///
+    /// @param field  field the editor belongs to
+    /// @param editor editor to size
+    private void applyNaturalHeight(Field field, FieldEditorFX editor) {
+        normalizeInputHeights(field, editor.getNode());
+        if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {
+            // These size themselves to their content: file rows or wrapped chips. A fixed height would override that.
+            return;
+        }
+        if ((editor.getWeight() > 1) && (editor.getNode() instanceof Region region)) {
+            region.setPrefHeight(editor.getWeight() * HEIGHT_PER_WEIGHT);
+        }
+    }
+
+    /// Function to reset the unlimited height the text inputs ask for, and to let text areas grow with their text
+    ///
+    /// @param field field the input belongs to
+    /// @param node  editor node, searched for text inputs
+    private void normalizeInputHeights(Field field, Node node) {
+        switch (node) {
+            case EditorTextArea textArea -> {
+                textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                // The width the field had before the rebuild lets the new area wrap correctly in its first frame
+                textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS);
+                if (expandedFields.contains(field)) {
+                    textArea.expand();
+                }
+                textArea.focusedProperty().addListener((_, _, focused) -> {
+                    if (focused) {
+                        expandedFields.add(field);
+                    }
+                });
+                textArea.widthProperty().addListener((_, _, width) -> {
+                    if (width.doubleValue() > 0) {
+                        textAreaWidths.put(field, width.doubleValue());
+                    }
+                });
+            }
+            case TextField textField ->
+                    textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            case Parent parent ->
+                    parent.getChildrenUnmodifiable().forEach(child -> normalizeInputHeights(field, child));
+            case null,
+                 default -> {
+            }
         }
     }
 
@@ -529,21 +594,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                 setupFieldArea();
             }
         });
-    }
-
-    /// Function to give a field row a fixed height
-    ///
-    /// The field editors ask for unlimited height and rely on their container to limit it, as the entry editor does
-    /// with its row constraints. Rows sized to their content would grow without end, so each row gets its height here.
-    ///
-    /// @param field       field shown in the row
-    /// @param fieldEditor editor shown in the row, whose weight scales the height
-    private static RowConstraints createFieldRowConstraints(Field field, FieldEditorFX fieldEditor) {
-        double rowHeight = field.isMultiLineDefined() ? MULTILINE_ROW_HEIGHT : ROW_HEIGHT;
-        double height = rowHeight * fieldEditor.getWeight();
-        RowConstraints rowConstraints = new RowConstraints(height, height, height);
-        rowConstraints.setValignment(VPos.TOP);
-        return rowConstraints;
     }
 
     /// The editors trigger undo on the keyboard shortcut. The regular action would undo the last change of the library,
