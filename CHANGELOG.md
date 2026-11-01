@@ -41,11 +41,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
 - We changed single-line entry fields to return focus to the editor when <kbd>Enter</kbd> is pressed. [#17445](https://github.com/JabRef/jabref/issues/17445)
 - We changed failed shared database connections to show a tab with "Retry" instead of an error dialog. [#16968](https://github.com/JabRef/jabref/pull/16968)
+- We show the donation prompt six months after the first launch and every six months, unless dismissed forever. [#17008](https://github.com/JabRef/jabref/pull/17008)
 - We changed the main table tooltip to stay visible while hovered, with a configurable duration. [#17502](https://github.com/JabRef/jabref/issues/17502)
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 
 ### Fixed
 
+- We fixed an issue where it was hard to distinguish between enabled/disabled status of search buttons in dark mode and added tooltips. [#11569](https://github.com/JabRef/jabref/issues/11569)
 - We fixed an issue where entries containing dollar signs or backslashes caused citation style preview and export to fail. [#12799](https://github.com/JabRef/jabref/issues/12799)
 - We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
 - We fixed JabKit to preserve existing citation keys when generating keys with the avoid-overwrite setting. [#17458](https://github.com/JabRef/jabref/issues/17458)
@@ -70,6 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
 - We fixed an issue where entries of type Misc were penalized too strictly during duplicate detection. [#16578](https://github.com/JabRef/jabref/issues/16578)
+- We fixed failed template exports overwriting existing files with empty or incomplete output. [#17423](https://github.com/JabRef/jabref/issues/17423)
 - We fixed an issue where the "Simple HTML" export separated author initials with spaces. [#17306](https://github.com/JabRef/jabref/pull/17306)
 - We fixed an issue where the Hayagriva YAML export wrote braced author names, such as company names, as invalid YAML. [#17316](https://github.com/JabRef/jabref/issues/17316)
 - We fixed an issue where "Community forum" in the Help menu opened the donation page instead of the forum. [#17162](https://github.com/JabRef/jabref/pull/17162)
@@ -94,6 +97,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the AI summary tab was blank for entries with only remote files. [#17203](https://github.com/JabRef/jabref/issues/17203)
 - We fixed an issue where legacy group memberships, markings, and special fields were no longer migrated when opening a library. [#17019](https://github.com/JabRef/jabref/pull/17019)
 - We fixed an issue where saving an SLR study overwrote different per-query native queries. [#17307](https://github.com/JabRef/jabref/pull/17307)
+- We fixed an issue where the field controls in the entry types preferences were not aligned. [#16994](https://github.com/JabRef/jabref/issues/16994)
 - We fixed an issue where AI chats were lost when JabRef did not quit regularly. [#17177](https://github.com/JabRef/jabref/pull/17177)
 - We fixed an issue where the links at the bottom of the Welcome tab were cut off in small windows. [#17015](https://github.com/JabRef/jabref/issues/17015)
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
@@ -404,6 +408,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where long recent library paths overflowed and were cut off in the Welcome tab. [#16808](https://github.com/JabRef/jabref/issues/16808)
 - We fixed an issue where a library file containing merge conflict markers was opened without any warning. [#9167](https://github.com/JabRef/jabref/issues/9167)
 - We fixed an issue where the deb, rpm and msi packages did not register JabRef for `.bib` files. [#17006](https://github.com/JabRef/jabref/issues/17006)
+- We fixed an issue where the search button in Web Search was enabled for empty search. [#17118](https://github.com/JabRef/jabref/issues/17118)
 - We fixed AI chat connection errors to show the server URL and the reason. [#17125](https://github.com/JabRef/jabref/pull/17125)
 
 ### Removed
