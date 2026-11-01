@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -39,7 +40,9 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.ai.AiDefaultEnums;
 import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.llm.PredefinedChatModel;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
@@ -72,7 +75,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();
 
     private final ListProperty<AiProvider> aiProvidersList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(AiProvider.values()));
+            new SimpleListProperty<>(FXCollections.observableArrayList(
+                    Arrays.stream(AiProvider.values())
+                          .filter(provider -> provider != AiProvider.DEBUG)
+                          .toList()));
     private final ObjectProperty<AiProvider> selectedAiProvider = new SimpleObjectProperty<>();
 
     private final ListProperty<String> chatModelsList =
@@ -93,6 +99,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty huggingFaceApiKey = new SimpleStringProperty();
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
+    private final BooleanProperty enableAiDebugProvider = new SimpleBooleanProperty();
 
     private final ListProperty<String> embeddingModelsList =
             new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -243,6 +250,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceApiKey.set(currentApiKey.get());
                         huggingFaceApiBaseUrl.set(currentApiBaseUrl.get());
                     }
+                    case DEBUG -> {
+                        // Will never be executed, as DEBUG should not appear in the AI provider selection.
+                    }
                 }
             }
 
@@ -267,6 +277,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                     currentApiKey.set(huggingFaceApiKey.get());
                     currentApiBaseUrl.set(huggingFaceApiBaseUrl.get());
                 }
+                case DEBUG -> {
+                    // Will never be executed, as DEBUG should not appear in the AI provider selection.
+                }
+            }
+
+            if (customizeExpertSettings.get() && enableAiDebugProvider.get()) {
+                return;
             }
 
             new FetchAiModelsBackgroundTask(aiModelService, newValue, currentApiBaseUrl.get(), currentApiKey.get())
@@ -300,6 +317,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         geminiChatModel.set(newValue);
                 case HUGGING_FACE ->
                         huggingFaceChatModel.set(newValue);
+                case DEBUG -> {
+                    // Will never be executed, as DEBUG should not appear in the AI provider selection.
+                }
             }
 
             contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(aiProvider, newValue));
@@ -320,6 +340,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         geminiAiApiKey.set(newValue);
                 case HUGGING_FACE ->
                         huggingFaceApiKey.set(newValue);
+                case DEBUG -> {
+                    // Will never be executed, as DEBUG should not appear in the AI provider selection.
+                }
             }
         });
 
@@ -338,11 +361,14 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         geminiApiBaseUrl.set(newValue);
                 case HUGGING_FACE ->
                         huggingFaceApiBaseUrl.set(newValue);
+                case DEBUG -> {
+                    // Will never be executed, as DEBUG should not appear in the AI provider selection.
+                }
             }
         });
 
         // A result only holds for the values it was tested with.
-        Stream.of(selectedAiProvider, currentChatModel, currentApiKey, currentApiBaseUrl, customizeExpertSettings)
+        Stream.of(selectedAiProvider, currentChatModel, currentApiKey, currentApiBaseUrl, customizeExpertSettings, enableAiDebugProvider)
               .forEach(property -> property.addListener((_, _, _) -> {
                   connectionTestState.set(ConnectionTestState.IDLE);
                   connectionTestDetails.set("");
@@ -451,9 +477,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         autoGenerateSummaries.setValue(workingAiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(workingAiPreferences.getAutoGenerateEmbeddings());
 
-        selectedAiProvider.setValue(workingAiPreferences.getAiProvider());
-
         customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
+        enableAiDebugProvider.setValue(workingAiPreferences.enableAiDebugProviderProperty().get());
+
+        AiProvider provider = workingAiPreferences.getAiProvider();
+        if (provider == AiProvider.DEBUG) {
+            // Will never be executed, as DEBUG should not appear in the AI provider selection.
+            selectedAiProvider.setValue(AiDefaultEnums.AI_PROVIDER);
+        } else {
+            selectedAiProvider.setValue(provider);
+        }
 
         selectedEmbeddingModel.setValue(workingAiPreferences.getEmbeddingModel());
 
@@ -491,7 +524,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         workingAiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         workingAiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
 
-        workingAiPreferences.setAiProvider(selectedAiProvider.get());
+        if (selectedAiProvider.get() == AiProvider.DEBUG) {
+            // Will never be executed, as DEBUG should not appear in the AI provider selection.
+        } else if (selectedAiProvider.get() != null) {
+            workingAiPreferences.setAiProvider(selectedAiProvider.get());
+        }
 
         workingAiPreferences.setOpenAiChatModel(openAiChatModel.get() == null ? "" : openAiChatModel.get());
         workingAiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
@@ -504,6 +541,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());
 
         workingAiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
+        workingAiPreferences.setEnableAiDebugProvider(enableAiDebugProvider.get());
 
         workingAiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
 
@@ -541,10 +579,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     /// Tests the connection with the values currently entered in the dialog, not the stored preferences.
     public BackgroundTask<String> testConnectionTask() {
-        AiProvider provider = selectedAiProvider.get();
-        String modelName = currentChatModel.get();
-        String apiKey = currentApiKey.get();
-        String baseUrl = customizeExpertSettings.get() ? currentApiBaseUrl.get() : provider.getApiUrl();
+        boolean isDebug = customizeExpertSettings.get() && enableAiDebugProvider.get();
+        AiProvider provider = isDebug ? AiProvider.DEBUG : (selectedAiProvider.get() != null ? selectedAiProvider.get() : AiDefaultEnums.AI_PROVIDER);
+        String modelName = isDebug ? PredefinedChatModel.DEBUG.getName() : currentChatModel.get();
+        String apiKey = isDebug ? "" : currentApiKey.get();
+        String baseUrl = isDebug ? AiProvider.DEBUG.getApiUrl() : (customizeExpertSettings.get() ? currentApiBaseUrl.get() : provider.getApiUrl());
         double temperatureValue = LocalizedNumbersUtils.stringToDouble(temperature.get()).orElse((double) AiDefaultExpertSettings.TEMPERATURE);
         int contextWindow = contextWindowSize.get();
         TokenEstimatorKind tokenEstimatorKind = tokenEstimationAlgorithmProperty.get();
@@ -588,6 +627,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         documentSplitterOverlapSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE);
         ragMaxResultsCount.set(AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT);
         ragMinScore.set(LocalizedNumbersUtils.doubleToString(AiDefaultExpertSettings.RAG_MIN_SCORE));
+        enableAiDebugProvider.set(AiDefaultExpertSettings.ENABLE_AI_DEBUG_PROVIDER);
     }
 
     public void resetTemplates() {
@@ -723,6 +763,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty customizeExpertSettingsProperty() {
         return customizeExpertSettings;
+    }
+
+    public BooleanProperty enableAiDebugProviderProperty() {
+        return enableAiDebugProvider;
     }
 
     public ReadOnlyListProperty<String> embeddingModelsProperty() {
