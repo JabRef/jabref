@@ -30,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a warning for shortcuts already in use, allowing users to replace the existing shortcut or keep both. [#17240](https://github.com/JabRef/jabref/issues/17240)
 - We added "Delete" and "Retry" to the context menu of AI chat messages and made user messages retryable. [#17151](https://github.com/JabRef/jabref/pull/17151)
 - We added an option to automatically merge changes made to the library file outside JabRef into the open library. [#8431](https://github.com/JabRef/jabref/issues/8431)
+- We added merging of conflicted copies left by sync clients, per library or as a global default (off by default). [#16827](https://github.com/JabRef/jabref/pull/16827)
 
 ### Changed
 
