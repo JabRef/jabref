@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,7 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AuthorTest {
     @Test
