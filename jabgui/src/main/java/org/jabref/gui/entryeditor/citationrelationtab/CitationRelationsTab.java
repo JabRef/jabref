@@ -7,7 +7,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1037,8 +1036,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                                         CitationFetcher.SearchType searchType,
                                         BibEntry existingEntry) {
         // [impl->feat~entry-editor.citations.review-before-import~1]
-        // The check model hands out a live list, which the import below changes while the review runs.
-        List<CitationRelationItem> itemsToReview = List.copyOf(entriesToReview);
         Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
         if (activeDatabase.isEmpty()) {
             dialogService.notify(Localization.lang("No library open"));
@@ -1046,19 +1043,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
         BibDatabaseContext databaseContext = activeDatabase.get();
 
-        // The dialog edits copies, so a skipped entry stays in the citation list as it was fetched.
-        // One copy per entry keeps the edits when the user goes back to an entry.
-        List<BibEntry> editedEntries = itemsToReview.stream()
-                                                    .map(item -> new BibEntry(item.entry()))
-                                                    .toList();
-        BitSet chosenForAdding = new BitSet(itemsToReview.size());
-
-        int position = 0;
-        while (position < itemsToReview.size()) {
+        CitationEntryReview review = new CitationEntryReview(entriesToReview);
+        while (!review.isFinished()) {
             CitationEntryReviewDialog reviewDialog = new CitationEntryReviewDialog(
-                    editedEntries.get(position),
-                    position + 1,
-                    itemsToReview.size(),
+                    review.getCurrentEntry(),
+                    review.getCurrentNumber(),
+                    review.getTotal(),
                     databaseContext,
                     entryTypesManager,
                     preferences,
@@ -1067,33 +1057,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                     taskExecutor);
 
             // Closing the window without choosing a button discards the review like "End review without imports" does.
-            CitationEntryReviewDialog.Decision decision = dialogService.showCustomDialogAndWait(reviewDialog)
-                                                                       .orElse(CitationEntryReviewDialog.Decision.CANCEL);
-            // Moving on from the last entry ends the loop, which imports the chosen entries
-            switch (decision) {
-                case PREVIOUS ->
-                        position = Math.max(0, position - 1);
-                case SKIP -> {
-                    chosenForAdding.clear(position);
-                    position++;
-                }
-                case NEXT -> {
-                    chosenForAdding.set(position);
-                    position++;
-                }
-                case CANCEL -> {
-                    dialogService.notify(Localization.lang("No entries added"));
-                    return;
-                }
-            }
+            review.applyDecision(dialogService.showCustomDialogAndWait(reviewDialog)
+                                              .orElse(CitationEntryReviewDialog.Decision.CANCEL));
         }
 
-        List<CitationRelationItem> acceptedItems = chosenForAdding.stream()
-                                                                  .mapToObj(index -> new CitationRelationItem(
-                                                                          editedEntries.get(index),
-                                                                          itemsToReview.get(index).localEntry(),
-                                                                          itemsToReview.get(index).isLocal()))
-                                                                  .toList();
+        List<CitationRelationItem> acceptedItems = review.getAcceptedItems();
         if (acceptedItems.isEmpty()) {
             dialogService.notify(Localization.lang("No entries added"));
             return;
