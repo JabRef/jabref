@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -29,6 +30,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
@@ -311,6 +315,22 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
         assertEquals(List.of(expected),
                 fetcher.performSearch("title=\"slice theorem for Fréchet\""));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"en", "tr", "az"})
+    @ResourceLock("Localization.lang")
+    @ResourceLock("java.util.Locale.default")
+    void normalizeTitleMatchingIgnoresDefaultLocale(String language) {
+        Locale originalLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag(language));
+
+            assertEquals("infinite dimensional frechet manifolds",
+                    ArXivFetcher.ArXiv.normalizeForTitleMatching("  INFINITE-dimensional Fréchet\n manifolds  "));
+        } finally {
+            Locale.setDefault(originalLocale);
+        }
     }
 
     @Test
