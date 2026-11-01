@@ -3,9 +3,11 @@ package org.jabref.logic.importer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -46,6 +48,8 @@ public class AuthorListParser {
     private static final Pattern ET_AL_SUFFIX = Pattern.compile("[,;\\s]++et\\s++al\\.?+$", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern COMMA_SEPARATOR = Pattern.compile("\\s*+,\\s*+");
+
+    private static final Pattern EXTENDED_NAME_START = Pattern.compile("\\s*\"?(?:given|family|prefix|suffix)(?:-i)?\\s*=", Pattern.CASE_INSENSITIVE);
 
     /// the raw bibtex author/editor field
     private String original;
@@ -158,7 +162,8 @@ public class AuthorListParser {
         final boolean authorsContainOpeningBrace = listOfNames.contains("{");
         final boolean authorsContainSemicolon = listOfNames.contains(";");
         final boolean authorsContainTwoOrMoreCommas = (listOfNames.length() - listOfNames.replace(",", "").length()) >= 2;
-        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
+        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas
+                && !EXTENDED_NAME_START.matcher(listOfNames).lookingAt()) {
             List<String> arrayNameList = Arrays.asList(listOfNames.split(","));
 
             // Delete spaces for correct case identification
@@ -204,7 +209,11 @@ public class AuthorListParser {
         // Parse author by author
         List<Author> authors = new ArrayList<>(5); // 5 seems to be reasonable initial size
         while (tokenStart < original.length()) {
-            getAuthor().ifPresent(authors::add);
+            if (EXTENDED_NAME_START.matcher(original).region(tokenEnd, original.length()).lookingAt()) {
+                authors.add(getExtendedAuthor());
+            } else {
+                getAuthor().ifPresent(authors::add);
+            }
         }
 
         if (andOthersPresent) {
@@ -212,6 +221,54 @@ public class AuthorListParser {
         }
 
         return AuthorList.of(authors);
+    }
+
+    private Author getExtendedAuthor() {
+        int nameStart = tokenEnd;
+        Token token;
+        do {
+            token = getToken();
+        } while (token != Token.AND && token != Token.EOF);
+        int nameEnd = token == Token.AND ? tokenStart : original.length();
+
+        String name = original.substring(nameStart, nameEnd).trim();
+        if (name.length() >= 2 && name.startsWith("\"") && name.endsWith("\"")) {
+            name = name.substring(1, name.length() - 1);
+        }
+        Map<String, String> parts = new HashMap<>();
+        int partStart = 0;
+        int bracesLevel = 0;
+        for (int i = 0; i < name.length(); i++) {
+            char character = name.charAt(i);
+            if (character == '{') {
+                bracesLevel++;
+            } else if (character == '}') {
+                bracesLevel--;
+            } else if (character == ',' && bracesLevel == 0) {
+                addExtendedNamePart(parts, name.substring(partStart, i));
+                partStart = i + 1;
+            }
+        }
+        addExtendedNamePart(parts, name.substring(partStart));
+
+        String given = parts.getOrDefault("given", "");
+        String givenAbbreviated = parts.getOrDefault("given-i", "");
+        if (givenAbbreviated.isEmpty() && !given.isEmpty()) {
+            givenAbbreviated = new AuthorListParser().parse("Placeholder, " + given)
+                                                     .getAuthor(0).getGivenNameAbbreviated().orElse("");
+        }
+
+        return new Author(given, givenAbbreviated, parts.getOrDefault("prefix", ""),
+                parts.getOrDefault("family", ""), parts.getOrDefault("suffix", ""), parts);
+    }
+
+    private static void addExtendedNamePart(Map<String, String> parts, String part) {
+        int equalsPosition = part.indexOf('=');
+        if (equalsPosition > 0) {
+            String key = part.substring(0, equalsPosition).trim().toLowerCase(Locale.ROOT);
+            String value = part.substring(equalsPosition + 1).trim();
+            parts.put(key, value);
+        }
     }
 
     /// Handle cases names in order Firstname Lastname, separated by `","` and a final `", and "`

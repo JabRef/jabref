@@ -19,6 +19,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldComparatorTest {
     @Test
+    void extendedNamesSortByTheirExplicitPrefixOption() {
+        for (StandardField field : new StandardField[] {StandardField.AUTHOR, StandardField.EDITOR}) {
+            BibEntry withoutPrefix = new BibEntry().withField(field, "family=Hasselt, given=Hado P., prefix=van, useprefix=false");
+            BibEntry withPrefix = new BibEntry().withField(field, "family=Hasselt, given=Hado P., prefix=van, useprefix=true");
+            BibEntry middle = new BibEntry().withField(field, "Miller, Max");
+            FieldComparator ascending = new FieldComparator(field);
+            FieldComparator descending = new FieldComparator(new OrFields(field), true);
+
+            assertEquals(-1, Integer.signum(ascending.compare(withoutPrefix, middle)));
+            assertEquals(1, Integer.signum(ascending.compare(withPrefix, middle)));
+            assertEquals(1, Integer.signum(descending.compare(withoutPrefix, middle)));
+            assertEquals(-1, Integer.signum(descending.compare(withPrefix, middle)));
+        }
+    }
+
+    @Test
+    void nameSortingUsesEditorWhenAuthorIsMissing() {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), false);
+        BibEntry edited = new BibEntry().withField(StandardField.EDITOR, "family=Hasselt, prefix=van, useprefix=true");
+        BibEntry authored = new BibEntry().withField(StandardField.AUTHOR, "Miller, Max");
+
+        assertEquals(1, Integer.signum(comparator.compare(edited, authored)));
+    }
+
+    @Test
     void compareMonthFieldIdentity() {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);
         BibEntry equal = new BibEntry()

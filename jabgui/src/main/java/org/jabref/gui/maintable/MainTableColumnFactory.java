@@ -29,6 +29,7 @@ import org.jabref.gui.maintable.columns.FileColumn;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.maintable.columns.NameColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
@@ -40,6 +41,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
 
@@ -278,6 +281,10 @@ public class MainTableColumnFactory {
 
     /// Creates a text column to display any standard field.
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel, MainTableTooltip tooltip) {
+        OrFields fields = FieldFactory.parseOrFields(columnModel.getQualifier());
+        if (!fields.isEmpty() && fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
+            return new NameColumn(columnModel, tooltip);
+        }
         return new FieldColumn(columnModel, tooltip);
     }
 
