@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class DebugAiProvider implements ChatModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DebugAiProvider.class);
-    private static final long DEFAULT_DELAY_MS = 500;
+    private static final long DEFAULT_DELAY_MS = 2000;
 
     @FunctionalInterface
     public interface Sleeper {
