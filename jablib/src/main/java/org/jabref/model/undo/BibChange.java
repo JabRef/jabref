@@ -23,7 +23,8 @@ public sealed interface BibChange permits
         UndoableStringChange,
         UndoableReplaceStrings,
         UndoableInsertString,
-        UndoableRemoveString {
+        UndoableRemoveString,
+        UndoableFileMove {
 
     /// The change that reverses this one.
     ///

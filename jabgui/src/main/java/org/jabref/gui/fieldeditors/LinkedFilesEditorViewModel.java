@@ -30,6 +30,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
+import org.jabref.gui.linkedfile.MultiPaperPdfSplitter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.EntryLookupsInProgress;
@@ -38,6 +39,7 @@ import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.PdfOutlineSplitter;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -163,13 +165,35 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addNewLinkedFile(LinkedFile linkedFile) {
-        files.add(new LinkedFileViewModel(
+        files.add(toViewModel(linkedFile));
+        linkedFile.findIn(databaseContext, preferences.getFilePreferences())
+                  .ifPresent(this::offerSplitOrCopy);
+    }
+
+    private void offerSplitOrCopy(Path pdf) {
+        new MultiPaperPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                .offerSplitOrCopy(pdf, entry, paper -> files.add(toViewModel(paper)));
+    }
+
+    public boolean canSplitPdf(LinkedFileViewModel linkedFile) {
+        return PdfOutlineSplitter.holdsPapers(entry.getType())
+                && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).filter(FileUtil::isPDFFile).isPresent();
+    }
+
+    public void splitPdf(LinkedFileViewModel linkedFile) {
+        linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences())
+                  .ifPresent(pdf -> new MultiPaperPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                          .splitOnRequest(pdf, entry));
+    }
+
+    private LinkedFileViewModel toViewModel(LinkedFile linkedFile) {
+        return new LinkedFileViewModel(
                 linkedFile,
                 entry,
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences));
+                preferences);
     }
 
     /// For the linked-file context menu, whose actions record into this library's journal.

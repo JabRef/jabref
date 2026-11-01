@@ -1,8 +1,10 @@
 package org.jabref.gui.importer;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -350,6 +352,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public void useWebSearchDownloadPreference() {
         viewModel.useWebSearchDownloadPreference();
         downloadLinkedOnlineFiles.setSelected(viewModel.shouldDownloadLinkedFiles());
+    }
+
+    /// @param pdfs PDFs the user already agreed to split into their papers, which are then split without asking again
+    public void markSplitConfirmed(Set<Path> pdfs) {
+        viewModel.markSplitConfirmed(pdfs);
     }
 
     private void setupPaginationBindings() {

@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public class ImportCleanupBibtex extends ImportCleanup {
 
@@ -20,6 +21,10 @@ public class ImportCleanupBibtex extends ImportCleanup {
     public BibEntry doPostCleanup(BibEntry entry) {
         entry = super.doPostCleanup(entry);
         convertToBibtexCleanup.cleanup(entry);
+        // [impl->req~logic.importer.multi-paper-pdf~1]
+        if (entry.getType() == StandardEntryType.Collection) {
+            entry.setType(StandardEntryType.Book);
+        }
         return entry;
     }
 }

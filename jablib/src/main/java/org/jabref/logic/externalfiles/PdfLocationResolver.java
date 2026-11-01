@@ -1,0 +1,161 @@
+package org.jabref.logic.externalfiles;
+
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+
+import org.jspecify.annotations.NullMarked;
+
+// [impl->req~logic.externalfiles.pdf-location-resolver~1]
+@NullMarked
+public final class PdfLocationResolver {
+
+    public static final Field PAGE_OFFSET = FieldFactory.parseField("pageoffset");
+
+    private static final Pattern FIRST_PAGE = Pattern.compile("\\s*([A-Za-z]?)([0-9]+|[ivxlcdmIVXLCDM]+)[A-Za-z]?");
+
+    private static final Pattern RANGE_SEPARATOR = Pattern.compile("\\s*(?:--|\u2014|\u2013|-)\\s*");
+
+    private static final Pattern FOLLOWING_PAGES = Pattern.compile("\\s*\\+");
+
+    private static final Pattern INTEGER = Pattern.compile("-?[0-9]+");
+
+    private PdfLocationResolver() {
+    }
+
+    public static Optional<PdfLocation> resolve(BibEntry entry, BibDatabase database) {
+        return firstPdf(entry).map(file -> location(entry, file, offsetOwner(entry, file, database), entry)).or(() -> database.getReferencedEntry(entry).flatMap(referenced -> firstPdf(referenced).map(file -> location(entry, file, referenced, referenced))));
+    }
+
+    private static PdfLocation location(BibEntry entry, LinkedFile file, BibEntry offsetOwner, BibEntry fileOwner) {
+        Optional<Integer> lastPageWithoutOffset = offsetOwner.hasField(PAGE_OFFSET) ? Optional.empty() : pdfPageSpan(entry, offsetOwner).map(PageSpan::lastPage);
+        return new PdfLocation(file, pdfPage(entry, offsetOwner), lastPageWithoutOffset, fileOwner);
+    }
+
+    private static BibEntry offsetOwner(BibEntry entry, LinkedFile file, BibDatabase database) {
+        if (entry.hasField(PAGE_OFFSET)) {
+            return entry;
+        }
+        return database.getReferencedEntry(entry).filter(referenced -> referenced.getFiles().stream().anyMatch(linked -> linked.getLink().equals(file.getLink()))).orElse(entry);
+    }
+
+    private static Optional<LinkedFile> firstPdf(BibEntry entry) {
+        return entry.getFiles().stream().filter(PdfLocationResolver::isPdf).findFirst();
+    }
+
+    private static boolean isPdf(LinkedFile file) {
+        if (StandardFileType.PDF.getName().equals(file.getFileType())) {
+            return true;
+        }
+        return FileUtil.getFileExtension(file.getLink()).filter("pdf"::equalsIgnoreCase).isPresent();
+    }
+
+    public static Optional<PageSpan> pdfPageSpan(BibEntry entry, BibEntry fileOwner) {
+        return entry.getField(StandardField.PAGES).flatMap(PdfLocationResolver::printedSpan).flatMap(printed -> toPdfSpan(printed, pageOffset(fileOwner)));
+    }
+
+    public static BibEntry pageOffsetOwner(BibEntry entry, BibDatabase database) {
+        if (entry.hasField(PAGE_OFFSET)) {
+            return entry;
+        }
+        return database.getReferencedEntry(entry).orElse(entry);
+    }
+
+    public static int pageOffset(BibEntry fileOwner) {
+        return fileOwner.getField(PAGE_OFFSET).filter(StringUtil::isNotBlank).map(String::trim).flatMap(PdfLocationResolver::parseInteger).orElse(0);
+    }
+
+    private static Optional<Integer> pdfPage(BibEntry entry, BibEntry fileOwner) {
+        return firstPrintedPage(entry).flatMap(printed -> toPdfPage(printed, pageOffset(fileOwner)));
+    }
+
+    private static Optional<Integer> firstPrintedPage(BibEntry entry) {
+        return entry.getField(StandardField.PAGES).filter(StringUtil::isNotBlank).flatMap(PdfLocationResolver::firstArabicPage);
+    }
+
+    private static Optional<PrintedSpan> printedSpan(String pages) {
+        return firstArabicPage(pages).flatMap(start -> printedSpanFrom(pages, start));
+    }
+
+    private static Optional<PrintedSpan> printedSpanFrom(String pages, int start) {
+        String rest = pages.substring(firstPageEnd(pages));
+        if (FOLLOWING_PAGES.matcher(rest).lookingAt()) {
+            return Optional.empty();
+        }
+        Matcher separator = RANGE_SEPARATOR.matcher(rest);
+        if (!separator.lookingAt()) {
+            return Optional.of(new PrintedSpan(start, start));
+        }
+        return firstArabicPage(rest.substring(separator.end())).filter(end -> end >= start).map(end -> new PrintedSpan(start, end));
+    }
+
+    private static int firstPageEnd(String pages) {
+        Matcher matcher = FIRST_PAGE.matcher(pages);
+        if (!matcher.lookingAt()) {
+            return 0;
+        }
+        return matcher.end();
+    }
+
+    private static Optional<Integer> firstArabicPage(String pages) {
+        Matcher matcher = FIRST_PAGE.matcher(pages);
+        if (!matcher.lookingAt()) {
+            return Optional.empty();
+        }
+        String number = matcher.group(2);
+        if (!INTEGER.matcher(number).matches()) {
+            return Optional.empty();
+        }
+        return parseInteger(number).filter(page -> page > 0);
+    }
+
+    private static Optional<PageSpan> toPdfSpan(PrintedSpan printed, int offset) {
+        return toPdfPage(printed.first(), offset).flatMap(first -> toPdfPage(printed.last(), offset).map(last -> new PageSpan(first, last)));
+    }
+
+    private static Optional<Integer> toPdfPage(int printedPage, int offset) {
+        long page = (long) printedPage + offset;
+        if ((page < 1) || (page > Integer.MAX_VALUE)) {
+            return Optional.empty();
+        }
+        return Optional.of((int) page);
+    }
+
+    private static Optional<Integer> parseInteger(String value) {
+        if (!INTEGER.matcher(value).matches()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Integer.parseInt(value));
+        } catch (NumberFormatException _) {
+            return Optional.empty();
+        }
+    }
+
+    /// @param lastPageWithoutOffset the PDF page the entry ends on, when its `pages` give a range and no `pageoffset` places them in the PDF
+    public record PdfLocation(LinkedFile file, Optional<Integer> page, Optional<Integer> lastPageWithoutOffset, BibEntry fileOwner) {
+        /// @return the page to open in the PDF, or the first page when the entry's page lies past the last of `pageCount` pages,
+        /// or when the PDF has no more pages than the entry's range without a `pageoffset`, because then it holds only the entry
+        public int pageWithin(int pageCount) {
+            return page.filter(number -> number <= pageCount)
+                       .filter(number -> lastPageWithoutOffset.filter(last -> last - number + 1 >= pageCount).isEmpty())
+                       .orElse(1);
+        }
+    }
+
+    public record PageSpan(int firstPage, int lastPage) {
+    }
+
+    private record PrintedSpan(int first, int last) {
+    }
+}
