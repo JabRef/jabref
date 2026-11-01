@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
@@ -92,6 +93,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         setContent(form()
                 .checkbox(Localization.lang("Show preview as a tab in entry editor"), viewModel.showAsExtraTabProperty())
                 .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
+                .stackedField(Localization.lang("Entry table tooltip duration in seconds (0 keeps it open)"), buildTooltipDurationSpinner())
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
                 .button(Localization.lang("Add BST file"), this::selectBstFile)
                 .custom(dualListRegion, lists -> lists
@@ -100,6 +102,13 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 .build());
 
         wireControls();
+    }
+
+    private Spinner<Integer> buildTooltipDurationSpinner() {
+        Spinner<Integer> spinner = new Spinner<>(0, 300, viewModel.tooltipDurationProperty().get());
+        spinner.getValueFactory().valueProperty().bindBidirectional(viewModel.tooltipDurationProperty().asObject());
+        spinner.setMaxWidth(100);
+        return spinner;
     }
 
     @Override
