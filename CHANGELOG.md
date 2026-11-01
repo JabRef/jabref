@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added test cases for linking existing and missing PDF attachments to bibliographic entries. [#12947](https://github.com/JabRef/jabref/issues/12947)
 - We added ISBN extraction from bibliographic pages in PDF books. [#12874](https://github.com/JabRef/jabref/issues/12874)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
@@ -2396,7 +2397,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening the menu 'Library properties' marked the library as modified. [#6451](https://github.com/JabRef/jabref/issues/6451)
 - We fixed an issue when importing resulted in an exception. [#7343](https://github.com/JabRef/jabref/issues/7343)
 - We fixed an issue where the field in the Field formatter dropdown selection were sorted in random order. [#7710](https://github.com/JabRef/jabref/issues/7710)
-- We added test cases for linking existing and missing PDF attachments to bibliographic entries. [#12947](https://github.com/JabRef/jabref/issues/12947)
 
 ### Removed
 
