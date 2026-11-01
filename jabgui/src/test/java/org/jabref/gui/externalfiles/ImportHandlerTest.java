@@ -476,8 +476,8 @@ class ImportHandlerTest {
 
         assertEquals(2, database.getEntries().size(), database.getEntries().toString());
         assertEquals(List.of("DocumentKey", "Doe2025"), database.getEntries().stream()
-                                                                       .map(entry -> entry.getCitationKey().orElseThrow())
-                                                                       .toList());
+                                                                .map(entry -> entry.getCitationKey().orElseThrow())
+                                                                .toList());
     }
 
     private ImportHandler handlerFor(BibDatabaseContext databaseContext, JabRefUndoManager journal) {
