@@ -1354,4 +1354,36 @@ class MarkdownPublicationExporterTest {
 
                 """, recentSection(output));
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2025\n\n<img src=x onerror=alert(1)>",
+            "2025 <img src=x onerror=alert(1)>"
+    })
+    void escapesHtmlAndNormalizesWhitespaceInYear(
+            String year, @TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025)
+                .withField(StandardField.YEAR, year);
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 \\<img src=x onerror=alert(1)>
+
+                """, exportRecentSection(tempDir, entry));
+    }
+
+    @Test
+    void escapesMarkdownInjectionInYear(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025)
+                .withField(StandardField.YEAR,
+                        "2025\n\n# Injected [click](javascript:alert(1))");
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 \\# Injected \\[click\\](javascript:alert(1))
+
+                """, exportRecentSection(tempDir, entry));
+    }
 }
