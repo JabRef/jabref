@@ -90,10 +90,14 @@ public class CodeAreaKeyBindings {
                     event.consume();
                 }
                 case EDITOR_KILL_LINE -> {
-                    int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
-                    String text = codeArea.getText();
-                    codeArea.setText(text.substring(0, pos));
-                    codeArea.select(offsetToTextPos(codeArea, pos));
+                    // [impl->req~ux.text-editing.line-boundaries~1]
+                    TextPos caret = codeArea.getCaretPosition();
+                    int lineEnd = codeArea.getPlainText(caret.index()).length();
+                    TextPos end = TextPos.ofLeading(caret.index(), lineEnd);
+                    if (caret.offset() == lineEnd && caret.index() + 1 < codeArea.getParagraphCount()) {
+                        end = TextPos.ofLeading(caret.index() + 1, 0);
+                    }
+                    codeArea.replaceText(caret, end, "");
                     event.consume();
                 }
                 case EDITOR_KILL_WORD -> {

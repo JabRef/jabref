@@ -238,6 +238,18 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Text editing shortcuts must respect line boundaries
+`req~ux.text-editing.line-boundaries~1`
+
+In multiline entry fields, beginning-of-line and end-of-line shortcuts move within the current newline-delimited line.
+Up and Down in multiline entry fields move to the previous or next newline-delimited line, clamping the column to its length.
+On the first or last line, respectively, they move to the beginning or end of the field.
+Document navigation shortcuts continue to move to the beginning or end of the whole field.
+In entry fields and the source editor, kill-line removes text from the caret to the next newline, preserving subsequent lines.
+At a line end, kill-line removes the newline and joins the following line; at the document end, it leaves the text unchanged.
+
+Needs: impl, utest
+
 ## Donation prompt returns every six months
 `req~ux.donation.recurring-prompt~1`
 
