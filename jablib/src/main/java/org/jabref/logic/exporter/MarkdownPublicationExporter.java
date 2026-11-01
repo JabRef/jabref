@@ -10,9 +10,13 @@ import java.nio.file.Path;
 import java.time.DateTimeException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -22,12 +26,14 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
@@ -35,6 +41,10 @@ import org.jspecify.annotations.NullMarked;
 // [impl->feat~export.markdown-publications~1]
 @NullMarked
 public class MarkdownPublicationExporter extends Exporter {
+
+    private static final Pattern DAY = Pattern.compile("[0-9]+");
+    private static final Pattern HEADING_MARKUP = Pattern.compile("[\\\\`*_{}\\[\\]()#+.!|<>-]");
+    private static final Set<String> ONLINE_SCHEMES = Set.of("http", "https", "ftp", "ftps");
 
     private final FilePreferences filePreferences;
     private final LayoutFormatterPreferences layoutPreferences;
@@ -80,7 +90,37 @@ public class MarkdownPublicationExporter extends Exporter {
             List<Path> fileDirectories,
             JournalAbbreviationRepository abbreviationRepository)
             throws IOException {
+        export(databaseContext, file, entries, fileDirectories, abbreviationRepository, Optional.of(file));
+    }
+
+    @Override
+    public void exportToStandardOutput(
+            BibDatabaseContext databaseContext,
+            Path temporaryFile,
+            List<BibEntry> entries,
+            List<Path> fileDirectories,
+            JournalAbbreviationRepository abbreviationRepository) throws IOException {
+        export(databaseContext, temporaryFile, entries, fileDirectories, abbreviationRepository, Optional.empty());
+    }
+
+    private void export(
+            BibDatabaseContext databaseContext,
+            Path file,
+            List<BibEntry> entries,
+            List<Path> suppliedFileDirectories,
+            JournalAbbreviationRepository abbreviationRepository,
+            Optional<Path> linkDestination) throws IOException {
+        List<Path> fileDirectories = Stream.concat(
+                suppliedFileDirectories.stream(),
+                databaseContext.getFileDirectories(filePreferences).stream())
+                                           .distinct()
+                                           .toList();
+
         if (entries.isEmpty()) {
+            try (AtomicFileWriter writer =
+                         new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
+                writer.write("");
+            }
             return;
         }
 
@@ -121,7 +161,7 @@ public class MarkdownPublicationExporter extends Exporter {
                 layout,
                 databaseContext,
                 fileDirectories,
-                file
+                linkDestination
         ));
         sections.add("## " + Localization.lang("All publications") + "\n\n"
                 + renderPublications(
@@ -129,7 +169,7 @@ public class MarkdownPublicationExporter extends Exporter {
                 layout,
                 databaseContext,
                 fileDirectories,
-                file
+                linkDestination
         ));
 
         databaseContext.getMetaData().getGroups()
@@ -144,7 +184,7 @@ public class MarkdownPublicationExporter extends Exporter {
                                        layout,
                                        databaseContext,
                                        fileDirectories,
-                                       file
+                                       linkDestination
                                );
                            }
                        });
@@ -160,7 +200,7 @@ public class MarkdownPublicationExporter extends Exporter {
             Layout layout,
             BibDatabaseContext databaseContext,
             List<Path> fileDirectories,
-            Path outputFile) {
+            Optional<Path> outputFile) {
         return entries.stream()
                       .map(entry -> renderPublication(
                               entry,
@@ -182,7 +222,7 @@ public class MarkdownPublicationExporter extends Exporter {
             Layout layout,
             BibDatabaseContext databaseContext,
             List<Path> fileDirectories,
-            Path outputFile) {
+            Optional<Path> outputFile) {
         if (!hasMatchingPublications(group, sorted)) {
             return;
         }
@@ -192,6 +232,8 @@ public class MarkdownPublicationExporter extends Exporter {
                               .orElse(group.getGroup().getName())
                               .replace('\r', ' ')
                               .replace('\n', ' ');
+        heading = HEADING_MARKUP.matcher(heading.replace("&", "&amp;"))
+                                .replaceAll("\\\\$0");
 
         StringJoiner section = new StringJoiner("\n\n");
         section.add("#".repeat(Math.min(headingLevel, 6)) + " " + heading);
@@ -239,9 +281,10 @@ public class MarkdownPublicationExporter extends Exporter {
             Layout layout,
             BibDatabaseContext databaseContext,
             List<Path> fileDirectories,
-            Path outputFile) {
+            Optional<Path> outputFile) {
+        // Fields are already resolved; do not expand library string macros again after validating the URL.
         String publication =
-                layout.doLayout(entry, databaseContext.getDatabase());
+                layout.doLayout(publicationForLayout(entry, databaseContext), new BibDatabase());
 
         Optional<String> pdfLink = entry.getFiles().stream()
                                         .filter(this::isPdfAttachment)
@@ -260,6 +303,52 @@ public class MarkdownPublicationExporter extends Exporter {
                         + link
                         + ">)\n")
                 .orElse(publication);
+    }
+
+    private BibEntry publicationForLayout(BibEntry entry, BibDatabaseContext databaseContext) {
+        BibEntry publication = new BibEntry(entry.getType());
+        for (StandardField field : List.of(StandardField.AUTHOR, StandardField.TITLE,
+                StandardField.JOURNAL, StandardField.BOOKTITLE, StandardField.YEAR)) {
+            entry.getResolvedFieldOrAlias(field, databaseContext.getDatabase())
+                 .ifPresent(value -> publication.withField(field, value));
+        }
+
+        entry.getResolvedFieldOrAlias(StandardField.DOI, databaseContext.getDatabase())
+             .flatMap(DOI::parse)
+             .flatMap(DOI::getExternalURI)
+             .map(URI::toASCIIString)
+             .flatMap(this::normalizeOnlineLink)
+             .or(() -> entry.getResolvedFieldOrAlias(StandardField.URL, databaseContext.getDatabase())
+                            .flatMap(this::normalizeOnlineLink))
+             .ifPresent(link -> publication.withField(StandardField.URL, link));
+        return publication;
+    }
+
+    private Optional<String> normalizeOnlineLink(String value) {
+        String link = value.strip();
+        if (link.regionMatches(true, 0, "www.", 0, 4)) {
+            link = "https://" + link;
+        }
+        if (link.codePoints().anyMatch(Character::isISOControl)) {
+            return Optional.empty();
+        }
+
+        String encoded = link.replace(" ", "%20")
+                             .replace("<", "%3C")
+                             .replace(">", "%3E")
+                             .replace("\"", "%22")
+                             .replace("\\", "%5C")
+                             .replace("`", "%60");
+        try {
+            URI uri = new URI(encoded);
+            return Optional.ofNullable(uri.getScheme())
+                           .filter(scheme -> ONLINE_SCHEMES.contains(scheme.toLowerCase(Locale.ROOT)))
+                           .flatMap(_ -> Optional.ofNullable(uri.getRawAuthority()))
+                           .filter(authority -> !authority.isBlank())
+                           .map(_ -> uri.toASCIIString());
+        } catch (URISyntaxException _) {
+            return Optional.empty();
+        }
     }
 
     private boolean isPdfAttachment(LinkedFile linkedFile) {
@@ -281,30 +370,25 @@ public class MarkdownPublicationExporter extends Exporter {
     private Optional<String> resolvePdfLink(
             LinkedFile linkedFile,
             List<Path> fileDirectories,
-            Path outputFile) {
+            Optional<Path> outputFile) {
         if (linkedFile.isOnlineLink()) {
-            String link = linkedFile.getLink();
-            if (link.regionMatches(true, 0, "www.", 0, 4)) {
-                link = "https://" + link;
-            }
-            return Optional.of(
-                    link
-                            .replace(" ", "%20")
-                            .replace("<", "%3C")
-                            .replace(">", "%3E")
-            );
+            return normalizeOnlineLink(linkedFile.getLink());
         }
 
-        return linkedFile.findIn(fileDirectories)
-                         .flatMap(path -> relativePdfLink(outputFile, path));
+        return outputFile.flatMap(destination -> linkedFile.findIn(fileDirectories)
+                                                           .flatMap(path -> relativePdfLink(destination, path)));
     }
 
     private Optional<String> relativePdfLink(
             Path outputFile,
             Path pdfFile) {
-        Path outputDirectory = outputFile.toAbsolutePath()
-                                         .normalize()
-                                         .getParent();
+        return Optional.ofNullable(outputFile.toAbsolutePath().normalize().getParent())
+                       .flatMap(directory -> relativePdfLinkFromDirectory(directory, pdfFile));
+    }
+
+    private Optional<String> relativePdfLinkFromDirectory(
+            Path outputDirectory,
+            Path pdfFile) {
         Path absolutePdf = pdfFile.toAbsolutePath().normalize();
 
         try {
@@ -331,11 +415,9 @@ public class MarkdownPublicationExporter extends Exporter {
     // [impl->req~export.markdown-publications.date-order~1]
     private long publicationDateKey(BibEntry entry) {
         try {
-            return entry.getPublicationDate()
-                        .or(() -> Date.parse(
-                                entry.getField(StandardField.YEAR),
-                                entry.getField(StandardField.MONTH),
-                                entry.getField(StandardField.DAY)))
+            return entry.getField(StandardField.DATE)
+                        .map(Date::parse)
+                        .orElseGet(() -> parseBibtexDate(entry))
                         .filter(date -> date.getYear().isPresent())
                         .map(date -> {
                             long year = date.getYear().orElseThrow();
@@ -350,5 +432,18 @@ public class MarkdownPublicationExporter extends Exporter {
         } catch (DateTimeException _) {
             return Long.MIN_VALUE;
         }
+    }
+
+    private Optional<Date> parseBibtexDate(BibEntry entry) {
+        Optional<String> month = entry.getField(StandardField.MONTH);
+        Optional<String> day = entry.getField(StandardField.DAY);
+        if (month.filter(value -> Month.parse(value).isEmpty()).isPresent()
+                || day.filter(value -> !DAY.matcher(value).matches()).isPresent()
+                || day.filter(value -> value.length() > 2).isPresent()
+                || (day.isPresent() && month.isEmpty())) {
+            return Optional.empty();
+        }
+        // Date.parse otherwise silently discards unparseable month/day fields.
+        return Date.parse(entry.getField(StandardField.YEAR), month, day);
     }
 }

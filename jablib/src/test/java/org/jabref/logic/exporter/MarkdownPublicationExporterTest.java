@@ -3,13 +3,16 @@ package org.jabref.logic.exporter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -542,6 +545,22 @@ class MarkdownPublicationExporterTest {
                 """, markdown.substring(markdown.indexOf("### Parent\n")));
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void writesEmptyFileForEmptyExport(
+            boolean existingFile,
+            @TempDir Path tempDir) throws Exception {
+        Path output = tempDir.resolve("empty-publications.md");
+        if (existingFile) {
+            Files.writeString(output, "Old publication list");
+        }
+
+        createExporter().export(new BibDatabaseContext(), output, List.of());
+
+        assertTrue(Files.exists(output));
+        assertEquals("", Files.readString(output));
+    }
+
     private MarkdownPublicationExporter createExporter() {
         LayoutFormatterPreferences preferences = LayoutFormatterPreferences.getDefault();
 
@@ -948,7 +967,7 @@ class MarkdownPublicationExporterTest {
         Path movedOutput = moved.resolve("reports/publications.md");
 
         assertTrue(Files.exists(
-                movedOutput.getParent().resolve("../pdfs/paper.pdf")
+                moved.resolve("pdfs/paper.pdf")
         ));
         assertEquals("""
                 ## Recent publications
@@ -1062,5 +1081,277 @@ class MarkdownPublicationExporterTest {
 
                         """.formatted(title.stripTrailing()),
                 exportRecentSection(tempDir, publication(title)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void resolvesConfiguredPdfWhenGenericExportSuppliesNoDirectories(
+            boolean libraryDirectory,
+            @TempDir Path tempDir) throws Exception {
+        Path attachmentDirectory = Files.createDirectory(tempDir.resolve("attachments"));
+        Files.createFile(attachmentDirectory.resolve("paper.pdf"));
+        FilePreferences preferences = FilePreferences.getDefault();
+        BibDatabaseContext context = new BibDatabaseContext();
+        if (libraryDirectory) {
+            context.getMetaData().setLibrarySpecificFileDirectory(attachmentDirectory.toString());
+        } else {
+            preferences.setStoreFilesRelativeToBibFile(false);
+            preferences.setMainFileDirectory(attachmentDirectory);
+        }
+        Path output = tempDir.resolve("generic.md");
+        BibEntry entry = publication(2025).withFiles(List.of(new LinkedFile("", "paper.pdf", "PDF")));
+
+        new MarkdownPublicationExporter(LayoutFormatterPreferences.getDefault(), preferences)
+                .export(context, output, List.of(entry), List.of(),
+                        JournalAbbreviationLoader.loadBuiltInRepository());
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 [PDF](<attachments/paper.pdf>)
+
+                """, recentSection(output));
+    }
+
+    @Test
+    void suppliedPdfDirectoryTakesPrecedenceOverConfiguredDirectory(@TempDir Path tempDir) throws Exception {
+        Path supplied = Files.createDirectory(tempDir.resolve("supplied"));
+        Path configured = Files.createDirectory(tempDir.resolve("configured"));
+        Files.createFile(supplied.resolve("paper.pdf"));
+        Files.createFile(configured.resolve("paper.pdf"));
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.getMetaData().setLibrarySpecificFileDirectory(configured.toString());
+        Path output = tempDir.resolve("precedence.md");
+        BibEntry entry = publication(2025).withFiles(List.of(new LinkedFile("", "paper.pdf", "PDF")));
+
+        createExporter().export(context, output, List.of(entry), List.of(supplied),
+                JournalAbbreviationLoader.loadBuiltInRepository());
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 [PDF](<supplied/paper.pdf>)
+
+                """, recentSection(output));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "13, ''", "0, ''", "invalid, ''", "feb, 32", "feb, 0",
+            "feb, invalid", "feb, 999999999999999999999", "'', 5"
+    })
+    void suppliedInvalidDatePartsSortAfterUsableDates(
+            String month, String day, @TempDir Path tempDir) throws Exception {
+        BibEntry invalid = publication(2026);
+        if (!month.isEmpty()) {
+            invalid.withField(StandardField.MONTH, month);
+        }
+        if (!day.isEmpty()) {
+            invalid.withField(StandardField.DAY, day);
+        }
+        Path output = tempDir.resolve("invalid-date.md");
+
+        createExporter().export(new BibDatabaseContext(), output, List.of(invalid, publication(2025)));
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025
+                * Paper 2026. 2026
+
+                """, recentSection(output));
+    }
+
+    @Test
+    void explicitDateTakesPrecedenceOverInvalidSeparateMonth(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2026)
+                .withField(StandardField.DATE, "2024-06-15")
+                .withField(StandardField.MONTH, "13");
+        Path output = tempDir.resolve("date-precedence.md");
+
+        createExporter().export(new BibDatabaseContext(), output, List.of(entry, publication(2025)));
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025
+                * Paper 2026. 2026
+
+                """, recentSection(output));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            " https://example.org/paper.pdf ",
+            "\thttps://example.org/paper.pdf\n",
+            " www.example.org/paper.pdf "
+    })
+    void trimsPaddedOnlinePdfLinks(String link, @TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025).withFiles(List.of(new LinkedFile("", link, "PDF")));
+        String expected = link.strip().startsWith("www.")
+                          ? "https://www.example.org/paper.pdf"
+                          : "https://example.org/paper.pdf";
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 [PDF](<%s>)
+
+                """.formatted(expected), exportRecentSection(tempDir, entry));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"www.example.org/paper", " www.example.org/paper "})
+    void normalizesSchemeLessTitleLinks(String link, @TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025).withField(StandardField.URL, link);
+
+        assertEquals("""
+                ## Recent publications
+
+                * [Paper 2025](<https://www.example.org/paper>). 2025
+
+                """, exportRecentSection(tempDir, entry));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void escapesHtmlInGroupDescriptionsAndFallbackNames(boolean description, @TempDir Path tempDir) throws Exception {
+        String unsafe = "<img src=x onerror=alert(1)>";
+        ExplicitGroup subgroup = group(description ? "Safe group" : unsafe);
+        if (description) {
+            subgroup.setDescription(unsafe);
+        }
+        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup("All entries"));
+        GroupTreeNode exportGroup = root.addSubgroup(group("Export"));
+        GroupTreeNode section = exportGroup.addSubgroup(subgroup);
+        BibEntry entry = publication(2025);
+        section.addEntriesToGroup(List.of(entry));
+
+        String markdown = export(tempDir, root, List.of(entry));
+
+        assertEquals("""
+                ### \\<img src=x onerror=alert\\(1\\)\\>
+
+                * Paper 2025. 2025
+                """, markdown.substring(markdown.indexOf("### ")));
+    }
+
+    @Test
+    void escapesMarkdownLinksAndEntitiesInGroupHeadings(@TempDir Path tempDir) throws Exception {
+        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup("All entries"));
+        GroupTreeNode exportGroup = root.addSubgroup(group("Export"));
+        GroupTreeNode section = exportGroup.addSubgroup(group("[click](javascript:alert(1)) &lt;tag&gt;"));
+        BibEntry entry = publication(2025);
+        section.addEntriesToGroup(List.of(entry));
+
+        String markdown = export(tempDir, root, List.of(entry));
+
+        assertEquals("""
+                ### \\[click\\]\\(javascript:alert\\(1\\)\\) &amp;lt;tag&amp;gt;
+
+                * Paper 2025. 2025
+                """, markdown.substring(markdown.indexOf("### ")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "javascript:alert(1)", "JaVaScRiPt:alert(1)", "data:text/html,<script>alert(1)</script>",
+            "vbscript:msgbox(1)", "file:///tmp/private.pdf", "https:paper", "paper.html"
+    })
+    void omitsUnsafeOrRelativeTitleUrls(String link, @TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025).withField(StandardField.URL, link);
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025
+
+                """, exportRecentSection(tempDir, entry));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"javascript:alert(1)", "not-a-doi"})
+    void invalidDoiFallsBackToValidatedUrl(String doi, @TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025)
+                .withField(StandardField.DOI, doi)
+                .withField(StandardField.URL, "https://example.org/paper");
+
+        assertEquals("""
+                ## Recent publications
+
+                * [Paper 2025](<https://example.org/paper>). 2025
+
+                """, exportRecentSection(tempDir, entry));
+    }
+
+    @Test
+    void invalidDoiWithoutUrlProducesPlainTitle(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025).withField(StandardField.DOI, "javascript:alert(1)");
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025
+
+                """, exportRecentSection(tempDir, entry));
+    }
+
+    @Test
+    void sanitizesInheritedUrlWithoutChangingLibraryEntries(@TempDir Path tempDir) throws Exception {
+        BibEntry parent = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("parent")
+                .withField(StandardField.URL, "javascript:alert(1)");
+        BibEntry entry = publication(2025).withField(StandardField.CROSSREF, "parent");
+        Map<Field, String> original = Map.copyOf(entry.getFieldMap());
+        Map<Field, String> originalParent = Map.copyOf(parent.getFieldMap());
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(parent, entry)));
+        Path output = tempDir.resolve("inherited.md");
+
+        createExporter().export(context, output, List.of(entry));
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025
+
+                """, recentSection(output));
+        assertEquals(original, entry.getFieldMap());
+        assertEquals(originalParent, parent.getFieldMap());
+    }
+
+    @Test
+    void standardOutputOmitsLocalPdfButKeepsOnlinePdf(@TempDir Path tempDir) throws Exception {
+        Path pdf = Files.createFile(tempDir.resolve("local.pdf"));
+        BibEntry entry = publication(2025).withFiles(List.of(
+                new LinkedFile("Local", pdf.toString(), "PDF"),
+                new LinkedFile("Online", "https://example.org/paper.pdf", "PDF")));
+        Path output = tempDir.resolve("stdout.md");
+
+        createExporter().exportToStandardOutput(new BibDatabaseContext(), output, List.of(entry), List.of(),
+                JournalAbbreviationLoader.loadBuiltInRepository());
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 [PDF](<https://example.org/paper.pdf>)
+
+                """, recentSection(output));
+    }
+
+    @Test
+    void standardOutputWithOnlyLocalPdfKeepsPublicationUnlinked(@TempDir Path tempDir) throws Exception {
+        Path pdf = Files.createFile(tempDir.resolve("local.pdf"));
+        BibEntry entry = publication(2025).withFiles(List.of(new LinkedFile("", pdf.toString(), "PDF")));
+        Path output = tempDir.resolve("stdout.md");
+
+        createExporter().exportToStandardOutput(new BibDatabaseContext(), output, List.of(entry), List.of(),
+                JournalAbbreviationLoader.loadBuiltInRepository());
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025
+
+                """, recentSection(output));
     }
 }
