@@ -70,4 +70,40 @@ class GeneralPropertiesViewModelTest {
         assertEquals(Optional.of("topic, subtopic"), entry.getField(StandardField.KEYWORDS));
         assertFalse(undoManager.canUndo(), "the group and the separator are the metadata snapshot's business");
     }
+
+    @Test
+    void storesLibraryNameAndDescription() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getFilePreferences().getUserAndHost()).thenReturn("user");
+        GeneralPropertiesViewModel viewModel = new GeneralPropertiesViewModel(databaseContext, mock(DialogService.class), preferences, mock(UndoManager.class));
+
+        viewModel.setValues(databaseContext.getMetaData());
+        viewModel.libraryNameProperty().set("ABC");
+        viewModel.libraryDescriptionProperty().set("Shared bibliography");
+        viewModel.storeSettings(databaseContext.getMetaData());
+
+        assertEquals(Optional.of("ABC"), databaseContext.getMetaData().getLibraryName());
+        assertEquals(Optional.of("Shared bibliography"), databaseContext.getMetaData().getLibraryDescription());
+    }
+
+    @Test
+    void blankNameAndDescriptionClearTheValues() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.getMetaData().setLibraryName("ABC");
+        databaseContext.getMetaData().setLibraryDescription("Shared bibliography");
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getFilePreferences().getUserAndHost()).thenReturn("user");
+        GeneralPropertiesViewModel viewModel = new GeneralPropertiesViewModel(databaseContext, mock(DialogService.class), preferences, mock(UndoManager.class));
+
+        viewModel.setValues(databaseContext.getMetaData());
+        viewModel.libraryNameProperty().set("   ");
+        viewModel.libraryDescriptionProperty().set("");
+        viewModel.storeSettings(databaseContext.getMetaData());
+
+        assertEquals(Optional.empty(), databaseContext.getMetaData().getLibraryName());
+        assertEquals(Optional.empty(), databaseContext.getMetaData().getLibraryDescription());
+    }
 }

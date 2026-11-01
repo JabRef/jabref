@@ -108,6 +108,18 @@ public class MetaDataSerializerTest {
     }
 
     @Test
+    void serializeLibraryNameAndDescription() {
+        metaData.setLibraryName("ABC");
+        metaData.setLibraryDescription("Shared team bibliography");
+
+        Map<String, String> expectedSerialization = new TreeMap<>();
+        expectedSerialization.put(MetaData.LIBRARY_DESCRIPTION, "Shared team bibliography;");
+        expectedSerialization.put(MetaData.LIBRARY_NAME, "ABC;");
+
+        assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
     void parsingEmptyOrFieldsReturnsEmptyCollections() {
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);

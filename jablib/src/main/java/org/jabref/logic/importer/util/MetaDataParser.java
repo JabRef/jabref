@@ -147,6 +147,10 @@ public class MetaDataParser {
                 } catch (IllegalArgumentException e) {
                     LOGGER.debug("Unknown library abbreviation type: {}", getSingleItem(values), e);
                 }
+            } else if (MetaData.LIBRARY_NAME.equals(entry.getKey())) {
+                metaData.setLibraryName(getSingleItem(values));
+            } else if (MetaData.LIBRARY_DESCRIPTION.equals(entry.getKey())) {
+                metaData.setLibraryDescription(getSingleItem(values));
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
                 defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
             } else if (MetaData.PROTECTED_FLAG_META.equals(entry.getKey())) {
