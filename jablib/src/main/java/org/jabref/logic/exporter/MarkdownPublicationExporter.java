@@ -111,8 +111,8 @@ public class MarkdownPublicationExporter extends Exporter {
             JournalAbbreviationRepository abbreviationRepository,
             Optional<Path> linkDestination) throws IOException {
         List<Path> fileDirectories = Stream.concat(
-                suppliedFileDirectories.stream(),
-                databaseContext.getFileDirectories(filePreferences).stream())
+                                                   suppliedFileDirectories.stream(),
+                                                   databaseContext.getFileDirectories(filePreferences).stream())
                                            .distinct()
                                            .toList();
 
