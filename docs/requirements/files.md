@@ -47,4 +47,20 @@ Closing the side pane releases the displayed PDF document.
 
 Needs: impl, utest
 
+## Empty file directory fields in library properties must show the effective directory as prompt text
+`req~jabgui.libraryproperties.file-directory.effective-prompt~1`
+
+When a directory field in the "General" tab of the library properties is empty, it shows the absolute directory JabRef falls back to as greyed prompt text.
+The prompt text is never stored in the library.
+
+- Library-specific file directory: the main file directory or the directory of the `.bib` file, depending on the preference to store files relative to the `.bib` file.
+- User-specific file directory: the library-specific file directory as currently entered, otherwise the same directory as for the library-specific file directory.
+- LaTeX file directory: the directory of the `.bib` file, otherwise the working directory.
+
+If there is no directory to fall back to (e.g., an unsaved library whose files are stored relative to the `.bib` file), the field stays empty.
+
+[Issue 17572](https://github.com/JabRef/jabref/issues/17572)
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
