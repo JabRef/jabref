@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,11 @@ import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherResult;
+import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.IdFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.URLUtil;
@@ -34,6 +40,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
@@ -43,6 +50,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,9 +58,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -427,6 +439,174 @@ class DownloadFullTextActionTest {
                 Optional.of("10.1000/original"),
                 entry.getField(StandardField.DOI)
         );
+    }
+
+    @Test
+    void downloadsAndAttachesFullTextWhenExistingFileIsMissingAndDoiIsDiscoveredFromTitle(
+            @TempDir Path tempDir) throws Exception {
+
+        // Arrange: create a small PDF response for our local HTTP server.
+        byte[] pdfContent = "%PDF-1.4\nScenario G test PDF\n%%EOF"
+                .getBytes(StandardCharsets.US_ASCII);
+
+        httpServer = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
+
+        httpServer.createContext("/test.pdf", exchange -> {
+            exchange.getResponseHeaders().add("Content-Type", "application/pdf");
+
+            if ("HEAD".equals(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(200, -1);
+            } else if ("GET".equals(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(200, pdfContent.length);
+                exchange.getResponseBody().write(pdfContent);
+            } else {
+                exchange.sendResponseHeaders(405, -1);
+            }
+
+            exchange.close();
+        });
+
+        httpServer.start();
+
+        String pdfUrl = "http://localhost:"
+                + httpServer.getAddress().getPort()
+                + "/test.pdf";
+
+        // Arrange: configure file preferences and temporary download directory.
+        FilePreferences filePreferences = FilePreferences.getDefault();
+        ExternalApplicationsPreferences externalApplicationsPreferences =
+                ExternalApplicationsPreferences.getDefault();
+
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.getExternalApplicationsPreferences())
+                .thenReturn(externalApplicationsPreferences);
+
+        // Make the state manager use the spy instead of the original database context.
+        BibDatabaseContext originalDatabaseContext = databaseContext;
+        databaseContext = spy(originalDatabaseContext);
+
+        stateManager.getOpenDatabases().remove(originalDatabaseContext);
+        stateManager.getOpenDatabases().add(databaseContext);
+        stateManager.setActiveDatabase(databaseContext);
+
+        // Configure the temporary download directory.
+        doReturn(List.of(tempDir))
+                .when(databaseContext)
+                .getFileDirectories(filePreferences);
+
+        doReturn(Optional.of(tempDir))
+                .when(databaseContext)
+                .getFirstExistingFileDir(filePreferences);
+
+        // Arrange: create an entry with a title but no DOI.
+        entry.setField(
+                StandardField.TITLE,
+                "A Test Article About Computer Science"
+        );
+
+        LinkedFile missingFile = new LinkedFile(
+                "",
+                Path.of("missing.pdf"),
+                "PDF"
+        );
+
+        entry.setFiles(List.of(missingFile));
+
+        entry.clearField(StandardField.DOI);
+
+        assertTrue(entry.getField(StandardField.DOI).isEmpty());
+
+        // Arrange: mock DOI discovery.
+        DOI discoveredDoi = new DOI("10.1000/discovered");
+
+        IdFetcher<DOI> doiFetcher = mock(IdFetcher.class);
+
+        when(doiFetcher.findIdentifier(any(BibEntry.class)))
+                .thenReturn(Optional.of(discoveredDoi));
+
+        // Arrange: mock full-text retrieval.
+        FulltextFetcher fulltextFetcher = mock(FulltextFetcher.class);
+
+        when(fulltextFetcher.getTrustLevel())
+                .thenReturn(TrustLevel.PUBLISHER);
+
+        when(fulltextFetcher.findFullText(any(BibEntry.class)))
+                .thenReturn(Optional.of(URLUtil.create(pdfUrl)));
+
+        // Arrange: capture background tasks submitted by the real workflow.
+        List<BackgroundTask<?>> submittedTasks = new ArrayList<>();
+
+        doAnswer(invocation -> {
+            BackgroundTask<?> submittedTask = invocation.getArgument(0);
+            submittedTasks.add(submittedTask);
+            return CompletableFuture.completedFuture(null);
+        }).when(taskExecutor).execute(any(BackgroundTask.class));
+
+        // Arrange: use the real DownloadFullTextAction constructor.
+        DownloadFullTextAction action = new DownloadFullTextAction(
+                dialogService,
+                stateManager,
+                preferences,
+                taskExecutor
+        );
+
+        // Act: run DOI discovery and full-text lookup.
+        try (MockedStatic<WebFetchers> webFetchers = mockStatic(WebFetchers.class)) {
+            webFetchers.when(() -> WebFetchers.getIdFetcherForIdentifier(
+                               eq(DOI.class),
+                               nullable(ImporterPreferences.class)))
+                       .thenReturn(doiFetcher);
+
+            webFetchers.when(() -> WebFetchers.getFullTextFetchers(
+                               nullable(ImportFormatPreferences.class),
+                               nullable(ImporterPreferences.class)))
+                       .thenReturn(Set.of(fulltextFetcher));
+
+            action.execute();
+
+            // The first task should be the full-text lookup.
+            assertEquals(1, submittedTasks.size());
+
+            BackgroundTask<?> lookupTask = submittedTasks.get(0);
+            Object downloads = lookupTask.call();
+
+            runSuccessHandler(lookupTask, downloads);
+
+            // Verify that DOI discovery and full-text retrieval occurred.
+            verify(doiFetcher).findIdentifier(any(BibEntry.class));
+
+            verify(fulltextFetcher).findFullText(argThat(discoveredEntry ->
+                    discoveredEntry.getField(StandardField.DOI)
+                                   .equals(Optional.of("10.1000/discovered"))
+            ));
+        }
+
+        // The successful lookup should have triggered a second task for downloading.
+        assertEquals(2, submittedTasks.size());
+
+        // Execute the actual file-download task and its success callback.
+        BackgroundTask<?> downloadTask = submittedTasks.get(1);
+        Object downloadResult = downloadTask.call();
+
+        runSuccessHandler(downloadTask, downloadResult);
+
+        // Assert: the original broken link remains and the downloaded file is added.
+        assertEquals(2, entry.getFiles().size());
+        assertTrue(entry.getFiles().contains(missingFile));
+
+        LinkedFile downloadedFile = entry.getFiles().stream()
+                                         .filter(file -> !file.equals(missingFile))
+                                         .findFirst()
+                                         .orElseThrow();
+
+        // Assert: the downloaded file exists and contains the expected content.
+        Path downloadedPath = tempDir.resolve(downloadedFile.getLink());
+
+        assertTrue(Files.exists(downloadedPath));
+        assertArrayEquals(pdfContent, Files.readAllBytes(downloadedPath));
+
+        // Assert: DOI discovery did not modify the original database entry.
+        assertTrue(entry.getField(StandardField.DOI).isEmpty());
     }
 
     @Test
