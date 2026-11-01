@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// Nothing is cached.
 ///
-/// Implentation note: This relies on <https://kong.github.io/unirest-java/configuration/> setting `followRedirects` to `true`
+/// Implementation note: This relies on <https://kong.github.io/unirest-java/configuration/> setting `followRedirects` to `true`
 /// and enabling cookie management.
 public class URLDownload {
 

@@ -189,7 +189,7 @@ public class LayoutHelper {
 
                 if (start) {
                     // changed section begin - arudert
-                    // keep the backslash so we know wether this is a fieldname or an ordinary parameter
+                    // keep the backslash so we know whether this is a fieldname or an ordinary parameter
                     // if (c != '\\') {
                     buffer.append((char) c);
                     // }

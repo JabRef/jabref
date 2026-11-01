@@ -26,6 +26,7 @@ import org.jabref.model.ai.chatting.ChatMessage;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // [utest->feat~ai.chat.jump-to-entry-pdf~1]
+@ResourceLock("Localization.lang")
 class AiChatMessageViewTest extends JavaFxTest {
 
     private DialogService dialogService;
@@ -69,6 +71,14 @@ class AiChatMessageViewTest extends JavaFxTest {
         AtomicReference<AiChatMessageView> viewRef = new AtomicReference<>();
         interact(() -> viewRef.set(new AiChatMessageView()));
         return viewRef.get();
+    }
+
+    // [utest->feat~ai.chat.regenerate-response~1]
+    @Test
+    void userMessageCanBeRetried() {
+        AiChatMessageViewModel viewModel = new AiChatMessageViewModel(clipBoardManager);
+        viewModel.chatMessageProperty().set(ChatMessage.userMessage("question"));
+        assertTrue(viewModel.showRegenerateProperty().get());
     }
 
     @Test

@@ -62,7 +62,7 @@ public class WebSearchPaneView extends VBox {
     /// Allows triggering search on pressing enter
     private void enableEnterToTriggerSearch(TextField query) {
         query.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER && viewModel.searchEnabledProperty().get()) {
                 viewModel.search();
             }
         });
@@ -122,11 +122,11 @@ public class WebSearchPaneView extends VBox {
         search.setDefaultButton(false);
         search.setOnAction(_ -> viewModel.search());
         search.setMaxWidth(Double.MAX_VALUE);
-        search.disableProperty().bind(importerEnabled.not());
+        search.disableProperty().bind(viewModel.searchEnabledProperty().not());
         return search;
     }
 
-    /// Creatse help button for currently selected fetcher
+    /// Creates help button for currently selected fetcher
     private StackPane createHelpButtonContainer() {
         StackPane helpButtonContainer = new StackPane();
         ActionFactory factory = new ActionFactory();

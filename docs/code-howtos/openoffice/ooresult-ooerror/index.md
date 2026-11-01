@@ -23,7 +23,7 @@ Since most of the code originally in `OOBibBase` was moved to `logic` and almost
 
 Note: some of the precondition checking still needs to stay in `OpenOfficePanel`: for example to provide a list of selected `BibEntry` instances, it needs to go through some steps from `frame.getCurrentLibraryTab()` to `(!entries.isEmpty() && checkThatEntriesHaveKeys(entries))`
 
-To avoid `OOBibBase` depending on the higher level `OpenOfficePanel` message texts needed in `OOBibBase` were moved from `OpenOfficePanel` to `OOError`. (Others stayed, but could be moved if that seems worthwile)
+To avoid `OOBibBase` depending on the higher level `OpenOfficePanel` message texts needed in `OOBibBase` were moved from `OpenOfficePanel` to `OOError`. (Others stayed, but could be moved if that seems worthwhile)
 
 ## OOError
 
@@ -96,7 +96,7 @@ with an assumption that at any time exactly one of `result` and `error` is prese
 
 > `class X<R,E> { boolean isOK; Object data; }` expresses this assumption more directly, (but omits the relation between the type parameters `<R,E>` and the type in `data`)
 
-* Since `OOResult` encodes the state `isOK` in `result.isPresent()` (and equivalently in `errror.isEmpty()`), we cannot allow construction of instances where both values are `isEmpty`.\
+* Since `OOResult` encodes the state `isOK` in `result.isPresent()` (and equivalently in `error.isEmpty()`), we cannot allow construction of instances where both values are `isEmpty`.\
   In particular, `OOResult.ok(null)` and `OOResult.error(null)` are not allowed: it would make the state `isOK` ambiguous.\
   It would also break the similarity to `Optional` to allow both `isEmpty` and `isOK` to be true.
 * Not allowing null, has a consequence on `OOResult<Void,E>`\

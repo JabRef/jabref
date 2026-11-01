@@ -39,13 +39,13 @@ public final class ChatHistoryUtils {
 
         if (message.role() != ChatMessage.Role.USER) {
             int index = chatHistory.indexOf(message);
-            if (index > 0) {
-                ChatMessage prev = chatHistory.get(index - 1);
-                if (prev.role() == ChatMessage.Role.USER) {
-                    contentToRegenerate = prev.content();
-                    cutoffTime = prev.timestamp();
-                }
+            if (index == 0 || chatHistory.get(index - 1).role() != ChatMessage.Role.USER) {
+                return Optional.empty();
             }
+
+            ChatMessage prev = chatHistory.get(index - 1);
+            contentToRegenerate = prev.content();
+            cutoffTime = prev.timestamp();
         }
 
         final Instant finalCutoffTime = cutoffTime;
@@ -74,7 +74,7 @@ public final class ChatHistoryUtils {
     /// Finds the last user message in the chat history by iterating backwards.
     ///
     /// @param chatHistory the chat history to search
-    /// @return the last user messag, or empty if no user message is found
+    /// @return the last user message, or empty if no user message is found
     public static Optional<ChatMessage> getLastUserMessage(List<ChatMessage> chatHistory) {
         for (int i = chatHistory.size() - 1; i >= 0; i--) {
             if (chatHistory.get(i).role() == ChatMessage.Role.USER) {

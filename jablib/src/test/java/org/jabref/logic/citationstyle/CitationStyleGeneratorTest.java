@@ -398,7 +398,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.TITLE, "volume + issue + pages")
                                 .withField(StandardField.VOLUME, "1")
-                                .withField(StandardField.COMMENT, "The issue field does not exist in Bibtex standard, therefore there is no need to render it (The issue field exists in biblatex standard though.). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.")
+                                .withField(StandardField.COMMENT, "The issue field does not exist in Bibtex standard, therefore there is no need to render it (The issue field exists in biblatex standard though.). Since, for this entry, there is no number field present and therefore no data will be overwritten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.")
                                 .withField(StandardField.ISSUE, "9"),
                         "apa.csl"),
 
@@ -426,7 +426,7 @@ class CitationStyleGeneratorTest {
                         "apa.csl"),
 
                 // 11.
-                // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
+                // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwritten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
                 Arguments.of(
                         "Foo, B. (n.d.). issue + pages. Bib(La)TeX Journal, (9), 45–67.\n",
                         BibDatabaseMode.BIBTEX,
@@ -480,7 +480,7 @@ class CitationStyleGeneratorTest {
                         "apa.csl"),
 
                 // 15.
-                // "The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing."
+                // "The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwritten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing."
                 Arguments.of(
                         "Foo, B. (n.d.). issue. Bib(La)TeX Journal, (9issue).\n",
                         BibDatabaseMode.BIBTEX,

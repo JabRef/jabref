@@ -1,6 +1,6 @@
 A very simple export filter that outputs a comma-separated file that can be used by Openoffice (OO) as a bibliography database.
 
-Uses two new custom formaters: 
+Uses two new custom formatters: 
 
   - GetOpenofficeType: 
       converts the default bibtextype entries into the numeric codes that

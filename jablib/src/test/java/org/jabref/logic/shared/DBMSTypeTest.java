@@ -33,7 +33,7 @@ class DBMSTypeTest {
     }
 
     @Test
-    void fromStringWorksForUnkownString() {
+    void fromStringWorksForUnknownString() {
         assertEquals(Optional.empty(), DBMSType.fromString("unknown"));
     }
 
