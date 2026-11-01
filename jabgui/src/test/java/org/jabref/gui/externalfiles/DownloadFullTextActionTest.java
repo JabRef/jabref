@@ -293,6 +293,143 @@ class DownloadFullTextActionTest {
     }
 
     @Test
+    void downloadsAndAttachesFullTextWhenExistingFileIsMissing(@TempDir Path tempDir) throws Exception {
+        // Arrange: create a small PDF response for our local HTTP server.
+        byte[] pdfContent = "%PDF-1.4\nScenario F test PDF\n%%EOF"
+                .getBytes(StandardCharsets.US_ASCII);
+
+        httpServer = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
+
+        httpServer.createContext("/test.pdf", exchange -> {
+            exchange.getResponseHeaders().add("Content-Type", "application/pdf");
+
+            if ("HEAD".equals(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(200, -1);
+            } else if ("GET".equals(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(200, pdfContent.length);
+                exchange.getResponseBody().write(pdfContent);
+            } else {
+                exchange.sendResponseHeaders(405, -1);
+            }
+
+            exchange.close();
+        });
+
+        httpServer.start();
+
+        String pdfUrl = "http://localhost:"
+                + httpServer.getAddress().getPort()
+                + "/test.pdf";
+
+        FetcherResult localFetcherResult = new FetcherResult(
+                TrustLevel.PUBLISHER,
+                URLUtil.create(pdfUrl),
+                Map.of()
+        );
+
+        // Arrange: configure the file preferences and temporary download directory.
+        FilePreferences filePreferences = FilePreferences.getDefault();
+        ExternalApplicationsPreferences externalApplicationsPreferences =
+                ExternalApplicationsPreferences.getDefault();
+
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.getExternalApplicationsPreferences())
+                .thenReturn(externalApplicationsPreferences);
+
+        // Make the state manager use the spy instead of the original database context.
+        BibDatabaseContext originalDatabaseContext = databaseContext;
+        databaseContext = spy(originalDatabaseContext);
+
+        stateManager.getOpenDatabases().remove(originalDatabaseContext);
+        stateManager.getOpenDatabases().add(databaseContext);
+        stateManager.setActiveDatabase(databaseContext);
+
+        // Configure the temporary download directory.
+        doReturn(List.of(tempDir))
+                .when(databaseContext)
+                .getFileDirectories(filePreferences);
+
+        doReturn(Optional.of(tempDir))
+                .when(databaseContext)
+                .getFirstExistingFileDir(filePreferences);
+
+        // Arrange: create an existing file link pointing to a missing PDF.
+        LinkedFile missingFile = new LinkedFile(
+                "",
+                Path.of("missing.pdf"),
+                "PDF"
+        );
+        entry.setFiles(List.of(missingFile));
+
+        // Arrange: capture every background task submitted by the real workflow.
+        List<BackgroundTask<?>> submittedTasks = new ArrayList<>();
+
+        doAnswer(invocation -> {
+            BackgroundTask<?> submittedTask = invocation.getArgument(0);
+            submittedTasks.add(submittedTask);
+            return CompletableFuture.completedFuture(null);
+        }).when(taskExecutor).execute(any(BackgroundTask.class));
+
+        // Arrange: use the real action, with a finder that returns our local PDF URL.
+        DownloadFullTextAction action = new DownloadFullTextAction(
+                dialogService,
+                stateManager,
+                preferences,
+                taskExecutor,
+                snapshot -> {
+                    assertNotSame(entry, snapshot);
+                    assertEquals(
+                            Optional.of("10.1000/original"),
+                            snapshot.getField(StandardField.DOI)
+                    );
+
+                    return Optional.of(localFetcherResult);
+                }
+        );
+
+        // Act: execute the full-text lookup.
+        action.execute();
+
+        assertEquals(1, submittedTasks.size());
+
+        // Execute the lookup task.
+        BackgroundTask<?> lookupTask = submittedTasks.get(0);
+        Object downloads = lookupTask.call();
+
+        // Run the success handler.
+        runSuccessHandler(lookupTask, downloads);
+
+        // The successful lookup should have triggered a second task for downloading.
+        assertEquals(2, submittedTasks.size());
+
+        // Execute the actual file-download task and its success callback.
+        BackgroundTask<?> downloadTask = submittedTasks.get(1);
+        Object downloadResult = downloadTask.call();
+        runSuccessHandler(downloadTask, downloadResult);
+
+        // Assert: the original broken link remains and the downloaded file is added.
+        assertEquals(2, entry.getFiles().size());
+        assertTrue(entry.getFiles().contains(missingFile));
+
+        LinkedFile downloadedFile = entry.getFiles().stream()
+                                         .filter(file -> !file.equals(missingFile))
+                                         .findFirst()
+                                         .orElseThrow();
+
+        // Assert: the newly downloaded file exists and contains the expected content.
+        Path downloadedPath = tempDir.resolve(downloadedFile.getLink());
+
+        assertTrue(Files.exists(downloadedPath));
+        assertArrayEquals(pdfContent, Files.readAllBytes(downloadedPath));
+
+        // Assert: the original DOI has not been changed.
+        assertEquals(
+                Optional.of("10.1000/original"),
+                entry.getField(StandardField.DOI)
+        );
+    }
+
+    @Test
     void queuedOrFinishedTaskLeavesNoFulltextLookupInProgress() throws Exception {
         RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.empty());
 
