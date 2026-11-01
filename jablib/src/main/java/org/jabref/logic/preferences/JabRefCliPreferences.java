@@ -70,8 +70,10 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalMode;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -367,6 +369,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
     private static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
+    private static final String JOURNAL_ABBREVIATION_MODE = "journalAbbreviationMode";
+    private static final String ABBREVIATION_TYPE_ON_FETCH = "useAbbreviationTypeOnFetch";
 
     // Protected terms
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
@@ -1229,14 +1233,17 @@ public class JabRefCliPreferences implements CliPreferences {
         abbreviationPreferences = new AbbreviationPreferences(
                 convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaultValues.getExternalJournalLists()))),
                 getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
-                getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
+                getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions()),
+                JournalMode.safeValueOf(get(JOURNAL_ABBREVIATION_MODE, defaultValues.useJournalAbbreviationMode().name())),
+                AbbreviationType.safeValueOf(get(ABBREVIATION_TYPE_ON_FETCH, defaultValues.useAbbreviationTypeOnFetch().name()))
         );
 
         bindCustomList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindBoolean(abbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
         bindBoolean(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
-
+        bindObject(abbreviationPreferences.getJournalAbbreviationMode(), JOURNAL_ABBREVIATION_MODE, defaultValues.useJournalAbbreviationMode(), JournalMode::name, JournalMode::safeValueOf);
+        bindObject(abbreviationPreferences.getAbbreviationTypeOnFetch(), ABBREVIATION_TYPE_ON_FETCH, defaultValues.useAbbreviationTypeOnFetch(), AbbreviationType::name, AbbreviationType::safeValueOf);
         return abbreviationPreferences;
     }
     // endregion

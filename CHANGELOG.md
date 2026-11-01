@@ -25,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an automatically generated commit message to the Git commit message box. [#16763](https://github.com/JabRef/jabref/issues/16763)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 - We added the cleanup formatter "LaTeX to Unicode-aware LaTeX", which converts LaTeX character commands to Unicode and keeps escaped characters. [#8715](https://github.com/JabRef/jabref/issues/8715)
+- We added preferences to automatically abbreviate or unabbreviate journal titles in fetched entries. [#11305](https://github.com/JabRef/jabref/issues/11305)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)
 - We added indentation and syntax highlighting for JSON in AI chat answers. [#17181](https://github.com/JabRef/jabref/pull/17181)
 - We added a warning for shortcuts already in use, allowing users to replace the existing shortcut or keep both. [#17240](https://github.com/JabRef/jabref/issues/17240)
