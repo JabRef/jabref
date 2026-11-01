@@ -9,8 +9,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -68,6 +70,25 @@ public class ISBN implements Identifier {
         } else {
             return Optional.empty();
         }
+    }
+
+    /// Finds the ISBN of the book described by free text, such as the text of a book's copyright page.
+    ///
+    /// An ISBN-10 and the ISBN-13 of the same book count as one identifier, which is returned as ISBN-13.
+    /// If the text contains no ISBN or more than one different identifier, none is returned.
+    public static Optional<ISBN> findInText(String text) {
+        return selectSingleBook(findAllInText(text));
+    }
+
+    private static Optional<ISBN> selectSingleBook(List<ISBN> candidates) {
+        Set<ISBN> isbn13s = candidates.stream()
+                                      .map(ISBN::asIsbn13)
+                                      .flatMap(Optional::stream)
+                                      .collect(Collectors.toSet());
+        if (isbn13s.size() == 1) {
+            return Optional.of(isbn13s.iterator().next());
+        }
+        return Optional.empty();
     }
 
     /// Finds valid ISBNs in free text, such as the text of a book's copyright page.
@@ -197,6 +218,28 @@ public class ISBN implements Identifier {
 
     public boolean isValid() {
         return isValidFormat() && isValidChecksum();
+    }
+
+    /// Returns the ISBN-13 form of this ISBN, so that an ISBN-10 and its ISBN-13 can be compared.
+    /// An ISBN-13 is returned as is. Empty if this ISBN is not valid.
+    public Optional<ISBN> asIsbn13() {
+        if (!isValid()) {
+            return Optional.empty();
+        }
+        if (isbnString.length() == 13) {
+            return Optional.of(this);
+        }
+        String first12Digits = "978" + isbnString.substring(0, 9);
+        return Optional.of(new ISBN(first12Digits + isbn13CheckDigit(first12Digits)));
+    }
+
+    /// The digits are weighted 1, 3, 1, 3, ... and summed. The check digit brings the sum up to a multiple of 10.
+    private static int isbn13CheckDigit(String first12Digits) {
+        int sum = 0;
+        for (int pos = 0; pos < 12; pos++) {
+            sum += (first12Digits.charAt(pos) - '0') * ((pos % 2) == 0 ? 1 : 3);
+        }
+        return (10 - (sum % 10)) % 10;
     }
 
     @Override
