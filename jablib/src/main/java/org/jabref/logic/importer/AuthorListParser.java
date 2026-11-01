@@ -226,7 +226,9 @@ public class AuthorListParser {
     private Author getExtendedAuthor() {
         int nameStart = tokenEnd;
         Token token;
+        // @formatter:off
         do {
+            // @formatter:on
             token = getToken();
         } while (token != Token.AND && token != Token.EOF);
         int nameEnd = token == Token.AND ? tokenStart : original.length();
