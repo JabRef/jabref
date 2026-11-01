@@ -357,7 +357,7 @@ public class SaveDatabaseAction {
                         entryTypesManager)
                         .withJournalAbbreviationRepository(
                                 journalAbbreviationRepository,
-                                preferences.getAbbreviationPreferences().shouldUseFJournalField())
+                                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField())
                         .withMutationScheduler(SaveDatabaseAction::runSaveMutation);
 
                 try {

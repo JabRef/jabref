@@ -57,6 +57,7 @@ import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
+import org.jabref.logic.conferences.ConferenceAbbreviationPreferences;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -69,8 +70,8 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
-import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -364,6 +365,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
 
     // Abbreviation preferences
+    private static final String EXTERNAL_CONFERENCE_LISTS = "externalConferenceLists";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
     private static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
@@ -511,7 +513,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private AbbreviationPreferences abbreviationPreferences;
+    private Optional<ConferenceAbbreviationPreferences> conferenceAbbreviationPreferences = Optional.empty();
+    private Optional<JournalAbbreviationPreferences> journalAbbreviationPreferences = Optional.empty();
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private OcrPreferences ocrPreferences;
@@ -1163,7 +1166,8 @@ public class JabRefCliPreferences implements CliPreferences {
         getTimestampPreferences();
         getRemotePreferences();
         getPushToApplicationPreferences();
-        getAbbreviationPreferences();
+        getJournalAbbreviationPreferences();
+        getConferenceAbbreviationPreferences();
         getGitPreferences();
         getSSLPreferences();
         getBibEntryPreferences();
@@ -1180,7 +1184,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences();
         getImporterPreferences();
         getGrobidPreferences();
-        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
+        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences()));
     }
 
     private void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1219,27 +1223,43 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region JournalAbbreviationPreferences
     @Override
-    public AbbreviationPreferences getAbbreviationPreferences() {
-        if (abbreviationPreferences != null) {
-            return abbreviationPreferences;
-        }
+    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
+        return journalAbbreviationPreferences.orElseGet(this::loadJournalAbbreviationPreferences);
+    }
 
-        AbbreviationPreferences defaultValues = AbbreviationPreferences.getDefault();
+    private JournalAbbreviationPreferences loadJournalAbbreviationPreferences() {
+        JournalAbbreviationPreferences defaultValues = JournalAbbreviationPreferences.getDefault();
 
-        abbreviationPreferences = new AbbreviationPreferences(
-                convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaultValues.getExternalJournalLists()))),
+        JournalAbbreviationPreferences preferences = new JournalAbbreviationPreferences(
+                convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaultValues.getExternalLists()))),
                 getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
                 getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
         );
 
-        bindCustomList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
+        bindCustomList(preferences.getExternalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
-        bindBoolean(abbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
-        bindBoolean(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
+        bindBoolean(preferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
+        bindBoolean(preferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
 
-        return abbreviationPreferences;
+        journalAbbreviationPreferences = Optional.of(preferences);
+        return preferences;
     }
     // endregion
+
+    @Override
+    public ConferenceAbbreviationPreferences getConferenceAbbreviationPreferences() {
+        return conferenceAbbreviationPreferences.orElseGet(this::loadConferenceAbbreviationPreferences);
+    }
+
+    private ConferenceAbbreviationPreferences loadConferenceAbbreviationPreferences() {
+        ConferenceAbbreviationPreferences defaultValues = ConferenceAbbreviationPreferences.getDefault();
+        ConferenceAbbreviationPreferences preferences = new ConferenceAbbreviationPreferences(
+                convertStringToList(get(EXTERNAL_CONFERENCE_LISTS, convertListToString(defaultValues.getExternalLists()))));
+        bindCustomList(preferences.getExternalLists(), EXTERNAL_CONFERENCE_LISTS, defaultValues.getExternalLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        conferenceAbbreviationPreferences = Optional.of(preferences);
+        return preferences;
+    }
 
     // region PushToApplicationPreferences
     public PushToApplicationPreferences getPushToApplicationPreferences() {

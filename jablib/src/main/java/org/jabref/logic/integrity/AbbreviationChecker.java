@@ -5,21 +5,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class AbbreviationChecker implements EntryChecker {
 
-    private final JournalAbbreviationRepository abbreviationRepository;
+    private final ConferenceAbbreviationRepository abbreviationRepository;
     private final Set<Field> fields = FieldFactory.getBookNameFields();
 
-    public AbbreviationChecker(JournalAbbreviationRepository abbreviationRepository) {
+    public AbbreviationChecker(ConferenceAbbreviationRepository abbreviationRepository) {
         this.abbreviationRepository = abbreviationRepository;
     }
 
+    // [impl->req~abbreviations.conference-integrity~1]
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> messages = new ArrayList<>();
