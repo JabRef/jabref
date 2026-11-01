@@ -55,7 +55,7 @@ class BibEntryWriterTest {
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
     }
 
-    // Tests for noramlization operations and bib exntended name form.
+    // Tests for normalization operations and bib extended name form.
     @Test
     void normalizedExtendedNamesSurviveWriteAndRead() throws IOException {
         String names = "family=Hasselt, given=Hado P., prefix=van, useprefix=false and "

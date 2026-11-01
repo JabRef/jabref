@@ -88,13 +88,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             // Sort by type.
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
-        } else if (fieldType == FieldType.NAME) {
-            // Authors must be fetched as input by the user
-            // (latexFree strips { and }, which define tokenization and hence alphabetization)
-            // This breaks sorting if letters with umlauts and similar symbols are not entered
-            // directly but makes tokenization work correctly.
-            f1 = getFieldValueRaw(e1).orElse(null);
-            f2 = getFieldValueRaw(e2).orElse(null);
         } else {
             f1 = getFieldValue(e1).orElse(null);
             f2 = getFieldValue(e2).orElse(null);
