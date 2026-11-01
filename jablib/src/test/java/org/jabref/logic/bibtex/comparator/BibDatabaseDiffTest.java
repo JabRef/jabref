@@ -134,6 +134,16 @@ class BibDatabaseDiffTest {
         assertEquals(entryTwo, diff.getEntryDifferences().getFirst().newEntry(), "there is another value as newEntry");
     }
 
+    @Test
+    void compareOfEntryAgainstEmptyDatabaseReportsDeletion() {
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "test");
+        BibDatabaseContext originalDatabase = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(originalDatabase, new BibDatabaseContext());
+
+        assertEquals(List.of(new BibEntryDiff(entry, null)), diff.getEntryDifferences());
+    }
+
     private BibDatabaseDiff compareEntries(BibEntry entryOne, BibEntry entryTwo) {
         BibDatabaseContext databaseOne = new BibDatabaseContext(new BibDatabase(List.of(entryOne)));
         BibDatabaseContext databaseTwo = new BibDatabaseContext(new BibDatabase(List.of(entryTwo)));
