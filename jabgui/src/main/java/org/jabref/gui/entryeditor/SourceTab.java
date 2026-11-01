@@ -36,6 +36,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -208,8 +209,10 @@ public class SourceTab extends EntryEditorTab {
                                                .orElse(BibDatabaseMode.BIBLATEX);
             try {
                 // [impl->req~entry-editor.source-tab.atomic-replacement~1]
-                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(),
-                        getSourceString(previousEntry, mode, fieldPreferences));
+                String source = getSourceString(previousEntry, mode, fieldPreferences);
+                if (!source.equals(StringUtil.unifyLineBreaks(codeArea.getText(), "\n"))) {
+                    codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), source);
+                }
                 codeArea.setEditable(true);
                 Platform.runLater(this::refreshCodeAreaDecorator);
             } catch (IOException ex) {
@@ -355,8 +358,23 @@ public class SourceTab extends EntryEditorTab {
             validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", parserWarnings)));
         }
 
-        CompoundEdit compound = new CompoundEdit(Localization.lang("source edit"));
         BibEntry newEntry = database.getEntries().getFirst();
+        for (Map.Entry<Field, String> field : newEntry.getFieldMap().entrySet()) {
+            if (outOfFocusEntry.getField(field.getKey()).filter(field.getValue()::equals).isPresent()) {
+                continue;
+            }
+            List<String> errors = FieldWriter.checkBalancedBraces(field.getValue());
+            if (!errors.isEmpty()) {
+                validationMessage.setValue(ValidationMessage.error(
+                        Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors))));
+                if (!parserWarnings.isEmpty()) {
+                    showSourceErrorLater(outOfFocusEntry, parserWarnings);
+                }
+                return;
+            }
+        }
+
+        CompoundEdit compound = new CompoundEdit(Localization.lang("source edit"));
         boolean wasWritingSource = writingSource;
         writingSource = true;
         try {
@@ -381,14 +399,6 @@ public class SourceTab extends EntryEditorTab {
                 String oldValue = outOfFocusEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
-                    // Test if the field is legally set.
-                    List<String> errors = FieldWriter.checkBalancedBraces(newValue);
-                    if (!errors.isEmpty()) {
-                        validationMessage.setValue(ValidationMessage.error(
-                                Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors))));
-                        return;
-                    }
-
                     compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                 }
             }

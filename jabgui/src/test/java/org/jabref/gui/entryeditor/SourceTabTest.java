@@ -32,6 +32,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -51,6 +52,7 @@ import org.jabref.support.DisabledOnCIServer;
 import com.airhacks.afterburner.injection.Injector;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.TextPos;
 import jfx.incubator.scene.control.richtext.model.StyledTextModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,6 +70,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
@@ -468,13 +471,13 @@ class SourceTabTest {
             JavaFxExtension.awaitEvents();
 
             JavaFxExtension.invokeAndWait(() -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)
-                    .set(Optional.of(new SearchQuery("title = Needle"))));
+                                                            .set(Optional.of(new SearchQuery("title = Needle"))));
             JavaFxExtension.awaitEvents();
             JavaFxExtension.invokeAndWait(() ->
                     assertEquals(List.of("title"), highlightedFields((CodeArea) sourceTab.getContent())));
 
             JavaFxExtension.invokeAndWait(() -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)
-                    .set(Optional.of(new SearchQuery("Needle"))));
+                                                            .set(Optional.of(new SearchQuery("Needle"))));
             JavaFxExtension.awaitEvents();
             JavaFxExtension.invokeAndWait(() ->
                     assertEquals(List.of("author", "title"), highlightedFields((CodeArea) sourceTab.getContent())));
@@ -492,7 +495,7 @@ class SourceTabTest {
                                                 .map(Text.class::cast)
                                                 .map(Text::getText)
                                                 .collect(Collectors.joining()))
-                     .map(line -> line.strip().split("\\s*=", 2)[0])
+                     .map(line -> line.substring(0, line.indexOf('=')).strip())
                      .sorted()
                      .toList();
     }
@@ -537,14 +540,16 @@ class SourceTabTest {
                     sourceTab.currentEntryProperty().set(second);
                     sourceTab.notifyAboutFocus(second);
                 }
-                case "dispose" -> sourceTab.dispose();
+                case "dispose" ->
+                        sourceTab.dispose();
                 case "round trip" -> {
                     assertNotSame(entry, equalEntry);
                     assertEquals(entry, equalEntry);
                     sourceTab.currentEntryProperty().set(equalEntry);
                     sourceTab.currentEntryProperty().set(entry);
                 }
-                default -> fail("Unknown cancellation action");
+                default ->
+                        fail("Unknown cancellation action");
             }
             editor.getModel().addListener(listener);
             pendingText.set(editor.getText());
@@ -558,6 +563,78 @@ class SourceTabTest {
         } finally {
             JavaFxExtension.invokeAndWait(() -> editor.getModel().removeListener(listener));
         }
+    }
+
+    @Test
+    void savingUnchangedSourceDoesNotReplaceDocumentOrMoveCaret() {
+        showSourceForEntry(createParserWarningEntry());
+        AtomicReference<CodeArea> sourceEditor = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> sourceEditor.set((CodeArea) sourceTab.getContent()));
+        CodeArea editor = sourceEditor.get();
+        List<String> documentChanges = new ArrayList<>();
+        StyledTextModel.Listener listener = change -> {
+            if (change.isEdit()) {
+                documentChanges.add(editor.getText());
+            }
+        };
+        TextPos caret = TextPos.ofLeading(1, 4);
+        JavaFxExtension.invokeAndWait(() -> {
+            editor.requestFocus();
+            assertTrue(editor.isFocused());
+            editor.select(caret);
+            editor.getModel().addListener(listener);
+            pane.requestFocus();
+            assertFalse(editor.isFocused());
+        });
+        try {
+            JavaFxExtension.awaitEvents();
+            JavaFxExtension.invokeAndWait(() -> {
+                assertEquals(List.of(), documentChanges);
+                assertEquals(caret, editor.getCaretPosition());
+            });
+        } finally {
+            JavaFxExtension.invokeAndWait(() -> editor.getModel().removeListener(listener));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void invalidParsedFieldDoesNotChangeEntryOrLoseParserWarning(boolean missingCitationKey) {
+        BibEntry entry = createParserWarningEntry()
+                .withField(StandardField.YEAR, "2000");
+        var originalType = entry.getType();
+        var originalKey = entry.getCitationKey();
+        var originalFields = Map.copyOf(entry.getFieldMap());
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        GuiUndoManager undoManager = mock(GuiUndoManager.class);
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+        when(stateManager.getUndoManager(databaseContext)).thenReturn(undoManager);
+        ConcurrentLinkedQueue<Boolean> dialogs = new ConcurrentLinkedQueue<>();
+        doAnswer(_ -> {
+            dialogs.add(Platform.canStartNestedEventLoop());
+            return null;
+        }).when(dialogService).showErrorDialogAndWait(anyString());
+        String source = "@book{" + (missingCitationKey ? "" : "changed,")
+                + "author={Changed author},title=\"\\{bad}\"}";
+        showSourceForEntry(entry);
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea editor = (CodeArea) sourceTab.getContent();
+            editor.requestFocus();
+            assertTrue(editor.isFocused());
+            editor.clear();
+            editor.appendText(source);
+            pane.requestFocus();
+            assertFalse(editor.isFocused());
+            assertEquals(originalType, entry.getType());
+            assertEquals(originalKey, entry.getCitationKey());
+            assertEquals(originalFields, entry.getFieldMap());
+        });
+        JavaFxExtension.awaitEvents();
+        JavaFxExtension.invokeAndWait(() ->
+                assertEquals(source, ((CodeArea) sourceTab.getContent()).getText()));
+        assertEquals(missingCitationKey ? List.of(true) : List.of(), List.copyOf(dialogs));
+        verifyNoInteractions(undoManager);
     }
 
     /// Editing the source and leaving the code area must write every kind of change back to the entry,
