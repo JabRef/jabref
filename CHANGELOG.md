@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the ability to import citations from a LibreOffice document into the current JabRef library. [#16516](https://github.com/JabRef/jabref/issues/16516)
 - We added ISBN extraction from bibliographic pages in PDF books. [#12874](https://github.com/JabRef/jabref/issues/12874)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
