@@ -287,6 +287,25 @@ public class SourceTab extends EntryEditorTab {
         showSourceDialogLater(entry, () -> dialogService.showErrorDialogAndWait(errors));
     }
 
+    private void refreshSourceLater(BibEntry entry, String parserWarnings) {
+        long revision = sourceRevision;
+        Platform.runLater(() -> {
+            if (sourceRevision != revision
+                    || previousEntry != entry
+                    || currentEntryProperty().get() != entry) {
+                return;
+            }
+
+            boolean errorAlreadyScheduled = lastScheduledErrorRevision == revision;
+            updateCodeArea();
+            if (errorAlreadyScheduled) {
+                lastScheduledErrorRevision = sourceRevision;
+            } else if (!parserWarnings.isEmpty()) {
+                showSourceErrorLater(entry, parserWarnings);
+            }
+        });
+    }
+
     private void storeSource(BibEntry outOfFocusEntry, String text) {
         if ((outOfFocusEntry == null) || text.isEmpty()) {
             return;
@@ -392,9 +411,7 @@ public class SourceTab extends EntryEditorTab {
         }
 
         validationMessage.setValue(null);
-        if (!parserWarnings.isEmpty()) {
-            showSourceErrorLater(outOfFocusEntry, parserWarnings);
-        }
+        refreshSourceLater(outOfFocusEntry, parserWarnings);
     }
 
     private void listenForSaveKeybinding(KeyEvent event) {

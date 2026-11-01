@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -20,17 +22,20 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -39,9 +44,11 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.DisabledOnCIServer;
 
+import com.airhacks.afterburner.injection.Injector;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.CodeArea;
 import jfx.incubator.scene.control.richtext.model.StyledTextModel;
@@ -50,12 +57,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -428,6 +437,127 @@ class SourceTabTest {
         expected.withField(StandardField.TITLE, "External title");
         assertEquals(expected.getType(), entry.getType());
         assertEquals(expected.getFieldMap(), entry.getFieldMap());
+    }
+
+    @Test
+    void sourceWriteBackRefreshesFieldScopedSearchHighlights() {
+        SearchPreferences searchPreferences = mock(SearchPreferences.class);
+        when(searchPreferences.shouldUsePostgresSearch()).thenReturn(false);
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getSearchPreferences()).thenReturn(searchPreferences);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+
+        try {
+            BibEntry entry = createParserWarningEntry()
+                    .withField(StandardField.AUTHOR, "Long author " + "A".repeat(160));
+            showSourceForEntry(entry);
+
+            JavaFxExtension.invokeAndWait(() -> {
+                CodeArea editor = (CodeArea) sourceTab.getContent();
+                editor.requestFocus();
+                assertTrue(editor.isFocused());
+                editor.clear();
+                editor.appendText("@Article{old, title={Needle}, author={Needle}}");
+                String editedSource = editor.getText();
+                pane.requestFocus();
+                assertFalse(editor.isFocused());
+                assertEquals(editedSource, editor.getText());
+                assertEquals(Optional.of("Needle"), entry.getField(StandardField.TITLE));
+                assertEquals(Optional.of("Needle"), entry.getField(StandardField.AUTHOR));
+            });
+            JavaFxExtension.awaitEvents();
+
+            JavaFxExtension.invokeAndWait(() -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)
+                    .set(Optional.of(new SearchQuery("title = Needle"))));
+            JavaFxExtension.awaitEvents();
+            JavaFxExtension.invokeAndWait(() ->
+                    assertEquals(List.of("title"), highlightedFields((CodeArea) sourceTab.getContent())));
+
+            JavaFxExtension.invokeAndWait(() -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)
+                    .set(Optional.of(new SearchQuery("Needle"))));
+            JavaFxExtension.awaitEvents();
+            JavaFxExtension.invokeAndWait(() ->
+                    assertEquals(List.of("author", "title"), highlightedFields((CodeArea) sourceTab.getContent())));
+        } finally {
+            Injector.forgetAll();
+        }
+    }
+
+    private List<String> highlightedFields(CodeArea editor) {
+        editor.applyCss();
+        editor.layout();
+        return editor.lookupAll(".search-highlight").stream()
+                     .map(highlight -> highlight.getParent().getChildrenUnmodifiable().stream()
+                                                .filter(Text.class::isInstance)
+                                                .map(Text.class::cast)
+                                                .map(Text::getText)
+                                                .collect(Collectors.joining()))
+                     .map(line -> line.strip().split("\\s*=", 2)[0])
+                     .sorted()
+                     .toList();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"edit", "switch", "dispose", "round trip"})
+    void pendingSourceRefreshIsCancelled(String action) {
+        BibEntry entry = createParserWarningEntry();
+        BibEntry second = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("second")
+                .withField(StandardField.TITLE, "Second title");
+        BibEntry equalEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("old")
+                .withField(StandardField.TITLE, "Needle")
+                .withField(StandardField.AUTHOR, "Needle");
+        showSourceForEntry(entry);
+        AtomicReference<CodeArea> sourceEditor = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> sourceEditor.set((CodeArea) sourceTab.getContent()));
+        CodeArea editor = sourceEditor.get();
+        List<String> documentChanges = new ArrayList<>();
+        StyledTextModel.Listener listener = change -> {
+            if (change.isEdit()) {
+                documentChanges.add(editor.getText());
+            }
+        };
+        AtomicReference<String> pendingText = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            editor.requestFocus();
+            assertTrue(editor.isFocused());
+            editor.clear();
+            editor.appendText("@Article{old, title={Needle}, author={Needle}}");
+            pane.requestFocus();
+            assertFalse(editor.isFocused());
+            assertEquals(Optional.of("Needle"), entry.getField(StandardField.TITLE));
+            switch (action) {
+                case "edit" -> {
+                    editor.requestFocus();
+                    editor.clear();
+                    editor.appendText("@Article{newer, title={Newer unsaved edit}}");
+                }
+                case "switch" -> {
+                    sourceTab.currentEntryProperty().set(second);
+                    sourceTab.notifyAboutFocus(second);
+                }
+                case "dispose" -> sourceTab.dispose();
+                case "round trip" -> {
+                    assertNotSame(entry, equalEntry);
+                    assertEquals(entry, equalEntry);
+                    sourceTab.currentEntryProperty().set(equalEntry);
+                    sourceTab.currentEntryProperty().set(entry);
+                }
+                default -> fail("Unknown cancellation action");
+            }
+            editor.getModel().addListener(listener);
+            pendingText.set(editor.getText());
+        });
+        try {
+            JavaFxExtension.awaitEvents();
+            JavaFxExtension.invokeAndWait(() -> {
+                assertEquals(pendingText.get(), editor.getText());
+                assertEquals(List.of(), documentChanges);
+            });
+        } finally {
+            JavaFxExtension.invokeAndWait(() -> editor.getModel().removeListener(listener));
+        }
     }
 
     /// Editing the source and leaving the code area must write every kind of change back to the entry,
