@@ -62,4 +62,22 @@ class GitIgnoreFileFilterTest {
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
         assertFalse(gitIgnoreFileFilter.accept(subDir.resolve("test.png")));
     }
+
+    @Test
+    void acceptsNothingMatchingLiteralOpeningBrace(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                notes{draft.pdf
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertFalse(gitIgnoreFileFilter.accept(dir.resolve("notes{draft.pdf")));
+    }
+
+    @Test
+    void acceptsOtherFilesWhenPatternContainsLiteralOpeningBrace(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                notes{draft.pdf
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertTrue(gitIgnoreFileFilter.accept(dir.resolve("paper.pdf")));
+    }
 }
