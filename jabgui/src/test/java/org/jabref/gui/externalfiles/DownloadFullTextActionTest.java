@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -18,9 +19,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -211,9 +214,13 @@ class DownloadFullTextActionTest {
         );
 
         // Arrange: configure the file preferences and temporary download directory.
-        FilePreferences filePreferences = FilePreferences.getDefault();
-        ExternalApplicationsPreferences externalApplicationsPreferences =
-                ExternalApplicationsPreferences.getDefault();
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        when(filePreferences.shouldKeepDownloadUrl()).thenReturn(true);
+        when(externalApplicationsPreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
 
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getExternalApplicationsPreferences())
@@ -340,9 +347,13 @@ class DownloadFullTextActionTest {
         );
 
         // Arrange: configure the file preferences and temporary download directory.
-        FilePreferences filePreferences = FilePreferences.getDefault();
-        ExternalApplicationsPreferences externalApplicationsPreferences =
-                ExternalApplicationsPreferences.getDefault();
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        when(filePreferences.shouldKeepDownloadUrl()).thenReturn(true);
+        when(externalApplicationsPreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
 
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getExternalApplicationsPreferences())
@@ -473,9 +484,13 @@ class DownloadFullTextActionTest {
                 + "/test.pdf";
 
         // Arrange: configure file preferences and temporary download directory.
-        FilePreferences filePreferences = FilePreferences.getDefault();
-        ExternalApplicationsPreferences externalApplicationsPreferences =
-                ExternalApplicationsPreferences.getDefault();
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        when(filePreferences.shouldKeepDownloadUrl()).thenReturn(true);
+        when(externalApplicationsPreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
 
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getExternalApplicationsPreferences())
