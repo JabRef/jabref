@@ -149,6 +149,8 @@ Needs: impl, utest
 
 When a LibreOffice document contains Zotero-compatible reference marks, the user can import their cited entries into the active library. Marks in other formats do not provide the data needed for this import.
 
+Needs: impl, utest
+
 ## PDF book detection must exclude conference article pages with grouped article evidence
 `req~import.pdf.conference-article-exclusion~1`
 
