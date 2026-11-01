@@ -15,6 +15,7 @@ module org.jabref.jabls {
 
     requires tools.jackson.core;
     requires tools.jackson.databind;
+    requires tools.jackson.dataformat.yaml;
 
     requires com.google.common;
     requires transitive com.google.gson;
