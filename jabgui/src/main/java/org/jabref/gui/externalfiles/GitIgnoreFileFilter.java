@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,8 +53,16 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
                                     return Stream.of(line);
                                 })
                                 // convert to Java syntax for Glob patterns
+                                .map(GitIgnoreFileFilter::toGlobPattern)
                                 .map(line -> "glob:" + line)
-                                .map(matcherString -> FileSystems.getDefault().getPathMatcher(matcherString))
+                                .flatMap(matcherString -> {
+                                    try {
+                                        return Stream.of(FileSystems.getDefault().getPathMatcher(matcherString));
+                                    } catch (PatternSyntaxException e) {
+                                        LOGGER.warn("Ignoring unparseable pattern {} in {}", matcherString, gitIgnore, e);
+                                        return Stream.<PathMatcher>empty();
+                                    }
+                                })
                                 .collect(Collectors.toSet());
                 // we want to ignore ".gitignore" itself
                 patterns.add(FileSystems.getDefault().getPathMatcher("glob:.gitignore"));
@@ -84,5 +93,27 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
             // If paths are on different roots, fall back to just the file name for relative matching
             return child.getFileName();
         }
+    }
+
+    /// Converts a `.gitignore` pattern into Java's glob syntax.
+    ///
+    /// Git has no alternation syntax, so `{` and `}` are literal characters there,
+    /// whereas `FileSystems.getPathMatcher` reads them as an alternation group and
+    /// rejects an unbalanced one. Such braces are therefore escaped. Existing
+    /// backslash escapes are passed through untouched.
+    private static String toGlobPattern(String gitIgnorePattern) {
+        StringBuilder result = new StringBuilder(gitIgnorePattern.length());
+        for (int i = 0; i < gitIgnorePattern.length(); i++) {
+            char current = gitIgnorePattern.charAt(i);
+            if ((current == '\\') && ((i + 1) < gitIgnorePattern.length())) {
+                result.append(current).append(gitIgnorePattern.charAt(i + 1));
+                i++;
+            } else if ((current == '{') || (current == '}')) {
+                result.append('\\').append(current);
+            } else {
+                result.append(current);
+            }
+        }
+        return result.toString();
     }
 }
