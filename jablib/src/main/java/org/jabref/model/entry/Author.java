@@ -230,7 +230,7 @@ public class Author {
     /// Returns the original invalid value so validation can report it without losing source data.
     public @NonNull Optional<String> getInvalidUsePrefix() {
         return Optional.ofNullable(extendedNameParts.get("useprefix"))
-                       .filter(value -> getUsePrefix().isEmpty());
+                       .filter(_ -> getUsePrefix().isEmpty());
     }
 
     /// Returns explicitly supplied initials, without generating initials or changing punctuation.
