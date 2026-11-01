@@ -23,6 +23,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class NameColumn extends MainTableColumn<NameColumn.Value> {
     public record Value(String display, String source) {
+        @Override
+        public String toString() {
+            return display;
+        }
     }
 
     private final OrFields fields;
