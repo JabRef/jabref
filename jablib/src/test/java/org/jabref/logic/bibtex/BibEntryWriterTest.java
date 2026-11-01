@@ -1,7 +1,7 @@
 package org.jabref.logic.bibtex;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.List;
@@ -68,7 +68,7 @@ class BibEntryWriterTest {
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBLATEX);
         BibEntry reloaded = new BibtexParser(importFormatPreferences)
-                .parse(new StringReader(stringWriter.toString()))
+                .parse(Reader.of(stringWriter.toString()))
                 .getDatabase().getEntries().getFirst();
 
         assertEquals(normalized, reloaded.getField(StandardField.AUTHOR).orElseThrow());

@@ -267,4 +267,12 @@ keep both or replace the existing assignments ([#17240](https://github.com/JabRe
 
 Needs: impl, utest
 
+### Display names in extended format
+`req~ui.names.display-extended~1`
+
+The main table displays names given in BibLaTeX extended name format in readable form (e.g., "Jane Doe" rather than the raw key-value string "Reader=...").
+
+Needs: impl
+
+
 <!-- markdownlint-disable-file MD022 -->
