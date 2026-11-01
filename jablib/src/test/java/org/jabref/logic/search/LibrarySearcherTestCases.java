@@ -39,6 +39,10 @@ public final class LibrarySearcherTestCases {
             .withCitationKey("title-upper-cased")
             .withField(StandardField.TITLE, "TITLE UPPER CASED");
 
+    public static final BibEntry ENTRY_WITH_DOI = new BibEntry(StandardEntryType.Article)
+            .withCitationKey("doi-entry")
+            .withField(StandardField.DOI, "10.1000/182");
+
     private LibrarySearcherTestCases() {
     }
 
@@ -85,7 +89,12 @@ public final class LibrarySearcherTestCases {
                 // regex on any field
                 Arguments.of(List.of(),
                         new SearchQuery("any =~ [Y]"),
-                        List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED))
+                        List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED)),
+
+                // DOI matching (full URLs should find entry by DOI)
+                Arguments.of(List.of(ENTRY_WITH_DOI),
+                        new SearchQuery("https://doi.org/10.1000/182"),
+                        List.of(ENTRY_WITH_DOI, TITLE_SENTENCE_CASED))
         );
     }
 }
