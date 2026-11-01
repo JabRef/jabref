@@ -62,6 +62,19 @@ class EntryEditorTabViewModelTest {
     }
 
     @Test
+    void storedCustomFieldKeepsItsCasing() {
+        viewModel.setValues();
+        EditorTabViewModel tab = viewModel.addCustomTab("General").orElseThrow();
+        viewModel.addFieldPattern(tab, "HALid");
+
+        viewModel.storeSettings();
+
+        assertEquals(
+                new EntryEditorTabModel.CustomizedFieldsTab("General", List.of("HALid")),
+                entryEditorPreferences.getTabModels().getLast());
+    }
+
+    @Test
     void addCustomTabWithExistingNameReturnsExistingTab() {
         viewModel.setValues();
         EditorTabViewModel tab = viewModel.addCustomTab("General").orElseThrow();
