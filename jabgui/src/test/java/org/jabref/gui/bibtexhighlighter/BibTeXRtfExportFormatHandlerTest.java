@@ -1,0 +1,96 @@
+package org.jabref.gui.bibtexhighlighter;
+
+import javafx.scene.Scene;
+import javafx.scene.input.Clipboard;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import org.jabref.gui.StateManager;
+import org.jabref.gui.search.SearchType;
+import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.logic.util.OptionalObjectProperty;
+
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
+import jfx.incubator.scene.control.richtext.TextPos;
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@NullMarked
+class BibTeXRtfExportFormatHandlerTest extends JavaFxTest {
+    private static final String SOURCE = """
+            @Article{Agrawal2015,
+              author       = {Agrawal, Shikha and Agrawal, Jitendra},
+              date         = {2015},
+            }""";
+
+    private static final String HEADER = "{\\rtf1\\ansi\\uc1\\deff0{\\fonttbl{\\f0\\fmodern Courier New;}}";
+
+    private Clipboard clipboard;
+    private BibTeXCodeArea source;
+
+    @Override
+    public void start(Stage stage) {
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)).thenReturn(OptionalObjectProperty.empty());
+        source = new BibTeXCodeArea(stateManager, new BibTeXSyntaxHighlighter());
+        source.setText(SOURCE);
+        clipboard = Clipboard.getSystemClipboard();
+        stage.setScene(new Scene(new VBox(source), 600, 400));
+        stage.show();
+        source.applyCss();
+        source.layout();
+    }
+
+    @AfterEach
+    void tearDown() {
+        interact(clipboard::clear);
+    }
+
+    // [utest->req~entry-editor.source-tab.copy-syntax-highlighting~1]
+    @Test
+    void copyUsesMonospaceFontAndKeepsLinesAndIndentation() {
+        interact(() -> {
+            source.selectAll();
+            source.copy();
+            assertEquals(HEADER + "{\\colortbl;\\red0\\green0\\blue0;}\n"
+                            + "\\f0 {\\cf1 @Article}\\{{\\cf1 Agrawal2015},\\line\n"
+                            + "  {\\cf1 author}       = {\\cf1 \\{Agrawal, Shikha and Agrawal, Jitendra\\}},\\line\n"
+                            + "  {\\cf1 date}         = {\\cf1 \\{2015\\}},\\line\n"
+                            + "\\}}",
+                    clipboard.getRtf());
+        });
+    }
+
+    @Test
+    void partialCitationKeyKeepsThemeColor() {
+        interact(() -> {
+            source.setStyle("-test-key-color: #EECC44;");
+            source.getScene().getStylesheets().add(getClass().getResource("bibtex-clipboard.css").toExternalForm());
+            source.applyCss();
+            source.layout();
+            source.select(TextPos.ofLeading(0, 11), TextPos.ofLeading(0, 17));
+            source.copy();
+            assertEquals(HEADER + "{\\colortbl;\\red238\\green204\\blue68;}\n\\f0 {\\cf1 rawal2}}", clipboard.getRtf());
+        });
+    }
+
+    @Test
+    void copyEscapesRtfAndNonAsciiCharacters() {
+        interact(() -> {
+            source.setText("@Misc{Müller,\n  note = {\\LaTeX{} 日本語},\n}");
+            source.selectAll();
+            source.copy();
+            // U+8A9E is above 32767, so RTF needs it as a negative number
+            assertEquals(HEADER + "{\\colortbl;\\red0\\green0\\blue0;}\n"
+                            + "\\f0 {\\cf1 @Misc}\\{{\\cf1 M}\\u252?{\\cf1 ller},\\line\n"
+                            + "  {\\cf1 note} = {\\cf1 \\{\\\\LaTeX\\{\\} \\u26085?\\u26412?\\u-30050?\\}},\\line\n"
+                            + "\\}}",
+                    clipboard.getRtf());
+        });
+    }
+}
