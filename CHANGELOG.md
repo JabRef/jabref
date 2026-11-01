@@ -410,6 +410,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the deb, rpm and msi packages did not register JabRef for `.bib` files. [#17006](https://github.com/JabRef/jabref/issues/17006)
 - We fixed an issue where the search button in Web Search was enabled for empty search. [#17118](https://github.com/JabRef/jabref/issues/17118)
 - We fixed AI chat connection errors to show the server URL and the reason. [#17125](https://github.com/JabRef/jabref/pull/17125)
+- We fixed many UI issues in the "Search for unlinked local files" wizard. [#16158](https://github.com/JabRef/jabref/issues/16158)
 
 ### Removed
 
