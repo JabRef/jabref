@@ -3,8 +3,6 @@ package org.jabref.logic.ai.chatting;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.l10n.Localization;
-
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -74,11 +72,14 @@ public class DebugAiProvider implements ChatModel {
                                      .reduce((_, second) -> second)
                                      .orElse("");
 
-        String response = Localization.lang(
-                "Hi! I am a dummy AI provider, I am made to test and debug the AI features.\n\nI have this system message:\n%0\n\nAnd I received this user message:\n%1",
-                systemMessage,
-                userMessage
-        );
+        String response = """
+                Hi! I am a dummy AI provider, I am made to test and debug the AI features.
+
+                I have this system message:
+                %s
+
+                And I received this user message:
+                %s""".formatted(systemMessage, userMessage);
 
         return new ChatResponse.Builder()
                 .aiMessage(new AiMessage(response))
