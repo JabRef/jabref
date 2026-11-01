@@ -22,9 +22,11 @@ import org.jspecify.annotations.NullMarked;
 /// Displays formatted names but sorts their resolved source values with the shared name comparator.
 @NullMarked
 public class NameColumn extends MainTableColumn<NameColumn.Value> {
-    public record Value(String display, String source) { }
+    public record Value(String display, String source) {
+    }
 
     private final OrFields fields;
+
     public NameColumn(MainTableColumnModel model, MainTableTooltip tooltip) {
         super(model);
         fields = FieldFactory.parseOrFields(model.getQualifier());

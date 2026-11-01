@@ -71,13 +71,12 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
     }
 
-   private Optional<String> getFieldValue(BibEntry entry) {
-       return fields.getFields().stream()
-                    .map(field -> fieldType == FieldType.NAME ? entry.getFieldOrAlias(field) : entry.getFieldOrAliasLatexFree(field))
-                    .flatMap(Optional::stream)
-                    .findFirst();
-   }
-
+    private Optional<String> getFieldValue(BibEntry entry) {
+        return fields.getFields().stream()
+                     .map(field -> fieldType == FieldType.NAME ? entry.getFieldOrAlias(field) : entry.getFieldOrAliasLatexFree(field))
+                     .flatMap(Optional::stream)
+                     .findFirst();
+    }
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {

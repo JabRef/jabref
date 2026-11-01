@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @NullMarked
 class NameComparatorTest {
     private final NameComparator comparator = new NameComparator();
+
     @Test
     void prefixChangesPositionAmongControlNames() {
         String without = "family=Hasselt, given=Hado P., prefix=van, useprefix=false";
@@ -20,6 +21,7 @@ class NameComparatorTest {
         assertEquals(List.of("Foster, Anna", without, "Miller, Max", with, "Zimmer, Zoe"),
                 List.of(with, "Zimmer, Zoe", without, "Foster, Anna", "Miller, Max").stream().sorted(comparator).toList());
     }
+
     @Test
     void equivalentConventionalAndExtendedNamesCompareEqually() {
         assertEquals(0, comparator.compare("Hasselt, Hado P.", "given=Hado P., family=Hasselt"));

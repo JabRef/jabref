@@ -218,9 +218,12 @@ public class Author {
     /// The original value is retained in [#getExtendedNameParts()] for storage.
     public @NonNull Optional<Boolean> getUsePrefix() {
         return getExtendedNameValue("useprefix").flatMap(value -> switch (value) {
-            case "true" -> Optional.of(true);
-            case "false" -> Optional.of(false);
-            default -> Optional.empty();
+            case "true" ->
+                    Optional.of(true);
+            case "false" ->
+                    Optional.of(false);
+            default ->
+                    Optional.empty();
         });
     }
 
