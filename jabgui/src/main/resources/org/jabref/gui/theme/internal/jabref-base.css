@@ -513,6 +513,7 @@
 .global-search-bar .toggle-button:selected,
 .global-search-bar .toggle-button:hover,
 .global-search-bar .toggle-button:selected:hover,
+.global-search-bar .toggle-button:armed,
 .global-search-bar .toggle-button:pressed {
     -fx-background-color: transparent;
 }
