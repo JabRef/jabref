@@ -17,7 +17,7 @@ val javafxDefault = "27"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
-val lucene = "10.5.2"
+val lucene = "10.6.0"
 
 val pdfbox = "3.0.8"
 
@@ -27,7 +27,7 @@ val jbang = "0.143.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
-    api(platform("ai.djl:bom:0.39.0"))
+    api(platform("ai.djl:bom:0.40.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.22.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
@@ -66,8 +66,8 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.10.4")
-    api("com.konghq:unirest-modules-gson:4.10.4")
+    api("com.konghq:unirest-java-core:4.10.5")
+    api("com.konghq:unirest-modules-gson:4.10.5")
     api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
     api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.1")
@@ -150,7 +150,7 @@ dependencies.constraints {
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.21")
-    api("org.jooq:jool:0.9.15")
+    api("org.jooq:jool:0.9.16")
     api("org.jsoup:jsoup:1.23.2")
     api("org.jspecify:jspecify:1.0.1")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
