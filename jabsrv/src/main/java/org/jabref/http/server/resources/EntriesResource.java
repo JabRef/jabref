@@ -6,12 +6,10 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
-import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
@@ -23,22 +21,16 @@ import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.openoffice.ZoteroCitationMarkParser;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.LinkedFile;
 
-import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.jspecify.annotations.Nullable;
@@ -55,9 +47,6 @@ public class EntriesResource {
 
     @Inject
     SrvStateManager srvStateManager;
-
-    @Inject
-    Gson gson;
 
     @Inject
     UiMessageHandler uiMessageHandler;
@@ -190,38 +179,5 @@ public class EntriesResource {
             return Optional.empty();
         }
         return Optional.of(ServerUtils.getLibraryPath(id, srvStateManager));
-    }
-
-    /// Loops through all entries in the specified library and adds attached files of type "PDF" to
-    /// a list and JSON serialises it.
-    /// FIXME: JabMap should serve the files per BibEntry. See <https://github.com/JabRef/jabmap/issues/56> for details
-    @GET
-    @Path("pdffiles")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public String getPDFFilesAsList(@PathParam("id") String id) throws IOException {
-        // get a list of all entries in library (specified by "id")
-        BibDatabaseContext databaseContext = ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
-        List<LinkedPdfFileDTO> response = new ArrayList<>();
-        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
-        if (entries.isEmpty()) {
-            throw new NotFoundException("No entries found for library: " + id);
-        }
-
-        // loop through all entries to extract pdfs and paths
-        for (BibEntry entry : entries) {
-            List<LinkedFile> pathsToFiles = entry.getFiles();
-            if (!pathsToFiles.isEmpty()) {
-                for (LinkedFile file : pathsToFiles) {
-                    // ignore all non pdf files and online references
-                    if (!"PDF".equals(file.getFileType()) || LinkedFile.isOnlineLink(file.getLink())) {
-                        continue;
-                    }
-                    // add file to response body
-                    LinkedPdfFileDTO localPdfFile = new LinkedPdfFileDTO(entry, file);
-                    response.add(localPdfFile);
-                }
-            }
-        }
-        return gson.toJson(response);
     }
 }

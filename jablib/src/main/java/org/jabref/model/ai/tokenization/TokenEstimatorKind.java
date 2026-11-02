@@ -22,7 +22,7 @@ public enum TokenEstimatorKind {
     public static TokenEstimatorKind safeValueOf(String name) {
         try {
             return TokenEstimatorKind.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return AiDefaultEnums.TOKEN_ESTIMATOR_KIND;
         }
     }

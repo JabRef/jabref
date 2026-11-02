@@ -59,6 +59,15 @@ jobs:
           ref: ${{ steps.resolve.outputs.branch }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
+      - name: Link PR in summary
+        env:
+          PR_NUMBER: ${{ inputs.pr || github.event.pull_request.number }}
+        run: |
+          {
+            echo "PR: https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # Pushes the merge commit back to the PR branch (the reason this workflow exists).
       # "$/" resolves the action from this workflow's own commit, not from the workspace -
       # the workspace holds the PR head (possibly a fork), whose copy of the action must

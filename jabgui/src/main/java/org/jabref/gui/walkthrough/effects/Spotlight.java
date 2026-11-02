@@ -5,9 +5,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
+import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -26,7 +26,6 @@ public final class Spotlight extends BaseWindowEffect {
     private Rectangle backdrop;
     private Rectangle hole;
     private volatile @Nullable Shape overlayShape;
-    private @Nullable Runnable onClickHandler;
     private @Nullable Timeline transitionAnimation;
 
     public Spotlight(@NonNull Pane pane) {
@@ -50,6 +49,10 @@ public final class Spotlight extends BaseWindowEffect {
     public void transitionTo(@NonNull Node newNode) {
         Shape overlayShape = this.overlayShape;
         if (overlayShape == null || !overlayShape.isVisible()) {
+            // The effect was hidden (e.g. target off-screen in a small window); rebuild it on the new target
+            if (node != null) {
+                detach();
+            }
             attach(newNode);
             return;
         }
@@ -92,10 +95,6 @@ public final class Spotlight extends BaseWindowEffect {
         });
 
         transitionAnimation.play();
-    }
-
-    public void setOnClick(@Nullable Runnable onClickHandler) {
-        this.onClickHandler = onClickHandler;
     }
 
     @Override
@@ -172,21 +171,10 @@ public final class Spotlight extends BaseWindowEffect {
         overlayShape.setManaged(false);
         overlayShape.getStyleClass().add("walkthrough-spotlight");
 
-        if (onClickHandler != null) {
-            overlayShape.setOnMouseClicked(this::handleClick);
-            overlayShape.setMouseTransparent(false);
-        } else {
-            overlayShape.setMouseTransparent(true);
-        }
+        // Clicks outside the target are swallowed so the user cannot interact with the shaded area
+        overlayShape.setOnMouseClicked(Event::consume);
 
         this.overlayShape = overlayShape;
         this.pane.getChildren().add(oldIndex, this.overlayShape);
-    }
-
-    private void handleClick(MouseEvent event) {
-        if (onClickHandler != null) {
-            onClickHandler.run();
-        }
-        event.consume();
     }
 }

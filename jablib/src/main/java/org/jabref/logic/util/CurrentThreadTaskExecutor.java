@@ -50,7 +50,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
 
     @Override
     public void shutdown() {
-        throttlers.forEach((throttler, aVoid) -> throttler.shutdown());
+        throttlers.forEach((throttler, _) -> throttler.shutdown());
     }
 
     @Override

@@ -29,7 +29,7 @@ class CitationEntryTest {
     }
 
     @Test
-    void citationEntryInitalPageInfoChanged() {
+    void citationEntryInitialPageInfoChanged() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
         assertEquals(Optional.of("Info"), citationEntry.getPageInfo());
     }

@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.ingestion.logic;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.ingestion.repositories.IngestedDocumentsRepository;
@@ -31,7 +32,17 @@ public class EmbeddingsCleaner {
         this.embeddingStore = embeddingStore;
         this.ingestedDocumentsRepository = ingestedDocumentsRepository;
 
+        removeAllIfGeneratedWithOtherModel();
         setupListeners();
+    }
+
+    /// Embeddings of different models are not comparable. This catches model changes made while JabRef was not running,
+    /// e.g., a new default model in a JabRef update.
+    // [impl->req~ai.ingestion.model-change-invalidation~1]
+    private void removeAllIfGeneratedWithOtherModel() {
+        if (!ingestedDocumentsRepository.getEmbeddingModel().equals(Optional.of(aiPreferences.getEmbeddingModel()))) {
+            removeAll();
+        }
     }
 
     private void setupListeners() {
@@ -41,6 +52,7 @@ public class EmbeddingsCleaner {
     public void removeAll() {
         embeddingStore.removeAll();
         ingestedDocumentsRepository.removeAll();
+        ingestedDocumentsRepository.setEmbeddingModel(aiPreferences.getEmbeddingModel());
     }
 
     public void removeDocument(String fileHash) {

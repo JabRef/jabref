@@ -117,7 +117,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     }
 
     private void addMessageColumnFilter(TableColumn<IntegrityMessage, String> messageColumn, MenuButton messageFilterButton) {
-        tableFilter.getColumnFilter(messageColumn).ifPresent(columnFilter -> {
+        tableFilter.getColumnFilter(messageColumn).ifPresent(_ -> {
             ContextMenu messageContextMenu = messageColumn.getContextMenu();
             if (messageContextMenu != null) {
                 messageFilterButton.setContextMenu(messageContextMenu);

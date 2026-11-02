@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -135,7 +136,11 @@ public class MainTableColumnFactory {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
-        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
+        columnPreferences.getColumns().stream()
+                         .filter(MainTableColumnModel::isConfigurable)
+                         .map(this::createColumn)
+                         .filter(Objects::nonNull)
+                         .forEach(columns::add);
         return columns;
     }
 

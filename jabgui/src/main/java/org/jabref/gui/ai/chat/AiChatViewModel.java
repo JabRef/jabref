@@ -140,7 +140,7 @@ public class AiChatViewModel extends AbstractViewModel {
         systemMessageTemplate.bind(aiPreferences.chattingSystemMessageTemplateProperty());
         userMessageTemplate.bind(aiPreferences.chattingUserMessageTemplateProperty());
 
-        this.embeddingModel.bind(ObservablesHelper.createClosableObjectBinding(
+        this.embeddingModel.bind(ObservablesHelper.createObjectBinding(
                 () -> EmbeddingModelFactory.create(aiPreferences, embeddingModelCache),
                 aiPreferences.getEmbeddingsProperties()
         ));
@@ -148,6 +148,11 @@ public class AiChatViewModel extends AbstractViewModel {
         this.documentSplitter.bind(ObservablesHelper.createObjectBinding(
                 () -> DocumentSplitterFactory.create(aiPreferences),
                 aiPreferences.getDocumentSplitterProperties()
+        ));
+
+        this.chatModel.bind(ObservablesHelper.createClosableObjectBinding(
+                () -> ChatModelFactory.create(aiPreferences),
+                aiPreferences.getChatProperties()
         ));
 
         BooleanBinding isAiTurnedOff = aiPreferences.aiFeaturesEnabledCurrentlyProperty().not();
@@ -187,8 +192,6 @@ public class AiChatViewModel extends AbstractViewModel {
                 aiPreferences.getRagMinScore(),
                 aiPreferences.getRagMaxResultsCount()
         ));
-
-        chatModel.setValue(ChatModelFactory.create(aiPreferences));
     }
 
     private void setupListeners() {

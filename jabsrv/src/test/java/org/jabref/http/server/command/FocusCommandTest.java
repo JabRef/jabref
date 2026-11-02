@@ -1,6 +1,7 @@
 package org.jabref.http.server.command;
 
 import org.jabref.http.server.ServerTest;
+import org.jabref.http.server.resources.command.CommandResource;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Application;

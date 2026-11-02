@@ -66,10 +66,10 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         entryLinkField.setComparator(Comparator.comparing(ParsedEntryLink::getKey));
 
         entryLinkField.setShowSearchIcon(false);
-        entryLinkField.setOnMouseClicked(event -> entryLinkField.getEditor().requestFocus());
+        entryLinkField.setOnMouseClicked(_ -> entryLinkField.getEditor().requestFocus());
         entryLinkField.getEditor().getStyleClass().clear();
         entryLinkField.getEditor().getStyleClass().add("tags-field-editor");
-        entryLinkField.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> entryLinkField.pseudoClassStateChanged(FOCUSED, newValue));
+        entryLinkField.getEditor().focusedProperty().addListener((_, _, newValue) -> entryLinkField.pseudoClassStateChanged(FOCUSED, newValue));
 
         String separator = EntryLinkList.SEPARATOR;
         entryLinkField.getEditor().setOnKeyReleased(event -> {
@@ -86,7 +86,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         Label tagLabel = new Label();
         tagLabel.setText(entryLinkField.getConverter().toString(entryLink));
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
-        tagLabel.getGraphic().setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
+        tagLabel.getGraphic().setOnMouseClicked(_ -> entryLinkField.removeTags(entryLink));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         tagLabel.setOnMouseClicked(event -> {
             if ((event.getClickCount() == 2 || event.isControlDown()) && event.getButton() == MouseButton.PRIMARY) {

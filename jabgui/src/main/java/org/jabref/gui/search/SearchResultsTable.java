@@ -10,9 +10,9 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
+import org.jabref.gui.maintable.ColumnPreferencesRecorder;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.maintable.PersistenceVisualStateTable;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -65,7 +65,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, preferences.getSearchDialogColumnPreferences()).addListeners();
+        new ColumnPreferencesRecorder(this, preferences.getSearchDialogColumnPreferences()).bind();
 
         database.getDatabase().registerListener(this);
     }

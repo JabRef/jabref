@@ -61,7 +61,7 @@ public class SaveOrderConfigPanel extends VBox {
                         createCriterionRow(criterionViewModel, row);
                     }
                 } else if (change.wasRemoved()) {
-                    for (SortCriterionViewModel criterionViewModel : change.getRemoved()) {
+                    for (SortCriterionViewModel _ : change.getRemoved()) {
                         clearCriterionRow(change.getFrom());
                     }
                 }

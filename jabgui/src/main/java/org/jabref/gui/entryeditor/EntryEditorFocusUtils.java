@@ -195,7 +195,7 @@ class EntryEditorFocusUtils {
         if (!shownFields.isEmpty() && node.getId() != null) {
             Optional<Field> boundaryField = first
                                             ? shownFields.stream().findFirst()
-                                            : shownFields.stream().reduce((firstField, secondField) -> secondField);
+                                            : shownFields.stream().reduce((_, secondField) -> secondField);
             boolean matchesBoundaryFieldId = boundaryField.map(Field::getName)
                                                           .map(name -> name.equalsIgnoreCase(node.getId()))
                                                           .orElse(false);
@@ -269,7 +269,7 @@ class EntryEditorFocusUtils {
 
         Collection<Field> shownFields = tab.getShownFields();
         if (!shownFields.isEmpty()) {
-            Optional<Field> lastField = shownFields.stream().reduce((first, second) -> second);
+            Optional<Field> lastField = shownFields.stream().reduce((_, second) -> second);
             Optional<Node> lastTextInput = EntryEditorFocusTraversal.findFirstTextInputById(parent, lastField.get().getName());
             if (lastTextInput.isPresent()) {
                 lastTextInput.get().requestFocus();

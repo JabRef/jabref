@@ -1,0 +1,48 @@
+app-id: org.jabref.jabref
+runtime: org.freedesktop.Platform
+runtime-version: '26.08'
+sdk: org.freedesktop.Sdk
+command: JabRef
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --share=network
+  - --filesystem=home
+  - --device=dri
+  - --talk-name=org.freedesktop.Flatpak
+modules:
+  - name: JabRef
+    buildsystem: simple
+    build-commands:
+      - tar -xzf JabRef-portable_linux.tar.gz --no-same-owner --directory=/app/ --strip-components=1
+      - install -D -m0644 /app/lib/JabRef.png /app/share/icons/hicolor/64x64/apps/org.jabref.jabref.png
+      - install -D -m0644 org.jabref.jabref.desktop /app/share/applications/org.jabref.jabref.desktop
+      - install -D -m0755 texstudio.sh /app/bin/texstudio
+      - install -D -m0755 texmaker.sh /app/bin/texmaker
+      - install -D -m0755 vim.sh /app/bin/vim
+      - install -D -m0755 emacsclient.sh /app/bin/emacsclient
+      - install -D -m0755 soffice.sh /app/bin/soffice
+    sources:
+      - type: file
+        only-arches:
+          - x86_64
+        url: https://github.com/JabRef/jabref/releases/download/v6.0-beta.1/JabRef-portable_linux.tar.gz
+        sha256: ed1f771e7b3284b6e61fada14fd89b4822bb9bff2f5b2dc3f5b3034ab471f798
+      - type: file
+        only-arches:
+          - aarch64
+        url: https://github.com/JabRef/jabref/releases/download/v6.0-beta.1/JabRef-portable_linux_arm64.tar.gz
+        sha256: 551bf1b5627e17f8311b96bd3a6ef234ace601812361e5db3375067d3b70b9e6
+        dest-filename: JabRef-portable_linux.tar.gz
+      - type: file
+        path: org.jabref.jabref.desktop
+      - type: file
+        path: texstudio.sh
+      - type: file
+        path: texmaker.sh
+      - type: file
+        path: vim.sh
+      - type: file
+        path: emacsclient.sh
+      - type: file
+        path: soffice.sh

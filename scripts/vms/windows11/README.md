@@ -11,7 +11,7 @@ One has to install the [JabRef Browser Extension](https://addons.mozilla.org/en-
 
 ### "Waiting for machine to reboot..."
 
-In case Vagrant reports "Waiting for machine to reboot..." and nothing happens, one has to "power off" the machine, execute `vagrant destory`, and then run `vagrant up` again.
+In case Vagrant reports "Waiting for machine to reboot..." and nothing happens, one has to "power off" the machine, execute `vagrant destroy`, and then run `vagrant up` again.
 
 ### `fatal: early EOF`
 

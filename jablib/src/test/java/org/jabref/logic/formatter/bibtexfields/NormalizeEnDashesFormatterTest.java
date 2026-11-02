@@ -31,7 +31,7 @@ class NormalizeEnDashesFormatterTest {
     }
 
     @Test
-    void dashesPreceededByASpaceAreKept() {
+    void dashesPrecededByASpaceAreKept() {
         assertEquals("Example -illustrative", formatter.format("Example -illustrative"));
     }
 

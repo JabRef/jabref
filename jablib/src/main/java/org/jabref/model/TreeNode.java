@@ -42,7 +42,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     @Nullable
     private T parent;
     /// The function which is invoked when something changed in the subtree.
-    private Consumer<T> onDescendantChanged = t -> {
+    private Consumer<T> onDescendantChanged = _ -> {
         /* Do nothing */
     };
 

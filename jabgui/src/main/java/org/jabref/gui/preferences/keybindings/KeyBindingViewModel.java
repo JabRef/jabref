@@ -62,7 +62,7 @@ public class KeyBindingViewModel {
         return realBinding;
     }
 
-    private void setBinding(String bind) {
+    void setBinding(String bind) {
         this.realBinding = bind;
         if (bind.isEmpty()) {
             this.shownBinding.set("");
@@ -93,7 +93,7 @@ public class KeyBindingViewModel {
         // validate the shortcut is no modifier key
 
         KeyCode code = evt.getCode();
-        if (code.isModifierKey() || (code == KeyCode.BACK_SPACE) || (code == KeyCode.SPACE) || (code == KeyCode.TAB)
+        if (code.isModifierKey() || (code == KeyCode.SPACE) || (code == KeyCode.TAB)
                 || (code == KeyCode.ENTER) || (code == KeyCode.UNDEFINED)) {
             return false;
         }

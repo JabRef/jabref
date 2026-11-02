@@ -95,7 +95,7 @@ public class NotificationListener implements Runnable {
                 }
                 try {
                     Thread.sleep(delayMillis);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException _) {
                     Thread.currentThread().interrupt();
                     return;
                 }

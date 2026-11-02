@@ -126,7 +126,7 @@ class JabRefGuiUndoManagerTest {
                 // Bounded, so that a failure here fails this test rather than leaving the
                 // JavaFX thread blocked for every test that follows.
                 release.await(5, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
             }
         });
@@ -149,7 +149,7 @@ class JabRefGuiUndoManagerTest {
         Platform.runLater(() -> {
             try {
                 release.await(5, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
             }
         });

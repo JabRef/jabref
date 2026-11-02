@@ -3,7 +3,7 @@ plugins {
     id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.jabref.gradle.feature.requirementtracing")
     id("org.openrewrite.rewrite") version "7.39.0"
-    id("org.cyclonedx.bom") version "3.4.1"
+    id("org.cyclonedx.bom") version "3.5.1"
 }
 
 // OpenRewrite should rewrite all sources
@@ -35,6 +35,19 @@ rewrite {
     failOnDryRunResults = true
 }
 
+// OpenRewrite parses with the JDK running Gradle, not with the toolchain.
+// An older JDK's parser mangles Java 25 syntax, e.g., `catch (Throwable _)` becomes `catch (Throwable_ _)`:
+// https://github.com/openrewrite/rewrite-migrate-java/issues/1239
+// A newer JDK fails to parse dozens of files:
+// https://github.com/openrewrite/rewrite/issues/7554
+tasks.matching { it.name.startsWith("rewrite") }.configureEach {
+    doFirst {
+        require(JavaVersion.current() == JavaVersion.VERSION_25) {
+            "OpenRewrite must run on JDK 25 (Gradle runs on ${JavaVersion.current()}). Set JAVA_HOME accordingly."
+        }
+    }
+}
+
 requirementTracing {
     inputDirectories.setFrom(
         files(
@@ -62,6 +75,12 @@ requirementTracing {
             "feat",
             "req",
             "adr"
+        )
+
+    filterWantedStatuses =
+        setOf(
+            // Requirements without `Status` field are treated as `approved`.
+            "approved"
         )
 
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer

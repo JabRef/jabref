@@ -19,7 +19,10 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
 ///
-/// Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
+/// Parsing algorithm is designed to satisfy two requirements:
+///   (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX;
+///   (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output).
+/// The following rules are used:
 /// 1. 'author field' is a sequence of tokens;
 ///     - tokens are separated by sequences of whitespaces (`Character.isWhitespace(c)==true`),
 ///       commas (,), dashes (-), and tildas (~);
@@ -61,7 +64,7 @@ import org.jspecify.annotations.Nullable;
 ///       fixing this problem, however, requires processing of the preabmle;
 /// 2. 'author names' in 'author field' are subsequences of tokens separated by
 ///    token `and` (`and` is case-insensitive); if 'author name' is an empty
-///    sequence of tokens, it is ignored; for examle, both
+///    sequence of tokens, it is ignored; for example, both
 ///    `"John Smith and Peter Black"` and
 ///    `"and and John Smith and and Peter Black"` consists of 2 'author name's
 ///    `"Johm Smith"` and `"Peter Black"` (in erroneous situations, this is a bit
@@ -79,7 +82,7 @@ import org.jspecify.annotations.Nullable;
 ///       token, 'von-part' consists of lower-case tokens starting the first lower-case
 ///       token and ending the lower-case token that is followed by upper-case token,
 ///       'last-part' consists of the rest of tokens; note that both 'first-part' and
-///       'latst-part' may be empty and 'last-part' may contain lower-case tokens; for
+///       'last-part' may be empty and 'last-part' may contain lower-case tokens; for
 ///       example: in `"von der"`, `'first-part'='last-part'=""`,
 ///       `'von-part'="von der"`; in
 ///       `"Charles Louis Xavier Joseph de la Vall{\'e}e la Poussin"`,
@@ -265,6 +268,11 @@ public class AuthorList implements Iterable<Author> {
         return authors;
     }
 
+    /// Returns the authors without the "et al." placeholder [Author#OTHERS]
+    public List<Author> getNamedAuthors() {
+        return authors.stream().filter(author -> !Author.OTHERS.equals(author)).toList();
+    }
+
     /// Returns a LaTeX-free version of this `AuthorList`.
     public AuthorList latexFree() {
         if (latexFreeAuthors == null) {
@@ -309,7 +317,7 @@ public class AuthorList implements Iterable<Author> {
     ///
     /// @param oxfordComma Whether to put a comma before the and at the end.
     /// @return formatted list of authors.
-    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsLastNames(boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), Author::getNamePrefixAndFamilyName, oxfordComma);
@@ -325,10 +333,10 @@ public class AuthorList implements Iterable<Author> {
     /// Neumann, John, Smith, John and Black Brown, Peter" or "von Neumann, J.,
     /// Smith, J. and Black Brown, P.".
     ///
-    /// @param abbreviate  whether to abbreivate first names.
+    /// @param abbreviate  whether to abbreviate first names.
     /// @param oxfordComma Whether to put a comma before the and at the end.
     /// @return formatted list of authors.
-    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), auth -> auth.getFamilyGiven(abbreviate), oxfordComma);
@@ -385,10 +393,10 @@ public class AuthorList implements Iterable<Author> {
     /// von Neumann, John Smith and Peter Black Brown" or "J. von Neumann, J.
     /// Smith and P. Black Brown"
     ///
-    /// @param abbreviate  whether to abbreivate first names.
+    /// @param abbreviate  whether to abbreviate first names.
     /// @param oxfordComma Whether to put a comma before the and at the end.
     /// @return formatted list of authors.
-    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), author -> author.getGivenFamily(abbreviate), oxfordComma);
@@ -430,7 +438,10 @@ public class AuthorList implements Iterable<Author> {
                            .collect(Collectors.joining(" and "));
     }
 
-    /// Returns the list of authors in a form suitable for alphabetization. This means that last names come first, never preceded by "von" particles, and that any braces are removed. First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another. This form is not intended to be suitable for presentation, only for sorting.
+    /// Returns the list of authors in a form suitable for alphabetization.
+    /// This means that last names come first, never preceded by "von" particles, and that any braces are removed.
+    /// First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another.
+    /// This form is not intended to be suitable for presentation, only for sorting.
     ///
     ///
     /// - "John Smith" ==> "Smith, J.";

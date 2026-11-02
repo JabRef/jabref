@@ -83,6 +83,26 @@ class HayagrivaYamlExporterTest {
     }
 
     @Test
+    final void exportsCorporateAuthorWithoutBraces(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("examplekey")
+                .withField(StandardField.AUTHOR, "{Some company} and M{\\\"u}ller, Hans");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
+
+        List<String> expected = List.of(
+                "examplekey:",
+                "  type: article",
+                "  author:",
+                "    - Some company",
+                "    - Müller, Hans");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
     final void exportsCorrectMultipleAuthors(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")

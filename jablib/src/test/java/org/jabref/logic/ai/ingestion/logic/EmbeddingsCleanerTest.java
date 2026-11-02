@@ -2,6 +2,7 @@ package org.jabref.logic.ai.ingestion.logic;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.ai.embedding.MVStoreEmbeddingStore;
 import org.jabref.logic.ai.ingestion.repositories.MVStoreIngestedDocumentsRepository;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.jabref.logic.ai.ingestion.logic.EmbeddingsCleaner.FILE_HASH_METADATA_KEY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -29,6 +31,7 @@ class EmbeddingsCleanerTest {
 
     private MVStoreEmbeddingStore embeddingStore;
     private MVStoreIngestedDocumentsRepository ingestedDocumentsRepository;
+    private AiPreferences aiPreferences;
     private EmbeddingsCleaner cleaner;
 
     @BeforeEach
@@ -38,8 +41,9 @@ class EmbeddingsCleanerTest {
         ingestedDocumentsRepository = new MVStoreIngestedDocumentsRepository(_ -> {
         }, tempDir.resolve("ingested.mv"));
 
-        AiPreferences aiPreferences = mock(AiPreferences.class);
+        aiPreferences = mock(AiPreferences.class);
         when(aiPreferences.getEmbeddingsProperties()).thenReturn(List.of());
+        when(aiPreferences.getEmbeddingModel()).thenReturn("model-a");
 
         cleaner = new EmbeddingsCleaner(aiPreferences, embeddingStore, ingestedDocumentsRepository);
     }
@@ -48,12 +52,69 @@ class EmbeddingsCleanerTest {
         return new TextSegment(text, new Metadata(java.util.Map.of(FILE_HASH_METADATA_KEY, hash)));
     }
 
-    private boolean hasAnyEmbedding() {
-        return !embeddingStore.search(EmbeddingSearchRequest.builder()
-                                                            .queryEmbedding(Embedding.from(new float[] {1.0f, 0.0f}))
-                                                            .maxResults(100)
-                                                            .minScore(0.0)
-                                                            .build()).matches().isEmpty();
+    private List<String> embeddedTexts() {
+        return embeddingStore.search(EmbeddingSearchRequest.builder()
+                                                           .queryEmbedding(Embedding.from(new float[] {1.0f, 0.0f}))
+                                                           .maxResults(100)
+                                                           .minScore(0.0)
+                                                           .build())
+                             .matches().stream()
+                             .map(match -> match.embedded().text())
+                             .toList();
+    }
+
+    @Test
+    void startupKeepsEmbeddingsOfSameModel() {
+        embeddingStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
+        ingestedDocumentsRepository.markDocumentAsFullyIngested("hash-1");
+
+        new EmbeddingsCleaner(aiPreferences, embeddingStore, ingestedDocumentsRepository);
+
+        assertEquals(List.of("doc"), embeddedTexts());
+        assertTrue(ingestedDocumentsRepository.isDocumentIngested("hash-1"));
+    }
+
+    // [utest->req~ai.ingestion.model-change-invalidation~1]
+    @Test
+    void startupClearsEmbeddingsOfOtherModel() {
+        embeddingStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
+        ingestedDocumentsRepository.markDocumentAsFullyIngested("hash-1");
+        when(aiPreferences.getEmbeddingModel()).thenReturn("model-b");
+
+        new EmbeddingsCleaner(aiPreferences, embeddingStore, ingestedDocumentsRepository);
+
+        assertEquals(List.of(), embeddedTexts());
+        assertFalse(ingestedDocumentsRepository.isDocumentIngested("hash-1"));
+        assertEquals(Optional.of("model-b"), ingestedDocumentsRepository.getEmbeddingModel());
+    }
+
+    // [utest->req~ai.ingestion.model-change-invalidation~1]
+    @Test
+    void startupClearsEmbeddingsWithoutRecordedModel() {
+        MVStoreIngestedDocumentsRepository legacyRepository = new MVStoreIngestedDocumentsRepository(_ -> {
+        }, tempDir.resolve("legacy.mv"));
+        legacyRepository.markDocumentAsFullyIngested("hash-1");
+        embeddingStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
+
+        new EmbeddingsCleaner(aiPreferences, embeddingStore, legacyRepository);
+
+        assertEquals(List.of(), embeddedTexts());
+        assertFalse(legacyRepository.isDocumentIngested("hash-1"));
+        assertEquals(Optional.of("model-a"), legacyRepository.getEmbeddingModel());
+    }
+
+    // [utest->req~ai.ingestion.model-change-invalidation~1]
+    @Test
+    void togglingExpertSettingsClearsEmbeddingsOfPreviousModel() {
+        AiPreferences preferences = AiPreferences.getDefault();
+        preferences.setEmbeddingModel("custom-model");
+        new EmbeddingsCleaner(preferences, embeddingStore, ingestedDocumentsRepository);
+        embeddingStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
+
+        preferences.setCustomizeExpertSettings(true);
+
+        assertEquals(List.of(), embeddedTexts());
+        assertEquals(Optional.of("custom-model"), ingestedDocumentsRepository.getEmbeddingModel());
     }
 
     @Test
@@ -62,7 +123,7 @@ class EmbeddingsCleanerTest {
 
         cleaner.removeAll();
 
-        assertFalse(hasAnyEmbedding());
+        assertEquals(List.of(), embeddedTexts());
     }
 
     @Test

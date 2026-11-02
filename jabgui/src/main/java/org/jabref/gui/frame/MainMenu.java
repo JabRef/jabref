@@ -17,6 +17,8 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
+import org.jabref.gui.citedrive.CiteDriveLoginAction;
+import org.jabref.gui.citedrive.CiteDrivePushAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.MergeLibraryAction;
@@ -82,6 +84,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
@@ -114,6 +117,7 @@ public class MainMenu extends MenuBar {
     private final PreviewControls previewControls;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -131,7 +135,8 @@ public class MainMenu extends MenuBar {
                     AiService aiService,
                     PreviewControls previewControls,
                     GitHandlerRegistry gitHandlerRegistry,
-                    JournalAbbreviationRepository journalAbbreviationRepository
+                    JournalAbbreviationRepository journalAbbreviationRepository,
+                    OAuthSessionRegistry oAuthSessionRegistry
     ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
@@ -150,6 +155,7 @@ public class MainMenu extends MenuBar {
         this.previewControls = previewControls;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
 
         createMenu();
     }
@@ -197,6 +203,7 @@ public class MainMenu extends MenuBar {
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
+                citeDriveMenu(factory),
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService))),
                 // endregion
@@ -372,7 +379,7 @@ public class MainMenu extends MenuBar {
 
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferences.getExternalApplicationsPreferences())),
-                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction(URLs.FORUM_URL, dialogService, preferences.getExternalApplicationsPreferences())),
 
                 new SeparatorMenuItem(),
 
@@ -381,6 +388,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction(URLs.DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                factory.createMenuItem(StandardActions.CONTRIBUTE, new OpenBrowserAction(URLs.CONTRIBUTE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferences, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction(URLs.WEBPAGE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
@@ -436,5 +444,14 @@ public class MainMenu extends MenuBar {
         );
 
         return sendMenu;
+    }
+
+    /// CiteDrive is opt-in: without it the menu is not shown at all
+    private Menu citeDriveMenu(ActionFactory factory) {
+        Menu citeDrive = factory.createSubMenu(StandardActions.CITE_DRIVE,
+                factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry)),
+                factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry)));
+        citeDrive.visibleProperty().bind(preferences.getCiteDrivePreferences().enabledProperty());
+        return citeDrive;
     }
 }

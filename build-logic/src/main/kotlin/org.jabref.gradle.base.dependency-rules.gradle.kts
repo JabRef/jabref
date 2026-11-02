@@ -186,6 +186,31 @@ extraJavaModuleInfo {
         uses("kong.unirest.core.json.JsonEngine")
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
+
+    // region nimbusdl
+    // required by nimbusdl
+    module("com.github.stephenc.jcip:jcip-annotations", "jcip.annotations") {
+        exportAllPackages()
+    }
+    module("net.minidev:json-smart", "json.smart") {
+        exportAllPackages()
+    }
+    module("com.nimbusds:content-type", "nimbusds.contenttype") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    knownModule("com.nimbusds:nimbus-jose-jwt", "com.nimbusds.jose.jwt")
+    module("com.nimbusds:lang-tag", "nimbusds.langtag") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("com.nimbusds:oauth2-oidc-sdk", "nimbusds.oauth2.oidc.sdk") {
+        overrideModuleName()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    // endregion
+
     module("com.squareup.okhttp3:mockwebserver3", "mockwebserver3") {
         preserveExisting()
     }
@@ -246,6 +271,9 @@ extraJavaModuleInfo {
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
         uses("dev.langchain4j.spi.json.ProviderJsonCodecFactory")
+        // Loaded by MistralAiChatModel.builder() and build(); missing uses crashes JabRef start with Mistral AI selected
+        uses("dev.langchain4j.model.mistralai.spi.MistralAiChatModelBuilderFactory")
+        uses("dev.langchain4j.model.mistralai.internal.client.MistralAiClientBuilderFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
     }
@@ -527,8 +555,6 @@ extraJavaModuleInfo {
         opens("javafx.scene.control.cell")
         opens("javafx.scene.control.skin")
         exports("com.sun.javafx.scene.control")
-        // required for ActionFactory#enableTooltips
-        opens("com.sun.javafx.scene.control")
     }
 
     module("org.hamcrest:hamcrest", "org.hamcrest")

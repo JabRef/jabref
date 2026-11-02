@@ -137,7 +137,7 @@ public class CleanupPreferences {
         public static Optional<CleanupStep> safeValueOf(String name) {
             try {
                 return Optional.of(valueOf(name));
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _) {
                 return Optional.empty();
             }
         }

@@ -524,7 +524,7 @@ public class OpenOfficePanel {
                             ex);
                 }
                 case BootstrapException bootstrapEx -> {
-                    LOGGER.error("Exception boostrap cause", bootstrapEx.getTargetException());
+                    LOGGER.error("Exception bootstrap cause", bootstrapEx.getTargetException());
                     dialogService.showErrorDialogAndWait("Bootstrap error", bootstrapEx.getTargetException());
                 }
                 case null,

@@ -86,10 +86,10 @@ public class ThreeWayMergeView extends VBox {
         toolbar.setOnSelectLeftEntryValuesButtonClicked(this::selectLeftEntryValues);
         toolbar.setOnSelectRightEntryValuesButtonClicked(this::selectRightEntryValues);
 
-        toolbar.showDiffProperty().addListener(e -> updateDiff());
-        toolbar.diffViewProperty().addListener(e -> updateDiff());
-        toolbar.diffHighlightingMethodProperty().addListener(e -> updateDiff());
-        toolbar.hideEqualFieldsProperty().addListener(e -> showOrHideEqualFields());
+        toolbar.showDiffProperty().addListener(_ -> updateDiff());
+        toolbar.diffViewProperty().addListener(_ -> updateDiff());
+        toolbar.diffHighlightingMethodProperty().addListener(_ -> updateDiff());
+        toolbar.hideEqualFieldsProperty().addListener(_ -> showOrHideEqualFields());
 
         updateDiff();
         showOrHideEqualFields();

@@ -39,12 +39,13 @@ public class AiEntryChatView extends StackPane {
     }
 
     private void setupBindings() {
-        // [pp->feat~ai.chatting.entries~1]
+        // [impl->req~ai.chatting.entries.privacy-policy~1]
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
         aiChatView.managedProperty().bind(aiChatView.visibleProperty());
 
         privacyNotice.visibleProperty().bind(viewModel.enabledProperty().not());
         aiChatView.visibleProperty().bind(viewModel.enabledProperty());
+        aiChatView.disableProperty().bind(viewModel.historyLoadedProperty().not());
 
         aiChatView.chatHistoryProperty().bind(viewModel.chatHistoryProperty());
         aiChatView.entriesProperty().bind(viewModel.entriesProperty());
@@ -52,5 +53,9 @@ public class AiEntryChatView extends StackPane {
 
     public ObjectProperty<FullBibEntry> selectedEntryProperty() {
         return viewModel.selectedEntryProperty();
+    }
+
+    public void dispose() {
+        viewModel.dispose();
     }
 }

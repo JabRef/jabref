@@ -43,9 +43,9 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
+    /// [impl->req~ux.dialogs.close-key-binding~1]
     public static boolean closeOnKeyBindingMatch(KeyEvent event, Dialog<?> dialog) {
-        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+        if (matchesCloseKeyBinding(event)) {
             dialog.close();
             event.consume();
 
@@ -70,9 +70,19 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyEvent);
     }
 
+    /// Heavy-weight dialogs such as the PDF viewer override this to keep their state on a stray "Close dialog" key.
+    protected boolean closesOnCloseKeyBinding() {
+        return true;
+    }
+
     private void handleKeyEvent(KeyEvent event) {
-        boolean closed = closeOnKeyBindingMatch(event, this);
-        if (closed) {
+        if (!closesOnCloseKeyBinding()) {
+            // Escape is consumed as well: JavaFX's own stage handler closes a dialog with a cancel button on an unconsumed Escape
+            if (event.getCode() == KeyCode.ESCAPE || matchesCloseKeyBinding(event)) {
+                event.consume();
+                return;
+            }
+        } else if (closeOnKeyBindingMatch(event, this)) {
             return;
         }
 
@@ -91,6 +101,11 @@ public class BaseDialog<T> extends Dialog<T> {
         }
     }
 
+    private static boolean matchesCloseKeyBinding(KeyEvent event) {
+        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+        return keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event);
+    }
+
     private Optional<Button> getDefaultButton() {
         return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));
     }
@@ -103,8 +118,7 @@ public class BaseDialog<T> extends Dialog<T> {
     }
 
     private void setDialogIcon(Image image) {
-        Stage dialogWindow = (Stage) getDialogPane().getScene().getWindow();
-        dialogWindow.getIcons().add(image);
+        IconTheme.applyLogo(this, image);
     }
 
     /// Fits the dialog window around its content.

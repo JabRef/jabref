@@ -58,7 +58,7 @@ public class RangeSort {
 
         public void add(V holder) {
             XText partitionKey = holder.getRange().getText();
-            List<V> partition = partitions.computeIfAbsent(partitionKey, unused -> new ArrayList<>());
+            List<V> partition = partitions.computeIfAbsent(partitionKey, _ -> new ArrayList<>());
             partition.add(holder);
         }
 

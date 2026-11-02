@@ -1,7 +1,9 @@
 package org.jabref.migrations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
@@ -15,14 +17,31 @@ import org.jspecify.annotations.NonNull;
 public class ConvertLegacyExplicitGroups implements PostOpenMigration {
 
     @Override
-    public void performMigration(@NonNull ParserResult parserResult) {
+    public boolean isMigrationNecessary(ParserResult parserResult) {
+        return parserResult.getMetaData().getGroups()
+                           .map(root -> !getExplicitGroupsWithLegacyKeys(root).isEmpty())
+                           .orElse(false);
+    }
+
+    @Override
+    public void performMigration(@NonNull ParserResult parserResult, List<BibEntry> entries) {
         if (parserResult.getMetaData().getGroups().isEmpty()) {
             return;
         }
 
-        for (ExplicitGroup group : getExplicitGroupsWithLegacyKeys(parserResult.getMetaData().getGroups().get())) {
+        List<ExplicitGroup> groups = getExplicitGroupsWithLegacyKeys(parserResult.getMetaData().getGroups().orElseThrow());
+        if (groups.isEmpty()) {
+            return;
+        }
+
+        Map<String, List<BibEntry>> entriesByCitationKey = new HashMap<>();
+        for (BibEntry entry : entries) {
+            entry.getCitationKey().ifPresent(key -> entriesByCitationKey.computeIfAbsent(key, _ -> new ArrayList<>()).add(entry));
+        }
+
+        for (ExplicitGroup group : groups) {
             for (String entryKey : group.getLegacyEntryKeys()) {
-                for (BibEntry entry : parserResult.getDatabase().getEntriesByCitationKey(entryKey)) {
+                for (BibEntry entry : entriesByCitationKey.getOrDefault(entryKey, List.of())) {
                     group.add(entry);
                 }
             }

@@ -647,4 +647,39 @@ public class DuplicateCheckTest {
         assertEquals(Optional.empty(),
                 duplicateChecker.containsDuplicate(List.of(), simpleArticle, BibDatabaseMode.BIBTEX));
     }
+
+    @Test
+    void duplicateDetectionWithMiscAndDifferentType() {
+        BibEntry miscEntry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Albert Einstein")
+                .withField(StandardField.TITLE, "Relativity")
+                .withField(StandardField.YEAR, "1916");
+
+        BibEntry techReportEntry = new BibEntry(StandardEntryType.TechReport)
+                .withField(StandardField.AUTHOR, "Albert Einstein")
+                .withField(StandardField.TITLE, "Relativity")
+                .withField(StandardField.YEAR, "1916");
+
+        assertTrue(duplicateChecker.isDuplicate(miscEntry, techReportEntry, BibDatabaseMode.BIBTEX));
+        assertTrue(duplicateChecker.isDuplicate(techReportEntry, miscEntry, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void articleAndMiscWithSameContentAreDuplicatesInBiblatexMode() {
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Zimmermann2020b")
+                .withField(StandardField.AUTHOR, "Zimmermann, Olaf")
+                .withField(StandardField.DATE, "2020")
+                .withField(StandardField.TITLE, "Architectural Decisions --- The Making Of")
+                .withField(StandardField.URL, "https://ozimmer.ch/practices/2020/04/27/ArchitectureDecisionMaking.html");
+
+        BibEntry misc = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("Zimmermann2020c")
+                .withField(StandardField.AUTHOR, "Zimmermann, Olaf")
+                .withField(StandardField.DATE, "2020")
+                .withField(StandardField.TITLE, "Architectural Decisions --- The Making Of")
+                .withField(StandardField.URL, "https://ozimmer.ch/practices/2020/04/27/ArchitectureDecisionMaking.html");
+
+        assertTrue(duplicateChecker.isDuplicate(article, misc, BibDatabaseMode.BIBLATEX));
+    }
 }

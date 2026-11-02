@@ -11,6 +11,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -22,6 +24,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -55,6 +58,7 @@ public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>();
+    private final ReadOnlyObjectWrapper<Optional<SearchResults>> searchResults = new ReadOnlyObjectWrapper<>(Optional.empty());
     private final GroupsPreferences groupsPreferences;
     private final SearchPreferences searchPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
@@ -96,18 +100,25 @@ public class MainTableDataModel {
         entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
         entriesFiltered = new FilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
 
-        searchQuerySubscription = EasyBind.listen(searchQueryProperty, (observable, oldValue, newValue) -> updateSearchMatches(newValue));
-        searchDisplayModeSubscription = EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (observable, oldValue, newValue) -> updateSearchDisplayMode(newValue));
-        selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
-        groupViewModeSubscription = EasyBind.listen(preferences.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
+        searchQuerySubscription = EasyBind.listen(searchQueryProperty, (_, _, newValue) -> updateSearchMatches(newValue));
+        searchDisplayModeSubscription = EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> updateSearchDisplayMode(newValue));
+        selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (_, _, newValue) -> updateGroupMatches(newValue));
+        groupViewModeSubscription = EasyBind.listen(preferences.getGroupsPreferences().groupViewModeProperty(), _ -> updateGroupMatches(selectedGroupsProperty.get()));
 
         resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().get() == MatchCategory.MATCHING_SEARCH_AND_GROUPS)));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
+    // [impl->req~jabgui.search.fulltext.entry-editor-results~1]
     private void updateSearchMatches(Optional<SearchQuery> query) {
         long updateSequence = searchUpdateSequence.incrementAndGet();
+        // Index updates may start a search off the FX thread; an older queued clear must not erase newer results.
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            if (updateSequence == searchUpdateSequence.get()) {
+                searchResults.set(Optional.empty());
+            }
+        });
         Optional<SearchQuery> querySnapshot = query.map(searchQuery -> new SearchQuery(
                 searchQuery.getSearchExpression(),
                 EnumSet.copyOf(searchQuery.getSearchFlags())));
@@ -118,12 +129,15 @@ public class MainTableDataModel {
                           if (updateSequence != searchUpdateSequence.get()) {
                               return;
                           }
-                          results.ifPresentOrElse(
-                                  this::setSearchMatches,
-                                  this::clearSearchMatches
-                          );
+                          // The editor consumes detailed hits, while the table needs derived match flags on each row.
+                          searchResults.set(results);
+                          results.ifPresentOrElse(this::setSearchMatches, this::clearSearchMatches);
                           FilteredListProxy.refilterListReflection(entriesFiltered);
                       }).executeWith(taskExecutor);
+    }
+
+    public ReadOnlyObjectProperty<Optional<SearchResults>> searchResultsProperty() {
+        return searchResults.getReadOnlyProperty();
     }
 
     /// Refresh the current search

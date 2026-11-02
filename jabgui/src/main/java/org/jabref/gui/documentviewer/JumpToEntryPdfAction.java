@@ -123,7 +123,7 @@ public class JumpToEntryPdfAction extends SimpleCommand {
         URI uri;
         try {
             uri = new URI(rawUrl.trim());
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
 
@@ -172,7 +172,7 @@ public class JumpToEntryPdfAction extends SimpleCommand {
     private static Optional<Integer> parsePositiveInt(String value) {
         try {
             return Optional.of(Integer.parseInt(value)).filter(number -> number > 0);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }
