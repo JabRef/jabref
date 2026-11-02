@@ -47,7 +47,7 @@ Each selected entry is shown with the entry editor's field editors and a preview
 Only the entries chosen during the review are imported, once the review is finished.
 See <https://github.com/JabRef/jabref/issues/13598>.
 
-Needs: impl
+Needs: impl, utest
 
 ## Main tab must display fields in single scrollable list
 `req~entry-editor.main-tab.single-list~1`

@@ -7,9 +7,11 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
@@ -20,6 +22,7 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -35,19 +38,21 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(JavaFxExtension.class)
 class CitationsRelationsTabViewModelTest {
     private BibDatabaseContext bibDatabaseContext;
 
@@ -55,6 +60,9 @@ class CitationsRelationsTabViewModelTest {
     private GuiPreferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
+    @Mock
+    private DialogService dialogService;
+    private StateManager stateManager;
     private BibEntry existingEntry;
     private BibEntry firstEntryToImport;
     private BibEntry secondEntryToImport;
@@ -88,7 +96,7 @@ class CitationsRelationsTabViewModelTest {
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
 
-        StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
+        stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
         // A real journal: the import records itself, and a deep-stubbed manager would answer the
         // recording block without running it, so nothing would be imported at all.
         when(stateManager.getUndoManager(any(BibDatabaseContext.class))).thenReturn(new HeadlessGuiUndoManager());
@@ -106,7 +114,7 @@ class CitationsRelationsTabViewModelTest {
         viewModel = new CitationsRelationsTabViewModel(
                 preferences,
                 stateManager,
-                mock(DialogService.class),
+                dialogService,
                 new DummyFileUpdateMonitor(),
                 new CurrentThreadTaskExecutor());
 
@@ -149,8 +157,8 @@ class CitationsRelationsTabViewModelTest {
 
         // The entries are cloned during the import. Thus, we need to get the actual entries from the database.
         // In the test, the citation key is not changed during the import, thus we can just look up the entries by their citation key.
-        BibEntry firstEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().get()).get();
-        BibEntry secondEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(secondEntryToImport.getCitationKey().get()).get();
+        BibEntry firstEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().orElseThrow()).orElseThrow();
+        BibEntry secondEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(secondEntryToImport.getCitationKey().orElseThrow()).orElseThrow();
 
         assertEquals(Optional.of("Test2023"), firstEntryInLibrary.getField(StandardField.CITES));
         assertEquals(List.of(existingEntry, firstEntryInLibrary, secondEntryInLibrary), bibDatabaseContext.getEntries());
@@ -191,8 +199,9 @@ class CitationsRelationsTabViewModelTest {
         assertEquals(citationItems.getFirst().entry(), viewModel.lastImportedEntryProperty().get());
     }
 
+    // [utest->feat~entry-editor.citations.review-before-import~1]
     @Test
-    void reviewedEntriesImportedSoThatExistingEntryCitesThem() {
+    void importReviewedEntries_addsCitationKeysToCitesField_whenSearchTypeIsCites() {
         List<CitationRelationItem> citationItems = List.of(
                 new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
@@ -200,26 +209,139 @@ class CitationsRelationsTabViewModelTest {
         viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
 
         assertEquals(Optional.of("FirstAuthorCitationKey2022,SecondAuthorCitationKey20221"), existingEntry.getField(StandardField.CITES));
+    }
+
+    @Test
+    void importReviewedEntries_insertsEntriesToLibrary_whenSearchTypeIsCites() {
+        List<CitationRelationItem> citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false),
+                new CitationRelationItem(secondEntryToImport, false));
+
+        viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
+
         // The duplicate check imports copies, so the library content is compared by citation key.
         assertEquals(List.of("Test2023", "FirstAuthorCitationKey2022", "SecondAuthorCitationKey20221"),
                 bibDatabaseContext.getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).toList());
     }
 
+    // [utest->feat~entry-editor.citations.review-before-import~1]
     @Test
-    void reviewedEntriesImportedSoThatTheyCiteExistingEntry() {
+    void importReviewedEntries_setsCitesFieldOnImportedEntries_whenSearchTypeIsCitedBy() {
         List<CitationRelationItem> citationItems = List.of(
                 new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
         viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
 
-        // The duplicate check imports copies, so the entries have to be looked up in the library.
-        BibEntry firstEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().get()).get();
-        BibEntry secondEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(secondEntryToImport.getCitationKey().get()).get();
+        BibEntry firstEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().orElseThrow()).orElseThrow();
+        BibEntry secondEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(secondEntryToImport.getCitationKey().orElseThrow()).orElseThrow();
 
         assertEquals(Optional.of("Test2023"), firstEntryInLibrary.getField(StandardField.CITES));
         assertEquals(Optional.of("Test2023"), secondEntryInLibrary.getField(StandardField.CITES));
+    }
+
+    @Test
+    void importReviewedEntries_updatesLastImportedEntryProperty_whenSearchTypeIsCitedBy() {
+        List<CitationRelationItem> citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false),
+                new CitationRelationItem(secondEntryToImport, false));
+
+        viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
+
+        BibEntry firstEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().orElseThrow()).orElseThrow();
         assertEquals(firstEntryInLibrary, viewModel.lastImportedEntryProperty().get());
+    }
+
+    @Test
+    void importReviewedEntries_doesNothing_whenEntriesToImportIsEmpty() {
+        viewModel.importReviewedEntries(List.of(), CitationFetcher.SearchType.CITES, existingEntry);
+
+        assertEquals(List.of(existingEntry), bibDatabaseContext.getEntries());
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+        verify(dialogService, never()).notify(any(String.class));
+    }
+
+    @Test
+    void importReviewedEntries_notifiesUser_whenNoLibraryIsOpen() {
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
+        List<CitationRelationItem> citationItems = List.of(new CitationRelationItem(firstEntryToImport, false));
+
+        viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
+
+        verify(dialogService).notify(Localization.lang("No library open"));
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+    }
+
+    @Test
+    void importReviewedEntries_appendsToExistingCitesField_whenExistingEntryAlreadyHasCites() {
+        existingEntry.setField(StandardField.CITES, "ExistingCiteKey2020");
+        List<CitationRelationItem> citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false),
+                new CitationRelationItem(secondEntryToImport, false));
+
+        viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
+
+        assertEquals(Optional.of("ExistingCiteKey2020,FirstAuthorCitationKey2022,SecondAuthorCitationKey20221"),
+                existingEntry.getField(StandardField.CITES));
+    }
+
+    @Test
+    void importReviewedEntries_notifiesUser_whenInspectedEntryHasNoCitationKeyAndSearchTypeIsCitedBy() {
+        existingEntry.clearCitationKey();
+        List<CitationRelationItem> citationItems = List.of(new CitationRelationItem(firstEntryToImport, false));
+
+        viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
+
+        verify(dialogService).notify(Localization.lang("No citation key for %0", existingEntry.getAuthorTitleYear()));
+        BibEntry firstEntryInLibrary = bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().orElseThrow()).orElseThrow();
+        assertEquals(Optional.empty(), firstEntryInLibrary.getField(StandardField.CITES));
+    }
+
+    @Test
+    void importReviewedEntries_doesNotLinkEntry_whenDuplicateIsSkipped() {
+        BibEntry duplicateInDb = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "First Author")
+                .withField(StandardField.YEAR, "2022")
+                .withField(StandardField.TITLE, "Gut microbiota and cognition")
+                .withCitationKey("ExistingKey2022");
+        bibDatabaseContext.getDatabase().insertEntry(duplicateInDb);
+
+        when(dialogService.showCustomDialogAndWait(any()))
+                .thenReturn(Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT));
+
+        List<CitationRelationItem> citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false),
+                new CitationRelationItem(secondEntryToImport, false));
+
+        JavaFxExtension.invokeAndWait(() ->
+                viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry));
+
+        // firstEntryToImport is a duplicate and was skipped, so only secondEntryToImport should be linked.
+        assertEquals(Optional.of("SecondAuthorCitationKey20221"), existingEntry.getField(StandardField.CITES));
+    }
+
+    // [utest->feat~entry-editor.citations.review-before-import~1]
+    @Test
+    void importReviewedEntries_importsEditedFieldValues_leavingOriginalCitationItemUnchanged() {
+        BibEntry originalFetched = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("FetchedKey2022")
+                .withField(StandardField.AUTHOR, "Fetched Author")
+                .withField(StandardField.TITLE, "Original Title");
+        BibEntry editedCopy = new BibEntry(originalFetched)
+                .withField(StandardField.TITLE, "Corrected Title during Review")
+                .withField(StandardField.DOI, "10.1000/182");
+
+        List<CitationRelationItem> citationItems = List.of(new CitationRelationItem(editedCopy, false));
+
+        viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
+
+        BibEntry importedEntry = bibDatabaseContext.getDatabase().getEntryByCitationKey("FetchedKey2022").orElseThrow();
+        assertEquals(Optional.of("Corrected Title during Review"), importedEntry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("10.1000/182"), importedEntry.getField(StandardField.DOI));
+
+        // Original fetched entry remains untouched
+        assertEquals(Optional.of("Original Title"), originalFetched.getField(StandardField.TITLE));
+        assertEquals(Optional.empty(), originalFetched.getField(StandardField.DOI));
     }
 
     @Test
@@ -248,28 +370,40 @@ class CitationsRelationsTabViewModelTest {
 
     @Test
     void trackCitationSearchCancelsPreviousTaskOfSameType() {
-        BackgroundTask<List<CitationRelationItem>> firstTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
-        BackgroundTask<List<CitationRelationItem>> secondTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
+        BackgroundTask<List<CitationRelationItem>> initialTask = mock(BackgroundTask.class);
+        BackgroundTask<List<CitationRelationItem>> newTask = mock(BackgroundTask.class);
 
-        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, firstTask);
-        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, secondTask);
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, initialTask);
+        verify(initialTask, never()).cancel(any(Boolean.class));
 
-        assertTrue(firstTask.isCancelled());
-        assertTrue(viewModel.isTrackedCitationSearch(CitationFetcher.SearchType.CITES, secondTask));
-        assertFalse(viewModel.isTrackedCitationSearch(CitationFetcher.SearchType.CITES, firstTask));
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, newTask);
+        verify(initialTask).cancel(false);
+        verify(newTask, never()).cancel(any(Boolean.class));
     }
 
     @Test
-    void cancelCitationSearchesCancelsTrackedTasks() {
-        BackgroundTask<List<CitationRelationItem>> citesTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
-        BackgroundTask<List<CitationRelationItem>> citedByTask = BackgroundTask.wrap(() -> List.<CitationRelationItem>of());
+    void trackCitationSearchDoesNotCancelOtherSearchTypeTask() {
+        BackgroundTask<List<CitationRelationItem>> citesTask = mock(BackgroundTask.class);
+        BackgroundTask<List<CitationRelationItem>> citedByTask = mock(BackgroundTask.class);
+
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, citesTask);
+        viewModel.trackCitationSearch(CitationFetcher.SearchType.CITED_BY, citedByTask);
+
+        verify(citesTask, never()).cancel(any(Boolean.class));
+        verify(citedByTask, never()).cancel(any(Boolean.class));
+    }
+
+    @Test
+    void cancelCitationSearchesCancelsBothTasks() {
+        BackgroundTask<List<CitationRelationItem>> citesTask = mock(BackgroundTask.class);
+        BackgroundTask<List<CitationRelationItem>> citedByTask = mock(BackgroundTask.class);
 
         viewModel.trackCitationSearch(CitationFetcher.SearchType.CITES, citesTask);
         viewModel.trackCitationSearch(CitationFetcher.SearchType.CITED_BY, citedByTask);
 
         viewModel.cancelCitationSearches();
 
-        assertTrue(citesTask.isCancelled());
-        assertTrue(citedByTask.isCancelled());
+        verify(citesTask).cancel(false);
+        verify(citedByTask).cancel(false);
     }
 }
