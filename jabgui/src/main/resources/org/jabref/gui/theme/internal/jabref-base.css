@@ -518,13 +518,13 @@
 }
 
 .global-search-bar .toggle-button .glyph-icon {
-    -fx-icon-color: -color-fg-subtle;
-    -fx-fill: -color-fg-subtle;
+    -fx-icon-color: -color-fg-default;
+    -fx-fill: -color-fg-default;
+    -fx-opacity: 0.55;
 }
 
 .global-search-bar .toggle-button:selected .glyph-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
+    -fx-opacity: 1;
 }
 
 /* search text */
