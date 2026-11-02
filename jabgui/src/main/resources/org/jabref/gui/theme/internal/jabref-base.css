@@ -1151,7 +1151,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .group-tree .numberColumn {
     -fx-alignment: center-right;
-    -fx-padding: 0.35em 0.2em 0.25em 0em;
 }
 
 .group-tree .numberColumn > .hits {
@@ -1180,10 +1179,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.20em 0em 0.20em 0em;
 }
 
-.group-tree .tree-table-row-cell:sub > .numberColumn {
-    -fx-padding: 0.20em 0.2em 0.20em 0em;
-}
-
 .group-tree .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
     -fx-border-color: -color-border-muted;
@@ -1191,10 +1186,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .group-tree .tree-table-row-cell:root > .tree-table-cell {
     -fx-padding: 0.65em 0em 0.65em 1em;
-}
-
-.group-tree .tree-table-row-cell:root > .numberColumn {
-    -fx-padding: 0.40em 0.2em 0.40em 0em;
 }
 
 .group-tree .tree-table-row-cell:root > .expansionNodeColumn {
