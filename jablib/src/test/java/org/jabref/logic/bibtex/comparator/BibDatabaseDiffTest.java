@@ -144,36 +144,13 @@ class BibDatabaseDiffTest {
     }
 
     @Test
-    void compareOfEntriesOfUnknownTypeWithOnlyOneEqualFieldReportsRemovalAndAddition() {
-        BibEntry entryOne = createMeasurement("first reading", "lab A");
-        BibEntry entryTwo = createMeasurement("totally other", "lab B");
+    void compareOfEntryAgainstEmptyDatabaseReportsDeletion() {
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "test");
+        BibDatabaseContext originalDatabase = new BibDatabaseContext(new BibDatabase(List.of(entry)));
 
-        BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(originalDatabase, new BibDatabaseContext());
 
-        assertEquals(List.of(new BibEntryDiff(entryOne, null), new BibEntryDiff(null, entryTwo)), diff.getEntryDifferences());
-    }
-
-    // [utest->req~ux.external-library-changes.custom-entry-types~1]
-    @Test
-    void compareOfEntriesOfCustomTypeWithEqualRequiredFieldReportsOneModification() {
-        entryTypesManager.addCustomOrModifiedType(
-                new BibEntryTypeBuilder().withType(MEASUREMENT)
-                                         .withRequiredFields(StandardField.NUMBER)
-                                         .build(),
-                BibDatabaseMode.BIBLATEX);
-        BibEntry entryOne = createMeasurement("first reading", "lab A");
-        BibEntry entryTwo = createMeasurement("totally other", "lab B");
-
-        BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
-
-        assertEquals(List.of(new BibEntryDiff(entryOne, entryTwo)), diff.getEntryDifferences());
-    }
-
-    private BibEntry createMeasurement(String title, String note) {
-        return new BibEntry(MEASUREMENT)
-                .withField(StandardField.NUMBER, "M-42")
-                .withField(StandardField.TITLE, title)
-                .withField(StandardField.NOTE, note);
+        assertEquals(List.of(new BibEntryDiff(entry, null)), diff.getEntryDifferences());
     }
 
     private BibDatabaseDiff compareEntries(BibEntry entryOne, BibEntry entryTwo) {

@@ -125,7 +125,6 @@ import org.jabref.model.search.SearchFlags;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.tobiasdiez.easybind.EasyBind;
@@ -316,6 +315,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FILES_IMPORT_NAMEPATTERN = "importFileNamePattern";
     private static final String FILES_IMPORT_DIRPATTERN = "importFileDirPattern";
     private static final String FILES_DOWNLOAD_LINKED = "downloadLinkedFiles";
+    private static final String IMPORT_DIALOG_DOWNLOAD_LINKED_FILES = "importDialogDownloadLinkedFiles";
     private static final String FILES_FULLTEXT_INDEX = "fulltextIndexLinkedFiles";
     private static final String FILES_WORKING_DIRECTORY = "workingDirectory";
 
@@ -410,6 +410,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
     private static final String AI_GEMINI_API_BASE_URL = "aiGeminiApiBaseUrl";
     private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
+    private static final String AI_ENABLE_DEBUG_PROVIDER = "aiEnableDebugProvider";
     private static final String AI_SUMMARIZATOR_KIND = "aiSummarizatorKind";
     private static final String AI_TOKEN_ESTIMATOR_KIND = "aiTokenEstimatorKind";
     private static final String AI_TEMPERATURE = "aiTemperature";
@@ -579,11 +580,30 @@ public class JabRefCliPreferences implements CliPreferences {
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
             // list needs to be mutable in observable preferences
-            // keep consistency with Splitter#splitToList
             return new ArrayList<>();
         }
 
-        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
+        List<String> result = new ArrayList<>();
+        StringBuilder element = new StringBuilder();
+        for (int i = 0; i < toConvert.length(); i++) {
+            char character = toConvert.charAt(i);
+            if (character == '\\' && i + 1 < toConvert.length()) {
+                char next = toConvert.charAt(i + 1);
+                if (next == '\\' || next == STRINGLIST_DELIMITER) {
+                    element.append(next);
+                    i++;
+                    continue;
+                }
+            }
+            if (character == STRINGLIST_DELIMITER) {
+                result.add(element.toString());
+                element.setLength(0);
+            } else {
+                element.append(character);
+            }
+        }
+        result.add(element.toString());
+        return result;
     }
     // endregion
 
@@ -1908,6 +1928,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern()),
                 get(FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern()),
                 getBoolean(FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles()),
+                getBoolean(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, defaultValues.shouldImportDialogDownloadLinkedFiles()),
                 getBoolean(FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles()),
                 getPath(FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory()),
                 getBoolean(BACKUP_ENABLED, defaultValues.shouldCreateBackup()),
@@ -1931,6 +1952,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(filePreferences.fileNamePatternProperty(), FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern());
         bindString(filePreferences.fileDirectoryPatternProperty(), FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern());
         bindBoolean(filePreferences.downloadLinkedFilesProperty(), FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles());
+        bindBoolean(filePreferences.importDialogDownloadLinkedFilesProperty(), IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, defaultValues.shouldImportDialogDownloadLinkedFiles());
         bindBoolean(filePreferences.fulltextIndexLinkedFilesProperty(), FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles());
         bindPath(filePreferences.workingDirectoryProperty(), FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory());
         bindBoolean(filePreferences.createBackupProperty(), BACKUP_ENABLED, defaultValues.shouldCreateBackup());
@@ -2249,6 +2271,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(AI_MISTRAL_AI_API_BASE_URL, defaultValues.getMistralAiApiBaseUrl()),
                 get(AI_GEMINI_API_BASE_URL, defaultValues.getGeminiApiBaseUrl()),
                 get(AI_HUGGING_FACE_API_BASE_URL, defaultValues.getHuggingFaceApiBaseUrl()),
+                getBoolean(AI_ENABLE_DEBUG_PROVIDER, defaultValues.getEnableAiDebugProvider()),
                 SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind().name())),
                 TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind().name())),
                 get(AI_EMBEDDING_MODEL, defaultValues.embeddingModelProperty().get()),
@@ -2288,6 +2311,8 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(aiPreferences.mistralAiApiBaseUrlProperty(), AI_MISTRAL_AI_API_BASE_URL, defaultValues.getMistralAiApiBaseUrl());
         bindString(aiPreferences.geminiApiBaseUrlProperty(), AI_GEMINI_API_BASE_URL, defaultValues.getGeminiApiBaseUrl());
         bindString(aiPreferences.huggingFaceApiBaseUrlProperty(), AI_HUGGING_FACE_API_BASE_URL, defaultValues.getHuggingFaceApiBaseUrl());
+
+        bindBoolean(aiPreferences.enableAiDebugProviderProperty(), AI_ENABLE_DEBUG_PROVIDER, defaultValues.getEnableAiDebugProvider());
 
         bindObject(aiPreferences.summarizatorKindProperty(), AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind(), SummarizatorKind::name, SummarizatorKind::safeValueOf);
         bindObject(aiPreferences.tokenEstimatorKindProperty(), AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind(), TokenEstimatorKind::name, TokenEstimatorKind::safeValueOf);

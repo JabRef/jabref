@@ -13,7 +13,7 @@ jobs:
   check_title_format:
     name: PR title describes the change
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -49,7 +49,7 @@ jobs:
 
   no-html-comments:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -82,7 +82,7 @@ jobs:
 
   mandatory-checks-section-exists:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot')
@@ -109,7 +109,7 @@ jobs:
 
   checklist-checked:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -155,7 +155,7 @@ jobs:
 
   license-checked:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot')
@@ -170,7 +170,7 @@ jobs:
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
 
           if ! CHECKLIST=$(printf '%s\n' "$BODY" | awk '
-            /^### Checklist$/ { found = 1; in_checklist = 1; next }
+            /^### Checklist[[:space:]]*$/ { found = 1; in_checklist = 1; next }
             /^#+ / { in_checklist = 0 }
             in_checklist { print }
             END { if (!found) exit 1 }

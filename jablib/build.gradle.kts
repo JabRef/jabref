@@ -13,7 +13,7 @@ plugins {
 
     id("antlr")
 
-    id("me.champeau.jmh") version "0.7.3"
+    id("me.champeau.jmh") version "0.7.4"
 
     id("com.vanniktech.maven.publish") version "0.37.0"
 

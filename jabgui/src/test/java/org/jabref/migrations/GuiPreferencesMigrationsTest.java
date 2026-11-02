@@ -8,6 +8,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
@@ -16,11 +17,14 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -478,5 +482,48 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
 
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+A"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void upgradeImportDialogDownloadLinkedFilesCopiesWebSearchChoice(boolean webSearchChoice) {
+        // [utest->req~import.dialog.download-linked-files~1]
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(false);
+        when(preferences.hasKey("downloadLinkedFiles")).thenReturn(true);
+        when(preferences.getBoolean(eq("downloadLinkedFiles"), anyBoolean())).thenReturn(webSearchChoice);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences).setImportDialogDownloadLinkedFiles(webSearchChoice);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", webSearchChoice);
+        verify(filePreferences, never()).setDownloadLinkedFiles(anyBoolean());
+    }
+
+    @Test
+    void upgradeImportDialogDownloadLinkedFilesKeepsStoredDialogChoice() {
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(true);
+        when(preferences.hasKey("downloadLinkedFiles")).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences, never()).setImportDialogDownloadLinkedFiles(anyBoolean());
+        verify(preferences, never()).putBoolean(eq("importDialogDownloadLinkedFiles"), anyBoolean());
+    }
+
+    @Test
+    void upgradeImportDialogDownloadLinkedFilesKeepsDefaultForNewUsers() {
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(false);
+        when(preferences.getBoolean("downloadLinkedFiles", true)).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences).setImportDialogDownloadLinkedFiles(true);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", true);
     }
 }

@@ -32,6 +32,7 @@ import org.jabref.gui.keyboard.WalkthroughKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
+import org.jabref.gui.shared.SharedDatabaseCleanup;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
@@ -558,6 +559,7 @@ public class JabRefGUI extends Application {
     @Override
     public void stop() {
         LOGGER.trace("Stopping JabRef GUI");
+        SharedDatabaseCleanup.awaitAll();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
 
