@@ -23,7 +23,7 @@ val pdfbox = "3.0.8"
 
 // Pinned instead of the dev.jbang plugin default "latest": a PATH miss would otherwise fetch
 // https://www.jbang.dev/releases/latest/download/version.txt (10 s timeout, no retries).
-val jbang = "0.142.0"
+val jbang = "0.143.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
@@ -66,8 +66,8 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.10.3")
-    api("com.konghq:unirest-modules-gson:4.10.3")
+    api("com.konghq:unirest-java-core:4.10.4")
+    api("com.konghq:unirest-modules-gson:4.10.4")
     api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
     api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.1")
@@ -92,7 +92,7 @@ dependencies.constraints {
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:6.0.0")
+    api("io.github.classgraph:classgraph:6.0.1")
     api("io.github.java-diff-utils:java-diff-utils:4.18")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")

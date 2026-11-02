@@ -21,23 +21,25 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class is responsible for getting the recommendations from Mr. DLib
+@NullMarked
 public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
     private static final String MDL_JABREF_PARTNER_ID = "1";
     private static final String MDL_URL = "api.mr-dlib.org";
     private static final String DEFAULT_MRDLIB_ERROR_MESSAGE = Localization.lang("Error while fetching recommendations from Mr.DLib.");
+
     private final String LANGUAGE;
     private final Version VERSION;
-    private String heading;
-    private String description;
-    private String recommendationSetId;
     private final MrDlibPreferences preferences;
+
+    private String heading = Localization.lang("Mr. DLib Recommendations");
+    private String description = "";
 
     public MrDLibFetcher(String language, Version version, MrDlibPreferences preferences) {
         LANGUAGE = language;
@@ -51,7 +53,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getFieldLatexFree(StandardField.TITLE);
         if (title.isEmpty()) {
             // without a title there is no reason to ask MrDLib
@@ -73,7 +75,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                 parserResult = importer.importDatabase(response);
                 heading = importer.getRecommendationsHeading();
                 description = importer.getRecommendationsDescription();
-                recommendationSetId = importer.getRecommendationSetId();
             } else {
                 // For displaying An ErrorMessage
                 description = DEFAULT_MRDLIB_ERROR_MESSAGE;

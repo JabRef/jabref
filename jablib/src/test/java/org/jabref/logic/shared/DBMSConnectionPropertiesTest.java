@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DBMSConnectionPropertiesTest {
@@ -55,6 +56,16 @@ class DBMSConnectionPropertiesTest {
 
         // psql/libpq parity: managed providers use private CAs that strict validation rejects
         assertEquals("require", properties.asProperties().getProperty("sslmode"));
+    }
+
+    @Test
+    void propertiesWithoutHostAreComparable() {
+        DBMSConnectionProperties withoutHost = new DBMSConnectionPropertiesBuilder().setType(DBMSType.POSTGRESQL).createDBMSConnectionProperties();
+        DBMSConnectionProperties withHost = new DBMSConnectionPropertiesBuilder().setType(DBMSType.POSTGRESQL).setHost("localhost").createDBMSConnectionProperties();
+
+        assertEquals(withoutHost, new DBMSConnectionPropertiesBuilder().setType(DBMSType.POSTGRESQL).createDBMSConnectionProperties());
+        assertNotEquals(withoutHost, withHost);
+        assertNotEquals(withHost, withoutHost);
     }
 
     @Test
