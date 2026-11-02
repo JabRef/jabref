@@ -32,7 +32,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String LASTNAME_GROUP = "LASTNAME";
     private static final String PAGE_GROUP = "PAGE";
     private static final String SUFFIX_GROUP = "SUFFIX";
-    private static final String TITLE_GROUP = "TITLE";
     private static final String TO_GROUP = "TO";
     private static final String YEAR_GROUP = "YEAR";
 
@@ -86,7 +85,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final Pattern LEADING_NOISE_PATTERN = Pattern.compile(
             "^(?:[\\s.,;:&\\-]|" + Pattern.quote(YEAR_TAG) + ")+");
 
-    private static final String NAME_PARTICLE_REGEX = "(?:de|der|den|van|von|di|da|del|dos|du|la|le|ten|ter)";
+    /// Lowercase name particles. They are matched case-insensitively, so that a capitalized particle (`Van Gogh`)
+    /// stays with the family name.
+    private static final String NAME_PARTICLE_REGEX = "(?i:de|der|den|van|von|di|da|del|dos|du|la|le|ten|ter)";
 
     private static final String NAME_SUFFIX_REGEX = "(?:Jr|Sr|II|III|IV)";
 
@@ -94,7 +95,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Unicode aware, in contrast to `\w`.
     private static final String NAME_WORD_REGEX = "\\p{Lu}[\\p{L}'’\\-]+";
 
-    /// Family name, optionally with lowercase particles (`de Roever`)
+    /// Family name, optionally with name particles (`de Roever`, `Van Gogh`)
     private static final String LASTNAME_REGEX =
             "(?<" + LASTNAME_GROUP + ">(?:" + NAME_PARTICLE_REGEX + "\\s+)*" + NAME_WORD_REGEX + ")";
 
@@ -174,14 +175,26 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final Pattern TITLE_END_PATTERN = Pattern.compile(
             SENTENCE_END_REGEX + "(?:" + Pattern.quote(YEAR_TAG) + "[\\s.,;:]*)?(?=\\d*\\p{L})");
 
-    private static final Pattern QUOTED_TITLE_PATTERN = Pattern.compile("^[\"“](?<" + TITLE_GROUP + ">[^\"”]+)[\"”]");
+    /// A quoted title at the start of a text. Each opening mark has its own closing mark, so a quotation inside a
+    /// curly-quoted title (`“Effects of "AI" on learning”`) does not end it. Supported pairs: `“…”`, `"…"`, `«…»`
+    /// and `„…“`. Nested straight quotes inside a straight-quoted title stay ambiguous.
+    ///
+    /// Java does not allow duplicate group names, so each alternative has its own group (see [#QUOTED_TITLE_GROUPS]).
+    private static final Pattern QUOTED_TITLE_PATTERN = Pattern.compile(
+            "^(?:“(?<TITLECURLY>[^”]+)”"
+                    + "|\"(?<TITLESTRAIGHT>[^\"]+)\""
+                    + "|«(?<TITLEGUILLEMET>[^»]+)»"
+                    + "|„(?<TITLEGERMAN>[^“”]+)[“”])");
 
-    private static final Pattern LEADING_FIELD_PUNCTUATION_PATTERN = Pattern.compile("^[\\s,;:.\"“”]+");
+    private static final List<String> QUOTED_TITLE_GROUPS =
+            List.of("TITLECURLY", "TITLESTRAIGHT", "TITLEGUILLEMET", "TITLEGERMAN");
 
-    private static final Pattern TRAILING_FIELD_PUNCTUATION_PATTERN = Pattern.compile("[\\s,;:.\"“”]+$");
+    private static final Pattern LEADING_FIELD_PUNCTUATION_PATTERN = Pattern.compile("^[\\s,;:.\"“”«»„]+");
+
+    private static final Pattern TRAILING_FIELD_PUNCTUATION_PATTERN = Pattern.compile("[\\s,;:.\"“”«»„]+$");
 
     /// Same as [#TRAILING_FIELD_PUNCTUATION_PATTERN], but keeps a trailing period
-    private static final Pattern TRAILING_FIELD_PUNCTUATION_WITHOUT_PERIOD_PATTERN = Pattern.compile("[\\s,;:\"“”]+$");
+    private static final Pattern TRAILING_FIELD_PUNCTUATION_WITHOUT_PERIOD_PATTERN = Pattern.compile("[\\s,;:\"“”«»„]+$");
 
     private static final Pattern LEADING_VENUE_NOISE_PATTERN = Pattern.compile("^[\\s,.;:]*(?:In\\s+(?=Proceedings\\b))?");
 
@@ -202,6 +215,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private String doi;
     private boolean isArticle;
     private String journalOrPublisher;
+
+    /// A title enclosed in quotation marks, without the marks, and the offset behind the closing mark.
+    private record QuotedTitle(String title, int end) {
+    }
 
     @Override
     public Optional<BibEntry> parsePlainCitation(String text) {
@@ -373,6 +390,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Finds the publication year. A leading APA date (`(1993).`, `(1991a).`) is preferred. Otherwise, the last
     /// valid year wins, because the publication year usually stands behind the title, which may mention a year, too.
     /// A year range (`2019–2021`) counts as its first year, and a number behind `p.`/`pp.` is a page, not a year.
+    /// A number behind `vol.`/`no.`/`issue` is a volume or issue, not a year, either.
     /// A range behind a publication year (`2020, 1725-1730`) is left for [#findPages]; a title year does not take precedence.
     ///
     /// Only the chosen occurrence is replaced by [#YEAR_TAG], so other occurrences (in the title) stay untouched.
@@ -393,8 +411,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         int titleEnd = findTitleEnd(input);
         Matcher matcher = YEAR_PATTERN.matcher(input);
         while (matcher.find()) {
+            String beforeCandidate = input.substring(0, matcher.start());
             if (!isValidYear(matcher.group(YEAR_GROUP))
-                    || PAGES_PREFIX_AT_END_PATTERN.matcher(input.substring(0, matcher.start())).find()) {
+                    || PAGES_PREFIX_AT_END_PATTERN.matcher(beforeCandidate).find()
+                    || VOLUME_OR_ISSUE_PREFIX_AT_END_PATTERN.matcher(beforeCandidate).find()) {
                 continue;
             }
             boolean isRange = matcher.end(YEAR_GROUP) < matcher.end();
@@ -416,6 +436,18 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         return (value > 1700) && (value <= Year.now().getValue());
     }
 
+    /// Matches a quoted title at the very beginning of `text`.
+    private static Optional<QuotedTitle> matchQuotedTitle(String text) {
+        Matcher matcher = QUOTED_TITLE_PATTERN.matcher(text);
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+        return QUOTED_TITLE_GROUPS.stream()
+                                  .filter(group -> matcher.group(group) != null)
+                                  .findFirst()
+                                  .map(group -> new QuotedTitle(matcher.group(group), matcher.end()));
+    }
+
     private static int findTitleEnd(String input) {
         String afterAuthors = (input.startsWith(AUTHOR_TAG) ? input.substring(AUTHOR_TAG.length()) : input).stripLeading();
         Matcher dateMatcher = YEAR_IN_PARENTHESES_PATTERN.matcher(afterAuthors);
@@ -423,9 +455,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             afterAuthors = afterAuthors.substring(dateMatcher.end());
         }
         afterAuthors = LEADING_NOISE_PATTERN.matcher(afterAuthors).replaceFirst("");
-        Matcher quotedTitleMatcher = QUOTED_TITLE_PATTERN.matcher(afterAuthors);
-        if (quotedTitleMatcher.find()) {
-            return input.length() - afterAuthors.length() + quotedTitleMatcher.end();
+        Optional<QuotedTitle> quotedTitle = matchQuotedTitle(afterAuthors);
+        if (quotedTitle.isPresent()) {
+            return input.length() - afterAuthors.length() + quotedTitle.orElseThrow().end();
         }
         int delimiterIndex = input.lastIndexOf("//");
         if (delimiterIndex != -1) {
@@ -494,7 +526,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             titleCandidate = LEADING_NOISE_PATTERN.matcher(remainder.substring(yearMatcher.end())).replaceFirst("");
         }
         if (!TITLE_END_PATTERN.matcher(titleCandidate).find()
-                && !QUOTED_TITLE_PATTERN.matcher(titleCandidate).find()
+                && matchQuotedTitle(titleCandidate).isEmpty()
                 && !titleCandidate.contains("//")) {
             return input;
         }
@@ -587,8 +619,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Infers title and journal/publisher from the text behind the authors.
     ///
     /// The title ends at the first sentence end (see [#TITLE_END_PATTERN]), at a closing quotation mark if the title
-    /// is quoted, or at `//`. If there is none of them, the first comma ends the title. A `?` or `!` that ends the
-    /// title belongs to it.
+    /// is quoted (see [#QUOTED_TITLE_PATTERN]), or at `//`. If there is none of them, the first comma ends the title.
+    /// A `?` or `!` that ends the title belongs to it.
     ///
     /// The journal/publisher is the first comma-separated part after the title. The text behind the first remaining
     /// placeholder token (pages or year) is ignored, because it is usually location or date information.
@@ -603,12 +635,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         String titlePart;
         String venuePart = "";
 
-        Matcher quotedTitleMatcher = QUOTED_TITLE_PATTERN.matcher(remainder);
+        Optional<QuotedTitle> quotedTitle = matchQuotedTitle(remainder);
         Matcher titleEndMatcher = TITLE_END_PATTERN.matcher(remainder);
         int delimiterIndex = remainder.lastIndexOf("//");
-        if (quotedTitleMatcher.find()) {
-            titlePart = quotedTitleMatcher.group(TITLE_GROUP);
-            venuePart = remainder.substring(quotedTitleMatcher.end());
+        if (quotedTitle.isPresent()) {
+            titlePart = quotedTitle.orElseThrow().title();
+            venuePart = remainder.substring(quotedTitle.orElseThrow().end());
         } else if (delimiterIndex != -1) {
             titlePart = remainder.substring(0, delimiterIndex);
             venuePart = remainder.substring(delimiterIndex + 2);
