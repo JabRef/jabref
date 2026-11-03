@@ -8,8 +8,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
@@ -57,6 +59,8 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
                                                              .map(FieldFactory::parseField)
                                                              .toList();
 
+    private static final Field INTERHASH = FieldFactory.parseField("interhash");
+
     private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
 
@@ -88,7 +92,8 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
         try (InputStream stream = getUrlDownload(url).asInputStream()) {
-            List<BibEntry> entries = getParser().parseEntries(stream);
+            // The cleanup removes the interhash, so duplicates have to be removed first
+            List<BibEntry> entries = removeDuplicatePosts(getParser().parseEntries(stream));
             entries.forEach(this::doPostCleanup);
             return entries;
         } catch (FetcherClientException e) {
@@ -103,6 +108,14 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
         } catch (ParseException e) {
             throw new FetcherException(url, "An internal parser error occurred while fetching", e);
         }
+    }
+
+    /// BibSonomy returns one post per user, and all posts of the same publication share an `interhash`
+    static List<BibEntry> removeDuplicatePosts(List<BibEntry> entries) {
+        Set<String> seenHashes = new HashSet<>();
+        return entries.stream()
+                      .filter(entry -> entry.getField(INTERHASH).map(seenHashes::add).orElse(true))
+                      .toList();
     }
 
     @Override

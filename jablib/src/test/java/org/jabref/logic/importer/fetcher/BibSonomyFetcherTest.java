@@ -43,6 +43,8 @@ import static org.mockito.Mockito.when;
 // [utest->feat~fetchers.bibsonomy~1]
 class BibSonomyFetcherTest {
 
+    private static final Field INTERHASH = FieldFactory.parseField("interhash");
+
     private final BuildInfo buildInfo = new BuildInfo();
 
     private BibSonomyFetcher fetcher;
@@ -228,11 +230,47 @@ class BibSonomyFetcherTest {
         assertEquals(expected, parseAndCleanRealResponse().getLast());
     }
 
+    @Test
+    void removeDuplicatePostsKeepsFirstPostOfEachPublication() {
+        BibEntry firstPost = new BibEntry().withField(StandardField.TITLE, "first post").withField(INTERHASH, "same");
+        BibEntry secondPost = new BibEntry().withField(StandardField.TITLE, "second post").withField(INTERHASH, "same");
+
+        assertEquals(List.of(firstPost), BibSonomyFetcher.removeDuplicatePosts(List.of(firstPost, secondPost)));
+    }
+
+    @Test
+    void removeDuplicatePostsKeepsDifferentPublicationsInOrder() {
+        BibEntry laterPublication = new BibEntry().withField(INTERHASH, "z");
+        BibEntry earlierPublication = new BibEntry().withField(INTERHASH, "a");
+
+        assertEquals(List.of(laterPublication, earlierPublication), BibSonomyFetcher.removeDuplicatePosts(List.of(laterPublication, earlierPublication)));
+    }
+
+    @Test
+    void removeDuplicatePostsKeepsPostsWithoutInterhash() {
+        BibEntry firstPost = new BibEntry().withField(StandardField.TITLE, "same");
+        BibEntry secondPost = new BibEntry().withField(StandardField.TITLE, "same");
+
+        assertEquals(List.of(firstPost, secondPost), BibSonomyFetcher.removeDuplicatePosts(List.of(firstPost, secondPost)));
+    }
+
+    @Test
+    void removeDuplicatePostsReducesRealResponseToOnePostPerPublication() throws IOException, ParseException {
+        List<BibEntry> uniquePosts = BibSonomyFetcher.removeDuplicatePosts(parseRealResponse());
+
+        assertEquals(List.of(Optional.of("shen2005folksonomy"), Optional.of("journals/patterns/TangJX26")),
+                uniquePosts.stream().map(BibEntry::getCitationKey).toList());
+    }
+
     private List<BibEntry> parseAndCleanRealResponse() throws IOException, ParseException {
+        List<BibEntry> entries = parseRealResponse();
+        entries.forEach(fetcher::doPostCleanup);
+        return entries;
+    }
+
+    private List<BibEntry> parseRealResponse() throws IOException, ParseException {
         try (InputStream response = BibSonomyFetcherTest.class.getResourceAsStream("bibsonomy-folksonomy.bib")) {
-            List<BibEntry> entries = fetcher.getParser().parseEntries(response);
-            entries.forEach(fetcher::doPostCleanup);
-            return entries;
+            return fetcher.getParser().parseEntries(response);
         }
     }
 
