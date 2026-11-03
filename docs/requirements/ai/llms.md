@@ -61,6 +61,17 @@ Covers:
 
 - feat~ai.llms.providers~1
 
+### JabRef must support debug LLM provider
+`req~ai.llms.providers.debug~1`
+
+Rationale: Allows testing and debugging of AI features without external API calls or credentials.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.llms.providers~1
+
 ## User can connect to local and custom LLMs
 `feat~ai.llms.custom~1`
 
