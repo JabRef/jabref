@@ -94,7 +94,17 @@ public final class LibrarySearcherTestCases {
                 // DOI matching (full URLs should find entry by DOI)
                 Arguments.of(List.of(ENTRY_WITH_DOI),
                         new SearchQuery("https://doi.org/10.1000/182"),
-                        List.of(ENTRY_WITH_DOI, TITLE_SENTENCE_CASED))
+                        List.of(ENTRY_WITH_DOI, TITLE_SENTENCE_CASED)),
+                doiSearchCase("https://doi.org/bfrhmx", "https://doi.org/bfrhmx"),
+                doiSearchCase("https://doi.org/bfrhmx", "10/bfrhmx"),
+                doiSearchCase("https://doi.org/10.1000/foo(bar)=baz", "10.1000/foo(bar)=baz"),
+                doiSearchCase("https://doi.org/10.1000/foo+bar", "10.1000/foo+bar"),
+                doiSearchCase("https://doi.org/10.1000/foo%2Bbar", "10.1000/foo+bar")
         );
     }
+    private static Arguments doiSearchCase(String query, String value) {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.DOI, value);
+        return Arguments.of(List.of(entry), new SearchQuery(query), List.of(entry));
+    }
+
 }

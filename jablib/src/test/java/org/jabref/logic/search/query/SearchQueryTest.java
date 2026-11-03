@@ -73,9 +73,9 @@ public class SearchQueryTest {
     })
     void doiNormalization(String searchExpression) {
         SearchQuery query = new SearchQuery(searchExpression);
-        assertEquals("10.1000/182<EOF>", query.getContext().getText());
+        assertEquals("\"10.1000/182\"<EOF>", query.getContext().getText());
         assertEquals(searchExpression, query.getSearchExpression());
-        assertEquals("10.1000/182", query.getNormalizedSearchExpression());
+        assertEquals("\"10.1000/182\"", query.getNormalizedSearchExpression());
     }
 
     // [utest->req~search.doi-link-normalization~1]
@@ -83,6 +83,12 @@ public class SearchQueryTest {
     void doiLikeImplicitAndNotNormalized() {
         SearchQuery query = new SearchQuery("10.1000/foo bar");
         assertEquals("10.1000/foo bar", query.getNormalizedSearchExpression());
+    }
+
+    @Test
+    void doiLinkInMultiTermQueryIsNotNormalized() {
+        String expression = "https://doi.org/10.1000/182\tother";
+        assertEquals(expression, new SearchQuery(expression).getNormalizedSearchExpression());
     }
 
     // [utest->req~search.doi-link-normalization~1]

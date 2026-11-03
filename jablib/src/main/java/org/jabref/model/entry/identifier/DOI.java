@@ -177,6 +177,36 @@ public class DOI implements Identifier {
         }
     }
 
+    /// Extracts a DOI link's search term without applying lossy DOI cleanup.
+    public static Optional<String> extractLinkSearchTerm(String text) {
+        String input = text.trim();
+        if (input.chars().anyMatch(Character::isWhitespace)) {
+            return Optional.empty();
+        }
+        Matcher shortcut = EXACT_SHORT_DOI_SHORTCUT.matcher(input);
+        if (shortcut.matches()) {
+            return Optional.of(shortcut.group(DOI_GROUP));
+        }
+        String lowerCase = input.toLowerCase(Locale.ROOT);
+        if (lowerCase.startsWith("doi.org/")) {
+            input = "https://" + input;
+        } else if (!lowerCase.startsWith("http://") && !lowerCase.startsWith("https://") && !lowerCase.startsWith("doi:")) {
+            return Optional.empty();
+        }
+        try {
+            String decoded = URLDecoder.decode(input.replace("+", "%2B"), StandardCharsets.UTF_8);
+            Matcher matcher = EXACT_DOI_PATT.matcher(decoded);
+            if (matcher.matches()) {
+                return Optional.of(matcher.group(DOI_GROUP));
+            }
+            Matcher shortMatcher = EXACT_SHORT_DOI_PATT.matcher(decoded);
+            return shortMatcher.matches() ? Optional.of(shortMatcher.group(DOI_GROUP)) : Optional.empty();
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Could not decode DOI link", e);
+            return Optional.empty();
+        }
+    }
+
     /// Determines whether a DOI/Short DOI is valid or not
     ///
     /// @param doi the DOI/Short DOI string

@@ -1,7 +1,6 @@
 package org.jabref.model.search.query;
 
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -124,23 +123,15 @@ public class SearchQuery {
 
     /// [impl->req~search.doi-link-normalization~1]
     /// Normalizes full DOI URLs to plain DOI identifiers (e.g., "https://doi.org/10.1000/182" -> "10.1000/182").
-    /// Normalizing to the plain DOI allows matching both entries storing clean DOIs and entries retaining
-    /// full HTTP links (since the plain DOI is a substring of the full URL).
-    /// Regex mode is skipped because `DOI.parse` strips backslashes and special characters, mutating regex syntax.
+    /// The identifier (or short DOI suffix) also matches entries retaining the full URL.
+    /// Regex mode is skipped to preserve the expression entered by the user.
     private static String normalizeDoi(String searchExpression, EnumSet<SearchFlags> searchFlags) {
-        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION) || searchExpression.trim().contains(" ")) {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
             return searchExpression;
         }
-        String trimmed = searchExpression.trim();
-        String lowerCased = trimmed.toLowerCase(Locale.ROOT);
-        if (lowerCased.startsWith("http://") || lowerCased.startsWith("https://")
-                || lowerCased.startsWith("doi.org/") || lowerCased.startsWith("doi:")) {
-            String toParse = lowerCased.startsWith("doi.org/") ? "https://" + trimmed : trimmed;
-            return DOI.parse(toParse)
-                      .map(DOI::asString)
-                      .orElse(searchExpression);
-        }
-        return searchExpression;
+        return DOI.extractLinkSearchTerm(searchExpression)
+                  .map(doi -> "\"" + doi.replace("\"", "\\\"") + "\"")
+                  .orElse(searchExpression);
     }
 
     /// Unescapes search value based on the Search grammar rules.
