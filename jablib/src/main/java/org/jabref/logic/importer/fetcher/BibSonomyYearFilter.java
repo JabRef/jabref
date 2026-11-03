@@ -26,12 +26,12 @@ final class BibSonomyYearFilter {
         yearCondition = toYearCondition(query);
     }
 
-    /// Entries without a four-digit year are kept, because their year cannot be compared
+    /// A year term never matches an entry without a four-digit year, because the year of that entry is unknown
     boolean accepts(BibEntry entry) {
         Optional<Integer> year = entry.getField(StandardField.YEAR)
                                       .filter(value -> FOUR_DIGIT_YEAR.matcher(value).matches())
                                       .map(Integer::parseInt);
-        return year.isEmpty() || yearCondition.map(condition -> condition.test(year)).orElse(true);
+        return yearCondition.map(condition -> condition.test(year)).orElse(true);
     }
 
     /// Tells whether an entry has to satisfy every year term of the query.

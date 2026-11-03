@@ -11,7 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class BibSonomyYearFilterTest {
 
@@ -64,15 +64,21 @@ class BibSonomyYearFilterTest {
         assertEquals(expected, BibSonomyYearFilter.allYearTermsAreRequired(parse(query)));
     }
 
-    @Test
-    void entryWithoutYearIsKept() {
-        assertTrue(new BibSonomyYearFilter(parse("year=2020")).accepts(new BibEntry()));
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "year=2020            | false",
+            "year-range=2010-2012 | false",
+            "NOT year=2020        | true",
+            "learning             | true"
+    })
+    void entryWithoutYearOnlyMatchesQueriesNotRequiringAYear(String query, boolean expected) {
+        assertEquals(expected, new BibSonomyYearFilter(parse(query)).accepts(new BibEntry()));
     }
 
     @Test
-    void entryWithNonNumericYearIsKept() {
+    void nonNumericYearCountsAsUnknown() {
         BibEntry entry = new BibEntry().withField(StandardField.YEAR, "in press");
 
-        assertTrue(new BibSonomyYearFilter(parse("year=2020")).accepts(entry));
+        assertFalse(new BibSonomyYearFilter(parse("year=2020")).accepts(entry));
     }
 }
