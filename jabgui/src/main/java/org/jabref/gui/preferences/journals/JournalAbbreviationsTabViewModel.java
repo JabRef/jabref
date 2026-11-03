@@ -339,6 +339,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 .executeWith(taskExecutor);
     }
 
+    /// Captures external list contents before background saving so later UI edits cannot change the pending write.
     private Map<Path, List<Abbreviation>> snapshotFilesToWrite() {
         if (!shouldWriteLists) {
             return Map.of();
@@ -349,6 +350,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                            .collect(Collectors.toMap(file -> file.getAbsolutePath().orElseThrow(), this::snapshotAbbreviations));
     }
 
+    /// Copies abbreviation values from their view models, excluding placeholder rows that must not be saved.
     private List<Abbreviation> snapshotAbbreviations(AbbreviationsFileViewModel file) {
         return file.abbreviationsProperty().stream()
                    .filter(abbreviation -> !abbreviation.isPseudoAbbreviation())
