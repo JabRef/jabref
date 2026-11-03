@@ -86,7 +86,7 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
             entries.forEach(this::doPostCleanup);
             return entries;
         } catch (FetcherClientException e) {
-            // BibSonomy repeats the rejected username and API key in its 401 response, so that response must not reach the error message
+            // BibSonomy repeats the rejected username and API key in its 401 response, so that response must reach neither the error message nor the log
             if (e.getHttpResponse().map(SimpleHttpResponse::statusCode).filter(status -> status == HttpURLConnection.HTTP_UNAUTHORIZED).isPresent()) {
                 LOGGER.debug("BibSonomy rejected the username or API key");
                 throw new FetcherException(Localization.lang("BibSonomy rejected the username or API key. Check them in Preferences > Web search > BibSonomy."));
@@ -147,8 +147,17 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     @Override
     public URLDownload getUrlDownload(URL url) {
+        return importerPreferences.getApiKey(FETCHER_NAME)
+                                  .map(String::strip)
+                                  .map(key -> authenticatedDownload(url, key))
+                                  .orElseGet(() -> new URLDownload(url));
+    }
+
+    /// BibSonomy repeats rejected credentials in its error responses, so these responses must not reach the log
+    private static URLDownload authenticatedDownload(URL url, String usernameAndApiKey) {
         URLDownload download = new URLDownload(url);
-        importerPreferences.getApiKey(FETCHER_NAME).map(String::strip).ifPresent(key -> download.addHeader("Authorization", basicAuthHeader(key)));
+        download.omitResponseBodyFromLog();
+        download.addHeader("Authorization", basicAuthHeader(usernameAndApiKey));
         return download;
     }
 
@@ -187,8 +196,7 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
             uriBuilder.addParameter("format", "bibtex");
             uriBuilder.addParameter("start", "0");
             uriBuilder.addParameter("end", "1");
-            URLDownload download = new URLDownload(uriBuilder.build().toURL());
-            download.addHeader("Authorization", basicAuthHeader(usernameAndApiKey));
+            URLDownload download = authenticatedDownload(uriBuilder.build().toURL(), usernameAndApiKey);
             // openConnection() throws FetcherException for 4xx/5xx, e.g. 401 wrong key, 400 bad format
             if (download.openConnection() instanceof HttpURLConnection connection) {
                 connection.disconnect();

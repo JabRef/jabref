@@ -118,6 +118,12 @@ class BibSonomyFetcherTest {
     }
 
     @Test
+    @ExternalServicesTest
+    void wrongCredentialsAreInvalid() {
+        assertFalse(fetcher.isValidKey("jabref-test-user:not-a-real-api-key"));
+    }
+
+    @Test
     void searchWithoutCredentialsThrows() {
         ImporterPreferences noKeyPreferences = mock(ImporterPreferences.class);
         when(noKeyPreferences.getApiKey(BibSonomyFetcher.FETCHER_NAME)).thenReturn(Optional.empty());
