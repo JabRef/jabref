@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// Guards [AiPreferences#copyFrom(AiPreferences)] against silently dropping values: the AI
 /// preferences tab commits every edit to a dialog-scoped working copy and relies on `copyFrom`
@@ -22,6 +23,18 @@ class AiPreferencesCopyFromTest {
     /// Captures the state at JabRef startup and belongs to the instance's own session; `copyFrom`
     /// deliberately leaves it alone.
     private static final String NOT_COPIED = "aiFeaturesEnabledInitially";
+
+    @Test
+    void copyRetainsDebugChoiceWhileExpertSettingsAreDisabled() {
+        AiPreferences source = AiPreferences.getDefault();
+        source.setEnableAiDebugProvider(true);
+        source.setCustomizeExpertSettings(false);
+
+        AiPreferences copy = AiPreferences.copyOf(source);
+        assertFalse(copy.getEnableAiDebugProvider());
+        copy.setCustomizeExpertSettings(true);
+        assertTrue(copy.getEnableAiDebugProvider());
+    }
 
     @Test
     void copyFromCopiesEveryProperty() throws IllegalAccessException {
