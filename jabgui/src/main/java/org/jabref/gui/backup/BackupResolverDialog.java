@@ -48,6 +48,7 @@ public class BackupResolverDialog extends FXDialog {
     private final Label backupEntries;
     private final Label backupChanges;
 
+    // [impl->req~jabgui.backup.restore-dialog-comparison~1]
     public BackupResolverDialog(Path originalPath,
                                 Path backupDir,
                                 ExternalApplicationsPreferences externalApplicationsPreferences,
@@ -88,6 +89,7 @@ public class BackupResolverDialog extends FXDialog {
                 wrapped(Localization.lang("Do you want to recover the library from the backup file?")));
         getDialogPane().setContent(content);
 
+        // [impl->req~jabgui.backup.restore-dialog-non-blocking~1]
         backupPathOpt.ifPresent(backupPath -> {
             BackgroundTask<BackupComparison> task = BackgroundTask
                     .wrap(() -> BackupComparator.compare(originalPath, backupPath, importFormatPreferences))
