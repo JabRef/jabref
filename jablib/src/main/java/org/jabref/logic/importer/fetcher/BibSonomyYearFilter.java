@@ -38,30 +38,43 @@ final class BibSonomyYearFilter {
     /// Only then, the years may be sent to BibSonomy: otherwise, BibSonomy would drop entries matching another branch of the query.
     static boolean allYearTermsAreRequired(BaseQueryNode query) {
         return switch (query) {
-            case OperatorNode node when node.op() == OperatorNode.Operator.OR -> node.children().stream().noneMatch(BibSonomyYearFilter::containsYearTerm);
-            case OperatorNode node -> node.children().stream().allMatch(BibSonomyYearFilter::allYearTermsAreRequired);
-            case NotNode node -> !containsYearTerm(node.negatedNode());
-            default -> true;
+            case OperatorNode node when node.op() == OperatorNode.Operator.OR ->
+                    node.children().stream().noneMatch(BibSonomyYearFilter::containsYearTerm);
+            case OperatorNode node ->
+                    node.children().stream().allMatch(BibSonomyYearFilter::allYearTermsAreRequired);
+            case NotNode node ->
+                    !containsYearTerm(node.negatedNode());
+            default ->
+                    true;
         };
     }
 
     private static boolean containsYearTerm(BaseQueryNode query) {
         return switch (query) {
-            case OperatorNode node -> node.children().stream().anyMatch(BibSonomyYearFilter::containsYearTerm);
-            case NotNode node -> containsYearTerm(node.negatedNode());
-            case SearchQueryNode node -> isYearField(node) || isYearRangeField(node);
-            default -> false;
+            case OperatorNode node ->
+                    node.children().stream().anyMatch(BibSonomyYearFilter::containsYearTerm);
+            case NotNode node ->
+                    containsYearTerm(node.negatedNode());
+            case SearchQueryNode node ->
+                    isYearField(node) || isYearRangeField(node);
+            default ->
+                    false;
         };
     }
 
     /// @return the condition on the year of an entry. Empty if the query does not restrict the year.
     private static Optional<Predicate<Optional<Integer>>> toYearCondition(BaseQueryNode query) {
         return switch (query) {
-            case OperatorNode node -> combine(node);
-            case NotNode node -> toYearCondition(node.negatedNode()).map(Predicate::not);
-            case SearchQueryNode node when isYearField(node) -> Optional.of(yearBetween(node.term(), node.term()));
-            case SearchQueryNode node when isYearRangeField(node) -> Optional.of(toYearRangeCondition(node.term()));
-            default -> Optional.empty();
+            case OperatorNode node ->
+                    combine(node);
+            case NotNode node ->
+                    toYearCondition(node.negatedNode()).map(Predicate::not);
+            case SearchQueryNode node when isYearField(node) ->
+                    Optional.of(yearBetween(node.term(), node.term()));
+            case SearchQueryNode node when isYearRangeField(node) ->
+                    Optional.of(toYearRangeCondition(node.term()));
+            default ->
+                    Optional.empty();
         };
     }
 
