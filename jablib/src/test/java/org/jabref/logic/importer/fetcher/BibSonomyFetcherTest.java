@@ -8,6 +8,7 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.search.query.SearchQueryVisitor;
@@ -29,6 +30,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -144,6 +146,8 @@ class BibSonomyFetcherTest {
 
         FetcherException exception = assertThrows(FetcherException.class, () -> fetcherWithWrongKey.performSearch("machine learning"));
 
-        assertEquals("BibSonomy rejected the username or API key. Check them in Preferences > Web search > BibSonomy.", exception.getMessage());
+        // BibSonomy's load balancer sometimes answers 503 before the credentials are checked, which says nothing about the credentials
+        assumeFalse(exception instanceof FetcherServerException);
+        assertEquals("BibSonomy rejected the username or API key. Check them in Preferences > Web search > BibSonomy.", exception.getLocalizedMessage());
     }
 }
