@@ -306,6 +306,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
 
         dbmsProcessor.startNotificationListener(this);
+        OfflineChanges.Recorded recorded = offlineChanges.peek();
+        lastSharedMetaData = Optional.ofNullable(recorded.lastSharedMetaData())
+                                     .orElseGet(() -> Optional.ofNullable(recorded.metaDataBase()).orElse(Map.of()));
         // Synchronously on the caller's thread: the library is not shown before this returns
         long localRevisionAtRead = localMetaDataRevision.get();
         Map<String, String> sharedMetaData = dbmsProcessor.getSharedMetaData();
@@ -401,6 +404,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     @VisibleForTesting
     Map<String, String> readSharedMetaData() throws SQLException {
         return dbmsProcessor.getSharedMetaData();
+    }
+
+    @VisibleForTesting
+    void writeSharedMetaDataToDatabase(Map<String, String> serializedMetaData) throws SQLException {
+        dbmsProcessor.setSharedMetaData(serializedMetaData);
     }
 
     private void pullMetaDataFromDatabase() {
@@ -559,8 +567,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private boolean writeSharedMetaData(Map<String, String> serializedMetaData) {
         return writeOrRecord("Could not write metadata to the shared database",
                 () -> {
-                    dbmsProcessor.setSharedMetaData(serializedMetaData);
+                    writeSharedMetaDataToDatabase(serializedMetaData);
                     lastSharedMetaData = serializedMetaData;
+                    offlineChanges.recordSharedMetaData(serializedMetaData);
                 },
                 () -> offlineChanges.recordMetaData(serializedMetaData, lastSharedMetaData));
     }
@@ -570,9 +579,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private boolean writeRecordedMetaData(Map<String, String> recordedMetaData, OfflineChanges.Recorded recorded) {
         return writeOrRecord("Could not write metadata to the shared database",
                 () -> {
-                    Map<String, String> merged = recorded.mergeMetaDataInto(dbmsProcessor.getSharedMetaData());
+                    Map<String, String> shared = dbmsProcessor.getSharedMetaData();
+                    Map<String, String> merged = recorded.mergeMetaDataInto(shared);
                     dbmsProcessor.setSharedMetaData(merged);
-                    lastSharedMetaData = merged;
+                    // Not `merged`: the pull ending the replay applies it and must see a recorded group deletion as one
+                    lastSharedMetaData = shared;
                 },
                 () -> offlineChanges.recordMetaData(recordedMetaData, recorded.metaDataBase()));
     }
@@ -622,15 +633,18 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 && (lastAppliedLocalMetaDataRevision == currentLocalRevision)) {
             return;
         }
-        lastSharedMetaData = sharedMetaData;
         try {
             metaData.setEventPropagation(false);
             new MetaDataParser(fileMonitor).parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
-            if (!sharedMetaData.containsKey(MetaData.GROUPSTREE)
-                    && !sharedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY)
+            // Groups that never reached the shared database (e.g., their write failed) are not a remote deletion
+            if (containsGroupTree(lastSharedMetaData)
+                    && !containsGroupTree(sharedMetaData)
                     && metaData.getGroups().isPresent()) {
                 metaData.clearGroups();
             }
+            // Only once applied: a snapshot that failed to parse must not hide an earlier shared group tree
+            lastSharedMetaData = sharedMetaData;
+            offlineChanges.recordSharedMetaData(sharedMetaData);
             lastAppliedRemoteMetaData = Map.copyOf(sharedMetaData);
             lastAppliedLocalMetaDataRevision = currentLocalRevision;
             hasAppliedRemoteMetaData = true;
@@ -639,6 +653,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } finally {
             metaData.setEventPropagation(true);
         }
+    }
+
+    private static boolean containsGroupTree(Map<String, String> serializedMetaData) {
+        return serializedMetaData.containsKey(MetaData.GROUPSTREE)
+                || serializedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY);
     }
 
     /// Applies the [MetaData] on all local and shared BibEntries.
