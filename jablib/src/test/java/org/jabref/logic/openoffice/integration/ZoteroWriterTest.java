@@ -216,7 +216,7 @@ class ZoteroWriterTest {
             OOResult<List<String>, JabRefException> result = "refresh".equals(action)
                                                              ? engine.refresh(databases, selectedStyle)
                                                              : engine.insert(List.of(entry), databases, selectedStyle, CitationType.AUTHORYEAR_PAR,
-                                                                     "", document.getText().createTextCursor(), false);
+                    "", document.getText().createTextCursor(), false);
             if (result.isError()) {
                 assertEquals(before, snapshot(document));
                 return;
