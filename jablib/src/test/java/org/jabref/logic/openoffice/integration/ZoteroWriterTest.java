@@ -198,6 +198,39 @@ class ZoteroWriterTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"refresh", "insert"})
+    void nativeLocatorsAreNeverSilentlyDroppedByRefreshOrInsertion(String action) throws Exception {
+        XTextDocument document = office.newDocument();
+        document.getText().setString("New citation: .\n");
+        String name = ZoteroReferenceMark.PREFIX + Files.readString(resource("zotero-native-locator.json")).strip() + " RNDlocator001";
+        appendMark(document, name, "[1, p. 17]");
+        DocumentSnapshot before = snapshot(document);
+        Path styleFile = temporaryDirectory.resolve("locator-aware.csl");
+        Files.writeString(styleFile, Files.readString(resource("zotero-numeric.csl"))
+                                          .replace("<text variable=\"citation-number\"/>", "<text variable=\"citation-number\"/><text variable=\"locator\" prefix=\", p. \"/>"));
+        CitationStyle selectedStyle = CSLStyleUtils.createCitationStyleFromFile(styleFile.toString()).orElseThrow();
+        BibEntry entry = nativeEntry("native");
+        List<BibDatabase> databases = List.of(new BibDatabase(List.of(entry)));
+        try (CitationEngine engine = engine(document)) {
+            OOResult<List<String>, JabRefException> result = "refresh".equals(action)
+                                                             ? engine.refresh(databases, selectedStyle)
+                                                             : engine.insert(List.of(entry), databases, selectedStyle, CitationType.AUTHORYEAR_PAR,
+                                                                     "", document.getText().createTextCursor(), false);
+            if (result.isError()) {
+                assertEquals(before, snapshot(document));
+                return;
+            }
+            assertEquals(List.of(), result.get());
+            Map<String, String> citations = zoteroMarks(document);
+            String updatedName = citations.keySet().stream()
+                                          .filter(mark -> "native-locator-citation".equals(json(mark).get("citationID").getAsString()))
+                                          .findFirst().orElseThrow();
+            assertEquals("17", json(updatedName).getAsJsonArray("citationItems").get(0).getAsJsonObject().get("locator").getAsString());
+            assertEquals("[1, p. 17]", citations.get(updatedName));
+        }
+    }
+
     @Test
     void ambiguousNativeDuplicatesRemainUnlinkedAndExportAsUnresolved() throws Exception {
         XTextDocument document = office.newDocument();

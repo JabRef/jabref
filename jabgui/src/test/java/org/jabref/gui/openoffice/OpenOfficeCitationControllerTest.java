@@ -95,7 +95,7 @@ class OpenOfficeCitationControllerTest {
             citationController.capabilities(style);
             CitationEngine engine = engines.constructed().getFirst();
             when(engine.insert(List.of(entry), databases, style, CitationType.AUTHORYEAR_INTEXT, "p. 5", cursor, syncWhenCiting))
-                    .thenReturn(OOResult.ok(List.of("unresolved")));
+                    .thenReturn(OOResult.ok(List.of()));
 
             citationController.insertCitation(List.of(entry), databases, style, CitationType.AUTHORYEAR_INTEXT, "p. 5");
 
@@ -104,6 +104,29 @@ class OpenOfficeCitationControllerTest {
             verifyNoInteractions(dialogs);
             verify(document, never()).lockControllers();
             verify(document, never()).unlockControllers();
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void insertionWarnsWhenExistingCitationKeysAreUnresolved(boolean syncWhenCiting) {
+        when(preferences.getSyncWhenCiting()).thenReturn(syncWhenCiting);
+        BibEntry entry = new BibEntry().withCitationKey("new");
+        List<BibDatabase> databases = List.of(new BibDatabase(List.of(entry)));
+        XTextViewCursor cursor = mock(XTextViewCursor.class);
+        try (MockedConstruction<CitationEngine> engines = mockEngines();
+             MockedStatic<UnoCursor> cursors = mockStatic(UnoCursor.class)) {
+            cursors.when(() -> UnoCursor.getViewCursor(document)).thenReturn(Optional.of(cursor));
+            OpenOfficeCitationController citationController = controller();
+            citationController.capabilities(style);
+            CitationEngine engine = engines.constructed().getFirst();
+            when(engine.insert(List.of(entry), databases, style, CitationType.AUTHORYEAR_PAR, "", cursor, syncWhenCiting))
+                    .thenReturn(OOResult.ok(List.of("old")));
+
+            citationController.insertCitation(List.of(entry), databases, style, CitationType.AUTHORYEAR_PAR, "");
+
+            verify(dialogs).showErrorDialogAndWait(lang("Could not insert citation"),
+                    lang("Your OpenOffice/LibreOffice document references at least %0 citation keys which could not be found in your current library. Some of these are %1.", "1", "old"));
         }
     }
 

@@ -545,6 +545,29 @@ class WriterIntegrationTest {
         assertGoldenNumbers(document, family);
     }
 
+    @Test
+    void insertionReportsExistingCitationKeysMissingFromTheSelectedLibrary() throws Exception {
+        XTextDocument document = office.newDocument();
+        document.getText().setString("Existing citation: .\nNew citation: .\nBibliography below.\n");
+        BibEntry oldEntry = new BibEntry().withCitationKey("old").withField(StandardField.TITLE, "Original library title");
+        BibEntry newEntry = new BibEntry().withCitationKey("new").withField(StandardField.TITLE, "Second library title");
+        OOStyle selectedStyle = CSLStyleUtils.createCitationStyleFromFile(resource("zotero-numeric.csl").toString()).orElseThrow();
+        try (CitationEngine engine = engine(document)) {
+            XTextCursor firstPosition = document.getText().createTextCursor();
+            firstPosition.goRight((short) "Existing citation: ".length(), false);
+            assertEquals(List.of(), success(engine.insert(List.of(oldEntry), List.of(new BibDatabase(List.of(oldEntry))),
+                    selectedStyle, CitationType.AUTHORYEAR_PAR, "", firstPosition, true)));
+            XTextCursor nextPosition = document.getText().createTextCursor();
+            nextPosition.goRight((short) (document.getText().getString().indexOf("New citation: ") + "New citation: ".length()), false);
+
+            assertEquals(List.of("old"), success(engine.insert(List.of(newEntry), List.of(new BibDatabase(List.of(newEntry))),
+                    selectedStyle, CitationType.AUTHORYEAR_PAR, "", nextPosition, true)));
+
+            assertEquals(Map.of("old", "Unresolved(old)", "new", "[1]"), textsByKey(document));
+            assertEquals("References\n1. Second library title", UnoTextSection.getAnchor(document, "JR_bib").orElseThrow().getString().strip());
+        }
+    }
+
     private CitationEngine engine(XTextDocument document) {
         return new CitationEngine(document, office.context(), preferences(), new BibEntryTypesManager());
     }
