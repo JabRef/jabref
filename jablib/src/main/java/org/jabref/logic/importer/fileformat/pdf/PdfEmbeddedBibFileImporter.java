@@ -3,8 +3,11 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -23,8 +26,10 @@ import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecifica
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachment;
+import org.jspecify.annotations.NullMarked;
 
 /// Imports an embedded Bib-File from the PDF.
+@NullMarked
 public class PdfEmbeddedBibFileImporter extends PdfImporter {
 
     private final BibtexParser bibtexParser;
@@ -59,8 +64,13 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
         for (PDPage page : document.getPages()) {
             for (PDAnnotation annotation : page.getAnnotations()) {
                 if (annotation instanceof PDAnnotationFileAttachment annotationFileAttachment) {
-                    PDComplexFileSpecification fileSpec = (PDComplexFileSpecification) annotationFileAttachment.getFile();
-                    allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));
+                    Optional<PDEmbeddedFile> embeddedFile = Optional.ofNullable((PDComplexFileSpecification) annotationFileAttachment.getFile())
+                                                                    .flatMap(PdfEmbeddedBibFileImporter::searchEmbeddedFile);
+
+                    // Using traditional `if` statement because of exceptions.
+                    if (embeddedFile.isPresent()) {
+                        allParsedEntries.addAll(extractAndParseFile(embeddedFile.get()));
+                    }
                 }
             }
         }
@@ -73,8 +83,12 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
             String filename = entry.getKey();
             FileUtil.getFileExtension(filename);
             if (FileUtil.isBibFile(Path.of(filename))) {
-                PDComplexFileSpecification fileSpec = entry.getValue();
-                allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));
+                Optional<PDEmbeddedFile> embeddedFile = searchEmbeddedFile(entry.getValue());
+
+                // Using traditional `if` statement because of exceptions.
+                if (embeddedFile.isPresent()) {
+                    allParsedEntries.addAll(extractAndParseFile(embeddedFile.get()));
+                }
             }
         }
         return allParsedEntries;
@@ -84,25 +98,17 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
         return bibtexParser.parseEntries(embeddedFile.createInputStream());
     }
 
-    private static PDEmbeddedFile getEmbeddedFile(PDComplexFileSpecification fileSpec) {
-        // search for the first available alternative of the embedded file
-        PDEmbeddedFile embeddedFile = null;
-        if (fileSpec != null) {
-            embeddedFile = fileSpec.getEmbeddedFileUnicode();
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFileDos();
-            }
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFileMac();
-            }
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFileUnix();
-            }
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFile();
-            }
-        }
-        return embeddedFile;
+    private static Optional<PDEmbeddedFile> searchEmbeddedFile(PDComplexFileSpecification fileSpec) {
+        List<PDEmbeddedFile> places = Arrays.asList(
+                fileSpec.getEmbeddedFileUnicode(),
+                fileSpec.getEmbeddedFileDos(),
+                fileSpec.getEmbeddedFileMac(),
+                fileSpec.getEmbeddedFileUnix(),
+                fileSpec.getEmbeddedFile()
+        );
+
+        // `fileSpec.getEmbedded*()` may return `null`, regardless of what IntelliJ might say here.
+        return places.stream().filter(Objects::nonNull).findFirst();
     }
 
     @Override
