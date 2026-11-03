@@ -236,6 +236,18 @@ class BibSonomyFetcherTest {
         assertThrows(FetcherException.class, () -> fetcherWithoutKey.performSearch("machine learning"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", ":", "user:", ":key", "   "})
+    void searchWithMalformedKeyAsksForCredentials(String key) {
+        ImporterPreferences malformedKeyPreferences = mock(ImporterPreferences.class);
+        when(malformedKeyPreferences.getApiKey(BibSonomyFetcher.FETCHER_NAME)).thenReturn(Optional.of(key));
+        BibSonomyFetcher fetcherWithMalformedKey = new BibSonomyFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), malformedKeyPreferences);
+
+        FetcherException exception = assertThrows(FetcherException.class, () -> fetcherWithMalformedKey.performSearch("machine learning"));
+
+        assertEquals("BibSonomy needs your username and API key. Enter them as 'username:apikey' in Preferences > Web search > BibSonomy.", exception.getLocalizedMessage());
+    }
+
     @Test
     @ExternalServicesTest
     void searchWithWrongCredentialsDoesNotShowThem() {

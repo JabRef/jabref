@@ -53,7 +53,7 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     private static final String SEARCH_URL = "https://www.bibsonomy.org/api/posts";
     private static final int MAX_RESULTS = 50;
-    private static final List<Field> INTERNAL_FIELDS = Stream.of("added-at", "interhash", "intrahash", "priority", "citeulike-article-id", "description")
+    private static final List<Field> INTERNAL_FIELDS = Stream.of("added-at", "citeulike-article-id", "description", "interhash", "intrahash", "priority")
                                                              .map(FieldFactory::parseField)
                                                              .toList();
 
@@ -68,11 +68,9 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
     @Override
     public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         // [impl->feat~fetchers.bibsonomy~1]
-        String usernameAndApiKey = importerPreferences.getApiKey(FETCHER_NAME).map(String::strip).orElse("");
-        if (!hasUsernameAndApiKey(usernameAndApiKey)) {
+        if (importerPreferences.getApiKey(FETCHER_NAME).map(String::strip).filter(BibSonomyFetcher::hasUsernameAndApiKey).isEmpty()) {
             throw new FetcherException(Localization.lang("BibSonomy needs your username and API key. Enter them as 'username:apikey' in Preferences > Web search > BibSonomy."));
         }
-        // The transformer gives the search string, so the query is transformed only once.
         // BibSonomy ignores the year tag when there is no search term, and the tag cannot express every query, so we also filter by year here.
         BibSonomyQueryTransformer transformer = new BibSonomyQueryTransformer();
         String query = transformer.transformSearchQuery(queryNode).orElse("");
