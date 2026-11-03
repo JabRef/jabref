@@ -3,13 +3,6 @@ parent: Requirements
 ---
 # OpenOffice/LibreOffice integration
 
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](https://github.com/JabRef/jabref/blob/main/AGENTS.md)
-> • [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)
-
 ## Canonical Writer citations must remain reusable across JStyle, CSL, and BST styles
 `req~openoffice.cross-family-citations~1`
 

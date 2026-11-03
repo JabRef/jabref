@@ -6,13 +6,6 @@ date: 2026-11-02
 # Use canonical Writer citation marks across style families
 `adr~canonical-writer-citations~1`
 
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](https://github.com/JabRef/jabref/blob/main/AGENTS.md)
-> • [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)
-
 Needs: impl
 
 ## Context and Problem Statement

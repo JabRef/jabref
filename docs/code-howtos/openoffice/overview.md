@@ -5,13 +5,6 @@ grand_parent: Code Howtos
 ---
 # Overview
 
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](https://github.com/JabRef/jabref/blob/main/AGENTS.md)
-> • [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)
-
 The OpenOffice/LibreOffice panel connects JabRef libraries to a Writer document.
 It inserts citations, refreshes their presentation, generates a bibliography, and exports cited entries to a library.
 JStyle, CSL, and BST styles share canonical JabRef citations when Zotero compatibility mode is disabled.

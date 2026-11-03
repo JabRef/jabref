@@ -1,10 +1,3 @@
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](../../../../../../../../../AGENTS.md)
-> • [CONTRIBUTING.md](../../../../../../../../../CONTRIBUTING.md)
-
 # Writer safety-gate fixtures
 
 Run `./gradlew :jablib:libreOfficeTest` from the repository root with real LibreOffice Writer and Pandoc installed.

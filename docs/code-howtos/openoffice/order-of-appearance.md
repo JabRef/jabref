@@ -5,13 +5,6 @@ grand_parent: Code Howtos
 ---
 # Order of appearance of citation groups
 
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](https://github.com/JabRef/jabref/blob/main/AGENTS.md)
-> • [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)
-
 The canonical Writer integration separates three orders:
 
 - **Storage order** is the key order encoded in a group's reference mark. Page-info property indexes always address this order.
