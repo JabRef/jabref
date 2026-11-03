@@ -269,7 +269,7 @@ public class DublinCoreExtractor {
     private void fillContributor(String authors) {
         AuthorList list = AuthorList.parse(authors);
         for (Author author : list.getAuthors()) {
-            dcSchema.addContributor(author.getGivenFamily(false));
+            dcSchema.addContributor(XmpUtilShared.toPlainText(author.getGivenFamily(false)));
         }
     }
 
@@ -277,7 +277,7 @@ public class DublinCoreExtractor {
     private void fillCreator(String creators) {
         AuthorList list = AuthorList.parse(creators);
         for (Author author : list.getAuthors()) {
-            dcSchema.addCreator(author.getGivenFamily(false));
+            dcSchema.addCreator(XmpUtilShared.toPlainTex(author.getGivenFamily(false)));
         }
     }
 
@@ -289,51 +289,51 @@ public class DublinCoreExtractor {
 
     /// BibTeX: abstract; DC: 'dc:description'
     private void fillDescription(String description) {
-        dcSchema.setDescription(description);
+        dcSchema.setDescription(XmpUtilShared.toPlainText(description));
     }
 
     /// BibTeX:doi; DC: 'dc:identifier'
     private void fillIdentifier(String identifier) {
-        dcSchema.setIdentifier(identifier);
+        dcSchema.setIdentifier(unprotectTermsFormatter.format(identifier));
     }
 
     /// BibTeX: publisher, DC: dc:publisher
     private void fillPublisher(String publisher) {
-        dcSchema.addPublisher(publisher);
+        dcSchema.addPublisher(XmpUtilShared.toPlainText(publisher));
     }
 
     /// BibTeX: keywords; DC: 'dc:subject'
     private void fillKeywords(String value) {
         String[] keywords = value.split(xmpPreferences.getKeywordSeparator().toString());
         for (String keyword : keywords) {
-            dcSchema.addSubject(keyword.trim());
+            dcSchema.addSubject(XmpUtilShared.toPlainText(keyword.trim()));
         }
     }
 
     /// BibTeX: title; DC: 'dc:title'
     private void fillTitle(String title) {
-        dcSchema.setTitle(title);
+        dcSchema.setTitle(XmpUtilShared.toPlainText(title));
     }
 
     /// BibTeX: Coverage (Custom Field); DC Field : Coverage
     private void fillCoverage(String coverage) {
-        dcSchema.setCoverage(coverage);
+        dcSchema.setCoverage(XmpUtilShared.toPlainText(coverage));
     }
 
     /// BibTeX: language; DC: dc:language
     private void fillLanguages(String languages) {
-        Arrays.stream(languages.split(","))
+        Arrays.stream(unprotectTermsFormatter.format(languages).split(","))
               .forEach(dcSchema::addLanguage);
     }
 
     /// BibTeX: Rights (Custom Field); DC: dc:rights
     private void fillRights(String rights) {
-        dcSchema.addRights(null, rights.split(",")[0]);
+        dcSchema.addRights(null, XmpUtilShared.toPlainText(rights.split(",")[0]));
     }
 
     /// BibTeX: Source (Custom Field); DC: Source
     private void fillSource(String source) {
-        dcSchema.setSource(source);
+        dcSchema.setSource((XmpUtilShared.toPlainText(source)));
     }
 
     /// All others (+ citation key) get packaged in the dc:relation attribute with `bibtex/` prefix in the content.
@@ -371,7 +371,7 @@ public class DublinCoreExtractor {
                 continue;
             }
 
-            String value = unprotectTermsFormatter.format(bibEntry.getField(field).get());
+            String value = bibEntry.getField(field).get();
             if (field instanceof StandardField standardField) {
                 switch (standardField) {
                     case EDITOR ->
