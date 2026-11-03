@@ -16,6 +16,8 @@ The [requirements](../../requirements/openoffice.md) and [ADR-0080](../../decisi
 
 ## Architecture and entry points
 
+![Writer citation integration architecture](layers-v1.svg)
+
 | Area | Entry points | Responsibility |
 | --- | --- | --- |
 | GUI | `OpenOfficePanel`, `OpenOfficeCitationController`, `OpenOfficeDocumentConnection` | Connect to a document, select a style, obtain capabilities, and present engine results. |

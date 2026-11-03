@@ -5,8 +5,8 @@ grand_parent: Code Howtos
 ---
 # Code reorganization
 
-This page records the historical JStyle reorganization, not the current canonical architecture.
-The historical classes, code sketches, and committed evidence links below are retained as historical records; removed backends do not provide compatibility in the current engine.
+This page retains the historical JStyle reorganization notes, with an updated diagram of the current citation integration.
+The directory descriptions, code sketches, and committed evidence links below are historical records; removed backends do not provide compatibility in the current engine.
 See the [current overview](overview.md), [ADR-0080](../../decisions/0080-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) for the active contract.
 
 The current GUI gateway is `OpenOfficeCitationController`, with concise action methods and GUI instances named `citationController`; document selection is handled by `OpenOfficeDocumentConnection`.
@@ -37,7 +37,10 @@ Why
 
 ### Layers
 
-![Layers](layers-v1.svg)
+![Current Writer citation integration layers](layers-v1.svg)
+
+The diagram shows the current shared canonical pipeline, separate native Zotero strategy, pure model, and common Writer infrastructure.
+The directory-by-directory notes below describe the earlier reorganization, not the current package layout.
 
 ### By directories
 
