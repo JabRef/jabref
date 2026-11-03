@@ -1,11 +1,13 @@
 package org.jabref.logic.search;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.params.provider.Arguments;
@@ -91,6 +93,8 @@ public final class LibrarySearcherTestCases {
                         new SearchQuery("any =~ [Y]"),
                         List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED)),
 
+                regexWithLiteralBackslash(),
+
                 // DOI matching (full URLs should find entry by DOI)
                 Arguments.of(List.of(ENTRY_WITH_DOI),
                         new SearchQuery("https://doi.org/10.1000/182"),
@@ -110,6 +114,11 @@ public final class LibrarySearcherTestCases {
                 doiSearchCase("https://example.org/article/10.1000/182", "https://example.org/article/10.1000/182"),
                 Arguments.of(List.of(), new SearchQuery("https://example.org/article/10.1000/182"), List.of(ENTRY_WITH_DOI))
         );
+    }
+
+    private static Arguments regexWithLiteralBackslash() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "foo\\bar");
+        return Arguments.of(List.of(entry), new SearchQuery("\"foo\\\\bar\"", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)), List.of(entry));
     }
 
     private static Arguments doiSearchCase(String query, String value) {

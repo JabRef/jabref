@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 public class SearchQuery {
 
-    private static final Pattern QUOTED_ESCAPE = Pattern.compile("\\\\([\\\\\"])");
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
 
     private final String searchExpression;
@@ -142,18 +141,25 @@ public class SearchQuery {
         }
         return DOI.extractLinkSearchTerms(searchExpression)
                   .map(terms -> terms.decoded().equals(terms.encoded())
-                                ? quoteSearchTerm(terms.decoded())
-                                : "(" + quoteSearchTerm(terms.decoded()) + " OR " + quoteSearchTerm(terms.encoded()) + ")")
+                                ? formatSearchTerm(terms.decoded())
+                                : "(" + formatSearchTerm(terms.decoded()) + " OR " + formatSearchTerm(terms.encoded()) + " )")
                   .orElse(searchExpression);
     }
 
-    private static String quoteSearchTerm(String term) {
-        return "\"" + term.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+    private static String formatSearchTerm(String term) {
+        if (term.contains("\\") && term.chars().noneMatch(Character::isWhitespace)) {
+            return term.replace("=", "\\=")
+                       .replace("!", "\\!")
+                       .replace("~", "\\~")
+                       .replace("(", "\\(")
+                       .replace(")", "\\)");
+        }
+        return "\"" + term.replace("\"", "\\\"") + "\"";
     }
 
     /// Unescapes search value based on the Search grammar rules.
     ///
-    /// - STRING_LITERAL: Removes enclosing quotes and unescapes `\"` and `\\`
+    /// - STRING_LITERAL: Removes enclosing quotes and unescapes `\"`
     ///
     /// - TERM: Unescapes `\=, \!, \~, \(, \)`
     public static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
@@ -164,7 +170,8 @@ public class SearchQuery {
         String term = ctx.getText();
 
         if (ctx.getStart().getType() == SearchParser.STRING_LITERAL) {
-            return QUOTED_ESCAPE.matcher(term.substring(1, term.length() - 1)).replaceAll("$1");
+            return term.substring(1, term.length() - 1)
+                       .replace("\\\"", "\"");
         }
 
         if (ctx.getStart().getType() == SearchParser.TERM) {

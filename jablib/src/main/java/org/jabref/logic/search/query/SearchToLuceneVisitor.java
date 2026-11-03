@@ -120,7 +120,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     }
 
     private static String escapeQuotes(String term) {
-        return term.replace("\\", "\\\\").replace("\"", "\\\"");
+        return term.replace("\"", "\\\"");
     }
 
     private static String escapeForLucene(String term) {
