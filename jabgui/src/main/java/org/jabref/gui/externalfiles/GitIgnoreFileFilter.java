@@ -1,7 +1,9 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +18,8 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitIgnoreFileFilter.class);
 
+    private static final String DEFAULT_IGNORES = ".gitignore\n.git\n.DS_Store\ndesktop.ini\nThumbs.db\n";
+
     private final IgnoreNode ignoreNode;
     private final Path baseDir;
 
@@ -29,13 +33,6 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
         if (currentPath == null) {
             this.baseDir = path;
-            // Add default ignores
-            try (java.io.ByteArrayInputStream input = new java.io.ByteArrayInputStream(
-                    ".git\n.DS_Store\ndesktop.ini\nThumbs.db\n.gitignore\n".getBytes(java.nio.charset.StandardCharsets.UTF_8))) {
-                ignoreNode.parse(input);
-            } catch (IOException e) {
-                LOGGER.info("Could not parse default ignores", e);
-            }
         } else {
             this.baseDir = currentPath;
             Path gitIgnore = currentPath.resolve(".gitignore");
@@ -44,13 +41,14 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
             } catch (IOException e) {
                 LOGGER.info("Could not read .gitignore from {}", gitIgnore, e);
             }
-            // Always ignore .gitignore itself and common defaults
-            try (java.io.ByteArrayInputStream input = new java.io.ByteArrayInputStream(
-                    ".gitignore\n.git\n.DS_Store\ndesktop.ini\nThumbs.db\n".getBytes(java.nio.charset.StandardCharsets.UTF_8))) {
-                ignoreNode.parse(input);
-            } catch (IOException e) {
-                LOGGER.info("Could not add default ignores", e);
-            }
+        }
+
+        // Always ignore ".gitignore" itself and common defaults.
+        // Parsed last, so the rules apply whether or not a .gitignore was found.
+        try (InputStream input = new ByteArrayInputStream(DEFAULT_IGNORES.getBytes(StandardCharsets.UTF_8))) {
+            ignoreNode.parse(input);
+        } catch (IOException e) {
+            LOGGER.info("Could not add default ignores", e);
         }
     }
 
