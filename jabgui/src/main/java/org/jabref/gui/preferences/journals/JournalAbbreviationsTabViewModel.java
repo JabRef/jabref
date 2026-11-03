@@ -3,6 +3,8 @@ package org.jabref.gui.preferences.journals;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,6 +19,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationWriter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -24,7 +27,6 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isLoading = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty useBuiltInJournalList = new SimpleBooleanProperty(true);
+    private final AtomicLong settingsGeneration = new AtomicLong();
+    private final Object listWriteLock = new Object();
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
 
     private final DialogService dialogService;
@@ -112,6 +117,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         addBuiltInList();
 
         useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
+        useBuiltInJournalList.set(abbreviationsPreferences.shouldUseBuiltInJournalList());
     }
 
     /// Read all saved file paths and read their abbreviations.
@@ -132,7 +138,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     /// This will load the built in abbreviation files and add it to the list of journal abbreviation files.
     public void addBuiltInList() {
         BackgroundTask
-                .wrap(journalAbbreviationRepository::getAllLoaded)
+                .wrap(() -> JournalAbbreviationLoader.loadBuiltInRepository().getAllLoaded())
                 .onRunning(() -> isLoading.setValue(true))
                 .onSuccess(result -> {
                     isLoading.setValue(false);
@@ -301,25 +307,42 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     /// finally updates the abbreviations auto complete.
     @Override
     public void storeSettings() {
+        // [impl->req~journals.disable-built-in~1]
+        long generation = settingsGeneration.incrementAndGet();
+        List<String> journalStringList = journalFiles.stream()
+                                                     .filter(path -> !path.isBuiltInListProperty().get())
+                                                     .flatMap(path -> path.getAbsolutePath().stream())
+                                                     .map(path -> path.toAbsolutePath().toString())
+                                                     .toList();
+        abbreviationsPreferences.setExternalJournalLists(journalStringList);
+        abbreviationsPreferences.setUseFJournalField(useFJournal.get());
+        abbreviationsPreferences.setUseBuiltInJournalList(useBuiltInJournalList.get());
+        Map<Path, List<Abbreviation>> filesToWrite = shouldWriteLists
+                                                   ? journalFiles.stream()
+                                                                 .filter(file -> !file.isBuiltInListProperty().get())
+                                                                 .collect(Collectors.toMap(file -> file.getAbsolutePath().orElseThrow(),
+                                                                         file -> file.abbreviationsProperty().stream()
+                                                                                     .filter(abbreviation -> !abbreviation.isPseudoAbbreviation())
+                                                                                     .map(AbbreviationViewModel::getAbbreviationObject)
+                                                                                     .toList()))
+                                                   : Map.of();
         BackgroundTask
                 .wrap(() -> {
-                    List<String> journalStringList = journalFiles.stream()
-                                                                 .filter(path -> !path.isBuiltInListProperty().get())
-                                                                 .filter(path -> path.getAbsolutePath().isPresent())
-                                                                 .map(path -> path.getAbsolutePath().get().toAbsolutePath().toString())
-                                                                 .collect(Collectors.toList());
-
-                    abbreviationsPreferences.setExternalJournalLists(journalStringList);
-                    abbreviationsPreferences.setUseFJournalField(useFJournal.get());
-
-                    if (shouldWriteLists) {
-                        saveJournalAbbreviationFiles();
+                    synchronized (listWriteLock) {
+                        if (generation == settingsGeneration.get()) {
+                            for (var file : filesToWrite.entrySet()) {
+                                AbbreviationWriter.writeOrCreate(file.getKey(), file.getValue());
+                            }
+                        }
+                    }
+                    return true;
+                })
+                .onSuccess(_ -> {
+                    if (generation == settingsGeneration.get()) {
                         shouldWriteLists = false;
+                        journalAbbreviationRepository.reload(abbreviationsPreferences, taskExecutor);
                     }
                 })
-                .onSuccess(_ -> Injector.setModelOrService(
-                        JournalAbbreviationRepository.class,
-                        JournalAbbreviationLoader.loadRepository(abbreviationsPreferences)))
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);
     }
@@ -358,6 +381,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty isFileRemovableProperty() {
         return isFileRemovable;
+    }
+
+    public SimpleBooleanProperty useBuiltInJournalListProperty() {
+        return useBuiltInJournalList;
     }
 
     public SimpleBooleanProperty useFJournalProperty() {

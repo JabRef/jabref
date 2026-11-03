@@ -3,8 +3,11 @@ package org.jabref.gui.autocompleter;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -60,6 +63,20 @@ class SuggestionProvidersTest {
     @MethodSource("getTestPairs")
     void appropriateCompleterReturned(Class<SuggestionProvider<BibEntry>> expected, Field field) {
         assertEquals(expected, suggestionProviders.getForField(field).getClass());
+    }
+
+    @Test
+    void existingJournalSuggestionsObserveSavedToggle() {
+        AbbreviationPreferences preferences = AbbreviationPreferences.getDefault();
+        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(preferences);
+        JournalsSuggestionProvider provider = new JournalsSuggestionProvider(StandardField.JOURNAL, new BibDatabase(), repository);
+        assertEquals(1, provider.getSource().filter("2D Materials"::equals).count());
+        preferences.setUseBuiltInJournalList(false);
+        repository.reload(preferences, new CurrentThreadTaskExecutor());
+        assertEquals(0, provider.getSource().filter("2D Materials"::equals).count());
+        preferences.setUseBuiltInJournalList(true);
+        repository.reload(preferences, new CurrentThreadTaskExecutor());
+        assertEquals(1, provider.getSource().filter("2D Materials"::equals).count());
     }
 
     @Test

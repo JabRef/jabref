@@ -141,4 +141,15 @@ While a new selection is still settling, saving or leaving the Source tab writes
 
 Needs: impl
 
+## Journal abbreviation preferences must allow disabling the built-in list without disabling external lists or LTWA
+`req~journals.disable-built-in~1`
+
+The built-in list is enabled by default, including when no saved preference exists.
+A saved change takes effect without restarting; canceling the preferences dialog leaves the active setting unchanged.
+The built-in list remains visible in preferences when disabled.
+
+See <https://github.com/JabRef/jabref/issues/12468>.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
