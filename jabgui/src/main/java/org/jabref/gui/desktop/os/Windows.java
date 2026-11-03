@@ -20,29 +20,34 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Windows extends NativeDesktop {
 
+    /// Explorer truncates its argument at this limit, so a longer argument names nothing and Explorer
+    /// silently falls back to showing the user's Documents folder. The limit counts the terminating
+    /// NUL character, leaving 259 usable characters.
+    private static final int MAX_PATH = 260;
+
     public Windows(HostServices hostServices, GuiPreferences preferences) {
         super(hostServices, preferences);
     }
 
     @Override
     protected void openFileWithDefaultApplication(String filePath) throws IOException {
-        // quote String so explorer handles URL query strings correctly
-        startProcess(new ProcessBuilder("explorer.exe", "\"" + filePath + "\""));
+        startProcess(new ProcessBuilder(shellOpenCommand(filePath)));
     }
 
     @Override
     public void openUrlWithSystemHandler(String url) throws IOException {
-        startProcess(new ProcessBuilder(urlOpenCommand(url)));
+        startProcess(new ProcessBuilder(shellOpenCommand(url)));
     }
 
-    /// Explorer truncates its argument at the Windows path limit of 260 characters, which OAuth login URLs exceed.
-    /// The URL protocol handler takes the URL unquoted and without that limit.
-    static List<String> urlOpenCommand(String url) {
-        if (url.length() > 260) {
-            return List.of("rundll32.exe", "url.dll,FileProtocolHandler", url);
+    /// Hands a file path or URL to the registered handler of the shell. Paths of [#MAX_PATH] characters
+    /// or more, which JabRef's generated file names reach easily, and OAuth login URLs go to the URL
+    /// protocol handler, which takes its argument unquoted and without that limit.
+    static List<String> shellOpenCommand(String pathOrUrl) {
+        if (pathOrUrl.length() >= MAX_PATH) {
+            return List.of("rundll32.exe", "url.dll,FileProtocolHandler", pathOrUrl);
         }
         // quote String so explorer handles URL query strings correctly
-        return List.of("explorer.exe", "\"" + url + "\"");
+        return List.of("explorer.exe", "\"" + pathOrUrl + "\"");
     }
 
     @Override
@@ -63,7 +68,19 @@ public class Windows extends NativeDesktop {
 
     @Override
     protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) throws IOException {
-        startProcess(new ProcessBuilder("explorer.exe", "/select,", filePath.toString()));
+        startProcess(new ProcessBuilder(revealCommand(filePath)));
+    }
+
+    /// Explorer cannot select a file it cannot address: at [#MAX_PATH] characters or more it ignores the
+    /// whole argument and shows the user's Documents folder. Opening the containing folder without the
+    /// selection at least arrives where the file is.
+    static List<String> revealCommand(Path filePath) {
+        String path = filePath.toString();
+        Path parent = filePath.getParent();
+        if (path.length() < MAX_PATH || parent == null) {
+            return List.of("explorer.exe", "/select,", path);
+        }
+        return shellOpenCommand(parent.toString());
     }
 
     @Override
