@@ -7,7 +7,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jspecify.annotations.NullMarked;
 
 /// Translates JabRef's search query into BibSonomy's free-text `search` parameter.
-/// BibSonomy has no fielded search; years are filtered client-side.
+/// BibSonomy has no fielded search; years are handled by the fetcher.
 @NullMarked
 public class BibSonomyQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
 

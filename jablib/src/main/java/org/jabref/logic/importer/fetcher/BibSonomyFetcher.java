@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -48,7 +47,6 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     private static final String SEARCH_URL = "https://www.bibsonomy.org/api/posts";
     private static final int MAX_RESULTS = 50;
-    private static final Pattern FOUR_DIGIT_YEAR = Pattern.compile("\\d{4}");
 
     private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
@@ -65,19 +63,20 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
         if (!hasUsernameAndApiKey(usernameAndApiKey)) {
             throw new FetcherException(Localization.lang("BibSonomy needs your username and API key. Enter them as 'username:apikey' in Preferences > Web search > BibSonomy."));
         }
-        // The transformer gives the search string and records the requested years, so the query is transformed only once.
-        // BibSonomy ignores the year tag when there is no search term, so we also filter by year here.
+        // The transformer gives the search string, so the query is transformed only once.
+        // BibSonomy ignores the year tag when there is no search term, and the tag cannot express every query, so we also filter by year here.
         BibSonomyQueryTransformer transformer = new BibSonomyQueryTransformer();
         String query = transformer.transformSearchQuery(queryNode).orElse("");
-        return fetchEntries(query, transformer).stream()
-                                               .filter(entry -> isInYearRange(entry, transformer))
-                                               .toList();
+        BibSonomyYearFilter yearFilter = new BibSonomyYearFilter(queryNode);
+        return fetchEntries(queryNode, query, transformer).stream()
+                                                          .filter(yearFilter::accepts)
+                                                          .toList();
     }
 
-    private List<BibEntry> fetchEntries(String query, BibSonomyQueryTransformer transformer) throws FetcherException {
+    private List<BibEntry> fetchEntries(BaseQueryNode queryNode, String query, BibSonomyQueryTransformer transformer) throws FetcherException {
         URL url;
         try {
-            url = getSearchUrl(query, transformer);
+            url = getSearchUrl(queryNode, query, transformer);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
@@ -99,29 +98,21 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
         }
     }
 
-    /// Entries without a four-digit year are kept, because their year cannot be compared
-    private static boolean isInYearRange(BibEntry entry, BibSonomyQueryTransformer transformer) {
-        return entry.getField(StandardField.YEAR)
-                    .filter(year -> FOUR_DIGIT_YEAR.matcher(year).matches())
-                    .map(Integer::parseInt)
-                    .map(year -> transformer.getStartYear().map(startYear -> year >= startYear).orElse(true)
-                            && transformer.getEndYear().map(endYear -> year <= endYear).orElse(true))
-                    .orElse(true);
-    }
-
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         BibSonomyQueryTransformer transformer = new BibSonomyQueryTransformer();
         String query = transformer.transformSearchQuery(queryNode).orElse("");
-        return getSearchUrl(query, transformer);
+        return getSearchUrl(queryNode, query, transformer);
     }
 
-    private static URL getSearchUrl(String query, BibSonomyQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
+    private static URL getSearchUrl(BaseQueryNode queryNode, String query, BibSonomyQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("resourcetype", "publication");
         uriBuilder.addParameter("format", "bibtex");
         uriBuilder.addParameter("search", query);
-        getYearTag(transformer).ifPresent(yearTag -> uriBuilder.addParameter("tags", yearTag));
+        if (BibSonomyYearFilter.allYearTermsAreRequired(queryNode)) {
+            getYearTag(transformer).ifPresent(yearTag -> uriBuilder.addParameter("tags", yearTag));
+        }
         uriBuilder.addParameter("start", "0");
         uriBuilder.addParameter("end", String.valueOf(MAX_RESULTS));
         return uriBuilder.build().toURL();

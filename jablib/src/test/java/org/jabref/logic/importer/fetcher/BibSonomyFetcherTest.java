@@ -64,9 +64,12 @@ class BibSonomyFetcherTest {
     @CsvSource(delimiter = '|', value = {
             "learning                          | search=learning&start=0&end=50",
             "learning year=2015                | search=learning&tags=sys%3Ayear%3A2015&start=0&end=50",
-            "learning year-range=2010-2012     | search=learning&tags=sys%3Ayear%3A2010-2012&start=0&end=50"
+            "learning year-range=2010-2012     | search=learning&tags=sys%3Ayear%3A2010-2012&start=0&end=50",
+            "title=foo OR year=2015            | search=foo&start=0&end=50",
+            "year=2015 OR year=2017            | search=&start=0&end=50",
+            "learning AND NOT year=2015        | search=learning&start=0&end=50"
     })
-    void yearIsSentAsSystemTag(String query, String expectedParameters) throws MalformedURLException, URISyntaxException {
+    void yearIsSentAsSystemTagOnlyIfRequired(String query, String expectedParameters) throws MalformedURLException, URISyntaxException {
         SearchQuery searchQuery = new SearchQuery(query);
         SearchQueryVisitor visitor = new SearchQueryVisitor(searchQuery.getSearchFlags());
 
