@@ -1,0 +1,74 @@
+# CS467 Team 5 fork only: build receipt for the backup restore dialog work.
+# Runs the backup-related tests under several default time zones, because the dialog will show saved times.
+name: Team 5 backup dialog checks
+
+on:
+  # Every push to any branch, main included
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  backup-tests:
+    if: github.repository == 'cs467-team5/jabref'
+    name: "Backup tests – TZ=${{ matrix.timezone }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # UTC; a +08:00 zone without daylight saving; a zone with daylight saving; a +12:45/+13:45 zone
+        timezone: [ UTC, Asia/Singapore, America/New_York, Pacific/Chatham ]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run backup tests
+        env:
+          TZ: ${{ matrix.timezone }}
+          CI: "true"
+        run: >
+          xvfb-run --auto-servernum ./gradlew --console=plain
+          :jablib:test --tests "org.jabref.logic.util.io.BackupFileUtilTest"
+          :jabgui:test --tests "org.jabref.gui.backup.BackupResolverDialogTest"
+          --tests "org.jabref.gui.dialogs.BackupUIManagerTest"
+          --tests "org.jabref.gui.autosaveandbackup.BackupManagerTest"
+      - name: Write receipt
+        if: always()
+        run: |
+          {
+            echo "### Backup tests, TZ=$TZ"
+            echo "Commit \`$(git rev-parse HEAD)\`, $(java -version 2>&1 | head -1)"
+            for f in jablib/build/test-results/test/*.xml jabgui/build/test-results/test/*.xml; do
+              [ -e "$f" ] && grep -o '<testsuite [^>]*' "$f" | sed -E 's/.*name="([^"]*)".*tests="([0-9]+)".*failures="([0-9]+)".*errors="([0-9]+)".*/- \1: tests=\2 failures=\3 errors=\4/'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          TZ: ${{ matrix.timezone }}
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: backup-test-results-${{ strategy.job-index }}
+          path: |
+            jablib/build/test-results/test/*.xml
+            jabgui/build/test-results/test/*.xml
+
+  checkstyle:
+    if: github.repository == 'cs467-team5/jabref'
+    name: Checkstyle (jablib, jabgui)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - run: ./gradlew --console=plain :jablib:checkstyleMain :jablib:checkstyleTest :jabgui:checkstyleMain :jabgui:checkstyleTest
