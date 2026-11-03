@@ -131,8 +131,8 @@ public class SearchQuery {
         }
         return DOI.extractLinkSearchTerms(searchExpression)
                   .map(terms -> terms.decoded().equals(terms.encoded())
-                          ? quoteSearchTerm(terms.decoded())
-                          : "(" + quoteSearchTerm(terms.decoded()) + " OR " + quoteSearchTerm(terms.encoded()) + ")")
+                                ? quoteSearchTerm(terms.decoded())
+                                : "(" + quoteSearchTerm(terms.decoded()) + " OR " + quoteSearchTerm(terms.encoded()) + ")")
                   .orElse(searchExpression);
     }
 
