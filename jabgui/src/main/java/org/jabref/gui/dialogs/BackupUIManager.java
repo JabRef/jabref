@@ -94,7 +94,7 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
@@ -191,7 +191,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

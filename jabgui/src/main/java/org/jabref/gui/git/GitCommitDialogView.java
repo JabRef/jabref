@@ -60,6 +60,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
                 taskExecutor,
                 gitHandlerRegistry,
                 preferences.getImportFormatPreferences(),
+                entryTypesManager,
                 fileUpdateMonitor);
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
