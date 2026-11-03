@@ -207,11 +207,32 @@ class BibSonomyFetcherTest {
                 .withField(StandardField.URL, "http://arxiv.org/abs/cs.IR/0509072")
                 .withField(StandardField.YEAR, "2005");
 
+        assertEquals(expected, parseAndCleanRealResponse().getFirst());
+    }
+
+    @Test
+    void movesDoiOfRealResponseFromEeField() throws IOException, ParseException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("journals/patterns/TangJX26")
+                .withField(StandardField.AUTHOR, "Tang, Chunlei and Jia, Xing and Xiong, Yun")
+                .withField(StandardField.DOI, "10.1016/j.patter.2026.101615")
+                .withField(StandardField.JOURNAL, "Patterns")
+                .withField(StandardField.KEYWORDS, "dblp")
+                .withField(StandardField.NUMBER, "8")
+                .withField(StandardField.PAGES, "101615")
+                .withField(StandardField.TITLE, "From data to value in multimodal learning.")
+                .withField(StandardField.URL, "http://dblp.uni-trier.de/db/journals/patterns/patterns7.html#TangJX26")
+                .withField(StandardField.VOLUME, "7")
+                .withField(StandardField.YEAR, "2026");
+
+        assertEquals(expected, parseAndCleanRealResponse().getLast());
+    }
+
+    private List<BibEntry> parseAndCleanRealResponse() throws IOException, ParseException {
         try (InputStream response = BibSonomyFetcherTest.class.getResourceAsStream("bibsonomy-folksonomy.bib")) {
             List<BibEntry> entries = fetcher.getParser().parseEntries(response);
             entries.forEach(fetcher::doPostCleanup);
-
-            assertEquals(expected, entries.getFirst());
+            return entries;
         }
     }
 
