@@ -14,7 +14,9 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
@@ -92,7 +94,7 @@ class BibSonomyFetcherTest {
                 .withField(StandardField.NUMBER, "8")
                 .withField(StandardField.PAGES, "101615")
                 .withField(StandardField.DOI, "10.1016/j.patter.2026.101615");
-        // Fields such as added-at or interhash belong to the user who posted the entry and may change, so only the bibliographic fields are compared
+        // Fields such as keywords or biburl belong to the user who posted the entry and may change, so only the bibliographic fields are compared
         List<Field> bibliographicFields = List.copyOf(expected.getFields());
 
         BibEntry firstEntry = fetcher.performSearch("From data to value in multimodal learning").getFirst();
@@ -100,6 +102,20 @@ class BibSonomyFetcherTest {
         assertEquals(expected.getType(), firstEntry.getType());
         assertEquals(bibliographicFields.stream().map(expected::getField).toList(),
                 bibliographicFields.stream().map(firstEntry::getField).toList());
+    }
+
+    @Test
+    @ExternalServicesTest
+    void searchReturnsEntriesWithoutInternalFields() throws FetcherException {
+        assumeCredentialsAvailable();
+        List<Field> internalFields = List.of(FieldFactory.parseField("added-at"), FieldFactory.parseField("interhash"), FieldFactory.parseField("intrahash"));
+
+        List<Field> foundInternalFields = fetcher.performSearch("From data to value in multimodal learning").stream()
+                                                 .flatMap(entry -> entry.getFields().stream())
+                                                 .filter(internalFields::contains)
+                                                 .toList();
+
+        assertEquals(List.of(), foundInternalFields);
     }
 
     @Test
@@ -114,6 +130,65 @@ class BibSonomyFetcherTest {
     void searchWithEmptyQueryReturnsEmptyList() throws FetcherException {
         assumeCredentialsAvailable();
         assertEquals(List.of(), fetcher.performSearch(""));
+    }
+
+    @Test
+    void cleanupConvertsTagsToKeywords() {
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "tagging folksonomy tagora");
+
+        fetcher.doPostCleanup(entry);
+
+        assertEquals(new BibEntry().withField(StandardField.KEYWORDS, "tagging, folksonomy, tagora"), entry);
+    }
+
+    @Test
+    void cleanupNormalizesMonth() {
+        BibEntry entry = new BibEntry().withField(StandardField.MONTH, "09");
+
+        fetcher.doPostCleanup(entry);
+
+        assertEquals(new BibEntry().withField(StandardField.MONTH, Month.SEPTEMBER.getJabRefFormat()), entry);
+    }
+
+    @Test
+    void cleanupNormalizesDoi() {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "https://doi.org/10.1145/1135777.1135843");
+
+        fetcher.doPostCleanup(entry);
+
+        assertEquals(new BibEntry().withField(StandardField.DOI, "10.1145/1135777.1135843"), entry);
+    }
+
+    @Test
+    void cleanupJoinsAbstractLines() {
+        BibEntry entry = new BibEntry().withField(StandardField.ABSTRACT, " first line\nsecond line ");
+
+        fetcher.doPostCleanup(entry);
+
+        assertEquals(new BibEntry().withField(StandardField.ABSTRACT, "first line second line"), entry);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"added-at", "interhash", "intrahash", "timestamp", "priority", "citeulike-article-id", "description"})
+    void cleanupRemovesInternalField(String fieldName) {
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Tagging")
+                                       .withField(FieldFactory.parseField(fieldName), "internal value");
+
+        fetcher.doPostCleanup(entry);
+
+        assertEquals(new BibEntry().withField(StandardField.TITLE, "Tagging"), entry);
+    }
+
+    @Test
+    void cleanupKeepsLinksToThePublication() {
+        BibEntry entry = new BibEntry().withField(StandardField.URL, "https://example.org/paper")
+                                       .withField(FieldFactory.parseField("biburl"), "https://www.bibsonomy.org/bibtex/abc/jabref-test-user");
+        BibEntry expected = new BibEntry().withField(StandardField.URL, "https://example.org/paper")
+                                          .withField(FieldFactory.parseField("biburl"), "https://www.bibsonomy.org/bibtex/abc/jabref-test-user");
+
+        fetcher.doPostCleanup(entry);
+
+        assertEquals(expected, entry);
     }
 
     @ParameterizedTest

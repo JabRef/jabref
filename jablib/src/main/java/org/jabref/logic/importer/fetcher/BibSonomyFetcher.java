@@ -10,11 +10,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -28,6 +31,9 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.http.SimpleHttpResponse;
 import org.jabref.model.search.query.BaseQueryNode;
@@ -47,6 +53,9 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     private static final String SEARCH_URL = "https://www.bibsonomy.org/api/posts";
     private static final int MAX_RESULTS = 50;
+    private static final List<Field> INTERNAL_FIELDS = Stream.of("added-at", "interhash", "intrahash", "priority", "citeulike-article-id", "description")
+                                                             .map(FieldFactory::parseField)
+                                                             .toList();
 
     private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
@@ -161,8 +170,14 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
     public void doPostCleanup(BibEntry entry) {
         new DoiCleanup().cleanup(entry);
         new FieldFormatterCleanupActions(true, List.of(
-                new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter())
+                new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
+                new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+                new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter())
         )).applySaveActions(entry);
+        INTERNAL_FIELDS.forEach(entry::clearField);
+        // BibSonomy separates tags with spaces
+        entry.getField(StandardField.KEYWORDS)
+             .ifPresent(tags -> entry.putKeywords(KeywordList.parse(tags, ' '), importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
     }
 
     @Override
