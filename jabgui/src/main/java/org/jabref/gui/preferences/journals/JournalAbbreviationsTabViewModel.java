@@ -317,20 +317,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         abbreviationsPreferences.setExternalJournalLists(journalStringList);
         abbreviationsPreferences.setUseFJournalField(useFJournal.get());
         abbreviationsPreferences.setUseBuiltInJournalList(useBuiltInJournalList.get());
-        Map<Path, List<Abbreviation>> filesToWrite = shouldWriteLists
-                                                   ? journalFiles.stream()
-                                                                 .filter(file -> !file.isBuiltInListProperty().get())
-                                                                 .collect(Collectors.toMap(file -> file.getAbsolutePath().orElseThrow(),
-                                                                         file -> file.abbreviationsProperty().stream()
-                                                                                     .filter(abbreviation -> !abbreviation.isPseudoAbbreviation())
-                                                                                     .map(AbbreviationViewModel::getAbbreviationObject)
-                                                                                     .toList()))
-                                                   : Map.of();
+        Map<Path, List<Abbreviation>> filesToWrite = snapshotFilesToWrite();
         BackgroundTask
                 .wrap(() -> {
                     synchronized (listWriteLock) {
                         if (generation == settingsGeneration.get()) {
-                            for (var file : filesToWrite.entrySet()) {
+                            for (Map.Entry<Path, List<Abbreviation>> file : filesToWrite.entrySet()) {
                                 AbbreviationWriter.writeOrCreate(file.getKey(), file.getValue());
                             }
                         }
@@ -345,6 +337,23 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 })
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);
+    }
+
+    private Map<Path, List<Abbreviation>> snapshotFilesToWrite() {
+        if (!shouldWriteLists) {
+            return Map.of();
+        }
+
+        return journalFiles.stream()
+                           .filter(file -> !file.isBuiltInListProperty().get())
+                           .collect(Collectors.toMap(file -> file.getAbsolutePath().orElseThrow(), this::snapshotAbbreviations));
+    }
+
+    private List<Abbreviation> snapshotAbbreviations(AbbreviationsFileViewModel file) {
+        return file.abbreviationsProperty().stream()
+                   .filter(abbreviation -> !abbreviation.isPseudoAbbreviation())
+                   .map(AbbreviationViewModel::getAbbreviationObject)
+                   .toList();
     }
 
     public SimpleBooleanProperty isLoadingProperty() {
