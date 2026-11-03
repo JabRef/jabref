@@ -171,8 +171,8 @@ public class JournalAbbreviationRepository {
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = data.customAbbreviations.stream()
-                                                                       .filter(abbreviation -> isMatched(journal, abbreviation))
-                                                                       .findFirst();
+                                                                            .filter(abbreviation -> isMatched(journal, abbreviation))
+                                                                            .findFirst();
         if (customAbbreviation.isPresent()) {
             return customAbbreviation;
         }

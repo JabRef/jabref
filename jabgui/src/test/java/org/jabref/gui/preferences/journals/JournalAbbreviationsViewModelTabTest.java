@@ -208,9 +208,9 @@ class JournalAbbreviationsViewModelTabTest {
         model.setValues();
         assertFalse(model.useBuiltInJournalListProperty().get());
         assertEquals(List.of("2D Materials"), model.abbreviationsProperty().stream()
-                                                 .map(AbbreviationViewModel::getName)
-                                                 .filter("2D Materials"::equals)
-                                                 .toList());
+                                                   .map(AbbreviationViewModel::getName)
+                                                   .filter("2D Materials"::equals)
+                                                   .toList());
     }
 
     @Test
