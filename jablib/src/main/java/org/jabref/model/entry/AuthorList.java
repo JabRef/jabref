@@ -19,7 +19,10 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
 ///
-/// Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
+/// Parsing algorithm is designed to satisfy two requirements:
+///   (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX;
+///   (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output).
+/// The following rules are used:
 /// 1. 'author field' is a sequence of tokens;
 ///     - tokens are separated by sequences of whitespaces (`Character.isWhitespace(c)==true`),
 ///       commas (,), dashes (-), and tildas (~);
@@ -265,6 +268,11 @@ public class AuthorList implements Iterable<Author> {
         return authors;
     }
 
+    /// Returns the authors without the "et al." placeholder [Author#OTHERS]
+    public List<Author> getNamedAuthors() {
+        return authors.stream().filter(author -> !Author.OTHERS.equals(author)).toList();
+    }
+
     /// Returns a LaTeX-free version of this `AuthorList`.
     public AuthorList latexFree() {
         if (latexFreeAuthors == null) {
@@ -430,7 +438,10 @@ public class AuthorList implements Iterable<Author> {
                            .collect(Collectors.joining(" and "));
     }
 
-    /// Returns the list of authors in a form suitable for alphabetization. This means that last names come first, never preceded by "von" particles, and that any braces are removed. First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another. This form is not intended to be suitable for presentation, only for sorting.
+    /// Returns the list of authors in a form suitable for alphabetization.
+    /// This means that last names come first, never preceded by "von" particles, and that any braces are removed.
+    /// First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another.
+    /// This form is not intended to be suitable for presentation, only for sorting.
     ///
     ///
     /// - "John Smith" ==> "Smith, J.";

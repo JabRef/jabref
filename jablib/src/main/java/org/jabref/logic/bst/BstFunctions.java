@@ -282,7 +282,7 @@ public class BstFunctions {
 
         if (m.find()) {
             StringBuilder sb = new StringBuilder();
-            m.appendReplacement(sb, m.group(1));
+            m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1)));
             sb.append('.');
             String group2 = m.group(2);
             if (group2 != null) {

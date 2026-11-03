@@ -124,6 +124,25 @@ class BstFunctionsTest {
     }
 
     @Test
+    void addPeriodWithSpecialRegexCharacters() throws RecognitionException {
+        BstVM vm = new BstVM("""
+                FUNCTION { test } {
+                    "Formula $\\alpha$"   add.period$
+                    "Trailing backslash\\" add.period$
+                    "Formula $\\alpha$}"   add.period$
+                }
+                EXECUTE { test }
+                """);
+
+        vm.render(List.of());
+
+        assertEquals("Formula $\\alpha$.}", vm.getContext().stack().pop());
+        assertEquals("Trailing backslash\\.", vm.getContext().stack().pop());
+        assertEquals("Formula $\\alpha$.", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
+    }
+
+    @Test
     void missing() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } { } { }

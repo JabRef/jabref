@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - main-release
-      - stable
+      - black-forest
     paths-ignore:
       - 'docs/**'
       - 'src/test/**'
@@ -308,7 +308,7 @@ jobs:
           echo "should-notarize=false" >> "$GITHUB_OUTPUT"
 
           if [[ "${{ github.event_name }}" == "push" ]]; then
-            if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "stable" ]]; then
+            if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "black-forest" ]]; then
               echo "☁️ Push to \`${{ github.ref_name }}\` – will upload"
               echo "☁️ Push to \`${{ github.ref_name }}\` – will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -457,7 +457,7 @@ jobs:
             ]
           }'
 
-          if [[ "$GITHUB_REF" != "refs/heads/main" && "$GITHUB_REF" != "refs/heads/stable" && "$SHOULD_NOTARIZE" != "true" ]]; then
+          if [[ "$GITHUB_REF" != "refs/heads/main" && "$GITHUB_REF" != "refs/heads/black-forest" && "$SHOULD_NOTARIZE" != "true" ]]; then
             # drop macos-15-intel
             MATRIX_JSON="$(jq -c ' .include |= map(select(.os != "macos-15-intel")) ' <<<"$MATRIX_JSON")"
           else

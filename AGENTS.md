@@ -505,7 +505,7 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ### Branches
 
-- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; CI labels a PR `dev: into-stable` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
+- `main` is the development branch; pull requests target it. `black-forest` in JabRef/jabref-black-forest is the last release plus ported fixes; CI labels a PR `dev: send-to-black-forest` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
 
 ### Commits
 
