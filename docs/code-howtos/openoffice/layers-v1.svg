@@ -397,7 +397,7 @@
          id="tspan817-3-9"
          x="58.016205"
          y="72.297386"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.56307739px">OOTextIntoOO</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.56307739px">OOTextWriter</tspan></text>
     <rect
        style="display:inline;opacity:0.95099996;fill:#faffbf;fill-opacity:1;fill-rule:evenodd;stroke:#050c13;stroke-width:0.0934983;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect815-3-0-5"
@@ -591,7 +591,7 @@
          id="tspan1163"
          x="101.04594"
          y="-0.62424481"
-         style="stroke-width:0.40996245px">Create OOFrontend instance</tspan></text>
+         style="stroke-width:0.40996245px">Create CitationDocument instance</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.27971148px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#666666;fill-opacity:1;stroke:none;stroke-width:0.40996245px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"

@@ -5,6 +5,9 @@ grand_parent: Code Howtos
 ---
 # Problems
 
+This page records historical JabRef 5.2/5.3 integration problems and proposed changes, not the current canonical storage contract.
+See the [architecture overview](overview.md) for the current implementation.
+
 ## pageInfo should belong to citations, not citation groups
 
 * Creating `[click:Separate]` revealed\
@@ -48,6 +51,8 @@ Reference marks have some features that make it easy to mess up citations in a d
 * (good) They can be moved (Ctrl-X,Ctrl-V)
 * They cannot be copied. (Ctrl-C, Ctrl-V) copies the text without the reference mark.
 * Reference marks are lost if the document is saved as docx.
+The following implementation links are historical snapshots; current range handling lives in `WriterReferenceMark` and `WriterReferenceMarks`.
+
 * I know of no way to insert text into an empty text range denoted by a reference mark
   * JabRef 5.3 recreates the reference mark (using [insertReferenceMark](https://github.com/JabRef/jabref/blob/475b2989ffa8ec61c3327c62ed8f694149f83220/src/main/java/org/jabref/gui/openoffice/OOBibBase.java#L1072)) [at this location](https://github.com/JabRef/jabref/blob/475b2989ffa8ec61c3327c62ed8f694149f83220/src/main/java/org/jabref/gui/openoffice/OOBibBase.java#L706)
   * `(change)` I preferred to (try to) avoid this: [NamedRangeReferenceMark.nrGetFillCursor](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/logic/openoffice/backend/NamedRangeReferenceMark.java#L225) returns a cursor between two invisible spaces, to provide the caller a location it can safely write some text. [NamedRangeReferenceMark.nrCleanFillCursor](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/logic/openoffice/backend/NamedRangeReferenceMark.java#L432) removes these invisible spaces unless the content would become empty or a single character. By keeping the content at least two characters, we avoid the ambiguity at the edges: a cursor positioned between two characters inside is always within the reference mark. (At the edges it may or may not be inside.)
@@ -62,7 +67,20 @@ It would be nice if we could have a backend with better properties. We probably 
 * JabRef 5.3 does not collect the effects of GUI actions on the document into larger Undo actions.\
   This makes the Undo functionality of LO impractical.
 * `(change)` collect the effects of GUI actions into large chunks: now a GUI action can be undone with a single click.
-  * except the effect on pageInfo: that is stored at the document level and is not restored by Undo.
+  * Historically, pageInfo was stored at document level and not restored by Undo.
+
+The older GUI already used undo contexts for citation insertion including mark conversion, refresh, merge, and separate; the historical notes above do not mean these contexts are new in the canonical integration.
+What those contexts did not restore was custom document-property state, as the old Manage citations comment explicitly noted for page information.
+The canonical integration now registers custom undo actions through `UndoableDocumentProperties` for per-citation page-info properties.
+Merge and Separate combine structural edits, final formatted output, and page-info changes in one undo context.
+Next-CSL-insertion format conversion also includes its citation sidecar and prepared applied-style and Zotero preference properties in one owned root undo context.
+The conversion-failure rollback described below is new recovery behavior to prevent partial citation corruption after ordinary application failures.
+`DocumentSession.writeWithRollback` requires unlocked undo support, rejects nesting, and rolls back ordinary application failures only after closing and verifying ownership of that context.
+Starting the write transaction can clear pre-existing redo history even when rollback restores the document; disconnects, lost ownership, and rollback failures require a distinct recovery error rather than an unconditional rollback claim.
+Ordinary updates retain raw style-property setters and do not gain this rollback behavior.
+The original conversion trigger remains, but native citation modifiers the framework cannot render are rejected before writing rather than silently omitted.
+Only citation marks are converted; normal bibliography synchronization is unchanged, leaving every bibliography section untouched when disabled and updating only the target mode's managed bibliography when enabled.
+See [canonical write preparation](overview.md#canonical-insert-and-refresh) and the [conversion policy](../../decisions/0080-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
 
 ## Block screen refresh
 

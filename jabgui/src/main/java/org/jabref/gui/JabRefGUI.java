@@ -29,7 +29,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.keyboard.WalkthroughKeyBindings;
-import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.openoffice.OpenOfficeDocumentConnection;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.shared.SharedDatabaseCleanup;
@@ -582,9 +582,9 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Closing OpenOffice connection");
-                OOBibBaseConnect.closeOfficeConnection();
-                LOGGER.trace("OpenOffice connection closed");
+                LOGGER.trace("Disposing client-side UNO bridges");
+                OpenOfficeDocumentConnection.disposeAllBridges();
+                LOGGER.trace("Client-side UNO bridges disposed");
             });
 
             executor.submit(() -> {

@@ -111,7 +111,7 @@ class BstPipelineTest {
         String ooText = BSTFormatUtils.convertPandocHtmlToOOText(html);
 
         // The OOText must be a plain inline run - no leading paragraph break that would
-        // orphan the "[n] " prefix written by BstCitationOOAdapter.insertBibliography.
+        // orphan the "[n] " prefix written by the BST renderer.
         assertFalse(ooText.startsWith("<p>"), "No leading <p> - would orphan the citation number");
     }
 

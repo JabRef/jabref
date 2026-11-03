@@ -10,3 +10,5 @@ This list uses the TOC functionality of the [Just the Docs Jekyll template](http
 For new ADRs, please use [adr-template.md](adr-template.md) as basis.
 More information on MADR is available at <https://adr.github.io/madr/>.
 General information about architectural decision records is available at <https://adr.github.io/>.
+
+- [ADR-0080: Use canonical Writer citation marks across style families](0080-canonical-writer-citations.md)

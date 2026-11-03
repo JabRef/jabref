@@ -46,6 +46,7 @@ class JStyleTest {
         JStyle style = new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
         assertTrue(style.isInternalStyle());
+        assertFalse(style.getCitProperties().containsKey("BibtexKeyCitations"));
         assertFalse(style.isCitationKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
@@ -67,6 +68,17 @@ class JStyleTest {
         assertFalse(style.isItalicCitations());
         assertTrue(style.isNumberEntries());
         assertTrue(style.isSortByPosition());
+    }
+
+    @Test
+    void citationKeyModeOverridesEffectiveNumberingWithoutChangingRawPreference() throws IOException {
+        JStyle style = new JStyle(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
+        style.getCitProperties().put("BibTeXKeyCitations", true);
+
+        assertTrue(style.isValid());
+        assertTrue(style.isCitationKeyCiteMarkers());
+        assertEquals(true, style.getProperty("IsNumberEntries"));
+        assertFalse(style.isNumberEntries());
     }
 
     // region: helpers
