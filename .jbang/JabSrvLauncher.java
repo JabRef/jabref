@@ -27,7 +27,7 @@
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.22
 //DEPS com.github.ben-manes.caffeine:caffeine:3.3.1
 //DEPS com.google.guava:guava:33.8.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.11.1
+//DEPS com.konghq:unirest-modules-gson:4.11.2
 //DEPS de.undercouch:citeproc-java:3.5.2
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
@@ -56,7 +56,7 @@
 //DEPS tools.jackson.core:jackson-databind:3.2.4
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4
 //DEPS com.nimbusds:oauth2-oidc-sdk:11.38.2
-//DEPS net.minidev:json-smart:2.6.0
+//DEPS net.minidev:json-smart:2.6.1
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
