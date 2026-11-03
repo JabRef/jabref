@@ -273,10 +273,6 @@
     -fx-background-color: -color-bg-secondary;
 }
 
-.global-search-bar .toggle-button .glyph-icon {
-    -fx-icon-color: derive(-fx-text-base-color, 80%);
-}
-
 .rating > .container > .button {
     -fx-icon-color: derive(-fx-text-base-color, 85%);
 }
@@ -513,19 +509,23 @@
 }
 
 /* search modifier buttons */
-.global-search-bar .toggle-button:selected {
-    -fx-background-color: -color-overlay-hover;
-    -fx-border-color: -color-accent;
-    -fx-border-width: 0 0 2px 0;
+.global-search-bar .toggle-button,
+.global-search-bar .toggle-button:selected,
+.global-search-bar .toggle-button:hover,
+.global-search-bar .toggle-button:selected:hover,
+.global-search-bar .toggle-button:armed,
+.global-search-bar .toggle-button:pressed {
+    -fx-background-color: transparent;
 }
 
-.global-search-bar .toggle-button:hover,
-.global-search-bar .toggle-button:selected:hover {
-    -fx-background-color: -color-overlay-hover;
+.global-search-bar .toggle-button .glyph-icon {
+    -fx-icon-color: -color-fg-default;
+    -fx-fill: -color-fg-default;
+    -fx-opacity: 0.55;
 }
 
 .global-search-bar .toggle-button:selected .glyph-icon {
-    -fx-icon-color: -fx-text-base-color;
+    -fx-opacity: 1;
 }
 
 /* search text */
