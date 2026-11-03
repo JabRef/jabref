@@ -106,6 +106,51 @@ class BackupUIManagerTest extends JavaFxTest {
                 any(DirectoryNotEmptyException.class));
     }
 
+    @Test
+    void missingBackupRestoreShowsOriginalPath(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.RESTORE_FROM_BACKUP));
+        Path originalFile = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                mock(StateManager.class)));
+
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("Restore backup"),
+                Localization.lang("No backup file was found for '%0'.", originalFile));
+    }
+
+    @Test
+    void emptyBackupRestoreShowsBackupPath(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.RESTORE_FROM_BACKUP));
+        Path originalFile = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(
+                originalFile,
+                BackupFileType.BACKUP,
+                backupDir);
+        Files.writeString(backupFile, "");
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                mock(StateManager.class)));
+
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("Restore backup"),
+                Localization.lang("The backup file '%0' is empty and was not restored.", backupFile));
+    }
+
     /// The review runs while the library is still being opened, so no tab exists for it yet and the active tab may be
     /// absent altogether (welcome tab, startup). The review must not depend on it. The backup adds groups to a library
     /// without groups, which produces a metadata change and a group change; accepting both has to install the groups.
