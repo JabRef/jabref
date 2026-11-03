@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
@@ -189,6 +192,27 @@ class BibSonomyFetcherTest {
         fetcher.doPostCleanup(entry);
 
         assertEquals(expected, entry);
+    }
+
+    @Test
+    void parsesAndCleansRealResponse() throws IOException, ParseException {
+        BibEntry expected = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("shen2005folksonomy")
+                .withField(StandardField.ABSTRACT, "Folksonomy is an emerging technology that works to classify the information over WWW through tagging the bookmarks, photos or other web-based contents. It is understood to be organized by every user while not limited to the authors of the contents and the professional editors. This study surveyed the folksonomy as a complex network. The result indicates that the network, which is composed of the tags from the folksonomy, displays both properties of small world and scale-free. However, the statistics only shows a local and static slice of the vast body of folksonomy which is still evolving.")
+                .withField(StandardField.AUTHOR, "Shen, Kaikai and Wu, Lide")
+                .withField(StandardField.EPRINT, "cs.IR/0509072")
+                .withField(StandardField.KEYWORDS, "tagging, folksonomy, tagora, d4.1, networks, statistics")
+                .withField(StandardField.MONTH, Month.SEPTEMBER.getJabRefFormat())
+                .withField(StandardField.TITLE, "Folksonomy as a Complex Network")
+                .withField(StandardField.URL, "http://arxiv.org/abs/cs.IR/0509072")
+                .withField(StandardField.YEAR, "2005");
+
+        try (InputStream response = BibSonomyFetcherTest.class.getResourceAsStream("bibsonomy-folksonomy.bib")) {
+            List<BibEntry> entries = fetcher.getParser().parseEntries(response);
+            entries.forEach(fetcher::doPostCleanup);
+
+            assertEquals(expected, entries.getFirst());
+        }
     }
 
     @ParameterizedTest
