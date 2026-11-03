@@ -25,18 +25,18 @@ How can citation style families share document actions without making stored cit
 
 ## Decision Drivers
 
-- Preserve citation identity, type, keys, and page information across style-family changes.
-- Keep numbering and formatted output separate from persistent citation identity.
-- Validate and render proposed changes before replacing document content.
-- Keep native Zotero storage separate while preserving the established next-insertion conversion trigger and warning.
-- Make legacy incompatibility explicit instead of guessing a migration.
-- Avoid silently losing unsupported native citation semantics.
+* Preserve citation identity, type, keys, and page information across style-family changes.
+* Keep numbering and formatted output separate from persistent citation identity.
+* Validate and render proposed changes before replacing document content.
+* Keep native Zotero storage separate while preserving the established next-insertion conversion trigger and warning.
+* Make legacy incompatibility explicit instead of guessing a migration.
+* Avoid silently losing unsupported native citation semantics.
 
 ## Considered Options
 
-- Keep separate backends and translate their formats when changing styles.
-- Use canonical JabRef marks and one document-action engine without migrating legacy marks.
-- Use canonical JabRef marks with automatic migration of legacy formats.
+* Keep separate backends and translate their formats when changing styles.
+* Use canonical JabRef marks and one document-action engine without migrating legacy marks.
+* Use canonical JabRef marks with automatic migration of legacy formats.
 
 ## Decision Outcome
 
@@ -68,7 +68,7 @@ Per-citation page information is stored under `JabRef_page_info:<uid>:<storageIn
 `MarkWriter` rewrites within canonical marks rather than renaming them when numbers change, retaining invisible boundaries for short/invisible citations.
 `DocumentCitations` is an action-local mutable/live facade; it is not a document subtype or immutable snapshot.
 `CitationGroupEditor` prepares merge/separate identities and replacements, then the engine renders that proposed state before applying it in one write session without a second render.
-Ordering precedes controller locking and retains the [documented visual-ordering limitations](../code-howtos/openoffice/order-of-appearance.md#visual-ordering-limitations).
+Ordering precedes controller locking and retains the [documented visual-ordering limitations](../code-howtos/openoffice/order-of-appearance.md).
 
 `CitationIds` supplies new CUID2 identities with a default length of 24 lowercase alphanumeric characters.
 Zotero wire conventions retain eight characters for new `citationID` values and ten after `RND`; existing foreign identities remain opaque and unchanged.
@@ -129,24 +129,24 @@ Ordinary write sessions do not gain this conversion-specific rollback behavior.
 
 ### Compatibility consequences
 
-- Legacy JStyle `JR_cite*` and CSL/BST `CID_n` citations remain visible but unmanaged by canonical reading, regenerated bibliographies, and export-cited results.
-- There is no automatic legacy migration; maintaining those citations requires a compatible older JabRef version or manual replacement.
-- Switching JStyle, CSL, and BST is supported for current canonical citations, not as a migration mechanism.
-- Unsupported stored canonical types and page information survive family changes even when the selected renderer approximates or does not display them.
-- Citation sidecar association loss limits recoverability of canonical-only state.
+* Legacy JStyle `JR_cite*` and CSL/BST `CID_n` citations remain visible but unmanaged by canonical reading, regenerated bibliographies, and export-cited results.
+* There is no automatic legacy migration; maintaining those citations requires a compatible older JabRef version or manual replacement.
+* Switching JStyle, CSL, and BST is supported for current canonical citations, not as a migration mechanism.
+* Unsupported stored canonical types and page information survive family changes even when the selected renderer approximates or does not display them.
+* Citation sidecar association loss limits recoverability of canonical-only state.
 
 ### Consequences
 
-- Good, because one engine owns document actions instead of independent family adapters with divergent state and policies.
-- Good, because rendering failures are reported before existing content is replaced.
-- Good, because group edits preserve page-info ownership and can be undone with their structural/text changes.
-- Good, because the established next-CSL-insertion trigger and citation-only conversion boundary remain.
-- Good, because unsupported native citation modifiers fail before content can be silently lost.
-- Good, because owned conversion rollback can recover ordinary application failures without undoing earlier user work.
-- Bad, because legacy JabRef mark formats are incompatible and are not migrated.
-- Bad, because metadata association can be invalidated or lost by external edits.
-- Bad, because conversion needs root undo ownership, may clear prior redo history, and cannot guarantee recovery from every UNO failure.
-- Bad, because whole-document ordering/rendering can still be required even when unchanged output is not rewritten.
+* Good, because one engine owns document actions instead of independent family adapters with divergent state and policies.
+* Good, because rendering failures are reported before existing content is replaced.
+* Good, because group edits preserve page-info ownership and can be undone with their structural/text changes.
+* Good, because the established next-CSL-insertion trigger and citation-only conversion boundary remain.
+* Good, because unsupported native citation modifiers fail before content can be silently lost.
+* Good, because owned conversion rollback can recover ordinary application failures without undoing earlier user work.
+* Bad, because legacy JabRef mark formats are incompatible and are not migrated.
+* Bad, because metadata association can be invalidated or lost by external edits.
+* Bad, because conversion needs root undo ownership, may clear prior redo history, and cannot guarantee recovery from every UNO failure.
+* Bad, because whole-document ordering/rendering can still be required even when unchanged output is not rewritten.
 
 ### Confirmation
 
@@ -159,8 +159,8 @@ The [OpenOffice/LibreOffice requirements](../requirements/openoffice.md) provide
 
 ## More Information
 
-- [Current architecture and style-selection overview](../code-howtos/openoffice/overview.md).
-- [Real-Writer testing instructions and artifacts](../code-howtos/testing.md#libreoffice-writer-integration-tests).
-- [ADR-0068](0068-use-a-preference-for-Zotero-compatibility-mode.md) remains the rationale for the explicit preference, next-insertion trigger, and warning; this decision replaces its legacy encoding, not that trigger.
+* [Current architecture and style-selection overview](../code-howtos/openoffice/overview.md).
+* [Real-Writer testing instructions and artifacts](../code-howtos/testing.md), under "LibreOffice Writer integration tests".
+* [ADR-0068](0068-use-a-preference-for-Zotero-compatibility-mode.md) remains the rationale for the explicit preference, next-insertion trigger, and warning; this decision replaces its legacy encoding, not that trigger.
 
 <!-- markdownlint-disable-file MD022 -->

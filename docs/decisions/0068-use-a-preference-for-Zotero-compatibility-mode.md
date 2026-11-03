@@ -17,7 +17,7 @@ Native citation locators, labels, prefixes, suffixes, author-only items, and mix
 Conversion changes citation marks only, not bibliographies.
 With synchronization disabled, all bibliography section names, text, and properties stay unchanged; with synchronization enabled, normal updates affect only the target mode's managed bibliography, leaving other-format sections alone.
 No bibliography renaming, consolidation, sidecar, or rejection based on bibliography settings is part of citation conversion.
-See [ADR-0080's conversion policy](0080-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion) for citation metadata preservation, the root-undo requirement, rollback limits, and the possible loss of pre-existing redo history.
+See [ADR-0080's conversion policy](0080-canonical-writer-citations.md) for citation metadata preservation, the root-undo requirement, rollback limits, and the possible loss of pre-existing redo history.
 
 ## Context and Problem Statement
 
