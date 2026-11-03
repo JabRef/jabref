@@ -220,17 +220,17 @@ public class XmpUtilWriter {
             }
 
             // LaTeX content is removed from the string for "standard" fields in the PDF
-            String value = unprotectTermsFormatter.format(resolvedEntry.getField(field).orElse(""));
+            String value = resolvedEntry.getField(field).orElseThrow();
 
             switch (field) {
                 case StandardField.AUTHOR ->
-                        di.setAuthor(value);
+                        di.setAuthor(XmpUtilShared.toPlainText(value));
                 case StandardField.TITLE ->
-                        di.setTitle(value);
+                        di.setTitle(XmpUtilShared.toPlainText(value));
                 case StandardField.KEYWORDS ->
-                        di.setKeywords(value);
+                        di.setKeywords(XmpUtilShared.toPlainText(value));
                 case StandardField.ABSTRACT ->
-                        di.setSubject(value);
+                        di.setSubject(XmpUtilShared.toPlainText(value));
                 case StandardField.FILE -> {
                     // do not write file field
                 }
