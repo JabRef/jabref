@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.jgit.ignore.IgnoreNode;
 import org.slf4j.Logger;
@@ -55,7 +57,11 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     @Override
     public boolean accept(Path path) throws IOException {
         Path relative = safeRelativize(baseDir, path);
-        String relativeStr = relative.toString().replace('\\', '/');
+        // Build the path with '/' separators from the path's own components;
+        // a plain string replacement would corrupt names legally containing a backslash
+        String relativeStr = StreamSupport.stream(relative.spliterator(), false)
+                                          .map(Path::toString)
+                                          .collect(Collectors.joining("/"));
         if (relativeStr.isEmpty()) {
             return true;
         }

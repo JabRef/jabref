@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -79,5 +81,15 @@ class GitIgnoreFileFilterTest {
                 """);
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
         assertTrue(gitIgnoreFileFilter.accept(dir.resolve("paper.pdf")));
+    }
+
+    @Test
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "\\ is an invalid filename character in Windows")
+    void acceptsFileWithBackslashInNameWhenPatternLooksLikeDirectory(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                notes/draft.pdf
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertTrue(gitIgnoreFileFilter.accept(dir.resolve("notes\\draft.pdf")));
     }
 }
