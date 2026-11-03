@@ -209,6 +209,8 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
             }
             return true;
         } catch (FetcherException | URISyntaxException | MalformedURLException _) {
+            // The message of a FetcherException contains the response, in which BibSonomy repeats the credentials, so the exception must not be logged
+            LOGGER.debug("Could not validate the BibSonomy username and API key");
             return false;
         }
     }
