@@ -99,12 +99,16 @@ public final class LibrarySearcherTestCases {
                 doiSearchCase("https://doi.org/bfrhmx", "10/bfrhmx"),
                 doiSearchCase("https://doi.org/10.1000/foo(bar)=baz", "10.1000/foo(bar)=baz"),
                 doiSearchCase("https://doi.org/10.1000/foo+bar", "10.1000/foo+bar"),
-                doiSearchCase("https://doi.org/10.1000/foo%2Bbar", "10.1000/foo+bar")
+                doiSearchCase("https://doi.org/10.1000/foo%2Bbar", "10.1000/foo+bar"),
+                doiSearchCase("https://doi.org/10.1000/foo%2Bbar", "http://dx.doi.org/10.1000/foo%2Bbar"),
+                doiSearchCase("https://doi.org/10.1000%2F182", "http://doi.org/10.1000%2F182"),
+                doiSearchCase("https://example.org/article/10.1000/182", "https://example.org/article/10.1000/182"),
+                Arguments.of(List.of(), new SearchQuery("https://example.org/article/10.1000/182"), List.of(ENTRY_WITH_DOI))
         );
     }
+
     private static Arguments doiSearchCase(String query, String value) {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.DOI, value);
         return Arguments.of(List.of(entry), new SearchQuery(query), List.of(entry));
     }
-
 }

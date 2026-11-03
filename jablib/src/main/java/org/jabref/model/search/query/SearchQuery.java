@@ -129,9 +129,15 @@ public class SearchQuery {
         if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
             return searchExpression;
         }
-        return DOI.extractLinkSearchTerm(searchExpression)
-                  .map(doi -> "\"" + doi.replace("\"", "\\\"") + "\"")
+        return DOI.extractLinkSearchTerms(searchExpression)
+                  .map(terms -> terms.decoded().equals(terms.encoded())
+                          ? quoteSearchTerm(terms.decoded())
+                          : "(" + quoteSearchTerm(terms.decoded()) + " OR " + quoteSearchTerm(terms.encoded()) + ")")
                   .orElse(searchExpression);
+    }
+
+    private static String quoteSearchTerm(String term) {
+        return "\"" + term.replace("\"", "\\\"") + "\"";
     }
 
     /// Unescapes search value based on the Search grammar rules.
