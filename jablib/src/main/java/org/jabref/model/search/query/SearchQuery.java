@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class SearchQuery {
 
+    private static final Pattern QUOTED_ESCAPE = Pattern.compile("\\\\([\\\\\"])");
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
 
     private final String searchExpression;
@@ -62,6 +63,16 @@ public class SearchQuery {
     /// (e.g., with full DOI links normalized to plain DOI identifiers).
     public String getNormalizedSearchExpression() {
         return normalizedSearchExpression;
+    }
+
+    /// Returns the text to highlight in a document for this search.
+    public String getHighlightSearchExpression() {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+            return searchExpression;
+        }
+        return DOI.extractLinkSearchTerms(searchExpression)
+                  .map(DOI.LinkSearchTerms::decoded)
+                  .orElse(searchExpression);
     }
 
     public SearchResults getSearchResults() {
@@ -137,12 +148,12 @@ public class SearchQuery {
     }
 
     private static String quoteSearchTerm(String term) {
-        return "\"" + term.replace("\"", "\\\"") + "\"";
+        return "\"" + term.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 
     /// Unescapes search value based on the Search grammar rules.
     ///
-    /// - STRING_LITERAL: Removes enclosing quotes and unescapes `\"`
+    /// - STRING_LITERAL: Removes enclosing quotes and unescapes `\"` and `\\`
     ///
     /// - TERM: Unescapes `\=, \!, \~, \(, \)`
     public static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
@@ -153,8 +164,7 @@ public class SearchQuery {
         String term = ctx.getText();
 
         if (ctx.getStart().getType() == SearchParser.STRING_LITERAL) {
-            return term.substring(1, term.length() - 1)
-                       .replace("\\\"", "\"");
+            return QUOTED_ESCAPE.matcher(term.substring(1, term.length() - 1)).replaceAll("$1");
         }
 
         if (ctx.getStart().getType() == SearchParser.TERM) {

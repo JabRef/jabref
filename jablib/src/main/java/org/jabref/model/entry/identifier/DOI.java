@@ -201,6 +201,11 @@ public class DOI implements Identifier {
         }
         try {
             String decoded = URLDecoder.decode(input.replace("+", "%2B"), StandardCharsets.UTF_8);
+            Matcher decodedShortcut = EXACT_SHORT_DOI_SHORTCUT.matcher(decoded);
+            if (decodedShortcut.matches()) {
+                String encoded = input.substring(input.lastIndexOf('/') + 1);
+                return Optional.of(new LinkSearchTerms(decodedShortcut.group(DOI_GROUP), encoded));
+            }
             Matcher matcher = EXACT_DOI_PATT.matcher(decoded);
             if (matcher.matches()) {
                 Matcher encodedMatcher = EXACT_DOI_PATT.matcher(input);

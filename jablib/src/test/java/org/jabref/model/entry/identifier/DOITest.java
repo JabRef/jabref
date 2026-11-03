@@ -28,6 +28,7 @@ class DOITest {
                 Arguments.of("https://doi.org/10.1000/foo%2Bbar", Optional.of(new DOI.LinkSearchTerms("10.1000/foo+bar", "10.1000/foo%2Bbar"))),
                 Arguments.of("https://doi.org/10.1000%2F182", Optional.of(new DOI.LinkSearchTerms("10.1000/182", "10.1000%2F182"))),
                 Arguments.of("https://doi.org/bfrhmx", Optional.of(new DOI.LinkSearchTerms("bfrhmx", "bfrhmx"))),
+                Arguments.of("https://doi.org/bfr%68mx", Optional.of(new DOI.LinkSearchTerms("bfrhmx", "bfr%68mx"))),
                 Arguments.of("https://example.org/article/10.1000/182", Optional.empty()),
                 Arguments.of("https://doi.org/10.1000/foo%XX", Optional.empty()),
                 Arguments.of("https://doi.org/10.1000/182 other", Optional.empty()));

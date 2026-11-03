@@ -91,11 +91,32 @@ public class SearchQueryTest {
         assertEquals(expression, new SearchQuery(expression).getNormalizedSearchExpression());
     }
 
+    @Test
+    void doiLinkWithEncodedBackslashIsValid() {
+        SearchQuery query = new SearchQuery("https://doi.org/10.1000/foo%5C");
+        assertTrue(query.isValid());
+        assertEquals("10.1000/foo\\", query.getHighlightSearchExpression());
+    }
+
+    @ParameterizedTest
+    @MethodSource("highlightSearchExpressions")
+    void highlightExpressionUsesDecodedDoi(String input, String expected) {
+        assertEquals(expected, new SearchQuery(input).getHighlightSearchExpression());
+    }
+
+    private static Stream<Arguments> highlightSearchExpressions() {
+        return Stream.of(
+                Arguments.of("https://doi.org/10.1000/foo%2Bbar", "10.1000/foo+bar"),
+                Arguments.of("https://doi.org/bfr%68mx", "bfrhmx"),
+                Arguments.of("author=Alice", "author=Alice"));
+    }
+
     // [utest->req~search.doi-link-normalization~1]
     @Test
     void doiNotNormalizedInRegexMode() {
         SearchQuery query = new SearchQuery("https://doi.org/10.1000/foo\\.", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         assertEquals("https://doi.org/10.1000/foo\\.", query.getNormalizedSearchExpression());
+        assertEquals("https://doi.org/10.1000/foo\\.", query.getHighlightSearchExpression());
     }
 
     @ParameterizedTest
