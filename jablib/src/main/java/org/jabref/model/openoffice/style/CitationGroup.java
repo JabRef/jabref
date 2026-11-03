@@ -11,7 +11,6 @@ import org.jabref.model.openoffice.util.OOListUtil;
 /// A CitationGroup describes a group of citations.
 public class CitationGroup {
 
-
     /*
      * Identifies this citation group.
      */

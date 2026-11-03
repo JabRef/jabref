@@ -414,9 +414,9 @@ class CSLFormatUtilsTest {
         String styleSource = getStyle("IEEE Reference Guide version 11.29.2023").getSource();
 
         List<String> citations = Stream.of(first, second)
-                                      .map(entry -> CitationStyleGenerator.generateCitation(List.of(entry), styleSource, HTML_OUTPUT_FORMAT, context, ENTRY_TYPES_MANAGER))
-                                      .map(CSLFormatUtils::transformHTML)
-                                      .toList();
+                                       .map(entry -> CitationStyleGenerator.generateCitation(List.of(entry), styleSource, HTML_OUTPUT_FORMAT, context, ENTRY_TYPES_MANAGER))
+                                       .map(CSLFormatUtils::transformHTML)
+                                       .toList();
 
         assertEquals(List.of("[1]", "[1]"), citations);
     }

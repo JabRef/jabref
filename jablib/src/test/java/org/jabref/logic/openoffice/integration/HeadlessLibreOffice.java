@@ -70,7 +70,7 @@ final class HeadlessLibreOffice implements AutoCloseable {
         // UNO bootstrap adds its own entries to this map.
         XComponentContext localContext = Bootstrap.createInitialComponentContext(new HashMap<>());
         XUnoUrlResolver resolver = query(XUnoUrlResolver.class, localContext.getServiceManager()
-                                                                           .createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext));
+                                                                            .createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", localContext));
         long deadline = System.nanoTime() + STARTUP_TIMEOUT.toNanos();
         while (System.nanoTime() < deadline) {
             assertTrue(writer.isAlive(), () -> "LibreOffice exited during startup; see " + log);

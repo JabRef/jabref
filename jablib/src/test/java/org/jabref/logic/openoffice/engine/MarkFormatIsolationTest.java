@@ -26,10 +26,14 @@ class MarkFormatIsolationTest {
         StringJoiner names = new StringJoiner(", ");
         keys.forEach(key -> names.add("JABREF_" + key));
         String wireType = switch (type) {
-            case AUTHORYEAR_PAR -> "NORMAL";
-            case AUTHORYEAR_INTEXT -> "IN_TEXT";
-            case INVISIBLE_CIT -> "EMPTY";
-            default -> type.name();
+            case AUTHORYEAR_PAR ->
+                    "NORMAL";
+            case AUTHORYEAR_INTEXT ->
+                    "IN_TEXT";
+            case INVISIBLE_CIT ->
+                    "EMPTY";
+            default ->
+                    type.name();
         };
 
         assertEquals(new JabRefMarkData(keys, uid, type), MarkCodec.decode(names + " " + wireType + " " + uid));

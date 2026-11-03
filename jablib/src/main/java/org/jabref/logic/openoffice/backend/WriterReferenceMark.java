@@ -89,7 +89,7 @@ public final class WriterReferenceMark {
 
     private static Optional<XComponentContext> findComponentContext(XTextDocument doc) {
         Optional<XPropertySet> properties = UnoCast.cast(XMultiServiceFactory.class, doc)
-                                                 .flatMap(factory -> UnoCast.cast(XPropertySet.class, factory));
+                                                   .flatMap(factory -> UnoCast.cast(XPropertySet.class, factory));
         if (properties.isEmpty()) {
             return Optional.empty();
         }

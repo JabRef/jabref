@@ -113,8 +113,8 @@ public final class CitationEngine implements AutoCloseable {
 
     // [impl->req~openoffice.legacy-marks-unmanaged~1]
     public OOResult<List<String>, JabRefException> insert(List<BibEntry> entries, List<BibDatabase> databases,
-                                                         OOStyle style, CitationType requestedType, String pageInfo,
-                                                         XTextCursor cursor, boolean rebuildBibliography) {
+                                                          OOStyle style, CitationType requestedType, String pageInfo,
+                                                          XTextCursor cursor, boolean rebuildBibliography) {
         if (closed) {
             return OOResult.error(unavailable());
         }
@@ -182,8 +182,8 @@ public final class CitationEngine implements AutoCloseable {
     }
 
     private OOResult<List<String>, JabRefException> insertWithConversion(List<BibEntry> entries, List<BibDatabase> databases,
-                                                                        CitationStyle style, CitationType type, String pageInfo,
-                                                                        XTextCursor cursor, boolean rebuildBibliography) {
+                                                                         CitationStyle style, CitationType type, String pageInfo,
+                                                                         XTextCursor cursor, boolean rebuildBibliography) {
         try {
             session.requireRollbackSupport();
             CitationFormatConverter.PreparedInsertion prepared = new CitationFormatConverter(document, context, preferences, entryTypes, zotero)
@@ -260,8 +260,8 @@ public final class CitationEngine implements AutoCloseable {
             List<CitationGroup> originalOrder = documentCitations.citationGroups.getCitationGroupsInGlobalOrder();
             CitationGroupEditor editor = new CitationGroupEditor(document, context, writer);
             CitationGroupEditor.PreparedEdit prepared = edit == GroupEdit.MERGE
-                                                       ? editor.prepareMerge(documentCitations, originalOrder)
-                                                       : editor.prepareSeparate(documentCitations, originalOrder);
+                                                        ? editor.prepareMerge(documentCitations, originalOrder)
+                                                        : editor.prepareSeparate(documentCitations, originalOrder);
             if (!prepared.hasChanges()) {
                 return OOResult.ok(List.of());
             }
@@ -304,10 +304,10 @@ public final class CitationEngine implements AutoCloseable {
             DocumentCitations documentCitations = new DocumentCitations(document);
             documentCitations.imposeGlobalOrder(document);
             List<String> citationKeys = documentCitations.citationGroups.getCitedReferencesSortedInOrderOfAppearance()
-                                                               .values()
-                                                               .stream()
-                                                               .map(CitedReference::getCitationKey)
-                                                               .toList();
+                                                                        .values()
+                                                                        .stream()
+                                                                        .map(CitedReference::getCitationKey)
+                                                                        .toList();
             return OOResult.ok(CitedEntryExporter.export(citationKeys, databases));
         } catch (NoDocumentException | WrappedTargetException e) {
             LOGGER.debug("Could not collect cited entries for export", e);

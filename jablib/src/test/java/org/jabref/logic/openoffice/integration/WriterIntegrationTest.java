@@ -195,7 +195,7 @@ class WriterIntegrationTest {
         Map<String, JabRefMarkData> identities = identities(document);
         assertEquals(types, groups(document).stream().map(group -> group.citationType).toList());
         assertEquals(keys, groups(document).stream().flatMap(group -> group.citationsInStorageOrder.stream())
-                                          .map(citation -> citation.getCitationKey()).toList());
+                                           .map(citation -> citation.getCitationKey()).toList());
         Map<String, Object> pageInfos = pageProperties(document);
         assertEquals(6, pageInfos.size());
         for (int index = 0; index < keys.size(); index++) {
@@ -300,9 +300,9 @@ class WriterIntegrationTest {
         preferences.setPandocPath(pandocPath);
         try (CitationEngine engine = new CitationEngine(document, office.context(), preferences, new BibEntryTypesManager())) {
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation)
-                    ? engine.refresh(List.of(database), style("bst"))
-                    : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style("bst"),
-                            CitationType.AUTHORYEAR_PAR, "p. 99", document.getText().createTextCursor(), true);
+                                                             ? engine.refresh(List.of(database), style("bst"))
+                                                             : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style("bst"),
+                    CitationType.AUTHORYEAR_PAR, "p. 99", document.getText().createTextCursor(), true);
             assertTrue(result.isError(), "A nonexistent Pandoc executable must fail the operation");
             assertInstanceOf(PandocRenderException.class, result.getError().getCause());
             assertEquals(Localization.lang("Could not run Pandoc. Install Pandoc and set its path in Preferences > OpenOffice/LibreOffice.")
@@ -336,9 +336,9 @@ class WriterIntegrationTest {
 
         try (CitationEngine engine = engine(document)) {
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation)
-                    ? engine.refresh(List.of(database), style)
-                    : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style,
-                            CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
+                                                             ? engine.refresh(List.of(database), style)
+                                                             : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style,
+                    CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
 
             assertTrue(result.isError());
             assertInstanceOf(MissingWriterStyleException.class, result.getError().getCause());
@@ -360,9 +360,9 @@ class WriterIntegrationTest {
         preferences.setBstCitationFormat(BstCitationFormat.STYLE_DEFINED);
         try (CitationEngine engine = new CitationEngine(document, office.context(), preferences, new BibEntryTypesManager())) {
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation)
-                    ? engine.refresh(List.of(database), style("bst"))
-                    : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style("bst"),
-                            CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
+                                                             ? engine.refresh(List.of(database), style("bst"))
+                                                             : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style("bst"),
+                    CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
 
             assertTrue(result.isError());
             assertInstanceOf(MissingCitationLabelException.class, result.getError().getCause());
@@ -498,9 +498,9 @@ class WriterIntegrationTest {
 
         try (CitationEngine engine = engine(document)) {
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation)
-                    ? engine.refresh(List.of(database), style("csl"))
-                    : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style("csl"),
-                            CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
+                                                             ? engine.refresh(List.of(database), style("csl"))
+                                                             : engine.insert(List.of(entry(database, "epsilon")), List.of(database), style("csl"),
+                    CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
             assertTrue(result.isError(), "Pending citation deletions must block edits even when recording is disabled");
             assertEquals(Localization.lang("Recording and/or Recorded changes"), result.getError().getMessage());
         }
@@ -559,9 +559,12 @@ class WriterIntegrationTest {
 
     private static OOStyle style(String family) throws IOException, URISyntaxException {
         return switch (family) {
-            case "csl" -> CSLStyleUtils.createCitationStyleFromFile(resource("superscript.csl").toString()).orElseThrow();
-            case "bst" -> BstStyle.loadExternal(resource("golden.bst"));
-            default -> new JStyle(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
+            case "csl" ->
+                    CSLStyleUtils.createCitationStyleFromFile(resource("superscript.csl").toString()).orElseThrow();
+            case "bst" ->
+                    BstStyle.loadExternal(resource("golden.bst"));
+            default ->
+                    new JStyle(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
         };
     }
 
@@ -750,10 +753,14 @@ class WriterIntegrationTest {
 
     private static Map<String, String> legacyMarks(String family) {
         return switch (family) {
-            case "jstyle" -> Map.of("JR_cite_1_alpha", "[1]", "JR_cite_1_beta", "[2]", "JR_cite_1_gamma", "[3]", "JR_cite_3_delta", "");
-            case "csl-empty" -> Map.of("JABREF_delta CID_1 goldenEmpty EMPTY", "");
-            case "csl" -> Map.of("JABREF_alpha CID_1 goldenAlpha NORMAL", "1", "JABREF_beta CID_2 goldenBeta NORMAL", "2", "JABREF_gamma CID_3 goldenGamma NORMAL", "3");
-            default -> Map.of("JABREF_alpha CID_1 goldenAlpha NORMAL", "[1]", "JABREF_beta CID_2 goldenBeta NORMAL", "[2]", "JABREF_gamma CID_3 goldenGamma NORMAL", "[3]");
+            case "jstyle" ->
+                    Map.of("JR_cite_1_alpha", "[1]", "JR_cite_1_beta", "[2]", "JR_cite_1_gamma", "[3]", "JR_cite_3_delta", "");
+            case "csl-empty" ->
+                    Map.of("JABREF_delta CID_1 goldenEmpty EMPTY", "");
+            case "csl" ->
+                    Map.of("JABREF_alpha CID_1 goldenAlpha NORMAL", "1", "JABREF_beta CID_2 goldenBeta NORMAL", "2", "JABREF_gamma CID_3 goldenGamma NORMAL", "3");
+            default ->
+                    Map.of("JABREF_alpha CID_1 goldenAlpha NORMAL", "[1]", "JABREF_beta CID_2 goldenBeta NORMAL", "[2]", "JABREF_gamma CID_3 goldenGamma NORMAL", "[3]");
         };
     }
 

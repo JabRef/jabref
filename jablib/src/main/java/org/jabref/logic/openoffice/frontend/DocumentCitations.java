@@ -239,8 +239,8 @@ public class DocumentCitations {
     /// Returns on first problem found.
 
     public OOVoidResult<JabRefException> checkRangeOverlapsWithCursor(XTextDocument doc,
-                                                                    List<RangeForOverlapCheck<CitationGroupId>> userRanges,
-                                                                    boolean requireSeparation) {
+                                                                      List<RangeForOverlapCheck<CitationGroupId>> userRanges,
+                                                                      boolean requireSeparation) {
         try {
             List<RangeForOverlapCheck<CitationGroupId>> citationRanges = getCitationRanges(doc);
 

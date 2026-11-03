@@ -30,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ZoteroReferenceMarkTest {
     private static final Gson GSON = new Gson();
-        private static final Pattern CITATION_ID = Pattern.compile("[a-z][a-z0-9]{7}");
-        private static final Pattern RANDOM_SUFFIX = Pattern.compile("RND[a-z][a-z0-9]{9}");
+    private static final Pattern CITATION_ID = Pattern.compile("[a-z][a-z0-9]{7}");
+    private static final Pattern RANDOM_SUFFIX = Pattern.compile("RND[a-z][a-z0-9]{9}");
 
     @Test
     void buildReferenceMarkCreatesZoteroReferenceMarkWithEmbeddedItemData() {
@@ -62,7 +62,7 @@ class ZoteroReferenceMarkTest {
         assertFalse(citationJson.has("properties"));
         assertEquals(ZoteroCitationData.CSL_CITATION_SCHEMA, citation.schema);
         assertEquals(8, citation.citationId.length());
-                assertTrue(CITATION_ID.matcher(citation.citationId).matches());
+        assertTrue(CITATION_ID.matcher(citation.citationId).matches());
         assertEquals(Boolean.TRUE, citationItem.suppressAuthor);
         assertFalse(citationItemJson.has("jabref-citation-number"));
         assertEquals(List.of("http://www.jabref.org/Smith2020"), citationItem.uris);
@@ -86,7 +86,7 @@ class ZoteroReferenceMarkTest {
                 CitationType.AUTHORYEAR_INTEXT), referenceMark);
         assertEquals(13, uniqueId.length());
         assertEquals("RND", uniqueId.substring(0, 3));
-                assertTrue(RANDOM_SUFFIX.matcher(uniqueId).matches());
+        assertTrue(RANDOM_SUFFIX.matcher(uniqueId).matches());
 
         BibEntry parsedEntry = ZoteroCitationMarkParser.parseCslCitationJson(
                 ZoteroReferenceMark.getCSLJson(referenceMarkName)).getFirst();

@@ -80,10 +80,14 @@ public final class UpdatePipeline {
             bibliography.rebuild(document, result.bibliography(), style instanceof JStyle);
         }
         DocumentStateStore.State state = switch (style) {
-            case JStyle jStyle -> new DocumentStateStore.State(DocumentStateStore.Family.JSTYLE, jStyle.getPath());
-            case CitationStyle csl -> new DocumentStateStore.State(DocumentStateStore.Family.CSL, csl.getStyleId());
-            case BstStyle bst -> new DocumentStateStore.State(DocumentStateStore.Family.BST, bst.getPath());
-            default -> throw new CreationException("Unsupported citation style");
+            case JStyle jStyle ->
+                    new DocumentStateStore.State(DocumentStateStore.Family.JSTYLE, jStyle.getPath());
+            case CitationStyle csl ->
+                    new DocumentStateStore.State(DocumentStateStore.Family.CSL, csl.getStyleId());
+            case BstStyle bst ->
+                    new DocumentStateStore.State(DocumentStateStore.Family.BST, bst.getPath());
+            default ->
+                    throw new CreationException("Unsupported citation style");
         };
         if (style instanceof CitationStyle csl && !ZoteroDocumentPreferences.writeCitationStyle(document, csl)) {
             throw new CreationException("Could not update document CSL preferences");

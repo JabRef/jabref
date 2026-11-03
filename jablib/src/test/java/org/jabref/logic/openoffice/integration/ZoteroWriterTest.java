@@ -96,8 +96,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 @Timeout(value = 180, unit = TimeUnit.SECONDS)
 class ZoteroWriterTest {
     private static final Pattern BIBLIOGRAPHY_NAME = Pattern.compile(
-                Pattern.quote("ZOTERO_BIBL {\"uncited\":[],\"omitted\":[],\"custom\":[]} CSL_BIBLIOGRAPHY RND") + "[a-z][a-z0-9]{9}");
-        private static final String NATIVE_URI = "http://zotero.org/users/123/items/NATIVE123";
+            Pattern.quote("ZOTERO_BIBL {\"uncited\":[],\"omitted\":[],\"custom\":[]} CSL_BIBLIOGRAPHY RND") + "[a-z][a-z0-9]{9}");
+    private static final String NATIVE_URI = "http://zotero.org/users/123/items/NATIVE123";
     private static final String CANONICAL = "JABREF_ignored NORMAL stableIgnored";
     private static final String LEGACY_CID = "JABREF_ignored CID_7 old NORMAL";
     private static final String LEGACY_JSTYLE = "JR_cite_1_ignored";
@@ -126,7 +126,7 @@ class ZoteroWriterTest {
 
     @ParameterizedTest
     @CsvSource({"TEMPORARY, ''", "TEMPORARY, x", "TEMPORARY, xy", "TEMPORARY, \u200b\u200b",
-                "TEMPORARY, \u200bx", "TEMPORARY, native", "PERSISTENT, \u200b\u200b", "PERSISTENT, \u200bold\u200b"})
+            "TEMPORARY, \u200bx", "TEMPORARY, native", "PERSISTENT, \u200b\u200b", "PERSISTENT, \u200bold\u200b"})
     void explicitBoundaryPoliciesPreserveNativeShortMarksAcrossRepeatedFillAndReopen(BoundaryPolicy policy, String initial) throws Exception {
         XTextDocument document = office.newDocument();
         String name = nativeMarkName();
@@ -186,7 +186,7 @@ class ZoteroWriterTest {
                 assertEquals("[1]", zoteroMarks(document).get(name));
             }
             assertEquals(2, zoteroMarks(document).keySet().stream()
-                                                .map(name -> ZoteroReferenceMark.parse(name).orElseThrow().uniqueId()).distinct().count());
+                                                 .map(name -> ZoteroReferenceMark.parse(name).orElseThrow().uniqueId()).distinct().count());
             assertEquals(List.of("native"), exportedKeys(success(engine.exportCited(List.of(database)))));
         }
         Map<String, String> expected = zoteroMarks(document);
@@ -280,7 +280,7 @@ class ZoteroWriterTest {
         }
         ignored.remove(CANONICAL);
         assertEquals(ignored, marks(document).entrySet().stream().filter(entry -> !ZoteroReferenceMark.isZoteroReferenceMarkName(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         assertEquals("Existing JabRef bibliography", UnoTextSection.getAnchor(document, "JR_bib").orElseThrow().getString());
         assertEquals(1, zoteroBibliographies(document).size());
         assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(document, "JabRef_page_info:stableIgnored:0"));
@@ -290,7 +290,7 @@ class ZoteroWriterTest {
             assertEquals(List.of("alpha", "ignored"), exportedKeys(success(engine.exportCited(List.of(database)))).stream().sorted().toList());
         }
         assertEquals(ignored, marks(reopened).entrySet().stream().filter(entry -> !ZoteroReferenceMark.isZoteroReferenceMarkName(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @ParameterizedTest
@@ -364,7 +364,7 @@ class ZoteroWriterTest {
         appendMark(document, nativeMarkName(), "[native]");
         DocumentSnapshot before = snapshot(document);
         OOStyle unsupported = "bst".equals(family) ? BstStyle.loadExternal(resource("golden.bst"))
-                : new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
+                                                   : new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
         try (CitationEngine engine = engine(document)) {
             assertFalse(success(engine.requiresFormatConversion(unsupported)));
             assertEquals(Set.of(), engine.capabilities(unsupported).supportedTypes());
@@ -428,7 +428,7 @@ class ZoteroWriterTest {
         CitationStyle invalid = new CitationStyle("invalid.csl", "invalid", "in-text", "Invalid", "", true, true, false, false, "not XML", false);
         try (CitationEngine engine = engine(document)) {
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation) ? engine.refresh(List.of(database), invalid)
-                    : engine.insert(List.of(entry), List.of(database), invalid, CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
+                                                                                         : engine.insert(List.of(entry), List.of(database), invalid, CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
             assertReason(Reason.DOCUMENT_FAILURE, result);
         }
 
@@ -448,9 +448,12 @@ class ZoteroWriterTest {
             anchor = createBibliography(document, name);
         } else {
             String name = switch (target) {
-                case "canonical" -> CANONICAL;
-                case "legacy" -> LEGACY_CID;
-                default -> nativeMarkName();
+                case "canonical" ->
+                        CANONICAL;
+                case "legacy" ->
+                        LEGACY_CID;
+                default ->
+                        nativeMarkName();
             };
             appendMark(document, name, "Protected citation");
             anchor = WriterReferenceMarks.getAnchor(document, name).orElseThrow();
@@ -484,7 +487,7 @@ class ZoteroWriterTest {
         BibDatabase database = new BibDatabase(List.of(entry));
         try (CitationEngine engine = engine(document)) {
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation) ? engine.refresh(List.of(database), style())
-                    : engine.insert(List.of(entry), List.of(database), style(), CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
+                                                                                         : engine.insert(List.of(entry), List.of(database), style(), CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true);
             assertReason(Reason.PENDING_DELETIONS, result);
         }
 
@@ -618,8 +621,8 @@ class ZoteroWriterTest {
 
     private static BibEntry nativeEntry(String key) {
         return new BibEntry(StandardEntryType.Article).withCitationKey(key)
-                .withField(StandardField.DOI, "10.123/native").withField(StandardField.TITLE, "Native linked title")
-                .withField(StandardField.AUTHOR, "Native, Nina").withField(StandardField.YEAR, "2020");
+                                                      .withField(StandardField.DOI, "10.123/native").withField(StandardField.TITLE, "Native linked title")
+                                                      .withField(StandardField.AUTHOR, "Native, Nina").withField(StandardField.YEAR, "2020");
     }
 
     private static BibDatabase database() {

@@ -275,7 +275,7 @@ class ZoteroCitationStrategyTest {
             metadata.when(() -> ConversionMetadata.prepareRelink(eq(document), eq(nativeName), anyString()))
                     .thenThrow(new WrappedTargetException("Cannot read citation conversion properties"));
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation) ? strategy().refresh(List.of(database), style())
-                    : strategy().insert(List.of(entry), List.of(database), style(), CitationType.AUTHORYEAR_PAR, "", cursor, false);
+                                                                                         : strategy().insert(List.of(entry), List.of(database), style(), CitationType.AUTHORYEAR_PAR, "", cursor, false);
             assertEquals(Reason.DOCUMENT_FAILURE, assertInstanceOf(StrategyException.class, result.getError()).reason());
             writer.verifyNoInteractions();
             documentPreferences.verifyNoInteractions();

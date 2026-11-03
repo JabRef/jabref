@@ -23,9 +23,12 @@ public final class RendererFactory {
 
     public CitationRenderer create(OOStyle style) throws RenderException {
         return switch (style) {
-            case JStyle jStyle -> new JStyleRenderer(jStyle);
-            case CitationStyle citationStyle -> new CslRenderer(citationStyle, entryTypesManager);
-            case BstStyle bstStyle -> new BstRenderer(bstStyle, pandocPath);
+            case JStyle jStyle ->
+                    new JStyleRenderer(jStyle);
+            case CitationStyle citationStyle ->
+                    new CslRenderer(citationStyle, entryTypesManager);
+            case BstStyle bstStyle ->
+                    new BstRenderer(bstStyle, pandocPath);
         };
     }
 }

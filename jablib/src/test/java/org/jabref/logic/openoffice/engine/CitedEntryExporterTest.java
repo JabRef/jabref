@@ -37,7 +37,7 @@ class CitedEntryExporterTest {
 
         assertEquals(List.of(), result.unresolvedKeys());
         assertEquals(List.of(childEntry, parentEntry), result.database().getEntries().stream()
-                        .sorted(Comparator.comparing(entry -> entry.getCitationKey().orElseThrow())).toList());
+                                                             .sorted(Comparator.comparing(entry -> entry.getCitationKey().orElseThrow())).toList());
         assertNotSame(childEntry, result.database().getEntryByCitationKey("Child2024").orElseThrow());
         assertSame(parentEntry, result.database().getEntryByCitationKey("Parent2024").orElseThrow());
     }
@@ -100,7 +100,7 @@ class CitedEntryExporterTest {
                 List.of(new BibDatabase(List.of(child, parent, grandparent, otherChild)), new BibDatabase(List.of(otherParent))));
 
         assertEquals(List.of(child, otherChild, parent), result.database().getEntries().stream()
-                        .sorted(Comparator.comparing(entry -> entry.getCitationKey().orElseThrow())).toList());
+                                                               .sorted(Comparator.comparing(entry -> entry.getCitationKey().orElseThrow())).toList());
         assertEquals(List.of(), result.unresolvedKeys());
     }
 

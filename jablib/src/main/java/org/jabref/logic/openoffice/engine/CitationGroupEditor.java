@@ -127,7 +127,7 @@ public final class CitationGroupEditor {
             }
         }
         List<CitationGroup> ordered = plan.groupsInDocumentOrder.stream()
-                                          .map(group -> storedGroups.getOrDefault(group.groupId, group)).toList();
+                                                                .map(group -> storedGroups.getOrDefault(group.groupId, group)).toList();
         documentCitations.citationGroups.setGlobalOrder(new ArrayList<>(ordered.stream().map(group -> group.groupId).toList()));
         return ordered;
     }
@@ -177,9 +177,9 @@ public final class CitationGroupEditor {
     private Replacement replacement(DocumentCitations documentCitations, List<CitationGroup> originals, List<CitationGroup> proposed)
             throws NoDocumentException, WrappedTargetException {
         XTextRange first = documentCitations.getMarkRange(document, originals.getFirst())
-                                  .orElseThrow(() -> new NoDocumentException("Missing citation range during group-edit preparation"));
+                                            .orElseThrow(() -> new NoDocumentException("Missing citation range during group-edit preparation"));
         XTextRange last = originals.size() == 1 ? first : documentCitations.getMarkRange(document, originals.getLast())
-                                                                 .orElseThrow(() -> new NoDocumentException("Missing citation range during group-edit preparation"));
+                                                                           .orElseThrow(() -> new NoDocumentException("Missing citation range during group-edit preparation"));
         XTextCursor range = first.getText().createTextCursorByRange(first.getStart());
         range.gotoRange(last.getEnd(), true);
         return new Replacement(List.copyOf(originals), List.copyOf(proposed), range);
@@ -245,7 +245,7 @@ public final class CitationGroupEditor {
         Optional<XTextRange> previous = Optional.empty();
         for (CitationGroup group : documentCitations.getCitationGroupsSortedWithinPartitions(document, false)) {
             XTextRange range = documentCitations.getMarkRange(document, group)
-                                      .orElseThrow(() -> new NoDocumentException("Missing citation range during merge scan"));
+                                                .orElseThrow(() -> new NoDocumentException("Missing citation range during merge scan"));
             if (group.citationType != CitationType.AUTHORYEAR_PAR || previous.filter(prior -> separatedOnlyByInlineBlanks(prior, range)).isEmpty()) {
                 if (current.size() > 1) {
                     result.add(List.copyOf(current));

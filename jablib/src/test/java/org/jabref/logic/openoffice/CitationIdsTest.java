@@ -1,4 +1,3 @@
-
 package org.jabref.logic.openoffice;
 
 import java.util.List;

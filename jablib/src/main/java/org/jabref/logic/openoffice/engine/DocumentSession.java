@@ -139,7 +139,7 @@ public final class DocumentSession {
     private static boolean hasSecondaryFailure(Throwable failure) {
         // Failed property compensation or Track Changes restoration can leave state outside UNO's undo log.
         return failure instanceof UnoRedlines.TrackChangesRestoreException || failure.getSuppressed().length > 0
-                        || Optional.ofNullable(failure.getCause()).map(DocumentSession::hasSecondaryFailure).orElse(false);
+                || Optional.ofNullable(failure.getCause()).map(DocumentSession::hasSecondaryFailure).orElse(false);
     }
 
     private JabRefException rollbackFailure(Throwable cause) {

@@ -187,7 +187,7 @@ class OOTextWriterTest {
 
     private static OOStyle style(String family) throws Exception {
         return "bst".equals(family) ? BstStyle.loadExternal(resource("golden.bst"))
-                : CSLStyleUtils.createCitationStyleFromFile(resource("zotero-numeric.csl").toString()).orElseThrow();
+                                    : CSLStyleUtils.createCitationStyleFromFile(resource("zotero-numeric.csl").toString()).orElseThrow();
     }
 
     private static Path resource(String name) throws URISyntaxException {

@@ -81,7 +81,7 @@ public final class MarkStore {
             throw new NoDocumentException("Not a canonical JabRef reference mark: " + name);
         }
         WriterReferenceMark range = ranges.find(document, name, BoundaryPolicy.PERSISTENT)
-                                 .orElseThrow(() -> new NoDocumentException("Missing citation range: " + name));
+                                          .orElseThrow(() -> new NoDocumentException("Missing citation range: " + name));
         List<Citation> citations = new ArrayList<>(data.citationKeys().size());
         for (int index = 0; index < data.citationKeys().size(); index++) {
             Citation citation = new Citation(data.citationKeys().get(index));

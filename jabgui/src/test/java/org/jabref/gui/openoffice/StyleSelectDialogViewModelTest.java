@@ -143,8 +143,8 @@ class StyleSelectDialogViewModelTest {
     class StyleFileLifecycleTest {
 
         private final List<CitationStyle> previousExternalStyles = CSLStyleLoader.getStyles().stream()
-                                                                                              .filter(style -> !style.isInternalStyle())
-                                                                                              .toList();
+                                                                                 .filter(style -> !style.isInternalStyle())
+                                                                                 .toList();
         private final CSLStyleLoader cslStyleLoader = spy(new CSLStyleLoader(openOfficePreferences));
         private final JournalAbbreviationRepository journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
         private final JStyleLoader realJStyleLoader = spy(new JStyleLoader(openOfficePreferences,
@@ -329,8 +329,8 @@ class StyleSelectDialogViewModelTest {
             when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(writeJStyle()));
             viewModel.addJStyleFile();
             viewModel.selectedJStyleProperty().set(viewModel.jStylesProperty().stream()
-                                                           .filter(style -> style.getJStyle().equals(previousSelection.getJStyle()))
-                                                           .findFirst().orElseThrow());
+                                                            .filter(style -> style.getJStyle().equals(previousSelection.getJStyle()))
+                                                            .findFirst().orElseThrow());
             ImportState before = state();
 
             viewModel.addJStyleFile();
@@ -391,9 +391,12 @@ class StyleSelectDialogViewModelTest {
             openOfficePreferences.setCurrentStyle(style);
             when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
             switch (style) {
-                case CitationStyle cslStyle -> doReturn(false).when(cslStyleLoader).removeStyle(cslStyle);
-                case JStyle jStyle -> doReturn(false).when(realJStyleLoader).removeStyle(jStyle);
-                case BstStyle bstStyle -> doReturn(false).when(bstStyleLoader).removeStyle(bstStyle);
+                case CitationStyle cslStyle ->
+                        doReturn(false).when(cslStyleLoader).removeStyle(cslStyle);
+                case JStyle jStyle ->
+                        doReturn(false).when(realJStyleLoader).removeStyle(jStyle);
+                case BstStyle bstStyle ->
+                        doReturn(false).when(bstStyleLoader).removeStyle(bstStyle);
             }
             ImportState before = state();
             String source = Files.readString(Path.of(style.getPath()));
@@ -430,7 +433,7 @@ class StyleSelectDialogViewModelTest {
                 selectStyle(previousSelection);
             }
             OOStyle unrelatedStyle = fileType == StandardFileType.CITATION_STYLE
-                    ? bstStyleLoader.getStyles().getLast() : CSLStyleLoader.getDefaultStyle();
+                                     ? bstStyleLoader.getStyles().getLast() : CSLStyleLoader.getDefaultStyle();
             openOfficePreferences.setCurrentStyle(applied ? style : unrelatedStyle);
             when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
             List<? extends OOStyle> remaining = styles(fileType).stream().filter(existing -> !existing.equals(style)).toList();
@@ -513,16 +516,19 @@ class StyleSelectDialogViewModelTest {
             OOStyle style = addExternalStyle(fileType);
             CitationStyle fallback = CSLStyleLoader.getDefaultStyle();
             OOStyle unrelatedStyle = fileType == StandardFileType.CITATION_STYLE
-                    ? bstStyleLoader.getStyles().getLast() : fallback;
+                                     ? bstStyleLoader.getStyles().getLast() : fallback;
             openOfficePreferences.setCurrentStyle(applied ? style : unrelatedStyle);
             when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
             String source = Files.readString(Path.of(style.getPath()));
 
             try (MockedStatic<CSLStyleLoader> catalog = mockStatic(CSLStyleLoader.class, CALLS_REAL_METHODS)) {
                 switch (style) {
-                    case CitationStyle cslStyle -> catalog.when(CSLStyleLoader::getStyles).thenReturn(List.of(cslStyle));
-                    case JStyle jStyle -> doReturn(List.of(jStyle)).when(realJStyleLoader).getStyles();
-                    case BstStyle bstStyle -> doReturn(List.of(bstStyle)).when(bstStyleLoader).getStyles();
+                    case CitationStyle cslStyle ->
+                            catalog.when(CSLStyleLoader::getStyles).thenReturn(List.of(cslStyle));
+                    case JStyle jStyle ->
+                            doReturn(List.of(jStyle)).when(realJStyleLoader).getStyles();
+                    case BstStyle bstStyle ->
+                            doReturn(List.of(bstStyle)).when(bstStyleLoader).getStyles();
                 }
                 viewModel = createViewModel(cslStyleLoader);
 
@@ -530,9 +536,12 @@ class StyleSelectDialogViewModelTest {
 
                 assertEquals(Optional.empty(), selectedStyle(fileType));
                 switch (style) {
-                    case CitationStyle _ -> assertEquals(List.of(), viewModel.getAvailableCslLayouts());
-                    case JStyle _ -> assertEquals(List.of(), viewModel.jStylesProperty());
-                    case BstStyle _ -> assertEquals(List.of(), viewModel.bstStylesProperty());
+                    case CitationStyle _ ->
+                            assertEquals(List.of(), viewModel.getAvailableCslLayouts());
+                    case JStyle _ ->
+                            assertEquals(List.of(), viewModel.jStylesProperty());
+                    case BstStyle _ ->
+                            assertEquals(List.of(), viewModel.bstStylesProperty());
                 }
                 assertEquals(applied ? fallback : unrelatedStyle, openOfficePreferences.getCurrentStyle());
                 assertFalse(fallback.getSource().isBlank());
@@ -577,10 +586,14 @@ class StyleSelectDialogViewModelTest {
 
         private OOStyle addExternalStyle(StandardFileType fileType) throws IOException {
             Path path = switch (fileType) {
-                case CITATION_STYLE -> writeCslStyle("imported.csl", "External import regression style", "Import regression");
-                case JSTYLE -> writeJStyle();
-                case BST -> Files.writeString(directory.resolve("imported.bst"), "READ");
-                default -> throw new AssertionError("Not a style file type: " + fileType);
+                case CITATION_STYLE ->
+                        writeCslStyle("imported.csl", "External import regression style", "Import regression");
+                case JSTYLE ->
+                        writeJStyle();
+                case BST ->
+                        Files.writeString(directory.resolve("imported.bst"), "READ");
+                default ->
+                        throw new AssertionError("Not a style file type: " + fileType);
             };
             when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(path));
             importStyle(fileType);
@@ -589,41 +602,55 @@ class StyleSelectDialogViewModelTest {
 
         private void deleteStyle(OOStyle style) {
             switch (style) {
-                case CitationStyle cslStyle -> viewModel.deleteCslStyle(cslStyle);
-                case JStyle jStyle -> viewModel.deleteJStyle(jStyle);
-                case BstStyle bstStyle -> viewModel.deleteBstStyle(bstStyle);
+                case CitationStyle cslStyle ->
+                        viewModel.deleteCslStyle(cslStyle);
+                case JStyle jStyle ->
+                        viewModel.deleteJStyle(jStyle);
+                case BstStyle bstStyle ->
+                        viewModel.deleteBstStyle(bstStyle);
             }
         }
 
         private void selectStyle(OOStyle style) {
             switch (style) {
-                case CitationStyle cslStyle -> viewModel.selectedCslLayoutProperty().set(viewModel.getAvailableCslLayouts().stream()
-                                                                                               .filter(layout -> layout.citationStyle().equals(cslStyle))
-                                                                                               .findFirst().orElseThrow());
-                case JStyle jStyle -> viewModel.selectedJStyleProperty().set(viewModel.jStylesProperty().stream()
-                                                                                    .filter(row -> row.getJStyle().equals(jStyle))
-                                                                                    .findFirst().orElseThrow());
-                case BstStyle bstStyle -> viewModel.selectedBstStyleProperty().set(viewModel.bstStylesProperty().stream()
-                                                                                        .filter(row -> row.getBstStyle().equals(bstStyle))
-                                                                                        .findFirst().orElseThrow());
+                case CitationStyle cslStyle ->
+                        viewModel.selectedCslLayoutProperty().set(viewModel.getAvailableCslLayouts().stream()
+                                                                           .filter(layout -> layout.citationStyle().equals(cslStyle))
+                                                                           .findFirst().orElseThrow());
+                case JStyle jStyle ->
+                        viewModel.selectedJStyleProperty().set(viewModel.jStylesProperty().stream()
+                                                                        .filter(row -> row.getJStyle().equals(jStyle))
+                                                                        .findFirst().orElseThrow());
+                case BstStyle bstStyle ->
+                        viewModel.selectedBstStyleProperty().set(viewModel.bstStylesProperty().stream()
+                                                                          .filter(row -> row.getBstStyle().equals(bstStyle))
+                                                                          .findFirst().orElseThrow());
             }
         }
 
         private Optional<OOStyle> selectedStyle(StandardFileType fileType) {
             return switch (fileType) {
-                case CITATION_STYLE -> Optional.ofNullable(viewModel.selectedCslLayoutProperty().get()).map(CitationStylePreviewLayout::citationStyle);
-                case JSTYLE -> Optional.ofNullable(viewModel.selectedJStyleProperty().get()).map(JStyleSelectViewModel::getJStyle);
-                case BST -> Optional.ofNullable(viewModel.selectedBstStyleProperty().get()).map(BstStyleSelectViewModel::getBstStyle);
-                default -> throw new AssertionError("Not a style file type: " + fileType);
+                case CITATION_STYLE ->
+                        Optional.ofNullable(viewModel.selectedCslLayoutProperty().get()).map(CitationStylePreviewLayout::citationStyle);
+                case JSTYLE ->
+                        Optional.ofNullable(viewModel.selectedJStyleProperty().get()).map(JStyleSelectViewModel::getJStyle);
+                case BST ->
+                        Optional.ofNullable(viewModel.selectedBstStyleProperty().get()).map(BstStyleSelectViewModel::getBstStyle);
+                default ->
+                        throw new AssertionError("Not a style file type: " + fileType);
             };
         }
 
         private List<? extends OOStyle> styles(StandardFileType fileType) {
             return switch (fileType) {
-                case CITATION_STYLE -> CSLStyleLoader.getStyles();
-                case JSTYLE -> realJStyleLoader.getStyles();
-                case BST -> bstStyleLoader.getStyles();
-                default -> throw new AssertionError("Not a style file type: " + fileType);
+                case CITATION_STYLE ->
+                        CSLStyleLoader.getStyles();
+                case JSTYLE ->
+                        realJStyleLoader.getStyles();
+                case BST ->
+                        bstStyleLoader.getStyles();
+                default ->
+                        throw new AssertionError("Not a style file type: " + fileType);
             };
         }
 
@@ -635,9 +662,12 @@ class StyleSelectDialogViewModelTest {
 
         private void verifyRemovalNotAttempted(OOStyle style) {
             switch (style) {
-                case CitationStyle cslStyle -> verify(cslStyleLoader, never()).removeStyle(cslStyle);
-                case JStyle jStyle -> verify(realJStyleLoader, never()).removeStyle(jStyle);
-                case BstStyle bstStyle -> verify(bstStyleLoader, never()).removeStyle(bstStyle);
+                case CitationStyle cslStyle ->
+                        verify(cslStyleLoader, never()).removeStyle(cslStyle);
+                case JStyle jStyle ->
+                        verify(realJStyleLoader, never()).removeStyle(jStyle);
+                case BstStyle bstStyle ->
+                        verify(bstStyleLoader, never()).removeStyle(bstStyle);
             }
         }
 
@@ -678,10 +708,14 @@ class StyleSelectDialogViewModelTest {
 
         private void importStyle(StandardFileType fileType) {
             switch (fileType) {
-                case CITATION_STYLE -> viewModel.addCslStyleFile();
-                case JSTYLE -> viewModel.addJStyleFile();
-                case BST -> viewModel.addBstStyleFile();
-                default -> throw new AssertionError("Not a style file type: " + fileType);
+                case CITATION_STYLE ->
+                        viewModel.addCslStyleFile();
+                case JSTYLE ->
+                        viewModel.addJStyleFile();
+                case BST ->
+                        viewModel.addBstStyleFile();
+                default ->
+                        throw new AssertionError("Not a style file type: " + fileType);
             }
         }
 

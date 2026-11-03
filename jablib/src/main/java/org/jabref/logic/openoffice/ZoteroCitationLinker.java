@@ -67,9 +67,9 @@ public final class ZoteroCitationLinker {
             return Optional.empty();
         }
         return Optional.ofNullable(citationItem.itemData).flatMap(_ -> ZoteroCitationMarkParser.toBibEntry(citationItem))
-                                       .flatMap(entry -> findDuplicate(entry, bibDatabaseContext, duplicateCheck))
-                                       .flatMap(BibEntry::getCitationKey)
-                                       .map(ZoteroReferenceMark::createJabRefUri);
+                       .flatMap(entry -> findDuplicate(entry, bibDatabaseContext, duplicateCheck))
+                       .flatMap(BibEntry::getCitationKey)
+                       .map(ZoteroReferenceMark::createJabRefUri);
     }
 
     private static Optional<BibEntry> findDuplicate(BibEntry entry, BibDatabaseContext context, DuplicateCheck duplicateCheck) {

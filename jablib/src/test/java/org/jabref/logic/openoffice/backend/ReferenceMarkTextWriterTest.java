@@ -96,7 +96,7 @@ class ReferenceMarkTextWriterTest {
 
     @ParameterizedTest
     @CsvSource({"<sup>1</sup>, 33", "<sub>1</sub>, -10", "<span lang=\"en\"><sup>12</sup></span>, 33",
-                "<span oo:CharStyleName=\"Citation\"><sub>1</sub></span>, -10"})
+            "<span oo:CharStyleName=\"Citation\"><sub>1</sub></span>, -10"})
     void restoresWholeMarkEscapementWithoutChangingFontHeight(String markup, short escapement) throws Exception {
         ReferenceMarkTextWriter.write(document, context, range, OOText.fromString(markup));
 

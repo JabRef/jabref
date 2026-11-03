@@ -136,7 +136,7 @@ class CitationGroupEditorTest {
             assertEquals(List.of(List.of("after"), List.of("beta"), List.of("alpha"), List.of("before")),
                     prepared.groupsInDocumentOrder().stream().map(CitationGroupEditorTest::keys).toList());
             assertEquals(List.of(info("p. 5"), info("p. 7")), prepared.groupsInDocumentOrder().subList(1, 3).stream()
-                                                                                .map(group -> group.citationsInStorageOrder.getFirst().getPageInfo()).toList());
+                                                                      .map(group -> group.citationsInStorageOrder.getFirst().getPageInfo()).toList());
             assertEquals(preparedNames, prepared.groupsInDocumentOrder().stream().map(CitationGroup::getReferenceMarkNameForLinking).toList());
             assertEquals(4L, Stream.concat(prepared.groupsInDocumentOrder().subList(1, 3).stream(), repeated.groupsInDocumentOrder().subList(1, 3).stream())
                                    .map(group -> group.groupId.citationGroupIdAsString()).distinct().count());

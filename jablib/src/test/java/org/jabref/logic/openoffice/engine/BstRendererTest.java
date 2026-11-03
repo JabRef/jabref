@@ -187,8 +187,8 @@ class BstRendererTest {
     private static PandocLatexConverter echoPandoc() throws IOException, InterruptedException {
         PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
         when(pandoc.latexToHtml(anyString())).thenAnswer(invocation -> Arrays.stream(invocation.<String>getArgument(0).split("\n\n"))
-                                                                          .map(text -> "<p>" + text + "</p>")
-                                                                          .collect(Collectors.joining("\n")));
+                                                                             .map(text -> "<p>" + text + "</p>")
+                                                                             .collect(Collectors.joining("\n")));
         return pandoc;
     }
 }

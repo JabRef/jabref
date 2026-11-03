@@ -40,7 +40,7 @@ public final class UndoableDocumentProperties {
     public static void preflight(XTextDocument document, Map<String, Optional<String>> changes)
             throws WrappedTargetException, IllegalTypeException, PropertyVetoException, NotRemoveableException {
         XPropertySet properties = UnoUserDefinedProperty.getPropertyContainer(document).flatMap(container -> UnoCast.cast(XPropertySet.class, container))
-                .orElseThrow(() -> new WrappedTargetException("Cannot inspect document properties"));
+                                                        .orElseThrow(() -> new WrappedTargetException("Cannot inspect document properties"));
         XPropertySetInfo information = properties.getPropertySetInfo();
         for (Map.Entry<String, Optional<String>> change : changes.entrySet()) {
             if (!information.hasPropertyByName(change.getKey())) {
@@ -93,7 +93,7 @@ public final class UndoableDocumentProperties {
 
     private static WrappedTargetException compensateRegistrationFailure(XTextDocument document, String name, Optional<String> before, Throwable cause) {
         WrappedTargetException failure = cause instanceof WrappedTargetException wrapped ? wrapped
-                : new WrappedTargetException(cause, "Could not register citation property undo", document, cause);
+                                                                                         : new WrappedTargetException(cause, "Could not register citation property undo", document, cause);
         try {
             restore(document, name, before);
         } catch (NotRemoveableException | WrappedTargetException | PropertyVetoException | IllegalTypeException | RuntimeException restoreFailure) {

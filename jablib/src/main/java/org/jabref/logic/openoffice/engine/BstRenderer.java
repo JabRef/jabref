@@ -87,9 +87,12 @@ public final class BstRenderer implements CitationRenderer {
             Map<CitationGroupId, OOText> markers = new LinkedHashMap<>();
             for (CitationGroup group : request.groupsInDocumentOrder()) {
                 String text = switch (request.options().bstCitationFormat()) {
-                    case NUMERIC -> numeric(group, numbers, data);
-                    case AUTHOR_YEAR -> authorYear(group, data);
-                    case STYLE_DEFINED -> styleDefined(group, byKey, data);
+                    case NUMERIC ->
+                            numeric(group, numbers, data);
+                    case AUTHOR_YEAR ->
+                            authorYear(group, data);
+                    case STYLE_DEFINED ->
+                            styleDefined(group, byKey, data);
                 };
                 markers.put(group.groupId, OOFormat.setLocaleNone(OOText.fromString(text)));
             }
@@ -101,9 +104,12 @@ public final class BstRenderer implements CitationRenderer {
                 for (int i = 0; i < orderedItems.size(); i++) {
                     BibItem item = orderedItems.get(i);
                     String prefix = switch (request.options().bstCitationFormat()) {
-                        case NUMERIC -> "[" + numbers.get(item.key()) + "] ";
-                        case STYLE_DEFINED -> "[" + StringEscapeUtils.escapeHtml4(label(item)) + "] ";
-                        case AUTHOR_YEAR -> "";
+                        case NUMERIC ->
+                                "[" + numbers.get(item.key()) + "] ";
+                        case STYLE_DEFINED ->
+                                "[" + StringEscapeUtils.escapeHtml4(label(item)) + "] ";
+                        case AUTHOR_YEAR ->
+                                "";
                     };
                     bibliography.add(BibliographyText.entry(prefix + bodies.get(i), request.options()));
                 }

@@ -46,20 +46,20 @@ final class OpenOfficeStyleCatalog {
         if (stored.isPresent()) {
             return stored.filter(state -> state.family() == DocumentStateStore.Family.CSL)
                          .flatMap(state -> cslStyles.get().stream()
-                                                   .filter(style -> state.styleId().equals(style.getPath()) || state.styleId().equals(style.getStyleId()))
-                                                   .findFirst());
+                                                    .filter(style -> state.styleId().equals(style.getPath()) || state.styleId().equals(style.getStyleId()))
+                                                    .findFirst());
         }
         return ZoteroDocumentPreferences.findCitationStyle(document, cslStyles.get());
     }
 
     Optional<OOStyle> find(DocumentStateStore.State state) {
         Stream<StyleOption> jStyles = jStyleLoader.getStyles().stream()
-                                                 .map(style -> new StyleOption(DocumentStateStore.Family.JSTYLE, style, Set.of(style.getPath())));
+                                                  .map(style -> new StyleOption(DocumentStateStore.Family.JSTYLE, style, Set.of(style.getPath())));
         Stream<StyleOption> cslStyles = this.cslStyles.get().stream()
-                                                    .map(style -> new StyleOption(DocumentStateStore.Family.CSL, style,
-                                                            Set.copyOf(List.of(style.getPath(), style.getStyleId()))));
+                                                      .map(style -> new StyleOption(DocumentStateStore.Family.CSL, style,
+                                                              Set.copyOf(List.of(style.getPath(), style.getStyleId()))));
         Stream<StyleOption> bstStyles = bstStyleLoader.getStyles().stream()
-                                                     .map(style -> new StyleOption(DocumentStateStore.Family.BST, style, Set.of(style.getPath())));
+                                                      .map(style -> new StyleOption(DocumentStateStore.Family.BST, style, Set.of(style.getPath())));
         return Stream.of(jStyles, cslStyles, bstStyles).flatMap(stream -> stream)
                      .filter(option -> option.family() == state.family() && option.identifiers().contains(state.styleId()))
                      .map(StyleOption::style)

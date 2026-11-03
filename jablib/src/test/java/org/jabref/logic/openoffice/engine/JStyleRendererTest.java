@@ -46,9 +46,9 @@ class JStyleRendererTest {
     @ValueSource(booleans = {false, true})
     void citationKeyModeEscapesResolvedAndMixedKeysWithStyleMarkup(boolean numberEntries) throws IOException, RenderException {
         RenderRequest request = request(List.of(
-                group("resolved", CitationType.AUTHORYEAR_PAR, "<b>", "&amp;", "研究🔬"),
-                group("mixed", CitationType.AUTHORYEAR_PAR, "<b>", "&amp;", "研究🔬", "<b>missing&amp;"),
-                group("unresolved", CitationType.AUTHORYEAR_PAR, "<b>missing&amp;")),
+                        group("resolved", CitationType.AUTHORYEAR_PAR, "<b>", "&amp;", "研究🔬"),
+                        group("mixed", CitationType.AUTHORYEAR_PAR, "<b>", "&amp;", "研究🔬", "<b>missing&amp;"),
+                        group("unresolved", CitationType.AUTHORYEAR_PAR, "<b>missing&amp;")),
                 List.of(entry("<b>", "Zebra"), entry("&amp;", "Beta"), entry("研究🔬", "Alpha")));
 
         RenderResult result = new JStyleRenderer(citationKeyStyle(numberEntries)).render(request);

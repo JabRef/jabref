@@ -159,7 +159,7 @@ class CanonicalStorageWriterTest {
         create(documentCitations, document, List.of("canonical"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR);
 
         assertEquals(List.of("canonical"), new DocumentCitations(document).citationGroups.getCitationGroupsUnordered().stream()
-                                                          .flatMap(group -> keys(group).stream()).toList());
+                                                                                         .flatMap(group -> keys(group).stream()).toList());
         assertEquals(3, WriterReferenceMarks.getListOfNames(document).size());
     }
 
@@ -220,7 +220,7 @@ class CanonicalStorageWriterTest {
 
                 XTextCursor full = range.getRawCursor(document).orElseThrow();
                 String expected = policy == BoundaryPolicy.PERSISTENT ? "\u200b" + content + "\u200b"
-                                                                     : content.length() == 1 ? "\u200b" + content : content;
+                                                                      : content.length() == 1 ? "\u200b" + content : content;
                 assertEquals(expected, full.getString());
                 XPropertySet properties = query(XPropertySet.class, full);
                 assertEquals(height, properties.getPropertyValue("CharHeight"));

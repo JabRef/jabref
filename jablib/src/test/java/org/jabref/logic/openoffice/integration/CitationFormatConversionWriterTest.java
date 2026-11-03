@@ -104,7 +104,7 @@ class CitationFormatConversionWriterTest {
             new BibEntry().withCitationKey("alpha").withField(StandardField.TITLE, "Alpha title").withField(StandardField.AUTHOR, "Alpha, Alice").withField(StandardField.YEAR, "2020"),
             new BibEntry().withCitationKey("beta").withField(StandardField.TITLE, "Beta title").withField(StandardField.AUTHOR, "Beta, Bob").withField(StandardField.YEAR, "2021"),
             new BibEntry().withCitationKey("native").withField(StandardField.TITLE, "Native linked title").withField(StandardField.DOI, "10.123/native")
-                    .withField(StandardField.AUTHOR, "Native, Nina").withField(StandardField.YEAR, "2020")));
+                          .withField(StandardField.AUTHOR, "Native, Nina").withField(StandardField.YEAR, "2020")));
 
     @BeforeAll
     void start(@TempDir Path profile) throws Exception {
@@ -324,7 +324,7 @@ class CitationFormatConversionWriterTest {
                     CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), false));
             for (String name : managedNames(document, targetZotero)) {
                 assertEquals((short) 33, query(XPropertySet.class, WriterReferenceMarks.getAnchor(document, name).orElseThrow()
-                        .getText().createTextCursorByRange(WriterReferenceMarks.getAnchor(document, name).orElseThrow())).getPropertyValue("CharEscapement"));
+                                                                                       .getText().createTextCursorByRange(WriterReferenceMarks.getAnchor(document, name).orElseThrow())).getPropertyValue("CharEscapement"));
             }
             undo.undo();
             assertEquals(before, snapshot(document));
@@ -332,7 +332,7 @@ class CitationFormatConversionWriterTest {
             success(engine.refresh(List.of(database), superscript));
             for (String name : managedNames(document, targetZotero)) {
                 assertEquals((short) 33, query(XPropertySet.class, WriterReferenceMarks.getAnchor(document, name).orElseThrow()
-                        .getText().createTextCursorByRange(WriterReferenceMarks.getAnchor(document, name).orElseThrow())).getPropertyValue("CharEscapement"));
+                                                                                       .getText().createTextCursorByRange(WriterReferenceMarks.getAnchor(document, name).orElseThrow())).getPropertyValue("CharEscapement"));
             }
         }
     }
@@ -389,7 +389,7 @@ class CitationFormatConversionWriterTest {
             assertEquals(snapshots, conversionSnapshots(document));
             assertTrue(managedNames(document, true).contains(edited));
             assertEquals("External Zotero formatting", JsonParser.parseString(ZoteroReferenceMark.getCSLJson(edited)).getAsJsonObject()
-                    .getAsJsonObject("properties").get("formattedCitation").getAsString());
+                                                                 .getAsJsonObject("properties").get("formattedCitation").getAsString());
 
             preferences.setZoteroCompatibilityMode(false);
             JabRefException failure = assertRejectedWithoutMutation(engine, document);
@@ -426,8 +426,8 @@ class CitationFormatConversionWriterTest {
             Snapshot before = snapshot(document);
             CitationStyle invalid = new CitationStyle("invalid.csl", "invalid", "in-text", "Invalid", "", true, true, false, false, "not XML", false);
             OOResult<List<String>, JabRefException> failed = "refresh".equals(operation) ? engine.refresh(List.of(database), invalid)
-                    : engine.insert(List.of(database.getEntryByCitationKey("beta").orElseThrow()), List.of(database), invalid,
-                            CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), false);
+                                                                                         : engine.insert(List.of(database.getEntryByCitationKey("beta").orElseThrow()), List.of(database), invalid,
+                    CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), false);
             assertTrue(failed.isError());
             assertEquals(before, snapshot(document));
             assertEquals(snapshots, conversionSnapshots(document));
@@ -502,7 +502,7 @@ class CitationFormatConversionWriterTest {
             assertEquals(5, managedNames(document, targetZotero).size());
             for (String name : managedNames(document, targetZotero)) {
                 String key = targetZotero ? ZoteroReferenceMark.parse(name).orElseThrow().citationKeys().getFirst()
-                        : MarkCodec.decode(name).citationKeys().getFirst();
+                                          : MarkCodec.decode(name).citationKeys().getFirst();
                 assertEquals(expected.get(key), WriterReferenceMarks.getAnchor(document, name).orElseThrow().getString().replace("\u200b", ""));
             }
         }
@@ -539,7 +539,7 @@ class CitationFormatConversionWriterTest {
             "true, false, false, true", "false, false, false, true", "true, true, false, true", "false, true, false, true",
             "true, true, true, false", "false, true, true, false"})
     void citationConversionOnlySynchronizesTheTargetBibliographyWhenRequested(boolean targetZotero, boolean synchronize,
-                                                                             boolean targetExists, boolean hasBibliography) throws Exception {
+                                                                              boolean targetExists, boolean hasBibliography) throws Exception {
         XTextDocument document = office.newDocument();
         document.getText().setString("Citation position\nCanonical bibliography\nFirst native bibliography\nSecond native bibliography\nUnrelated user content\n");
         if (targetZotero || targetExists) {
@@ -749,9 +749,12 @@ class CitationFormatConversionWriterTest {
             insert(engine, document, "alpha", false);
             String uid = MarkCodec.decode(managedNames(document, false).getFirst()).uniqueId();
             String property = switch (kind) {
-                case "nonremovable-page" -> MarkStore.pageInfoProperty(uid, 0);
-                case "numeric-metadata" -> "JabRef_citation_conversion:" + uid;
-                default -> DocumentStateStore.PROPERTY_NAME;
+                case "nonremovable-page" ->
+                        MarkStore.pageInfoProperty(uid, 0);
+                case "numeric-metadata" ->
+                        "JabRef_citation_conversion:" + uid;
+                default ->
+                        DocumentStateStore.PROPERTY_NAME;
             };
             UnoUserDefinedProperty.removeIfExists(document, property);
             XPropertyContainer container = UnoUserDefinedProperty.getPropertyContainer(document).orElseThrow();
@@ -807,15 +810,15 @@ class CitationFormatConversionWriterTest {
                 return invocation.callRealMethod();
             });
                  MockedStatic<ReferenceMarkTextWriter> markers = mockStatic(ReferenceMarkTextWriter.class, invocation -> {
-                if ("markers".equals(phase) && "write".equals(invocation.getMethod().getName())) {
-                    WriterReferenceMark range = invocation.getArgument(2);
-                    if (range.getRangeName().contains("alpha")) {
-                        renamed.set(!managedNames(document, targetZotero).isEmpty());
-                        throw new CreationException("Injected marker write failure after rename");
-                    }
-                }
-                return invocation.callRealMethod();
-            })) {
+                     if ("markers".equals(phase) && "write".equals(invocation.getMethod().getName())) {
+                         WriterReferenceMark range = invocation.getArgument(2);
+                         if (range.getRangeName().contains("alpha")) {
+                             renamed.set(!managedNames(document, targetZotero).isEmpty());
+                             throw new CreationException("Injected marker write failure after rename");
+                         }
+                     }
+                     return invocation.callRealMethod();
+                 })) {
                 assertTrue(engine.insert(List.of(database.getEntryByCitationKey("beta").orElseThrow()), List.of(database), style(),
                         CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), false).isError());
             }

@@ -25,7 +25,7 @@ public class UnoNamed {
             CreationException {
 
         XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, documentAnnotation.doc())
-                                                     .orElseThrow(() -> new CreationException("Document does not supply a service factory"));
+                                          .orElseThrow(() -> new CreationException("Document does not supply a service factory"));
 
         Object xObject;
         try {

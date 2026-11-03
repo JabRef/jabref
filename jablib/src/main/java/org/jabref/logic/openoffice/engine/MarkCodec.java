@@ -66,24 +66,37 @@ public final class MarkCodec {
 
     private static String encodeType(CitationType type) {
         return switch (type) {
-            case AUTHORYEAR_PAR -> "NORMAL";
-            case AUTHORYEAR_INTEXT -> "IN_TEXT";
-            case INVISIBLE_CIT -> "EMPTY";
-            case AUTHORYEAR_NOPAR -> "NOPAR";
-            case AUTHOR_ONLY -> "AUTHOR_ONLY";
-            case YEAR_ONLY -> "YEAR_ONLY";
+            case AUTHORYEAR_PAR ->
+                    "NORMAL";
+            case AUTHORYEAR_INTEXT ->
+                    "IN_TEXT";
+            case INVISIBLE_CIT ->
+                    "EMPTY";
+            case AUTHORYEAR_NOPAR ->
+                    "NOPAR";
+            case AUTHOR_ONLY ->
+                    "AUTHOR_ONLY";
+            case YEAR_ONLY ->
+                    "YEAR_ONLY";
         };
     }
 
     private static CitationType decodeType(String type) throws MarkCodecException {
         return switch (type) {
-            case "NORMAL" -> CitationType.AUTHORYEAR_PAR;
-            case "IN_TEXT" -> CitationType.AUTHORYEAR_INTEXT;
-            case "EMPTY" -> CitationType.INVISIBLE_CIT;
-            case "NOPAR" -> CitationType.AUTHORYEAR_NOPAR;
-            case "AUTHOR_ONLY" -> CitationType.AUTHOR_ONLY;
-            case "YEAR_ONLY" -> CitationType.YEAR_ONLY;
-            default -> throw new MarkCodecException(MarkCodecException.Reason.INVALID_MARK_NAME, "Unknown canonical citation type");
+            case "NORMAL" ->
+                    CitationType.AUTHORYEAR_PAR;
+            case "IN_TEXT" ->
+                    CitationType.AUTHORYEAR_INTEXT;
+            case "EMPTY" ->
+                    CitationType.INVISIBLE_CIT;
+            case "NOPAR" ->
+                    CitationType.AUTHORYEAR_NOPAR;
+            case "AUTHOR_ONLY" ->
+                    CitationType.AUTHOR_ONLY;
+            case "YEAR_ONLY" ->
+                    CitationType.YEAR_ONLY;
+            default ->
+                    throw new MarkCodecException(MarkCodecException.Reason.INVALID_MARK_NAME, "Unknown canonical citation type");
         };
     }
 }

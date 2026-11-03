@@ -90,14 +90,14 @@ public class UnoRedlines {
                 throw inspectionFailure("Cannot read pending Writer change", exception);
             }
             XPropertySet properties = UnoCast.cast(XPropertySet.class, change)
-                                            .orElseThrow(() -> inspectionFailure("Missing Writer redline properties"));
+                                             .orElseThrow(() -> inspectionFailure("Missing Writer redline properties"));
             if (!REDLINE_TYPE_DELETE.equals(redlineProperty(properties, "RedlineType"))) {
                 continue;
             }
             XTextRange start = UnoCast.cast(XTextRange.class, redlineProperty(properties, "RedlineStart"))
-                                     .orElseThrow(() -> inspectionFailure("Missing Writer deletion start anchor"));
+                                      .orElseThrow(() -> inspectionFailure("Missing Writer deletion start anchor"));
             XTextRange end = UnoCast.cast(XTextRange.class, redlineProperty(properties, "RedlineEnd"))
-                                   .orElseThrow(() -> inspectionFailure("Missing Writer deletion end anchor"));
+                                    .orElseThrow(() -> inspectionFailure("Missing Writer deletion end anchor"));
             if (!UnoRuntime.areSame(start.getText(), end.getText())) {
                 throw inspectionFailure("Writer deletion anchors belong to different text containers");
             }
@@ -116,7 +116,7 @@ public class UnoRedlines {
                     continue;
                 }
                 XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, deletedRange.getText())
-                                                  .orElseThrow(() -> inspectionFailure("Cannot compare Writer deletion anchors"));
+                                                   .orElseThrow(() -> inspectionFailure("Cannot compare Writer deletion anchors"));
                 boolean disjoint;
                 try {
                     disjoint = UnoTextRange.compareStartsUnsafe(compare, deletedRange, range.getEnd()) > 0

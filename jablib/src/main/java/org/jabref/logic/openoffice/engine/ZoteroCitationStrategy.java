@@ -72,7 +72,6 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     static final String BIBLIOGRAPHY_PREFIX = "ZOTERO_BIBL ";
     private static final Logger LOGGER = LoggerFactory.getLogger(ZoteroCitationStrategy.class);
 
-
     private final XTextDocument document;
     private final XComponentContext context;
     private final OpenOfficePreferences preferences;
@@ -85,7 +84,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     }
 
     ZoteroCitationStrategy(XTextDocument document, XComponentContext context, OpenOfficePreferences preferences,
-                          BibEntryTypesManager entryTypes, WriterReferenceMarks ranges) {
+                           BibEntryTypesManager entryTypes, WriterReferenceMarks ranges) {
         this.document = document;
         this.context = context;
         this.preferences = preferences;
@@ -94,8 +93,8 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     }
 
     public OOResult<List<String>, JabRefException> insert(List<BibEntry> entries, List<BibDatabase> databases,
-                                                         OOStyle style, CitationType type, String pageInfo,
-                                                         XTextCursor cursor, boolean rebuildBib) {
+                                                          OOStyle style, CitationType type, String pageInfo,
+                                                          XTextCursor cursor, boolean rebuildBib) {
         try {
             CitationStyle cslStyle = requireStyle(style);
             CitationType zoteroType = requireType(type);
@@ -146,8 +145,8 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
                     preferences.getAddSpaceBefore() && !hasAdjacentSpace(cursor, false),
                     preferences.getAddSpaceAfter() && !hasAdjacentSpace(cursor, true), BoundaryPolicy.TEMPORARY);
             List<StoredCitation> stored = ordered.stream().map(citation -> citation == inserted
-                                                                         ? new StoredCitation(mark, inserted.group(), inserted.anchor(), Optional.of(range), mark.name())
-                                                                         : citation).toList();
+                                                                           ? new StoredCitation(mark, inserted.group(), inserted.anchor(), Optional.of(range), mark.name())
+                                                                           : citation).toList();
             apply(stored, rendered, cslStyle, rebuildBib, metadataUpdates);
             return OOResult.ok(rendered.unresolvedKeys());
         } catch (StrategyException exception) {
@@ -195,7 +194,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     private void validate(List<StoredCitation> citations, Optional<XTextCursor> insertion)
             throws NoDocumentException, com.sun.star.uno.Exception, StrategyException {
         List<RangeForOverlapCheck<String>> citationRanges = citations.stream()
-                .map(citation -> protectedRange(citation.anchor(), citation.originalName(), RangeForOverlapCheck.REFERENCE_MARK_KIND)).toList();
+                                                                     .map(citation -> protectedRange(citation.anchor(), citation.originalName(), RangeForOverlapCheck.REFERENCE_MARK_KIND)).toList();
         validateRanges(citationRanges, insertion, Set.of(BIBLIOGRAPHY_PREFIX));
     }
 
@@ -210,7 +209,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
                 continue;
             }
             WriterReferenceMark range = ranges.find(document, name, BoundaryPolicy.TEMPORARY)
-                                     .orElseThrow(() -> new NoDocumentException("Missing protected reference mark"));
+                                              .orElseThrow(() -> new NoDocumentException("Missing protected reference mark"));
             XTextRange anchor = range.getMarkRange(document).orElseThrow(() -> new NoDocumentException("Missing protected reference-mark anchor"));
             unmanaged.add(protectedRange(anchor, name, RangeForOverlapCheck.REFERENCE_MARK_KIND));
         }
@@ -218,7 +217,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
         for (String name : UnoTextSection.getNameAccess(document).getElementNames()) {
             if (name.startsWith(BIBLIOGRAPHY_PREFIX) || BibliographySection.NAME.equals(name)) {
                 XTextRange anchor = UnoTextSection.getAnchor(document, name)
-                                                .orElseThrow(() -> new NoDocumentException("Missing protected bibliography section"));
+                                                  .orElseThrow(() -> new NoDocumentException("Missing protected bibliography section"));
                 RangeForOverlapCheck<String> range = protectedRange(anchor, name, RangeForOverlapCheck.BIBLIOGRAPHY_MARK_KIND);
                 if (editedBibliographyPrefixes.stream().anyMatch(name::startsWith)) {
                     managed.add(range);
@@ -308,7 +307,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             return false;
         }
         XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, left.getText())
-                                          .orElseThrow(() -> new NoDocumentException("Cannot compare protected Zotero ranges"));
+                                           .orElseThrow(() -> new NoDocumentException("Cannot compare protected Zotero ranges"));
         return compare.compareRegionStarts(left, right) == 0 && compare.compareRegionEnds(left, right) == 0;
     }
 
@@ -317,7 +316,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             return false;
         }
         XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, left.getText())
-                                          .orElseThrow(() -> new NoDocumentException("Cannot compare protected Zotero ranges"));
+                                           .orElseThrow(() -> new NoDocumentException("Cannot compare protected Zotero ranges"));
         if (compare.compareRegionStarts(left, right) == 0 && compare.compareRegionEnds(left, right) == 0) {
             return true;
         }
@@ -328,8 +327,8 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
 
     LinkPlan planLinks(List<StoredCitation> citations, List<BibDatabase> databases) {
         List<BibEntry> entries = databases.stream()
-                                         .flatMap(database -> database.getEntries().stream().map(entry -> database.resolveForStrings(entry, false)))
-                                         .distinct().toList();
+                                          .flatMap(database -> database.getEntries().stream().map(entry -> database.resolveForStrings(entry, false)))
+                                          .distinct().toList();
         return ZoteroCitationLinker.planLinks(citations.stream().map(StoredCitation::originalName).toList(),
                 new BibDatabaseContext(new BibDatabase(entries)), entryTypes);
     }
@@ -338,7 +337,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
         List<StoredCitation> planned = new ArrayList<>();
         for (StoredCitation citation : citations) {
             ZoteroReferenceMark mark = ZoteroReferenceMark.parse(links.updatedName(citation.originalName()))
-                                                        .orElseThrow(() -> new RenderException("Cannot parse planned Zotero URI link"));
+                                                          .orElseThrow(() -> new RenderException("Cannot parse planned Zotero URI link"));
             CitationGroup group = new CitationGroup(citation.group().groupId, citation.group().citationType,
                     mark.citationKeys().stream().map(Citation::new).toList(), Optional.empty());
             planned.add(new StoredCitation(mark, group, citation.anchor(), citation.range(), citation.originalName()));
@@ -408,7 +407,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
         for (StoredCitation citation : citations) {
             if (!citation.originalName().equals(citation.mark().name())) {
                 ConversionMetadata.prepareRelink(document, citation.originalName(), citation.mark().name())
-                        .ifPresent(metadata -> updates.put(citation.originalName(), metadata));
+                                  .ifPresent(metadata -> updates.put(citation.originalName(), metadata));
             }
         }
         return updates;
@@ -443,7 +442,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
 
     private WriterReferenceMark recreateLinkedMark(StoredCitation citation) throws NoDocumentException, CreationException, com.sun.star.uno.Exception {
         XTextContent content = WriterReferenceMarks.getAsTextContent(document, citation.originalName())
-                                      .orElseThrow(() -> new NoDocumentException("Zotero mark disappeared before applying its planned link"));
+                                                   .orElseThrow(() -> new NoDocumentException("Zotero mark disappeared before applying its planned link"));
         XTextRange anchor = Optional.ofNullable(content.getAnchor()).orElseThrow(() -> new NoDocumentException("Missing Zotero link anchor"));
         XTextCursor position = anchor.getText().createTextCursorByRange(anchor);
         OOTextWriter.removeEscapementFormatting(position);
@@ -489,8 +488,12 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
 
     static CitationType requireType(CitationType type) throws StrategyException {
         return switch (type) {
-            case AUTHORYEAR_PAR, AUTHORYEAR_INTEXT, INVISIBLE_CIT -> type;
-            default -> throw new StrategyException(Reason.UNSUPPORTED_TYPE, "Zotero mode does not support this citation type", Localization.lang("Cannot generate citation based on selected citation style."));
+            case AUTHORYEAR_PAR,
+                 AUTHORYEAR_INTEXT,
+                 INVISIBLE_CIT ->
+                    type;
+            default ->
+                    throw new StrategyException(Reason.UNSUPPORTED_TYPE, "Zotero mode does not support this citation type", Localization.lang("Cannot generate citation based on selected citation style."));
         };
     }
 

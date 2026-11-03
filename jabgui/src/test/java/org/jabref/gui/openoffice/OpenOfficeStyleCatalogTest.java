@@ -78,9 +78,12 @@ class OpenOfficeStyleCatalogTest {
     @EnumSource(DocumentStateStore.Family.class)
     void canonicalRestorationUsesExplicitStoredFamilyWithoutReadingZoteroPreferences(DocumentStateStore.Family family) throws WrappedTargetException {
         OOStyle expected = switch (family) {
-            case BST -> bstStyle;
-            case CSL -> cslStyle;
-            case JSTYLE -> jStyle;
+            case BST ->
+                    bstStyle;
+            case CSL ->
+                    cslStyle;
+            case JSTYLE ->
+                    jStyle;
         };
         String identity = family.name() + "\n" + expected.getPath();
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);

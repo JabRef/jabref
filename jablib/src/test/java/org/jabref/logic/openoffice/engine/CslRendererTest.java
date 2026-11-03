@@ -32,7 +32,7 @@ class CslRendererTest {
     @Test
     void assignsDocumentNumbersForAStyleRequestingCollapsedRanges() throws RenderException {
         RenderRequest request = request(List.of(group("first", CitationType.AUTHORYEAR_PAR, "a"), group("second", CitationType.AUTHORYEAR_PAR, "b"),
-                group("range", CitationType.AUTHORYEAR_PAR, "c", "d", "e")),
+                        group("range", CitationType.AUTHORYEAR_PAR, "c", "d", "e")),
                 List.of(entry("a", "A"), entry("b", "B"), entry("c", "C"), entry("d", "D"), entry("e", "E")));
 
         // citeproc-java 3.5.2 does not implement collapse; the cluster must still use the real document numbers.
@@ -42,7 +42,7 @@ class CslRendererTest {
     @Test
     void reusesNumbersInNonconsecutiveClusters() throws RenderException {
         RenderRequest request = request(List.of(group("all", CitationType.AUTHORYEAR_PAR, "a", "b", "c", "d", "e"),
-                group("gaps", CitationType.AUTHORYEAR_PAR, "a", "c", "e")),
+                        group("gaps", CitationType.AUTHORYEAR_PAR, "a", "c", "e")),
                 List.of(entry("a", "A"), entry("b", "B"), entry("c", "C"), entry("d", "D"), entry("e", "E")));
 
         assertEquals(List.of("[1, 2, 3, 4, 5]", "[1, 3, 5]"), markers(request, renderer(false, true).render(request)));

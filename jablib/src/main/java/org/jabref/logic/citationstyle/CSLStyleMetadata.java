@@ -55,7 +55,8 @@ public record CSLStyleMetadata(String styleId,
                 int event = reader.next();
                 if (event == XMLStreamConstants.START_ELEMENT) {
                     switch (reader.getLocalName()) {
-                        case "style" -> styleClass = Optional.ofNullable(reader.getAttributeValue("", "class")).orElse("");
+                        case "style" ->
+                                styleClass = Optional.ofNullable(reader.getAttributeValue("", "class")).orElse("");
                         case "bibliography" -> {
                             hasBibliography = true;
                             inBibliography = true;
@@ -66,8 +67,10 @@ public record CSLStyleMetadata(String styleId,
                                 hasBibliographySortOrder = true;
                             }
                         }
-                        case "citation" -> hasCitation = true;
-                        case "info" -> inInfo = true;
+                        case "citation" ->
+                                hasCitation = true;
+                        case "info" ->
+                                inInfo = true;
                         case "id" -> {
                             if (inInfo) {
                                 styleId = reader.getElementText();
@@ -83,8 +86,9 @@ public record CSLStyleMetadata(String styleId,
                                 shortTitle = reader.getElementText();
                             }
                         }
-                        case "category" -> isNumericStyle = Optional.ofNullable(reader.getAttributeValue("", "citation-format"))
-                                                                    .map("numeric"::equals).orElse(isNumericStyle);
+                        case "category" ->
+                                isNumericStyle = Optional.ofNullable(reader.getAttributeValue("", "citation-format"))
+                                                         .map("numeric"::equals).orElse(isNumericStyle);
                     }
                 } else if (event == XMLStreamConstants.END_ELEMENT) {
                     if ("info".equals(reader.getLocalName())) {

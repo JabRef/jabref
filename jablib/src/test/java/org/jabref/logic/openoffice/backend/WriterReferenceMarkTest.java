@@ -71,7 +71,7 @@ class WriterReferenceMarkTest {
 
     @ParameterizedTest
     @CsvSource({"PERSISTENT, '', false, false", "PERSISTENT, a, false, false", "PERSISTENT, ab, false, false",
-                "TEMPORARY, '', false, false", "TEMPORARY, a, false, true", "TEMPORARY, ab, true, true"})
+            "TEMPORARY, '', false, false", "TEMPORARY, a, false, true", "TEMPORARY, ab, true, true"})
     void cleanupUsesExplicitPolicyAndRetainsSafeMinimumLength(BoundaryPolicy policy, String rendered, boolean removeLeft, boolean removeRight) throws Exception {
         when(full.getString()).thenReturn(BOUNDARY + rendered + BOUNDARY);
         WriterReferenceMark mark = marks.find(document, NAME, policy).orElseThrow();

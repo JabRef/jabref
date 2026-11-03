@@ -51,7 +51,7 @@ public final class WriterReferenceMarks {
     /// Also used to check whether a document connection is still working.
     public static XNameAccess getNameAccess(XTextDocument doc) throws NoDocumentException {
         XReferenceMarksSupplier supplier = UnoCast.cast(XReferenceMarksSupplier.class, doc)
-                                                 .orElseThrow(() -> new NoDocumentException("Document does not supply reference marks"));
+                                                  .orElseThrow(() -> new NoDocumentException("Document does not supply reference marks"));
         try {
             return supplier.getReferenceMarks();
         } catch (DisposedException exception) {

@@ -39,7 +39,7 @@ public final class DocumentOrder {
     }
 
     public List<CitationGroup> inDocumentOrder(XTextDocument document, CitationGroups groups, MarkStore store,
-                                              Optional<FunctionalTextViewCursor> viewCursor)
+                                               Optional<FunctionalTextViewCursor> viewCursor)
             throws NoDocumentException, WrappedTargetException {
         return sort(document, inputs(document, groups, store, true), viewCursor);
     }
@@ -96,7 +96,7 @@ public final class DocumentOrder {
         Map<XText, List<RangeSortEntry<CitationGroup>>> partitions = new LinkedHashMap<>();
         for (CitationGroup group : groups.getCitationGroupsUnordered()) {
             XTextRange range = store.getMarkRange(group, document)
-                             .orElseThrow(() -> new NoDocumentException("Missing citation range during document ordering"));
+                                    .orElseThrow(() -> new NoDocumentException("Missing citation range during document ordering"));
             partitions.computeIfAbsent(range.getText(), _ -> new ArrayList<>()).add(new RangeSortEntry<>(range, 0, group));
         }
         List<RangeSortable<CitationGroup>> result = new ArrayList<>();

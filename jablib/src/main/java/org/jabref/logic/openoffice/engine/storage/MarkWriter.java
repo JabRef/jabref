@@ -39,7 +39,6 @@ public final class MarkWriter implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MarkWriter.class);
 
-
     private final XTextDocument document;
     private final XComponentContext context;
     private final Cache<String, OOText> lastWritten = Caffeine.newBuilder().maximumSize(2048).build();
@@ -90,7 +89,7 @@ public final class MarkWriter implements AutoCloseable {
             int changed = 0;
             for (CitationGroup group : groups) {
                 if (write(store, group, Optional.ofNullable(markers.get(group.groupId))
-                                                           .orElseThrow(() -> new CreationException("Missing rendered citation text")))) {
+                                                .orElseThrow(() -> new CreationException("Missing rendered citation text")))) {
                     changed++;
                 }
             }

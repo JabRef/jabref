@@ -107,7 +107,7 @@ final class CitationFormatConverter {
         ReadPlan source = read(selected);
         List<PlannedCitation> citations = source.citations();
         zotero.validateRanges(citations.stream().map(citation -> new RangeForOverlapCheck<>(citation.anchor(), citation.oldName(),
-                RangeForOverlapCheck.REFERENCE_MARK_KIND, citation.oldName())).toList(), Optional.of(cursor),
+                        RangeForOverlapCheck.REFERENCE_MARK_KIND, citation.oldName())).toList(), Optional.of(cursor),
                 rebuildBibliography ? Set.of(targetZotero ? ZoteroCitationStrategy.BIBLIOGRAPHY_PREFIX : BibliographySection.NAME) : Set.of());
         for (PlannedCitation citation : citations) {
             if (MarkCodec.isCanonicalMarkName(citation.oldName())) {
@@ -256,7 +256,7 @@ final class CitationFormatConverter {
     }
 
     private static Map<String, Optional<String>> propertyChanges(List<PlannedCitation> citations, Map<String, Optional<String>> styles,
-                                                                boolean targetZotero, CitationStyle style)
+                                                                 boolean targetZotero, CitationStyle style)
             throws MarkCodecException {
         Map<String, Optional<String>> changes = new LinkedHashMap<>();
         for (PlannedCitation citation : citations) {
@@ -284,7 +284,7 @@ final class CitationFormatConverter {
         Set<String> used = new HashSet<>();
         for (PlannedCitation citation : citations) {
             String nativeName = ZoteroReferenceMark.isZoteroReferenceMarkName(citation.newName()) ? citation.newName()
-                    : citation.metadata().map(ConversionMetadata::zoteroName).orElse("");
+                                                                                                  : citation.metadata().map(ConversionMetadata::zoteroName).orElse("");
             if (nativeName.isEmpty()) {
                 continue;
             }
@@ -424,7 +424,7 @@ final class CitationFormatConverter {
                     }
                 }
                 ReferenceMarkTextWriter.write(document, context, range, Optional.ofNullable(rendered.markers().get(citation.group().groupId))
-                        .orElseThrow(() -> new CreationException("Missing prepared conversion text")));
+                                                                                .orElseThrow(() -> new CreationException("Missing prepared conversion text")));
             }
             if (rebuildBibliography) {
                 if (targetZotero) {
