@@ -58,12 +58,8 @@ public class BackupResolverDialog extends FXDialog {
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
         Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
-        Node backupNameCell;
-        if (backupPathOpt.isPresent()) {
-            backupNameCell = backupLink(backupPathOpt.orElseThrow(), externalApplicationsPreferences);
-        } else {
-            backupNameCell = value("backupName", Localization.lang("File not found"));
-        }
+        Node backupNameCell = backupPathOpt.<Node>map(path -> backupLink(path, externalApplicationsPreferences))
+                                           .orElseGet(() -> value("backupName", Localization.lang("File not found")));
         GridPane table = new GridPane();
         table.setHgap(12);
         table.setVgap(6);
