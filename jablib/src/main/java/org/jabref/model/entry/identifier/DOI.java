@@ -125,6 +125,9 @@ public class DOI implements Identifier {
             trimmedDoi = URLDecoder.decode(trimmedDoi, StandardCharsets.UTF_8);
         }
 
+        // The DOI patterns accept "?" in the suffix, because it is a valid DOI character. Thus, tracking parameters would become part of the DOI.
+        trimmedDoi = URLUtil.removeTrackingParameters(trimmedDoi);
+
         // Extract DOI/Short DOI
         Matcher matcher = EXACT_DOI_PATT.matcher(trimmedDoi);
         if (matcher.find()) {

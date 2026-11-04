@@ -211,6 +211,20 @@ class DOITest {
                 // acceptDoiWithSpecialCharacters
                 Arguments.of("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2").asString()),
 
+                // ignoreTrackingParameters
+                // See https://github.com/JabRef/jabref/issues/17689
+                Arguments.of("https://doi.org/10.1371/journal.pone.0000308",
+                        DOI.parse("https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter").get().getURIAsASCIIString()),
+                Arguments.of("10.1371/journal.pone.0000308", new DOI("https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter").asString()),
+                Arguments.of("10.1371/journal.pone.0000308", new DOI("https://doi.org/10.1371/journal.pone.0000308%3Futm_source=newsletter").asString()),
+                Arguments.of("10.1371/journal.pone.0000308", DOI.parse("10.1371/journal.pone.0000308?utm_source=newsletter").get().asString()),
+                Arguments.of("10.1371/journal.pone.0000308", DOI.parse("10.1371/journal.pone.0000308?utm\\_source=newsletter").get().asString()),
+                Arguments.of("10.1371/journal.pone.0000308", DOI.findInText("see https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter for details").get().asString()),
+                Arguments.of("10/gf4gqc", new DOI("https://doi.org/10/gf4gqc?utm_source=newsletter").asString()),
+                Arguments.of("10/d8dn", new DOI("https://doi.org/d8dn?utm_source=newsletter").asString()),
+                // a question mark which is part of the DOI is kept
+                Arguments.of("10.1006/rwei.1999?.0001", DOI.parse("https://doi.org/10.1006/rwei.1999%3F.0001").get().asString()),
+
                 // findDoiInsideArbitraryText
                 Arguments.of("10.1006/jmbi.1998.2354",
                         DOI.findInText("other stuff 10.1006/jmbi.1998.2354 end").get().asString()),
