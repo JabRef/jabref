@@ -12,6 +12,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
@@ -121,9 +122,13 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
                     ConsistencySymbol.fromText(item)
                                      .ifPresentOrElse(
-                                             symbol -> setGraphic(symbol.getIcon().getGraphicNode()),
+                                             symbol -> {
+                                                 setGraphic(symbol.getIcon().getGraphicNode());
+                                                 setTooltip(new Tooltip(symbol.getDescription()));
+                                             },
                                              () -> {
                                                  setGraphic(null);
+                                                 setTooltip(null);
                                                  setText(item);
                                              }
                                      );
