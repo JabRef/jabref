@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -143,8 +142,13 @@ public class ExportService {
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibDatabase database = bibDatabaseContext.getDatabase();
+            boolean fullExport = entries.size() == database.getEntryCount();
             SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                     .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
+            if (!fullExport) {
+                saveConfiguration.withSaveType(BibDatabaseWriter.SaveType.PLAIN_BIBTEX);
+            }
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
@@ -154,8 +158,7 @@ public class ExportService {
                 @Override
                 protected void writeDatabaseID(String sharedDatabaseID) throws IOException {
                     // Partial exports must not reconnect to the source shared library.
-                    BibDatabase database = bibDatabaseContext.getDatabase();
-                    if (entries.size() == database.getEntryCount() && Set.copyOf(entries).containsAll(database.getEntries())) {
+                    if (fullExport) {
                         super.writeDatabaseID(sharedDatabaseID);
                     }
                 }

@@ -40,21 +40,29 @@ class ExportServiceTest extends AbstractJabKitTest {
         BibEntry excluded = ImportService.importBibTexFile(getClassResourceAsPath("origin.bib"), preferences, true)
                                          .getDatabase().getEntries().getFirst();
         database.insertEntry(excluded);
+        String librarySpecificFileDirectory = "/source-library-files";
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        databaseContext.getMetaData().setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         Optional<String> sharedDatabaseId = shared ? Optional.of("source-library") : Optional.empty();
         sharedDatabaseId.ifPresent(database::setSharedDatabaseID);
         List<BibEntry> entries = database.getEntries().subList(0, selectedEntryCount);
         Path output = tempDir.resolve("selected.bib");
 
         new ExportService(preferences, true).exportBibDatabaseContextToFile(
-                new BibDatabaseContext(database), entries, output, "bibtex");
+                databaseContext, entries, output, "bibtex");
 
-        BibDatabase actual = ImportService.importBibTexFile(output, preferences, true).getDatabase();
+        BibDatabaseContext actualContext = ImportService.importBibTexFile(output, preferences, true).getDatabaseContext();
+        BibDatabase actual = actualContext.getDatabase();
         assertEquals(entries, actual.getEntries());
         assertEquals(database.getPreamble(), actual.getPreamble());
         assertEquals("Journal of Reproducible Tests", actual.getStringByName("journalname").orElseThrow().getContent());
         assertEquals(List.of(selected, excluded), database.getEntries());
         Optional<String> expectedSharedDatabaseId = selectedEntryCount == database.getEntryCount() ? sharedDatabaseId : Optional.empty();
         assertEquals(expectedSharedDatabaseId, actual.getSharedDatabaseID());
+        Optional<String> expectedFileDirectory = selectedEntryCount == database.getEntryCount()
+                ? Optional.of(librarySpecificFileDirectory)
+                : Optional.empty();
+        assertEquals(expectedFileDirectory, actualContext.getMetaData().getLibrarySpecificFileDirectory());
         assertEquals(sharedDatabaseId, database.getSharedDatabaseID());
     }
 
