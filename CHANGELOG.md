@@ -52,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
 - We fixed an issue where unmarked entries looked marked as relevant when hovering over them in the entry table. [#16881](https://github.com/JabRef/jabref/issues/16881)
 - We fixed an issue where long entry previews were cut off without a vertical scrollbar. [#17359](https://github.com/JabRef/jabref/issues/17359)
+- We fixed citation key generation to ignore "as" as a function word. [#17523](https://github.com/JabRef/jabref/issues/17523)
 
 ### Removed
 
@@ -2388,3 +2389,6 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 <!-- markdownlint-disable-file MD024 MD033 MD053 -->
+
+
+[def]: https://github.com/JabRef/jabref/issues/17523
