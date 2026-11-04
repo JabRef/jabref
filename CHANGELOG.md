@@ -117,6 +117,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Removed
 
 - We removed the "Waiting for AI reply..." notification; the AI chat already shows a progress indicator. [#17145](https://github.com/JabRef/jabref/pull/17145)
+- We temporarily removed the language handling for Docling due to a bug in RapidOCR. [#17674](https://github.com/JabRef/jabref/pull/17674)
 
 ## [6.0-beta.1] - 2026-09-21
 
