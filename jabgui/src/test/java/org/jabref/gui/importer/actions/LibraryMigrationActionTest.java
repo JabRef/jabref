@@ -1,9 +1,13 @@
 package org.jabref.gui.importer.actions;
 
+import java.lang.ref.Reference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
@@ -20,6 +24,7 @@ import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
@@ -113,6 +118,39 @@ class LibraryMigrationActionTest {
         assertEquals(Optional.empty(), prioritized.getField(StandardField.KEYWORDS));
         assertEquals(List.of("markings"), parserResult.getMetaData().getSkippedMigrations());
         assertTrue(parserResult.getChangedOnMigration());
+    }
+
+    @Test
+    void migrateBatchesChangesAndRestoresEntryObservation() {
+        BibEntry entry = new BibEntry().withCitationKey("Entry")
+                                       .withField(InternalField.MARKED_INTERNAL, "[Owner:6]")
+                                       .withField(StandardField.KEYWORDS, "topic, prio1");
+        ParserResult parserResult = parserResultNeedingAllMigrations(entry);
+        ObservableList<BibEntry> observedEntries = parserResult.getDatabase().getEntries();
+        List<Integer> updateSizes = new ArrayList<>();
+        observedEntries.addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasUpdated()) {
+                    updateSizes.add(change.getTo() - change.getFrom());
+                }
+            }
+        });
+        answerDialog(true, 2, -1);
+
+        new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
+
+        // The entries were detached while migrating, so no per-field update reached the list
+        assertEquals(List.of(), updateSizes);
+        assertEquals(List.of(entry), parserResult.getDatabase().getEntries());
+        assertEquals(Optional.of("Owner:6"), entry.getField(StandardField.GROUPS));
+        assertEquals(Optional.of("prio1"), entry.getField(SpecialField.PRIORITY));
+        assertTrue(parserResult.getChangedOnMigration());
+
+        entry.setField(StandardField.TITLE, "Changed after migration");
+
+        // The database only weakly retains this list view, so keep it alive through the observed mutation.
+        Reference.reachabilityFence(observedEntries);
+        assertEquals(List.of(1), updateSizes);
     }
 
     @Test
