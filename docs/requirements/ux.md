@@ -128,7 +128,7 @@ Needs: impl, utest
 ## Consistency dialog can restrict field columns to a BibTeX style
 `req~ux.consistency.bst-field-columns~1`
 
-The user chooses a `.bst` file; only the fields its `ENTRY` command declares stay visible, since the style ignores all other fields. Entry type and citation key stay visible.
+The user chooses a `.bst` file and can switch between all columns and only the fields its `ENTRY` command declares, since the style ignores all other fields. Switching back and forth keeps the chosen style. Entry type and citation key stay visible.
 
 Needs: impl, utest
 

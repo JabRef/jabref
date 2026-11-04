@@ -6,9 +6,9 @@ import java.util.List;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -34,8 +34,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
+    @FXML private RadioButton restrictToBstFieldsRadio;
     @FXML private Label bstStyleLabel;
-    @FXML private Button showAllFieldsButton;
 
     @Inject private StateManager stateManager;
     @Inject private EntryEditor entryEditor;
@@ -81,9 +81,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         tableView.setItems(filteredData);
 
-        bstStyleLabel.textProperty().bind(viewModel.bstStyleNameProperty().map(name -> Localization.lang("Currently selected BST style: '%0'", name)));
-        bstStyleLabel.visibleProperty().bind(viewModel.bstStyleNameProperty().isNotEmpty());
-        showAllFieldsButton.disableProperty().bind(viewModel.bstStyleNameProperty().isEmpty());
+        restrictToBstFieldsRadio.selectedProperty().bindBidirectional(viewModel.restrictToBstFieldsProperty());
+        restrictToBstFieldsRadio.disableProperty().bind(viewModel.bstStyleNameProperty().isEmpty());
+        bstStyleLabel.textProperty().bind(viewModel.bstStyleNameProperty());
 
         List<Field> reportedFields = viewModel.getReportedFields();
         int columnIndex = 0;
@@ -162,13 +162,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     }
 
     @FXML
-    private void restrictToBstFields() {
-        viewModel.restrictToBstFields();
-    }
-
-    @FXML
-    private void showAllFields() {
-        viewModel.showAllFields();
+    private void browseBstFile() {
+        viewModel.browseBstFile();
     }
 
     @FXML

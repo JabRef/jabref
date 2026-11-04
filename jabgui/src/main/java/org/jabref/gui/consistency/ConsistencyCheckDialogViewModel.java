@@ -17,10 +17,11 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -69,8 +70,16 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final List<Field> allReportedFields;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final StringProperty selectedEntryType = new SimpleStringProperty();
-    private final ObjectProperty<Predicate<Field>> shownFields = new SimpleObjectProperty<>(_ -> true);
+    private final BooleanProperty restrictToBstFields = new SimpleBooleanProperty(false);
     private final StringProperty bstStyleName = new SimpleStringProperty("");
+    private Set<String> bstEntryFields = Set.of();
+    private final ObjectBinding<Predicate<Field>> shownFields = Bindings.createObjectBinding(() -> {
+        if (!restrictToBstFields.get()) {
+            return _ -> true;
+        }
+        Set<String> entryFields = bstEntryFields;
+        return field -> isReadByStyle(entryFields, field);
+    }, restrictToBstFields, bstStyleName);
 
     public ConsistencyCheckDialogViewModel(DialogService dialogService,
                                            GuiPreferences preferences,
@@ -125,32 +134,37 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return allReportedFields;
     }
 
-    /// Which field columns are shown; all unless restricted by [#restrictToBstFields()]
-    public ReadOnlyObjectProperty<Predicate<Field>> shownFieldsProperty() {
+    /// Which field columns are shown: all, or only the fields of the chosen `.bst` style
+    public ObjectBinding<Predicate<Field>> shownFieldsProperty() {
         return shownFields;
     }
 
-    /// File name of the `.bst` style the columns are restricted to; empty if all columns are shown
+    public BooleanProperty restrictToBstFieldsProperty() {
+        return restrictToBstFields;
+    }
+
+    /// File name of the chosen `.bst` style; empty if none was chosen yet
     public ReadOnlyStringProperty bstStyleNameProperty() {
         return bstStyleName;
     }
 
     // [impl->req~ux.consistency.bst-field-columns~1]
-    public void restrictToBstFields() {
+    public void browseBstFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .addExtensionFilter(StandardFileType.BST)
                 .withDefaultExtension(StandardFileType.BST)
                 .build();
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::restrictToBstFields);
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::loadBstFile);
     }
 
+    /// Reads the fields of the given style and restricts the columns to them
     @VisibleForTesting
-    void restrictToBstFields(Path bstFile) {
+    void loadBstFile(Path bstFile) {
         try {
-            Set<String> entryFields = new BstVM(bstFile).getEntryFields();
-            shownFields.set(field -> isReadByStyle(entryFields, field));
+            bstEntryFields = new BstVM(bstFile).getEntryFields();
             bstStyleName.set(bstFile.getFileName().toString());
+            restrictToBstFields.set(true);
         } catch (IOException | ParseCancellationException e) {
             LOGGER.error("Could not read .bst file {}", bstFile, e);
             dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), e);
@@ -163,11 +177,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
                                           ? Stream.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY)
                                           : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
         return fieldsSeenByStyle.map(seen -> seen.getName().toLowerCase(Locale.ROOT)).anyMatch(entryFields::contains);
-    }
-
-    public void showAllFields() {
-        shownFields.set(_ -> true);
-        bstStyleName.set("");
     }
 
     public List<String> getColumnNames() {

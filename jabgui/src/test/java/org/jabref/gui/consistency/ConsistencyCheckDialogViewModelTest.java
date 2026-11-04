@@ -58,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -90,20 +91,22 @@ class ConsistencyCheckDialogViewModelTest {
 
     @Test
         // [utest->req~ux.consistency.bst-field-columns~1]
-    void bstStyleRestrictsShownFields(@TempDir Path tempDir) throws Exception {
+    void bstStyleRestrictsShownFieldsUntilSwitchedOff(@TempDir Path tempDir) throws Exception {
         Path bstFile = tempDir.resolve("minimal.bst");
         Files.writeString(bstFile, "ENTRY { author title } {} {}");
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
 
-        viewModel.restrictToBstFields(bstFile);
+        viewModel.loadBstFile(bstFile);
 
         assertEquals("minimal.bst", viewModel.bstStyleNameProperty().get());
-        assertEquals(List.of(StandardField.TITLE), viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).toList());
+        assertTrue(viewModel.restrictToBstFieldsProperty().get());
+        assertEquals(List.of(StandardField.TITLE), shownFields(viewModel));
 
-        viewModel.showAllFields();
+        viewModel.restrictToBstFieldsProperty().set(false);
+        assertEquals(viewModel.getReportedFields(), shownFields(viewModel));
 
-        assertEquals("", viewModel.bstStyleNameProperty().get());
-        assertEquals(viewModel.getReportedFields(), viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).toList());
+        viewModel.restrictToBstFieldsProperty().set(true);
+        assertEquals(List.of(StandardField.TITLE), shownFields(viewModel));
     }
 
     @Test
@@ -118,9 +121,13 @@ class ConsistencyCheckDialogViewModelTest {
                 .withField(StandardField.AUTHOR, "Author Two");
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(first, second));
 
-        viewModel.restrictToBstFields(bstFile);
+        viewModel.loadBstFile(bstFile);
 
-        assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE), viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).toList());
+        assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE), shownFields(viewModel));
+    }
+
+    private static List<StandardField> shownFields(ConsistencyCheckDialogViewModel viewModel) {
+        return viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).map(StandardField.class::cast).toList();
     }
 
     @ParameterizedTest
