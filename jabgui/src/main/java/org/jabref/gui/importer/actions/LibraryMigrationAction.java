@@ -63,8 +63,8 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
         // The conversions the user can decide on come first
         List<PostOpenMigration> migrations = getOfferedMigrations(parserResult, dialogService, preferences).stream()
-                                                                                            .sorted(Comparator.comparing(migration -> !migration.isOptional()))
-                                                                                            .toList();
+                                                                                                           .sorted(Comparator.comparing(migration -> !migration.isOptional()))
+                                                                                                           .toList();
         for (PostOpenMigration migration : migrations) {
             Label description = wrappingLabel(migration.getDescription());
             Node perform;
@@ -126,8 +126,8 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
 
     static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         return getOfferedMigrations(parserResult, dialogService, preferences).stream()
-                                                              .filter(migration -> migration.isMigrationNecessary(parserResult))
-                                                              .toList();
+                                                                             .filter(migration -> migration.isMigrationNecessary(parserResult))
+                                                                             .toList();
     }
 
     /// All migrations except the ones the user declined for this library

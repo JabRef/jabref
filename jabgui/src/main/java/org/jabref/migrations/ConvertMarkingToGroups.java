@@ -56,7 +56,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             // Group names are unique per library, so existing groups (e.g., from a partial earlier run) are extended wherever they are in the tree
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
                 GroupTreeNode markingGroup = root.findGroupByName(marking.getKey())
-                        .orElseGet(() -> markingRoot(root).addSubgroup(new ExplicitGroup(marking.getKey(), GroupHierarchyType.INCLUDING, keywordSeparator)));
+                                                 .orElseGet(() -> markingRoot(root).addSubgroup(new ExplicitGroup(marking.getKey(), GroupHierarchyType.INCLUDING, keywordSeparator)));
                 markingGroup.addEntriesToGroup(marking.getValue());
             }
             parserResult.getMetaData().setGroups(root);
