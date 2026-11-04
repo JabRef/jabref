@@ -71,6 +71,12 @@ class SearchQueryLuceneConversionTest {
         assertEquals(expected, SearchQueryConversion.searchToLucene(new SearchQuery(searchExpression)));
     }
 
+    @Test
+    void doiLinkWithEncodedBackslashProducesEscapedLucenePhrase() {
+        SearchQuery query = new SearchQuery("https://doi.org/10.1000/foo%5C");
+        assertEquals("(10.1000\\/foo\\\\ OR \"10.1000/foo%5C\")", SearchQueryConversion.searchToLucene(query));
+    }
+
     /// The case-sensitivity toggle of the search bar applies to unfielded terms.
     @Test
     void caseSensitiveSearchBarFlagAppliesToUnfieldedTerm() {
