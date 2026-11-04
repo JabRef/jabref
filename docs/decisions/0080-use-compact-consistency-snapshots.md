@@ -7,13 +7,6 @@ parent: Decision Records
 
 Needs: impl
 
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](../../AGENTS.md)
-> • [CONTRIBUTING.md](../../CONTRIBUTING.md)
-
 ## Context and Problem Statement
 
 Consistency checks must preserve results after library edits and allow recomputing reports for entries cited in an AUX file. Copying every `BibEntry` also allocates event buses, observable properties, maps, and caches. Keeping complete cell matrices for both the full library and its cited subset increases retained memory further in large libraries.
