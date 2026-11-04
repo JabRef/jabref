@@ -277,7 +277,7 @@ public class DublinCoreExtractor {
     private void fillCreator(String creators) {
         AuthorList list = AuthorList.parse(creators);
         for (Author author : list.getAuthors()) {
-            dcSchema.addCreator(XmpUtilShared.toPlainTex(author.getGivenFamily(false)));
+            dcSchema.addCreator(XmpUtilShared.toPlainText(author.getGivenFamily(false)));
         }
     }
 
