@@ -43,6 +43,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.groups.AddToGroupAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingDispatcher;
@@ -410,6 +411,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
         LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor);
+        AddToGroupAction addToGroupAction = new AddToGroupAction(dialogService, stateManager);
 
         KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(keyBindings)
                 .on(KeyBinding.SELECT_FIRST_ENTRY, this::clearAndSelectFirst)
@@ -423,7 +425,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .on(KeyBinding.OPEN_URL_OR_DOI, openUrlAction::execute)
                 .on(KeyBinding.OPEN_FILE, openSelectedEntriesFilesActionFileAction::execute)
                 .on(KeyBinding.MERGE_WITH_FETCHED_ENTRY, mergeWithFetchedEntryAction::execute)
-                .on(KeyBinding.LOOKUP_DOC_IDENTIFIER, lookupIdentifierAction::execute);
+                .on(KeyBinding.LOOKUP_DOC_IDENTIFIER, lookupIdentifierAction::execute)
+                .on(KeyBinding.ASSIGN_ENTRIES_TO_GROUP, addToGroupAction::execute);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
