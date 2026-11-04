@@ -113,6 +113,12 @@ public class BibliographyConsistencyCheck {
     ///
     /// @implNote This class does not implement [org.jabref.logic.integrity.DatabaseChecker], because it returns a list of [org.jabref.logic.integrity.IntegrityMessage], which are too fine-grained.
     public Result check(BibDatabaseContext bibContext, BibEntryTypesManager bibEntryTypesManager, BiConsumer<Integer, Integer> entriesGroupingProgress) {
+        return checkEntries(bibContext.getEntries(), bibContext.getMode(), bibEntryTypesManager, entriesGroupingProgress);
+    }
+
+    /// Checks a selected set of entries without registering database listeners on them.
+    public Result checkEntries(List<BibEntry> sourceEntries, BibDatabaseMode mode, BibEntryTypesManager bibEntryTypesManager,
+                               BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
         // collects fields existing in all entries, scoped by entry type
@@ -120,9 +126,9 @@ public class BibliographyConsistencyCheck {
         // collects entries of the same type
         Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new HashMap<>();
 
-        collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
+        collectEntriesIntoMaps(sourceEntries, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
-        List<BibEntryType> entryTypeDefinitions = bibEntryTypesManager.getAllTypes(bibContext.getMode()).stream().toList();
+        List<BibEntryType> entryTypeDefinitions = bibEntryTypesManager.getAllTypes(mode).stream().toList();
 
         // Use LinkedHashMap to preserve the order of Bib(tex|latex)EntryTypeDefinitions.ALL
         Map<EntryType, EntryTypeResult> resultMap = new LinkedHashMap<>();
@@ -158,10 +164,7 @@ public class BibliographyConsistencyCheck {
         return new Result(resultMap);
     }
 
-    private static void collectEntriesIntoMaps(BibDatabaseContext bibContext, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
-        BibDatabaseMode mode = bibContext.getMode();
-        List<BibEntry> entries = bibContext.getEntries();
-
+    private static void collectEntriesIntoMaps(List<BibEntry> entries, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
         for (BibEntry entry : entries) {
             EntryType entryType = entry.getType();
 

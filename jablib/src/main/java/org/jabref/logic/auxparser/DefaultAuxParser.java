@@ -1,7 +1,6 @@
 package org.jabref.logic.auxparser;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,7 +44,25 @@ public class DefaultAuxParser implements AuxParser {
     @Override
     public AuxParserResult parse(Path auxFile) {
         AuxParserResult result = new AuxParserResult(masterDatabase);
+        try {
+            readFiles(auxFile, result, false);
+        } catch (IOException e) {
+            LOGGER.warn("Problem opening file", e);
+        }
+        resolveTags(result);
+        return result;
+    }
 
+    /// Parses the complete AUX input, failing if the selected file or any included file cannot be read.
+    public AuxParserResult parseStrict(Path auxFile) throws IOException {
+        AuxParserResult result = new AuxParserResult(masterDatabase);
+        readFiles(auxFile, result, true);
+        resolveTags(result);
+        return result;
+    }
+
+    private void readFiles(Path auxFile, AuxParserResult result, boolean failOnReadError) throws IOException {
+        auxFile = auxFile.toAbsolutePath().normalize();
         // nested AUX files
         List<Path> fileList = new ArrayList<>(1);
         fileList.add(auxFile);
@@ -62,17 +79,15 @@ public class DefaultAuxParser implements AuxParser {
                     matchCitation(result, line);
                     matchNestedAux(auxFile, result, fileList, line);
                 }
-            } catch (FileNotFoundException e) {
-                LOGGER.warn("Cannot locate input file", e);
             } catch (IOException e) {
+                if (failOnReadError) {
+                    throw e;
+                }
                 LOGGER.warn("Problem opening file", e);
             }
 
             fileIndex++;
         }
-        resolveTags(result);
-
-        return result;
     }
 
     private void matchNestedAux(Path baseAuxFile, AuxParserResult result, List<Path> fileList, String line) {
@@ -89,6 +104,7 @@ public class DefaultAuxParser implements AuxParser {
                 inputFile = Path.of(inputString);
             }
 
+            inputFile = inputFile.toAbsolutePath().normalize();
             if (!fileList.contains(inputFile)) {
                 fileList.add(inputFile);
                 result.increaseNestedAuxFilesCounter();

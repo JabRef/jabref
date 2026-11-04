@@ -241,6 +241,132 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals("", viewModel.bstStyleNameProperty().get());
     }
 
+    @Test
+        // [utest->req~ux.consistency.aux-entry-selection~1]
+    void auxSelectionRecomputesColumnsAndRetainsOriginalEntries(@TempDir Path tempDir) throws Exception {
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.NOTE, "Note");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second").withField(StandardField.AUTHOR, "Author Two");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(first, second));
+        List<String> fullColumns = viewModel.getColumnNames();
+        Path aux = Files.writeString(tempDir.resolve("selected.aux"), "\\citation{first}");
+        Path bst = Files.writeString(tempDir.resolve("style.bst"), "ENTRY { title } {} {}");
+        loadBstFile(viewModel, bst);
+        first.setField(StandardField.TITLE, "Changed after the check");
+
+        BackgroundTask<?> task = scheduleAux(viewModel, aux);
+        assertEquals(List.of(first, second), viewModel.getTableData().stream().map(ConsistencyMessage::bibEntry).toList());
+        completeTask(task);
+
+        assertEquals("selected.aux", viewModel.auxFileNameProperty().get());
+        assertEquals(List.of("Entry Type", "CitationKey", "Journal", "Title", "Year"), viewModel.getColumnNames());
+        assertEquals(List.of(first), viewModel.getTableData().stream().map(ConsistencyMessage::bibEntry).toList());
+        assertEquals(List.of("Article", "first", "-", "-", "-"), viewModel.getTableData().getFirst().message());
+        assertEquals(List.of(StandardField.TITLE), shownFields(viewModel));
+
+        viewModel.showAllEntries();
+
+        assertEquals("", viewModel.auxFileNameProperty().get());
+        assertEquals(fullColumns, viewModel.getColumnNames());
+        assertEquals(List.of(first, second), viewModel.getTableData().stream().map(ConsistencyMessage::bibEntry).toList());
+        assertEquals(List.of(StandardField.TITLE), shownFields(viewModel));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "\\citation{unknown}"})
+    void auxWithoutMatchingCitationsShowsEmptyReport(String contents, @TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Path aux = Files.writeString(tempDir.resolve("empty.aux"), contents);
+
+        completeTask(scheduleAux(viewModel, aux));
+
+        assertEquals(List.of(), viewModel.getTableData());
+        assertEquals(List.of(), viewModel.getEntryTypes());
+        assertEquals(List.of("Entry Type", "CitationKey"), viewModel.getColumnNames());
+    }
+
+    @Test
+    void auxNestedCitationsAndWildcardSelectEntries(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Files.writeString(tempDir.resolve("nested.aux"), "\\citation{second}");
+        Path aux = Files.writeString(tempDir.resolve("main.aux"), "\\@input{nested.aux}");
+
+        completeTask(scheduleAux(viewModel, aux));
+
+        assertEquals(List.of("second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
+        Files.writeString(aux, "\\citation{*}");
+
+        completeTask(scheduleAux(viewModel, aux));
+
+        assertEquals(List.of("first", "second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
+    }
+
+    @Test
+    void staleAuxResultsAndFailuresDoNotReplaceLatestSelection(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Path first = Files.writeString(tempDir.resolve("first.aux"), "\\citation{first}");
+        Path second = Files.writeString(tempDir.resolve("second.aux"), "\\citation{second}");
+        BackgroundTask<?> older = scheduleAux(viewModel, first);
+        BackgroundTask<?> newer = scheduleAux(viewModel, second);
+
+        completeTask(newer);
+        completeTask(older);
+        older.getOnException().accept(new IOException("Superseded"));
+
+        assertEquals("second.aux", viewModel.auxFileNameProperty().get());
+        assertEquals(List.of("second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
+        BackgroundTask<?> pending = scheduleAux(viewModel, first);
+        viewModel.showAllEntries();
+        completeTask(pending);
+        assertEquals("", viewModel.auxFileNameProperty().get());
+        assertEquals(List.of("first", "second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
+    }
+
+    @Test
+    void failedAuxReadPreservesCurrentReport(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Path aux = Files.writeString(tempDir.resolve("selected.aux"), "\\citation{second}");
+        completeTask(scheduleAux(viewModel, aux));
+        BackgroundTask<?> task = scheduleAux(viewModel, tempDir.resolve("missing.aux"));
+        IOException exception = assertThrows(IOException.class, task::call);
+
+        task.getOnException().accept(exception);
+
+        verify(dialogService).showErrorDialogAndWait(Localization.lang("Could not read the .aux file."), exception);
+        assertEquals("selected.aux", viewModel.auxFileNameProperty().get());
+        assertEquals(List.of("second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = StandardFileType.class, names = {"CSV", "TXT"})
+    void auxExportsCaptureSelectedReportBeforeReset(StandardFileType fileType, @TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Path aux = Files.writeString(tempDir.resolve("selected.aux"), "\\citation{second}");
+        completeTask(scheduleAux(viewModel, aux));
+        clearInvocations(taskExecutor);
+        Path output = tempDir.resolve("report");
+        BackgroundTask<?> export = scheduleExport(viewModel, fileType, output);
+        viewModel.showAllEntries();
+
+        export.call();
+
+        assertFalse(Files.readString(output).contains("first"));
+        assertTrue(Files.readString(output).contains("second"));
+    }
+
+    private BackgroundTask<?> scheduleAux(ConsistencyCheckDialogViewModel viewModel, Path aux) {
+        clearInvocations(taskExecutor);
+        viewModel.loadAuxFile(aux);
+        ArgumentCaptor<BackgroundTask<?>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+        return captor.getValue();
+    }
+
+    private static <T> void completeTask(BackgroundTask<T> task) throws Exception {
+        task.getOnSuccess().accept(task.call());
+    }
+
     private static List<StandardField> shownFields(ConsistencyCheckDialogViewModel viewModel) {
         return viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).map(StandardField.class::cast).toList();
     }
@@ -430,6 +556,6 @@ class ConsistencyCheckDialogViewModelTest {
         bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
-        return new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor);
+        return new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor, entries);
     }
 }

@@ -37,6 +37,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     @FXML private ComboBox<String> entryTypeCombo;
     @FXML private RadioButton restrictToBstFieldsRadio;
     @FXML private Label bstStyleLabel;
+    @FXML private Label auxFileLabel;
 
     @Inject private StateManager stateManager;
     @Inject private EntryEditor entryEditor;
@@ -86,6 +87,19 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         restrictToBstFieldsRadio.disableProperty().bind(viewModel.bstStyleNameProperty().isEmpty());
         bstStyleLabel.textProperty().bind(viewModel.bstStyleNameProperty());
 
+        auxFileLabel.textProperty().bind(viewModel.auxFileNameProperty());
+        tableView.setPlaceholder(new Label(Localization.lang("No problems found.")));
+        rebuildColumns();
+        viewModel.reportRevisionProperty().addListener(_ -> rebuildColumns());
+
+        // A hidden column must not keep sorting the rows
+        EasyBind.listen(viewModel.shownFieldsProperty(), _ -> tableView.getSortOrder().removeIf(column -> !column.isVisible()));
+    }
+
+    private void rebuildColumns() {
+        tableView.getSortOrder().clear();
+        tableView.getColumns().forEach(column -> column.visibleProperty().unbind());
+        tableView.getColumns().clear();
         List<Field> reportedFields = viewModel.getReportedFields();
         int columnIndex = 0;
         // [impl->req~ux.consistency.missing-field-columns~1]
@@ -160,9 +174,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         Arrays.stream(SpecialField.values())
               .map(FieldTextMapper::getDisplayName)
               .forEach(this::removeColumnByTitle);
-
-        // A hidden column must not keep sorting the rows
-        EasyBind.listen(viewModel.shownFieldsProperty(), _ -> tableView.getSortOrder().removeIf(column -> !column.isVisible()));
     }
 
     public void removeColumnByTitle(String columnName) {
@@ -172,6 +183,16 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     @FXML
     private void browseBstFile() {
         viewModel.browseBstFile();
+    }
+
+    @FXML
+    private void browseAuxFile() {
+        viewModel.browseAuxFile();
+    }
+
+    @FXML
+    private void showAllEntries() {
+        viewModel.showAllEntries();
     }
 
     @FXML

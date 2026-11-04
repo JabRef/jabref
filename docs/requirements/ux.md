@@ -132,6 +132,17 @@ The user chooses a `.bst` file and can switch between all columns and only the f
 
 Needs: impl, utest
 
+## Consistency check must compare only entries selected by an AUX file
+`req~ux.consistency.aux-entry-selection~1`
+
+The user chooses a LaTeX `.aux` file to select cited entries, including citations from nested AUX files. A wildcard citation selects all library entries. The check recomputes differences within the selected entries, preserves the chosen field restriction, and allows restoring all entries. Unknown citation keys do not select entries; a valid selection without matching entries produces an empty report. Uncited cross-reference parents do not participate in the comparison.
+
+Reading and checking run in the background. A read failure preserves the previous report; an older request cannot replace a newer selection. Exports use the selected-entry report, while entry navigation targets the original library entries.
+
+Context: [AUX selection for consistency checks](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403).
+
+Needs: impl, utest
+
 ## Group creation must allow populating new explicit group from selection
 `req~ux.groups.create-explicit-from-selection~1`
 

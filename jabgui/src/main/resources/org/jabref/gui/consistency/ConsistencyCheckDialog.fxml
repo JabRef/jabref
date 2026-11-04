@@ -34,6 +34,11 @@
                 <Button onAction="#browseBstFile" text="%Browse .bst file..."/>
                 <Label fx:id="bstStyleLabel" styleClass="text-muted"/>
             </HBox>
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Button onAction="#browseAuxFile" text="%Browse .aux file..."/>
+                <Button onAction="#showAllEntries" text="%Show all entries"/>
+                <Label fx:id="auxFileLabel" styleClass="text-muted"/>
+            </HBox>
             <HBox spacing="4.0" alignment="CENTER">
                 <Button onAction="#exportAsCsv" text="%Export as csv file" />
                 <Button onAction="#exportAsTxt" text="%Export as txt file" />
