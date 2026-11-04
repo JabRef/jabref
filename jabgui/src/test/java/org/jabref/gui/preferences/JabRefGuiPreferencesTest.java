@@ -83,7 +83,7 @@ class JabRefGuiPreferencesTest {
     }
 
     @Test
-                      void migrateLegacyWindowsConsoleCommandKeepsExecutableWithSpaces() {
+    void migrateLegacyWindowsConsoleCommandKeepsExecutableWithSpaces() {
         List<String> expected = List.of("C:\\Program Files\\ConEmu\\ConEmu64.exe", "/single", "/dir", "%DIR");
 
         assertEquals(expected, JabRefGuiPreferences.migrateLegacyCommand(
@@ -121,7 +121,7 @@ class JabRefGuiPreferencesTest {
                 preferences, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, List.of()));
         verify(preferences).putStringList(CONSOLE_COMMAND_ARGUMENTS, command);
     }
-                  
+
     @Test
     void storeCustomizedPreviewStylePersistsData() {
         List<CustomizedPreviewStyle> styles = List.of(
