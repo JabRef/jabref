@@ -352,13 +352,8 @@ class DOITest {
 
     @Test
     void getExternalURIWithQueryParameter() {
-        String base = "10.1371/journal.pone.0000308";
-        String params = "?utm_source=newsletter";
-
-        DOI doi = new DOI(base + params);
-        assertEquals(
-                Optional.of(URI.create("https://doi.org/" + base + params)),
-                doi.getExternalURI()
-        );
+        String doiString = "10.1371/journal.pone.0000308?utm_source=newsletter";
+        DOI doi = new DOI(doiString);
+        assertEquals(Optional.of(URI.create("https://doi.org/" + doiString)), doi.getExternalURI());
     }
 }
