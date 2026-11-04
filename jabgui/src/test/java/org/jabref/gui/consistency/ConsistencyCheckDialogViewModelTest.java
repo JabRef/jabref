@@ -106,6 +106,23 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals(viewModel.getReportedFields(), viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).toList());
     }
 
+    @Test
+        // [utest->req~ux.consistency.bst-field-columns~1]
+    void bstStyleKeepsAliasedFields(@TempDir Path tempDir) throws Exception {
+        Path bstFile = tempDir.resolve("minimal.bst");
+        Files.writeString(bstFile, "ENTRY { author journal } {} {}");
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.JOURNALTITLE, "Journal One");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author Two");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(first, second));
+
+        viewModel.restrictToBstFields(bstFile);
+
+        assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE), viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).toList());
+    }
+
     @ParameterizedTest
     @EnumSource(value = StandardFileType.class, names = {"CSV", "TXT"})
         // [utest->req~ux.consistency.export-background~1]

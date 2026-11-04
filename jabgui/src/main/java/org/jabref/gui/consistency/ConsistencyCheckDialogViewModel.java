@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -42,8 +43,10 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -146,12 +149,20 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     void restrictToBstFields(Path bstFile) {
         try {
             Set<String> entryFields = new BstVM(bstFile).getEntryFields();
-            shownFields.set(field -> entryFields.contains(field.getName().toLowerCase(Locale.ROOT)));
+            shownFields.set(field -> isReadByStyle(entryFields, field));
             bstStyleName.set(bstFile.getFileName().toString());
         } catch (IOException | ParseCancellationException e) {
             LOGGER.error("Could not read .bst file {}", bstFile, e);
             dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), e);
         }
+    }
+
+    /// A style reads a field also through its alias or date parts, mirroring [BibEntry#getFieldOrAlias]
+    private static boolean isReadByStyle(Set<String> entryFields, Field field) {
+        Stream<Field> fieldsSeenByStyle = field == StandardField.DATE
+                ? Stream.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY)
+                : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
+        return fieldsSeenByStyle.map(seen -> seen.getName().toLowerCase(Locale.ROOT)).anyMatch(entryFields::contains);
     }
 
     public void showAllFields() {
