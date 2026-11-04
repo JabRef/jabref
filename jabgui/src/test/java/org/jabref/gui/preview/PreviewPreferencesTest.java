@@ -104,4 +104,15 @@ class PreviewPreferencesTest {
         assertEquals(defaultStyle1.getFirst().id(), defaultStyle2.getFirst().id());
         assertEquals(defaultStyle1, defaultStyle2);
     }
+
+    @Test
+    void getSelectedPreviewLayoutEmptyLayoutCycleUsesDefaultStyle() {
+        // layout cycle is empty
+        PreviewPreferences preferences = new PreviewPreferences(List.of(), 0, List.of(), false, false, List.of(), false);
+
+        TextBasedPreviewLayout layout = assertInstanceOf(TextBasedPreviewLayout.class, preferences.getSelectedPreviewLayout());
+
+        assertEquals(TextBasedPreviewLayout.NAME, layout.getId());
+        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, layout.getName());
+    }
 }

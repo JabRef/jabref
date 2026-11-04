@@ -155,7 +155,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         customizedTab = new Tab(Localization.lang("Customized"), customizedColumn);
         customizedTab.setClosable(false);
 
-        // [impl->req~entry-preview.tabs~1]
+        // [impl->feat~entry-preview.tabs~1]
         availableTabPane = new TabPane(cslTab, customizedTab);
         availableTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -355,7 +355,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
-        // [impl->req~entry-preview.create-custom-style~1]
+        // [impl->feat~entry-preview.create-custom-style~1]
         viewModel.newCustomizedStyleNameProperty().bindBidirectional(addCustomizedStyleNameField.textProperty());
         toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
         toLeftButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
@@ -629,7 +629,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 String newName = editField.getText();
                 cancelRename();
                 if (item != null) {
-                    viewModel.availableSelectionModelProperty().getValue().select(item);
                     viewModel.renameStyle(newName, item);
                     listView.refresh();
                 }

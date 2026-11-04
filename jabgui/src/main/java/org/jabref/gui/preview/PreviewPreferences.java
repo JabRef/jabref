@@ -21,7 +21,7 @@ import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public class PreviewPreferences {
-    private static final CustomizedPreviewStyle DEFAULT_STYLE = new CustomizedPreviewStyle(
+    public static final CustomizedPreviewStyle DEFAULT_STYLE = new CustomizedPreviewStyle(
             TextBasedPreviewLayout.NAME,
             TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME,
             TextBasedPreviewLayout.DEFAULT.replace("__NEWLINE__", "\n"));
@@ -111,13 +111,12 @@ public class PreviewPreferences {
                 || layoutCyclePosition.getValue() < 0
                 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
             CustomizedPreviewStyle fallback = customizedPreviewStyles.isEmpty()
-                                              ? new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)
+                                              ? DEFAULT_STYLE
                                               : customizedPreviewStyles.getFirst();
             return TextBasedPreviewLayout.of(fallback.id(), fallback.name(), fallback.text(),
                     LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
-        } else {
-            return layoutCycle.get(layoutCyclePosition.getValue());
         }
+        return layoutCycle.get(layoutCyclePosition.getValue());
     }
 
     public ObservableList<CustomizedPreviewStyle> getCustomizedPreviewStyles() {

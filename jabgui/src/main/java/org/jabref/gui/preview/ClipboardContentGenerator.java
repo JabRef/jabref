@@ -1,7 +1,6 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +9,10 @@ import javafx.scene.input.ClipboardContent;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
-import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -66,7 +61,7 @@ public record ClipboardContentGenerator(
                     bibDatabaseContext,
                     Injector.instantiateModelOrService(BibEntryTypesManager.class));
         } else {
-            return generateTextBasedPreviewLayoutCitations(selectedEntries, bibDatabaseContext);
+            return generatePreviewLayoutCitations(selectedEntries, bibDatabaseContext);
         }
     }
 
@@ -131,22 +126,14 @@ public record ClipboardContentGenerator(
         return content;
     }
 
-    private List<String> generateTextBasedPreviewLayoutCitations(List<BibEntry> selectedEntries, BibDatabaseContext bibDatabaseContext) throws IOException {
-        TextBasedPreviewLayout customPreviewLayout;
-        if (previewPreferences.getSelectedPreviewLayout() instanceof TextBasedPreviewLayout selected) {
-            customPreviewLayout = selected;
-        } else {
-            CustomizedPreviewStyle storedLayout = previewPreferences.getCustomizedPreviewStyles().isEmpty()
-                                                  ? new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)
-                                                  : previewPreferences.getCustomizedPreviewStyles().getFirst();
-            customPreviewLayout = TextBasedPreviewLayout.of(storedLayout.id(), storedLayout.name(), storedLayout.text(), layoutFormatterPreferences, abbreviationRepository);
-        }
-        Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
+    private List<String> generatePreviewLayoutCitations(List<BibEntry> selectedEntries, BibDatabaseContext bibDatabaseContext) {
+        PreviewLayout selectedLayout = previewPreferences.getSelectedPreviewLayout();
         List<String> citations = new ArrayList<>(selectedEntries.size());
-        for (BibEntry entry : selectedEntries) {
-            citations.add(layout.doLayout(entry, bibDatabaseContext.getDatabase()));
+        for (BibEntry entry : selectedEntries) {        // handles layouts that are not CSL, CSL handled in generateCitations
+            String preview = selectedLayout.generatePreview(entry, bibDatabaseContext);
+            citations.add(preview);
         }
+
         return citations;
     }
 }

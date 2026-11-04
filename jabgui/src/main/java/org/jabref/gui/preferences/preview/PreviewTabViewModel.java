@@ -214,17 +214,19 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /// Store the changes of preference-preview settings.
-    // [impl->req~entry-preview.persist-custom-style~1]
+    // [impl->feat~entry-preview.persist-custom-style~1]
     @Override
     public void storeSettings() {
         if (chosenListProperty.isEmpty()) {
             PreviewLayout defaultLayout = customizedListProperty.stream()
                                                                 .filter(TextBasedPreviewLayout.class::isInstance)
                                                                 .findFirst()
-                                                                .orElseGet(() -> {
-                                                                    CustomizedPreviewStyle fallback = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT);
-                                                                    return TextBasedPreviewLayout.of(fallback.id(), fallback.name(), fallback.text(), layoutFormatterPreferences, abbreviationRepository);
-                                                                });
+                                                                .orElseGet(() -> TextBasedPreviewLayout.of(
+                                                                        PreviewPreferences.DEFAULT_STYLE.id(),
+                                                                        PreviewPreferences.DEFAULT_STYLE.name(),
+                                                                        PreviewPreferences.DEFAULT_STYLE.text(),
+                                                                        layoutFormatterPreferences,
+                                                                        abbreviationRepository));
             chosenListProperty.add(defaultLayout);
         }
 
@@ -652,9 +654,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    /// Commits an edit made in the style-name field to the currently selected TextBasedPreviewLayout.
-    /// No-ops for non-customized (CSL/BST) selections. Reverts the field on blank/duplicate input.
-    /// [impl->req~entry-preview.rename-custom-style~1]
+    /// Commits an edit to the selected TextBasedPreviewLayout. User is warned if edit is blank or the name already exists.
+    /// The customized list is resorted after a successful rename.
+    /// [impl->feat~entry-preview.rename-custom-style~1]
     public void renameStyle(@NonNull String newName, PreviewLayout previewLayout) {
         if (!(previewLayout instanceof TextBasedPreviewLayout textLayout)) {
             return;
@@ -679,7 +681,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
 
         textLayout.setName(trimmed);
-        customizedListProperty.getValue().sort(Comparator.comparing(PreviewLayout::getDisplayName, String.CASE_INSENSITIVE_ORDER));
+        customizedListProperty.getValue().sort(BY_DISPLAY_NAME);
     }
 
     private String nextCustomStyleDefaultName() {

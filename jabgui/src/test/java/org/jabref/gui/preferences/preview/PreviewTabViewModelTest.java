@@ -263,7 +263,10 @@ class PreviewTabViewModelTest {
         assertEquals(1, viewModel.chosenListProperty().size());
         PreviewLayout defaultPreviewLayout = viewModel.chosenListProperty().getFirst();
         assertInstanceOf(TextBasedPreviewLayout.class, defaultPreviewLayout);
-        assertEquals(TextBasedPreviewLayout.NAME, defaultPreviewLayout.getName());
+        TextBasedPreviewLayout textBasedPreviewLayout = (TextBasedPreviewLayout) defaultPreviewLayout;
+        assertEquals(PreviewPreferences.DEFAULT_STYLE.id(), textBasedPreviewLayout.getId());
+        assertEquals(PreviewPreferences.DEFAULT_STYLE.name(), textBasedPreviewLayout.getName());
+        assertEquals(PreviewPreferences.DEFAULT_STYLE.text(), textBasedPreviewLayout.getText());
     }
 
     @Test

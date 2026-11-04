@@ -9,6 +9,7 @@ import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.migrations.PreferencesMigrations;
 
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +71,10 @@ class JabRefGuiPreferencesTest {
     void storeCustomizedPreviewStylePersistsData() {
         List<CustomizedPreviewStyle> styles = List.of(
                 new CustomizedPreviewStyle("id1", "name1", "text1"),
-                new CustomizedPreviewStyle("id2", "name2", "text2"));
+                new CustomizedPreviewStyle("id2", "name2", "text2"),
+                new CustomizedPreviewStyle("id3", "name3", ""),
+                new CustomizedPreviewStyle("id4", "name4", ""),
+                new CustomizedPreviewStyle("id5", "name5", "hello\nworld"));
         JabRefGuiPreferences jabRefGuiPreferences = new InMemoryGuiPreferences();
         jabRefGuiPreferences.storeCustomizedPreviewStyle(styles);
         List<CustomizedPreviewStyle> customizedPreviewStyleList = jabRefGuiPreferences.getCustomizedPreviewStyle(List.of());
@@ -91,14 +95,28 @@ class JabRefGuiPreferencesTest {
     }
 
     @Test
-    void getCustomizedPreviewStyleMigratesPreviewStyle() {
+    void upgradeLegacyCustomPreviewStyleMigratedStyleIsReadByLoader() {
         JabRefGuiPreferences preferences = new InMemoryGuiPreferences();
-        preferences.put(JabRefGuiPreferences.PREVIEW_STYLE, "\\myText__NEWLINE__");
+        String legacyText = "<b>\\bibtextype</b>__NEWLINE__";
+        preferences.put(JabRefGuiPreferences.PREVIEW_STYLE, legacyText);
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(preferences);
 
-        List<CustomizedPreviewStyle> result = preferences.getCustomizedPreviewStyle(List.of());
+        CustomizedPreviewStyle expected = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
+                TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME,
+                legacyText.replace("__NEWLINE__", "\n"));
+        assertEquals(List.of(expected), preferences.getCustomizedPreviewStyle(List.of()));
+    }
 
-        assertEquals(List.of(new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
-                TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, "\\myText\n")), result);
+    @Test
+    void upgradeLegacyCustomPreviewStyleEmptyListIsNotRemigrated() {
+        JabRefGuiPreferences preferences = new InMemoryGuiPreferences();
+        preferences.put(JabRefGuiPreferences.PREVIEW_STYLE, "<b>\\bibtextype</b>__NEWLINE__");
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(preferences);   // first startup
+        preferences.storeCustomizedPreviewStyle(List.of());                   // user deletes every style
+
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(preferences);   // next startup
+
+        assertEquals(List.of(), preferences.getCustomizedPreviewStyle(List.of()));
     }
 }
 

@@ -67,7 +67,6 @@ import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
@@ -1088,8 +1087,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     public List<CustomizedPreviewStyle> getCustomizedPreviewStyle(List<CustomizedPreviewStyle> defaults) {
-        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(this);
-
         List<CustomizedPreviewStyle> result = new ArrayList<>();
         for (int i = 0; hasKey(PREVIEW_STYLE_CUSTOMIZED_ID + i); i++) {
             result.add(new CustomizedPreviewStyle(
