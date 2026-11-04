@@ -14,9 +14,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -78,6 +80,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);
+    private final IntegerProperty tooltipDuration = new SimpleIntegerProperty();
 
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
 
@@ -144,6 +147,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         showAsExtraTabProperty.set(previewPreferences.shouldShowPreviewAsExtraTab());
         showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
+        tooltipDuration.set(previewPreferences.getTooltipDuration());
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
 
@@ -243,6 +247,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
         previewPreferences.setShowPreviewAsExtraTab(showAsExtraTabProperty.getValue());
         previewPreferences.setShowPreviewEntryTableTooltip(showPreviewInEntryTableTooltip.getValue());
+        previewPreferences.tooltipDurationProperty().set(tooltipDuration.get());
         previewPreferences.setBstPreviewLayoutPaths(bstStylesPaths);
 
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
@@ -520,6 +525,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty showAsExtraTabProperty() {
         return showAsExtraTabProperty;
+    }
+
+    public IntegerProperty tooltipDurationProperty() {
+        return tooltipDuration;
     }
 
     public BooleanProperty showPreviewInEntryTableTooltip() {
