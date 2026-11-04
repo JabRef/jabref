@@ -110,7 +110,7 @@ dependencies.constraints {
     api("net.java.dev.jna:jna-platform:5.19.1")
     api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
     api("net.ltgt.nullaway:nullaway:2.3.0")
-    api("net.minidev:json-smart:2.6.0")
+    api("net.minidev:json-smart:2.6.1")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.1")
