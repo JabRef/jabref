@@ -34,6 +34,8 @@ annote = "annote"
 ands = "ands"
 # .sav backup file extension
 sav = "sav"
+# LaTeX environments
+multline = "multline"
 # Spelling used by external APIs (LibreOffice UNO, JAX-RS, xmpbox)
 removeable = "removeable"
 writeable = "writeable"
