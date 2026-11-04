@@ -54,7 +54,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +78,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final BooleanProperty restrictToBstFields = new SimpleBooleanProperty(false);
     private final StringProperty bstStyleName = new SimpleStringProperty("");
     private Set<String> bstEntryFields = Set.of();
+    private long bstLoadGeneration;
     private final ObjectBinding<Predicate<Field>> shownFields = Bindings.createObjectBinding(() -> {
         if (!restrictToBstFields.get()) {
             return _ -> true;
@@ -176,25 +176,29 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     /// Reads the fields of the given style and restricts the columns to them
     @VisibleForTesting
     void loadBstFile(Path bstFile) {
-        Set<String> entryFields;
-        try {
-            entryFields = new BstVM(bstFile).getEntryFields();
-        } catch (IOException | ParseCancellationException e) {
-            LOGGER.error("Could not read .bst file {}", bstFile, e);
-            dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), e);
-            return;
-        }
-        if (entryFields.isEmpty()) {
-            // A style without ENTRY fields renders nothing - the file is not usable as a style
-            LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
-            dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
-            return;
-        }
-        bstEntryFields = entryFields;
-        bstStyleName.set(bstFile.getFileName().toString());
-        restrictToBstFields.set(true);
-        // Another file of the same name leaves both properties unchanged
-        shownFields.invalidate();
+        long generation = ++bstLoadGeneration;
+        BackgroundTask.wrap(() -> new BstVM(bstFile).getEntryFields())
+                      .onSuccess(entryFields -> {
+                          if (generation != bstLoadGeneration) {
+                              return;
+                          }
+                          if (entryFields.isEmpty()) {
+                              LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
+                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
+                              return;
+                          }
+                          bstEntryFields = entryFields;
+                          bstStyleName.set(bstFile.getFileName().toString());
+                          restrictToBstFields.set(true);
+                          shownFields.invalidate();
+                      })
+                      .onFailure(exception -> {
+                          if (generation == bstLoadGeneration) {
+                              LOGGER.error("Could not read .bst file {}", bstFile, exception);
+                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), exception);
+                          }
+                      })
+                      .executeWith(taskExecutor);
     }
 
     /// A style reads a field also through its alias, mirroring [BibEntry#getFieldOrAlias]: `journal` is read from `journaltitle`,
