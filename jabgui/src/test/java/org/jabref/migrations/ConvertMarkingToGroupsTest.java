@@ -25,6 +25,8 @@ class ConvertMarkingToGroupsTest {
         BibEntry entry = new BibEntry()
                 .withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         ParserResult parserResult = new ParserResult(Set.of(entry));
+        // The library was saved after an earlier run that converted other entries, so its group tree already has
+        // the "Markings" groups while this entry still carries its marking
         GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         root.addSubgroup(new ExplicitGroup("Markings", GroupHierarchyType.INCLUDING, ','))
             .addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
@@ -44,6 +46,7 @@ class ConvertMarkingToGroupsTest {
         BibEntry entry = new BibEntry()
                 .withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         ParserResult parserResult = new ParserResult(Set.of(entry));
+        // The user moved the converted group elsewhere; group names are unique per library, so it must be reused there
         GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         root.addSubgroup(new ExplicitGroup("Reading", GroupHierarchyType.INCLUDING, ','))
             .addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
