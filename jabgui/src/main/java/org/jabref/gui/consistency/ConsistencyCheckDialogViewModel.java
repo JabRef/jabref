@@ -9,11 +9,17 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -23,6 +29,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
@@ -39,6 +46,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
+import com.google.common.annotations.VisibleForTesting;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +66,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final List<Field> allReportedFields;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final StringProperty selectedEntryType = new SimpleStringProperty();
+    private final ObjectProperty<Predicate<Field>> shownFields = new SimpleObjectProperty<>(_ -> true);
+    private final StringProperty bstStyleName = new SimpleStringProperty("");
 
     public ConsistencyCheckDialogViewModel(DialogService dialogService,
                                            GuiPreferences preferences,
@@ -105,6 +116,47 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     public ObservableList<ConsistencyMessage> getTableData() {
         return tableData;
+    }
+
+    public List<Field> getReportedFields() {
+        return allReportedFields;
+    }
+
+    /// Which field columns are shown; all unless restricted by [#restrictToBstFields()]
+    public ReadOnlyObjectProperty<Predicate<Field>> shownFieldsProperty() {
+        return shownFields;
+    }
+
+    /// File name of the `.bst` style the columns are restricted to; empty if all columns are shown
+    public ReadOnlyStringProperty bstStyleNameProperty() {
+        return bstStyleName;
+    }
+
+    // [impl->req~ux.consistency.bst-field-columns~1]
+    public void restrictToBstFields() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .addExtensionFilter(StandardFileType.BST)
+                .withDefaultExtension(StandardFileType.BST)
+                .build();
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::restrictToBstFields);
+    }
+
+    @VisibleForTesting
+    void restrictToBstFields(Path bstFile) {
+        try {
+            Set<String> entryFields = new BstVM(bstFile).getEntryFields();
+            shownFields.set(field -> entryFields.contains(field.getName().toLowerCase(Locale.ROOT)));
+            bstStyleName.set(bstFile.getFileName().toString());
+        } catch (IOException | ParseCancellationException e) {
+            LOGGER.error("Could not read .bst file {}", bstFile, e);
+            dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), e);
+        }
+    }
+
+    public void showAllFields() {
+        shownFields.set(_ -> true);
+        bstStyleName.set("");
     }
 
     public List<String> getColumnNames() {

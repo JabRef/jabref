@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.entry.BibEntry;
@@ -30,6 +31,12 @@ public class BstVMTest {
                 .withField(StandardField.OWNER, "oezbek")
                 .withField(StandardField.TIMESTAMP, "2006.05.29")
                 .withField(StandardField.URL, "http://james.howison.name/publications.html");
+    }
+
+    @Test
+    void entryFieldsAreReadFromEntryCommand() throws URISyntaxException, IOException {
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
+        assertEquals(Set.of("address", "author", "booktitle", "chapter", "edition", "editor", "howpublished", "institution", "journal", "key", "month", "note", "number", "organization", "pages", "publisher", "school", "series", "title", "type", "volume", "year"), vm.getEntryFields());
     }
 
     @Test

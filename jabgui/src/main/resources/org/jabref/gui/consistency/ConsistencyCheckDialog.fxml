@@ -25,6 +25,11 @@
                 <Label text="%Entry type"/>
                 <ComboBox fx:id="entryTypeCombo" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
             </HBox>
+            <HBox spacing="4.0" alignment="CENTER_LEFT">
+                <Button onAction="#restrictToBstFields" text="%Restrict to fields of .bst style..." />
+                <Button fx:id="showAllFieldsButton" onAction="#showAllFields" text="%Show all fields" />
+                <Label fx:id="bstStyleLabel" />
+            </HBox>
             <HBox spacing="4.0" alignment="CENTER">
                 <Button onAction="#exportAsCsv" text="%Export as csv file" />
                 <Button onAction="#exportAsTxt" text="%Export as txt file" />

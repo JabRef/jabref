@@ -88,6 +88,24 @@ class ConsistencyCheckDialogViewModelTest {
         ), viewModel.getTableData().stream().map(ConsistencyMessage::message).toList());
     }
 
+    @Test
+        // [utest->req~ux.consistency.bst-field-columns~1]
+    void bstStyleRestrictsShownFields(@TempDir Path tempDir) throws Exception {
+        Path bstFile = tempDir.resolve("minimal.bst");
+        Files.writeString(bstFile, "ENTRY { author title } {} {}");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+
+        viewModel.restrictToBstFields(bstFile);
+
+        assertEquals("minimal.bst", viewModel.bstStyleNameProperty().get());
+        assertEquals(List.of(StandardField.TITLE), viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).toList());
+
+        viewModel.showAllFields();
+
+        assertEquals("", viewModel.bstStyleNameProperty().get());
+        assertEquals(viewModel.getReportedFields(), viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).toList());
+    }
+
     @ParameterizedTest
     @EnumSource(value = StandardFileType.class, names = {"CSV", "TXT"})
         // [utest->req~ux.consistency.export-background~1]

@@ -125,6 +125,13 @@ Context: [Consistency-check output fixes](https://github.com/JabRef/jabref/pull/
 
 Needs: impl, utest
 
+## Consistency dialog can restrict field columns to a BibTeX style
+`req~ux.consistency.bst-field-columns~1`
+
+The user chooses a `.bst` file; only the fields its `ENTRY` command declares stay visible, since the style ignores all other fields. Entry type and citation key stay visible.
+
+Needs: impl, utest
+
 ## Group creation must allow populating new explicit group from selection
 `req~ux.groups.create-explicit-from-selection~1`
 

@@ -6,7 +6,9 @@ import java.util.List;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -32,6 +34,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
+    @FXML private Label bstStyleLabel;
+    @FXML private Button showAllFieldsButton;
 
     @Inject private StateManager stateManager;
     @Inject private EntryEditor entryEditor;
@@ -77,11 +81,23 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         tableView.setItems(filteredData);
 
+        bstStyleLabel.textProperty().bind(viewModel.bstStyleNameProperty().map(name -> Localization.lang("Currently selected BST style: '%0'", name)));
+        bstStyleLabel.visibleProperty().bind(viewModel.bstStyleNameProperty().isNotEmpty());
+        showAllFieldsButton.disableProperty().bind(viewModel.bstStyleNameProperty().isEmpty());
+
+        List<Field> reportedFields = viewModel.getReportedFields();
         int columnIndex = 0;
         // [impl->req~ux.consistency.missing-field-columns~1]
         for (String columnName : viewModel.getColumnNames()) {
             final int currentIndex = columnIndex;
             TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(columnName);
+
+            // The first two columns (entry type and citation key) are always shown
+            if (currentIndex >= 2) {
+                Field field = reportedFields.get(currentIndex - 2);
+                // [impl->req~ux.consistency.bst-field-columns~1]
+                tableColumn.visibleProperty().bind(viewModel.shownFieldsProperty().map(shown -> shown.test(field)));
+            }
 
             tableColumn.setCellValueFactory(row -> {
                 List<String> message = row.getValue().message();
@@ -143,6 +159,16 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     public void removeColumnByTitle(String columnName) {
         tableView.getColumns().removeIf(column -> column.getText().equalsIgnoreCase(columnName));
+    }
+
+    @FXML
+    private void restrictToBstFields() {
+        viewModel.restrictToBstFields();
+    }
+
+    @FXML
+    private void showAllFields() {
+        viewModel.showAllFields();
     }
 
     @FXML
