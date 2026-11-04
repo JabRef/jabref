@@ -60,8 +60,8 @@ class ExportServiceTest extends AbstractJabKitTest {
         Optional<String> expectedSharedDatabaseId = selectedEntryCount == database.getEntryCount() ? sharedDatabaseId : Optional.empty();
         assertEquals(expectedSharedDatabaseId, actual.getSharedDatabaseID());
         Optional<String> expectedFileDirectory = selectedEntryCount == database.getEntryCount()
-                ? Optional.of(librarySpecificFileDirectory)
-                : Optional.empty();
+                                                 ? Optional.of(librarySpecificFileDirectory)
+                                                 : Optional.empty();
         assertEquals(expectedFileDirectory, actualContext.getMetaData().getLibrarySpecificFileDirectory());
         assertEquals(sharedDatabaseId, database.getSharedDatabaseID());
     }
