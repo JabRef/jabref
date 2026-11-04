@@ -46,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the main table tooltip to stay visible while hovered, with a configurable duration. [#17502](https://github.com/JabRef/jabref/issues/17502)
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We shortened the read-status and priority menu labels (e.g., "Mark as read", "High") and made the read and low-priority icon colors easier to distinguish. [#17691](https://github.com/JabRef/jabref/pull/17691)
+
 ### Fixed
 
 - We fixed an issue where it was hard to distinguish between enabled/disabled status of search buttons in dark mode and added tooltips. [#11569](https://github.com/JabRef/jabref/issues/11569)
