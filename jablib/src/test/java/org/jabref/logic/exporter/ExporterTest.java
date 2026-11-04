@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
+import org.xml.sax.SAXException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -51,10 +53,15 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+    void exportingEmptyDatabaseYieldsExpectedDocument(Exporter exportFormat, String name, @TempDir Path testFolder)
+            throws IOException, SaveException, ParserConfigurationException, TransformerException, SAXException {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
         exportFormat.export(new BibDatabaseContext(), tmpFile, List.of());
-        assertEquals(List.of(), Files.readAllLines(tmpFile));
+        if (exportFormat instanceof BibframeExporter) {
+            assertEquals("rdf:RDF", DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(tmpFile.toFile()).getDocumentElement().getTagName());
+        } else {
+            assertEquals(List.of(), Files.readAllLines(tmpFile));
+        }
     }
 }
