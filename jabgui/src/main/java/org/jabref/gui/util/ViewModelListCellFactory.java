@@ -26,40 +26,43 @@ import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Constructs a [ListCell] based on the view model of the row and a bunch of specified converter methods.
 ///
 /// @param <T> cell value
+@NullMarked
 public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
 
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
 
-    private Callback<T, String> toText;
-    private Callback<T, Node> toGraphic;
-    private Callback<T, Tooltip> toTooltip;
-    private BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent;
-    private Supplier<List<String>> styleClassSupplier;
-    private Callback<T, ContextMenu> toContextMenu;
-    private BiConsumer<T, ? super MouseEvent> toOnDragDetected;
-    private BiConsumer<T, ? super DragEvent> toOnDragDropped;
-    private BiConsumer<T, ? super DragEvent> toOnDragEntered;
-    private BiConsumer<T, ? super DragEvent> toOnDragExited;
-    private BiConsumer<T, ? super DragEvent> toOnDragOver;
-    private BiConsumer<T, ? super DragEvent> toOnDragDone;
+    private @Nullable Callback<T, String> toText;
+    private @Nullable Callback<T, @Nullable Node> toGraphic;
+    private Callback<ListCell<T>, Callback<T, @Nullable Tooltip>> tooltipFactory = _ -> _ -> null;
+    private @Nullable BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent;
+    private @Nullable Supplier<List<String>> styleClassSupplier;
+    private @Nullable Callback<T, @Nullable ContextMenu> toContextMenu;
+    private @Nullable BiConsumer<T, ? super MouseEvent> toOnDragDetected;
+    private @Nullable BiConsumer<T, ? super DragEvent> toOnDragDropped;
+    private @Nullable BiConsumer<T, ? super DragEvent> toOnDragEntered;
+    private @Nullable BiConsumer<T, ? super DragEvent> toOnDragExited;
+    private @Nullable BiConsumer<T, ? super DragEvent> toOnDragOver;
+    private @Nullable BiConsumer<T, ? super DragEvent> toOnDragDone;
     private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
-    private Callback<T, ValidationStatus> validationStatusProperty;
+    private @Nullable Callback<T, ValidationStatus> validationStatusProperty;
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
         this.toText = toText;
         return this;
     }
 
-    public ViewModelListCellFactory<T> withGraphic(Callback<T, Node> toGraphic) {
+    public ViewModelListCellFactory<T> withGraphic(Callback<T, @Nullable Node> toGraphic) {
         this.toGraphic = toGraphic;
         return this;
     }
 
-    public ViewModelListCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon) {
+    public ViewModelListCellFactory<T> withIcon(Callback<T, @Nullable JabRefIcon> toIcon) {
         this.toGraphic = viewModel -> {
             JabRefIcon icon = toIcon.call(viewModel);
             if (icon != null) {
@@ -75,23 +78,38 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
-    public ViewModelListCellFactory<T> withStringTooltip(Callback<T, String> toStringTooltip) {
-        this.toTooltip = viewModel -> {
+    public ViewModelListCellFactory<T> withStringTooltip(Callback<T, @Nullable String> toStringTooltip) {
+        return withTooltip(viewModel -> {
             String tooltipText = toStringTooltip.call(viewModel);
             if (StringUtil.isNotBlank(tooltipText)) {
                 return new Tooltip(tooltipText);
             }
             return null;
+        });
+    }
+
+    public ViewModelListCellFactory<T> withTooltip(Callback<T, @Nullable Tooltip> toTooltip) {
+        this.tooltipFactory = _ -> toTooltip;
+        return this;
+    }
+
+    /// Creates one tooltip per cell and binds its text to the current item's observable value.
+    ///
+    /// The callback is called when the cell receives an item. It must return a property or a lazy
+    /// observable that releases its listeners when the cell changes items or becomes empty.
+    ///
+    /// @param toTooltipText provides observable tooltip text for an item
+    /// @return this factory
+    public ViewModelListCellFactory<T> withTooltipText(Callback<T, ObservableValue<String>> toTooltipText) {
+        this.tooltipFactory = cell -> {
+            Tooltip tooltip = new Tooltip();
+            tooltip.textProperty().bind(cell.itemProperty().flatMap(toTooltipText::call).when(cell.emptyProperty().not()));
+            return _ -> tooltip;
         };
         return this;
     }
 
-    public ViewModelListCellFactory<T> withTooltip(Callback<T, Tooltip> toTooltip) {
-        this.toTooltip = toTooltip;
-        return this;
-    }
-
-    public ViewModelListCellFactory<T> withContextMenu(Callback<T, ContextMenu> toContextMenu) {
+    public ViewModelListCellFactory<T> withContextMenu(Callback<T, @Nullable ContextMenu> toContextMenu) {
         this.toContextMenu = toContextMenu;
         return this;
     }
@@ -160,12 +178,13 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     }
 
     @Override
-    public ListCell<T> call(ListView<T> param) {
+    public ListCell<T> call(@Nullable ListView<T> param) {
         ListCell<T> listCell = new ListCell<>() {
             final List<Subscription> subscriptions = new ArrayList<>();
+            private final Callback<T, @Nullable Tooltip> toTooltip = tooltipFactory.call(this);
 
             @Override
-            protected void updateItem(T item, boolean empty) {
+            protected void updateItem(@Nullable T item, boolean empty) {
                 super.updateItem(item, empty);
 
                 // Remove previous subscriptions
@@ -186,22 +205,23 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     if (toGraphic != null) {
                         setGraphic(toGraphic.call(viewModel));
                     }
-                    if (toOnMouseClickedEvent != null) {
-                        setOnMouseClicked(event -> toOnMouseClickedEvent.accept(viewModel, event));
+                    BiConsumer<T, ? super MouseEvent> onMouseClickedEvent = toOnMouseClickedEvent;
+                    if (onMouseClickedEvent != null) {
+                        setOnMouseClicked(event -> onMouseClickedEvent.accept(viewModel, event));
                     }
-                    if (toTooltip != null) {
-                        setTooltip(toTooltip.call(viewModel));
-                    }
+                    setTooltip(toTooltip.call(viewModel));
                     if (toContextMenu != null) {
                         setContextMenu(toContextMenu.call(viewModel));
                     }
-                    if (toOnDragDetected != null) {
-                        setOnDragDetected(event -> toOnDragDetected.accept(viewModel, event));
+                    BiConsumer<T, ? super MouseEvent> onDragDetected = toOnDragDetected;
+                    if (onDragDetected != null) {
+                        setOnDragDetected(event -> onDragDetected.accept(viewModel, event));
                     }
-                    if (toOnDragDropped != null) {
+                    BiConsumer<T, ? super DragEvent> onDragDropped = toOnDragDropped;
+                    if (onDragDropped != null) {
                         setOnDragDropped(event -> {
                             // For reordering we need to accept the event so that the local handlers get it
-                            toOnDragDropped.accept(viewModel, event);
+                            onDragDropped.accept(viewModel, event);
                             Node parent = getParent();
                             if (parent != null) {
                                 // The parent is the box for dropping from external files; that should be used as target (and not this cell)
@@ -212,16 +232,19 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                             event.consume();
                         });
                     }
-                    if (toOnDragEntered != null) {
-                        setOnDragEntered(event -> toOnDragEntered.accept(viewModel, event));
+                    BiConsumer<T, ? super DragEvent> onDragEntered = toOnDragEntered;
+                    if (onDragEntered != null) {
+                        setOnDragEntered(event -> onDragEntered.accept(viewModel, event));
                     }
-                    if (toOnDragExited != null) {
-                        setOnDragExited(event -> toOnDragExited.accept(viewModel, event));
+                    BiConsumer<T, ? super DragEvent> onDragExited = toOnDragExited;
+                    if (onDragExited != null) {
+                        setOnDragExited(event -> onDragExited.accept(viewModel, event));
                     }
-                    if (toOnDragOver != null) {
+                    BiConsumer<T, ? super DragEvent> onDragOver = toOnDragOver;
+                    if (onDragOver != null) {
                         setOnDragOver(event -> {
                             // For reordering we need to accept the event so that the local handlers get it
-                            toOnDragOver.accept(viewModel, event);
+                            onDragOver.accept(viewModel, event);
                             Node parent = getParent();
                             if (parent != null) {
                                 DragEvent forwarded = event.copyFor(parent, parent);
@@ -230,8 +253,9 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                             event.consume();
                         });
                     }
-                    if (toOnDragDone != null) {
-                        setOnDragDone(event -> toOnDragDone.accept(viewModel, event));
+                    BiConsumer<T, ? super DragEvent> onDragDone = toOnDragDone;
+                    if (onDragDone != null) {
+                        setOnDragDone(event -> onDragDone.accept(viewModel, event));
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);

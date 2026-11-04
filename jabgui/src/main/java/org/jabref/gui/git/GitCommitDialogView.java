@@ -62,7 +62,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
         commitMessage.setPromptText(Localization.lang("Enter commit message here"));
-
+        viewModel.prefillGeneratedCommitMessage();
         this.setResultConverter(button -> {
             if (button != ButtonType.CANCEL) {
                 if (button == commitAndPushButton) {

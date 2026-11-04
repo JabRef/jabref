@@ -30,6 +30,56 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
+## BibTeX importer must accept whitespace before citation keys
+`req~import.bibtex.key-leading-whitespace~1`
+
+This includes LF, CRLF, and multiple line breaks immediately after the entry's opening brace.
+
+For example, the following entry retains the citation key `somebody2023` and title `Example` without warnings:
+
+```bibtex
+@inproceedings{
+somebody2023,
+  title = {Example}
+}
+```
+
+Origin: <https://github.com/JabRef/jabref/issues/9622>
+
+Needs: impl, utest
+
+## BibTeX importer must recover entries missing their citation key
+`req~import.bibtex.missing-key-recovery~1`
+
+Recovery includes entries where both the key and its comma are omitted before the first field assignment.
+Empty entries enclosed in braces or parentheses are retained, including an entry ending at the end of the file.
+Fields are retained even with long custom field names or extensive whitespace before `=`.
+Recovered assignments produce a warning naming the line of the first field; diagnostics for a missing key refer to the complete entry.
+
+For example, the following entry omits both the citation key and its comma:
+
+```bibtex
+@article{
+  author = {Ed von Test},
+  title = {Test}
+}
+```
+
+The importer retains both fields, leaves the citation key empty, and reports `Line 2: Found entry without citation key.`.
+
+Context: <https://github.com/JabRef/jabref/pull/17496>
+
+Needs: impl, utest
+
+## BibTeX importer must preserve balanced parentheses in citation keys
+`req~import.bibtex.citation-key-parentheses~1`
+
+This applies to entries enclosed in parentheses as well as braces.
+For `@article(Smith(2000), title={x})`, the citation key is `Smith(2000)` and the title is `x`.
+Context: <https://github.com/JabRef/jabref/pull/17496#discussion_r4308280956>
+
+Needs: impl, utest
+
 ## Library must maintain imported entries sorted by internal id
 `req~import.entries.sorted-by-id~1`
 
@@ -91,6 +141,29 @@ Needs: impl, utest
 When a library declares entry types that differ from the ones stored in the preferences, JabRef offers to store them. This holds both for entry types JabRef does not know and for customizations of entry types JabRef ships.
 
 The definition the user accepts is the one from the library file, and it replaces the stored one. Entry types the user leaves unchecked when confirming the dialog are remembered as declined. Opening the same library again therefore offers nothing, unless the definition in the library or the stored one has changed since. Cancelling the dialog decides nothing, so the entry types are offered again.
+
+Needs: impl, utest
+
+## PDF book detection must exclude conference article pages with grouped article evidence
+`req~import.pdf.conference-article-exclusion~1`
+
+For the book-import work in [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874), an abstract heading, a keywords heading, and an ACM reference-format citation identifying a contribution to a conference or proceedings together disqualify that page as a book imprint candidate. An ISBN on such a page can belong to the proceedings.
+
+The individual terms are insufficient for exclusion. This rule recognizes a specific article format, not all research papers.
+
+Needs: impl, utest
+
+## The import dialog must remember its download choice
+`req~import.dialog.download-linked-files~1`
+
+The import dialog remembers whether to download referenced files, including after restarting JabRef.
+Confirming an import saves the choice and applies it to that import; canceling leaves the saved choice unchanged.
+The choice is independent of the automatic download setting in Preferences > Web search and is only shown in the import dialog.
+Dialogs opened by JabRef's Web search, including identifier searches, use the Web search preference instead and do not change the saved import choice.
+On first startup, the existing web search setting initializes the dialog preference once; if no setting exists, downloads are enabled by default.
+Later changes to the web search setting must not change the initialized dialog preference, even after restarting.
+
+See [JabRef issue #16332](https://github.com/JabRef/jabref/issues/16332).
 
 Needs: impl, utest
 

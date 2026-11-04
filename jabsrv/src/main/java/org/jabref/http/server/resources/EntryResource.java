@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
+import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.preferences.CliPreferences;
@@ -20,6 +21,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.html.HtmlEscapers;
+import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -43,6 +45,9 @@ public class EntryResource {
 
     @Inject
     SrvStateManager srvStateManager;
+
+    @Inject
+    Gson gson;
 
     /// At [http://localhost:23119/libraries/){id}/entries/{entryId}](http://localhost:23119/libraries/){id}/entries/{entryId}
     ///
@@ -146,18 +151,33 @@ public class EntryResource {
                         HtmlEscapers.htmlEscaper().escape(releaseDate));
     }
 
+    /// At <http://localhost:23119/libraries/{id}/entries/{entryId}/files>
+    ///
+    /// Lists the local PDF files linked to the given BibEntry. Online links and non-PDF files are skipped.
+    ///
+    /// @param id      The name of the library
+    /// @param entryId The CitationKey of the BibEntry
+    /// @return a JSON array of `{fileName, parentCitationKey, path}` objects, see [LinkedPdfFileDTO]
+    ///
+    /// [impl->req~jabsrv.entry.files.list~1]
+    @GET
+    @Path("files")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public String getFiles(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
+        BibEntry entry = getEntry(getDatabaseContext(id), id, entryId);
+        List<LinkedPdfFileDTO> files = entry.getFiles().stream()
+                                            .filter(file -> "PDF".equals(file.getFileType()) && !LinkedFile.isOnlineLink(file.getLink()))
+                                            .map(file -> new LinkedPdfFileDTO(entry, file))
+                                            .toList();
+        return gson.toJson(files);
+    }
+
     @POST
     @Path("files")
     @Consumes("application/pdf")
     public Response addFile(@PathParam("id") String id, @PathParam("entryId") String entryId, InputStream fileInputStream) throws IOException {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
-        List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
-        if (entriesByCitationKey.isEmpty()) {
-            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
-        }
-
-        // 1. Determine BibEntry
-        BibEntry entry = entriesByCitationKey.getFirst();
+        BibEntry entry = getEntry(databaseContext, id, entryId);
 
         // 2. Determine target directory
         Optional<java.nio.file.Path> targetDirOpt = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
@@ -190,6 +210,14 @@ public class EntryResource {
         } else {
             return Response.ok("File uploaded but could not be renamed to suggested pattern.").build();
         }
+    }
+
+    private BibEntry getEntry(BibDatabaseContext databaseContext, String id, String entryId) {
+        List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
+        if (entriesByCitationKey.isEmpty()) {
+            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+        }
+        return entriesByCitationKey.getFirst();
     }
 
     /// @param id - also "demo" for the Chocolate.bib file
