@@ -27,6 +27,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
+import org.jabref.migrations.ConvertSearchGroupSyntax;
 import org.jabref.migrations.PerformLoadDatabaseMigrations;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
@@ -42,7 +43,7 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        return !getNecessaryMigrations(parserResult, preferences).isEmpty();
+        return !getNecessaryMigrations(parserResult, dialogService, preferences).isEmpty();
     }
 
     /// [impl->req~import.legacy-library-migration~1]
@@ -61,7 +62,7 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         table.getColumnConstraints().addAll(descriptionColumn, performColumn);
         table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
         // The conversions the user can decide on come first
-        List<PostOpenMigration> migrations = getOfferedMigrations(parserResult, preferences).stream()
+        List<PostOpenMigration> migrations = getOfferedMigrations(parserResult, dialogService, preferences).stream()
                                                                                             .sorted(Comparator.comparing(migration -> !migration.isOptional()))
                                                                                             .toList();
         for (PostOpenMigration migration : migrations) {
@@ -123,20 +124,21 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         parserResult.setChangedOnMigration(true);
     }
 
-    static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, CliPreferences preferences) {
-        return getOfferedMigrations(parserResult, preferences).stream()
+    static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+        return getOfferedMigrations(parserResult, dialogService, preferences).stream()
                                                               .filter(migration -> migration.isMigrationNecessary(parserResult))
                                                               .toList();
     }
 
     /// All migrations except the ones the user declined for this library
-    private static List<PostOpenMigration> getOfferedMigrations(ParserResult parserResult, CliPreferences preferences) {
+    private static List<PostOpenMigration> getOfferedMigrations(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         Character keywordSeparator = parserResult.getDatabaseContext().getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator());
         List<String> skippedMigrations = parserResult.getMetaData().getSkippedMigrations();
         return Stream.of(
                              new ConvertLegacyExplicitGroups(),
                              new ConvertMarkingToGroups(keywordSeparator),
-                             new SpecialFieldsToSeparateFields(keywordSeparator))
+                             new SpecialFieldsToSeparateFields(keywordSeparator),
+                             new ConvertSearchGroupSyntax(dialogService))
                      // A stored skip never silences a mandatory conversion: without it, saving would lose data
                      .filter(migration -> !migration.isOptional() || !skippedMigrations.contains(migration.getId()))
                      .toList();

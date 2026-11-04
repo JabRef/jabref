@@ -56,9 +56,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
             new LibraryMigrationAction(),
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction(),
-            // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
-            new SearchGroupsMigrationAction()
+            new CheckForNewEntryTypesAction()
     );
 
     private final LibraryTabContainer tabContainer;

@@ -20,6 +20,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
+import org.jabref.migrations.ConvertSearchGroupSyntax;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
 import org.jabref.model.entry.BibEntry;
@@ -53,7 +54,7 @@ class LibraryMigrationActionTest {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry().withField(StandardField.KEYWORDS, "foo, bar")));
 
-        assertEquals(List.of(), LibraryMigrationAction.getNecessaryMigrations(parserResult, preferences));
+        assertEquals(List.of(), LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences));
     }
 
     @Test
@@ -63,7 +64,7 @@ class LibraryMigrationActionTest {
                 new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]"),
                 new BibEntry().withField(StandardField.KEYWORDS, "foo, prio1")));
 
-        List<Class<? extends PostOpenMigration>> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, preferences)
+        List<Class<? extends PostOpenMigration>> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences)
                                                                                  .stream()
                                                                                  .<Class<? extends PostOpenMigration>>map(PostOpenMigration::getClass)
                                                                                  .toList();
@@ -72,12 +73,23 @@ class LibraryMigrationActionTest {
     }
 
     @Test
+    void oldSearchGroupSyntaxIsOffered() {
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
+        parserResult.getMetaData().setContainsSearchGroups(true);
+
+        List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences);
+
+        assertEquals(List.of(ConvertSearchGroupSyntax.class), offered.stream().map(PostOpenMigration::getClass).toList());
+    }
+
+    @Test
     void declinedMigrationsAreNotOfferedAgain() {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]")));
         parserResult.getMetaData().setSkippedMigrations(List.of("markings"));
 
-        assertEquals(List.of(), LibraryMigrationAction.getNecessaryMigrations(parserResult, preferences));
+        assertEquals(List.of(), LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences));
     }
 
     @Test
@@ -87,7 +99,7 @@ class LibraryMigrationActionTest {
         parserResult.getMetaData().setGroupsInLegacyFormat(true);
         parserResult.getMetaData().setSkippedMigrations(List.of("legacyGroups"));
 
-        List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, preferences);
+        List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences);
 
         assertEquals(List.of(ConvertLegacyExplicitGroups.class), offered.stream().map(PostOpenMigration::getClass).toList());
     }
@@ -98,7 +110,7 @@ class LibraryMigrationActionTest {
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
         parserResult.getMetaData().setGroupsInLegacyFormat(true);
 
-        List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, preferences);
+        List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences);
 
         assertEquals(1, offered.size());
         assertEquals(ConvertLegacyExplicitGroups.class, offered.getFirst().getClass());
