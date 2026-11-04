@@ -137,7 +137,7 @@ Needs: impl, utest
 
 The user chooses a LaTeX `.aux` file to select cited entries, including citations from nested AUX files. If exactly one `.aux` file lies next to the library file, it is chosen by default. A wildcard citation selects all library entries. The check recomputes differences within the selected entries and preserves the chosen field restriction. The user switches between all entries and the cited ones; switching keeps the chosen `.aux` file. Unknown citation keys do not select entries; a valid selection without matching entries produces an empty report. Uncited cross-reference parents do not participate in the comparison.
 
-Reading and checking run in the background. A read failure preserves the previous report; an older request cannot replace a newer selection. Exports use the selected-entry report, while entry navigation targets the original library entries.
+Reading and checking run in the background. Superseded loads stop cooperatively when the selection changes or the dialog closes. Reports share immutable field-presence snapshots and derive cell symbols on demand. A read failure preserves the previous report; an older request cannot replace a newer selection. Exports use the selected-entry report, while entry navigation targets the original library entries.
 
 Context: [AUX selection for consistency checks](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403).
 

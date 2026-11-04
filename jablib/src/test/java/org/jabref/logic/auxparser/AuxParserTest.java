@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -196,6 +198,15 @@ class AuxParserTest {
 
         assertEquals(Set.of("first", "second", "*"), result.getUniqueKeys());
         assertEquals(1, result.getNestedAuxCount());
+    }
+
+    @Test
+    void strictParsingStopsWhenCancelledDuringReading(@TempDir Path directory) throws IOException {
+        Path aux = Files.writeString(directory.resolve("main.aux"), "\\citation{first}\n".repeat(100));
+        AtomicInteger checkpoints = new AtomicInteger();
+        DefaultAuxParser parser = new DefaultAuxParser(new BibDatabase());
+        assertThrows(CancellationException.class, () -> parser.parseStrict(aux, () -> checkpoints.incrementAndGet() >= 5));
+        assertEquals(5, checkpoints.get());
     }
 
     @Test

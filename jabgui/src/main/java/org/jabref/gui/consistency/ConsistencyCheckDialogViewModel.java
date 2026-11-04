@@ -7,15 +7,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
@@ -41,48 +41,40 @@ import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
-import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
-    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
-    private BibliographyConsistencyCheck.Result result;
+    private BibliographyConsistencyCheck.Report report;
+    private final BibliographyConsistencyCheck.Snapshot snapshot;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
-    private final BibEntryTypesManager entryTypesManager;
-    private final BibDatabaseMode bibDatabaseMode;
     private final TaskExecutor taskExecutor;
 
     private List<Field> allReportedFields;
-    private final List<BibEntry> sourceEntries;
-    private final Map<BibEntry, BibEntry> originalEntries = new IdentityHashMap<>();
     private final ObservableList<String> allEntryTypes = FXCollections.observableArrayList();
     private final IntegerProperty reportRevision = new SimpleIntegerProperty();
     private final StringProperty auxFileName = new SimpleStringProperty("");
     private final BooleanProperty restrictToAuxEntries = new SimpleBooleanProperty(false);
-    private Optional<ConsistencyReport> auxReport = Optional.empty();
-    private final ConsistencyReport fullReport;
+    private Optional<BibliographyConsistencyCheck.Report> auxReport = Optional.empty();
+    private final BibliographyConsistencyCheck.Report fullReport;
     private long auxLoadGeneration;
+    private AtomicBoolean auxCancelled = new AtomicBoolean();
+    private Optional<Future<?>> auxFuture = Optional.empty();
+    private AtomicBoolean bstCancelled = new AtomicBoolean();
+    private Optional<Future<?>> bstFuture = Optional.empty();
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final Map<String, List<Field>> entryTypeToReportedFields = new HashMap<>();
     private final FilteredList<String> entryTypes;
@@ -100,27 +92,14 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     public ConsistencyCheckDialogViewModel(DialogService dialogService,
                                            GuiPreferences preferences,
-                                           BibEntryTypesManager entryTypesManager,
-                                           BibDatabaseMode bibDatabaseMode,
-                                           BibliographyConsistencyCheck.Result result,
-                                           TaskExecutor taskExecutor,
-                                           List<BibEntry> entries) {
+                                           BibliographyConsistencyCheck.Snapshot snapshot,
+                                           TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.entryTypesManager = new BibEntryTypesManager();
-        this.entryTypesManager.addCustomOrModifiedTypes(List.copyOf(entryTypesManager.getAllCustomizedTypes(bibDatabaseMode)), bibDatabaseMode);
-        this.bibDatabaseMode = bibDatabaseMode;
+        this.snapshot = snapshot;
         this.taskExecutor = taskExecutor;
-        Map<BibEntry, BibEntry> snapshots = new IdentityHashMap<>();
-        this.sourceEntries = entries.stream().map(entry -> {
-            BibEntry snapshot = new BibEntry(entry);
-            snapshots.put(entry, snapshot);
-            originalEntries.put(snapshot, entry);
-            return snapshot;
-        }).toList();
-        this.result = snapshotResult(result, snapshots);
         this.entryTypes = new FilteredList<>(allEntryTypes);
-        this.fullReport = prepareReport(this.result);
+        this.fullReport = snapshot.check(Set.of("*"), Thread.currentThread()::isInterrupted);
         this.restrictToAuxEntries.addListener((_, _, restrict) -> switchEntrySelection(restrict));
         applyReport(fullReport);
         // An entry type without a visible column has no differences to show
@@ -136,30 +115,13 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return selectedEntryType;
     }
 
-    // [impl->req~ux.consistency.export-snapshot~1]
-    private BibliographyConsistencyCheck.Result snapshotResult(BibliographyConsistencyCheck.Result result, Map<BibEntry, BibEntry> snapshots) {
-        Map<EntryType, BibliographyConsistencyCheck.EntryTypeResult> snapshotResults = new LinkedHashMap<>();
-        result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -> {
-            List<BibEntry> snapshotEntries = entryTypeResult.sortedEntries().stream().map(snapshots::get).toList();
-            snapshotResults.put(entryType, new BibliographyConsistencyCheck.EntryTypeResult(Set.copyOf(entryTypeResult.fields()), snapshotEntries));
-        });
-        return new BibliographyConsistencyCheck.Result(snapshotResults);
-    }
-
-    private ConsistencyReport prepareReport(BibliographyConsistencyCheck.Result findings) {
-        try (TableDataWriter writer = new TableDataWriter(findings)) {
-            writer.writeFindings();
-            return new ConsistencyReport(findings, List.copyOf(writer.getAllReportedFields()), List.copyOf(writer.messages), Map.copyOf(writer.reportedFieldsByType));
-        }
-    }
-
-    private void applyReport(ConsistencyReport report) {
-        result = report.result();
+    private void applyReport(BibliographyConsistencyCheck.Report report) {
+        this.report = report;
         allReportedFields = report.fields();
         entryTypeToReportedFields.clear();
         entryTypeToReportedFields.putAll(report.fieldsByType());
         tableData.clear();
-        allEntryTypes.setAll(result.entryTypeToResultMap().keySet().stream().map(EntryType::getDisplayName).sorted().toList());
+        allEntryTypes.setAll(report.fieldsByType().keySet().stream().sorted().toList());
         reportRevision.set(reportRevision.get() + 1);
         tableData.setAll(report.messages());
         if (!entryTypes.contains(selectedEntryType.get())) {
@@ -184,8 +146,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             auxReport.ifPresent(this::applyReport);
         } else {
             // A pending .aux load must not re-enable the restriction
+            cancelAuxLoad();
             ++auxLoadGeneration;
-            applyReport(fullReport);
+            if (report != fullReport) {
+                applyReport(fullReport);
+            }
         }
     }
 
@@ -216,36 +181,53 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     // [impl->req~ux.consistency.aux-entry-selection~1]
     @VisibleForTesting
     void loadAuxFile(Path auxFile) {
+        cancelAuxLoad();
         long generation = ++auxLoadGeneration;
-        BackgroundTask.wrap(() -> {
-            Set<String> keys = new DefaultAuxParser(new BibDatabase()).parseStrict(auxFile).getUniqueKeys();
-            List<BibEntry> selectedEntries = sourceEntries.stream()
-                    .filter(entry -> keys.contains("*") || entry.getCitationKey().filter(keys::contains).isPresent())
-                    .toList();
-            BibliographyConsistencyCheck.Result findings = new BibliographyConsistencyCheck().checkEntries(selectedEntries, bibDatabaseMode, entryTypesManager, (_, _) -> {
-            });
-            return prepareReport(findings);
-        }).onSuccess(report -> {
-            if (generation == auxLoadGeneration) {
-                auxReport = Optional.of(report);
+        AtomicBoolean cancelled = new AtomicBoolean();
+        auxCancelled = cancelled;
+        auxFuture = Optional.ofNullable(BackgroundTask.wrap(() -> {
+            checkCancelled(cancelled);
+            Set<String> keys = new DefaultAuxParser(new BibDatabase()).parseStrict(auxFile, cancelled::get).getUniqueKeys();
+            return snapshot.check(keys, () -> cancelled.get() || Thread.currentThread().isInterrupted());
+        }).onSuccess(result -> {
+            if (!cancelled.get() && generation == auxLoadGeneration) {
+                auxReport = Optional.of(result);
                 auxFileName.set(auxFile.getFileName().toString());
                 if (restrictToAuxEntries.get()) {
-                    applyReport(report);
+                    applyReport(result);
                 } else {
                     restrictToAuxEntries.set(true);
                 }
             }
         }).onFailure(exception -> {
-            if (generation == auxLoadGeneration) {
+            if (!cancelled.get() && generation == auxLoadGeneration) {
                 LOGGER.error("Could not read .aux file {}", auxFile, exception);
                 dialogService.showErrorDialogAndWait(Localization.lang("Could not read the .aux file."), exception);
             }
-        }).executeWith(taskExecutor);
+        }).executeWith(taskExecutor));
     }
 
-    @NullMarked
-    private record ConsistencyReport(BibliographyConsistencyCheck.Result result, List<Field> fields,
-                                     List<ConsistencyMessage> messages, Map<String, List<Field>> fieldsByType) {
+    private void cancelAuxLoad() {
+        auxCancelled.set(true);
+        auxFuture.ifPresent(future -> future.cancel(true));
+        auxFuture = Optional.empty();
+    }
+
+    private void cancelBstLoad() {
+        bstCancelled.set(true);
+        bstFuture.ifPresent(future -> future.cancel(true));
+        bstFuture = Optional.empty();
+    }
+
+    public void cancelPendingLoads() {
+        cancelAuxLoad();
+        cancelBstLoad();
+    }
+
+    private static void checkCancelled(AtomicBoolean cancelled) {
+        if (cancelled.get() || Thread.currentThread().isInterrupted()) {
+            throw new CancellationException();
+        }
     }
 
     /// The entry types having a visible column
@@ -288,29 +270,35 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     /// Reads the fields of the given style and restricts the columns to them
     @VisibleForTesting
     void loadBstFile(Path bstFile) {
+        cancelBstLoad();
         long generation = ++bstLoadGeneration;
-        BackgroundTask.wrap(() -> new BstVM(bstFile).getFieldSelection())
-                      .onSuccess(selection -> {
-                          if (generation != bstLoadGeneration) {
-                              return;
-                          }
-                          if (selection.isEmpty()) {
-                              LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
-                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
-                              return;
-                          }
-                          selectedFields = selection.orElseThrow();
-                          bstStyleName.set(bstFile.getFileName().toString());
-                          restrictToBstFields.set(true);
-                          shownFields.invalidate();
-                      })
-                      .onFailure(exception -> {
-                          if (generation == bstLoadGeneration) {
-                              LOGGER.error("Could not read .bst file {}", bstFile, exception);
-                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), exception);
-                          }
-                      })
-                      .executeWith(taskExecutor);
+        AtomicBoolean cancelled = new AtomicBoolean();
+        bstCancelled = cancelled;
+        bstFuture = Optional.ofNullable(BackgroundTask.wrap(() -> {
+                                                          checkCancelled(cancelled);
+                                                          return new BstVM(bstFile).getFieldSelection();
+                                                      })
+                                                      .onSuccess(selection -> {
+                                                          if (cancelled.get() || generation != bstLoadGeneration) {
+                                                              return;
+                                                          }
+                                                          if (selection.isEmpty()) {
+                                                              LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
+                                                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
+                                                              return;
+                                                          }
+                                                          selectedFields = selection.orElseThrow();
+                                                          bstStyleName.set(bstFile.getFileName().toString());
+                                                          restrictToBstFields.set(true);
+                                                          shownFields.invalidate();
+                                                      })
+                                                      .onFailure(exception -> {
+                                                          if (!cancelled.get() && generation == bstLoadGeneration) {
+                                                              LOGGER.error("Could not read .bst file {}", bstFile, exception);
+                                                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), exception);
+                                                          }
+                                                      })
+                                                      .executeWith(taskExecutor));
     }
 
     public List<String> getColumnNames() {
@@ -319,46 +307,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         result.add("CitationKey");
         allReportedFields.forEach(field -> result.add(FieldTextMapper.getDisplayName(field).trim()));
         return result;
-    }
-
-    /// Fills [#tableData] using the same columns and cell symbols as the TXT and CSV exports
-    private class TableDataWriter extends BibliographyConsistencyCheckResultWriter {
-
-        private final List<ConsistencyMessage> messages = new ArrayList<>();
-        private final Map<String, List<Field>> reportedFieldsByType = new HashMap<>();
-
-        TableDataWriter(BibliographyConsistencyCheck.Result findings) {
-            super(findings, Writer.nullWriter(), true,
-                    ConsistencyCheckDialogViewModel.this.entryTypesManager, ConsistencyCheckDialogViewModel.this.bibDatabaseMode);
-        }
-
-        List<Field> getAllReportedFields() {
-            return allReportedFields;
-        }
-
-        @Override
-        public void writeFindings() {
-            try {
-                super.writeFindings();
-            } catch (IOException e) {
-                // writeBibEntry does not perform any I/O
-                LOGGER.error("Could not collect consistency check findings", e);
-            }
-        }
-
-        @Override
-        protected void writeBibEntry(BibEntry bibEntry, EntryTypeReport entryTypeReport) {
-            List<String> message = getFindingsAsList(bibEntry, entryTypeReport).stream()
-                                                                               .map(cell -> WHITESPACE.matcher(cell).replaceAll(" "))
-                                                                               .toList();
-            // [impl->req~ux.consistency.entry-navigation~1]
-            messages.add(new ConsistencyMessage(message, originalEntries.getOrDefault(bibEntry, bibEntry)));
-            reportedFieldsByType.put(entryTypeReport.displayName(), entryTypeReport.reportedFields());
-        }
-
-        @Override
-        public void close() {
-        }
     }
 
     protected void startExportAsTxt() {
@@ -374,12 +322,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         }
 
         Path path = exportPath.orElseThrow();
-        BibliographyConsistencyCheck.Result exportResult = result;
+        BibliographyConsistencyCheck.Report exportReport = report;
         // [impl->req~ux.consistency.export-background~1]
         BackgroundTask.wrap(() -> {
-            try (Writer writer = new OutputStreamWriter(Files.newOutputStream(path));
-                 BibliographyConsistencyCheckResultTxtWriter resultWriter = new BibliographyConsistencyCheckResultTxtWriter(exportResult, writer, true, entryTypesManager, bibDatabaseMode)) {
-                resultWriter.writeFindings();
+            try (Writer writer = new OutputStreamWriter(Files.newOutputStream(path))) {
+                exportReport.writeTxt(writer);
             }
             return path;
         }).onFailure(this::showExportError).executeWith(taskExecutor);
@@ -398,12 +345,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         }
 
         Path path = exportPath.orElseThrow();
-        BibliographyConsistencyCheck.Result exportResult = result;
+        BibliographyConsistencyCheck.Report exportReport = report;
         // [impl->req~ux.consistency.export-background~1]
         BackgroundTask.wrap(() -> {
-            try (Writer writer = new OutputStreamWriter(Files.newOutputStream(path));
-                 BibliographyConsistencyCheckResultCsvWriter resultWriter = new BibliographyConsistencyCheckResultCsvWriter(exportResult, writer, true, entryTypesManager, bibDatabaseMode)) {
-                resultWriter.writeFindings();
+            try (Writer writer = new OutputStreamWriter(Files.newOutputStream(path))) {
+                exportReport.writeCsv(writer);
             }
             return path;
         }).onFailure(this::showExportError).executeWith(taskExecutor);

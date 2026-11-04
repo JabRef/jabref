@@ -56,6 +56,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         this.setTitle(Localization.lang("Check consistency"));
         this.initModality(Modality.NONE);
+        this.setOnHidden(_ -> viewModel.cancelPendingLoads());
 
         ViewLoader.view(this)
                   .load()

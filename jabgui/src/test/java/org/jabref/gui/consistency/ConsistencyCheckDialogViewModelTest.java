@@ -5,8 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -220,7 +222,7 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals("", viewModel.bstStyleNameProperty().get());
 
         newer.getOnSuccess().accept(newer.call());
-        older.getOnSuccess().accept(older.call());
+        assertThrows(CancellationException.class, older::call);
 
         assertEquals("second.bst", viewModel.bstStyleNameProperty().get());
         assertEquals(List.of(StandardField.YEAR), shownFields(viewModel));
@@ -316,14 +318,14 @@ class ConsistencyCheckDialogViewModelTest {
         BackgroundTask<?> newer = scheduleAux(viewModel, second);
 
         completeTask(newer);
-        completeTask(older);
+        assertThrows(CancellationException.class, older::call);
         older.getOnException().accept(new IOException("Superseded"));
 
         assertEquals("second.aux", viewModel.auxFileNameProperty().get());
         assertEquals(List.of("second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
         BackgroundTask<?> pending = scheduleAux(viewModel, first);
         viewModel.restrictToAuxEntriesProperty().set(false);
-        completeTask(pending);
+        assertThrows(CancellationException.class, pending::call);
         assertFalse(viewModel.restrictToAuxEntriesProperty().get());
         assertEquals("second.aux", viewModel.auxFileNameProperty().get());
         assertEquals(List.of("first", "second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
@@ -392,6 +394,17 @@ class ConsistencyCheckDialogViewModelTest {
 
         verify(taskExecutor, never()).execute(any());
         assertEquals("", viewModel.auxFileNameProperty().get());
+    }
+
+    @Test
+    void closingDialogCancelsPendingLoads(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Future<?> future = mock(Future.class);
+        org.mockito.Mockito.doReturn(future).when(taskExecutor).execute(any(BackgroundTask.class));
+        BackgroundTask<?> pending = scheduleAux(viewModel, tempDir.resolve("not-read.aux"));
+        viewModel.cancelPendingLoads();
+        verify(future).cancel(true);
+        assertThrows(CancellationException.class, pending::call);
     }
 
     private BackgroundTask<?> scheduleAux(ConsistencyCheckDialogViewModel viewModel, Path aux) {
@@ -593,8 +606,7 @@ class ConsistencyCheckDialogViewModelTest {
     private ConsistencyCheckDialogViewModel createViewModelForEntries(List<BibEntry> entries) {
         BibDatabaseContext bibContext = new BibDatabaseContext(new BibDatabase(entries));
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
-        });
-        return new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor, entries);
+        BibliographyConsistencyCheck.Snapshot snapshot = BibliographyConsistencyCheck.snapshot(entries, bibContext.getMode(), entryTypesManager, () -> false);
+        return new ConsistencyCheckDialogViewModel(dialogService, preferences, snapshot, taskExecutor);
     }
 }

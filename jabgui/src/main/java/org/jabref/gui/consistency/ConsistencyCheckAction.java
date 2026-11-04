@@ -63,14 +63,9 @@ public class ConsistencyCheckAction extends SimpleCommand {
             @Override
             public ConsistencyCheckDialogViewModel call() {
                 List<BibEntry> entries = List.copyOf(bibContext.getEntries());
-                BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-                BibliographyConsistencyCheck.Result result = consistencyCheck.checkEntries(entries, bibContext.getMode(), entryTypesManager, (count, total) ->
-                        UiTaskExecutor.runInJavaFXThread(() -> {
-                            updateProgress(count, total);
-                            updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
-                        }));
+                BibliographyConsistencyCheck.Snapshot snapshot = BibliographyConsistencyCheck.snapshot(entries, bibContext.getMode(), entryTypesManager, this::isCancelled);
                 // [impl->req~ux.consistency.report-background~1]
-                ConsistencyCheckDialogViewModel viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor, entries);
+                ConsistencyCheckDialogViewModel viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, snapshot, taskExecutor);
                 bibContext.getDatabasePath().ifPresent(viewModel::useAuxFileNextTo);
                 return viewModel;
             }

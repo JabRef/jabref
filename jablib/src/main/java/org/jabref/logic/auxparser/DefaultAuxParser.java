@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
+import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +47,7 @@ public class DefaultAuxParser implements AuxParser {
     public AuxParserResult parse(Path auxFile) {
         AuxParserResult result = new AuxParserResult(masterDatabase);
         try {
-            readFiles(auxFile, result, false);
+            readFiles(auxFile, result, false, () -> false);
         } catch (IOException e) {
             LOGGER.warn("Problem opening file", e);
         }
@@ -55,13 +57,25 @@ public class DefaultAuxParser implements AuxParser {
 
     /// Parses the complete AUX input, failing if the selected file or any included file cannot be read.
     public AuxParserResult parseStrict(Path auxFile) throws IOException {
+        return parseStrict(auxFile, () -> false);
+    }
+
+    public AuxParserResult parseStrict(Path auxFile, BooleanSupplier cancelled) throws IOException {
+        checkCancelled(cancelled);
         AuxParserResult result = new AuxParserResult(masterDatabase);
-        readFiles(auxFile, result, true);
+        readFiles(auxFile, result, true, cancelled);
+        checkCancelled(cancelled);
         resolveTags(result);
         return result;
     }
 
-    private void readFiles(Path auxFile, AuxParserResult result, boolean failOnReadError) throws IOException {
+    private static void checkCancelled(BooleanSupplier cancelled) {
+        if (cancelled.getAsBoolean() || Thread.currentThread().isInterrupted()) {
+            throw new CancellationException();
+        }
+    }
+
+    private void readFiles(Path auxFile, AuxParserResult result, boolean failOnReadError, BooleanSupplier cancelled) throws IOException {
         auxFile = auxFile.toAbsolutePath().normalize();
         // nested AUX files
         List<Path> fileList = new ArrayList<>(1);
@@ -70,12 +84,18 @@ public class DefaultAuxParser implements AuxParser {
         int fileIndex = 0;
 
         while (fileIndex < fileList.size()) {
+            if (failOnReadError) {
+                checkCancelled(cancelled);
+            }
             Path file = fileList.get(fileIndex);
 
             try (BufferedReader br = Files.newBufferedReader(file)) {
                 String line;
 
                 while ((line = br.readLine()) != null) {
+                    if (failOnReadError) {
+                        checkCancelled(cancelled);
+                    }
                     matchCitation(result, line);
                     matchNestedAux(auxFile, result, fileList, line);
                 }
