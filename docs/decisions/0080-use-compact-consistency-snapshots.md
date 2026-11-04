@@ -13,11 +13,13 @@ Consistency checks must preserve results after library edits and allow recomputi
 
 ## Considered Options
 
-- Copy the complete entry model and materialize every report cell.
-- Read live entries whenever a cell or export is requested.
-- Capture compact immutable field-presence metadata and derive report cells when requested.
+* Copy the complete entry model and materialize every report cell.
+* Read live entries whenever a cell or export is requested.
+* Capture compact immutable field-presence metadata and derive report cells when requested.
 
 ## Decision Outcome
+
+Chosen option: "Capture compact immutable field-presence metadata and derive report cells when requested", because it preserves stable reports without a second entry model and without one cell reference per row and column.
 
 Use compact immutable metadata for field presence, alias presence, entry type, citation key, and captured ordering. Keep original entry references solely for navigation. Reports share the snapshot, retain their selected rows and column metadata, and derive symbols on demand. Exports stream those same captured facts rather than reading edited entries.
 
