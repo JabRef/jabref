@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -31,6 +32,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Subscription;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
@@ -89,6 +91,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final LibraryTab libraryTab;
     private final StateManager stateManager;
+    private final AtomicReference<BibEntry> entryEditedSinceLastSort = new AtomicReference<>();
+    private final Subscription editorShowingSubscription;
     private final BibDatabaseContext database;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
@@ -232,6 +236,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }));
 
+        // Editing is finished when the user goes back to the table or closes the entry editor.
+        // The click that moves the focus may also change the selection, so sort only after it is handled.
+        focusedProperty().addListener((_, _, focused) -> {
+            if (focused) {
+                Platform.runLater(this::sortAndRevealEditedEntry);
+            }
+        });
+        editorShowingSubscription = stateManager.getEditorShowing().subscribe(showing -> {
+            if (!showing) {
+                sortAndRevealEditedEntry();
+            }
+        });
+
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
         // The default comparator of the SortedList does not consider the insertion index of entries that are equal according to the comparator.
@@ -366,18 +383,22 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        // Wait until JabRef has updated the values of the changed entry before sorting again
-        Platform.runLater(() -> sortAndRevealSelectedEntry(event.getBibEntry()));
+        // Sorting a large library on every keystroke is too slow, so only remember the entry and sort once the editing is finished
+        entryEditedSinceLastSort.set(event.getBibEntry());
     }
 
-    private void sortAndRevealSelectedEntry(BibEntry changedEntry) {
-        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
-        if (selectedEntry == null || selectedEntry.getEntry() != changedEntry) {
+    private void sortAndRevealEditedEntry() {
+        BibEntry editedEntry = entryEditedSinceLastSort.getAndSet(null);
+        if (editedEntry == null) {
             return;
         }
         // The sorted list re-sorts as soon as the field changes, before the cached cell values of the entry are updated.
         // It then sorts with the old value. Sorting again here uses the current value.
         sort();
+        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
+        if (selectedEntry == null || selectedEntry.getEntry() != editedEntry) {
+            return;
+        }
         int selectedIndex = getSelectionModel().getSelectedIndex();
         // Unlike TableView#scrollTo, this scrolls only as far as needed and does nothing if the row is already fully visible
         Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
@@ -636,6 +657,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void dispose() {
         columnPreferencesApplier.unbind();
         columnPreferencesRecorder.unbind();
+        editorShowingSubscription.unsubscribe();
         database.getDatabase().unregisterListener(this);
     }
 
