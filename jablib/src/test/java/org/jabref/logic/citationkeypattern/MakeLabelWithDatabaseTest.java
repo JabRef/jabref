@@ -2,19 +2,17 @@ package org.jabref.logic.citationkeypattern;
 
 import java.util.Optional;
 
-import javafx.beans.property.SimpleObjectProperty;
-
+import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import javafx.beans.property.SimpleObjectProperty;
 
 /// Bracketed patterns themselves are tested at [org.jabref.logic.citationkeypattern.BracketedPatternTest].
 @Execution(ExecutionMode.CONCURRENT)
@@ -303,7 +301,7 @@ class MakeLabelWithDatabaseTest {
     }
 
     @Test
-    void generateKeyShorttitleIgnoresAs(){
+    void generateKeyShorttitleIgnoresAs() {
         bibtexKeyPattern.setDefaultValue("[shorttitle:lower]");
         entry.setField(StandardField.TITLE, "Economic Systems as Networks");
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
