@@ -160,8 +160,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     /// A style reads a field also through its alias or date parts, mirroring [BibEntry#getFieldOrAlias]
     private static boolean isReadByStyle(Set<String> entryFields, Field field) {
         Stream<Field> fieldsSeenByStyle = field == StandardField.DATE
-                ? Stream.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY)
-                : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
+                                          ? Stream.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY)
+                                          : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
         return fieldsSeenByStyle.map(seen -> seen.getName().toLowerCase(Locale.ROOT)).anyMatch(entryFields::contains);
     }
 
