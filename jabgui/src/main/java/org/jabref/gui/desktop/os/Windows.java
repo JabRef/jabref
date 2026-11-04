@@ -42,6 +42,7 @@ public class Windows extends NativeDesktop {
     /// Hands a file path or URL to the registered handler of the shell. Paths of [#MAX_PATH] characters
     /// or more, which JabRef's generated file names reach easily, and OAuth login URLs go to the URL
     /// protocol handler, which takes its argument unquoted and without that limit.
+    // [impl->adr~open-long-windows-paths-with-the-url-protocol-handler~1]
     static List<String> shellOpenCommand(String pathOrUrl) {
         if (pathOrUrl.length() >= MAX_PATH) {
             return List.of("rundll32.exe", "url.dll,FileProtocolHandler", pathOrUrl);
