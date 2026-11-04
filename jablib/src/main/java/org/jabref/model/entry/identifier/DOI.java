@@ -332,7 +332,7 @@ public class DOI implements Identifier {
     public Optional<URI> getExternalURIFromBase(URI base) {
         try {
             String path = "/" + doi;
-            String query = null;
+            @Nullable String query = null;
             int queryIndex = doi.indexOf('?');
             boolean hasQueryParam = (queryIndex != -1)
                     && (doi.indexOf('=', queryIndex) != -1);

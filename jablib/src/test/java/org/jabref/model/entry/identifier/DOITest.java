@@ -346,6 +346,11 @@ class DOITest {
     }
 
     @Test
+    void nullDoiThrowsException() {
+        assertThrows(NullPointerException.class, () -> new DOI(null));
+    }
+
+    @Test
     void getExternalURIWithQueryParameter() {
         String base = "10.1371/journal.pone.0000308";
         String params = "?utm_source=newsletter";
