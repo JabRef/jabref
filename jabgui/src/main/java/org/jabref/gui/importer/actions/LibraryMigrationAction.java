@@ -27,6 +27,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
+import org.jabref.migrations.PerformLoadDatabaseMigrations;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
 
@@ -106,16 +107,17 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
                                                .filter(migrate::equals)
                                                .isPresent();
 
-        mandatoryMigrations.forEach(migration -> migration.performMigration(parserResult));
+        List<PostOpenMigration> selectedMigrations = new ArrayList<>(mandatoryMigrations);
         List<String> skippedMigrations = new ArrayList<>(parserResult.getMetaData().getSkippedMigrations());
         for (Map.Entry<PostOpenMigration, CheckBox> entry : checkBoxes.entrySet()) {
             PostOpenMigration migration = entry.getKey();
             if (migrateSelected && entry.getValue().isSelected()) {
-                migration.performMigration(parserResult);
+                selectedMigrations.add(migration);
             } else {
                 skippedMigrations.add(migration.getId());
             }
         }
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(parserResult, selectedMigrations);
         // The declined conversions are part of the library, so the choice survives a reopen
         parserResult.getMetaData().setSkippedMigrations(skippedMigrations);
         parserResult.setChangedOnMigration(true);

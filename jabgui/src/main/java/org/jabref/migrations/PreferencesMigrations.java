@@ -102,7 +102,27 @@ public class PreferencesMigrations {
         upgradeTheme(preferences);
         migrateFileAnnotationsTabVisibility(preferences);
         upgradeEntryEditorCustomTabs(preferences);
+        upgradeImportDialogDownloadLinkedFiles(preferences);
         GrobidUrlMigration.migrate(preferences);
+    }
+
+    /// Before [#16332](https://github.com/JabRef/jabref/issues/16332), the "Download referenced files" checkbox of the
+    /// import dialog was initialized from and saved to the web search setting `downloadLinkedFiles`. Imports that do not
+    /// come from a web search now have their own preference. It is initialized once from the web search setting, so
+    /// existing users keep their previous choice. New users get the default.
+    // [impl->req~import.dialog.download-linked-files~1]
+    static void upgradeImportDialogDownloadLinkedFiles(JabRefGuiPreferences prefs) {
+        final String WEB_SEARCH_DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
+        final String IMPORT_DIALOG_DOWNLOAD_LINKED_FILES = "importDialogDownloadLinkedFiles";
+
+        if (prefs.hasKey(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES)) {
+            return;
+        }
+
+        boolean initialChoice = prefs.getBoolean(WEB_SEARCH_DOWNLOAD_LINKED_FILES, true);
+        prefs.getFilePreferences().setImportDialogDownloadLinkedFiles(initialChoice);
+        // A property change listener does not persist a value that already equals the default.
+        prefs.putBoolean(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, initialChoice);
     }
 
     /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered

@@ -53,8 +53,8 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
     }
 
     @Override
-    public void performMigration(ParserResult parserResult) {
-        parserResult.getDatabase().getEntries().forEach(this::migrateEntry);
+    public void performMigration(ParserResult parserResult, List<BibEntry> entries) {
+        entries.forEach(this::migrateEntry);
     }
 
     private boolean hasKeywordToMigrate(BibEntry entry) {

@@ -89,4 +89,16 @@ class ConvertMarkingToGroupsTest {
         assertEquals(Optional.of(rootExpected), parserResult.getMetaData().getGroups());
         assertFalse(migration.isMigrationNecessary(parserResult));
     }
+
+    @Test
+    void performMigrationKeepsExistingMembershipsWithSemicolonSeparator() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.GROUPS, "A; B")
+                .withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
+        ParserResult parserResult = new ParserResult(Set.of(entry));
+
+        new ConvertMarkingToGroups(';').performMigration(parserResult);
+
+        assertEquals(Optional.of("A; B; Nicolas:6"), entry.getField(StandardField.GROUPS));
+    }
 }

@@ -2,19 +2,23 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader.ImportResult;
@@ -29,14 +33,19 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
@@ -47,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
@@ -97,6 +108,41 @@ class ImportHandlerTest {
         testEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2023")
                 .withField(StandardField.AUTHOR, "Test Author");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true, false", "false, true"})
+    void downloadOverrideControlsDownloadsWithoutChangingWebSearch(boolean choice, boolean webSearchChoice) {
+        // [utest->req~import.dialog.download-linked-files~1]
+        when(preferences.getFilePreferences().shouldDownloadLinkedFiles()).thenReturn(webSearchChoice);
+        if (choice) {
+            importHandler.enableLinkedFileDownloads();
+        } else {
+            importHandler.disableLinkedFileDownloads();
+        }
+        BibEntry entry = new BibEntry().withFiles(List.of(new LinkedFile("", "https://example.org/paper.pdf", "PDF")));
+
+        try (MockedConstruction<LinkedFileViewModel> downloads = mockConstruction(LinkedFileViewModel.class)) {
+            importHandler.downloadLinkedFiles(entry);
+
+            assertEquals(choice ? 1 : 0, downloads.constructed().size());
+            downloads.constructed().forEach(download -> verify(download).download(Mockito.eq(false), any()));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void downloadsUseWebSearchPreferenceWithoutOverride(boolean choice) {
+        // [utest->req~import.dialog.download-linked-files~1]
+        when(preferences.getFilePreferences().shouldDownloadLinkedFiles()).thenReturn(choice);
+        BibEntry entry = new BibEntry().withFiles(List.of(new LinkedFile("", "https://example.org/paper.pdf", "PDF")));
+
+        try (MockedConstruction<LinkedFileViewModel> downloads = mockConstruction(LinkedFileViewModel.class)) {
+            importHandler.downloadLinkedFiles(entry);
+
+            assertEquals(choice ? 1 : 0, downloads.constructed().size());
+            downloads.constructed().forEach(download -> verify(download).download(Mockito.eq(false), any()));
+        }
     }
 
     @Test
@@ -403,6 +449,40 @@ class ImportHandlerTest {
 
         journal.undo();
         assertEquals(List.of(existing), database.getEntries(), "the replaced entry could not be restored");
+    }
+
+    /// An imported entry may carry a key from its source that is already taken in the library.
+    /// With "Generate new key on import" (the default setting), the imported entry gets a free key and the existing key stays.
+    @Test
+    void importedEntryWithTakenKeyGetsNewKeyAndExistingKeyStays() {
+        BibEntry existingWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "汪, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibEntry importedWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "王, 大明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibDatabase database = new BibDatabase(List.of(existingWang));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
+        GlobalCitationKeyPatterns keyPatterns = GlobalCitationKeyPatterns.fromPattern("[auth:transliterate:camel][year]");
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                keyPatterns,
+                new SimpleObjectProperty<>(',')));
+
+        handlerFor(databaseContext, new JabRefUndoManager()).importEntries(List.of(importedWang));
+
+        assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
+                List.of(existingWang.getCitationKey(), importedWang.getCitationKey()));
     }
 
     private ImportHandler handlerFor(BibDatabaseContext databaseContext, JabRefUndoManager journal) {

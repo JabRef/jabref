@@ -19,6 +19,7 @@ class EntryResourceTest extends ServerTest {
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(EntryResource.class);
         addGuiBridgeToResourceConfig(resourceConfig);
+        addGsonToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGlobalExceptionMapperToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
@@ -56,5 +57,49 @@ class EntryResourceTest extends ServerTest {
         String body = response.readEntity(String.class);
         assertFalse(body.contains("<script>alert('xss')</script>"));
         assertTrue(body.contains("&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"));
+    }
+
+    @Test
+    void filesListsOnlyLocalPdfsOfEntry() {
+        // [utest->req~jabsrv.entry.files.list~1]
+        setAvailableLibraries(EnumSet.of(TestBibFile.FILES_SERVER_TEST));
+
+        String response = target("/libraries/" + TestBibFile.FILES_SERVER_TEST.id + "/entries/Files2026/files")
+                .request()
+                .get(String.class);
+
+        String expected = """
+                [
+                  {
+                    "fileName": "Files2026.pdf",
+                    "parentCitationKey": "Files2026",
+                    "path": "Files2026.pdf"
+                  }
+                ]""";
+        assertEquals(expected, response);
+    }
+
+    @Test
+    void filesOfEntryWithoutFilesIsEmptyList() {
+        // [utest->req~jabsrv.entry.files.list~1]
+        setAvailableLibraries(EnumSet.of(TestBibFile.FILES_SERVER_TEST));
+
+        String response = target("/libraries/" + TestBibFile.FILES_SERVER_TEST.id + "/entries/NoFiles2026/files")
+                .request()
+                .get(String.class);
+
+        assertEquals("[]", response);
+    }
+
+    @Test
+    void filesOfUnknownEntryIs404() {
+        // [utest->req~jabsrv.entry.files.list~1]
+        setAvailableLibraries(EnumSet.of(TestBibFile.FILES_SERVER_TEST));
+
+        Response response = target("/libraries/" + TestBibFile.FILES_SERVER_TEST.id + "/entries/Unknown2026/files")
+                .request()
+                .get();
+
+        assertEquals(404, response.getStatus());
     }
 }

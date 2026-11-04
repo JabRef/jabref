@@ -69,7 +69,7 @@ AI-based coding assistants are increasingly enabled by default at every step of 
 
 While these tools can help newcomers navigate the codebase, they often generate well-meaning but unhelpful submissions.
 
-There are also ethical and legal considerations around authorship, licensing, and environmental impact.
+Ethical and legal considerations around authorship, licensing, and environmental impact also apply.
 
 We believe that learning to code and contributing to open source are deeply human endeavors that requires curiosity, slowness, and community.
 
