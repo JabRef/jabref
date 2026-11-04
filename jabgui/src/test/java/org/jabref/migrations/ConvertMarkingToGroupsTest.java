@@ -40,6 +40,25 @@ class ConvertMarkingToGroupsTest {
     }
 
     @Test
+    void markingGroupElsewhereInTreeIsReused() {
+        BibEntry entry = new BibEntry()
+                .withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
+        ParserResult parserResult = new ParserResult(Set.of(entry));
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        root.addSubgroup(new ExplicitGroup("Reading", GroupHierarchyType.INCLUDING, ','))
+            .addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
+        parserResult.getMetaData().setGroups(root);
+
+        new ConvertMarkingToGroups(',').performMigration(parserResult);
+
+        GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        rootExpected.addSubgroup(new ExplicitGroup("Reading", GroupHierarchyType.INCLUDING, ','))
+                    .addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
+        assertEquals(Optional.of(rootExpected), parserResult.getMetaData().getGroups());
+        assertEquals(Optional.of("Nicolas:6"), entry.getField(StandardField.GROUPS));
+    }
+
+    @Test
     void blankMarkingIsRemovedWithoutCreatingGroups() {
         BibEntry entry = new BibEntry()
                 .withField(InternalField.MARKED_INTERNAL, " ");

@@ -53,16 +53,10 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
         if (!markings.isEmpty()) {
             GroupTreeNode root = parserResult.getMetaData().getGroups()
                                              .orElseGet(() -> GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
-            // Group names are unique per library, so an existing "Markings" tree (e.g., from a partial earlier run) is extended
-            GroupTreeNode markingRoot = childNamed(root, Localization.lang("Markings"))
-                    .orElseGet(() -> {
-                        GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, keywordSeparator));
-                        root.addChild(node, 0);
-                        return node;
-                    });
+            // Group names are unique per library, so existing groups (e.g., from a partial earlier run) are extended wherever they are in the tree
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
-                GroupTreeNode markingGroup = childNamed(markingRoot, marking.getKey())
-                        .orElseGet(() -> markingRoot.addSubgroup(new ExplicitGroup(marking.getKey(), GroupHierarchyType.INCLUDING, keywordSeparator)));
+                GroupTreeNode markingGroup = root.findGroupByName(marking.getKey())
+                        .orElseGet(() -> markingRoot(root).addSubgroup(new ExplicitGroup(marking.getKey(), GroupHierarchyType.INCLUDING, keywordSeparator)));
                 markingGroup.addEntriesToGroup(marking.getValue());
             }
             parserResult.getMetaData().setGroups(root);
@@ -71,8 +65,13 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
         clearMarkings(entries);
     }
 
-    private static Optional<GroupTreeNode> childNamed(GroupTreeNode parent, String name) {
-        return parent.getChildren().stream().filter(child -> child.getName().equals(name)).findFirst();
+    private GroupTreeNode markingRoot(GroupTreeNode root) {
+        return root.findGroupByName(Localization.lang("Markings"))
+                   .orElseGet(() -> {
+                       GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, keywordSeparator));
+                       root.addChild(node, 0);
+                       return node;
+                   });
     }
 
     /// Looks for markings (such as __markedentry = {[Nicolas:6]}) in the given list of entries.
