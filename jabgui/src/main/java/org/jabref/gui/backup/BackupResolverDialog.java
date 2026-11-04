@@ -41,7 +41,6 @@ public class BackupResolverDialog extends FXDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupResolverDialog.class);
     private static final String UNKNOWN = "–";
-    private static final double NAME_CELL_MAX_WIDTH = 240;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
 
     private final Label currentEntries;
@@ -59,14 +58,19 @@ public class BackupResolverDialog extends FXDialog {
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
         Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
+        Node backupNameCell;
+        if (backupPathOpt.isPresent()) {
+            backupNameCell = backupLink(backupPathOpt.orElseThrow(), externalApplicationsPreferences);
+        } else {
+            backupNameCell = value("backupName", Localization.lang("File not found"));
+        }
         GridPane table = new GridPane();
         table.setHgap(12);
         table.setVgap(6);
         table.addRow(0, header(Localization.lang("Property")), header(Localization.lang("Current file")), header(Localization.lang("Backup file")));
         table.addRow(1, new Label(Localization.lang("Name")),
                 capped(value("currentName", originalPath.getFileName().toString())),
-                backupPathOpt.<Node>map(path -> backupLink(path, externalApplicationsPreferences))
-                             .orElseGet(() -> value("backupName", Localization.lang("File not found"))));
+                backupNameCell);
         table.addRow(2, new Label(Localization.lang("Size")),
                 value("currentSize", FileUtil.getFileSize(originalPath).orElse(UNKNOWN)),
                 value("backupSize", backupPathOpt.flatMap(FileUtil::getFileSize).orElse(UNKNOWN)));
@@ -74,7 +78,7 @@ public class BackupResolverDialog extends FXDialog {
                 value("currentModified", formatModified(originalPath)),
                 value("backupModified", backupPathOpt.map(this::formatModified).orElse(UNKNOWN)));
 
-        // Rows are filled before the task starts: in tests CurrentThreadTaskExecutor runs onSuccess/onFailure inside executeWith, while the constructor is still running
+        // Create the labels before starting the task as it might finish immediately 
         String initial = backupPathOpt.isPresent() ? Localization.lang("Calculating...") : UNKNOWN;
         currentEntries = value("currentEntries", initial);
         backupEntries = value("backupEntries", initial);
@@ -117,7 +121,7 @@ public class BackupResolverDialog extends FXDialog {
 
     /// Backup file names carry a hash prefix and a timestamp, so name cells are capped and show the full name as a tooltip.
     private static <T extends Labeled> T capped(T cell) {
-        cell.setMaxWidth(NAME_CELL_MAX_WIDTH);
+        cell.setMaxWidth(240);
         cell.setTooltip(new Tooltip(cell.getText()));
         return cell;
     }
@@ -147,12 +151,15 @@ public class BackupResolverDialog extends FXDialog {
     private void fillCounts(BackupComparison comparison) {
         currentEntries.setText(format(comparison.current().entryCount()));
         backupEntries.setText(format(comparison.backup().entryCount()));
-        backupChanges.setText(comparison.changes()
-                                        .map(changes -> changes.added() == 0 && changes.removed() == 0 && changes.modified() == 0
-                                                        ? Localization.lang("No entry changes")
-                                                        : Localization.lang("removed: %0, added: %1, modified: %2",
-                                                String.valueOf(changes.removed()), String.valueOf(changes.added()), String.valueOf(changes.modified())))
-                                        .orElse(UNKNOWN));
+        backupChanges.setText(comparison.changes().map(BackupResolverDialog::describeChanges).orElse(UNKNOWN));
+    }
+
+    private static String describeChanges(BackupComparison.ChangeCounts changes) {
+        if (changes.added() == 0 && changes.removed() == 0 && changes.modified() == 0) {
+            return Localization.lang("No entry changes");
+        }
+        return Localization.lang("removed: %0, added: %1, modified: %2",
+                String.valueOf(changes.removed()), String.valueOf(changes.added()), String.valueOf(changes.modified()));
     }
 
     private void setCountsUnknown() {
