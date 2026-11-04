@@ -113,6 +113,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed custom terminal and file browser commands failing when library directories contain spaces. [#12531](https://github.com/JabRef/jabref/issues/12531)
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
+- We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 
 ### Removed
 
