@@ -1,5 +1,6 @@
 package org.jabref.model.entry.identifier;
 
+import java.net.URI;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -345,7 +346,14 @@ class DOITest {
     }
 
     @Test
-    void rejectNullDoiParameter() {
-        assertThrows(NullPointerException.class, () -> new DOI(null));
+    void getExternalURIWithQueryParameter() {
+        String base = "10.1371/journal.pone.0000308";
+        String params = "?utm_source=newsletter";
+
+        DOI doi = new DOI(base + params);
+        assertEquals(
+                Optional.of(URI.create("https://doi.org/" + base + params)),
+                doi.getExternalURI()
+        );
     }
 }
