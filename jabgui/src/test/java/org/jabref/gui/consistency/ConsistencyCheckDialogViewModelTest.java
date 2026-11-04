@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,7 +99,7 @@ class ConsistencyCheckDialogViewModelTest {
         Files.writeString(bstFile, "ENTRY { author title } {} {}");
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
 
-        viewModel.loadBstFile(bstFile);
+        loadBstFile(viewModel, bstFile);
 
         assertEquals("minimal.bst", viewModel.bstStyleNameProperty().get());
         assertTrue(viewModel.restrictToBstFieldsProperty().get());
@@ -122,7 +124,7 @@ class ConsistencyCheckDialogViewModelTest {
                 .withField(StandardField.AUTHOR, "Author Two");
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(first, second));
 
-        viewModel.loadBstFile(bstFile);
+        loadBstFile(viewModel, bstFile);
 
         assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE), shownFields(viewModel));
     }
@@ -133,8 +135,8 @@ class ConsistencyCheckDialogViewModelTest {
         Path yearStyle = Files.writeString(Files.createDirectory(tempDir.resolve("b")).resolve("style.bst"), "ENTRY { author year } {} {}");
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
 
-        viewModel.loadBstFile(titleStyle);
-        viewModel.loadBstFile(yearStyle);
+        loadBstFile(viewModel, titleStyle);
+        loadBstFile(viewModel, yearStyle);
 
         assertEquals(List.of(StandardField.YEAR), shownFields(viewModel));
     }
@@ -145,7 +147,7 @@ class ConsistencyCheckDialogViewModelTest {
         Files.writeString(bstFile, "FUNCTION { nothing } { }");
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
 
-        viewModel.loadBstFile(bstFile);
+        loadBstFile(viewModel, bstFile);
 
         verify(dialogService).showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
         assertEquals("", viewModel.bstStyleNameProperty().get());
@@ -166,7 +168,7 @@ class ConsistencyCheckDialogViewModelTest {
                 .withField(StandardField.AUTHOR, "Author Two");
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(first, second));
 
-        viewModel.loadBstFile(bstFile);
+        loadBstFile(viewModel, bstFile);
 
         assertEquals(List.of(StandardField.DATE, StandardField.MONTH, StandardField.YEAR), shownFields(viewModel));
     }
@@ -182,7 +184,7 @@ class ConsistencyCheckDialogViewModelTest {
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(article, bookWithPublisher, book));
         viewModel.selectedEntryTypeProperty().set("Article");
 
-        viewModel.loadBstFile(bstFile);
+        loadBstFile(viewModel, bstFile);
 
         assertEquals(List.of("Book"), viewModel.getEntryTypes());
         assertEquals("Book", viewModel.selectedEntryTypeProperty().get());
@@ -190,6 +192,52 @@ class ConsistencyCheckDialogViewModelTest {
         viewModel.restrictToBstFieldsProperty().set(false);
 
         assertEquals(List.of("Article", "Book"), viewModel.getEntryTypes());
+    }
+
+    private void loadBstFile(ConsistencyCheckDialogViewModel viewModel, Path path) throws Exception {
+        clearInvocations(taskExecutor);
+        viewModel.loadBstFile(path);
+        ArgumentCaptor<BackgroundTask<Set<String>>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+        BackgroundTask<Set<String>> task = captor.getValue();
+        task.getOnSuccess().accept(task.call());
+    }
+
+    @Test
+    void loadingBstFileRunsInBackgroundAndIgnoresOlderResults(@TempDir Path tempDir) throws Exception {
+        Path first = Files.writeString(tempDir.resolve("first.bst"), "ENTRY { title } {} {}");
+        Path second = Files.writeString(tempDir.resolve("second.bst"), "ENTRY { year } {} {}");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+
+        viewModel.loadBstFile(first);
+        viewModel.loadBstFile(second);
+        ArgumentCaptor<BackgroundTask<Set<String>>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor, org.mockito.Mockito.times(2)).execute(captor.capture());
+        BackgroundTask<Set<String>> older = captor.getAllValues().getFirst();
+        BackgroundTask<Set<String>> newer = captor.getAllValues().getLast();
+        assertEquals("", viewModel.bstStyleNameProperty().get());
+
+        newer.getOnSuccess().accept(newer.call());
+        older.getOnSuccess().accept(older.call());
+
+        assertEquals("second.bst", viewModel.bstStyleNameProperty().get());
+        assertEquals(List.of(StandardField.YEAR), shownFields(viewModel));
+    }
+
+    @Test
+    void failedBstLoadShowsErrorWithoutChangingSelection(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Path missing = tempDir.resolve("missing.bst");
+        viewModel.loadBstFile(missing);
+        ArgumentCaptor<BackgroundTask<Set<String>>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+        BackgroundTask<Set<String>> task = captor.getValue();
+        IOException exception = assertThrows(IOException.class, task::call);
+
+        task.getOnException().accept(exception);
+
+        verify(dialogService).showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), exception);
+        assertEquals("", viewModel.bstStyleNameProperty().get());
     }
 
     private static List<StandardField> shownFields(ConsistencyCheckDialogViewModel viewModel) {
