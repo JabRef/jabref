@@ -176,7 +176,7 @@ class ClipboardContentGeneratorTest {
         int selectedPosition = 0;
         List<PreviewLayout> previewLayoutList = new ArrayList<>(List.of(first, second));
 
-        PreviewPreferences preferences = new PreviewPreferences(previewLayoutList, selectedPosition, List.of(), false, false, List.of(), false);
+        PreviewPreferences preferences = new PreviewPreferences(previewLayoutList, selectedPosition, List.of(), false, false, 0, List.of(), false);
         ClipboardContentGenerator clipboardContentGenerator = new ClipboardContentGenerator(preferences, formatterPreferences, journalAbbreviationRepository);
         ClipboardContent content = clipboardContentGenerator.generate(List.of(new BibEntry()), CitationStyleOutputFormat.HTML, new BibDatabaseContext());
         assertEquals("style1", content.getString());

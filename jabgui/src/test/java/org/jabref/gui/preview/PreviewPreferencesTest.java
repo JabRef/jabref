@@ -53,6 +53,7 @@ class PreviewPreferencesTest {
                 List.of(new CustomizedPreviewStyle(ID1, NAME1, TEXT1)),
                 false,
                 false,
+                0,
                 List.of(),
                 false);
         PreviewLayout previewLayout = preferences.getSelectedPreviewLayout();
@@ -84,6 +85,7 @@ class PreviewPreferencesTest {
                 List.of(),
                 false,
                 false,
+                0,
                 List.of(),
                 false);
         PreviewLayout previewLayout = preferences.getLayoutCycle().getFirst();
@@ -108,7 +110,7 @@ class PreviewPreferencesTest {
     @Test
     void getSelectedPreviewLayoutEmptyLayoutCycleUsesDefaultStyle() {
         // layout cycle is empty
-        PreviewPreferences preferences = new PreviewPreferences(List.of(), 0, List.of(), false, false, List.of(), false);
+        PreviewPreferences preferences = new PreviewPreferences(List.of(), 0, List.of(), false, false, 0, List.of(), false);
 
         TextBasedPreviewLayout layout = assertInstanceOf(TextBasedPreviewLayout.class, preferences.getSelectedPreviewLayout());
 

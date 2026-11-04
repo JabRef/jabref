@@ -94,7 +94,7 @@ class PreviewTabViewModelTest {
 
     private PreviewTabViewModel setUpViewModel() {
         PreviewPreferences previewPreferences = new PreviewPreferences(
-                List.of(), 0, List.of(), false, false, List.of(), false);
+                List.of(), 0, List.of(), false, false, 0, List.of(), false);
         PreviewTabViewModel viewModel = viewModelWith(previewPreferences);
         viewModel.setValues();
         return viewModel;
@@ -112,6 +112,7 @@ class PreviewTabViewModelTest {
                         new CustomizedPreviewStyle(ID3, NAME3, TEXT3)),
                 false,
                 false,
+                0,
                 List.of(),
                 false
         );
@@ -152,6 +153,7 @@ class PreviewTabViewModelTest {
                 List.of(),
                 false,
                 false,
+                0,
                 List.of(),
                 false
         );
@@ -172,7 +174,7 @@ class PreviewTabViewModelTest {
     @Test
     void storeSettingsPersistsAllCustomizedStyles() {
         PreviewPreferences previewPreferences = new PreviewPreferences(
-                List.of(), 0, List.of(), false, false, List.of(), false);
+                List.of(), 0, List.of(), false, false, 0, List.of(), false);
         PreviewTabViewModel viewModel = viewModelWith(previewPreferences);
         viewModel.setValues();
 
@@ -203,6 +205,7 @@ class PreviewTabViewModelTest {
                 List.of(new CustomizedPreviewStyle("id1", "name", "<b>originalText</b>")),
                 false,
                 false,
+                0,
                 List.of(),
                 false
         );
@@ -231,6 +234,7 @@ class PreviewTabViewModelTest {
                 List.of(new CustomizedPreviewStyle("id1", "existingName", "<b>text1</b>")),
                 false,
                 false,
+                0,
                 List.of(),
                 false
         );
