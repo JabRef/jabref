@@ -109,6 +109,7 @@ class OpenOfficeCitationControllerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
+    // [utest->req~openoffice.insertion-unresolved-warning~1]
     void insertionWarnsWhenExistingCitationKeysAreUnresolved(boolean syncWhenCiting) {
         when(preferences.getSyncWhenCiting()).thenReturn(syncWhenCiting);
         BibEntry entry = new BibEntry().withCitationKey("new");
@@ -121,12 +122,36 @@ class OpenOfficeCitationControllerTest {
             citationController.capabilities(style);
             CitationEngine engine = engines.constructed().getFirst();
             when(engine.insert(List.of(entry), databases, style, CitationType.AUTHORYEAR_PAR, "", cursor, syncWhenCiting))
-                    .thenReturn(OOResult.ok(List.of("old")));
+                    .thenReturn(OOResult.ok(List.of("old", "other")));
 
             citationController.insertCitation(List.of(entry), databases, style, CitationType.AUTHORYEAR_PAR, "");
 
-            verify(dialogs).showErrorDialogAndWait(lang("Could not insert citation"),
-                    lang("Your OpenOffice/LibreOffice document references at least %0 citation keys which could not be found in your current library. Some of these are %1.", "1", "old"));
+            InOrder order = inOrder(engine, dialogs);
+            order.verify(engine).insert(List.of(entry), databases, style, CitationType.AUTHORYEAR_PAR, "", cursor, syncWhenCiting);
+            order.verify(dialogs).showWarningDialogAndWait(lang("Unresolved citations"),
+                    lang("The citation was inserted, but some existing citations could not be found in the selected libraries: %0. Open the corresponding libraries and refresh the document.", "old, other"));
+            verify(dialogs, never()).showErrorDialogAndWait(anyString(), anyString());
+        }
+    }
+
+    @Test
+    void insertionFailureShowsAnErrorWithoutAnUnresolvedCitationWarning() {
+        BibEntry entry = new BibEntry().withCitationKey("new");
+        List<BibDatabase> databases = List.of(new BibDatabase(List.of(entry)));
+        XTextViewCursor cursor = mock(XTextViewCursor.class);
+        try (MockedConstruction<CitationEngine> engines = mockEngines();
+             MockedStatic<UnoCursor> cursors = mockStatic(UnoCursor.class)) {
+            cursors.when(() -> UnoCursor.getViewCursor(document)).thenReturn(Optional.of(cursor));
+            OpenOfficeCitationController citationController = controller();
+            citationController.capabilities(style);
+            CitationEngine engine = engines.constructed().getFirst();
+            when(engine.insert(List.of(entry), databases, style, CitationType.AUTHORYEAR_PAR, "", cursor, false))
+                    .thenReturn(OOResult.error(new JabRefException("render failed")));
+
+            citationController.insertCitation(List.of(entry), databases, style, CitationType.AUTHORYEAR_PAR, "");
+
+            verify(dialogs).showErrorDialogAndWait(lang("Could not insert citation"), "render failed");
+            verify(dialogs, never()).showWarningDialogAndWait(anyString(), anyString());
         }
     }
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
@@ -32,6 +33,7 @@ import org.mockito.MockedStatic;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -199,6 +201,25 @@ class ConversionMetadataTest {
     void nonemptyNativeCitationModifiersAreRejected(String field) {
         String name = ZoteroReferenceMark.PREFIX + "{\"citationItems\":[{\"" + field + "\":\"value\"}]}";
         assertThrows(RenderException.class, () -> ConversionMetadata.requireSupportedModifiers(name));
+    }
+
+    @Test
+    void conversionRetainsItsOwnModifierGuidanceAndTheValidationCause() {
+        RenderException error = assertThrows(RenderException.class, () -> ConversionMetadata.requireSupportedModifiers(NATIVE));
+
+        assertEquals(Optional.of(Localization.lang("Cannot convert Zotero citations with locators, labels, prefixes, suffixes, author-only items, or mixed author suppression. Remove these modifiers in Zotero and try again.")), error.localizedMessage());
+        assertEquals("Unsupported native Zotero citation modifiers", assertInstanceOf(RenderException.class, error.getCause()).getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"{}", "[]", "null", "not JSON", "{\"citationItems\":null}",
+            "{\"citationItems\":{}}", "{\"citationItems\":[null]}", "{\"citationItems\":[{\"suppress-author\":{}}]}"})
+    void malformedNativeModifiersRetainInvalidMetadataGuidance(String json) {
+        RenderException error = assertThrows(RenderException.class,
+                () -> ConversionMetadata.requireSupportedModifiers(ZoteroReferenceMark.PREFIX + json));
+
+        assertEquals(CitationFormatConverter.invalidMetadata().localizedMessage(), error.localizedMessage());
+        assertInstanceOf(RenderException.class, error.getCause());
     }
 
     @Test

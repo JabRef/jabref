@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
+import org.jabref.logic.openoffice.engine.ZoteroCitationModifiers.UnsupportedModifiersException;
 import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -146,40 +147,16 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
 
     static void requireSupportedModifiers(String name) throws RenderException {
         try {
-            JsonObject citation = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(name)).getAsJsonObject();
-            rejectTextModifiers(citation);
-            if (citation.has("properties") && citation.get("properties").isJsonObject()) {
-                rejectTextModifiers(citation.getAsJsonObject("properties"));
-            }
-            Optional<Boolean> suppression = Optional.empty();
-            for (JsonElement element : citation.getAsJsonArray("citationItems")) {
-                JsonObject item = element.getAsJsonObject();
-                rejectTextModifiers(item);
-                if (item.has("author-only") && item.get("author-only").getAsBoolean()) {
-                    throw unsupportedModifiers();
-                }
-                boolean suppress = item.has("suppress-author") && item.get("suppress-author").getAsBoolean();
-                if (suppression.isPresent() && suppression.orElseThrow() != suppress) {
-                    throw unsupportedModifiers();
-                }
-                suppression = Optional.of(suppress);
-            }
-        } catch (JsonParseException | IllegalStateException | UnsupportedOperationException exception) {
+            ZoteroCitationModifiers.requireSupportedModifiers(name);
+        } catch (UnsupportedModifiersException exception) {
+            LOGGER.debug("Cannot convert native Zotero citation modifiers", exception);
+            CitationFormatConverter.ConversionException failure = new CitationFormatConverter.ConversionException("Unsupported native Zotero citation modifiers",
+                    Localization.lang("Cannot convert Zotero citations with locators, labels, prefixes, suffixes, author-only items, or mixed author suppression. Remove these modifiers in Zotero and try again."));
+            failure.initCause(exception);
+            throw failure;
+        } catch (RenderException exception) {
             throw CitationFormatConverter.invalidMetadata(exception);
         }
-    }
-
-    private static void rejectTextModifiers(JsonObject json) throws RenderException {
-        for (String field : List.of("locator", "label", "prefix", "suffix")) {
-            if (json.has(field) && !json.get(field).isJsonNull() && !json.get(field).getAsString().isEmpty()) {
-                throw unsupportedModifiers();
-            }
-        }
-    }
-
-    private static RenderException unsupportedModifiers() {
-        return new CitationFormatConverter.ConversionException("Unsupported native Zotero citation modifiers",
-                Localization.lang("Cannot convert Zotero citations with locators, labels, prefixes, suffixes, author-only items, or mixed author suppression. Remove these modifiers in Zotero and try again."));
     }
 
     static String identity(String name) throws RenderException {

@@ -54,6 +54,25 @@ With synchronization enabled and a style that has a bibliography, normal handlin
 
 Needs: impl, utest
 
+## Native Zotero citation updates must reject unsupported modifiers before mutation
+`req~openoffice.zotero-modifier-safe-update~1`
+
+Ordinary native Zotero insertion and refresh reject existing citations with nonempty locators, labels, prefixes, suffixes, author-only items, or mixed per-item author suppression before changing any citation, bibliography, document property, or undo history.
+The error explains that no citations were changed and directs the user to update the citations in Zotero.
+Uniform author suppression remains supported, and export-cited remains available because it does not rewrite citations.
+This modifier check does not impose conversion-sidecar freshness requirements on ordinary native updates.
+
+Needs: impl, utest
+
+## Successful citation insertion must warn about unresolved existing citation keys
+`req~openoffice.insertion-unresolved-warning~1`
+
+After successful insertion, the controller shows an "Unresolved citations" warning listing every unresolved key returned by the engine and advising the user to open the corresponding libraries and refresh.
+This applies with bibliography synchronization enabled or disabled, since insertion always refreshes citation markers.
+An empty unresolved-key list produces no warning; an insertion failure retains its error dialog rather than reporting success.
+
+Needs: impl, utest
+
 ## Canonical citation merge or separation must be undoable in one complete step
 `req~openoffice.single-step-group-undo~1`
 

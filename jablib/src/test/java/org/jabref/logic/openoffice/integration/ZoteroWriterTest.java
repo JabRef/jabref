@@ -12,11 +12,13 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.ZoteroCitationLinker;
@@ -28,6 +30,7 @@ import org.jabref.logic.openoffice.backend.WriterReferenceMark.BoundaryPolicy;
 import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
 import org.jabref.logic.openoffice.engine.CitationEngine;
 import org.jabref.logic.openoffice.engine.CitedEntryExporter;
+import org.jabref.logic.openoffice.engine.RenderException;
 import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.Reason;
 import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StrategyException;
 import org.jabref.logic.openoffice.style.BstStyle;
@@ -77,8 +80,10 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.jabref.logic.openoffice.integration.HeadlessLibreOffice.query;
@@ -229,6 +234,81 @@ class ZoteroWriterTest {
             assertEquals("17", json(updatedName).getAsJsonArray("citationItems").get(0).getAsJsonObject().get("locator").getAsString());
             assertEquals("[1, p. 17]", citations.get(updatedName));
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("unsupportedNativeUpdates")
+    // [utest->req~openoffice.zotero-modifier-safe-update~1]
+    void unsupportedNativeModifiersRejectUpdatesWithFullSnapshotUnchanged(String operation, String location, String field) throws Exception {
+        XTextDocument document = office.newDocument();
+        document.getText().setString("New citation: .\n");
+        appendMark(document, nativeMarkName().replace("native-citation", "supported-citation"), "[supported]");
+        JsonObject citation = json(nativeMarkName());
+        JsonObject item = citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+        if ("author-only".equals(field)) {
+            item.addProperty(field, true);
+        } else if ("mixed-suppression".equals(field)) {
+            citation.getAsJsonArray("citationItems").add(item.deepCopy());
+            item.addProperty("suppress-author", true);
+        } else {
+            JsonObject target = switch (location) {
+                case "properties" -> citation.getAsJsonObject("properties");
+                case "item" -> item;
+                default -> citation;
+            };
+            target.addProperty(field, "17");
+        }
+        String name = ZoteroReferenceMark.PREFIX + citation + " RNDmodifier01";
+        appendMark(document, name, "[native, p. 17]");
+        XTextRange anchor = WriterReferenceMarks.getAnchor(document, name).orElseThrow();
+        XPropertySet format = query(XPropertySet.class, anchor.getText().createTextCursorByRange(anchor));
+        format.setPropertyValue("CharHeight", 18.0f);
+        format.setPropertyValue("CharWeight", FontWeight.BOLD);
+        format.setPropertyValue("CharPosture", FontSlant.ITALIC);
+        format.setPropertyValue("CharColor", 0x345678);
+        XTextCursor bibliography = document.getText().createTextCursor();
+        bibliography.gotoEnd(false);
+        bibliography.setString("\n");
+        bibliography.collapseToEnd();
+        bibliography.setString("Existing native bibliography");
+        UnoTextSection.create(new DocumentAnnotation(document, "ZOTERO_BIBL unchanged", bibliography, true));
+        UnoUserDefinedProperty.setStringProperty(document, "JabRef_citation_conversion:unrelated", "not JSON");
+        UnoUserDefinedProperty.setStringProperty(document, "JabRef_document_style", "CSL\nuntouched");
+        UnoRedlines.setRecordChanges(document, true);
+        DocumentSnapshot before = snapshot(document);
+        BibEntry entry = nativeEntry("native");
+        List<BibDatabase> databases = List.of(new BibDatabase(List.of(entry)));
+        try (CitationEngine engine = engine(document)) {
+            OOResult<List<String>, JabRefException> result = "refresh".equals(operation)
+                                                             ? engine.refresh(databases, style())
+                                                             : engine.insert(List.of(entry), databases, style(), CitationType.AUTHORYEAR_PAR,
+                    "", document.getText().createTextCursor(), true);
+            StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+            assertEquals(Reason.UNSUPPORTED_MODIFIERS, error.reason());
+            assertEquals(Localization.lang("Cannot update Zotero citations with unsupported modifiers. No citations were changed. Update them in Zotero instead."), error.getLocalizedMessage());
+            assertEquals("Unsupported native Zotero citation modifiers", assertInstanceOf(RenderException.class, error.getCause()).getMessage());
+            assertEquals(before, snapshot(document));
+            assertTrue(UnoRedlines.getRecordChanges(document));
+            CitedEntryExporter.ExportResult exported = success(engine.exportCited(databases));
+            assertEquals(List.of(), exported.database().getEntries());
+            assertEquals(List.of("Zotero-600"), exported.unresolvedKeys());
+            assertEquals(before, snapshot(document));
+        }
+        assertEquals(before, snapshot(document));
+    }
+
+    private static Stream<Arguments> unsupportedNativeUpdates() {
+        Stream.Builder<Arguments> cases = Stream.builder();
+        for (String operation : List.of("refresh", "insert")) {
+            for (String field : List.of("locator", "label", "prefix", "suffix")) {
+                for (String location : List.of("citation", "properties", "item")) {
+                    cases.add(Arguments.of(operation, location, field));
+                }
+            }
+            cases.add(Arguments.of(operation, "item", "author-only"));
+            cases.add(Arguments.of(operation, "item", "mixed-suppression"));
+        }
+        return cases.build();
     }
 
     @Test

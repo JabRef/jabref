@@ -83,6 +83,9 @@ A preparation/rendering failure leaves marks, properties, text, and undo history
 Insertion refreshes citation markers even when bibliography synchronization is disabled.
 That preference controls whether the target mode's managed bibliography is also updated; it is not overridden merely because a bibliography already exists.
 A style without a bibliography can still update citation markers without rebuilding a bibliography.
+If existing citations cannot be resolved in the selected libraries, a successful insertion shows an "Unresolved citations" warning listing every returned key and advising the user to open the corresponding libraries and refresh.
+The warning applies with synchronization enabled or disabled; the insertion succeeds, but existing markers may show unresolved keys, and synchronization may omit their bibliography entries.
+Stored keys remain available for resolution after reopening the libraries and refreshing.
 
 ## What is stored in a document
 
@@ -204,8 +207,10 @@ Invalid metadata, unsupported citation modifiers, unresolved sources, unsuitable
 `ConversionMetadata` stores a document-local citation sidecar under `JabRef_citation_conversion:<uid>`.
 It preserves the canonical uid, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, including URI links, opaque identifiers, and harmless unknown metadata, while the association remains valid through conversion and save/reopen.
 Previously stored canonical partial types and page information survive but are not rendered in Zotero mode.
-Native nonempty locators, labels, prefixes, suffixes, author-only items, and mixed per-item `suppress-author` flags are rejected before conversion with an actionable error; uniform suppression is supported.
-A rejected locator-bearing citation keeps its existing text and JSON; this is not locator conversion or rendering support.
+Native nonempty locators, labels, prefixes, suffixes, author-only items, and mixed per-item `suppress-author` flags are rejected before conversion or ordinary native insertion/refresh with an actionable error; uniform suppression is supported.
+`ZoteroCitationModifiers` validates these modifiers before linking, rendering, or writing native updates, independently of conversion-sidecar freshness checks.
+A rejected update leaves citations, bibliography, document properties, and undo history unchanged and directs the user to update the citations in Zotero; this is not locator conversion or rendering support.
+Export-cited still reads these citations because it does not rewrite them.
 The sidecar is not a rendered-output cache: opaque native JSON may include Zotero display properties that are preserved rather than used for rendering.
 
 A native citation's `citationID` or mark suffix associates it with its sidecar.

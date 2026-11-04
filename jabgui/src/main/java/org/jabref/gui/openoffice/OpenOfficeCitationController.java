@@ -233,7 +233,15 @@ public class OpenOfficeCitationController {
         }
         OOResult<List<String>, JabRefException> result = current.get().insert(entries, selectedDatabases, style, type,
                 Optional.ofNullable(pageInfo).orElse(""), cursor.get(), openOfficePreferences.getSyncWhenCiting());
-        showErrorIfPresent(title, result.asVoidResult().mapError(OOError::from));
+        if (showErrorIfPresent(title, result.asVoidResult().mapError(OOError::from))) {
+            return;
+        }
+        // [impl->req~openoffice.insertion-unresolved-warning~1]
+        if (!result.get().isEmpty()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Unresolved citations"),
+                    Localization.lang("The citation was inserted, but some existing citations could not be found in the selected libraries: %0. Open the corresponding libraries and refresh the document.",
+                            String.join(", ", result.get())));
+        }
     }
 
     public void mergeCitations(List<BibDatabase> databases, OOStyle style) {

@@ -564,7 +564,7 @@ class WriterIntegrationTest {
                     selectedStyle, CitationType.AUTHORYEAR_PAR, "", nextPosition, true)));
 
             assertEquals(Map.of("old", "Unresolved(old)", "new", "[1]"), textsByKey(document));
-            assertEquals("References\n1. Second library title", UnoTextSection.getAnchor(document, "JR_bib").orElseThrow().getString().strip());
+            assertEquals(List.of("References", "1. Second library title"), UnoTextSection.getAnchor(document, "JR_bib").orElseThrow().getString().strip().lines().toList());
         }
     }
 

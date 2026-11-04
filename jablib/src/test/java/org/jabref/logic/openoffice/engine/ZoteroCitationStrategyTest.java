@@ -26,6 +26,7 @@ import org.jabref.logic.openoffice.uno.NoDocumentException;
 import org.jabref.logic.openoffice.uno.OOTextWriter;
 import org.jabref.logic.openoffice.uno.UnoDispatch;
 import org.jabref.logic.openoffice.uno.UnoRedlines;
+import org.jabref.logic.openoffice.uno.UnoUndo;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -35,6 +36,8 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.util.OOResult;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.XEnumeration;
 import com.sun.star.container.XEnumerationAccess;
@@ -53,6 +56,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -187,6 +191,126 @@ class ZoteroCitationStrategyTest {
         verify(ranges, never()).find(document, LEGACY_JSTYLE, BoundaryPolicy.TEMPORARY);
         verify(ranges, never()).find(document, CANONICAL, BoundaryPolicy.TEMPORARY);
         verifyNoInteractions(document, preferences, context);
+    }
+
+    @ParameterizedTest
+    @MethodSource("unsupportedNativeUpdates")
+    // [utest->req~openoffice.zotero-modifier-safe-update~1]
+    void unsupportedModifiersRejectNativeUpdatesBeforeLinkingRenderingOrWrites(String operation, String name) throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(ZOTERO, name));
+        when(ranges.find(document, name, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        BibEntry entry = entry("a", "A");
+        List<BibDatabase> databases = List.of(new BibDatabase(List.of(entry)));
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class);
+             MockedStatic<ConversionMetadata> metadata = mockStatic(ConversionMetadata.class);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class)) {
+            OOResult<List<String>, JabRefException> result = "refresh".equals(operation)
+                                                             ? strategy().refresh(databases, style())
+                                                             : strategy().insert(List.of(entry), databases, style(), CitationType.AUTHORYEAR_PAR, "", cursor, true);
+            StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+            assertEquals(Reason.UNSUPPORTED_MODIFIERS, error.reason());
+            assertEquals(Localization.lang("Cannot update Zotero citations with unsupported modifiers. No citations were changed. Update them in Zotero instead."), error.getLocalizedMessage());
+            assertEquals("Unsupported native Zotero citation modifiers", assertInstanceOf(RenderException.class, error.getCause()).getMessage());
+            linker.verifyNoInteractions();
+            metadata.verifyNoInteractions();
+            writer.verifyNoInteractions();
+            documentPreferences.verifyNoInteractions();
+            verifyNoInteractions(document, context, preferences, range);
+            verify(ranges, never()).find(any(), anyString(), any(BoundaryPolicy.class));
+            verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
+            verify(cursor, never()).setString(anyString());
+            verify(text, never()).removeTextContent(any());
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("unsupportedNativeUpdates")
+    // [utest->req~openoffice.zotero-modifier-safe-update~1]
+    void engineRejectsUnsupportedNativeModifiersBeforeOpeningAWriteSession(String operation, String name) throws Exception {
+        when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
+        BibEntry entry = entry("a", "A");
+        List<BibDatabase> databases = List.of(new BibDatabase(List.of(entry)));
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class);
+             MockedStatic<UnoRedlines> recording = mockStatic(UnoRedlines.class)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(List.of(LEGACY_CID, ZOTERO, name));
+            try (CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+                undo.clearInvocations();
+                OOResult<List<String>, JabRefException> result = "refresh".equals(operation)
+                                                                 ? engine.refresh(databases, style())
+                                                                 : engine.insert(List.of(entry), databases, style(), CitationType.AUTHORYEAR_PAR, "", cursor, true);
+
+                StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+                assertEquals(Reason.UNSUPPORTED_MODIFIERS, error.reason());
+                assertEquals(Localization.lang("Cannot update Zotero citations with unsupported modifiers. No citations were changed. Update them in Zotero instead."), error.getLocalizedMessage());
+                assertEquals("Unsupported native Zotero citation modifiers", assertInstanceOf(RenderException.class, error.getCause()).getMessage());
+                undo.verifyNoInteractions();
+                recording.verifyNoInteractions();
+                verify(document, never()).lockControllers();
+                verify(document, never()).unlockControllers();
+                verify(document, never()).getText();
+                verifyNoInteractions(context);
+                verify(cursor, never()).setString(anyString());
+            }
+        }
+    }
+
+    @Test
+    void malformedSuppressionWithLocatorCannotBeReadByTheTolerantParser() {
+        assertEquals(Optional.empty(), ZoteroReferenceMark.parse(malformedSuppressionWithLocatorName()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("unsupportedNativeNames")
+    void exportWithUnsupportedModifiersStillReadsKeysWithoutDocumentWrites(String name) throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(name));
+        when(ranges.find(document, name, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        CitedEntryExporter.ExportResult result = strategy().exportCited(List.of(new BibDatabase(List.of(entry("a", "A"))))).get();
+
+        assertEquals(List.of("a"), result.database().getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).toList());
+        assertEquals(List.of(), result.unresolvedKeys());
+        verifyNoInteractions(document, context, preferences);
+        verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
+        verify(cursor, never()).setString(anyString());
+    }
+
+    private static Stream<Arguments> unsupportedNativeUpdates() {
+        return Stream.concat(unsupportedNativeNames(), Stream.of(malformedSuppressionWithLocatorName()))
+                     .flatMap(name -> Stream.of(Arguments.of("refresh", name), Arguments.of("insert", name)));
+    }
+
+    private static String malformedSuppressionWithLocatorName() {
+        JsonObject citation = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+        JsonObject item = citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+        item.addProperty("locator", "17");
+        item.add("suppress-author", new JsonObject());
+        return ZoteroReferenceMark.PREFIX + citation + " RNDabcdefghij";
+    }
+
+    private static Stream<String> unsupportedNativeNames() {
+        Stream.Builder<String> names = Stream.builder();
+        for (String field : List.of("locator", "label", "prefix", "suffix")) {
+            for (String location : List.of("citation", "properties", "item")) {
+                JsonObject citation = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+                JsonObject target = switch (location) {
+                    case "properties" -> citation.getAsJsonObject("properties");
+                    case "item" -> citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+                    default -> citation;
+                };
+                target.addProperty(field, "value");
+                names.add(ZoteroReferenceMark.PREFIX + citation + " RNDabcdefghij");
+            }
+        }
+        JsonObject authorOnly = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+        authorOnly.getAsJsonArray("citationItems").get(0).getAsJsonObject().addProperty("author-only", true);
+        names.add(ZoteroReferenceMark.PREFIX + authorOnly + " RNDabcdefghij");
+        JsonObject mixed = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+        JsonObject item = mixed.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+        mixed.getAsJsonArray("citationItems").add(item.deepCopy());
+        item.addProperty("suppress-author", true);
+        names.add(ZoteroReferenceMark.PREFIX + mixed + " RNDabcdefghij");
+        return names.build();
     }
 
     @Test

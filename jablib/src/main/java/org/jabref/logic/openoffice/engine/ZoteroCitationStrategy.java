@@ -111,6 +111,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             }
             List<BibDatabase> selected = new ArrayList<>(databases);
             selected.add(new BibDatabase(entries.stream().map(BibEntry::new).toList()));
+            requireSupportedModifiers();
             List<StoredCitation> citations = read();
             validate(citations, Optional.of(cursor));
 
@@ -160,6 +161,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     public OOResult<List<String>, JabRefException> refresh(List<BibDatabase> databases, OOStyle style) {
         try {
             CitationStyle cslStyle = requireStyle(style);
+            requireSupportedModifiers();
             List<StoredCitation> original = read();
             validate(original, Optional.empty());
 
@@ -188,6 +190,23 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
         } catch (NoDocumentException | WrappedTargetException | IllegalArgumentException
                  | IllegalStateException | com.sun.star.uno.RuntimeException exception) {
             return OOResult.error(failure(Localization.lang("Problem collecting citations"), exception));
+        }
+    }
+
+    // [impl->req~openoffice.zotero-modifier-safe-update~1]
+    void requireSupportedModifiers() throws NoDocumentException, StrategyException {
+        requireOpen();
+        for (String name : ranges.names(document)) {
+            if (!ZoteroReferenceMark.isZoteroReferenceMarkName(name)) {
+                continue;
+            }
+            try {
+                ZoteroCitationModifiers.requireSupportedModifiers(name);
+            } catch (RenderException exception) {
+                LOGGER.debug("Cannot update native Zotero citation modifiers", exception);
+                throw new StrategyException(Reason.UNSUPPORTED_MODIFIERS, "Unsupported native Zotero citation modifiers",
+                        Localization.lang("Cannot update Zotero citations with unsupported modifiers. No citations were changed. Update them in Zotero instead."), exception);
+            }
         }
     }
 
@@ -528,6 +547,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
         PAGE_INFO_NOT_SUPPORTED,
         PENDING_DELETIONS,
         PROTECTED_RANGE,
+        UNSUPPORTED_MODIFIERS,
         UNSUPPORTED_STYLE,
         UNSUPPORTED_TYPE
     }
