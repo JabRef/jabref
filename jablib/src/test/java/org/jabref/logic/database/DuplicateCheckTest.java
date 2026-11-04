@@ -19,6 +19,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -85,6 +86,56 @@ public class DuplicateCheckTest {
         BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Bill{\\\"{a}} Bob{\\\"{a}}");
 
         assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void bibtexInBookAndInCollectionForSameChapterAreDuplicates() {
+        BibEntry inBook = bibtexBookPart();
+        BibEntry inCollection = collectionContribution();
+
+        assertAll(
+                () -> assertTrue(duplicateChecker.isDuplicate(inBook, inCollection, BibDatabaseMode.BIBTEX)),
+                () -> assertTrue(duplicateChecker.isDuplicate(inCollection, inBook, BibDatabaseMode.BIBTEX)));
+    }
+
+    @Test
+    void bibtexBookPartRequiresMatchingLocatorAuthorAndBookTitle() {
+        BibEntry inBook = bibtexBookPart();
+        BibEntry differentChapter = collectionContribution().withField(StandardField.CHAPTER, "4");
+        BibEntry differentPages = collectionContribution().withField(StandardField.PAGES, "71--90");
+        BibEntry differentAuthor = collectionContribution().withField(StandardField.AUTHOR, "Elizabeth Ballard");
+        BibEntry differentBook = collectionContribution().withField(StandardField.BOOKTITLE, "Another book");
+        BibEntry noLocator = collectionContribution();
+        noLocator.clearField(StandardField.CHAPTER);
+        noLocator.clearField(StandardField.PAGES);
+
+        assertAll(
+                () -> assertFalse(duplicateChecker.isDuplicate(inBook, differentChapter, BibDatabaseMode.BIBTEX)),
+                () -> assertFalse(duplicateChecker.isDuplicate(inBook, differentPages, BibDatabaseMode.BIBTEX)),
+                () -> assertFalse(duplicateChecker.isDuplicate(inBook, differentAuthor, BibDatabaseMode.BIBTEX)),
+                () -> assertFalse(duplicateChecker.isDuplicate(inBook, differentBook, BibDatabaseMode.BIBTEX)),
+                () -> assertFalse(duplicateChecker.isDuplicate(inBook, noLocator, BibDatabaseMode.BIBTEX)));
+    }
+
+    private static BibEntry bibtexBookPart() {
+        return new BibEntry(StandardEntryType.InBook)
+                .withField(StandardField.AUTHOR, "Jane Smith")
+                .withField(StandardField.TITLE, "Handbook of Computing")
+                .withField(StandardField.CHAPTER, "3")
+                .withField(StandardField.PAGES, "51--70")
+                .withField(StandardField.PUBLISHER, "Example Press")
+                .withField(StandardField.YEAR, "2020");
+    }
+
+    private static BibEntry collectionContribution() {
+        return new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.AUTHOR, "Jane Smith")
+                .withField(StandardField.TITLE, "Algorithms for Sorting")
+                .withField(StandardField.BOOKTITLE, "Handbook of Computing")
+                .withField(StandardField.CHAPTER, "3")
+                .withField(StandardField.PAGES, "51--70")
+                .withField(StandardField.PUBLISHER, "Example Press")
+                .withField(StandardField.YEAR, "2020");
     }
 
     @ParameterizedTest

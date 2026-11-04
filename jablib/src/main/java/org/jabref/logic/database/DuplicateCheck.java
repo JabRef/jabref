@@ -112,6 +112,26 @@ public class DuplicateCheck {
                         (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL));
     }
 
+    private static boolean isBibtexBookPartComparison(BibEntry inBook, BibEntry contribution) {
+        return inBook.getType().equals(StandardEntryType.InBook)
+                && SIMILAR_ENTRY_TYPES.contains(contribution.getType())
+                && !contribution.getType().equals(StandardEntryType.InBook)
+                && inBook.getField(StandardField.BOOKTITLE).isEmpty();
+    }
+
+    private static boolean isSameBibtexBookPart(BibEntry inBook, BibEntry contribution) {
+        if (compareSingleField(StandardField.AUTHOR, inBook, contribution) != EQUAL) {
+            return false;
+        }
+        boolean sameBook = inBook.getFieldLatexFree(StandardField.TITLE)
+                                 .flatMap(title -> contribution.getFieldLatexFree(StandardField.BOOKTITLE)
+                                                               .map(bookTitle -> compareField(title, bookTitle) == EQUAL))
+                                 .orElse(false);
+        int chapter = compareSingleField(StandardField.CHAPTER, inBook, contribution);
+        int pages = compareSingleField(StandardField.PAGES, inBook, contribution);
+        return sameBook && chapter != NOT_EQUAL && pages != NOT_EQUAL && (chapter == EQUAL || pages == EQUAL);
+    }
+
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
         final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields.isEmpty()
@@ -298,6 +318,15 @@ public class DuplicateCheck {
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
+        }
+
+        if (bibDatabaseMode == BibDatabaseMode.BIBTEX) {
+            if (isBibtexBookPartComparison(one, two)) {
+                return isSameBibtexBookPart(one, two);
+            }
+            if (isBibtexBookPartComparison(two, one)) {
+                return isSameBibtexBookPart(two, one);
+            }
         }
 
         // In case an ISBN is present, it is a strong indicator that the entries are equal.
