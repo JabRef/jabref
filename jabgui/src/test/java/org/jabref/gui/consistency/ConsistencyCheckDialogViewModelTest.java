@@ -127,6 +127,31 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE), shownFields(viewModel));
     }
 
+    @Test
+    void anotherBstFileOfTheSameNameReplacesTheFields(@TempDir Path tempDir) throws Exception {
+        Path titleStyle = Files.writeString(Files.createDirectory(tempDir.resolve("a")).resolve("style.bst"), "ENTRY { author title } {} {}");
+        Path yearStyle = Files.writeString(Files.createDirectory(tempDir.resolve("b")).resolve("style.bst"), "ENTRY { author year } {} {}");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+
+        viewModel.loadBstFile(titleStyle);
+        viewModel.loadBstFile(yearStyle);
+
+        assertEquals(List.of(StandardField.YEAR), shownFields(viewModel));
+    }
+
+    @Test
+    void bstFileWithoutEntryFieldsIsRejected(@TempDir Path tempDir) throws Exception {
+        Path bstFile = tempDir.resolve("noentry.bst");
+        Files.writeString(bstFile, "FUNCTION { nothing } { }");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+
+        viewModel.loadBstFile(bstFile);
+
+        verify(dialogService).showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
+        assertEquals("", viewModel.bstStyleNameProperty().get());
+        assertFalse(viewModel.restrictToBstFieldsProperty().get());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"date", "year", "month"})
         // [utest->req~ux.consistency.bst-field-columns~1]

@@ -176,14 +176,25 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     /// Reads the fields of the given style and restricts the columns to them
     @VisibleForTesting
     void loadBstFile(Path bstFile) {
+        Set<String> entryFields;
         try {
-            bstEntryFields = new BstVM(bstFile).getEntryFields();
-            bstStyleName.set(bstFile.getFileName().toString());
-            restrictToBstFields.set(true);
+            entryFields = new BstVM(bstFile).getEntryFields();
         } catch (IOException | ParseCancellationException e) {
             LOGGER.error("Could not read .bst file {}", bstFile, e);
             dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), e);
+            return;
         }
+        if (entryFields.isEmpty()) {
+            // A style without ENTRY fields renders nothing - the file is not usable as a style
+            LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
+            dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
+            return;
+        }
+        bstEntryFields = entryFields;
+        bstStyleName.set(bstFile.getFileName().toString());
+        restrictToBstFields.set(true);
+        // Another file of the same name leaves both properties unchanged
+        shownFields.invalidate();
     }
 
     /// A style reads a field also through its alias, mirroring [BibEntry#getFieldOrAlias]: `journal` is read from `journaltitle`,

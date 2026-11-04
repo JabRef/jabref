@@ -155,6 +155,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         Arrays.stream(SpecialField.values())
               .map(FieldTextMapper::getDisplayName)
               .forEach(this::removeColumnByTitle);
+
+        // A hidden column must not keep sorting the rows
+        EasyBind.listen(viewModel.shownFieldsProperty(), _ -> tableView.getSortOrder().removeIf(column -> !column.isVisible()));
     }
 
     public void removeColumnByTitle(String columnName) {
