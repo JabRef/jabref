@@ -65,7 +65,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
+        entryTypeCombo.setItems(viewModel.getEntryTypes());
         entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
         EasyBind.listen(entryTypeCombo.getEditor().textProperty(), _ -> entryTypeCombo.commitValue());
         entryTypeCombo.getSelectionModel().selectFirst();

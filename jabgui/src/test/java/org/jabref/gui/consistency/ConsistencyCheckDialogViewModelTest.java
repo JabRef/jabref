@@ -126,6 +126,27 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE), shownFields(viewModel));
     }
 
+    @Test
+        // [utest->req~ux.consistency.bst-field-columns~1]
+    void entryTypesWithoutVisibleColumnAreHidden(@TempDir Path tempDir) throws Exception {
+        Path bstFile = tempDir.resolve("minimal.bst");
+        Files.writeString(bstFile, "ENTRY { author publisher } {} {}");
+        BibEntry article = new BibEntry(StandardEntryType.Article, "article").withField(StandardField.AUTHOR, "Author One");
+        BibEntry bookWithPublisher = new BibEntry(StandardEntryType.Book, "first").withField(StandardField.AUTHOR, "Author One").withField(StandardField.PUBLISHER, "Publisher");
+        BibEntry book = new BibEntry(StandardEntryType.Book, "second").withField(StandardField.AUTHOR, "Author Two");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(article, bookWithPublisher, book));
+        viewModel.selectedEntryTypeProperty().set("Article");
+
+        viewModel.loadBstFile(bstFile);
+
+        assertEquals(List.of("Book"), viewModel.getEntryTypes());
+        assertEquals("Book", viewModel.selectedEntryTypeProperty().get());
+
+        viewModel.restrictToBstFieldsProperty().set(false);
+
+        assertEquals(List.of("Article", "Book"), viewModel.getEntryTypes());
+    }
+
     private static List<StandardField> shownFields(ConsistencyCheckDialogViewModel viewModel) {
         return viewModel.getReportedFields().stream().filter(viewModel.shownFieldsProperty().get()).map(StandardField.class::cast).toList();
     }

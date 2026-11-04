@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +26,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -69,6 +72,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private final List<Field> allReportedFields;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
+    private final Map<String, List<Field>> entryTypeToReportedFields = new HashMap<>();
+    private final FilteredList<String> entryTypes;
     private final StringProperty selectedEntryType = new SimpleStringProperty();
     private final BooleanProperty restrictToBstFields = new SimpleBooleanProperty(false);
     private final StringProperty bstStyleName = new SimpleStringProperty("");
@@ -100,6 +105,16 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             this.allReportedFields = tableDataWriter.getAllReportedFields();
             tableDataWriter.writeFindings();
         }
+
+        List<String> allEntryTypes = this.result.entryTypeToResultMap().keySet().stream().map(EntryType::getDisplayName).sorted().toList();
+        this.entryTypes = new FilteredList<>(FXCollections.observableList(allEntryTypes));
+        // An entry type without a visible column has no differences to show
+        this.entryTypes.predicateProperty().bind(shownFields.map(shown -> entryType -> entryTypeToReportedFields.get(entryType).stream().anyMatch(shown)));
+        this.entryTypes.addListener((ListChangeListener<String>) _ -> {
+            if (!entryTypes.contains(selectedEntryType.get())) {
+                selectedEntryType.set(entryTypes.isEmpty() ? null : entryTypes.getFirst());
+            }
+        });
     }
 
     public StringProperty selectedEntryTypeProperty() {
@@ -120,9 +135,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return new BibliographyConsistencyCheck.Result(snapshotResults);
     }
 
-    public List<String> getEntryTypes() {
-        List<String> entryTypes = new ArrayList<>();
-        result.entryTypeToResultMap().forEach((entrySet, _) -> entryTypes.add(entrySet.getDisplayName()));
+    /// The entry types having a visible column
+    public ObservableList<String> getEntryTypes() {
         return entryTypes;
     }
 
@@ -219,6 +233,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
                                                                                .toList();
             // [impl->req~ux.consistency.entry-navigation~1]
             tableData.add(new ConsistencyMessage(message, originalEntries.getOrDefault(bibEntry, bibEntry)));
+            entryTypeToReportedFields.put(entryTypeReport.displayName(), entryTypeReport.reportedFields());
         }
 
         @Override
