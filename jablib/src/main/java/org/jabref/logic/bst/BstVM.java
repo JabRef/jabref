@@ -4,11 +4,17 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryConverter;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -110,6 +116,21 @@ public class BstVM {
                     .flatMap(entryCommand -> entryCommand.idListOpt(0).identifier().stream())
                     .map(identifier -> identifier.getText().toLowerCase(Locale.ROOT))
                     .collect(Collectors.toSet());
+    }
+
+    /// Selects fields that can supply values to this style, including aliases and date parts.
+    public Optional<Predicate<Field>> getFieldSelection() {
+        Set<String> entryFields = getEntryFields();
+        if (entryFields.isEmpty()) {
+            return Optional.empty();
+        }
+        Set<Field> dateFields = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
+        return Optional.of(field -> {
+            Stream<Field> candidates = dateFields.contains(field)
+                                       ? dateFields.stream()
+                                       : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
+            return candidates.map(candidate -> candidate.getName().toLowerCase(Locale.ROOT)).anyMatch(entryFields::contains);
+        });
     }
 
     @VisibleForTesting

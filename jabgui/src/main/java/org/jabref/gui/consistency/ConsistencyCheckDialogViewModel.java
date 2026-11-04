@@ -10,13 +10,11 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -47,10 +45,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -61,7 +57,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
-    private static final Set<Field> DATE_FIELDS = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
 
     private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
@@ -77,14 +72,13 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final StringProperty selectedEntryType = new SimpleStringProperty();
     private final BooleanProperty restrictToBstFields = new SimpleBooleanProperty(false);
     private final StringProperty bstStyleName = new SimpleStringProperty("");
-    private Set<String> bstEntryFields = Set.of();
+    private Predicate<Field> selectedFields = _ -> true;
     private long bstLoadGeneration;
     private final ObjectBinding<Predicate<Field>> shownFields = Bindings.createObjectBinding(() -> {
         if (!restrictToBstFields.get()) {
             return _ -> true;
         }
-        Set<String> entryFields = bstEntryFields;
-        return field -> isReadByStyle(entryFields, field);
+        return selectedFields;
     }, restrictToBstFields, bstStyleName);
 
     public ConsistencyCheckDialogViewModel(DialogService dialogService,
@@ -177,17 +171,17 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     @VisibleForTesting
     void loadBstFile(Path bstFile) {
         long generation = ++bstLoadGeneration;
-        BackgroundTask.wrap(() -> new BstVM(bstFile).getEntryFields())
-                      .onSuccess(entryFields -> {
+        BackgroundTask.wrap(() -> new BstVM(bstFile).getFieldSelection())
+                      .onSuccess(selection -> {
                           if (generation != bstLoadGeneration) {
                               return;
                           }
-                          if (entryFields.isEmpty()) {
+                          if (selection.isEmpty()) {
                               LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
                               dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
                               return;
                           }
-                          bstEntryFields = entryFields;
+                          selectedFields = selection.orElseThrow();
                           bstStyleName.set(bstFile.getFileName().toString());
                           restrictToBstFields.set(true);
                           shownFields.invalidate();
@@ -199,15 +193,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
                           }
                       })
                       .executeWith(taskExecutor);
-    }
-
-    /// A style reads a field also through its alias, mirroring [BibEntry#getFieldOrAlias]: `journal` is read from `journaltitle`,
-    /// `date` from `year`, `month` and `day`, and the other way round.
-    private static boolean isReadByStyle(Set<String> entryFields, Field field) {
-        Stream<Field> fieldsSeenByStyle = DATE_FIELDS.contains(field)
-                                          ? DATE_FIELDS.stream()
-                                          : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
-        return fieldsSeenByStyle.map(seen -> seen.getName().toLowerCase(Locale.ROOT)).anyMatch(entryFields::contains);
     }
 
     public List<String> getColumnNames() {

@@ -5,10 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import javafx.concurrent.Task;
 import javafx.scene.control.TableCell;
@@ -41,6 +41,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -197,9 +198,9 @@ class ConsistencyCheckDialogViewModelTest {
     private void loadBstFile(ConsistencyCheckDialogViewModel viewModel, Path path) throws Exception {
         clearInvocations(taskExecutor);
         viewModel.loadBstFile(path);
-        ArgumentCaptor<BackgroundTask<Set<String>>> captor = ArgumentCaptor.captor();
+        ArgumentCaptor<BackgroundTask<Optional<Predicate<Field>>>> captor = ArgumentCaptor.captor();
         verify(taskExecutor).execute(captor.capture());
-        BackgroundTask<Set<String>> task = captor.getValue();
+        BackgroundTask<Optional<Predicate<Field>>> task = captor.getValue();
         task.getOnSuccess().accept(task.call());
     }
 
@@ -211,10 +212,10 @@ class ConsistencyCheckDialogViewModelTest {
 
         viewModel.loadBstFile(first);
         viewModel.loadBstFile(second);
-        ArgumentCaptor<BackgroundTask<Set<String>>> captor = ArgumentCaptor.captor();
+        ArgumentCaptor<BackgroundTask<Optional<Predicate<Field>>>> captor = ArgumentCaptor.captor();
         verify(taskExecutor, org.mockito.Mockito.times(2)).execute(captor.capture());
-        BackgroundTask<Set<String>> older = captor.getAllValues().getFirst();
-        BackgroundTask<Set<String>> newer = captor.getAllValues().getLast();
+        BackgroundTask<Optional<Predicate<Field>>> older = captor.getAllValues().getFirst();
+        BackgroundTask<Optional<Predicate<Field>>> newer = captor.getAllValues().getLast();
         assertEquals("", viewModel.bstStyleNameProperty().get());
 
         newer.getOnSuccess().accept(newer.call());
@@ -229,9 +230,9 @@ class ConsistencyCheckDialogViewModelTest {
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
         Path missing = tempDir.resolve("missing.bst");
         viewModel.loadBstFile(missing);
-        ArgumentCaptor<BackgroundTask<Set<String>>> captor = ArgumentCaptor.captor();
+        ArgumentCaptor<BackgroundTask<Optional<Predicate<Field>>>> captor = ArgumentCaptor.captor();
         verify(taskExecutor).execute(captor.capture());
-        BackgroundTask<Set<String>> task = captor.getValue();
+        BackgroundTask<Optional<Predicate<Field>>> task = captor.getValue();
         IOException exception = assertThrows(IOException.class, task::call);
 
         task.getOnException().accept(exception);

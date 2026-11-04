@@ -40,6 +40,15 @@ public class BstVMTest {
     }
 
     @Test
+    void fieldSelectionIncludesAliasesAndDateParts() {
+        var selection = new BstVM("ENTRY { journal date } {} {}").getFieldSelection().orElseThrow();
+
+        assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.YEAR),
+                List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.YEAR, StandardField.TITLE)
+                    .stream().filter(selection).toList());
+    }
+
+    @Test
     void abbrv() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
         assertTrue(vm.hasSortCommand());
