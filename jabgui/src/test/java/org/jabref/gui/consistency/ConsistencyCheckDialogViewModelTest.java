@@ -65,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -358,6 +359,39 @@ class ConsistencyCheckDialogViewModelTest {
 
         assertFalse(Files.readString(output).contains("first"));
         assertTrue(Files.readString(output).contains("second"));
+    }
+
+    @Test
+        // [utest->req~ux.consistency.aux-entry-selection~1]
+    void singleAuxFileNextToLibraryIsUsedByDefault(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Files.writeString(tempDir.resolve("paper.aux"), "\\citation{second}");
+        Files.writeString(tempDir.resolve("other.bib"), "");
+        clearInvocations(taskExecutor);
+
+        viewModel.useAuxFileNextTo(tempDir.resolve("library.bib"));
+
+        ArgumentCaptor<BackgroundTask<?>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+        completeTask(captor.getValue());
+        assertEquals("paper.aux", viewModel.auxFileNameProperty().get());
+        assertTrue(viewModel.restrictToAuxEntriesProperty().get());
+        assertEquals(List.of("second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 2})
+    void auxFileIsNotUsedByDefaultUnlessExactlyOne(int auxFileCount, @TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        for (int i = 0; i < auxFileCount; i++) {
+            Files.writeString(tempDir.resolve("paper" + i + ".aux"), "\\citation{second}");
+        }
+        clearInvocations(taskExecutor);
+
+        viewModel.useAuxFileNextTo(tempDir.resolve("library.bib"));
+
+        verify(taskExecutor, never()).execute(any());
+        assertEquals("", viewModel.auxFileNameProperty().get());
     }
 
     private BackgroundTask<?> scheduleAux(ConsistencyCheckDialogViewModel viewModel, Path aux) {

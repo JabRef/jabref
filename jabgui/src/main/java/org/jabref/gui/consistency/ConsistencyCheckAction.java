@@ -70,7 +70,9 @@ public class ConsistencyCheckAction extends SimpleCommand {
                             updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
                         }));
                 // [impl->req~ux.consistency.report-background~1]
-                return new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor, entries);
+                ConsistencyCheckDialogViewModel viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor, entries);
+                bibContext.getDatabasePath().ifPresent(viewModel::useAuxFileNextTo);
+                return viewModel;
             }
         };
 

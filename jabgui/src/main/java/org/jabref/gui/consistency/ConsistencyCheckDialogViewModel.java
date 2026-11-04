@@ -10,11 +10,13 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -184,6 +186,21 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             // A pending .aux load must not re-enable the restriction
             ++auxLoadGeneration;
             applyReport(fullReport);
+        }
+    }
+
+    /// Uses the `.aux` file next to the library as default selection, if there is exactly one
+    public void useAuxFileNextTo(Path bibFile) {
+        Path directory = bibFile.toAbsolutePath().getParent();
+        List<Path> auxFiles;
+        try (Stream<Path> files = Files.list(directory)) {
+            auxFiles = files.filter(file -> file.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".aux")).toList();
+        } catch (IOException e) {
+            LOGGER.warn("Could not look for .aux files in {}", directory, e);
+            return;
+        }
+        if (auxFiles.size() == 1) {
+            loadAuxFile(auxFiles.getFirst());
         }
     }
 
