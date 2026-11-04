@@ -62,6 +62,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+    private static final Set<Field> DATE_FIELDS = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
 
     private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
@@ -185,10 +186,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         }
     }
 
-    /// A style reads a field also through its alias or date parts, mirroring [BibEntry#getFieldOrAlias]
+    /// A style reads a field also through its alias, mirroring [BibEntry#getFieldOrAlias]: `journal` is read from `journaltitle`,
+    /// `date` from `year`, `month` and `day`, and the other way round.
     private static boolean isReadByStyle(Set<String> entryFields, Field field) {
-        Stream<Field> fieldsSeenByStyle = field == StandardField.DATE
-                                          ? Stream.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY)
+        Stream<Field> fieldsSeenByStyle = DATE_FIELDS.contains(field)
+                                          ? DATE_FIELDS.stream()
                                           : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
         return fieldsSeenByStyle.map(seen -> seen.getName().toLowerCase(Locale.ROOT)).anyMatch(entryFields::contains);
     }

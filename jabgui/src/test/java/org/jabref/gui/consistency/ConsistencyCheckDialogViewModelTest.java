@@ -52,6 +52,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -124,6 +125,25 @@ class ConsistencyCheckDialogViewModelTest {
         viewModel.loadBstFile(bstFile);
 
         assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE), shownFields(viewModel));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"date", "year", "month"})
+        // [utest->req~ux.consistency.bst-field-columns~1]
+    void dateAndItsPartsAreReadForEachOther(String declaredField, @TempDir Path tempDir) throws Exception {
+        Path bstFile = tempDir.resolve("minimal.bst");
+        Files.writeString(bstFile, "ENTRY { author " + declaredField + " } {} {}");
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.DATE, "2026-11")
+                .withField(StandardField.MONTH, "11");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author Two");
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(first, second));
+
+        viewModel.loadBstFile(bstFile);
+
+        assertEquals(List.of(StandardField.DATE, StandardField.MONTH, StandardField.YEAR), shownFields(viewModel));
     }
 
     @Test
