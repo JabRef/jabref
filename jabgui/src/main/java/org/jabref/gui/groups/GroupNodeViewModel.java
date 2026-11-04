@@ -639,6 +639,11 @@ public class GroupNodeViewModel {
     }
 
     public boolean canAddEntriesIn() {
+        return canAddEntriesIn(groupNode);
+    }
+
+    /// Static variant for callers that work on the group tree without building view models for it.
+    public static boolean canAddEntriesIn(GroupTreeNode groupNode) {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _,
