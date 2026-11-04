@@ -77,6 +77,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final ObservableList<String> allEntryTypes = FXCollections.observableArrayList();
     private final IntegerProperty reportRevision = new SimpleIntegerProperty();
     private final StringProperty auxFileName = new SimpleStringProperty("");
+    private final BooleanProperty restrictToAuxEntries = new SimpleBooleanProperty(false);
+    private Optional<ConsistencyReport> auxReport = Optional.empty();
     private final ConsistencyReport fullReport;
     private long auxLoadGeneration;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
@@ -117,6 +119,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         this.result = snapshotResult(result, snapshots);
         this.entryTypes = new FilteredList<>(allEntryTypes);
         this.fullReport = prepareReport(this.result);
+        this.restrictToAuxEntries.addListener((_, _, restrict) -> switchEntrySelection(restrict));
         applyReport(fullReport);
         // An entry type without a visible column has no differences to show
         this.entryTypes.predicateProperty().bind(shownFields.map(shown -> entryType -> entryTypeToReportedFields.get(entryType).stream().anyMatch(shown)));
@@ -170,6 +173,20 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return auxFileName;
     }
 
+    public BooleanProperty restrictToAuxEntriesProperty() {
+        return restrictToAuxEntries;
+    }
+
+    private void switchEntrySelection(boolean restrict) {
+        if (restrict) {
+            auxReport.ifPresent(this::applyReport);
+        } else {
+            // A pending .aux load must not re-enable the restriction
+            ++auxLoadGeneration;
+            applyReport(fullReport);
+        }
+    }
+
     public void browseAuxFile() {
         FileDialogConfiguration configuration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
@@ -193,8 +210,13 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             return prepareReport(findings);
         }).onSuccess(report -> {
             if (generation == auxLoadGeneration) {
-                applyReport(report);
+                auxReport = Optional.of(report);
                 auxFileName.set(auxFile.getFileName().toString());
+                if (restrictToAuxEntries.get()) {
+                    applyReport(report);
+                } else {
+                    restrictToAuxEntries.set(true);
+                }
             }
         }).onFailure(exception -> {
             if (generation == auxLoadGeneration) {
@@ -202,12 +224,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
                 dialogService.showErrorDialogAndWait(Localization.lang("Could not read the .aux file."), exception);
             }
         }).executeWith(taskExecutor);
-    }
-
-    public void showAllEntries() {
-        ++auxLoadGeneration;
-        applyReport(fullReport);
-        auxFileName.set("");
     }
 
     @NullMarked

@@ -24,19 +24,25 @@
                 </columnResizePolicy>
             </TableView>
             <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Label text="%Entry type"/>
+                <ComboBox fx:id="entryTypeCombo" prefWidth="200.0"/>
+            </HBox>
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
                 <fx:define>
                     <ToggleGroup fx:id="shownFieldsToggleGroup"/>
                 </fx:define>
-                <Label text="%Entry type"/>
-                <ComboBox fx:id="entryTypeCombo" prefWidth="200.0"/>
                 <RadioButton text="%Show all fields" selected="true" toggleGroup="$shownFieldsToggleGroup"/>
                 <RadioButton fx:id="restrictToBstFieldsRadio" text="%Restrict to fields of .bst style" toggleGroup="$shownFieldsToggleGroup"/>
                 <Button onAction="#browseBstFile" text="%Browse .bst file..."/>
                 <Label fx:id="bstStyleLabel" styleClass="text-muted"/>
             </HBox>
             <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <fx:define>
+                    <ToggleGroup fx:id="shownEntriesToggleGroup"/>
+                </fx:define>
+                <RadioButton text="%Show all entries" selected="true" toggleGroup="$shownEntriesToggleGroup"/>
+                <RadioButton fx:id="restrictToAuxEntriesRadio" text="%Restrict to entries cited in .aux file" toggleGroup="$shownEntriesToggleGroup"/>
                 <Button onAction="#browseAuxFile" text="%Browse .aux file..."/>
-                <Button onAction="#showAllEntries" text="%Show all entries"/>
                 <Label fx:id="auxFileLabel" styleClass="text-muted"/>
             </HBox>
             <HBox spacing="4.0" alignment="CENTER">

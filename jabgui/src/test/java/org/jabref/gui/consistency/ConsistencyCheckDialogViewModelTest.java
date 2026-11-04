@@ -265,12 +265,16 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals(List.of("Article", "first", "-", "-", "-"), viewModel.getTableData().getFirst().message());
         assertEquals(List.of(StandardField.TITLE), shownFields(viewModel));
 
-        viewModel.showAllEntries();
+        viewModel.restrictToAuxEntriesProperty().set(false);
 
-        assertEquals("", viewModel.auxFileNameProperty().get());
+        assertEquals("selected.aux", viewModel.auxFileNameProperty().get());
         assertEquals(fullColumns, viewModel.getColumnNames());
         assertEquals(List.of(first, second), viewModel.getTableData().stream().map(ConsistencyMessage::bibEntry).toList());
         assertEquals(List.of(StandardField.TITLE), shownFields(viewModel));
+
+        viewModel.restrictToAuxEntriesProperty().set(true);
+
+        assertEquals(List.of(first), viewModel.getTableData().stream().map(ConsistencyMessage::bibEntry).toList());
     }
 
     @ParameterizedTest
@@ -317,9 +321,10 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals("second.aux", viewModel.auxFileNameProperty().get());
         assertEquals(List.of("second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
         BackgroundTask<?> pending = scheduleAux(viewModel, first);
-        viewModel.showAllEntries();
+        viewModel.restrictToAuxEntriesProperty().set(false);
         completeTask(pending);
-        assertEquals("", viewModel.auxFileNameProperty().get());
+        assertFalse(viewModel.restrictToAuxEntriesProperty().get());
+        assertEquals("second.aux", viewModel.auxFileNameProperty().get());
         assertEquals(List.of("first", "second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
     }
 
@@ -347,7 +352,7 @@ class ConsistencyCheckDialogViewModelTest {
         clearInvocations(taskExecutor);
         Path output = tempDir.resolve("report");
         BackgroundTask<?> export = scheduleExport(viewModel, fileType, output);
-        viewModel.showAllEntries();
+        viewModel.restrictToAuxEntriesProperty().set(false);
 
         export.call();
 
