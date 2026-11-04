@@ -238,7 +238,7 @@ class ZoteroWriterTest {
 
     @ParameterizedTest
     @MethodSource("unsupportedNativeUpdates")
-    // [utest->req~openoffice.zotero-modifier-safe-update~1]
+        // [utest->req~openoffice.zotero-modifier-safe-update~1]
     void unsupportedNativeModifiersRejectUpdatesWithFullSnapshotUnchanged(String operation, String location, String field) throws Exception {
         XTextDocument document = office.newDocument();
         document.getText().setString("New citation: .\n");
@@ -252,9 +252,12 @@ class ZoteroWriterTest {
             item.addProperty("suppress-author", true);
         } else {
             JsonObject target = switch (location) {
-                case "properties" -> citation.getAsJsonObject("properties");
-                case "item" -> item;
-                default -> citation;
+                case "properties" ->
+                        citation.getAsJsonObject("properties");
+                case "item" ->
+                        item;
+                default ->
+                        citation;
             };
             target.addProperty(field, "17");
         }

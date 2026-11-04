@@ -195,7 +195,7 @@ class ZoteroCitationStrategyTest {
 
     @ParameterizedTest
     @MethodSource("unsupportedNativeUpdates")
-    // [utest->req~openoffice.zotero-modifier-safe-update~1]
+        // [utest->req~openoffice.zotero-modifier-safe-update~1]
     void unsupportedModifiersRejectNativeUpdatesBeforeLinkingRenderingOrWrites(String operation, String name) throws Exception {
         when(ranges.names(document)).thenReturn(List.of(ZOTERO, name));
         when(ranges.find(document, name, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
@@ -226,7 +226,7 @@ class ZoteroCitationStrategyTest {
 
     @ParameterizedTest
     @MethodSource("unsupportedNativeUpdates")
-    // [utest->req~openoffice.zotero-modifier-safe-update~1]
+        // [utest->req~openoffice.zotero-modifier-safe-update~1]
     void engineRejectsUnsupportedNativeModifiersBeforeOpeningAWriteSession(String operation, String name) throws Exception {
         when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
         BibEntry entry = entry("a", "A");
@@ -294,9 +294,12 @@ class ZoteroCitationStrategyTest {
             for (String location : List.of("citation", "properties", "item")) {
                 JsonObject citation = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
                 JsonObject target = switch (location) {
-                    case "properties" -> citation.getAsJsonObject("properties");
-                    case "item" -> citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
-                    default -> citation;
+                    case "properties" ->
+                            citation.getAsJsonObject("properties");
+                    case "item" ->
+                            citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+                    default ->
+                            citation;
                 };
                 target.addProperty(field, "value");
                 names.add(ZoteroReferenceMark.PREFIX + citation + " RNDabcdefghij");

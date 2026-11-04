@@ -109,7 +109,7 @@ class OpenOfficeCitationControllerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    // [utest->req~openoffice.insertion-unresolved-warning~1]
+        // [utest->req~openoffice.insertion-unresolved-warning~1]
     void insertionWarnsWhenExistingCitationKeysAreUnresolved(boolean syncWhenCiting) {
         when(preferences.getSyncWhenCiting()).thenReturn(syncWhenCiting);
         BibEntry entry = new BibEntry().withCitationKey("new");
