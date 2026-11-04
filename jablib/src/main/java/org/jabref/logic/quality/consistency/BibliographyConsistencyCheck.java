@@ -402,7 +402,7 @@ public class BibliographyConsistencyCheck {
                     }
                 }
                 if (rows.size() > firstRow) {
-                    fieldsByType.put(type.fields.displayName(), reported);
+                    fieldsByType.computeIfAbsent(type.fields.displayName(), _ -> new BitSet()).or(reported);
                     allReported.or(reported);
                 }
             }

@@ -42,10 +42,16 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
@@ -61,10 +67,12 @@ import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -97,7 +105,7 @@ class ConsistencyCheckDialogViewModelTest {
     }
 
     @Test
-        // [utest->req~ux.consistency.bst-field-columns~1]
+        // [utest->req~ux.consistency.bst-field-columns~2]
     void bstStyleRestrictsShownFieldsUntilSwitchedOff(@TempDir Path tempDir) throws Exception {
         Path bstFile = tempDir.resolve("minimal.bst");
         Files.writeString(bstFile, "ENTRY { author title } {} {}");
@@ -117,7 +125,7 @@ class ConsistencyCheckDialogViewModelTest {
     }
 
     @Test
-        // [utest->req~ux.consistency.bst-field-columns~1]
+        // [utest->req~ux.consistency.bst-field-columns~2]
     void bstStyleKeepsAliasedFields(@TempDir Path tempDir) throws Exception {
         Path bstFile = tempDir.resolve("minimal.bst");
         Files.writeString(bstFile, "ENTRY { author journal } {} {}");
@@ -160,7 +168,7 @@ class ConsistencyCheckDialogViewModelTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"date", "year", "month"})
-        // [utest->req~ux.consistency.bst-field-columns~1]
+        // [utest->req~ux.consistency.bst-field-columns~2]
     void dateAndItsPartsAreReadForEachOther(String declaredField, @TempDir Path tempDir) throws Exception {
         Path bstFile = tempDir.resolve("minimal.bst");
         Files.writeString(bstFile, "ENTRY { author " + declaredField + " } {} {}");
@@ -178,7 +186,7 @@ class ConsistencyCheckDialogViewModelTest {
     }
 
     @Test
-        // [utest->req~ux.consistency.bst-field-columns~1]
+        // [utest->req~ux.consistency.bst-field-columns~2]
     void entryTypesWithoutVisibleColumnAreHidden(@TempDir Path tempDir) throws Exception {
         Path bstFile = tempDir.resolve("minimal.bst");
         Files.writeString(bstFile, "ENTRY { author publisher } {} {}");
@@ -196,6 +204,45 @@ class ConsistencyCheckDialogViewModelTest {
         viewModel.restrictToBstFieldsProperty().set(false);
 
         assertEquals(List.of("Article", "Book"), viewModel.getEntryTypes());
+    }
+
+    @Test
+    void entryTypesRequiringOnlySpecialFieldsAreNotSelectable(@TempDir Path tempDir) throws Exception {
+        var type = new UnknownEntryType("specialOnly");
+        entryTypesManager.addCustomOrModifiedType(new BibEntryType(type,
+                List.of(new BibField(SpecialField.RANKING, FieldPriority.IMPORTANT)),
+                List.of(new OrFields(SpecialField.RANKING))), BibDatabaseMode.BIBTEX);
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntries(List.of(new BibEntry(type, "entry")));
+        Path bst = Files.writeString(tempDir.resolve("style.bst"), "ENTRY { ranking } {} {}");
+
+        loadBstFile(viewModel, bst);
+
+        assertEquals(List.of(SpecialField.RANKING), viewModel.getReportedFields());
+        assertEquals(List.of(), viewModel.getEntryTypes());
+        assertNull(viewModel.selectedEntryTypeProperty().get());
+    }
+
+    @Test
+    void styleCompletionPreservesLaterChoiceToShowAllFields(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        Path titleStyle = Files.writeString(tempDir.resolve("title.bst"), "ENTRY { title } {} {}");
+        Path yearStyle = Files.writeString(tempDir.resolve("year.bst"), "ENTRY { year } {} {}");
+        loadBstFile(viewModel, titleStyle);
+        clearInvocations(taskExecutor);
+        viewModel.loadBstFile(yearStyle);
+        ArgumentCaptor<BackgroundTask<Optional<Predicate<Field>>>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+        var pending = captor.getValue();
+        var result = pending.call();
+
+        viewModel.restrictToBstFieldsProperty().set(false);
+        pending.getOnSuccess().accept(result);
+
+        assertFalse(viewModel.restrictToBstFieldsProperty().get());
+        assertEquals("year.bst", viewModel.bstStyleNameProperty().get());
+        assertEquals(viewModel.getReportedFields(), shownFields(viewModel));
+        viewModel.restrictToBstFieldsProperty().set(true);
+        assertEquals(List.of(StandardField.YEAR), shownFields(viewModel));
     }
 
     private void loadBstFile(ConsistencyCheckDialogViewModel viewModel, Path path) throws Exception {
@@ -245,7 +292,7 @@ class ConsistencyCheckDialogViewModelTest {
     }
 
     @Test
-        // [utest->req~ux.consistency.aux-entry-selection~1]
+        // [utest->req~ux.consistency.aux-entry-selection~2]
     void auxSelectionRecomputesColumnsAndRetainsOriginalEntries(@TempDir Path tempDir) throws Exception {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
@@ -291,6 +338,7 @@ class ConsistencyCheckDialogViewModelTest {
         assertEquals(List.of(), viewModel.getTableData());
         assertEquals(List.of(), viewModel.getEntryTypes());
         assertEquals(List.of("Entry Type", "CitationKey"), viewModel.getColumnNames());
+        assertTrue(viewModel.hasFindings());
     }
 
     @Test
@@ -364,7 +412,7 @@ class ConsistencyCheckDialogViewModelTest {
     }
 
     @Test
-        // [utest->req~ux.consistency.aux-entry-selection~1]
+        // [utest->req~ux.consistency.aux-entry-selection~2]
     void singleAuxFileNextToLibraryIsUsedByDefault(@TempDir Path tempDir) throws Exception {
         ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
         Files.writeString(tempDir.resolve("paper.aux"), "\\citation{second}");
@@ -392,8 +440,43 @@ class ConsistencyCheckDialogViewModelTest {
 
         viewModel.useAuxFileNextTo(tempDir.resolve("library.bib"));
 
-        verify(taskExecutor, never()).execute(any());
+        ArgumentCaptor<BackgroundTask<?>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+        completeTask(captor.getValue());
         assertEquals("", viewModel.auxFileNameProperty().get());
+    }
+
+    @Test
+    void automaticAuxReadFailureKeepsFullReportWithoutErrorDialog(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        List<ConsistencyMessage> original = List.copyOf(viewModel.getTableData());
+        Files.writeString(tempDir.resolve("paper.aux"), "\\@input{missing.aux}");
+        viewModel.useAuxFileNextTo(tempDir.resolve("library.bib"));
+        ArgumentCaptor<BackgroundTask<?>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+        BackgroundTask<?> pending = captor.getValue();
+        IOException exception = assertThrows(IOException.class, pending::call);
+
+        pending.getOnException().accept(exception);
+
+        verify(dialogService, never()).showErrorDialogAndWait(anyString(), any(Throwable.class));
+        assertEquals(original, viewModel.getTableData());
+        assertEquals("", viewModel.auxFileNameProperty().get());
+        assertFalse(viewModel.restrictToAuxEntriesProperty().get());
+    }
+
+    @Test
+    void automaticAuxDiscoveryRunsInBackground(@TempDir Path tempDir) throws Exception {
+        ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+        viewModel.useAuxFileNextTo(tempDir.resolve("library.bib"));
+        Files.writeString(tempDir.resolve("paper.aux"), "\\citation{second}");
+        ArgumentCaptor<BackgroundTask<?>> captor = ArgumentCaptor.captor();
+        verify(taskExecutor).execute(captor.capture());
+
+        completeTask(captor.getValue());
+
+        assertEquals("paper.aux", viewModel.auxFileNameProperty().get());
+        assertEquals(List.of("second"), viewModel.getTableData().stream().map(message -> message.message().get(1)).toList());
     }
 
     @Test
@@ -566,11 +649,41 @@ class ConsistencyCheckDialogViewModelTest {
         }
 
         @Test
+        @SuppressWarnings("unchecked")
+        void reusedEmptyCellClearsItsSymbolTooltip() {
+            ConsistencyCheckDialogViewModel viewModel = createViewModelForEntriesHavingOnlyAuthor();
+            interact(() -> {
+                Injector.setModelOrService(StateManager.class, mock(StateManager.class));
+                Injector.setModelOrService(EntryEditor.class, mock(EntryEditor.class));
+                ConsistencyCheckDialog dialog = new ConsistencyCheckDialog(mock(LibraryTab.class), dialogService, viewModel);
+                TableView<ConsistencyMessage> table = JavaFxExtension.lookup(dialog.getDialogPane(), "#tableView", TableView.class);
+                TableColumn<ConsistencyMessage, String> column = (TableColumn<ConsistencyMessage, String>) table.getColumns().get(3);
+                TableRow<ConsistencyMessage> row = new TableRow<>();
+                row.updateTableView(table);
+                row.updateIndex(0);
+                TableCell<ConsistencyMessage, String> cell = column.getCellFactory().call(column);
+                cell.updateTableView(table);
+                cell.updateTableRow(row);
+                cell.updateTableColumn(column);
+                cell.updateIndex(0);
+                assertEquals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getDescription(), cell.getTooltip().getText());
+
+                cell.updateIndex(-1);
+
+                assertNull(cell.getTooltip());
+                assertNull(cell.getGraphic());
+                assertNull(cell.getText());
+            });
+        }
+
+        @Test
             // [utest->req~ux.consistency.report-background~1]
-        void workerPreparesReportBeforeShowingDialog() throws Exception {
+        void workerPreparesReportBeforeShowingDialog(@TempDir Path tempDir) throws Exception {
             BibEntry entry = new BibEntry(StandardEntryType.Article, "first").withField(StandardField.AUTHOR, "Author One");
             BibDatabaseContext bibContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
             bibContext.setMode(BibDatabaseMode.BIBTEX);
+            bibContext.setDatabasePath(tempDir.resolve("library.bib"));
+            Files.writeString(tempDir.resolve("paper.aux"), "\\citation{unknown}");
             JabRefGuiStateManager stateManager = new JabRefGuiStateManager();
             stateManager.setActiveDatabase(bibContext);
             LibraryTab libraryTab = mock(LibraryTab.class);
@@ -588,6 +701,8 @@ class ConsistencyCheckDialogViewModelTest {
                 executor.submit(task);
                 viewModel = task.get(10, TimeUnit.SECONDS);
             }
+
+            verify(uiTaskExecutor, never()).execute(any(BackgroundTask.class));
 
             assertEquals(List.of(List.of("Article", "first", "-", "-", "-")),
                     viewModel.getTableData().stream().map(ConsistencyMessage::message).toList());

@@ -126,18 +126,18 @@ Context: [Consistency-check output fixes](https://github.com/JabRef/jabref/pull/
 Needs: impl, utest
 
 ## Consistency dialog can restrict field columns to a BibTeX style
-`req~ux.consistency.bst-field-columns~1`
+`req~ux.consistency.bst-field-columns~2`
 
-The user chooses a `.bst` file and can switch between all columns and only the fields its `ENTRY` command declares, since the style ignores all other fields. Switching back and forth keeps the chosen style. Entry type and citation key stay visible; entry types without a visible column are not offered.
+The user chooses a `.bst` file and can switch between all columns and the fields its `ENTRY` command declares, their supported aliases, and the implicit `crossref` field. Switching back and forth keeps the chosen style. A pending style load preserves a later choice to show all fields. Entry type and citation key stay visible; entry types without a visible column are not offered.
 
 Needs: impl, utest
 
 ## Consistency check must compare only entries selected by an AUX file
-`req~ux.consistency.aux-entry-selection~1`
+`req~ux.consistency.aux-entry-selection~2`
 
-The user chooses a LaTeX `.aux` file to select cited entries, including citations from nested AUX files. If exactly one `.aux` file lies next to the library file, it is chosen by default. A wildcard citation selects all library entries. The check recomputes differences within the selected entries and preserves the chosen field restriction. The user switches between all entries and the cited ones; switching keeps the chosen `.aux` file. Unknown citation keys do not select entries; a valid selection without matching entries produces an empty report. Uncited cross-reference parents do not participate in the comparison.
+The user chooses a LaTeX `.aux` file to select cited entries, including citations from nested AUX files. If exactly one `.aux` file lies next to the library file, it is chosen by default after the consistency dialog opens. The decision to open the dialog uses the full-library findings, regardless of the default AUX subset. A wildcard citation selects all library entries. The check recomputes differences within the selected entries and preserves the chosen field restriction. The user switches between all entries and the cited ones; switching keeps the chosen `.aux` file. Unknown citation keys do not select entries; a valid selection without matching entries produces an empty report. Uncited cross-reference parents do not participate in the comparison.
 
-Reading and checking run in the background. Superseded loads stop cooperatively when the selection changes or the dialog closes. Reports share immutable field-presence snapshots and derive cell symbols on demand. A read failure preserves the previous report; an older request cannot replace a newer selection. Exports use the selected-entry report, while entry navigation targets the original library entries.
+Reading and checking run in the background. Superseded loads stop cooperatively when the selection changes or the dialog closes. Reports share immutable field-presence snapshots and derive cell symbols on demand. A read failure preserves the previous report. Automatic-load failures are logged without opening an error dialog; explicitly selected file failures are shown to the user. An older request cannot replace a newer selection. Exports use the selected-entry report, while entry navigation targets the original library entries.
 
 Context: [AUX selection for consistency checks](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403).
 

@@ -66,18 +66,18 @@ public class ConsistencyCheckAction extends SimpleCommand {
                 BibliographyConsistencyCheck.Snapshot snapshot = BibliographyConsistencyCheck.snapshot(entries, bibContext.getMode(), entryTypesManager, this::isCancelled);
                 // [impl->req~ux.consistency.report-background~1]
                 ConsistencyCheckDialogViewModel viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, snapshot, taskExecutor);
-                bibContext.getDatabasePath().ifPresent(viewModel::useAuxFileNextTo);
                 return viewModel;
             }
         };
 
         task.setOnFailed(_ -> dialogService.showErrorDialogAndWait(Localization.lang("Consistency check failed."), task.getException()));
         task.setOnSucceeded(_ -> {
-            if (task.getValue().getTableData().isEmpty()) {
+            if (!task.getValue().hasFindings()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(
-                        new ConsistencyCheckDialog(libraryTab, dialogService, task.getValue()));
+                ConsistencyCheckDialog dialog = new ConsistencyCheckDialog(libraryTab, dialogService, task.getValue());
+                dialog.setOnShown(_ -> bibContext.getDatabasePath().ifPresent(task.getValue()::useAuxFileNextTo));
+                dialogService.showCustomDialogAndWait(dialog);
             }
         });
         taskExecutor.execute(task);

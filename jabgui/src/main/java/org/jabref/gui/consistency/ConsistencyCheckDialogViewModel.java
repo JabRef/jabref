@@ -12,9 +12,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -48,8 +50,11 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
+import org.jabref.model.entry.field.SpecialField;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,13 +73,13 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final IntegerProperty reportRevision = new SimpleIntegerProperty();
     private final StringProperty auxFileName = new SimpleStringProperty("");
     private final BooleanProperty restrictToAuxEntries = new SimpleBooleanProperty(false);
-    private Optional<BibliographyConsistencyCheck.Report> auxReport = Optional.empty();
+    private BibliographyConsistencyCheck.@Nullable Report auxReport;
     private final BibliographyConsistencyCheck.Report fullReport;
     private long auxLoadGeneration;
     private AtomicBoolean auxCancelled = new AtomicBoolean();
-    private Optional<Future<?>> auxFuture = Optional.empty();
+    private @Nullable Future<?> auxFuture;
     private AtomicBoolean bstCancelled = new AtomicBoolean();
-    private Optional<Future<?>> bstFuture = Optional.empty();
+    private @Nullable Future<?> bstFuture;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final Map<String, List<Field>> entryTypeToReportedFields = new HashMap<>();
     private final FilteredList<String> entryTypes;
@@ -83,6 +88,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final StringProperty bstStyleName = new SimpleStringProperty("");
     private Predicate<Field> selectedFields = _ -> true;
     private long bstLoadGeneration;
+    private long fieldDisplayGeneration;
     private final ObjectBinding<Predicate<Field>> shownFields = Bindings.createObjectBinding(() -> {
         if (!restrictToBstFields.get()) {
             return _ -> true;
@@ -101,18 +107,31 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         this.entryTypes = new FilteredList<>(allEntryTypes);
         this.fullReport = snapshot.check(Set.of("*"), Thread.currentThread()::isInterrupted);
         this.restrictToAuxEntries.addListener((_, _, restrict) -> switchEntrySelection(restrict));
+        this.restrictToBstFields.addListener((_, _, _) -> fieldDisplayGeneration++);
         applyReport(fullReport);
         // An entry type without a visible column has no differences to show
-        this.entryTypes.predicateProperty().bind(shownFields.map(shown -> entryType -> entryTypeToReportedFields.get(entryType).stream().anyMatch(shown)));
-        this.entryTypes.addListener((ListChangeListener<String>) _ -> {
-            if (!entryTypes.contains(selectedEntryType.get())) {
-                selectedEntryType.set(entryTypes.isEmpty() ? null : entryTypes.getFirst());
-            }
-        });
+        this.entryTypes.predicateProperty().bind(shownFields.map(shown -> entryType -> entryTypeToReportedFields.getOrDefault(entryType, List.of()).stream()
+                                                                                                                .filter(field -> !(field instanceof SpecialField)).anyMatch(shown)));
+        this.entryTypes.addListener((ListChangeListener<String>) _ -> selectVisibleEntryType());
+        selectVisibleEntryType();
     }
 
     public StringProperty selectedEntryTypeProperty() {
         return selectedEntryType;
+    }
+
+    public boolean hasFindings() {
+        return !fullReport.messages().isEmpty();
+    }
+
+    private void selectVisibleEntryType() {
+        if (!entryTypes.contains(selectedEntryType.get())) {
+            selectedEntryType.set(firstVisibleEntryType());
+        }
+    }
+
+    private @Nullable String firstVisibleEntryType() {
+        return entryTypes.isEmpty() ? null : entryTypes.getFirst();
     }
 
     private void applyReport(BibliographyConsistencyCheck.Report report) {
@@ -124,9 +143,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         allEntryTypes.setAll(report.fieldsByType().keySet().stream().sorted().toList());
         reportRevision.set(reportRevision.get() + 1);
         tableData.setAll(report.messages());
-        if (!entryTypes.contains(selectedEntryType.get())) {
-            selectedEntryType.set(entryTypes.isEmpty() ? null : entryTypes.getFirst());
-        }
+        selectVisibleEntryType();
     }
 
     public ReadOnlyIntegerProperty reportRevisionProperty() {
@@ -143,7 +160,9 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private void switchEntrySelection(boolean restrict) {
         if (restrict) {
-            auxReport.ifPresent(this::applyReport);
+            if (auxReport != null) {
+                applyReport(auxReport);
+            }
         } else {
             // A pending .aux load must not re-enable the restriction
             cancelAuxLoad();
@@ -156,16 +175,16 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     /// Uses the `.aux` file next to the library as default selection, if there is exactly one
     public void useAuxFileNextTo(Path bibFile) {
+        loadAuxFile(() -> findAuxFileNextTo(bibFile), exception -> LOGGER.warn("Could not load a default .aux file next to {}", bibFile, exception));
+    }
+
+    private Optional<Path> findAuxFileNextTo(Path bibFile) throws IOException {
         Path directory = bibFile.toAbsolutePath().getParent();
-        List<Path> auxFiles;
         try (Stream<Path> files = Files.list(directory)) {
-            auxFiles = files.filter(file -> file.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".aux")).toList();
-        } catch (IOException e) {
-            LOGGER.warn("Could not look for .aux files in {}", directory, e);
-            return;
-        }
-        if (auxFiles.size() == 1) {
-            loadAuxFile(auxFiles.getFirst());
+            List<Path> auxFiles = files.filter(Files::isRegularFile)
+                                       .filter(file -> file.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".aux"))
+                                       .limit(2).toList();
+            return auxFiles.size() == 1 ? Optional.of(auxFiles.getFirst()) : Optional.empty();
         }
     }
 
@@ -178,45 +197,67 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         dialogService.showFileOpenDialog(configuration).ifPresent(this::loadAuxFile);
     }
 
-    // [impl->req~ux.consistency.aux-entry-selection~1]
+    // [impl->req~ux.consistency.aux-entry-selection~2]
     @VisibleForTesting
     void loadAuxFile(Path auxFile) {
+        loadAuxFile(() -> Optional.of(auxFile), exception -> {
+            LOGGER.error("Could not read .aux file {}", auxFile, exception);
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not read the .aux file."), exception);
+        });
+    }
+
+    private void loadAuxFile(Callable<Optional<Path>> fileSelection, Consumer<Exception> onFailure) {
         cancelAuxLoad();
         long generation = ++auxLoadGeneration;
         AtomicBoolean cancelled = new AtomicBoolean();
         auxCancelled = cancelled;
-        auxFuture = Optional.ofNullable(BackgroundTask.wrap(() -> {
+        auxFuture = BackgroundTask.wrap(() -> {
             checkCancelled(cancelled);
+            Optional<Path> selectedFile = fileSelection.call();
+            if (selectedFile.isEmpty()) {
+                return Optional.<AuxSelection>empty();
+            }
+            Path auxFile = selectedFile.orElseThrow();
             Set<String> keys = new DefaultAuxParser(new BibDatabase()).parseStrict(auxFile, cancelled::get).getUniqueKeys();
-            return snapshot.check(keys, () -> cancelled.get() || Thread.currentThread().isInterrupted());
+            BibliographyConsistencyCheck.Report findings = snapshot.check(keys, () -> cancelled.get() || Thread.currentThread().isInterrupted());
+            return Optional.of(new AuxSelection(auxFile.getFileName().toString(), findings));
         }).onSuccess(result -> {
             if (!cancelled.get() && generation == auxLoadGeneration) {
-                auxReport = Optional.of(result);
-                auxFileName.set(auxFile.getFileName().toString());
-                if (restrictToAuxEntries.get()) {
-                    applyReport(result);
-                } else {
-                    restrictToAuxEntries.set(true);
-                }
+                result.ifPresent(selection -> {
+                    auxReport = selection.report();
+                    auxFileName.set(selection.fileName());
+                    if (restrictToAuxEntries.get()) {
+                        applyReport(selection.report());
+                    } else {
+                        restrictToAuxEntries.set(true);
+                    }
+                });
             }
         }).onFailure(exception -> {
             if (!cancelled.get() && generation == auxLoadGeneration) {
-                LOGGER.error("Could not read .aux file {}", auxFile, exception);
-                dialogService.showErrorDialogAndWait(Localization.lang("Could not read the .aux file."), exception);
+                onFailure.accept(exception);
             }
-        }).executeWith(taskExecutor));
+        }).executeWith(taskExecutor);
+    }
+
+    @NullMarked
+    private record AuxSelection(String fileName, BibliographyConsistencyCheck.Report report) {
     }
 
     private void cancelAuxLoad() {
         auxCancelled.set(true);
-        auxFuture.ifPresent(future -> future.cancel(true));
-        auxFuture = Optional.empty();
+        if (auxFuture != null) {
+            auxFuture.cancel(true);
+            auxFuture = null;
+        }
     }
 
     private void cancelBstLoad() {
         bstCancelled.set(true);
-        bstFuture.ifPresent(future -> future.cancel(true));
-        bstFuture = Optional.empty();
+        if (bstFuture != null) {
+            bstFuture.cancel(true);
+            bstFuture = null;
+        }
     }
 
     public void cancelPendingLoads() {
@@ -257,7 +298,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return bstStyleName;
     }
 
-    // [impl->req~ux.consistency.bst-field-columns~1]
+    // [impl->req~ux.consistency.bst-field-columns~2]
     public void browseBstFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
@@ -272,33 +313,36 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     void loadBstFile(Path bstFile) {
         cancelBstLoad();
         long generation = ++bstLoadGeneration;
+        long displayGeneration = fieldDisplayGeneration;
         AtomicBoolean cancelled = new AtomicBoolean();
         bstCancelled = cancelled;
-        bstFuture = Optional.ofNullable(BackgroundTask.wrap(() -> {
-                                                          checkCancelled(cancelled);
-                                                          return new BstVM(bstFile).getFieldSelection();
-                                                      })
-                                                      .onSuccess(selection -> {
-                                                          if (cancelled.get() || generation != bstLoadGeneration) {
-                                                              return;
-                                                          }
-                                                          if (selection.isEmpty()) {
-                                                              LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
-                                                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
-                                                              return;
-                                                          }
-                                                          selectedFields = selection.orElseThrow();
-                                                          bstStyleName.set(bstFile.getFileName().toString());
-                                                          restrictToBstFields.set(true);
-                                                          shownFields.invalidate();
-                                                      })
-                                                      .onFailure(exception -> {
-                                                          if (!cancelled.get() && generation == bstLoadGeneration) {
-                                                              LOGGER.error("Could not read .bst file {}", bstFile, exception);
-                                                              dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), exception);
-                                                          }
-                                                      })
-                                                      .executeWith(taskExecutor));
+        bstFuture = BackgroundTask.wrap(() -> {
+                                      checkCancelled(cancelled);
+                                      return new BstVM(bstFile).getFieldSelection();
+                                  })
+                                  .onSuccess(selection -> {
+                                      if (cancelled.get() || generation != bstLoadGeneration) {
+                                          return;
+                                      }
+                                      if (selection.isEmpty()) {
+                                          LOGGER.error("No ENTRY fields in .bst file {}", bstFile);
+                                          dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."));
+                                          return;
+                                      }
+                                      selectedFields = selection.orElseThrow();
+                                      bstStyleName.set(bstFile.getFileName().toString());
+                                      if (displayGeneration == fieldDisplayGeneration) {
+                                          restrictToBstFields.set(true);
+                                      }
+                                      shownFields.invalidate();
+                                  })
+                                  .onFailure(exception -> {
+                                      if (!cancelled.get() && generation == bstLoadGeneration) {
+                                          LOGGER.error("Could not read .bst file {}", bstFile, exception);
+                                          dialogService.showErrorDialogAndWait(Localization.lang("You must select a valid .bst style file."), exception);
+                                      }
+                                  })
+                                  .executeWith(taskExecutor);
     }
 
     public List<String> getColumnNames() {

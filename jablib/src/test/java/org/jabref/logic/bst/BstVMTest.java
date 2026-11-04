@@ -49,6 +49,15 @@ public class BstVMTest {
     }
 
     @Test
+    void fieldSelectionIncludesImplicitCrossref() throws URISyntaxException, IOException {
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
+        var selection = vm.getFieldSelection().orElseThrow();
+
+        assertEquals(List.of(StandardField.CROSSREF, StandardField.TITLE),
+                List.of(StandardField.CROSSREF, StandardField.TITLE, StandardField.DOI).stream().filter(selection).toList());
+    }
+
+    @Test
     void abbrv() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
         assertTrue(vm.hasSortCommand());

@@ -114,7 +114,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
             // The first two columns (entry type and citation key) are always shown
             if (currentIndex >= 2) {
                 Field field = reportedFields.get(currentIndex - 2);
-                // [impl->req~ux.consistency.bst-field-columns~1]
+                // [impl->req~ux.consistency.bst-field-columns~2]
                 tableColumn.visibleProperty().bind(viewModel.shownFieldsProperty().map(shown -> shown.test(field)));
             }
 
@@ -135,12 +135,14 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                     if (empty || item == null) {
                         setGraphic(null);
                         setText(null);
+                        setTooltip(null);
                         return;
                     }
 
                     ConsistencySymbol.fromText(item)
                                      .ifPresentOrElse(
                                              symbol -> {
+                                                 setText(null);
                                                  setGraphic(symbol.getIcon().getGraphicNode());
                                                  setTooltip(new Tooltip(symbol.getDescription()));
                                              },

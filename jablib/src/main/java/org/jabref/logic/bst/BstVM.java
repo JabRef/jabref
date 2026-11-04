@@ -126,6 +126,9 @@ public class BstVM {
         }
         Set<Field> dateFields = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
         return Optional.of(field -> {
+            if (field == StandardField.CROSSREF) {
+                return true;
+            }
             Stream<Field> candidates = dateFields.contains(field)
                                        ? dateFields.stream()
                                        : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());

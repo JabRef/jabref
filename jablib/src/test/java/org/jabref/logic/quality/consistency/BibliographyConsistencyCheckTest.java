@@ -27,7 +27,9 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
@@ -154,6 +156,23 @@ class BibliographyConsistencyCheckTest {
         assertEquals(before.toString(), after.toString());
         assertSame(entry, report.messages().getFirst().bibEntry());
         assertThrows(UnsupportedOperationException.class, () -> report.messages().getFirst().message().set(0, "changed"));
+    }
+
+    @Test
+    void compactReportsMergeFieldsForTypesWithTheSameDisplayName() {
+        List<BibEntry> entries = List.of(
+                new BibEntry(BiblatexNonStandardEntryType.Standard, "first").withField(StandardField.NOTE, "Note"),
+                new BibEntry(BiblatexNonStandardEntryType.Standard, "second"),
+                new BibEntry(IEEETranEntryType.Standard, "third").withField(StandardField.YEAR, "2026"),
+                new BibEntry(IEEETranEntryType.Standard, "fourth"));
+        var snapshot = BibliographyConsistencyCheck.snapshot(entries, BibDatabaseMode.BIBLATEX, entryTypesManager, () -> false);
+
+        var report = snapshot.check(Set.of("*"), () -> false);
+
+        Set<Field> differingFields = report.fieldsByType().get("Standard").stream()
+                                           .filter(Set.of(StandardField.NOTE, StandardField.YEAR)::contains)
+                                           .collect(Collectors.toSet());
+        assertEquals(Set.of(StandardField.NOTE, StandardField.YEAR), differingFields);
     }
 
     @Test
