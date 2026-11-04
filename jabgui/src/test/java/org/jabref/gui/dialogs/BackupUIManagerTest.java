@@ -125,12 +125,16 @@ class BackupUIManagerTest extends JavaFxTest {
                 .thenReturn(Optional.of(BackupResolverDialog.RESTORE_FROM_BACKUP));
         Path originalFile = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
 
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
+
         interact(() -> BackupUIManager.showRestoreBackupDialog(
                 dialogService,
+                tabContainer,
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                mock(StateManager.class)));
+                new JabRefGuiStateManager()));
 
         verify(dialogService).showErrorDialogAndWait(
                 Localization.lang("Restore backup"),
@@ -150,12 +154,16 @@ class BackupUIManagerTest extends JavaFxTest {
                 backupDir);
         Files.writeString(backupFile, "");
 
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
+
         interact(() -> BackupUIManager.showRestoreBackupDialog(
                 dialogService,
+                tabContainer,
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                mock(StateManager.class)));
+                new JabRefGuiStateManager()));
 
         verify(dialogService).showErrorDialogAndWait(
                 Localization.lang("Restore backup"),
