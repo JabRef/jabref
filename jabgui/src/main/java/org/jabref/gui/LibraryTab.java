@@ -629,12 +629,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             tabTitle.append(displayName);
 
             boolean displayNameIsDuplicated = stateManager.getOpenDatabases().stream()
-                                                           .filter(context -> context != bibDatabaseContext)
-                                                           .map(context -> context.getMetaData().getLibraryName()
-                                                                                  .orElseGet(() -> context.getDatabasePath()
-                                                                                                       .map(path -> path.getFileName().toString())
-                                                                                                       .orElse("")))
-                                                           .anyMatch(displayName::equals);
+                                                          .filter(context -> context != bibDatabaseContext)
+                                                          .map(context -> context.getMetaData().getLibraryName()
+                                                                                 .orElseGet(() -> context.getDatabasePath()
+                                                                                                         .map(path -> path.getFileName().toString())
+                                                                                                         .orElse("")))
+                                                          .anyMatch(displayName::equals);
 
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
             // Unicode codepoint deliberately chosen to avoid semantical confusion
@@ -665,8 +665,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 tabTitle.append('*');
                 int untitledNumber = getUntitledLibraryNumber();
                 String untitledName = untitledNumber > 0
-                        ? Localization.lang("untitled (%0)", Integer.toString(untitledNumber))
-                        : Localization.lang("untitled");
+                                      ? Localization.lang("untitled (%0)", Integer.toString(untitledNumber))
+                                      : Localization.lang("untitled");
                 String displayName = bibDatabaseContext.getMetaData().getLibraryName()
                                                        .orElse(untitledName);
                 tabTitle.append(displayName);

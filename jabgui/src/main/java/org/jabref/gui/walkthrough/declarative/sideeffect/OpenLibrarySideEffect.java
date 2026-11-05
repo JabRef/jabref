@@ -140,10 +140,10 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
 
     static Optional<LibraryTab> findWalkthroughLibraryTab(Collection<LibraryTab> libraryTabs, @Nullable LibraryTab createdTab) {
         if (createdTab != null && libraryTabs.contains(createdTab)) {
-        return Optional.of(createdTab);
-    }
+            return Optional.of(createdTab);
+        }
         return Optional.empty();
-}
+    }
 
     private Optional<BibDatabaseContext> loadExampleLibrary() {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(libraryName)) {
