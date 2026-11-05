@@ -88,6 +88,7 @@ public class DOI implements Identifier {
     // Pattern
     private static final Pattern DOI_RESOLVER_PREFIX = Pattern.compile("^https?://(?:www\\.|dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
     private static final Pattern EXACT_DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
+
     private static final Pattern FIND_DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_DOI_EXP, Pattern.CASE_INSENSITIVE);
     // Pattern (short DOI)
     private static final Pattern EXACT_SHORT_DOI_SHORTCUT = Pattern.compile(SHORT_DOI_SHORTCUT, Pattern.CASE_INSENSITIVE); // eg doi.org/bfrhmx (no "10/")
@@ -158,7 +159,7 @@ public class DOI implements Identifier {
     public static Optional<DOI> parse(String doi) {
         try {
             LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-            String cleanedDOI = doi;
+            String cleanedDOI = removeTrackingParameters(doi);
             cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);
             // needs to be handled before LatexToUnicode, because otherwise `^` will be treated as conversion superscript
             cleanedDOI = cleanedDOI.replaceAll("\\^", "");
@@ -223,6 +224,20 @@ public class DOI implements Identifier {
             LOGGER.debug("Could not decode DOI link", e);
             return Optional.empty();
         }
+    }
+
+    /// Removes the query (e.g., `?utm_source=newsletter`) and the fragment (e.g., `#section`) from a DOI resolver URL,
+    /// because they are not part of the DOI.
+    ///
+    /// Only DOI resolver URLs (such as `https://doi.org/...`) are changed. Other URLs may carry the DOI inside the query
+    /// (e.g., `https://www.scitepress.org/Link.aspx?doi=10.5220/0010404301780189`) and are returned unchanged.
+    /// Call this before URL decoding, because an encoded `%3F` or `%23` is a valid part of a DOI.
+    private static String removeTrackingParameters(String doi) {
+        String trimmed = doi.trim();
+        if (DOI_RESOLVER_PREFIX.matcher(trimmed).find()) {
+            return URLUtil.removeQueryAndFragment(trimmed);
+        }
+        return doi;
     }
 
     /// Determines whether a DOI/Short DOI is valid or not
