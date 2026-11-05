@@ -1,9 +1,12 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.SequencedSet;
+import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -22,10 +25,12 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.sciteTallies.TalliesResponse;
+import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NullMarked;
@@ -107,6 +112,8 @@ public class CitationsRelationsTabViewModel {
     ///
     /// The duplicate check runs asynchronously and inserts copies of the given entries, so the citation
     /// relation is set on the entries that actually reached the library, once every entry is imported or skipped.
+    /// An entry resolved by keeping its duplicate in the library is still part of the relation, so the kept entry is
+    /// linked in its place. An entry whose duplicate dialog was closed is left out.
     public void importReviewedEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
         Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
         if (activeDatabase.isEmpty()) {
@@ -125,11 +132,10 @@ public class CitationsRelationsTabViewModel {
         tracker.setOnFinish(() -> {
             List<BibEntry> importedEntries = tracker.getImportedEntries();
             dialogService.notify(Localization.lang("%0 entry(s) imported", importedEntries.size()));
-            if (importedEntries.isEmpty()) {
-                return;
+            linkReviewedEntries(importedEntries, tracker.getKeptExistingEntries(), searchType, existingEntry, databaseContext);
+            if (!importedEntries.isEmpty()) {
+                lastImportedEntry.set(importedEntries.getFirst());
             }
-            linkImportedEntries(importedEntries, searchType, existingEntry);
-            lastImportedEntry.set(importedEntries.getFirst());
         });
         createImportHandler(databaseContext).importEntriesWithDuplicateCheck(null, entries, tracker);
     }
@@ -155,12 +161,92 @@ public class CitationsRelationsTabViewModel {
         }
     }
 
-    private void linkCites(List<BibEntry> entries, BibEntry existingEntry) {
+    /// Records the citation relation between the inspected entry and the outcome of a review.
+    ///
+    /// @param importedEntries entries the review added to the library, which must already have their citation keys
+    /// @param keptEntries     library entries the user kept instead of importing their duplicates
+    /// @param searchType      whether the inspected entry cites the reviewed entries or is cited by them
+    /// @param existingEntry   the inspected entry
+    /// @param databaseContext library the entries belong to
+    // [impl->req~entry-editor.citations.review-links-kept-duplicate~1]
+    private void linkReviewedEntries(List<BibEntry> importedEntries,
+                                     List<BibEntry> keptEntries,
+                                     CitationFetcher.SearchType searchType,
+                                     BibEntry existingEntry,
+                                     BibDatabaseContext databaseContext) {
+        List<BibEntry> keptEntriesToLink = determineKeptEntriesToLink(keptEntries, existingEntry, databaseContext);
+        if (importedEntries.isEmpty() && keptEntriesToLink.isEmpty()) {
+            return;
+        }
+        switch (searchType) {
+            case CITES ->
+                    linkReviewedCites(importedEntries, keptEntriesToLink, existingEntry, databaseContext);
+            case CITED_BY -> {
+                linkCitedBy(importedEntries, existingEntry);
+                existingEntry.getCitationKey().ifPresent(citationKey ->
+                        linkKeptEntriesCitedBy(keptEntriesToLink, citationKey, databaseContext));
+            }
+        }
+    }
+
+    /// Function to pick the kept entries a citation relation can be recorded for
+    ///
+    /// @param keptEntries     library entries the user kept, one per reviewed entry resolved that way
+    /// @param existingEntry   the inspected entry
+    /// @param databaseContext library the entries belong to
+    private List<BibEntry> determineKeptEntriesToLink(List<BibEntry> keptEntries, BibEntry existingEntry, BibDatabaseContext databaseContext) {
+        // BibEntry.equals compares the content, so only the id tells whether two reviewed entries kept the same library entry
+        Set<String> seenEntryIds = new HashSet<>();
+        return keptEntries.stream()
+                          // The inspected entry can be the duplicate that was kept, and an entry does not cite itself
+                          .filter(keptEntry -> keptEntry != existingEntry)
+                          // Keeping the import for another reviewed entry can have removed the kept entry from the library
+                          .filter(keptEntry -> databaseContext.getDatabase().containsEntryWithId(keptEntry.getId()))
+                          .filter(keptEntry -> seenEntryIds.add(keptEntry.getId()))
+                          .toList();
+    }
+
+    /// With nothing imported, this write is the only change of the review. It therefore has to be recorded, or
+    /// closing the library would not offer to save it.
+    ///
+    /// A kept entry is not changed by the review, so one without a citation key is reported instead of given a key.
+    private void linkReviewedCites(List<BibEntry> importedEntries, List<BibEntry> keptEntries, BibEntry existingEntry, BibDatabaseContext databaseContext) {
+        keptEntries.stream()
+                   .filter(keptEntry -> keptEntry.getCitationKey().isEmpty())
+                   .forEach(keptEntry -> dialogService.notify(Localization.lang("No citation key for %0", keptEntry.getAuthorTitleYear())));
+        SequencedSet<String> alreadyCited = existingEntry.getCites();
+        List<BibEntry> entriesToCite = Stream.concat(importedEntries.stream(), keptEntries.stream())
+                                             .filter(entry -> entry.getCitationKey().filter(citationKey -> !alreadyCited.contains(citationKey)).isPresent())
+                                             .toList();
+        if (!entriesToCite.isEmpty()) {
+            linkCites(entriesToCite, existingEntry)
+                    .ifPresent(change -> recordLinkChange(change, databaseContext));
+        }
+    }
+
+    /// Unlike an imported entry, a kept entry was already part of the library, and undoing the import does not take
+    /// this change back. It is therefore recorded as its own step.
+    private void linkKeptEntriesCitedBy(List<BibEntry> keptEntries, String citationKey, BibDatabaseContext databaseContext) {
+        for (BibEntry keptEntry : keptEntries) {
+            SequencedSet<String> existingCites = keptEntry.getCites();
+            if (existingCites.add(citationKey)) {
+                keptEntry.setCites(existingCites)
+                         .ifPresent(change -> recordLinkChange(change, databaseContext));
+            }
+        }
+    }
+
+    // [impl->req~entry-editor.citations.review-link-undoable~1]
+    private void recordLinkChange(FieldChange change, BibDatabaseContext databaseContext) {
+        stateManager.getUndoManager(databaseContext).addEdit(new UndoableFieldChange(change));
+    }
+
+    private Optional<FieldChange> linkCites(List<BibEntry> entries, BibEntry existingEntry) {
         SequencedSet<String> citeKeys = existingEntry.getCites();
         entries.stream()
                .flatMap(entry -> entry.getCitationKey().stream())
                .forEach(citeKeys::add);
-        existingEntry.setCites(citeKeys);
+        return existingEntry.setCites(citeKeys);
     }
 
     /// "cited by" is the opposite of "cites", but not stored in field `CITED_BY`, but in the `CITES` field of the citing entry.

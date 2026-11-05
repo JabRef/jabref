@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
@@ -39,16 +41,25 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -297,27 +308,316 @@ class CitationsRelationsTabViewModelTest {
         assertEquals(Optional.empty(), firstEntryInLibrary.getField(StandardField.CITES));
     }
 
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
     @Test
-    void importReviewedEntries_doesNotLinkEntry_whenDuplicateIsSkipped() {
-        BibEntry duplicateInDb = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "First Author")
-                .withField(StandardField.YEAR, "2022")
-                .withField(StandardField.TITLE, "Gut microbiota and cognition")
-                .withCitationKey("ExistingKey2022");
-        bibDatabaseContext.getDatabase().insertEntry(duplicateInDb);
+    void importReviewedEntries_linksLibraryEntry_whenExistingDuplicateIsKept() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
 
-        when(dialogService.showCustomDialogAndWait(any()))
-                .thenReturn(Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT));
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport, secondEntryToImport);
 
-        List<CitationRelationItem> citationItems = List.of(
-                new CitationRelationItem(firstEntryToImport, false),
-                new CitationRelationItem(secondEntryToImport, false));
+        assertEquals(Optional.of("SecondAuthorCitationKey20221,ExistingKey2022"), existingEntry.getField(StandardField.CITES));
+        assertEquals(Optional.empty(), bibDatabaseContext.getDatabase().getEntryByCitationKey(firstEntryToImport.getCitationKey().orElseThrow()));
+    }
 
-        JavaFxExtension.invokeAndWait(() ->
-                viewModel.importReviewedEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry));
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_linksLibraryEntry_whenDecisionIsAutoRemoveExact() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
 
-        // firstEntryToImport is a duplicate and was skipped, so only secondEntryToImport should be linked.
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.AUTOREMOVE_EXACT),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport);
+
+        assertEquals(Optional.of("ExistingKey2022"), existingEntry.getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_doesNotLinkEntry_whenDuplicateDialogIsClosed() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.empty(),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport, secondEntryToImport);
+
         assertEquals(Optional.of("SecondAuthorCitationKey20221"), existingEntry.getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_linksLibraryEntry_whenEveryAcceptedEntryIsKept() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport);
+
+        assertEquals(Optional.of("ExistingKey2022"), existingEntry.getField(StandardField.CITES));
+        verify(dialogService).notify(Localization.lang("%0 entry(s) imported", 0));
+        assertNull(viewModel.lastImportedEntryProperty().get());
+    }
+
+    // [utest->req~entry-editor.citations.review-link-undoable~1]
+    @Test
+    void importReviewedEntries_writesCitesOnLibraryEntryAsUndoableStep_whenCitedByDuplicateIsKept() {
+        BibEntry duplicateInLibrary = insertDuplicateOfFirstEntry("ExistingKey2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITED_BY,
+                firstEntryToImport);
+
+        assertEquals(Optional.of("Test2023"), duplicateInLibrary.getField(StandardField.CITES));
+
+        stateManager.getUndoManager(bibDatabaseContext).undo();
+
+        assertEquals(Optional.empty(), duplicateInLibrary.getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-link-undoable~1]
+    @Test
+    void importReviewedEntries_recordsNoUndoStep_whenKeptEntryAlreadyCitesInspectedEntry() {
+        BibEntry duplicateInLibrary = insertDuplicateOfFirstEntry("ExistingKey2022");
+        duplicateInLibrary.setField(StandardField.CITES, "Test2023");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITED_BY,
+                firstEntryToImport);
+
+        assertEquals(Optional.of("Test2023"), duplicateInLibrary.getField(StandardField.CITES));
+        assertEquals(Optional.empty(), stateManager.getUndoManager(bibDatabaseContext).undo());
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_notifiesUser_whenKeptEntryHasNoCitationKey() {
+        BibEntry duplicateWithoutKey = new BibEntry(firstEntryToImport);
+        duplicateWithoutKey.clearCitationKey();
+        bibDatabaseContext.getDatabase().insertEntry(duplicateWithoutKey);
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport);
+
+        verify(dialogService).notify(Localization.lang("No citation key for %0", duplicateWithoutKey.getAuthorTitleYear()));
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+        assertEquals(Optional.empty(), duplicateWithoutKey.getCitationKey());
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_notifiesOnce_whenInspectedEntryHasNoCitationKeyAndEntriesAreImportedAndKept() {
+        existingEntry.clearCitationKey();
+        BibEntry duplicateInLibrary = insertDuplicateOfFirstEntry("ExistingKey2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITED_BY,
+                firstEntryToImport, secondEntryToImport);
+
+        verify(dialogService).notify(Localization.lang("No citation key for %0", existingEntry.getAuthorTitleYear()));
+        assertEquals(Optional.empty(), duplicateInLibrary.getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @ParameterizedTest
+    @EnumSource(CitationFetcher.SearchType.class)
+    void importReviewedEntries_doesNotLinkEntryToItself_whenKeptDuplicateIsInspectedEntry(CitationFetcher.SearchType searchType) {
+        existingEntry.setField(StandardField.YEAR, "2022");
+        existingEntry.setField(StandardField.TITLE, "Gut microbiota and cognition");
+        BibEntry duplicateOfInspectedEntry = new BibEntry(existingEntry).withCitationKey("Fetched2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                searchType,
+                duplicateOfInspectedEntry);
+
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+        assertEquals(List.of(existingEntry), bibDatabaseContext.getEntries());
+    }
+
+    // [utest->req~entry-editor.citations.review-link-undoable~1]
+    @Test
+    void importReviewedEntries_marksLibraryChangedAndUndoesCites_whenEveryAcceptedEntryIsKept() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
+        GuiUndoManager undoManager = stateManager.getUndoManager(bibDatabaseContext);
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport);
+
+        assertEquals(Optional.of("ExistingKey2022"), existingEntry.getField(StandardField.CITES));
+        assertTrue(undoManager.hasChangedProperty().get());
+
+        undoManager.undo();
+
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-link-undoable~1]
+    @Test
+    void importReviewedEntries_undoesLinkBeforeImport_whenEntriesAreImportedAndKept() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
+        GuiUndoManager undoManager = stateManager.getUndoManager(bibDatabaseContext);
+        String importedKey = secondEntryToImport.getCitationKey().orElseThrow();
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport, secondEntryToImport);
+
+        undoManager.undo();
+
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+        assertEquals(importedKey, bibDatabaseContext.getDatabase().getEntryByCitationKey(importedKey).orElseThrow().getCitationKey().orElseThrow());
+
+        undoManager.undo();
+
+        assertEquals(Optional.empty(), bibDatabaseContext.getDatabase().getEntryByCitationKey(importedKey));
+    }
+
+    // [utest->req~entry-editor.citations.review-link-undoable~1]
+    @Test
+    void importReviewedEntries_recordsNoUndoStep_whenInspectedEntryAlreadyCitesKeptEntry() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
+        existingEntry.setField(StandardField.CITES, "Other2020, ExistingKey2022");
+        GuiUndoManager undoManager = stateManager.getUndoManager(bibDatabaseContext);
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport);
+
+        assertEquals(Optional.of("Other2020, ExistingKey2022"), existingEntry.getField(StandardField.CITES));
+        assertFalse(undoManager.hasChangedProperty().get());
+        assertEquals(Optional.empty(), undoManager.undo());
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_doesNotCiteKeptEntry_whenLaterDecisionRemovesItFromLibrary() {
+        insertDuplicateOfFirstEntry("ExistingKey2022");
+        BibEntry secondDuplicate = new BibEntry(firstEntryToImport).withCitationKey("Replacement2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                List.of(Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                        Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT)),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport, secondDuplicate);
+
+        assertEquals(Optional.empty(), bibDatabaseContext.getDatabase().getEntryByCitationKey("ExistingKey2022"));
+        assertEquals(Optional.of("Replacement2022"), existingEntry.getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_doesNotWriteToKeptEntry_whenLaterDecisionRemovesItFromLibrary() {
+        BibEntry duplicateInLibrary = insertDuplicateOfFirstEntry("ExistingKey2022");
+        BibEntry secondDuplicate = new BibEntry(firstEntryToImport).withCitationKey("Replacement2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                List.of(Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                        Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT)),
+                CitationFetcher.SearchType.CITED_BY,
+                firstEntryToImport, secondDuplicate);
+
+        assertEquals(Optional.empty(), bibDatabaseContext.getDatabase().getEntryByCitationKey("ExistingKey2022"));
+        assertEquals(Optional.empty(), duplicateInLibrary.getField(StandardField.CITES));
+        assertEquals(Optional.of("Test2023"), bibDatabaseContext.getDatabase().getEntryByCitationKey("Replacement2022").orElseThrow().getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-links-kept-duplicate~1]
+    @Test
+    void importReviewedEntries_notifiesOnce_whenSameKeptEntryWithoutCitationKeyIsKeptTwice() {
+        BibEntry duplicateWithoutKey = new BibEntry(firstEntryToImport);
+        duplicateWithoutKey.clearCitationKey();
+        bibDatabaseContext.getDatabase().insertEntry(duplicateWithoutKey);
+        BibEntry secondDuplicate = new BibEntry(firstEntryToImport).withCitationKey("Other2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                List.of(Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                        Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT)),
+                CitationFetcher.SearchType.CITES,
+                firstEntryToImport, secondDuplicate);
+
+        verify(dialogService).notify(Localization.lang("No citation key for %0", duplicateWithoutKey.getAuthorTitleYear()));
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+    }
+
+    // [utest->req~entry-editor.citations.review-link-undoable~1]
+    @Test
+    void importReviewedEntries_recordsOneUndoStep_whenSameEntryIsKeptTwiceForCitedBy() {
+        BibEntry duplicateInLibrary = insertDuplicateOfFirstEntry("ExistingKey2022");
+        BibEntry secondDuplicate = new BibEntry(firstEntryToImport).withCitationKey("Other2022");
+        GuiUndoManager undoManager = stateManager.getUndoManager(bibDatabaseContext);
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                List.of(Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT),
+                        Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT)),
+                CitationFetcher.SearchType.CITED_BY,
+                firstEntryToImport, secondDuplicate);
+
+        assertEquals(Optional.of("Test2023"), duplicateInLibrary.getField(StandardField.CITES));
+
+        undoManager.undo();
+
+        assertEquals(Optional.empty(), duplicateInLibrary.getField(StandardField.CITES));
+        assertEquals(Optional.empty(), undoManager.undo());
+    }
+
+    @Test
+    void importEntries_recordsNoUndoStepForCitesWrite() {
+        GuiUndoManager undoManager = stateManager.getUndoManager(bibDatabaseContext);
+
+        viewModel.importEntries(List.of(new CitationRelationItem(firstEntryToImport, false)), CitationFetcher.SearchType.CITES, existingEntry);
+        assertEquals(Optional.of("FirstAuthorCitationKey2022"), existingEntry.getField(StandardField.CITES));
+
+        // The newest step is the import itself. Removing the entry takes its key out of the cites field by itself.
+        undoManager.undo();
+
+        assertEquals(List.of(existingEntry), bibDatabaseContext.getEntries());
+        assertEquals(Optional.empty(), undoManager.undo());
+    }
+
+    private BibEntry insertDuplicateOfFirstEntry(String citationKey) {
+        BibEntry duplicateInLibrary = new BibEntry(firstEntryToImport).withCitationKey(citationKey);
+        bibDatabaseContext.getDatabase().insertEntry(duplicateInLibrary);
+        return duplicateInLibrary;
+    }
+
+    private void importReviewedEntriesResolvingDuplicatesWith(Optional<DuplicateResolverDialog.DuplicateResolverResult> decision,
+                                                              CitationFetcher.SearchType searchType,
+                                                              BibEntry... entries) {
+        importReviewedEntriesResolvingDuplicatesWith(List.of(decision), searchType, entries);
+    }
+
+    /// The duplicate check asks for its decisions on the JavaFX thread. Only the answers of the dialog matter here,
+    /// so the dialog is not built: its merge view needs most of the application.
+    ///
+    /// @param decisions the answers of the duplicate dialog in order, empty if the dialog gets closed
+    private void importReviewedEntriesResolvingDuplicatesWith(List<Optional<DuplicateResolverDialog.DuplicateResolverResult>> decisions,
+                                                              CitationFetcher.SearchType searchType,
+                                                              BibEntry... entries) {
+        doReturn(decisions.getFirst(), decisions.subList(1, decisions.size()).toArray()).when(dialogService).showCustomDialogAndWait(any());
+        List<CitationRelationItem> citationItems = Arrays.stream(entries)
+                                                         .map(entry -> new CitationRelationItem(entry, false))
+                                                         .toList();
+        JavaFxExtension.invokeAndWait(() -> {
+            try (MockedConstruction<DuplicateResolverDialog> _ = mockConstruction(DuplicateResolverDialog.class)) {
+                viewModel.importReviewedEntries(citationItems, searchType, existingEntry);
+            }
+        });
+        // The import handler turns a failure before the dialog answers into a skip, which must not pass for the decision
+        verify(dialogService, times(decisions.size())).showCustomDialogAndWait(any());
     }
 
     // [utest->feat~entry-editor.citations.review-before-import~1]
