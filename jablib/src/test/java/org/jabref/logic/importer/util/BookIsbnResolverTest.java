@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat.pdf;
+package org.jabref.logic.importer.util;
 
 import java.util.LinkedHashMap;
 import java.util.List;

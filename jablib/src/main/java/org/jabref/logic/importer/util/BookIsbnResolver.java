@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat.pdf;
+package org.jabref.logic.importer.util;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -15,9 +15,9 @@ import org.jabref.model.entry.identifier.ISBN;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-final class BookIsbnResolver {
+public final class BookIsbnResolver {
 
-    static final int MAX_CANDIDATES = 4;
+    public static final int MAX_CANDIDATES = 4;
     private static final Pattern SEPARATORS = Pattern.compile("[\\p{P}\\p{Z}\\s]+");
     private static final Pattern YEAR = Pattern.compile("[0-9]{4}");
 
@@ -27,14 +27,14 @@ final class BookIsbnResolver {
         UNKNOWN
     }
 
-    boolean hasRequiredMetadata(BibEntry localBook) {
+    public boolean hasRequiredMetadata(BibEntry localBook) {
         return List.of(StandardField.TITLE, contributorField(localBook), StandardField.PUBLISHER, StandardField.YEAR)
                    .stream()
                    .allMatch(field -> normalizedField(localBook, field).isPresent());
     }
 
     // [impl->req~import.pdf.book-isbn-resolution~1]
-    Optional<ISBN> resolve(BibEntry localBook, Map<ISBN, Optional<BibEntry>> candidates) {
+    public Optional<ISBN> resolve(BibEntry localBook, Map<ISBN, Optional<BibEntry>> candidates) {
         if (!hasRequiredMetadata(localBook) || candidates.size() < 2 || candidates.size() > MAX_CANDIDATES) {
             return Optional.empty();
         }
