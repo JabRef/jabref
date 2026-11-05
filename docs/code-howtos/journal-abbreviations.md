@@ -22,6 +22,17 @@ The generator uses all `.csv` files from <https://github.com/JabRef/abbrv.jabref
         );
 ```
 
+## Loading and refreshing journal lists
+
+`AbbreviationPreferences.shouldUseBuiltInJournalList()` defaults to `true`.
+When disabled, repository loading skips the built-in aggregate but still loads external CSV lists and LTWA.
+`loadBuiltInRepository()` always loads the built-in aggregate, including for the preferences list display.
+
+The GUI retains its injected repository when saving preferences and calls `reload` with the saved values.
+Reloading captures the preference values before scheduling background work, then publishes the completed data in one update.
+Each request has a generation number: a result from an older request cannot overwrite a newer request.
+Existing consumers see the refreshed data on their next lookup; while loading, they continue using the previous data.
+
 ## Future work
 
 See <https://github.com/JabRef/jabref-issue-melting-pot/issues/41>

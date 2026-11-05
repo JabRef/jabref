@@ -65,6 +65,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     private void buildView() {
         setContent(form()
+                .checkbox(Localization.lang("Use the built-in journal abbreviation list"), viewModel.useBuiltInJournalListProperty())
                 .custom(buildFileChooserRow())
                 .custom(buildAbbreviationsEditor())
                 .custom(buildAddAbbreviationRow())
