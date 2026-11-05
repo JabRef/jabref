@@ -123,19 +123,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             metaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
-        String libraryName = libraryNameProperty.getValue().trim();
-        if (libraryName.isEmpty()) {
-            metaData.clearLibraryName();
-        } else {
-            metaData.setLibraryName(libraryName);
-        }
-
-        String libraryDescription = libraryDescriptionProperty.getValue().trim();
-        if (libraryDescription.isEmpty()) {
-            metaData.clearLibraryDescription();
-        } else {
-            metaData.setLibraryDescription(libraryDescription);
-        }
+        metaData.setLibraryName(libraryNameProperty.getValue());
+        metaData.setLibraryDescription(libraryDescriptionProperty.getValue());
 
         storeKeywordSeparator(metaData);
     }
