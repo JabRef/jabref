@@ -633,7 +633,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             toolTipText.append(databasePath.toAbsolutePath());
             addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
 
-            if (databaseLocation == DatabaseLocation.SHARED) {
+                if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 toolTipText.append(' ');
@@ -651,15 +651,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append('*');
                 int untitledNumber = getUntitledLibraryNumber();
-                if (untitledNumber > 0) {
-                    tabTitle.append(Localization.lang("untitled (%0)", Integer.toString(untitledNumber)));
-                } else {
-                    tabTitle.append(Localization.lang("untitled"));
-                }
+                String untitledName = untitledNumber > 0
+                        ? Localization.lang("untitled (%0)", Integer.toString(untitledNumber))
+                        : Localization.lang("untitled");
+                String displayName = bibDatabaseContext.getMetaData().getLibraryName()
+                                                       .orElse(untitledName);
+                tabTitle.append(displayName);
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
+
             addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
             addModeInfo(toolTipText, bibDatabaseContext);
             if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
