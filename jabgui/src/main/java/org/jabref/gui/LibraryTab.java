@@ -627,13 +627,26 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                                    .filter(name -> !name.isBlank())
                                                    .orElse(databasePath.getFileName().toString());
             tabTitle.append(displayName);
+
+            boolean displayNameIsDuplicated = stateManager.getOpenDatabases().stream()
+                                                           .filter(context -> context != bibDatabaseContext)
+                                                           .map(context -> context.getMetaData().getLibraryName()
+                                                                                  .orElseGet(() -> context.getDatabasePath()
+                                                                                                       .map(path -> path.getFileName().toString())
+                                                                                                       .orElse("")))
+                                                           .anyMatch(displayName::equals);
+
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
             // Unicode codepoint deliberately chosen to avoid semantical confusion
-            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
+            if (displayNameIsDuplicated && uniquePathPart.isEmpty()) {
+                tabTitle.append(" \u2013 ").append(databasePath.getFileName());
+            } else {
+                uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
+            }
+
             toolTipText.append(databasePath.toAbsolutePath());
             addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
-
-                if (databaseLocation == DatabaseLocation.SHARED) {
+            if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 toolTipText.append(' ');
