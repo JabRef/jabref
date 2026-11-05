@@ -49,6 +49,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             "(?:(?:https?|ftps?)://|www\\.)\\S*$",
             Pattern.CASE_INSENSITIVE);
 
+    /// A citation contains a handful of DOI-like parts at most. The limit keeps [#removeDoi] linear for a pasted
+    /// publisher link that contains thousands of them: each skipped candidate rescans the text in front of it.
+    private static final int MAX_DOI_CANDIDATES = 10;
+
     private static final Pattern URL_PATTERN = Pattern.compile(
             "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
                     "(([\\w\\-]+\\.)+?([\\w\\-.~]+\\/?)*" +
@@ -314,7 +318,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// (`https://x.org` -> `https: //x. org`), so no URL could be found afterwards.
     private String removeDoi(String input) {
         int searchStart = 0;
-        while (searchStart < input.length()) {
+        int attempts = 0;
+        // The number of candidates is limited (see MAX_DOI_CANDIDATES), so the total work stays linear
+        while (searchStart < input.length() && attempts < MAX_DOI_CANDIDATES) {
+            attempts++;
             String remainingInput = input.substring(searchStart);
             Optional<DOI> candidate = DOI.findInText(remainingInput);
             if (candidate.isEmpty()) {
