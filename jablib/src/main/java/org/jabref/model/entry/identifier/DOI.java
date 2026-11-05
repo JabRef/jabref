@@ -344,7 +344,7 @@ public class DOI implements Identifier {
 
             URI uri = new URI(base.getScheme(), base.getHost(), path, query, null);
             return Optional.of(uri);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
     }
