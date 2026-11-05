@@ -118,7 +118,7 @@ public class WelcomeTab extends Tab {
         this.recentLibrariesBox = new VBox(8);
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        main = new VBox(24, createTopTitles(), new VBox(), createCommunityBox());
+        main = new VBox(20, createTopTitles(), new VBox(), createCommunityBox());
         main.getStyleClass().addAll("welcome-main-container", "align-center");
         // Sized to its content, so the StackPane centers it: whitespace above and below on a tall window.
         main.setMaxHeight(Region.USE_PREF_SIZE);
@@ -144,13 +144,13 @@ public class WelcomeTab extends Tab {
         welcomeLabel.getStyleClass().addAll("h1", "text-accent");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
-        VBox topTitles = new VBox(12, welcomeLabel, descriptionLabel);
+        VBox topTitles = new VBox(8, welcomeLabel, descriptionLabel);
         topTitles.getStyleClass().add("align-top-left");
         return topTitles;
     }
 
     private void initializeColumns() {
-        GridPane grid = new GridPane(24, 24);
+        GridPane grid = new GridPane(24, 20);
         grid.getStyleClass().add("align-top-center");
 
         VBox leftColumn = createLeftColumn();
@@ -180,7 +180,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createLeftColumn() {
-        VBox leftColumn = new VBox(24,
+        VBox leftColumn = new VBox(20,
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
@@ -191,7 +191,7 @@ public class WelcomeTab extends Tab {
     private VBox createRightColumn() {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
-        VBox rightColumn = new VBox(24, quickSettings, walkthroughs);
+        VBox rightColumn = new VBox(20, quickSettings, walkthroughs);
         rightColumn.getStyleClass().addAll("align-top-left");
         return rightColumn;
     }
@@ -345,7 +345,7 @@ public class WelcomeTab extends Tab {
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         FlowPane iconLinksContainer = createIconLinksContainer();
         FlowPane textLinksContainer = createTextLinksContainer();
-        VBox container = new VBox(12);
+        VBox container = new VBox(8);
         container.getStyleClass().add("align-top-left");
         container.getChildren().addAll(iconLinksContainer, textLinksContainer);
         return createVBoxContainer(header, container);
