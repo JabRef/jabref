@@ -26,6 +26,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 - We added the cleanup formatter "LaTeX to Unicode-aware LaTeX", which converts LaTeX character commands to Unicode and keeps escaped characters. [#8715](https://github.com/JabRef/jabref/issues/8715)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)
+- We added restricting the columns of the consistency check to the fields a `.bst` style uses. [#17710](https://github.com/JabRef/jabref/pull/17710)
+- We added consistency checks for entries cited in `.aux` files, automatically selecting a single file beside the library. [#1403](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403)
+- We added tooltips explaining the symbols in the consistency check table. [#17710](https://github.com/JabRef/jabref/pull/17710)
 - We added indentation and syntax highlighting for JSON in AI chat answers. [#17181](https://github.com/JabRef/jabref/pull/17181)
 - We added a warning for shortcuts already in use, allowing users to replace the existing shortcut or keep both. [#17240](https://github.com/JabRef/jabref/issues/17240)
 - We added "Delete" and "Retry" to the context menu of AI chat messages and made user messages retryable. [#17151](https://github.com/JabRef/jabref/pull/17151)
@@ -74,6 +77,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
+- We fixed duplicate detection across compatible book-section and conference-paper entry types. [#17293](https://github.com/JabRef/jabref/issues/17293)
 - We fixed an issue where entries of type Misc were penalized too strictly during duplicate detection. [#16578](https://github.com/JabRef/jabref/issues/16578)
 - We fixed failed template exports overwriting existing files with empty or incomplete output. [#17423](https://github.com/JabRef/jabref/issues/17423)
 - We fixed an issue where the "Simple HTML" export separated author initials with spaces. [#17306](https://github.com/JabRef/jabref/pull/17306)
@@ -112,10 +116,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed custom terminal and file browser commands failing when library directories contain spaces. [#12531](https://github.com/JabRef/jabref/issues/12531)
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
+- We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 
 ### Removed
 
 - We removed the "Waiting for AI reply..." notification; the AI chat already shows a progress indicator. [#17145](https://github.com/JabRef/jabref/pull/17145)
+- We temporarily removed the language handling for Docling due to a bug in RapidOCR. [#17674](https://github.com/JabRef/jabref/pull/17674)
 
 ## [6.0-beta.1] - 2026-09-21
 
