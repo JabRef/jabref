@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added an option to enable AI provider debugging in expert settings for testing AI features without external API calls. [#17607](https://github.com/JabRef/jabref/pull/17607)
 - We added ISBN extraction from bibliographic pages in PDF books. [#12874](https://github.com/JabRef/jabref/issues/12874)
+- We added support for extracting book metadata from DSTU-style citations and selecting matching ISBNs during PDF import. [#12874](https://github.com/JabRef/jabref/issues/12874)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
 - We added ARM64 Flatpak builds, nightly, beta, and stable channels, and host editor integration. [#13349](https://github.com/JabRef/jabref/issues/13349)
