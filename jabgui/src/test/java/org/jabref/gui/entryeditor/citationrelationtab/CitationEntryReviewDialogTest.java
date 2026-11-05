@@ -17,6 +17,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -26,6 +27,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -249,6 +251,9 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
         if (parent instanceof DialogPane dialogPane && dialogPane.getContent() instanceof Parent contentParent) {
             result.addAll(findChildren(contentParent, clazz));
         }
+        if (parent instanceof TitledPane titledPane && titledPane.getContent() instanceof Parent sectionContent) {
+            result.addAll(findChildren(sectionContent, clazz));
+        }
         if (parent instanceof SplitPane splitPane) {
             for (Node item : splitPane.getItems()) {
                 if (clazz.isInstance(item)) {
@@ -370,6 +375,19 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
                                            .anyMatch(label -> "Author".equalsIgnoreCase(label.getText())
                                                    || FieldsUtil.getDisplayName(StandardField.AUTHOR).equalsIgnoreCase(label.getText()));
             assertTrue(hasAuthorLabel);
+        });
+    }
+
+    @Test
+    void dialog_showsNoLinkedFilesEditor_whenEntryHasFile() {
+        interact(() -> {
+            BibEntry entry = new BibEntry(StandardEntryType.Article)
+                    .withCitationKey("Key2022")
+                    .withField(StandardField.FILE, ":paper.pdf:PDF");
+            CitationEntryReviewDialog reviewDialog = createDialog(1, 1, entry);
+
+            assertEquals(List.of(), findChildren(reviewDialog.getDialogPane(), LinkedFilesEditor.class));
+            assertEquals(Optional.of(":paper.pdf:PDF"), entry.getField(StandardField.FILE));
         });
     }
 

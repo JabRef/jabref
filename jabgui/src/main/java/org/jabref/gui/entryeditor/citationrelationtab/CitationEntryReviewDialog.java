@@ -112,6 +112,10 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     /// Characters not allowed in the name of the user specific comment field.
     private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]");
 
+    /// Fields without an editor in the review. The file editor's actions change the library and files on disk
+    /// directly, which neither skipping the entry nor ending the review could undo; files are attached after the import.
+    private static final Set<Field> FIELDS_NOT_REVIEWED = Set.of(StandardField.FILE);
+
     /// Multiline fields the user has focused, and thereby expanded. The rows are rebuilt after a chip
     /// click or a type change, so the expansion must outlive the editors.
     private final Set<Field> expandedFields = new HashSet<>();
@@ -318,6 +322,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                  .forEach(fields::add);
         fields.addAll(fieldsShownWithoutValue);
         fields.removeIf(field -> field instanceof InternalField);
+        fields.removeAll(FIELDS_NOT_REVIEWED);
         return fields;
     }
 
@@ -539,7 +544,9 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     ///
     /// @param candidates fields a chip could be offered for
     private Stream<Field> fieldsWithoutRow(Collection<Field> candidates) {
-        return candidates.stream().filter(field -> !editors.containsKey(field));
+        return candidates.stream()
+                         .filter(field -> !editors.containsKey(field))
+                         .filter(field -> !FIELDS_NOT_REVIEWED.contains(field));
     }
 
     /// Function to create the button which adds one field
