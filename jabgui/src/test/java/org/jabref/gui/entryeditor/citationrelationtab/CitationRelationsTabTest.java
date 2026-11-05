@@ -39,6 +39,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +52,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@NullMarked
 @ExtendWith(JavaFxExtension.class)
 class CitationRelationsTabTest {
 

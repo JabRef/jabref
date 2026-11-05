@@ -816,9 +816,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (doiSubscription != null) {
-            doiSubscription.unsubscribe();
-        }
+        Optional.ofNullable(doiSubscription).ifPresent(Subscription::unsubscribe);
         lastSearchedDoi = entry.getDOI();
         doiSubscription = EasyBind.subscribe(entry.getFieldBinding(StandardField.DOI), _ -> {
             if (isSelected()) {
@@ -843,18 +841,13 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void handleFocus() {
-        BibEntry entry = getCurrentEntry();
-        if (entry != null) {
-            refreshIfDoiChanged(entry);
-        }
+        Optional.ofNullable(getCurrentEntry()).ifPresent(this::refreshIfDoiChanged);
     }
 
     @Override
     protected void dispose() {
-        if (doiSubscription != null) {
-            doiSubscription.unsubscribe();
-            doiSubscription = null;
-        }
+        Optional.ofNullable(doiSubscription).ifPresent(Subscription::unsubscribe);
+        doiSubscription = null;
         super.dispose();
     }
 
