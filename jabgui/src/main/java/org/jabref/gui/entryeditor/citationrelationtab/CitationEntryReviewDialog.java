@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
@@ -33,6 +34,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -51,6 +53,7 @@ import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.JabRefGuiUndoManager;
@@ -73,6 +76,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.undo.UndoableChangeType;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -209,10 +213,9 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                 Optional.ofNullable(selectedType).ifPresent(this::applyEntryType));
         entry.registerListener(this);
         setOnHidden(_ -> entry.unregisterListener(this));
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, this::handleUndoShortcuts);
 
         setResultConverter(buttonType -> {
-            // Kept whatever the decision is, so that the type is still chosen when the user comes back to this entry
-            entry.setType(entryTypeCombo.getValue());
             if (previousButtonType.equals(buttonType)) {
                 return Decision.PREVIOUS;
             }
@@ -486,7 +489,10 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     ///
     /// @param selectedType entry type chosen in the combo box
     private void applyEntryType(EntryType selectedType) {
-        entry.setType(selectedType);
+        EntryType previousType = entry.getType();
+        // When the combo box only follows an undo or redo, the entry already has the type, so nothing is recorded
+        entry.setType(selectedType)
+             .ifPresent(_ -> reviewUndoManager.addEdit(new UndoableChangeType(entry, previousType, selectedType)));
         setupFieldArea();
     }
 
@@ -578,11 +584,11 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         Optional.ofNullable(editors.get(field)).ifPresent(FieldEditorFX::focus);
     }
 
-    /// Function to follow a change of the fields of the entry under review
+    /// Function to follow a change of the entry under review
     ///
-    /// Looking up the bibliographic data of a DOI fills in fields that have no row yet, so the rows are
-    /// built again. Only a changed set of fields causes that, so typing in an editor neither rebuilds the
-    /// rows nor takes the focus away.
+    /// Looking up the bibliographic data of a DOI fills in fields that have no row yet, and an undo or redo
+    /// can change the entry type, so the rows are built again. Only a changed set of fields or a changed
+    /// entry type causes that, so typing in an editor neither rebuilds the rows nor takes the focus away.
     ///
     /// @param event field change reported by the entry
     @Subscribe
@@ -597,10 +603,27 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         }
         // The change arrives while the editor is still handling it, so the rebuild waits for the next pulse
         Platform.runLater(() -> {
+            // Undo and redo change the type behind the combo box. Following them also rebuilds the rows for that type.
+            entryTypeCombo.setValue(entry.getType());
             if (!determineFieldsToShow().equals(editors.keySet())) {
                 setupFieldArea();
             }
         });
+    }
+
+    /// Editors built with the undo actions handle these shortcuts themselves and consume them. Others, such as the
+    /// identifier and keyword fields, use the native undo of their text input. This covers the rest of the dialog,
+    /// in particular the entry type combo box, whose changes are part of the same history.
+    ///
+    /// @param event key press that reached the dialog pane
+    private void handleUndoShortcuts(KeyEvent event) {
+        if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.UNDO, event)) {
+            undoAction.execute();
+            event.consume();
+        } else if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.REDO, event)) {
+            redoAction.execute();
+            event.consume();
+        }
     }
 
     /// The editors trigger undo on the keyboard shortcut. The regular action would undo the last change of the library,
@@ -609,7 +632,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return new UndoAction(dialogService, stateManager) {
             @Override
             public void execute() {
-                reviewUndoManager.undo();
+                keepEditorFocus(reviewUndoManager::undo);
             }
         };
     }
@@ -619,8 +642,55 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return new RedoAction(dialogService, stateManager) {
             @Override
             public void execute() {
-                reviewUndoManager.redo();
+                keepEditorFocus(reviewUndoManager::redo);
             }
         };
+    }
+
+    /// Function to run an undo or redo without losing the focus of the editor holding it
+    ///
+    /// Following the change can rebuild the rows, and the focus would then fall through to a button of the dialog,
+    /// where the next key press could end the review of this entry.
+    ///
+    /// @param undoOrRedo the change to the entry, during which [#listen(FieldChangedEvent)] queues the rebuild
+    private void keepEditorFocus(Runnable undoOrRedo) {
+        Optional<Field> focusedField = findFieldOfFocusedEditor();
+        Optional<FieldEditorFX> focusedEditor = focusedField.map(editors::get);
+        undoOrRedo.run();
+        // Queued behind the rebuild. The editor of the field is still the same one if the rows were not rebuilt.
+        focusedField.ifPresent(field -> Platform.runLater(() -> {
+            if (!Optional.ofNullable(editors.get(field)).equals(focusedEditor)) {
+                // As in showFieldEditor, the rebuilt editors become focusable only after another pass
+                Platform.runLater(() -> restoreFocus(field));
+            }
+        }));
+    }
+
+    /// Function to find the field whose editor contains the focus owner of the dialog's scene
+    private Optional<Field> findFieldOfFocusedEditor() {
+        return Optional.ofNullable(getDialogPane().getScene().getFocusOwner())
+                       .flatMap(focusOwner -> editors.entrySet().stream()
+                                                     .filter(fieldAndEditor -> isSameOrDescendant(focusOwner, fieldAndEditor.getValue().getNode()))
+                                                     .map(Map.Entry::getKey)
+                                                     .findFirst());
+    }
+
+    /// Function to check whether a node is the given ancestor or lies below it
+    ///
+    /// @param node     node to start from
+    /// @param ancestor node to look for among the parents
+    private static boolean isSameOrDescendant(Node node, Node ancestor) {
+        return Stream.iterate(node, Objects::nonNull, Node::getParent).anyMatch(ancestor::equals);
+    }
+
+    /// Function to return the focus to the rebuilt editor of a field, or to the entry type if the field lost its row
+    ///
+    /// @param field field whose editor held the focus before the rows were rebuilt
+    private void restoreFocus(Field field) {
+        if (editors.containsKey(field)) {
+            focusEditor(field);
+        } else {
+            entryTypeCombo.requestFocus();
+        }
     }
 }

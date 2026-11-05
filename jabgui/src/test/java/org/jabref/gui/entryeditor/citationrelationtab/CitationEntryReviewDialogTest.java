@@ -8,6 +8,7 @@ import java.util.Optional;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,7 +18,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -28,6 +33,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -39,6 +45,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.undo.JabRefUndoManager;
@@ -70,10 +77,14 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 // [utest->feat~entry-editor.citations.review-before-import~1]
@@ -331,7 +342,7 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
     }
 
     @Test
-    void resultConverter_writesSelectedEntryTypeToEntry() {
+    void selectedEntryType_isKept_forEveryDecision() {
         interact(() -> {
             BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Key2022");
             CitationEntryReviewDialog reviewDialog = createDialog(1, 1, entry);
@@ -340,10 +351,10 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
             ComboBox<EntryType> entryTypeCombo = (ComboBox<EntryType>) findChildNode(reviewDialog.getDialogPane(), ComboBox.class).orElseThrow();
             entryTypeCombo.setValue(StandardEntryType.Book);
 
-            ButtonType okButton = findButtonType(reviewDialog, ButtonBar.ButtonData.OK_DONE);
-            reviewDialog.getResultConverter().call(okButton);
-
-            assertEquals(StandardEntryType.Book, entry.getType());
+            for (ButtonType buttonType : reviewDialog.getDialogPane().getButtonTypes()) {
+                reviewDialog.getResultConverter().call(buttonType);
+                assertEquals(StandardEntryType.Book, entry.getType());
+            }
         });
     }
 
@@ -389,6 +400,273 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
             assertEquals(List.of(), findChildren(reviewDialog.getDialogPane(), LinkedFilesEditor.class));
             assertEquals(Optional.of(":paper.pdf:PDF"), entry.getField(StandardField.FILE));
         });
+    }
+
+    @Test
+    void undoAndRedoShortcuts_changeEntryTypeAndComboBox_whenFiredAtComboBox() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Key2022");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+        interact(() -> {
+            assertEquals(StandardEntryType.Article, entry.getType());
+            assertEquals(StandardEntryType.Article, entryTypeCombo.getValue());
+        });
+
+        fireShortcut(entryTypeCombo, KeyCode.Y);
+        interact(() -> {
+            assertEquals(StandardEntryType.Book, entry.getType());
+            assertEquals(StandardEntryType.Book, entryTypeCombo.getValue());
+        });
+    }
+
+    @Test
+    void resultConverter_keepsRestoredEntryType_afterUndo() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Key2022");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+
+        interact(() -> {
+            assertNotNull(dialog);
+            dialog.getResultConverter().call(findButtonType(dialog, ButtonBar.ButtonData.OK_DONE));
+
+            assertEquals(StandardEntryType.Article, entry.getType());
+        });
+    }
+
+    @Test
+    void undoShortcut_rebuildsFieldRows_whenRestoredTypeShowsTheSameFields() {
+        BibEntry entry = new BibEntry(StandardEntryType.MastersThesis).withCitationKey("Key2022");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.PhdThesis);
+
+        List<FieldNameLabel> rowsBeforeUndo = new ArrayList<>();
+        interact(() -> rowsBeforeUndo.addAll(findFieldLabels()));
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+
+        interact(() -> {
+            List<FieldNameLabel> rowsAfterUndo = findFieldLabels();
+            assertEquals(rowsBeforeUndo.stream().map(FieldNameLabel::getText).toList(),
+                    rowsAfterUndo.stream().map(FieldNameLabel::getText).toList());
+            assertNotSame(rowsBeforeUndo.getFirst(), rowsAfterUndo.getFirst());
+        });
+    }
+
+    @Test
+    void undoShortcut_revertsTypeBeforeFieldEdit_whenFieldWasEditedFirst() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2022")
+                .withField(StandardField.TITLE, "Original title");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        interact(() -> findTextInput("Original title").setText("Corrected title"));
+        awaitEvents();
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+        interact(() -> {
+            assertEquals(StandardEntryType.Article, entry.getType());
+            assertEquals(Optional.of("Corrected title"), entry.getField(StandardField.TITLE));
+        });
+
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+        interact(() -> {
+            assertEquals(StandardEntryType.Article, entry.getType());
+            assertEquals(Optional.of("Original title"), entry.getField(StandardField.TITLE));
+        });
+    }
+
+    @Test
+    void undoShortcut_showsRowsOfRestoredType_whenTypesHaveDifferentRows() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Key2022");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        String publisher = FieldsUtil.getDisplayName(StandardField.PUBLISHER);
+        List<String> articleRows = new ArrayList<>();
+        interact(() -> articleRows.addAll(findFieldLabelTexts()));
+
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+        interact(() -> assertEquals(List.of(publisher), findFieldLabelTexts().stream().filter(publisher::equals).toList()));
+
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+        interact(() -> {
+            assertEquals(StandardEntryType.Article, entry.getType());
+            assertEquals(StandardEntryType.Article, entryTypeCombo.getValue());
+            assertEquals(List.of(), findFieldLabelTexts().stream().filter(publisher::equals).toList());
+            assertEquals(articleRows, findFieldLabelTexts());
+        });
+    }
+
+    @Test
+    void undoShortcut_returnsFocusToRebuiltEditor_whenFiredAtTextEditor() {
+        useKeyBindingsWithoutCharacterCombinations();
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2022")
+                .withField(StandardField.TITLE, "Sample title");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+
+        List<TextInputControl> focusedEditor = new ArrayList<>();
+        interact(() -> {
+            focusedEditor.add(findTextInput("Sample title"));
+            focusedEditor.getFirst().requestFocus();
+            assertSame(focusedEditor.getFirst(), dialogFocusOwner());
+        });
+        fireShortcut(focusedEditor.getFirst(), KeyCode.Z);
+
+        interact(() -> {
+            assertEquals(StandardEntryType.Article, entry.getType());
+            assertNotSame(focusedEditor.getFirst(), findTextInput("Sample title"));
+            assertSame(findTextInput("Sample title"), dialogFocusOwner());
+        });
+    }
+
+    @Test
+    void undoShortcut_focusesEntryType_whenFocusedFieldLosesItsRow() {
+        useKeyBindingsWithoutCharacterCombinations();
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Key2022");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+
+        List<TextInputControl> publisherEditor = new ArrayList<>();
+        interact(() -> {
+            publisherEditor.add(findTextInputInRowOf(StandardField.PUBLISHER));
+            publisherEditor.getFirst().requestFocus();
+        });
+        fireShortcut(publisherEditor.getFirst(), KeyCode.Z);
+
+        interact(() -> {
+            assertEquals(StandardEntryType.Article, entry.getType());
+            assertSame(entryTypeCombo, dialogFocusOwner());
+        });
+    }
+
+    @Test
+    void undoShortcut_leavesFocusOnEntryType_whenFiredAtComboBox() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2022")
+                .withField(StandardField.TITLE, "Sample title");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+        interact(entryTypeCombo::requestFocus);
+
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+
+        interact(() -> {
+            assertEquals(StandardEntryType.Article, entry.getType());
+            assertSame(entryTypeCombo, dialogFocusOwner());
+        });
+    }
+
+    @Test
+    void entryTypeChange_isOneUndoStep_whenComboBoxFollowsEntry() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Key2022");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+        selectEntryType(entryTypeCombo, StandardEntryType.Misc);
+
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+        interact(() -> assertEquals(StandardEntryType.Book, entry.getType()));
+
+        fireShortcut(entryTypeCombo, KeyCode.Z);
+        interact(() -> assertEquals(StandardEntryType.Article, entry.getType()));
+    }
+
+    @Test
+    void undoShortcut_undoesOneStep_whenFiredAtTextEditor() {
+        useKeyBindingsWithoutCharacterCombinations();
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2022")
+                .withField(StandardField.TITLE, "Sample title");
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+        selectEntryType(entryTypeCombo, StandardEntryType.Misc);
+
+        interact(() -> fireShortcutEvent(findTextInput("Sample title"), KeyCode.Z));
+        awaitEvents();
+
+        interact(() -> {
+            assertEquals(StandardEntryType.Book, entry.getType());
+            assertEquals(StandardEntryType.Book, entryTypeCombo.getValue());
+        });
+    }
+
+    /// The editors' filter asks `KeyBindingRepository.matches`, which also tries the character combinations of all
+    /// other bindings. The headless toolkit of the tests does not support those.
+    private void useKeyBindingsWithoutCharacterCombinations() {
+        KeyBindingRepository keyBindings = spy(new KeyBindingRepository());
+        doAnswer(invocation -> keyBindings.checkKeyCombinationEquality(invocation.<KeyBinding>getArgument(1), invocation.<KeyEvent>getArgument(0)))
+                .when(keyBindings).matches(any(), any());
+        when(preferences.getKeyBindingRepository()).thenReturn(keyBindings);
+    }
+
+    /// Shows the dialog, because the combo box gets the skin and the behavior that handle its keys only then.
+    @SuppressWarnings("unchecked")
+    private ComboBox<EntryType> showDialogAndFindEntryTypeCombo(BibEntry entry) {
+        List<ComboBox<EntryType>> entryTypeCombo = new ArrayList<>();
+        interact(() -> {
+            CitationEntryReviewDialog reviewDialog = createDialog(1, 1, entry);
+            dialog = reviewDialog;
+            reviewDialog.initOwner(primaryStage);
+            reviewDialog.show();
+            reviewDialog.getDialogPane().applyCss();
+            entryTypeCombo.add((ComboBox<EntryType>) findChildNode(reviewDialog.getDialogPane(), ComboBox.class).orElseThrow());
+            assertNotNull(entryTypeCombo.getFirst().getSkin());
+        });
+        awaitEvents();
+        return entryTypeCombo.getFirst();
+    }
+
+    private void selectEntryType(ComboBox<EntryType> entryTypeCombo, EntryType entryType) {
+        interact(() -> entryTypeCombo.setValue(entryType));
+        awaitEvents();
+    }
+
+    private void fireShortcut(Node target, KeyCode keyCode) {
+        interact(() -> fireShortcutEvent(target, keyCode));
+        awaitEvents();
+    }
+
+    private static void fireShortcutEvent(Node target, KeyCode keyCode) {
+        Event.fireEvent(target, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", keyCode, false, !OS.OS_X, false, OS.OS_X));
+    }
+
+    private TextInputControl findTextInput(String text) {
+        assertNotNull(dialog);
+        return findChildren(dialog.getDialogPane(), TextInputControl.class).stream()
+                                                                           .filter(input -> text.equals(input.getText()))
+                                                                           .findFirst()
+                                                                           .orElseThrow();
+    }
+
+    private List<FieldNameLabel> findFieldLabels() {
+        assertNotNull(dialog);
+        // A shown dialog has skins, through which findChildren reaches the same label on several paths
+        return findChildren(dialog.getDialogPane(), FieldNameLabel.class).stream().distinct().toList();
+    }
+
+    private List<String> findFieldLabelTexts() {
+        return findFieldLabels().stream().map(FieldNameLabel::getText).toList();
+    }
+
+    private TextInputControl findTextInputInRowOf(StandardField field) {
+        FieldNameLabel label = findFieldLabels().stream()
+                                                .filter(fieldLabel -> FieldsUtil.getDisplayName(field).equals(fieldLabel.getText()))
+                                                .findFirst()
+                                                .orElseThrow();
+        GridPane grid = (GridPane) label.getParent();
+        Parent editor = grid.getChildren().stream()
+                            .filter(node -> Objects.equals(GridPane.getRowIndex(node), GridPane.getRowIndex(label)))
+                            .filter(node -> node != label)
+                            .map(Parent.class::cast)
+                            .findFirst()
+                            .orElseThrow();
+        return findChildNode(editor, TextInputControl.class).orElseThrow();
+    }
+
+    private @Nullable Node dialogFocusOwner() {
+        assertNotNull(dialog);
+        return dialog.getDialogPane().getScene().getFocusOwner();
     }
 
     private static String stylesheet(String path) {
