@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
@@ -94,6 +95,7 @@ import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import org.controlsfx.control.CheckListView;
 import org.jspecify.annotations.Nullable;
@@ -122,6 +124,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private ComboBox<CitationFetcherType> fetcherCombo;
     private @Nullable CitationComponents currentCitingComponents;
     private @Nullable CitationComponents currentCitedByComponents;
+    private Optional<DOI> lastSearchedDoi = Optional.empty();
+    private @Nullable Subscription doiSubscription;
 
     private boolean shouldClearSelectionOnDrop = false;
 
@@ -286,6 +290,19 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void refreshCurrentEntryAfterDoiLookup(BibEntry entry) {
+        refreshForDoiChange(entry, true);
+    }
+
+    private void refreshIfDoiChanged(BibEntry entry) {
+        Optional<DOI> currentDoi = entry.getDOI();
+        if (Objects.equals(currentDoi, lastSearchedDoi)) {
+            return;
+        }
+        refreshForDoiChange(entry, false);
+    }
+
+    private void refreshForDoiChange(BibEntry entry, boolean bypassCache) {
+        lastSearchedDoi = entry.getDOI();
         if (currentCitingComponents == null
                 || currentCitedByComponents == null
                 || currentCitingComponents.entry() != entry
@@ -295,8 +312,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         citationsRelationsTabViewModel.updateForEntry(entry);
-        searchForRelations(currentCitingComponents, currentCitedByComponents, true);
-        searchForRelations(currentCitedByComponents, currentCitingComponents, true);
+        searchForRelations(currentCitingComponents, currentCitedByComponents, bypassCache);
+        searchForRelations(currentCitedByComponents, currentCitingComponents, bypassCache);
     }
 
     private void resetEmptyPanels() {
@@ -799,6 +816,16 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        if (doiSubscription != null) {
+            doiSubscription.unsubscribe();
+        }
+        lastSearchedDoi = entry.getDOI();
+        doiSubscription = EasyBind.subscribe(entry.getFieldBinding(StandardField.DOI), _ -> {
+            if (isSelected()) {
+                refreshIfDoiChanged(entry);
+            }
+        });
+
         citationsRelationsTabViewModel.updateForEntry(entry);
 
         SplitPane splitPane = getPaneAndStartSearch(entry);
@@ -812,6 +839,23 @@ public class CitationRelationsTab extends EntryEditorTab {
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         setContent(root);
+    }
+
+    @Override
+    protected void handleFocus() {
+        BibEntry entry = getCurrentEntry();
+        if (entry != null) {
+            refreshIfDoiChanged(entry);
+        }
+    }
+
+    @Override
+    protected void dispose() {
+        if (doiSubscription != null) {
+            doiSubscription.unsubscribe();
+            doiSubscription = null;
+        }
+        super.dispose();
     }
 
     private void searchForRelations(CitationComponents citationComponents,
