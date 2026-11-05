@@ -15,10 +15,10 @@ import jfx.incubator.scene.control.richtext.model.StyledSegment;
 import jfx.incubator.scene.control.richtext.model.StyledTextModel;
 import org.jspecify.annotations.NullMarked;
 
-/// A piece of BibTeX source with its text color, as [BibTeXHtmlExportFormatHandler] and [BibTeXRtfExportFormatHandler] export it.
+/// A piece of BibTeX source with its text color, as [BibTeXHtmlExportFormatHandler] exports it.
 ///
 /// A line break is a run of `"\n"`.
-/// The BibTeX stylesheets only set the fill, so the color is the only style the exports keep.
+/// The BibTeX stylesheets only set the fill, so the color is the only style the HTML export keeps.
 @NullMarked
 record TextRun(String text, Optional<Color> color) {
     /// Collects the runs between `start` and `end`, with the colors `resolver` computes from the current theme.

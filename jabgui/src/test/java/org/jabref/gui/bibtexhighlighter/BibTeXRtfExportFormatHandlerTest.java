@@ -17,6 +17,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,8 +29,6 @@ class BibTeXRtfExportFormatHandlerTest extends JavaFxTest {
               author       = {Agrawal, Shikha and Agrawal, Jitendra},
               date         = {2015},
             }""";
-
-    private static final String HEADER = "{\\rtf1\\ansi\\uc1\\deff0{\\fonttbl{\\f0\\fmodern Courier New;}}";
 
     private Clipboard clipboard;
     private BibTeXCodeArea source;
@@ -57,25 +57,29 @@ class BibTeXRtfExportFormatHandlerTest extends JavaFxTest {
         interact(() -> {
             source.selectAll();
             source.copy();
-            assertEquals(HEADER + "{\\colortbl;\\red0\\green0\\blue0;}\n"
-                            + "\\f0 {\\cf1 @Article}\\{{\\cf1 Agrawal2015},\\line\n"
-                            + "  {\\cf1 author}       = {\\cf1 \\{Agrawal, Shikha and Agrawal, Jitendra\\}},\\line\n"
-                            + "  {\\cf1 date}         = {\\cf1 \\{2015\\}},\\line\n"
-                            + "\\}}",
-                    clipboard.getRtf());
+            String rtf = clipboard.getRtf();
+            assertTrue(rtf.contains("\\f1\\fmodern Courier New;"));
+            assertTrue(rtf.substring(rtf.indexOf("\\fi0")).contains("\\f1"));
+            assertFalse(rtf.substring(rtf.indexOf("\\fi0")).contains("\\f0"));
+            assertTrue(rtf.contains("@Article\\{Agrawal2015,"));
+            assertTrue(rtf.contains("  author       = \\{Agrawal, Shikha and Agrawal, Jitendra\\},"));
+            assertTrue(rtf.contains("  date         = \\{2015\\},"));
+            assertEquals(3, rtf.split("\\\\par", -1).length - 1);
         });
     }
 
     @Test
     void partialCitationKeyKeepsThemeColor() {
         interact(() -> {
-            source.setStyle("-test-key-color: #EECC44;");
-            source.getScene().getStylesheets().add(getClass().getResource("bibtex-clipboard.css").toExternalForm());
+            source.setStyle("-color-success-emphasis: #EECC44;");
+            source.getScene().getStylesheets().add(getClass().getResource("/org/jabref/gui/theme/internal/jabref-base.css").toExternalForm());
             source.applyCss();
             source.layout();
             source.select(TextPos.ofLeading(0, 11), TextPos.ofLeading(0, 17));
             source.copy();
-            assertEquals(HEADER + "{\\colortbl;\\red238\\green204\\blue68;}\n\\f0 {\\cf1 rawal2}}", clipboard.getRtf());
+            String rtf = clipboard.getRtf();
+            assertTrue(rtf.contains("\\red238\\green204\\blue68;"));
+            assertTrue(rtf.contains("\\cf2 rawal2"));
         });
     }
 
@@ -85,12 +89,9 @@ class BibTeXRtfExportFormatHandlerTest extends JavaFxTest {
             source.setText("@Misc{Müller,\n  note = {\\LaTeX{} 日本語},\n}");
             source.selectAll();
             source.copy();
-            // U+8A9E is above 32767, so RTF needs it as a negative number
-            assertEquals(HEADER + "{\\colortbl;\\red0\\green0\\blue0;}\n"
-                            + "\\f0 {\\cf1 @Misc}\\{{\\cf1 M}\\u252?{\\cf1 ller},\\line\n"
-                            + "  {\\cf1 note} = {\\cf1 \\{\\\\LaTeX\\{\\} \\u26085?\\u26412?\\u-30050?\\}},\\line\n"
-                            + "\\}}",
-                    clipboard.getRtf());
+            String rtf = clipboard.getRtf();
+            assertTrue(rtf.contains("M\\u252?ller"));
+            assertTrue(rtf.contains("\\{\\\\LaTeX\\{\\} \\u26085?\\u26412?\\u-30050?\\}"));
         });
     }
 }

@@ -92,8 +92,8 @@ class BibTeXHtmlExportFormatHandlerTest extends JavaFxTest {
     @ValueSource(strings = {"#0033B3", "#EECC44"})
     void partialCitationKeyKeepsThemeColor(String color) {
         interact(() -> {
-            source.setStyle("-test-key-color: " + color + ";");
-            source.getScene().getStylesheets().add(getClass().getResource("bibtex-clipboard.css").toExternalForm());
+            source.setStyle("-color-success-emphasis: " + color + ";");
+            source.getScene().getStylesheets().add(getClass().getResource("/org/jabref/gui/theme/internal/jabref-base.css").toExternalForm());
             source.applyCss();
             source.layout();
             source.select(TextPos.ofLeading(0, 11), TextPos.ofLeading(0, 17));
