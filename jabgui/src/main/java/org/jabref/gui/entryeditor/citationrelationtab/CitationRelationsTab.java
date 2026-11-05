@@ -307,6 +307,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void refreshForDoiChange(BibEntry entry, boolean bypassCache) {
+        isLookingUpDoi = false;
         lastSearchedDoi = entry.getDOI();
         if (currentCitingComponents == null
                 || currentCitedByComponents == null
