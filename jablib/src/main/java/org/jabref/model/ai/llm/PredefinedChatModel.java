@@ -36,7 +36,8 @@ public enum PredefinedChatModel {
 
     // Dummy variant for Hugging Face models.
     // Blank entry is used for cases where the model name is not specified.
-    BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0);
+    BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0),
+    DEBUG(AiProvider.DEBUG, "debug", 128000);
 
     private final AiProvider aiProvider;
     private final String name;

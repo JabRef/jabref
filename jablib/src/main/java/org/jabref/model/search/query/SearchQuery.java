@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchBaseVisitor;
@@ -25,6 +26,7 @@ public class SearchQuery {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
 
     private final String searchExpression;
+    private String normalizedSearchExpression = "";
     private final EnumSet<SearchFlags> searchFlags;
     private SearchParser.StartContext context;
     private boolean isValidExpression;
@@ -37,19 +39,39 @@ public class SearchQuery {
     public SearchQuery(@NonNull String searchExpression, EnumSet<SearchFlags> searchFlags) {
         this.searchExpression = searchExpression;
         this.searchFlags = searchFlags;
+        String resolved = normalizeDoi(searchExpression, searchFlags);
         try {
-            this.context = getStartContext(searchExpression);
+            this.context = getStartContext(resolved);
+            this.normalizedSearchExpression = resolved;
             isValidExpression = containsOnlyValidRegularExpressions(context, searchFlags);
         } catch (ParseCancellationException e) {
             // We use getCause here as the real exception is nested and this avoids that the stack trace get too large
             // and we don't see the root cause
             LOGGER.debug("Search query Parsing error", e.getCause());
+            this.normalizedSearchExpression = searchExpression;
             isValidExpression = false;
         }
     }
 
+    /// Returns the original, user-facing search expression.
     public String getSearchExpression() {
         return searchExpression;
+    }
+
+    /// Returns the normalized search expression used for parsing and matching
+    /// (e.g., with full DOI links normalized to plain DOI identifiers).
+    public String getNormalizedSearchExpression() {
+        return normalizedSearchExpression;
+    }
+
+    /// Returns the text to highlight in a document for this search.
+    public String getHighlightSearchExpression() {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+            return searchExpression;
+        }
+        return DOI.extractLinkSearchTerms(searchExpression)
+                  .map(DOI.LinkSearchTerms::decoded)
+                  .orElse(searchExpression);
     }
 
     public SearchResults getSearchResults() {
@@ -107,6 +129,32 @@ public class SearchQuery {
 
     private static boolean containsOnlyValidRegularExpressions(SearchParser.StartContext context, EnumSet<SearchFlags> searchFlags) {
         return new SearchRegularExpressionValidator(searchFlags).visit(context);
+    }
+
+    /// [impl->req~search.doi-link-normalization~1]
+    /// Normalizes full DOI URLs to plain DOI identifiers (e.g., "https://doi.org/10.1000/182" -> "10.1000/182").
+    /// The identifier (or short DOI suffix) also matches entries retaining the full URL.
+    /// Regex mode is skipped to preserve the expression entered by the user.
+    private static String normalizeDoi(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+            return searchExpression;
+        }
+        return DOI.extractLinkSearchTerms(searchExpression)
+                  .map(terms -> terms.decoded().equals(terms.encoded())
+                                ? formatSearchTerm(terms.decoded())
+                                : "(" + formatSearchTerm(terms.decoded()) + " OR " + formatSearchTerm(terms.encoded()) + " )")
+                  .orElse(searchExpression);
+    }
+
+    private static String formatSearchTerm(String term) {
+        if (term.contains("\\") && term.chars().noneMatch(Character::isWhitespace)) {
+            return term.replace("=", "\\=")
+                       .replace("!", "\\!")
+                       .replace("~", "\\~")
+                       .replace("(", "\\(")
+                       .replace(")", "\\)");
+        }
+        return "\"" + term.replace("\"", "\\\"") + "\"";
     }
 
     /// Unescapes search value based on the Search grammar rules.
