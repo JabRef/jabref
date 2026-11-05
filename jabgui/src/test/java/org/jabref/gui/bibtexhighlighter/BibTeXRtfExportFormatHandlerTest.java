@@ -61,10 +61,10 @@ class BibTeXRtfExportFormatHandlerTest extends JavaFxTest {
             source.selectAll();
             source.copy();
             assertEquals(HEADER + "{\\colortbl ;\\red0\\green0\\blue0;}\r\n"
-                            + "\\fi0\\ql \\f1\\fs26\\cf0 @Article\\{Agrawal2015,\\cf0 \\par\r\n"
-                            + "\\fi0\\ql \\cf0   author       = \\{Agrawal, Shikha and Agrawal, Jitendra\\},\\cf0 \\par\r\n"
-                            + "\\fi0\\ql \\cf0   date         = \\{2015\\},\\cf0 \\par\r\n"
-                            + "\\fi0\\ql \\cf0 \\}\\cf0 \r\n}\r\n", clipboard.getRtf());
+                    + "\\fi0\\ql \\f1\\fs26\\cf0 @Article\\{Agrawal2015,\\cf0 \\par\r\n"
+                    + "\\fi0\\ql \\cf0   author       = \\{Agrawal, Shikha and Agrawal, Jitendra\\},\\cf0 \\par\r\n"
+                    + "\\fi0\\ql \\cf0   date         = \\{2015\\},\\cf0 \\par\r\n"
+                    + "\\fi0\\ql \\cf0 \\}\\cf0 \r\n}\r\n", clipboard.getRtf());
         });
     }
 
@@ -79,7 +79,7 @@ class BibTeXRtfExportFormatHandlerTest extends JavaFxTest {
             source.select(TextPos.ofLeading(0, 11), TextPos.ofLeading(0, 17));
             source.copy();
             assertEquals(HEADER + "{\\colortbl ;\\red0\\green0\\blue0;\\red238\\green204\\blue68;}\r\n"
-                            + "\\fi0\\ql \\f1\\cf2 rawal2\\cf0 \r\n}\r\n", clipboard.getRtf());
+                    + "\\fi0\\ql \\f1\\cf2 rawal2\\cf0 \r\n}\r\n", clipboard.getRtf());
         });
     }
 
@@ -90,9 +90,9 @@ class BibTeXRtfExportFormatHandlerTest extends JavaFxTest {
             source.selectAll();
             source.copy();
             assertEquals(HEADER + "{\\colortbl ;\\red0\\green0\\blue0;}\r\n"
-                            + "\\fi0\\ql \\f1\\fs26\\cf0 @Misc\\{M\\u252?ller,\\cf0 \\par\r\n"
-                            + "\\fi0\\ql \\cf0   note = \\{\\\\LaTeX\\{\\} \\u26085?\\u26412?\\u-30050?\\},\\cf0 \\par\r\n"
-                            + "\\fi0\\ql \\cf0 \\}\\cf0 \r\n}\r\n", clipboard.getRtf());
+                    + "\\fi0\\ql \\f1\\fs26\\cf0 @Misc\\{M\\u252?ller,\\cf0 \\par\r\n"
+                    + "\\fi0\\ql \\cf0   note = \\{\\\\LaTeX\\{\\} \\u26085?\\u26412?\\u-30050?\\},\\cf0 \\par\r\n"
+                    + "\\fi0\\ql \\cf0 \\}\\cf0 \r\n}\r\n", clipboard.getRtf());
         });
     }
 }
