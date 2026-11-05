@@ -4,8 +4,11 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -21,10 +24,24 @@
                     <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
-            <HBox spacing="4.0" alignment="CENTER">
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
                 <Label text="%Entry type"/>
-                <ComboBox fx:id="entryTypeCombo" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                <ComboBox fx:id="entryTypeCombo" prefWidth="200.0"/>
             </HBox>
+            <GridPane hgap="10.0" vgap="10.0">
+                <fx:define>
+                    <ToggleGroup fx:id="shownFieldsToggleGroup"/>
+                    <ToggleGroup fx:id="shownEntriesToggleGroup"/>
+                </fx:define>
+                <RadioButton text="%Show all fields" selected="true" toggleGroup="$shownFieldsToggleGroup" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <RadioButton fx:id="restrictToBstFieldsRadio" text="%Restrict to fields of .bst style" toggleGroup="$shownFieldsToggleGroup" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Button onAction="#browseBstFile" text="%Browse .bst file..." maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                <Label fx:id="bstStyleLabel" styleClass="text-muted" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                <RadioButton text="%Show all entries" selected="true" toggleGroup="$shownEntriesToggleGroup" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <RadioButton fx:id="restrictToAuxEntriesRadio" text="%Restrict to entries cited in .aux file" toggleGroup="$shownEntriesToggleGroup" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Button onAction="#browseAuxFile" text="%Browse .aux file..." maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                <Label fx:id="auxFileLabel" styleClass="text-muted" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+            </GridPane>
             <HBox spacing="4.0" alignment="CENTER">
                 <Button onAction="#exportAsCsv" text="%Export as csv file" />
                 <Button onAction="#exportAsTxt" text="%Export as txt file" />
