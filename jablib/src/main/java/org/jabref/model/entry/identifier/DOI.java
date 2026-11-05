@@ -86,9 +86,8 @@ public class DOI implements Identifier {
     private static final String HTTP_EXP = "https?://[^\\s]+?" + DOI_EXP;
     private static final String SHORT_DOI_HTTP_EXP = "https?://[^\\s]+?" + SHORT_DOI_EXP;
     // Pattern
-    private static final Pattern DOI_RESOLVER_PREFIX = Pattern.compile("^https?://(?:www\\.|dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DOI_RESOLVER_PREFIX = Pattern.compile("^https?://(?:www\\.|dx\\.)?doi\\.org(?::[0-9]+)?/", Pattern.CASE_INSENSITIVE);
     private static final Pattern EXACT_DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
-
     private static final Pattern FIND_DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_DOI_EXP, Pattern.CASE_INSENSITIVE);
     // Pattern (short DOI)
     private static final Pattern EXACT_SHORT_DOI_SHORTCUT = Pattern.compile(SHORT_DOI_SHORTCUT, Pattern.CASE_INSENSITIVE); // eg doi.org/bfrhmx (no "10/")
