@@ -252,6 +252,15 @@ When a shared library receives a group-tree update, groups that remain in the up
 
 Needs: impl, utest
 
+## Suggested groups must be recognized independently of their name
+`req~ux.groups.suggested-groups-recognized-by-expression~1`
+
+"Add JabRef suggested groups" recognizes a suggested group that is already present by its position in the group tree and its search expression.
+Its name is not used: it is translated when the group is created and the user may rename it.
+Thus, running the action again after changing the language or renaming a suggested group adds no duplicates ([#16147](https://github.com/JabRef/jabref/issues/16147)).
+
+Needs: impl, utest
+
 ## Assigning an already used keyboard shortcut must require confirmation
 `req~ux.keybindings.duplicate-warning~1`
 

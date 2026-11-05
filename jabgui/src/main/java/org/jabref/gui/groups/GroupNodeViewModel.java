@@ -33,6 +33,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.groups.SuggestedGroups;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
@@ -626,16 +627,8 @@ public class GroupNodeViewModel {
         return groupNode.getGroup() instanceof AllEntriesGroup;
     }
 
-    public boolean hasSimilarSearchGroup(SearchGroup searchGroup) {
-        return getChildren().stream()
-                            .filter(child -> child.getGroupNode().getGroup() instanceof SearchGroup)
-                            .map(child -> (SearchGroup) child.getGroupNode().getGroup())
-                            .anyMatch(group -> group.equals(searchGroup));
-    }
-
     public boolean hasAllSuggestedGroups() {
-        return hasSimilarSearchGroup(GroupsFactory.createWithoutFilesGroup())
-                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup());
+        return SuggestedGroups.areAllPresent(groupNode);
     }
 
     public boolean canAddEntriesIn() {

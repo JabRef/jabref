@@ -34,7 +34,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
-import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.groups.SuggestedGroups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
@@ -343,23 +343,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     ///
     /// @param parent The "All Entries" parent node.
     public void addSuggestedGroups(GroupNodeViewModel parent) {
-        currentDatabase.ifPresent(database -> {
-            GroupTreeNode rootNode = parent.getGroupNode();
-            List<GroupTreeNode> newSuggestedSubgroups = new ArrayList<>();
-
-            // 1. Create "Entries without linked files" group if it doesn't exist
-            SearchGroup withoutFilesGroup = GroupsFactory.createWithoutFilesGroup();
-            if (!parent.hasSimilarSearchGroup(withoutFilesGroup)) {
-                GroupTreeNode subGroup = rootNode.addSubgroup(withoutFilesGroup);
-                newSuggestedSubgroups.add(subGroup);
-            }
-
-            // 2. Create "Entries without groups" group if it doesn't exist
-            SearchGroup withoutGroupsGroup = GroupsFactory.createWithoutGroupsGroup();
-            if (!parent.hasSimilarSearchGroup(withoutGroupsGroup)) {
-                GroupTreeNode subGroup = rootNode.addSubgroup(withoutGroupsGroup);
-                newSuggestedSubgroups.add(subGroup);
-            }
+        currentDatabase.ifPresent(database -> recordTreeChange(Localization.lang("Add JabRef suggested groups"), _ -> {
+            List<GroupTreeNode> newSuggestedSubgroups = SuggestedGroups.addMissing(parent.getGroupNode());
 
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
@@ -368,10 +353,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                         : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
                     .toList());
 
-            writeGroupChangesToMetaData();
-
             dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
-        });
+        }));
     }
 
     /// Check if it is necessary to show a group modified, reassign entry dialog

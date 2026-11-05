@@ -34,6 +34,7 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
@@ -340,6 +341,43 @@ class GroupTreeViewModelTest {
 
         assertEquals(2, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
+    }
+
+    /// The name of a suggested group is translated when the group is created, so after switching
+    /// the language it no longer matches the name a new suggestion gets.
+    @Test
+    // [utest->req~ux.groups.suggested-groups-recognized-by-expression~1]
+    void shouldNotDuplicateSuggestedGroupsCreatedInAnotherLanguage() {
+        GroupNodeViewModel rootGroup = groupTree.rootGroupProperty().getValue();
+        SearchGroup withoutFiles = GroupsFactory.createWithoutFilesGroup();
+        withoutFiles.nameProperty().set("Einträge ohne verknüpfte Dateien");
+        rootGroup.getGroupNode().addSubgroup(withoutFiles);
+        SearchGroup withoutGroups = GroupsFactory.createWithoutGroupsGroup();
+        withoutGroups.nameProperty().set("Einträge ohne Gruppen");
+        rootGroup.getGroupNode().addSubgroup(withoutGroups);
+
+        assertTrue(rootGroup.hasAllSuggestedGroups());
+
+        groupTree.addSuggestedGroups(rootGroup);
+
+        assertEquals(2, rootGroup.getChildren().size());
+    }
+
+    @Test
+    // [utest->req~logic.undo.group-operations-recorded~1]
+    void addingSuggestedGroupsIsOneUndoStep() {
+        databaseContext.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+
+        groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue());
+        assertEquals(List.of(
+                        GroupsFactory.createWithoutFilesGroup().getName(),
+                        GroupsFactory.createWithoutGroupsGroup().getName()),
+                childNames());
+
+        assertTrue(journal.canUndo(), "adding the suggested groups was not recorded");
+        journal.undo();
+        assertEquals(List.of(), childNames());
     }
 
     @Test
