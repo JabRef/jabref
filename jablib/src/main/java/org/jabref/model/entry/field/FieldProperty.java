@@ -24,6 +24,10 @@ public enum FieldProperty {
     MONTH,
 
     MULTILINE_TEXT,
+
+    /// Enables numeric-aware sorting and influences how JabRef treats field content.
+    /// This is a JabRef property, not a BibLaTeX datatype: fields such as `number` and
+    /// `edition` can also contain literal values. See the [BibLaTeX field definitions](https://github.com/plk/biblatex/blob/dev/doc/latex/biblatex/biblatex.tex).
     NUMERIC,
     PAGINATION,
     PERSON_NAMES,
