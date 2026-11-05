@@ -874,7 +874,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .welcome-main-container {
     -fx-max-width: 120em;
-    -fx-padding: 1.25em 1.5em;
+    -fx-padding: 1em;
 }
 
 /* Welcome Community  */
