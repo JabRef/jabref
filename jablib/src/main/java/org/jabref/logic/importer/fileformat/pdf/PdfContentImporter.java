@@ -28,6 +28,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.pdf.BookExtraction;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -230,7 +231,11 @@ public class PdfContentImporter extends PdfImporter {
         String pageText = bibliographicPages.orElseThrow();
         Optional<BibEntry> localBook = extractBookMetadata(pageText);
 
-        List<ISBN> isbns = ISBN.findAllInText(pageText);
+        List<ISBN> isbns = ISBN.findAllInText(pageText).stream()
+                              .map(ISBN::asIsbn13)
+                              .flatMap(Optional::stream)
+                              .distinct()
+                              .toList();
         if (isbns.isEmpty() && localBook.isEmpty()) {
             return Optional.empty();
         }
