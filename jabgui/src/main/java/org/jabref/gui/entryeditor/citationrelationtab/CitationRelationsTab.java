@@ -126,6 +126,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private @Nullable CitationComponents currentCitedByComponents;
     private Optional<DOI> lastSearchedDoi = Optional.empty();
     private @Nullable Subscription doiSubscription;
+    private boolean isLookingUpDoi = false;
 
     private boolean shouldClearSelectionOnDrop = false;
 
@@ -210,6 +211,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void onDoiLookUpError() {
+        isLookingUpDoi = false;
         onDoiMissing();
     }
 
@@ -249,6 +251,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void onDoiMissing() {
+        isLookingUpDoi = false;
         resetEmptyPanels();
         sciteResultsPane.getChildren().clear();
 
@@ -282,7 +285,9 @@ public class CitationRelationsTab extends EntryEditorTab {
             setLabelOn(currentCitedByComponents.listView(), Localization.lang("Looking up DOI..."));
         }
 
+        isLookingUpDoi = true;
         citationsRelationsTabViewModel.lookUpDoi(entry, () -> {
+            isLookingUpDoi = false;
             if (getCurrentEntry() == entry) {
                 refreshCurrentEntryAfterDoiLookup(entry);
             }
@@ -816,10 +821,11 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        isLookingUpDoi = false;
         Optional.ofNullable(doiSubscription).ifPresent(Subscription::unsubscribe);
         lastSearchedDoi = entry.getDOI();
         doiSubscription = EasyBind.subscribe(entry.getFieldBinding(StandardField.DOI), _ -> {
-            if (isSelected()) {
+            if (isSelected() && !isLookingUpDoi) {
                 refreshIfDoiChanged(entry);
             }
         });
@@ -846,6 +852,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void dispose() {
+        isLookingUpDoi = false;
         Optional.ofNullable(doiSubscription).ifPresent(Subscription::unsubscribe);
         doiSubscription = null;
         super.dispose();
@@ -863,7 +870,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private void setUpEmptyPanel(CitationComponents citationComponents,
                                  CitationComponents otherCitationComponents) {
-        hideNodes(citationComponents.abortButton(), citationComponents.progress());
+        hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
         showNodes(citationComponents.refreshButton());
 
         HBox hBox = new HBox(4);
