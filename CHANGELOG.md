@@ -54,11 +54,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where clicking "Generate" in the AUX file import dialog before parsing caused an exception.
 - We fixed an issue where it was hard to distinguish between enabled/disabled status of search buttons in dark mode and added tooltips. [#11569](https://github.com/JabRef/jabref/issues/11569)
 - We fixed an issue where entries containing dollar signs, backslashes, or unset fields passed to `substring$` caused citation style preview and export to fail. [#12799](https://github.com/JabRef/jabref/issues/12799)
-- We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
+- We fixed an issue where citationcount, day, and dayfiled columns were sorted alphabetically instead of numerically. [#17459](https://github.com/JabRef/jabref/issues/17459)
 - We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
 - We fixed JabKit to preserve existing citation keys when generating keys with the avoid-overwrite setting. [#17458](https://github.com/JabRef/jabref/issues/17458)
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
 - We fixed the BibTeX source dialog background in the Citation Relations tab for dark themes. [#13599](https://github.com/JabRef/jabref/issues/13599)
+- We fixed BibTeX source pasted into rich-text applications losing its indentation, line breaks, and monospace font. [#17392](https://github.com/JabRef/jabref/issues/17392)
 - We fixed unreadable linked-file paths and indistinguishable selection backgrounds in the entry editor when using dark mode. [#17364](https://github.com/JabRef/jabref/issues/17364)
 - We fixed the linked file tooltip showing the old file name after renaming or moving the file. [#9277](https://github.com/JabRef/jabref/issues/9277)
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
@@ -117,6 +118,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
+- We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
 
 ### Removed
 
