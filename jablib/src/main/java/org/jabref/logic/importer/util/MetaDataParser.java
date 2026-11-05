@@ -251,10 +251,12 @@ public class MetaDataParser {
         StringBuilder res = new StringBuilder();
         while ((c = reader.read()) != -1) {
             if (escape) {
-                // at org.jabref.logic.exporter.MetaDataSerializer.serializeMetaData, only MetaData.SEPARATOR_CHARACTER, MetaData.ESCAPE_CHARACTER are quoted
-                // That means ; and \\
+                // MetaDataSerializer quotes ;, \, {, and }.
                 char character = (char) c;
-                if (character != MetaData.SEPARATOR_CHARACTER && character != MetaData.ESCAPE_CHARACTER) {
+                if (character != MetaData.SEPARATOR_CHARACTER
+                        && character != MetaData.ESCAPE_CHARACTER
+                        && character != '{'
+                        && character != '}') {
                     // Keep the escape character
                     res.append("\\");
                 }

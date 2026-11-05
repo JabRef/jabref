@@ -108,13 +108,13 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    void serializeLibraryNameAndDescription() {
-        metaData.setLibraryName("ABC");
-        metaData.setLibraryDescription("Shared team bibliography");
+    void serializeLibraryNameAndDescriptionWithBraces() {
+        metaData.setLibraryName("Draft {v2");
+        metaData.setLibraryDescription("Notes}");
 
         Map<String, String> expectedSerialization = new TreeMap<>();
-        expectedSerialization.put(MetaData.LIBRARY_DESCRIPTION, "Shared team bibliography;");
-        expectedSerialization.put(MetaData.LIBRARY_NAME, "ABC;");
+        expectedSerialization.put(MetaData.LIBRARY_DESCRIPTION, "Notes\\};");
+        expectedSerialization.put(MetaData.LIBRARY_NAME, "Draft \\{v2;");
 
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }

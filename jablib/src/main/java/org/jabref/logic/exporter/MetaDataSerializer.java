@@ -115,6 +115,8 @@ public class MetaDataSerializer {
             }
 
             boolean isSaveActions = MetaData.SAVE_ACTIONS.equals(metaItem.getKey());
+            boolean escapeBraces = MetaData.LIBRARY_NAME.equals(metaItem.getKey())
+                    || MetaData.LIBRARY_DESCRIPTION.equals(metaItem.getKey());
             // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
             StringJoiner joiner = new StringJoiner(MetaData.SEPARATOR_STRING, "", MetaData.SEPARATOR_STRING);
             boolean lastWasSaveActionsEnablement = false;
@@ -125,13 +127,15 @@ public class MetaDataSerializer {
                 } else {
                     string = "";
                 }
-                string += StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER);
+
+                string += StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING + (escapeBraces ? "{}" : ""), MetaData.ESCAPE_CHARACTER);
                 // in case of save actions, add an additional newline after the enabled flag
                 lastWasSaveActionsEnablement = isSaveActions
                         && (FieldFormatterCleanupActions.ENABLED.equals(dataItem)
                         || FieldFormatterCleanupActions.DISABLED.equals(dataItem));
                 joiner.add(string);
             }
+
             String serializedItem = joiner.toString();
             if (!serializedItem.isEmpty()) {
                 // Only add non-empty values

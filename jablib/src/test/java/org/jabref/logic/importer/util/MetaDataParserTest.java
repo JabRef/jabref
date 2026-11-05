@@ -172,10 +172,10 @@ public class MetaDataParserTest {
     }
 
     @Test
-    void libraryNameAndDescriptionRoundTrip() throws ParseException {
+    void libraryNameAndDescriptionWithBracesRoundTrip() throws ParseException {
         MetaData original = new MetaData();
-        original.setLibraryName("ABC");
-        original.setLibraryDescription("Shared team bibliography; with semicolon");
+        original.setLibraryName("Draft {v2");
+        original.setLibraryDescription("Notes}; with semicolon");
 
         GlobalCitationKeyPatterns globalPattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         Map<String, String> serialized = MetaDataSerializer.getSerializedStringMap(original, globalPattern);
@@ -183,8 +183,8 @@ public class MetaDataParserTest {
         MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
         MetaData parsed = parser.parse(new MetaData(), serialized, ',', "userAndHost");
 
-        assertEquals(Optional.of("ABC"), parsed.getLibraryName());
-        assertEquals(Optional.of("Shared team bibliography; with semicolon"), parsed.getLibraryDescription());
+        assertEquals(Optional.of("Draft {v2"), parsed.getLibraryName());
+        assertEquals(Optional.of("Notes}; with semicolon"), parsed.getLibraryDescription());
     }
 
     @Test
