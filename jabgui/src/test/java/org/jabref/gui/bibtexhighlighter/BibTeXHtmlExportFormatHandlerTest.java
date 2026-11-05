@@ -57,7 +57,7 @@ class BibTeXHtmlExportFormatHandlerTest extends JavaFxTest {
         interact(clipboard::clear);
     }
 
-    // [utest->req~entry-editor.source-tab.copy-syntax-highlighting~1]
+    // [utest->req~entry-editor.source-tab.copy-layout~1]
     @Test
     void copyKeepsIndentationAndLineBreaksInMonospacePre() {
         interact(() -> {
@@ -88,6 +88,7 @@ class BibTeXHtmlExportFormatHandlerTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~entry-editor.source-tab.copy-syntax-colors~1]
     @ParameterizedTest
     @ValueSource(strings = {"#0033B3", "#EECC44"})
     void partialCitationKeyKeepsThemeColor(String color) {

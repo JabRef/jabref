@@ -40,7 +40,7 @@ public class BibTeXHtmlExportFormatHandler extends DataFormatHandler {
         throw new UnsupportedOperationException("BibTeX source cannot be imported from HTML");
     }
 
-    // [impl->req~entry-editor.source-tab.copy-syntax-highlighting~1]
+    // [impl->req~entry-editor.source-tab.copy-layout~1,req~entry-editor.source-tab.copy-syntax-colors~1]
     @Override
     public Object copy(StyledTextModel model, StyleResolver resolver, TextPos start, TextPos end) throws IOException {
         StringWriter writer = new StringWriter();
