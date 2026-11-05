@@ -25,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an automatically generated commit message to the Git commit message box. [#16763](https://github.com/JabRef/jabref/issues/16763)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 - We added the cleanup formatter "LaTeX to Unicode-aware LaTeX", which converts LaTeX character commands to Unicode and keeps escaped characters. [#8715](https://github.com/JabRef/jabref/issues/8715)
+- We added a "No value" subgroup to automatic keyword groups, collecting entries without a value such as an unranked entry. [#10264](https://github.com/JabRef/jabref/issues/10264)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)
 - We added restricting the columns of the consistency check to the fields a `.bst` style uses. [#17710](https://github.com/JabRef/jabref/pull/17710)
 - We added consistency checks for entries cited in `.aux` files, automatically selecting a single file beside the library. [#1403](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403)
