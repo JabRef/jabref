@@ -19,6 +19,7 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -27,6 +28,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -130,6 +133,58 @@ class SharedDatabaseLoginDialogViewModelTest {
         assertFalse(keyringViewModel.passwordLoadingProperty().get());
     }
 
+    /// Selects the stored connection in a dialog whose keyring read only finishes when the returned task is completed
+    private BackgroundTask<Optional<String>> selectWithPendingPasswordRead(SharedDatabaseLoginDialogViewModel keyringViewModel, TaskExecutor taskExecutor) {
+        keyringViewModel.selectedSavedConnectionProperty().set(keyringViewModel.getSavedConnections().getFirst());
+        ArgumentCaptor<BackgroundTask<Optional<String>>> passwordRead = ArgumentCaptor.captor();
+        verify(taskExecutor, atLeastOnce()).execute(passwordRead.capture());
+        return passwordRead.getValue();
+    }
+
+    private static void complete(BackgroundTask<Optional<String>> passwordRead) throws Exception {
+        passwordRead.getOnSuccess().accept(passwordRead.call());
+    }
+
+    @Test
+    void passwordReadFinishingAfterAnEditIsDropped() throws Exception {
+        when(storedConnection.getRememberPassword()).thenReturn(true);
+        when(storedConnection.getPassword()).thenReturn(Optional.of("secret"));
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        SharedDatabaseLoginDialogViewModel keyringViewModel = createViewModel(() -> true, taskExecutor);
+        BackgroundTask<Optional<String>> passwordRead = selectWithPendingPasswordRead(keyringViewModel, taskExecutor);
+
+        keyringViewModel.hostProperty().set("other.example.org");
+        complete(passwordRead);
+
+        assertEquals("", keyringViewModel.passwordProperty().get());
+    }
+
+    @Test
+    void typingPasswordAllowsConnectingDuringASlowRead() {
+        when(storedConnection.getRememberPassword()).thenReturn(true);
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        SharedDatabaseLoginDialogViewModel keyringViewModel = createViewModel(() -> true, taskExecutor);
+        selectWithPendingPasswordRead(keyringViewModel, taskExecutor);
+
+        keyringViewModel.passwordProperty().set("typed");
+
+        assertFalse(keyringViewModel.passwordLoadingProperty().get());
+    }
+
+    @Test
+    void passwordReadFinishingAfterARemovalIsDropped() throws Exception {
+        when(storedConnection.getRememberPassword()).thenReturn(true);
+        when(storedConnection.getPassword()).thenReturn(Optional.of("secret"));
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        SharedDatabaseLoginDialogViewModel keyringViewModel = createViewModel(() -> true, taskExecutor);
+        BackgroundTask<Optional<String>> passwordRead = selectWithPendingPasswordRead(keyringViewModel, taskExecutor);
+
+        keyringViewModel.removeSavedConnection();
+        complete(passwordRead);
+
+        assertEquals("", keyringViewModel.passwordProperty().get());
+    }
+
     @Test
     void selectingConnectionWithoutStoredPortUsesTheDefaultPort() {
         viewModel.selectedSavedConnectionProperty().set(null);
@@ -218,6 +273,18 @@ class SharedDatabaseLoginDialogViewModelTest {
         verify(duplicateConnection, never()).remove();
         assertEquals(List.of("stored", "duplicate", "unrelated"), lastSharedDatabasesOpened);
         assertEquals(1, viewModel.getSavedConnections().size());
+    }
+
+    /// The listed identifier may be gone while a duplicate is still stored
+    @Test
+    void failedRemovalOfADuplicateListsWhatIsStillStored() throws BackingStoreException {
+        when(duplicateConnection.remove()).thenThrow(new BackingStoreException("Disk full"));
+        when(duplicateConnection.getDisplayLabel()).thenReturn("alice@localhost:5432/jabref");
+        when(lastUsedConnection.listSavedIds()).thenReturn(List.of("duplicate"));
+
+        viewModel.removeSavedConnection();
+
+        assertEquals(List.of("duplicate"), viewModel.getSavedConnections().stream().map(SharedDatabaseLoginDialogViewModel.SavedConnection::id).toList());
     }
 
     @Test

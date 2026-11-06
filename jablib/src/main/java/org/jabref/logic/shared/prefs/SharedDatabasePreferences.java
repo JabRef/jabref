@@ -15,6 +15,7 @@ import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
 
+import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
@@ -151,7 +152,8 @@ public class SharedDatabasePreferences {
 
     /// Stores the plain password in the system keyring; a blank password clears it.
     ///
-    /// @return whether the keyring operation succeeded
+    /// @return whether the password is stored or cleared as asked; clearing succeeds without a keyring backend, as no
+    ///         password can be stored then
     public boolean setPassword(String password) {
         try (Keyring keyring = keyringFactory.call()) {
             if (StringUtil.isBlank(password)) {
@@ -165,6 +167,14 @@ public class SharedDatabasePreferences {
             }
             internalPrefs.remove(SHARED_DATABASE_PASSWORD);
             return true;
+        } catch (BackendNotSupportedException e) {
+            // Without a keyring backend no password can have been stored, so there is nothing to clear
+            LOGGER.debug("No keyring backend for the shared database password", e);
+            if (StringUtil.isBlank(password)) {
+                internalPrefs.remove(SHARED_DATABASE_PASSWORD);
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             LOGGER.warn("Could not access keyring for storing the shared database password", e);
             return false;

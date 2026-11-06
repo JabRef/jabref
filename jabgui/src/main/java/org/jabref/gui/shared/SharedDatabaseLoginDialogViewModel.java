@@ -92,8 +92,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final AiService aiService;
     /// The connection used last; the other stored connections are reached through it
     private final SharedDatabasePreferences sharedDatabasePreferences;
-    /// The connection whose settings fill the form; a password read later only applies while it still does
-    private SharedDatabasePreferences appliedPreferences;
+    /// Numbers the reads of a stored password: a read only fills in the password while it is the current one. Applying
+    /// another connection, editing the connection, typing a password, or clearing the form start a new number.
+    private long passwordRead;
+    /// Set while a saved connection fills the form, which is not an edit by the user
+    private boolean applyingSavedConnection;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -128,7 +131,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.sharedDatabasePreferences = sharedDatabasePreferences;
-        this.appliedPreferences = sharedDatabasePreferences;
         this.keyringAvailable = keyringAvailability.getAsBoolean();
         this.aiService = aiService;
         this.stateManager = stateManager;
@@ -182,7 +184,16 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         formValidator = new CompositeValidator();
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, folderValidator, connectionUrlValidator, jdbcUrlValidator);
 
-        savedConnections.setAll(sharedDatabasePreferences.listSavedIds().stream().map(this::toSavedConnection).toList());
+        // The stored password belongs to the connection as stored: once it is edited, or a password is typed, it no longer applies
+        for (StringProperty connectionField : List.of(host, port, database, user, jdbcUrl, password)) {
+            connectionField.addListener((_, _, _) -> {
+                if (!applyingSavedConnection) {
+                    cancelPasswordRead();
+                }
+            });
+        }
+
+        reloadSavedConnections();
         applyPreferences(sharedDatabasePreferences);
 
         EasyBind.subscribe(selectedSavedConnection, selected -> Optional.ofNullable(selected).ifPresent(this::applySavedConnection));
@@ -391,40 +402,51 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     /// Sets every field, also those the connection has no value for: otherwise switching between saved connections
     /// would keep values of the connection shown before
     private void applyPreferences(SharedDatabasePreferences prefs) {
-        host.set(prefs.getHost().orElse(""));
-        port.set(prefs.getPort().orElse(Integer.toString(DBMSType.POSTGRESQL.getDefaultPort())));
-        database.set(prefs.getName().orElse(""));
-        user.set(prefs.getUser().orElse(""));
-        useSSL.setValue(prefs.isUseSSL());
-        expertMode.set(prefs.isUseExpertMode());
-        jdbcUrl.set(prefs.getJdbcUrl().orElse(""));
-
-        rememberPassword.set(prefs.getRememberPassword() && keyringAvailable);
-        // Switching to another saved connection must not leave the previous connection's password behind
-        password.set("");
-        appliedPreferences = prefs;
-        passwordLoading.set(rememberPassword.get());
-        if (rememberPassword.get()) {
-            loadPassword(prefs);
+        applyingSavedConnection = true;
+        try {
+            host.set(prefs.getHost().orElse(""));
+            port.set(prefs.getPort().orElse(Integer.toString(DBMSType.POSTGRESQL.getDefaultPort())));
+            database.set(prefs.getName().orElse(""));
+            user.set(prefs.getUser().orElse(""));
+            useSSL.setValue(prefs.isUseSSL());
+            expertMode.set(prefs.isUseExpertMode());
+            jdbcUrl.set(prefs.getJdbcUrl().orElse(""));
+            rememberPassword.set(prefs.getRememberPassword() && keyringAvailable);
+            // Switching to another saved connection must not leave the previous connection's password behind
+            password.set("");
+            folder.set(prefs.getFolder().orElse(""));
+            autosave.set(prefs.getAutosave());
+        } finally {
+            applyingSavedConnection = false;
         }
 
-        folder.set(prefs.getFolder().orElse(""));
-        autosave.set(prefs.getAutosave());
+        cancelPasswordRead();
+        if (rememberPassword.get()) {
+            passwordLoading.set(true);
+            loadPassword(prefs, passwordRead);
+        }
+    }
+
+    private void cancelPasswordRead() {
+        passwordRead++;
+        passwordLoading.set(false);
     }
 
     /// Some keyrings block or ask the user for permission, so the password is read off the FX thread
-    private void loadPassword(SharedDatabasePreferences prefs) {
+    private void loadPassword(SharedDatabasePreferences prefs, long read) {
         BackgroundTask.wrap(prefs::getPassword)
                       .onSuccess(storedPassword -> {
-                          // A slow keyring must neither overwrite a password typed meanwhile nor apply to a connection switched away from
-                          if (appliedPreferences == prefs) {
-                              storedPassword.filter(_ -> password.get().isEmpty()).ifPresent(password::set);
+                          // A slow keyring must not fill in the password once the form shows something else
+                          if (read == passwordRead) {
+                              applyingSavedConnection = true;
+                              storedPassword.ifPresent(password::set);
+                              applyingSavedConnection = false;
                               passwordLoading.set(false);
                           }
                       })
                       .onFailure(e -> {
                           LOGGER.warn("Could not read the stored shared database password", e);
-                          if (appliedPreferences == prefs) {
+                          if (read == passwordRead) {
                               passwordLoading.set(false);
                           }
                       })
@@ -480,6 +502,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 LOGGER.warn("Could not remove the stored shared database connection {}", removedId, e);
                 // The connection stays in the list: hiding an entry that is still stored would offer it again on the next start
                 dialogService.showErrorDialogAndWait(Localization.lang("Could not remove the saved connection."), e);
+                // Duplicates removed before the failure are gone: the list shows what is still stored
+                reloadSavedConnections();
                 return;
             }
             // Without this, JabRef would try to reconnect to the removed database on the next start
@@ -513,8 +537,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private void clearConnectionFields() {
-        appliedPreferences = sharedDatabasePreferences;
-        passwordLoading.set(false);
+        cancelPasswordRead();
         connectionUrl.set("");
         host.set("");
         port.set(Integer.toString(DBMSType.POSTGRESQL.getDefaultPort()));
@@ -527,6 +550,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         rememberPassword.set(false);
         autosave.set(false);
         folder.set("");
+    }
+
+    private void reloadSavedConnections() {
+        selectedSavedConnection.set(null);
+        savedConnections.setAll(sharedDatabasePreferences.listSavedIds().stream().map(this::toSavedConnection).toList());
     }
 
     private SavedConnection toSavedConnection(String sharedDatabaseId) {

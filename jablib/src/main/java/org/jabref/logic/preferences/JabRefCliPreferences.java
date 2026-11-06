@@ -516,7 +516,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private AiPreferences aiPreferences;
     private OcrPreferences ocrPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
-    private SharedDatabasePreferences sharedDatabasePreferences;
+    private @Nullable SharedDatabasePreferences sharedDatabasePreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private GitPreferences gitPreferences;
 

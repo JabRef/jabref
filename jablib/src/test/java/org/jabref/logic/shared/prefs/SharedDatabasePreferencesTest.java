@@ -10,6 +10,7 @@ import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
 import org.jabref.logic.shared.DBMSType;
 
+import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.junit.jupiter.api.AfterEach;
@@ -21,7 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-/// Works on a node and a keyring of its own, so neither the developer's stored connections nor their passwords are touched.
+/// Unlike the tests of classes that use [SharedDatabasePreferences], this one cannot mock it: it is the class under test.
+/// Its lookups (finding, listing, and clearing stored connections) read the connections that the helpers store in the
+/// preferences tree, so the stored connections have to be real as well.
+///
+/// What the class depends on is replaced instead: it works on a preferences node and a keyring of its own, so neither
+/// the developer's stored connections nor their passwords are touched.
 class SharedDatabasePreferencesTest {
 
     private static final String ID = "stored";
@@ -233,12 +239,24 @@ class SharedDatabasePreferencesTest {
     @Test
     void clearingAllConnectionsKeepsConnectionWhosePasswordCannotBeRemoved() throws BackingStoreException {
         SharedDatabasePreferences lastUsedWithoutKeyring = new SharedDatabasePreferences(connectionsRoot, "default", () -> {
-            throw new IOException("Credential store not available");
+            throw new IOException("Credential store locked");
         });
 
         lastUsedWithoutKeyring.clearAllConnections();
 
         assertEquals(List.of(ID), lastUsedWithoutKeyring.listSavedIds());
+    }
+
+    /// Without a keyring backend no password can have been stored, so none can be left behind
+    @Test
+    void clearingAllConnectionsWithoutKeyringBackendRemovesThem() throws BackingStoreException {
+        SharedDatabasePreferences lastUsedWithoutBackend = new SharedDatabasePreferences(connectionsRoot, "default", () -> {
+            throw new BackendNotSupportedException("No keyring backend");
+        });
+
+        lastUsedWithoutBackend.clearAllConnections();
+
+        assertEquals(List.of(), lastUsedWithoutBackend.listSavedIds());
     }
 
     @Test
