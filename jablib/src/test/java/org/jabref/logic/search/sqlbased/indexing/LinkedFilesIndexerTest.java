@@ -67,7 +67,8 @@ public class LinkedFilesIndexerTest {
 
     @Test
     void cancelledStartupSkipsGatheringEntries() {
-        BackgroundTask<Void> task = BackgroundTask.wrap(() -> { });
+        BackgroundTask<Void> task = BackgroundTask.wrap(() -> {
+        });
         task.cancel(false);
         indexer.updateOnStart(task);
         verify(context, never()).getEntries();
@@ -86,7 +87,8 @@ public class LinkedFilesIndexerTest {
         });
         when(second.getFiles()).thenReturn(List.of());
         when(context.getEntries()).thenReturn(List.of(first, second));
-        BackgroundTask<Void> task = BackgroundTask.wrap(() -> { });
+        BackgroundTask<Void> task = BackgroundTask.wrap(() -> {
+        });
         try (ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
             try {
                 Future<?> indexing = workers.submit(() -> indexer.updateOnStart(task));

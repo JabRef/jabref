@@ -148,10 +148,12 @@ class SerialBackgroundTaskGroupTest {
                 });
                 assertTrue(started.await(5, TimeUnit.SECONDS));
                 group.cancelAndRunWhenIdle(() -> cleanupRan.set(true));
-                group.close(() -> { });
+                group.close(() -> {
+                });
                 group.cancel();
                 release.complete(null);
-                group.closeAndWait(() -> { });
+                group.closeAndWait(() -> {
+                });
                 assertTrue(cleanupRan.get());
             } finally {
                 release.complete(null);
@@ -165,7 +167,8 @@ class SerialBackgroundTaskGroupTest {
         SerialBackgroundTaskGroup group = new SerialBackgroundTaskGroup(executor);
         long generation = group.generation();
         group.cancel();
-        group.submit(generation, _ -> { });
+        group.submit(generation, _ -> {
+        });
         verify(executor, never()).execute(any());
     }
 }
