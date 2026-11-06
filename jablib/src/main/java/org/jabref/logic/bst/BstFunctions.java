@@ -659,6 +659,11 @@ public class BstFunctions {
         Object o2 = stack.pop();
         Object o3 = stack.pop();
 
+        if ((o1 instanceof Integer) && (o2 instanceof Integer) && (o3 == null)) {
+            stack.push("");
+            return;
+        }
+
         if (!((o1 instanceof Integer length) && (o2 instanceof Integer start) && (o3 instanceof String string))) {
             throw new BstVMException("Expecting two integers and a string for substring$ (line %d)".formatted(ctx.start.getLine()));
         }
