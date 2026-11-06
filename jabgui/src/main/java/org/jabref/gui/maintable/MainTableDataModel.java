@@ -322,7 +322,7 @@ public class MainTableDataModel {
         }
 
         SearchQuery searchQuery = query.get();
-        String expression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getSearchExpression() + ")";
+        String expression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getNormalizedSearchExpression() + ")";
         SearchQuery entryQuery = new SearchQuery(expression, searchQuery.getSearchFlags());
         SearchResults results = searchContext.search(entryQuery);
         return new IndexedEntrySearchMatch(
