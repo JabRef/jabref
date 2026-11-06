@@ -24,6 +24,7 @@ public class BibTeXCodeArea extends CodeArea {
     private Subscription colorSchemeSubscription = Subscription.EMPTY;
 
     public BibTeXCodeArea(StateManager stateManager, BibTeXSyntaxHighlighter syntaxHighlighter) {
+        super(new BibTeXCodeTextModel());
         highlighter = new BibTeXHighlighter(stateManager, syntaxHighlighter);
         setSyntaxDecorator(highlighter);
         setWrapText(true);
