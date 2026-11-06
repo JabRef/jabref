@@ -66,7 +66,7 @@ class GitIgnoreFileFilterTest {
     }
 
     @Test
-    void acceptsNothingMatchingLiteralOpeningBrace(@TempDir Path dir) throws IOException {
+    void rejectsFileMatchingPatternWithLiteralOpeningBrace(@TempDir Path dir) throws IOException {
         Files.writeString(dir.resolve(".gitignore"), """
                 notes{draft.pdf
                 """);
@@ -81,6 +81,21 @@ class GitIgnoreFileFilterTest {
                 """);
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
         assertTrue(gitIgnoreFileFilter.accept(dir.resolve("paper.pdf")));
+    }
+
+    @Test
+    void acceptsDefaultIgnoredFileWhenNegatedInGitIgnore(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                !desktop.ini
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertTrue(gitIgnoreFileFilter.accept(dir.resolve("desktop.ini")));
+    }
+
+    @Test
+    void rejectsDefaultIgnoredFileWithoutGitIgnore(@TempDir Path dir) throws IOException {
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertFalse(gitIgnoreFileFilter.accept(dir.resolve("Thumbs.db")));
     }
 
     @Test

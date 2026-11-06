@@ -18,7 +18,13 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitIgnoreFileFilter.class);
 
-    private static final String DEFAULT_IGNORES = ".gitignore\n.git\n.DS_Store\ndesktop.ini\nThumbs.db\n";
+    private static final String DEFAULT_IGNORES = """
+            .gitignore
+            .git
+            .DS_Store
+            desktop.ini
+            Thumbs.db
+            """;
 
     private final IgnoreNode ignoreNode;
     private final Path baseDir;
@@ -31,6 +37,14 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
         this.ignoreNode = new IgnoreNode();
 
+        // Always ignore ".gitignore" itself and common defaults.
+        // Parsed first, because the last matching rule wins: negations in the user's .gitignore can override these.
+        try (InputStream input = new ByteArrayInputStream(DEFAULT_IGNORES.getBytes(StandardCharsets.UTF_8))) {
+            ignoreNode.parse(input);
+        } catch (IOException e) {
+            LOGGER.info("Could not add default ignores", e);
+        }
+
         if (currentPath == null) {
             this.baseDir = path;
         } else {
@@ -41,14 +55,6 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
             } catch (IOException e) {
                 LOGGER.info("Could not read .gitignore from {}", gitIgnore, e);
             }
-        }
-
-        // Always ignore ".gitignore" itself and common defaults.
-        // Parsed last, so the rules apply whether or not a .gitignore was found.
-        try (InputStream input = new ByteArrayInputStream(DEFAULT_IGNORES.getBytes(StandardCharsets.UTF_8))) {
-            ignoreNode.parse(input);
-        } catch (IOException e) {
-            LOGGER.info("Could not add default ignores", e);
         }
     }
 
