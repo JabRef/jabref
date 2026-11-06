@@ -6,12 +6,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogEvent;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -21,10 +23,12 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -53,6 +57,9 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private CheckBox expertMode;
     @FXML private TextField connectionUrl;
     @FXML private TitledPane advancedPane;
+    @FXML private GridPane savedConnectionsPane;
+    @FXML private ComboBox<SharedDatabaseLoginDialogViewModel.SavedConnection> savedConnections;
+    @FXML private Button removeSavedConnection;
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
@@ -82,7 +89,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         ControlHelper.setAction(connectButton, this.getDialogPane(), _ -> openDatabase());
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
         // must be set here, because in initializing the button is still null
-        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
+        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not().or(viewModel.passwordLoadingProperty()));
         // Reading the clipboard once the dialog is shown would run inside the nested event loop of
         // showAndWait and leave the dialog in a state that breaks the next one, so it happens up front
         viewModel.applyClipboardConnectionUrl();
@@ -108,6 +115,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 tabContainer,
                 dialogService,
                 preferences,
+                preferences.getSharedDatabasePreferences(),
+                OS::isKeyringAvailable,
                 aiService,
                 stateManager,
                 entryTypesManager,
@@ -116,6 +125,15 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 taskExecutor,
                 journalAbbreviationRepository,
                 gitHandlerRegistry);
+        new ViewModelListCellFactory<SharedDatabaseLoginDialogViewModel.SavedConnection>()
+                .withText(SharedDatabaseLoginDialogViewModel.SavedConnection::label)
+                .install(savedConnections);
+        savedConnections.setItems(viewModel.getSavedConnections());
+        savedConnections.valueProperty().bindBidirectional(viewModel.selectedSavedConnectionProperty());
+        savedConnectionsPane.visibleProperty().bind(viewModel.hasSavedConnectionsProperty());
+        savedConnectionsPane.managedProperty().bind(savedConnectionsPane.visibleProperty());
+        removeSavedConnection.disableProperty().bind(viewModel.selectedSavedConnectionProperty().isNull());
+
         connectionUrl.textProperty().bindBidirectional(viewModel.connectionUrlProperty());
         database.textProperty().bindBidirectional(viewModel.databaseproperty());
         host.textProperty().bindBidirectional(viewModel.hostProperty());
@@ -187,6 +205,11 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 getDialogPane().getScene().getWindow().sizeToScene();
             }
         });
+    }
+
+    @FXML
+    private void removeSavedConnection() {
+        viewModel.removeSavedConnection();
     }
 
     @FXML
