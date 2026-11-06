@@ -232,10 +232,10 @@ public class PdfContentImporter extends PdfImporter {
         Optional<BibEntry> localBook = extractBookMetadata(pageText);
 
         List<ISBN> isbns = ISBN.findAllInText(pageText).stream()
-                              .map(ISBN::asIsbn13)
-                              .flatMap(Optional::stream)
-                              .distinct()
-                              .toList();
+                               .map(ISBN::asIsbn13)
+                               .flatMap(Optional::stream)
+                               .distinct()
+                               .toList();
         if (isbns.isEmpty() && localBook.isEmpty()) {
             return Optional.empty();
         }
