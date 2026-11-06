@@ -51,4 +51,20 @@ class MultiMergeEntriesViewTest extends JavaFxTest {
 
         assertEquals(Optional.of(":paper.pdf:PDF"), merged.getField(StandardField.FILE));
     }
+
+    @Test
+    void multiSourceMergingWithDistinctFields() {
+        interact(() -> {
+            dialog.addSource("Source 1", new BibEntry().withField(StandardField.TITLE, "Original Title").withField(StandardField.AUTHOR, "Alice"));
+            dialog.addSource("Source 2", new BibEntry().withField(StandardField.TITLE, "Better Title").withField(StandardField.YEAR, "2024"));
+            dialog.addSource("Source 3", new BibEntry().withField(StandardField.TITLE, "Alternative Title").withField(StandardField.PAGES, "1-10"));
+        });
+
+        BibEntry merged = dialog.getResultConverter().call(ButtonType.OK);
+
+        assertEquals(Optional.of("Original Title"), merged.getField(StandardField.TITLE));
+        assertEquals(Optional.of("Alice"), merged.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("2024"), merged.getField(StandardField.YEAR));
+        assertEquals(Optional.of("1-10"), merged.getField(StandardField.PAGES));
+    }
 }
