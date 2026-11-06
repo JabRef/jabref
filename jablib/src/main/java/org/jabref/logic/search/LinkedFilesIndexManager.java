@@ -2,7 +2,6 @@ package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -26,8 +25,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResults;
 
+import com.google.common.base.Strings;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,11 +41,12 @@ public class LinkedFilesIndexManager {
     private final LuceneIndexer linkedFilesIndexer;
     private final LinkedFilesSearcher linkedFilesSearcher;
     private final DelayTaskThrottler indexUpdateThrottler;
+    private final Object fileChangesLock = new Object();
     private final ConcurrentHashMap<String, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
     private final SerialBackgroundTaskGroup indexingTasks;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private record FileDelta(String oldValue, String newValue) {
+    private record FileDelta(long generation, String oldValue, String newValue) {
     }
 
     public LinkedFilesIndexManager(BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FilePreferences filePreferences) {
@@ -77,73 +77,82 @@ public class LinkedFilesIndexManager {
     // [impl->req~search.fulltext.disable-indexing~1]
     private void bindToPreferences(boolean newValue) {
         if (newValue) {
-            indexingTasks.cancel();
+            synchronized (fileChangesLock) {
+                indexingTasks.cancel();
+            }
             runIndexingTask(task -> {
                 linkedFilesIndexer.removeAllFromIndex();
                 linkedFilesIndexer.updateOnStart(task);
             });
         } else {
-            indexUpdateThrottler.cancel();
-            pendingFileValuesByEntry.clear();
-            indexingTasks.cancelAndRunWhenIdle(linkedFilesIndexer::removeAllFromIndex);
+            synchronized (fileChangesLock) {
+                indexUpdateThrottler.cancel();
+                pendingFileValuesByEntry.clear();
+                indexingTasks.cancelAndRunWhenIdle(linkedFilesIndexer::removeAllFromIndex);
+            }
         }
     }
 
     private void runIndexingTask(Consumer<BackgroundTask<?>> work) {
+        runIndexingTask(indexingTasks.generation(), work);
+    }
+
+    private void runIndexingTask(long generation, Consumer<BackgroundTask<?>> work) {
         if (!closed.get() && shouldIndexLinkedFiles.get()) {
-            indexingTasks.submit(work);
+            indexingTasks.submit(generation, work);
         }
     }
 
     private void updateOnStart() {
-        if (shouldIndexLinkedFiles.get()) {
-            runIndexingTask(linkedFilesIndexer::updateOnStart);
-        }
+        runIndexingTask(linkedFilesIndexer::updateOnStart);
     }
 
     public void addToIndex(List<BibEntry> entries) {
-        if (shouldIndexLinkedFiles.get()) {
-            runIndexingTask(task -> linkedFilesIndexer.addToIndex(entries, task));
-        }
+        runIndexingTask(task -> linkedFilesIndexer.addToIndex(entries, task));
     }
 
     public void removeFromIndex(List<BibEntry> entries) {
-        if (shouldIndexLinkedFiles.get()) {
-            runIndexingTask(task -> linkedFilesIndexer.removeFromIndex(entries, task));
-        }
+        runIndexingTask(task -> linkedFilesIndexer.removeFromIndex(entries, task));
     }
 
     public void updateEntry(FieldChangedEvent event) {
+        long generation = indexingTasks.generation();
         if (closed.get() || !shouldIndexLinkedFiles.get() || !event.getField().equals(StandardField.FILE)) {
             return;
         }
 
         BibEntry entry = event.getBibEntry();
         String entryId = entry.getId();
-        pendingFileValuesByEntry.compute(entryId, (_, existing) -> {
-            return Optional.ofNullable(existing)
-                           .map(fileDelta -> new FileDelta(fileDelta.oldValue(), normalizeNullToEmpty(event.getNewValue())))
-                           .orElseGet(() -> new FileDelta(normalizeNullToEmpty(event.getOldValue()), normalizeNullToEmpty(event.getNewValue())));
-        });
-
-        indexUpdateThrottler.schedule(() -> {
-            if (closed.get() || !shouldIndexLinkedFiles.get()) {
+        synchronized (fileChangesLock) {
+            if (closed.get() || generation != indexingTasks.generation()) {
                 return;
             }
-
-            Optional.ofNullable(pendingFileValuesByEntry.remove(entryId)).ifPresent(fileValues ->
-                    runIndexingTask(task -> linkedFilesIndexer.updateEntry(entry, fileValues.oldValue(), fileValues.newValue(), task)));
-        });
+            pendingFileValuesByEntry.compute(entryId, (_, existing) -> {
+                if (existing != null && existing.generation() > generation) {
+                    return existing;
+                }
+                String oldValue = Strings.nullToEmpty(event.getOldValue());
+                if (existing != null && existing.generation() == generation) {
+                    oldValue = existing.oldValue();
+                }
+                return new FileDelta(generation, oldValue, Strings.nullToEmpty(event.getNewValue()));
+            });
+            indexUpdateThrottler.schedule(() -> updatePendingFileChange(generation, entry, entryId));
+        }
     }
 
-    private static String normalizeNullToEmpty(@Nullable String value) {
-        return Optional.ofNullable(value).orElse("");
+    private void updatePendingFileChange(long generation, BibEntry entry, String entryId) {
+        if (closed.get() || !shouldIndexLinkedFiles.get()) {
+            return;
+        }
+        var fileValues = pendingFileValuesByEntry.get(entryId);
+        if (fileValues != null && fileValues.generation() == generation && pendingFileValuesByEntry.remove(entryId, fileValues)) {
+            runIndexingTask(generation, task -> linkedFilesIndexer.updateEntry(entry, fileValues.oldValue(), fileValues.newValue(), task));
+        }
     }
 
     public void rebuildIndex() {
-        if (shouldIndexLinkedFiles.get()) {
-            runIndexingTask(linkedFilesIndexer::rebuildIndex);
-        }
+        runIndexingTask(linkedFilesIndexer::rebuildIndex);
     }
 
     public SearchResults search(SearchQuery query) {
@@ -170,8 +179,10 @@ public class LinkedFilesIndexManager {
     }
 
     private void closeThrottler(boolean waitForShutdown) {
-        indexUpdateThrottler.cancel();
-        pendingFileValuesByEntry.clear();
+        synchronized (fileChangesLock) {
+            indexUpdateThrottler.cancel();
+            pendingFileValuesByEntry.clear();
+        }
         if (waitForShutdown) {
             indexUpdateThrottler.shutdown();
         } else {

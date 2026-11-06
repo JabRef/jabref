@@ -128,4 +128,44 @@ class SerialBackgroundTaskGroupTest {
         assertEquals(2, submitted.size());
         submitted.getLast().call();
     }
+
+    @Test
+    void cancelAfterCloseDoesNotDiscardPendingCleanup() throws Exception {
+        try (ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            TaskExecutor executor = mock(TaskExecutor.class);
+            when(executor.execute(any())).thenAnswer(invocation -> {
+                BackgroundTask<?> task = invocation.getArgument(0);
+                return workers.submit(task::call);
+            });
+            SerialBackgroundTaskGroup group = new SerialBackgroundTaskGroup(executor);
+            CountDownLatch started = new CountDownLatch(1);
+            CompletableFuture<Void> release = new CompletableFuture<>();
+            AtomicBoolean cleanupRan = new AtomicBoolean();
+            try {
+                group.submit(_ -> {
+                    started.countDown();
+                    release.join();
+                });
+                assertTrue(started.await(5, TimeUnit.SECONDS));
+                group.cancelAndRunWhenIdle(() -> cleanupRan.set(true));
+                group.close(() -> { });
+                group.cancel();
+                release.complete(null);
+                group.closeAndWait(() -> { });
+                assertTrue(cleanupRan.get());
+            } finally {
+                release.complete(null);
+            }
+        }
+    }
+
+    @Test
+    void submissionWithCancelledGenerationIsDiscarded() {
+        TaskExecutor executor = mock(TaskExecutor.class);
+        SerialBackgroundTaskGroup group = new SerialBackgroundTaskGroup(executor);
+        long generation = group.generation();
+        group.cancel();
+        group.submit(generation, _ -> { });
+        verify(executor, never()).execute(any());
+    }
 }

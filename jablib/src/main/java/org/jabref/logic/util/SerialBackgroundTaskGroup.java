@@ -1,13 +1,13 @@
 package org.jabref.logic.util;
 
 import java.util.ArrayDeque;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,8 @@ public class SerialBackgroundTaskGroup {
     private final Object stateLock = new Object();
     private final Object workLock = new Object();
     private final Queue<Work> pending = new ArrayDeque<>();
-    private Optional<BackgroundTask<?>> activeTask = Optional.empty();
+    private @Nullable BackgroundTask<?> activeTask;
+    private @Nullable Runnable pendingCleanup;
     private long generation;
     private boolean closed;
     private boolean scheduled;
@@ -35,9 +36,25 @@ public class SerialBackgroundTaskGroup {
 
     /// Submits work unless the group has closed. Work from a cancelled generation is skipped.
     public void submit(Consumer<BackgroundTask<?>> work) {
+        enqueue(0, true, work);
+    }
+
+    /// Returns a token invalidated by cancellation or closure.
+    public long generation() {
+        synchronized (stateLock) {
+            return generation;
+        }
+    }
+
+    /// Submits work only if the token still identifies the current generation.
+    public void submit(long expectedGeneration, Consumer<BackgroundTask<?>> work) {
+        enqueue(expectedGeneration, false, work);
+    }
+
+    private void enqueue(long expectedGeneration, boolean acceptCurrent, Consumer<BackgroundTask<?>> work) {
         boolean schedule;
         synchronized (stateLock) {
-            if (closed) {
+            if (closed || (!acceptCurrent && generation != expectedGeneration)) {
                 return;
             }
             pending.add(new Work(generation, work));
@@ -82,13 +99,13 @@ public class SerialBackgroundTaskGroup {
                             if (closed || generation != work.generation() || isCancelled()) {
                                 return null;
                             }
-                            activeTask = Optional.of(this);
+                            activeTask = this;
                         }
                         try {
                             work.action().accept(this);
                         } finally {
                             synchronized (stateLock) {
-                                activeTask = Optional.empty();
+                                activeTask = null;
                             }
                         }
                     }
@@ -113,9 +130,11 @@ public class SerialBackgroundTaskGroup {
     /// Invalidates queued work and requests cancellation without interrupting the active worker.
     public void cancel() {
         synchronized (stateLock) {
-            generation++;
-            pending.clear();
-            activeTask.ifPresent(task -> task.cancel(false));
+            if (closed) {
+                return;
+            }
+            pendingCleanup = null;
+            cancelWork();
         }
     }
 
@@ -127,17 +146,23 @@ public class SerialBackgroundTaskGroup {
                 return;
             }
             cancel();
+            pendingCleanup = cleanup;
             cancelledGeneration = generation;
         }
         HeadlessExecutorService.INSTANCE.execute(() -> {
             synchronized (workLock) {
-                boolean runCleanup;
+                Runnable cleanupToRun;
                 synchronized (stateLock) {
-                    runCleanup = !closed && generation == cancelledGeneration;
+                    if (closed || generation != cancelledGeneration) {
+                        return;
+                    }
+                    if (pendingCleanup == null) {
+                        return;
+                    }
+                    cleanupToRun = pendingCleanup;
+                    pendingCleanup = null;
                 }
-                if (runCleanup) {
-                    cleanup.run();
-                }
+                cleanupToRun.run();
             }
         });
     }
@@ -171,15 +196,38 @@ public class SerialBackgroundTaskGroup {
                 return false;
             }
             closed = true;
-            cancel();
+            cancelWork();
             return true;
+        }
+    }
+
+    private void cancelWork() {
+        generation++;
+        pending.clear();
+        if (activeTask != null) {
+            activeTask.cancel(false);
+        }
+    }
+
+    private @Nullable Runnable takePendingCleanup() {
+        synchronized (stateLock) {
+            var cleanup = pendingCleanup;
+            pendingCleanup = null;
+            return cleanup;
         }
     }
 
     private void finishClose(Runnable cleanup) {
         try {
             synchronized (workLock) {
-                cleanup.run();
+                var cleanupToRun = takePendingCleanup();
+                try {
+                    if (cleanupToRun != null) {
+                        cleanupToRun.run();
+                    }
+                } finally {
+                    cleanup.run();
+                }
             }
             closeCompletion.complete(null);
         } catch (RuntimeException | Error exception) {
