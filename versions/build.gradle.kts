@@ -49,7 +49,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.5.0")
+    api("com.dlsc.gemsfx:gemsfx:4.6.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.6.0")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -66,8 +66,8 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.11.2")
-    api("com.konghq:unirest-modules-gson:4.11.2")
+    api("com.konghq:unirest-java-core:4.11.3")
+    api("com.konghq:unirest-modules-gson:4.11.3")
     api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
     api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.1")
@@ -139,7 +139,7 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-locator:4.0.3")
     api("org.glassfish.hk2:hk2-utils:4.0.3")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
-    api("org.graalvm.sdk:nativeimage:25.4.4.1.1")
+    api("org.graalvm.sdk:nativeimage:25.5.5.0.3")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.6.Final")
     api("org.hisp.dhis:json-tree:1.12.0")
