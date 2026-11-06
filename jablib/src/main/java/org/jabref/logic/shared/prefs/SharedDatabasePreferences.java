@@ -290,7 +290,11 @@ public class SharedDatabasePreferences {
     /// identifies a stored connection.
     public String getDisplayLabel() {
         if (isUseExpertMode()) {
-            return "%s (%s)".formatted(getJdbcUrl().orElse(keyringAccount), getUser().orElse(""));
+            // Rebuilt from its parts, as a URL typed in expert mode may carry the password as a parameter
+            String url = getJdbcUrl().flatMap(DBMSConnectionUrl::parse)
+                                     .map(DBMSConnectionUrl::toJdbcUrl)
+                                     .orElse(keyringAccount);
+            return "%s (%s)".formatted(url, getUser().orElse(""));
         }
         return "%s@%s:%s/%s".formatted(
                 getUser().orElse(""),
@@ -362,10 +366,19 @@ public class SharedDatabasePreferences {
 
     /// Removes every stored connection, passwords included, and clears the connection used last.
     /// Used when all preferences are reset.
+    ///
+    /// A connection whose password cannot be deleted from the keyring is kept: removing its settings would leave the
+    /// password behind under an identifier nothing refers to anymore, while a listed connection can still be removed later.
     public void clearAllConnections() throws BackingStoreException {
         for (String sharedDatabaseId : connectionsRoot.childrenNames()) {
-            if (!DEFAULT_NODE.equals(sharedDatabaseId)) {
-                forConnection(sharedDatabaseId).remove();
+            if (DEFAULT_NODE.equals(sharedDatabaseId)) {
+                continue;
+            }
+            SharedDatabasePreferences stored = forConnection(sharedDatabaseId);
+            if (stored.setPassword("")) {
+                stored.internalPrefs.removeNode();
+            } else {
+                LOGGER.warn("Kept the stored shared database connection {}, as its password could not be removed from the keyring", sharedDatabaseId);
             }
         }
         forConnection(DEFAULT_NODE).clear();

@@ -89,7 +89,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         ControlHelper.setAction(connectButton, this.getDialogPane(), _ -> openDatabase());
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
         // must be set here, because in initializing the button is still null
-        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
+        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not().or(viewModel.passwordLoadingProperty()));
         // Reading the clipboard once the dialog is shown would run inside the nested event loop of
         // showAndWait and leave the dialog in a state that breaks the next one, so it happens up front
         viewModel.applyClipboardConnectionUrl();

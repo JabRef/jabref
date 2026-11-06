@@ -1,5 +1,6 @@
 package org.jabref.logic.shared.prefs;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
@@ -199,10 +200,17 @@ class SharedDatabasePreferencesTest {
     }
 
     @Test
+    void displayLabelOfExpertModeConnectionHidesThePassword() {
+        SharedDatabasePreferences expertPreferences = storeExpertConnection(OTHER_ID, "jdbc:postgresql://db.example.org/jabref?password=secret&user=alice");
+
+        assertEquals("jdbc:postgresql://db.example.org:5432/jabref (alice)", expertPreferences.getDisplayLabel());
+    }
+
+    @Test
     void displayLabelOfExpertModeConnectionNamesTheUser() {
         SharedDatabasePreferences expertPreferences = storeExpertConnection(OTHER_ID, "jdbc:postgresql://db.example.org/jabref");
 
-        assertEquals("jdbc:postgresql://db.example.org/jabref (alice)", expertPreferences.getDisplayLabel());
+        assertEquals("jdbc:postgresql://db.example.org:5432/jabref (alice)", expertPreferences.getDisplayLabel());
     }
 
     /// Saving one library must not erase the password of another library because of the dialog's last choice
@@ -219,6 +227,18 @@ class SharedDatabasePreferencesTest {
         new SharedDatabasePreferences(connectionsRoot, "default", () -> keyring).setRememberPassword(true);
 
         assertTrue(preferences.shouldRememberPassword());
+    }
+
+    /// Removing its settings would leave the password behind under an identifier nothing refers to anymore
+    @Test
+    void clearingAllConnectionsKeepsConnectionWhosePasswordCannotBeRemoved() throws BackingStoreException {
+        SharedDatabasePreferences lastUsedWithoutKeyring = new SharedDatabasePreferences(connectionsRoot, "default", () -> {
+            throw new IOException("Credential store not available");
+        });
+
+        lastUsedWithoutKeyring.clearAllConnections();
+
+        assertEquals(List.of(ID), lastUsedWithoutKeyring.listSavedIds());
     }
 
     @Test

@@ -79,6 +79,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final BooleanProperty expertMode = new SimpleBooleanProperty();
     private final StringProperty jdbcUrl = new SimpleStringProperty("");
+    /// While the stored password is read, connecting would authenticate without it
+    private final BooleanProperty passwordLoading = new SimpleBooleanProperty();
     private final StringProperty connectionUrl = new SimpleStringProperty("");
     private final ObservableList<SavedConnection> savedConnections = FXCollections.observableArrayList();
     private final ObjectProperty<@Nullable SavedConnection> selectedSavedConnection = new SimpleObjectProperty<>();
@@ -401,6 +403,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         // Switching to another saved connection must not leave the previous connection's password behind
         password.set("");
         appliedPreferences = prefs;
+        passwordLoading.set(rememberPassword.get());
         if (rememberPassword.get()) {
             loadPassword(prefs);
         }
@@ -412,12 +415,24 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     /// Some keyrings block or ask the user for permission, so the password is read off the FX thread
     private void loadPassword(SharedDatabasePreferences prefs) {
         BackgroundTask.wrap(prefs::getPassword)
-                      .onSuccess(storedPassword -> storedPassword
-                              // A slow keyring must neither overwrite a password typed meanwhile nor apply to a connection switched away from
-                              .filter(_ -> appliedPreferences == prefs && password.get().isEmpty())
-                              .ifPresent(password::set))
-                      .onFailure(e -> LOGGER.warn("Could not read the stored shared database password", e))
+                      .onSuccess(storedPassword -> {
+                          // A slow keyring must neither overwrite a password typed meanwhile nor apply to a connection switched away from
+                          if (appliedPreferences == prefs) {
+                              storedPassword.filter(_ -> password.get().isEmpty()).ifPresent(password::set);
+                              passwordLoading.set(false);
+                          }
+                      })
+                      .onFailure(e -> {
+                          LOGGER.warn("Could not read the stored shared database password", e);
+                          if (appliedPreferences == prefs) {
+                              passwordLoading.set(false);
+                          }
+                      })
                       .executeWith(taskExecutor);
+    }
+
+    public BooleanProperty passwordLoadingProperty() {
+        return passwordLoading;
     }
 
     // [impl->req~shared-database.saved-connections-offered~1]
@@ -499,6 +514,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     private void clearConnectionFields() {
         appliedPreferences = sharedDatabasePreferences;
+        passwordLoading.set(false);
         connectionUrl.set("");
         host.set("");
         port.set(Integer.toString(DBMSType.POSTGRESQL.getDefaultPort()));
