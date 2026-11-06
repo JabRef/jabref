@@ -21,6 +21,7 @@ public class SerialBackgroundTaskGroup {
     private final Object stateLock = new Object();
     private final Object workLock = new Object();
     private final Queue<Work> pending = new ArrayDeque<>();
+    private final ThreadLocal<@Nullable SchedulingState> schedulingOnThisThread = new ThreadLocal<>();
     private @Nullable BackgroundTask<?> activeTask;
     private @Nullable Runnable pendingCleanup;
     private long generation;
@@ -28,6 +29,10 @@ public class SerialBackgroundTaskGroup {
     private boolean scheduled;
 
     private record Work(long generation, Consumer<BackgroundTask<?>> action) {
+    }
+
+    private static final class SchedulingState {
+        private boolean rescheduleRequested;
     }
 
     public SerialBackgroundTaskGroup(TaskExecutor executor) {
@@ -68,7 +73,27 @@ public class SerialBackgroundTaskGroup {
         }
     }
 
+    /// Drains iteratively instead of recursively: when the executor runs the task synchronously, the task's request to
+    /// schedule its successor is recorded and handled after the task returns, keeping the stack depth constant.
     private void scheduleNext() {
+        SchedulingState activeState = schedulingOnThisThread.get();
+        if (activeState != null) {
+            activeState.rescheduleRequested = true;
+            return;
+        }
+        SchedulingState state = new SchedulingState();
+        schedulingOnThisThread.set(state);
+        try {
+            do {
+                state.rescheduleRequested = false;
+                scheduleOne();
+            } while (state.rescheduleRequested);
+        } finally {
+            schedulingOnThisThread.remove();
+        }
+    }
+
+    private void scheduleOne() {
         Work work;
         synchronized (stateLock) {
             if (closed || pending.isEmpty()) {

@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
@@ -170,5 +171,18 @@ class SerialBackgroundTaskGroupTest {
         group.submit(generation, _ -> {
         });
         verify(executor, never()).execute(any());
+    }
+
+    @Test
+    void synchronousExecutorDrainsLongQueueWithoutNesting() {
+        SerialBackgroundTaskGroup group = new SerialBackgroundTaskGroup(new CurrentThreadTaskExecutor());
+        int queuedTasks = 50_000;
+        AtomicInteger completed = new AtomicInteger();
+        group.submit(_ -> {
+            for (int i = 0; i < queuedTasks; i++) {
+                group.submit(_ -> completed.incrementAndGet());
+            }
+        });
+        assertEquals(queuedTasks, completed.get());
     }
 }
