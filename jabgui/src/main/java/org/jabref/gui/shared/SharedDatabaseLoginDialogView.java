@@ -1,7 +1,6 @@
 package org.jabref.gui.shared;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -24,6 +23,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -122,15 +122,14 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 taskExecutor,
                 journalAbbreviationRepository,
                 gitHandlerRegistry);
+        new ViewModelListCellFactory<SharedDatabaseLoginDialogViewModel.SavedConnection>()
+                .withText(SharedDatabaseLoginDialogViewModel.SavedConnection::label)
+                .install(savedConnections);
         savedConnections.setItems(viewModel.getSavedConnections());
-        savedConnectionsPane.visibleProperty().bind(Bindings.isNotEmpty(viewModel.getSavedConnections()));
+        savedConnections.valueProperty().bindBidirectional(viewModel.selectedSavedConnectionProperty());
+        savedConnectionsPane.visibleProperty().bind(viewModel.hasSavedConnectionsProperty());
         savedConnectionsPane.managedProperty().bind(savedConnectionsPane.visibleProperty());
-        removeSavedConnection.disableProperty().bind(savedConnections.getSelectionModel().selectedItemProperty().isNull());
-        EasyBind.subscribe(savedConnections.getSelectionModel().selectedItemProperty(), selected -> {
-            if (selected != null) {
-                viewModel.applySavedConnection(selected);
-            }
-        });
+        removeSavedConnection.disableProperty().bind(viewModel.selectedSavedConnectionProperty().isNull());
 
         connectionUrl.textProperty().bindBidirectional(viewModel.connectionUrlProperty());
         database.textProperty().bindBidirectional(viewModel.databaseproperty());
@@ -207,7 +206,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @FXML
     private void removeSavedConnection() {
-        viewModel.removeSavedConnection(savedConnections.getSelectionModel().getSelectedItem());
+        viewModel.removeSavedConnection();
     }
 
     @FXML

@@ -8,8 +8,12 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.prefs.BackingStoreException;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -40,6 +44,7 @@ import org.jabref.logic.shared.DBMSConnectionUrl;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -53,6 +58,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,12 +80,16 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty jdbcUrl = new SimpleStringProperty("");
     private final StringProperty connectionUrl = new SimpleStringProperty("");
     private final ObservableList<SavedConnection> savedConnections = FXCollections.observableArrayList();
+    private final ObjectProperty<@Nullable SavedConnection> selectedSavedConnection = new SimpleObjectProperty<>();
+    private final BooleanBinding hasSavedConnections = Bindings.isNotEmpty(savedConnections);
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final AiService aiService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
+    /// The connection whose settings fill the form; a password read later only applies while it still does
+    private SharedDatabasePreferences appliedPreferences = sharedDatabasePreferences;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -165,6 +175,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         savedConnections.setAll(SharedDatabasePreferences.listSavedIds().stream().map(SavedConnection::of).toList());
         applyPreferences(sharedDatabasePreferences);
+
+        EasyBind.subscribe(selectedSavedConnection, selected -> {
+            if (selected != null) {
+                applySavedConnection(selected);
+            }
+        });
 
         EasyBind.subscribe(connectionUrl, text -> DBMSConnectionUrl.parse(text).ifPresent(this::applyConnectionUrl));
     }
@@ -378,69 +394,114 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         rememberPassword.set(prefs.getRememberPassword() && keyringAvailable);
         // Switching to another saved connection must not leave the previous connection's password behind
-        password.set(rememberPassword.get() ? prefs.getPassword().orElse("") : "");
+        password.set("");
+        appliedPreferences = prefs;
+        if (rememberPassword.get()) {
+            loadPassword(prefs);
+        }
 
         prefs.getFolder().ifPresent(folder::set);
         autosave.set(prefs.getAutosave());
     }
 
-    // [impl->req~shared-database.saved-connections~1]
-    public ObservableList<SavedConnection> getSavedConnections() {
-        return savedConnections;
+    /// Some keyrings block or ask the user for permission, so the password is read off the FX thread
+    private void loadPassword(SharedDatabasePreferences prefs) {
+        BackgroundTask.wrap(prefs::getPassword)
+                      .onSuccess(storedPassword -> storedPassword
+                              // A slow keyring must neither overwrite a password typed meanwhile nor apply to a connection switched away from
+                              .filter(_ -> appliedPreferences == prefs && password.get().isEmpty())
+                              .ifPresent(password::set))
+                      .onFailure(e -> LOGGER.warn("Could not read the stored shared database password", e))
+                      .executeWith(taskExecutor);
     }
 
-    public void applySavedConnection(SavedConnection savedConnection) {
+    // [impl->req~shared-database.saved-connections-offered~1]
+    public ObservableList<SavedConnection> getSavedConnections() {
+        return FXCollections.unmodifiableObservableList(savedConnections);
+    }
+
+    public ObjectProperty<@Nullable SavedConnection> selectedSavedConnectionProperty() {
+        return selectedSavedConnection;
+    }
+
+    public BooleanBinding hasSavedConnectionsProperty() {
+        return hasSavedConnections;
+    }
+
+    private void applySavedConnection(SavedConnection savedConnection) {
         // A half-typed URL would keep failing validation and disable "Connect" although the fields are complete
         connectionUrl.set("");
         applyPreferences(new SharedDatabasePreferences(savedConnection.id()));
     }
 
-    public void removeSavedConnection(SavedConnection savedConnection) {
-        SharedDatabasePreferences savedPreferences = new SharedDatabasePreferences(savedConnection.id());
-        DBMSConnectionProperties removedProperties = new DBMSConnectionProperties(savedPreferences);
-        boolean passwordCleared;
-        try {
-            passwordCleared = savedPreferences.remove();
-        } catch (BackingStoreException e) {
-            LOGGER.warn("Could not remove the stored shared database connection", e);
-            // The connection stays in the list: hiding an entry that is still stored would offer it again on the next start
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not remove the saved connection."), e);
+    // [impl->req~shared-database.saved-connections-deletable~1]
+    public void removeSavedConnection() {
+        SavedConnection savedConnection = selectedSavedConnection.get();
+        if (savedConnection == null) {
             return;
+        }
+        SharedDatabasePreferences savedPreferences = new SharedDatabasePreferences(savedConnection.id());
+        // Duplicates stored before connections were reused are listed as this one entry, so they go along with it
+        List<String> removedIds = savedPreferences.listIdsOfSameDatabase();
+        if (isOpen(removedIds)) {
+            // Quitting would store the open library's connection again, so the removal would not last
+            dialogService.showWarningDialogAndWait(Localization.lang("Saved connections"),
+                    Localization.lang("Close the library of this connection before removing it."));
+            return;
+        }
+        boolean passwordCleared = true;
+        for (String removedId : removedIds) {
+            try {
+                passwordCleared &= new SharedDatabasePreferences(removedId).remove();
+            } catch (BackingStoreException e) {
+                LOGGER.warn("Could not remove the stored shared database connection {}", removedId, e);
+                // The connection stays in the list: hiding an entry that is still stored would offer it again on the next start
+                dialogService.showErrorDialogAndWait(Localization.lang("Could not remove the saved connection."), e);
+                return;
+            }
+            // Without this, JabRef would try to reconnect to the removed database on the next start
+            preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened().remove(removedId);
         }
         if (keyringAvailable && !passwordCleared) {
             dialogService.notify(Localization.lang("The password of the removed connection is still stored in the credential store."));
         }
         // The default node holds the connection used last, password included, and prefills the dialog
-        if (sharedDatabasePreferences.addresses(removedProperties)) {
+        if (sharedDatabasePreferences.addressesSameDatabaseAs(savedPreferences)) {
             try {
                 sharedDatabasePreferences.clear();
             } catch (BackingStoreException e) {
                 LOGGER.warn("Could not clear the last used shared database connection", e);
             }
         }
-        // Without this, JabRef would try to reconnect to the removed database on the next start
-        preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened().remove(savedConnection.id());
+        selectedSavedConnection.set(null);
         savedConnections.remove(savedConnection);
+        // Otherwise "Connect" would store the removed connection again right away
+        clearConnectionFields();
     }
 
-    /// A stored connection as shown in the "Saved connections" list; [#toString()] is the list entry's text.
+    private boolean isOpen(List<String> sharedDatabaseIds) {
+        return tabContainer.getLibraryTabs().stream()
+                           .flatMap(tab -> tab.getBibDatabaseContext().getDatabase().getSharedDatabaseID().stream())
+                           .anyMatch(sharedDatabaseIds::contains);
+    }
+
+    private void clearConnectionFields() {
+        appliedPreferences = sharedDatabasePreferences;
+        connectionUrl.set("");
+        host.set("");
+        port.set(Integer.toString(DBMSType.POSTGRESQL.getDefaultPort()));
+        database.set("");
+        user.set("");
+        password.set("");
+        jdbcUrl.set("");
+        expertMode.set(false);
+    }
+
+    /// A stored connection as shown in the "Saved connections" list
     @NullMarked
     public record SavedConnection(String id, String label) {
         static SavedConnection of(String id) {
-            SharedDatabasePreferences prefs = new SharedDatabasePreferences(id);
-            if (prefs.isUseExpertMode()) {
-                return new SavedConnection(id, prefs.getJdbcUrl().orElse(id));
-            }
-            return new SavedConnection(id, "%s@%s:%s/%s".formatted(
-                    prefs.getUser().orElse(""),
-                    prefs.getHost().orElse(""),
-                    prefs.getPort().orElse(""),
-                    prefs.getName().orElse("")));
-        }
-
-        @Override
-        public String toString() {
-            return label;
+            return new SavedConnection(id, new SharedDatabasePreferences(id).getDisplayLabel());
         }
     }
 
