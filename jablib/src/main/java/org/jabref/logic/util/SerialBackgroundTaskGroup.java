@@ -84,10 +84,11 @@ public class SerialBackgroundTaskGroup {
         SchedulingState state = new SchedulingState();
         schedulingOnThisThread.set(state);
         try {
-            do {
+            state.rescheduleRequested = true;
+            while (state.rescheduleRequested) {
                 state.rescheduleRequested = false;
                 scheduleOne();
-            } while (state.rescheduleRequested);
+            }
         } finally {
             schedulingOnThisThread.remove();
         }
