@@ -27,6 +27,7 @@ import org.jabref.model.search.query.SearchResults;
 
 import com.google.common.base.Strings;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +146,7 @@ public class LinkedFilesIndexManager {
         if (closed.get() || !shouldIndexLinkedFiles.get()) {
             return;
         }
-        var fileValues = pendingFileValuesByEntry.get(entryId);
+        @Nullable FileDelta fileValues = pendingFileValuesByEntry.get(entryId);
         if (fileValues != null && fileValues.generation() == generation && pendingFileValuesByEntry.remove(entryId, fileValues)) {
             runIndexingTask(generation, task -> linkedFilesIndexer.updateEntry(entry, fileValues.oldValue(), fileValues.newValue(), task));
         }

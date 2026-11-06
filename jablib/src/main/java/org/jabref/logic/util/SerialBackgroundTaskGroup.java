@@ -236,7 +236,7 @@ public class SerialBackgroundTaskGroup {
 
     private @Nullable Runnable takePendingCleanup() {
         synchronized (stateLock) {
-            var cleanup = pendingCleanup;
+            @Nullable Runnable cleanup = pendingCleanup;
             pendingCleanup = null;
             return cleanup;
         }
@@ -245,7 +245,7 @@ public class SerialBackgroundTaskGroup {
     private void finishClose(Runnable cleanup) {
         try {
             synchronized (workLock) {
-                var cleanupToRun = takePendingCleanup();
+                @Nullable Runnable cleanupToRun = takePendingCleanup();
                 try {
                     if (cleanupToRun != null) {
                         cleanupToRun.run();
