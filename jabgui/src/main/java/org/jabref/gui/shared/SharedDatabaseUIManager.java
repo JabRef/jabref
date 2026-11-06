@@ -38,7 +38,6 @@ import org.jabref.logic.shared.event.SharedWriteFailedEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -252,7 +251,7 @@ public class SharedDatabaseUIManager {
         }
 
         String sharedDatabaseID = sharedDatabaseIDOptional.get();
-        DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
+        DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(preferences.getSharedDatabasePreferences().forConnection(sharedDatabaseID));
         SharedDatabaseCleanup.awaitDatabase(dbmsConnectionProperties);
 
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();

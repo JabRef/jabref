@@ -1,5 +1,6 @@
 package org.jabref.gui.consistency;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -14,6 +15,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.slf4j.Logger;
@@ -60,24 +62,22 @@ public class ConsistencyCheckAction extends SimpleCommand {
         Task<ConsistencyCheckDialogViewModel> task = new Task<>() {
             @Override
             public ConsistencyCheckDialogViewModel call() {
-                BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-                BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibContext, entryTypesManager, (count, total) ->
-                        UiTaskExecutor.runInJavaFXThread(() -> {
-                            updateProgress(count, total);
-                            updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
-                        }));
+                List<BibEntry> entries = List.copyOf(bibContext.getEntries());
+                BibliographyConsistencyCheck.Snapshot snapshot = BibliographyConsistencyCheck.snapshot(entries, bibContext.getMode(), entryTypesManager, this::isCancelled);
                 // [impl->req~ux.consistency.report-background~1]
-                return new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor);
+                ConsistencyCheckDialogViewModel viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, snapshot, taskExecutor);
+                return viewModel;
             }
         };
 
         task.setOnFailed(_ -> dialogService.showErrorDialogAndWait(Localization.lang("Consistency check failed."), task.getException()));
         task.setOnSucceeded(_ -> {
-            if (task.getValue().getTableData().isEmpty()) {
+            if (!task.getValue().hasFindings()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(
-                        new ConsistencyCheckDialog(libraryTab, dialogService, task.getValue()));
+                ConsistencyCheckDialog dialog = new ConsistencyCheckDialog(libraryTab, dialogService, task.getValue());
+                dialog.setOnShown(_ -> bibContext.getDatabasePath().ifPresent(task.getValue()::useAuxFileNextTo));
+                dialogService.showCustomDialogAndWait(dialog);
             }
         });
         taskExecutor.execute(task);

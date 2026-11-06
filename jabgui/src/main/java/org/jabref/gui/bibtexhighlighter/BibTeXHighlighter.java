@@ -214,7 +214,8 @@ public class BibTeXHighlighter implements SyntaxDecorator {
             if (baseStyleClass != null) {
                 builder.addWithStyleNames(text, baseStyleClass);
             } else {
-                builder.addSegment(text);
+                // A style map lets the RTF exporter set the font on unhighlighted text.
+                builder.addWithStyleNames(text);
             }
         }
     }
