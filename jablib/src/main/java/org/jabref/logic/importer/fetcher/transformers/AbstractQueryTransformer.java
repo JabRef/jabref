@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ public abstract class AbstractQueryTransformer {
         String term = query.term();
         String field = NO_EXPLICIT_FIELD;
         if (query.field().isPresent()) {
-            field = String.valueOf(query.field().get().getName()).toLowerCase();
+            field = String.valueOf(query.field().get().getName()).toLowerCase(Locale.ROOT);
         }
         switch (field) {
             case "author" -> {
