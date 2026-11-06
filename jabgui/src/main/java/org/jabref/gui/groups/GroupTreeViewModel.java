@@ -353,7 +353,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                         : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
                     .toList());
 
-            dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
+            long createdGroups = newSuggestedSubgroups.stream()
+                                                      .flatMap(GroupTreeNode::iterateOverTree)
+                                                      .count();
+            dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(createdGroups)));
         }));
     }
 

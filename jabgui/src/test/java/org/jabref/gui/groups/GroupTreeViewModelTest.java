@@ -19,6 +19,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.NoOpSearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -34,7 +35,6 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
@@ -312,7 +312,7 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -325,7 +325,7 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -335,11 +335,12 @@ class GroupTreeViewModelTest {
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutGroupsGroup());
-        assertEquals(2, rootGroup.getChildren().size());
+        rootGroup.getGroupNode().addChild(GroupsFactory.createMarkingAndGradingGroups());
+        assertEquals(3, rootGroup.getChildren().size());
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -348,17 +349,12 @@ class GroupTreeViewModelTest {
     @Test
     // [utest->req~ux.groups.suggested-groups-recognized-by-expression~1]
     void shouldNotDuplicateSuggestedGroupsCreatedInAnotherLanguage() {
-        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
-        SearchGroup withoutFiles = GroupsFactory.createWithoutFilesGroup();
-        withoutFiles.nameProperty().set("Einträge ohne verknüpfte Dateien");
-        root.addSubgroup(withoutFiles);
-        SearchGroup withoutGroups = GroupsFactory.createWithoutGroupsGroup();
-        withoutGroups.nameProperty().set("Einträge ohne Gruppen");
-        root.addSubgroup(withoutGroups);
-        databaseContext.getMetaData().setGroups(root);
-        // The view model reads the tree when it is told about the library, and refreshes on later
-        // changes only through Platform.runLater - so it is rebuilt here rather than waited on.
-        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        GroupTreeNode root = createLibraryWithAllSuggestedGroups();
+        root.iterateOverTree()
+            .filter(node -> node != root)
+            .forEach(node -> node.getGroup().nameProperty().set("Übersetzt: " + node.getGroup().getName()));
+        List<String> translatedNames = childNames();
+        long groupsBefore = root.iterateOverTree().count();
         GroupNodeViewModel rootGroup = groupTree.rootGroupProperty().getValue();
 
         assertTrue(rootGroup.hasAllSuggestedGroups());
@@ -366,7 +362,8 @@ class GroupTreeViewModelTest {
         // Runs on the JavaFX thread, so that it does not edit the tree while the queued refresh walks it
         JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(rootGroup));
 
-        assertEquals(List.of("Einträge ohne verknüpfte Dateien", "Einträge ohne Gruppen"), childNames());
+        assertEquals(translatedNames, childNames());
+        assertEquals(groupsBefore, root.iterateOverTree().count());
     }
 
     @Test
@@ -379,12 +376,51 @@ class GroupTreeViewModelTest {
         JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
         assertEquals(List.of(
                         GroupsFactory.createWithoutFilesGroup().getName(),
-                        GroupsFactory.createWithoutGroupsGroup().getName()),
+                        GroupsFactory.createWithoutGroupsGroup().getName(),
+                        GroupsFactory.createMarkingAndGradingGroups().getGroup().getName()),
                 childNames());
 
         assertTrue(journal.canUndo(), "adding the suggested groups was not recorded");
         JavaFxExtension.invokeAndWait(journal::undo);
         assertEquals(List.of(), childNames());
+    }
+
+    /// Whether the whole tree is created or a single group restored, the selection shows what was added.
+    @Test
+    void selectsRestoredGroupOnly() {
+        GroupTreeNode root = createLibraryWithAllSuggestedGroups();
+        GroupTreeNode rank = root.getChildren().getLast().getChildren().getFirst();
+        AbstractGroup threeStars = rank.getChildren().get(2).getGroup();
+        rank.getChildren().get(2).removeFromParent();
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
+
+        assertEquals(List.of(threeStars), groupTree.selectedGroupsProperty().stream().map(group -> group.getGroupNode().getGroup()).toList());
+    }
+
+    @Test
+    void notificationCountsAllCreatedGroups() {
+        databaseContext.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
+
+        long createdGroups = databaseContext.getMetaData().getGroups().orElseThrow().iterateOverTree().count() - 1;
+        assertEquals(25, createdGroups);
+        verify(dialogService).notify(Localization.lang("Created %0 suggested groups.", "25"));
+    }
+
+    /// Replaces the library's groups by "All entries" with every suggested group below it
+    private GroupTreeNode createLibraryWithAllSuggestedGroups() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        root.addSubgroup(GroupsFactory.createWithoutFilesGroup());
+        root.addSubgroup(GroupsFactory.createWithoutGroupsGroup());
+        root.addChild(GroupsFactory.createMarkingAndGradingGroups());
+        databaseContext.getMetaData().setGroups(root);
+        // The view model reads the tree when it is told about the library, and refreshes on later
+        // changes only through Platform.runLater - so it is rebuilt here rather than waited on.
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        return root;
     }
 
     @Test

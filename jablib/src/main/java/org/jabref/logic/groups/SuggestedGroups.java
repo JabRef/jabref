@@ -26,9 +26,9 @@ public final class SuggestedGroups {
     /// Suggested groups that are already present stay as they are, including the user's changes to their name, icon, or color.
     ///
     /// A missing group is inserted before the next suggested group that is present, or as last child if there is none.
-    /// Thus, the suggested groups keep their order among each other, while the user's own groups may end up in between.
+    /// Groups that are already present are not moved.
     ///
-    /// @return the added nodes, in the order of the suggestions
+    /// @return the roots of the added subtrees, in the order of the suggestions
     public static List<GroupTreeNode> addMissing(GroupTreeNode allEntries) {
         List<GroupTreeNode> added = new ArrayList<>();
         for (MissingSuggestion missing : findMissing(createSuggestions(), allEntries)) {
@@ -48,6 +48,7 @@ public final class SuggestedGroups {
         GroupTreeNode allEntries = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         allEntries.addSubgroup(GroupsFactory.createWithoutFilesGroup());
         allEntries.addSubgroup(GroupsFactory.createWithoutGroupsGroup());
+        allEntries.addChild(GroupsFactory.createMarkingAndGradingGroups());
         return allEntries;
     }
 

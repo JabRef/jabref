@@ -33,7 +33,7 @@ class SuggestedGroupsTest {
     void addsAllSuggestionsToLibraryWithoutGroups() {
         List<GroupTreeNode> added = SuggestedGroups.addMissing(allEntries);
 
-        assertEquals(suggestedGroups(), groupsOf(allEntries.getChildren()));
+        assertEquals(describe(SuggestedGroups.createSuggestions()), describe(allEntries));
         assertEquals(allEntries.getChildren(), added);
         assertTrue(SuggestedGroups.areAllPresent(allEntries));
     }
@@ -45,7 +45,7 @@ class SuggestedGroupsTest {
         List<GroupTreeNode> added = SuggestedGroups.addMissing(allEntries);
 
         assertEquals(List.of(), added);
-        assertEquals(suggestedGroups(), groupsOf(allEntries.getChildren()));
+        assertEquals(describe(SuggestedGroups.createSuggestions()), describe(allEntries));
     }
 
     /// The name of a suggested group is translated when the group is created.
@@ -53,17 +53,16 @@ class SuggestedGroupsTest {
     @Test
     // [utest->req~ux.groups.suggested-groups-recognized-by-expression~1]
     void recognizesSuggestedGroupsCreatedInAnotherLanguage() {
-        SearchGroup withoutFiles = GroupsFactory.createWithoutFilesGroup();
-        withoutFiles.nameProperty().set("Einträge ohne verknüpfte Dateien");
-        allEntries.addSubgroup(withoutFiles);
-        SearchGroup withoutGroups = GroupsFactory.createWithoutGroupsGroup();
-        withoutGroups.nameProperty().set("Einträge ohne Gruppen");
-        allEntries.addSubgroup(withoutGroups);
+        SuggestedGroups.addMissing(allEntries);
+        allEntries.iterateOverTree()
+                  .filter(node -> node != allEntries)
+                  .forEach(node -> node.getGroup().nameProperty().set("Übersetzt: " + node.getGroup().getName()));
+        long groupsBefore = allEntries.iterateOverTree().count();
 
         List<GroupTreeNode> added = SuggestedGroups.addMissing(allEntries);
 
         assertEquals(List.of(), added);
-        assertEquals(List.of("Einträge ohne verknüpfte Dateien", "Einträge ohne Gruppen"), namesOf(allEntries.getChildren()));
+        assertEquals(groupsBefore, allEntries.iterateOverTree().count());
     }
 
     @Test
@@ -76,8 +75,9 @@ class SuggestedGroupsTest {
 
         SuggestedGroups.addMissing(allEntries);
 
-        assertEquals(List.of("Missing PDFs", GroupsFactory.createWithoutGroupsGroup().getName()), namesOf(allEntries.getChildren()));
+        assertEquals(SuggestedGroups.createSuggestions().getNumberOfChildren(), allEntries.getNumberOfChildren());
         AbstractGroup kept = allEntries.getChildren().getFirst().getGroup();
+        assertEquals("Missing PDFs", kept.getName());
         assertEquals(Optional.of("#ff0000"), kept.getColor());
         assertEquals(Optional.of("PDF_FILE"), kept.getIconName());
     }
@@ -90,8 +90,8 @@ class SuggestedGroupsTest {
 
         List<GroupTreeNode> added = SuggestedGroups.addMissing(allEntries);
 
-        assertEquals(suggestedGroups(), groupsOf(added));
-        assertTrue(groupsOf(allEntries.getChildren()).contains(userGroup));
+        assertEquals(groupsOf(SuggestedGroups.createSuggestions().getChildren()), groupsOf(added));
+        assertEquals(userGroup, allEntries.getChildren().getFirst().getGroup());
     }
 
     @Test
@@ -101,7 +101,7 @@ class SuggestedGroupsTest {
 
         List<GroupTreeNode> added = SuggestedGroups.addMissing(allEntries);
 
-        assertEquals(suggestedGroups(), groupsOf(added));
+        assertEquals(groupsOf(SuggestedGroups.createSuggestions().getChildren()), groupsOf(added));
         assertEquals(1, folder.getNumberOfChildren());
     }
 
@@ -117,13 +117,45 @@ class SuggestedGroupsTest {
                         "Books",
                         GroupsFactory.createWithoutFilesGroup().getName(),
                         GroupsFactory.createWithoutGroupsGroup().getName(),
-                        "Articles"),
+                        "Articles",
+                        GroupsFactory.createMarkingAndGradingGroups().getGroup().getName()),
                 namesOf(allEntries.getChildren()));
     }
 
     @Test
-    void areAllPresentIsFalseWhenOneSuggestionIsMissing() {
-        allEntries.addSubgroup(GroupsFactory.createWithoutFilesGroup());
+    void restoresDeletedIntermediateGroupWithItsSubgroups() {
+        SuggestedGroups.addMissing(allEntries);
+        GroupTreeNode marking = allEntries.getChildren().getLast();
+        GroupTreeNode rank = marking.getChildren().getFirst();
+        String rankDescription = describe(rank);
+        rank.removeFromParent();
+
+        List<GroupTreeNode> added = SuggestedGroups.addMissing(allEntries);
+
+        assertEquals(1, added.size());
+        assertEquals(marking.getChildren().getFirst(), added.getFirst());
+        assertEquals(rankDescription, describe(added.getFirst()));
+    }
+
+    @Test
+    void restoresDeletedRankLeafAtItsPosition() {
+        SuggestedGroups.addMissing(allEntries);
+        GroupTreeNode rank = allEntries.getChildren().getLast().getChildren().getFirst();
+        GroupTreeNode threeStars = rank.getChildren().get(2);
+        AbstractGroup deleted = threeStars.getGroup();
+        threeStars.removeFromParent();
+
+        List<GroupTreeNode> added = SuggestedGroups.addMissing(allEntries);
+
+        assertEquals(List.of(deleted), groupsOf(added));
+        assertEquals(added.getFirst(), rank.getChildren().get(2));
+        assertEquals(5, rank.getNumberOfChildren());
+    }
+
+    @Test
+    void areAllPresentIsFalseWhenOneLeafIsMissing() {
+        SuggestedGroups.addMissing(allEntries);
+        allEntries.getChildren().getLast().getChildren().getLast().getChildren().getLast().removeFromParent();
 
         assertFalse(SuggestedGroups.areAllPresent(allEntries));
     }
@@ -135,15 +167,19 @@ class SuggestedGroupsTest {
         assertEquals(0, allEntries.getNumberOfChildren());
     }
 
-    private static List<AbstractGroup> suggestedGroups() {
-        return groupsOf(SuggestedGroups.createSuggestions().getChildren());
-    }
-
     private static List<AbstractGroup> groupsOf(List<GroupTreeNode> nodes) {
         return nodes.stream().map(GroupTreeNode::getGroup).toList();
     }
 
     private static List<String> namesOf(List<GroupTreeNode> nodes) {
         return nodes.stream().map(node -> node.getGroup().getName()).toList();
+    }
+
+    /// Describes a subtree by what identifies a suggested group: its position and its search expression
+    private static String describe(GroupTreeNode root) {
+        return String.join("\n", root.iterateOverTree()
+                                     .map(node -> "  ".repeat(node.getLevel() - root.getLevel())
+                                             + (node.getGroup() instanceof SearchGroup searchGroup ? searchGroup.getSearchExpression() : node.getGroup().getClass().getSimpleName()))
+                                     .toList());
     }
 }

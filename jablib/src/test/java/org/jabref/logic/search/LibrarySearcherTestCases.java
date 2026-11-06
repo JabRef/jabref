@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
@@ -38,6 +39,15 @@ public final class LibrarySearcherTestCases {
     public static final BibEntry TITLE_UPPER_CASED = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-upper-cased")
             .withField(StandardField.TITLE, "TITLE UPPER CASED");
+
+    public static final BibEntry MARKED_RELEVANT = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("marked-relevant")
+            .withField(SpecialField.RELEVANCE, "relevant");
+
+    /// A value typed by hand that contains the value of a special field
+    public static final BibEntry TYPED_IRRELEVANT = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("typed-irrelevant")
+            .withField(SpecialField.RELEVANCE, "irrelevant");
 
     private LibrarySearcherTestCases() {
     }
@@ -85,7 +95,24 @@ public final class LibrarySearcherTestCases {
                 // regex on any field
                 Arguments.of(List.of(),
                         new SearchQuery("any =~ [Y]"),
-                        List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED))
+                        List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED)),
+
+                // special fields, as used by the suggested groups: contains (=) vs. exact (==), negated exact (!==), presence (=~.*)
+                Arguments.of(List.of(MARKED_RELEVANT, TYPED_IRRELEVANT),
+                        new SearchQuery("relevance = relevant"),
+                        List.of(MARKED_RELEVANT, TYPED_IRRELEVANT, ARTICLE_HARRER)),
+                Arguments.of(List.of(MARKED_RELEVANT),
+                        new SearchQuery("relevance == relevant"),
+                        List.of(MARKED_RELEVANT, TYPED_IRRELEVANT, ARTICLE_HARRER)),
+                Arguments.of(List.of(TYPED_IRRELEVANT, ARTICLE_HARRER),
+                        new SearchQuery("relevance !== relevant"),
+                        List.of(MARKED_RELEVANT, TYPED_IRRELEVANT, ARTICLE_HARRER)),
+                Arguments.of(List.of(MARKED_RELEVANT, TYPED_IRRELEVANT),
+                        new SearchQuery("relevance =~.*"),
+                        List.of(MARKED_RELEVANT, TYPED_IRRELEVANT, ARTICLE_HARRER)),
+                Arguments.of(List.of(MARKED_RELEVANT, TYPED_IRRELEVANT),
+                        new SearchQuery("ranking =~.* OR relevance =~.*"),
+                        List.of(MARKED_RELEVANT, TYPED_IRRELEVANT, ARTICLE_HARRER))
         );
     }
 }

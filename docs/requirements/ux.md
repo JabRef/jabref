@@ -261,6 +261,14 @@ Thus, running the action again after changing the language or renaming a suggest
 
 Needs: impl, utest
 
+## Suggested groups must offer one group per special field value
+`req~ux.groups.suggested-marking-groups~1`
+
+"Add JabRef suggested groups" adds the group "Marking and grading" with one group per special field (rank, relevance, quality, print status, priority, read status) and below it one group per value of the field.
+For a field with a single value, such as relevance, a second group holds the entries without that value, including the entries without the field ([#16147](https://github.com/JabRef/jabref/issues/16147)).
+
+Needs: impl, utest
+
 ## Assigning an already used keyboard shortcut must require confirmation
 `req~ux.keybindings.duplicate-warning~1`
 
