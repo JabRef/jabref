@@ -38,6 +38,8 @@ JabRef supports more fetchers. Investigate the package `org.jabref.logic.importe
 
 Fetchers with a documented request limit use `FetcherRateLimiter`. Express limits with `ofRequestsPerInterval` when a provider specifies requests per time window; use `ofRequestsPerSecond` for limits returned dynamically by an API. A limiter is shared across all instances of a fetcher so parallel searches respect the provider-wide request rate.
 
+The arXiv title-search fallback compares titles after removing accents, normalizing punctuation and whitespace, and converting to lowercase with `Locale.ROOT`. This keeps title matching independent of the system language. Queries sent to arXiv retain their accented characters.
+
 ## Fulltext Fetchers
 
 * all fulltext fetchers run in parallel

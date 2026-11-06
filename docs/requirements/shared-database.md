@@ -73,6 +73,13 @@ Connecting to a database created by an earlier JabRef version copies its content
 
 Needs: impl
 
+## Shared database client must load entries with missing entry types
+`req~shared-database.missing-entry-type~1`
+
+When a shared database entry has a null or blank type, JabRef loads it as `Misc` instead of failing to load the shared database.
+
+Needs: impl, utest
+
 ## Shared database login dialog must accept connection URLs
 `req~shared-database.connection-url~1`
 
