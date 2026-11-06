@@ -2,6 +2,7 @@ package org.jabref.logic.groups;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
@@ -76,7 +77,9 @@ class SuggestedGroupsTest {
         SuggestedGroups.addMissing(allEntries);
 
         assertEquals(List.of("Missing PDFs", GroupsFactory.createWithoutGroupsGroup().getName()), namesOf(allEntries.getChildren()));
-        assertEquals(customized, allEntries.getChildren().getFirst().getGroup());
+        AbstractGroup kept = allEntries.getChildren().getFirst().getGroup();
+        assertEquals(Optional.of("#ff0000"), kept.getColor());
+        assertEquals(Optional.of("PDF_FILE"), kept.getIconName());
     }
 
     @Test

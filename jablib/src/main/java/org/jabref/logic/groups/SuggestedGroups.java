@@ -25,7 +25,8 @@ public final class SuggestedGroups {
     /// Adds the suggested groups that are missing below `allEntries`.
     /// Suggested groups that are already present stay as they are, including the user's changes to their name, icon, or color.
     ///
-    /// A missing group is inserted before the next suggested group that is present, so that a restored group returns to its place.
+    /// A missing group is inserted before the next suggested group that is present, or as last child if there is none.
+    /// Thus, the suggested groups keep their order among each other, while the user's own groups may end up in between.
     ///
     /// @return the added nodes, in the order of the suggestions
     public static List<GroupTreeNode> addMissing(GroupTreeNode allEntries) {

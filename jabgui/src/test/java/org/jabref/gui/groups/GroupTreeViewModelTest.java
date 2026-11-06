@@ -348,19 +348,25 @@ class GroupTreeViewModelTest {
     @Test
     // [utest->req~ux.groups.suggested-groups-recognized-by-expression~1]
     void shouldNotDuplicateSuggestedGroupsCreatedInAnotherLanguage() {
-        GroupNodeViewModel rootGroup = groupTree.rootGroupProperty().getValue();
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         SearchGroup withoutFiles = GroupsFactory.createWithoutFilesGroup();
         withoutFiles.nameProperty().set("Einträge ohne verknüpfte Dateien");
-        rootGroup.getGroupNode().addSubgroup(withoutFiles);
+        root.addSubgroup(withoutFiles);
         SearchGroup withoutGroups = GroupsFactory.createWithoutGroupsGroup();
         withoutGroups.nameProperty().set("Einträge ohne Gruppen");
-        rootGroup.getGroupNode().addSubgroup(withoutGroups);
+        root.addSubgroup(withoutGroups);
+        databaseContext.getMetaData().setGroups(root);
+        // The view model reads the tree when it is told about the library, and refreshes on later
+        // changes only through Platform.runLater - so it is rebuilt here rather than waited on.
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        GroupNodeViewModel rootGroup = groupTree.rootGroupProperty().getValue();
 
         assertTrue(rootGroup.hasAllSuggestedGroups());
 
-        groupTree.addSuggestedGroups(rootGroup);
+        // Runs on the JavaFX thread, so that it does not edit the tree while the queued refresh walks it
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(rootGroup));
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(List.of("Einträge ohne verknüpfte Dateien", "Einträge ohne Gruppen"), childNames());
     }
 
     @Test
@@ -369,14 +375,15 @@ class GroupTreeViewModelTest {
         databaseContext.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
         groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
 
-        groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue());
+        // Both operations edit the tree the queued refresh reads, so they run on the JavaFX thread
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
         assertEquals(List.of(
                         GroupsFactory.createWithoutFilesGroup().getName(),
                         GroupsFactory.createWithoutGroupsGroup().getName()),
                 childNames());
 
         assertTrue(journal.canUndo(), "adding the suggested groups was not recorded");
-        journal.undo();
+        JavaFxExtension.invokeAndWait(journal::undo);
         assertEquals(List.of(), childNames());
     }
 
