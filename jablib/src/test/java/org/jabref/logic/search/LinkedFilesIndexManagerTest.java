@@ -1,6 +1,7 @@
 package org.jabref.logic.search;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,9 +23,21 @@ import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.LinkedFilesConstants;
+import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -422,6 +435,76 @@ class LinkedFilesIndexManagerTest {
                 manager.closeAndWait();
             }
         }
+    }
+
+    @Test
+        // [utest->req~search.fulltext.disable-indexing~1]
+    void reenablingHidesStaleIndexUntilItIsCleared() throws Exception {
+        try (ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor();
+             IndexWriter writer = new IndexWriter(new ByteBuffersDirectory(), new IndexWriterConfig(LinkedFilesConstants.LINKED_FILES_ANALYZER));
+             SearcherManager searcherManager = new SearcherManager(writer, null)) {
+            TaskExecutor executor = mock(TaskExecutor.class);
+            when(executor.createThrottler(anyInt())).thenReturn(new DelayTaskThrottler(700));
+            when(executor.execute(any())).thenAnswer(invocation -> {
+                BackgroundTask<?> task = invocation.getArgument(0);
+                return workers.submit(task::call);
+            });
+            SimpleBooleanProperty enabled = new SimpleBooleanProperty(false);
+            FilePreferences preferences = mock(FilePreferences.class);
+            when(preferences.fulltextIndexLinkedFilesProperty()).thenReturn(enabled);
+            when(preferences.shouldFulltextIndexLinkedFiles()).thenAnswer(_ -> enabled.get());
+            LuceneIndexer indexer = mock(LuceneIndexer.class);
+            when(indexer.getSearcherManager()).thenReturn(searcherManager);
+            doAnswer(_ -> {
+                writer.deleteAll();
+                return null;
+            }).when(indexer).removeAllFromIndex();
+            CountDownLatch staleIndexed = new CountDownLatch(1);
+            CountDownLatch rebuilt = new CountDownLatch(1);
+            CompletableFuture<Void> release = new CompletableFuture<>();
+            AtomicInteger starts = new AtomicInteger();
+            doAnswer(_ -> {
+                if (starts.incrementAndGet() == 1) {
+                    writer.addDocument(indexedPage("stale"));
+                    staleIndexed.countDown();
+                    release.join();
+                } else {
+                    writer.addDocument(indexedPage("fresh"));
+                    rebuilt.countDown();
+                }
+                return null;
+            }).when(indexer).updateOnStart(any());
+            BibDatabaseContext databaseContext = new BibDatabaseContext();
+            databaseContext.getDatabase().insertEntry(new BibEntry().withFiles(List.of(new LinkedFile("", "paper.pdf", "PDF"))));
+            LinkedFilesIndexManager manager = new LinkedFilesIndexManager(databaseContext, executor, preferences, indexer);
+            try {
+                enabled.set(true);
+                assertTrue(staleIndexed.await(5, TimeUnit.SECONDS));
+                assertEquals(1, fulltextMatches(manager, "stale"));
+                enabled.set(false);
+                enabled.set(true);
+                assertEquals(0, fulltextMatches(manager, "stale"));
+                release.complete(null);
+                assertTrue(rebuilt.await(5, TimeUnit.SECONDS));
+                assertEquals(0, fulltextMatches(manager, "stale"));
+                assertEquals(1, fulltextMatches(manager, "fresh"));
+            } finally {
+                release.complete(null);
+                manager.closeAndWait();
+            }
+        }
+    }
+
+    private static Document indexedPage(String content) {
+        Document document = new Document();
+        document.add(new StringField(LinkedFilesConstants.PATH.toString(), "paper.pdf", Field.Store.YES));
+        document.add(new StringField(LinkedFilesConstants.PAGE_NUMBER.toString(), "1", Field.Store.YES));
+        document.add(new TextField(LinkedFilesConstants.CONTENT.toString(), content, Field.Store.YES));
+        return document;
+    }
+
+    private static int fulltextMatches(LinkedFilesIndexManager manager, String term) {
+        return manager.search(new SearchQuery(term, EnumSet.of(SearchFlags.FULLTEXT))).getMatchedEntries().size();
     }
 
     private static class PausedPreference extends SimpleBooleanProperty {

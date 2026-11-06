@@ -46,6 +46,8 @@ public class LinkedFilesIndexManager {
     private final ConcurrentHashMap<String, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
     private final SerialBackgroundTaskGroup indexingTasks;
     private final AtomicBoolean closed = new AtomicBoolean(false);
+    /// Set from re-enabling indexing until the index left over from before disabling has been cleared.
+    private final AtomicBoolean staleIndex = new AtomicBoolean(false);
 
     private record FileDelta(long generation, String oldValue, String newValue) {
     }
@@ -78,11 +80,16 @@ public class LinkedFilesIndexManager {
     // [impl->req~search.fulltext.disable-indexing~1]
     private void bindToPreferences(boolean newValue) {
         if (newValue) {
+            staleIndex.set(true);
             synchronized (fileChangesLock) {
                 indexingTasks.cancel();
             }
             runIndexingTask(task -> {
-                linkedFilesIndexer.removeAllFromIndex();
+                try {
+                    linkedFilesIndexer.removeAllFromIndex();
+                } finally {
+                    staleIndex.set(false);
+                }
                 linkedFilesIndexer.updateOnStart(task);
             });
         } else {
@@ -157,6 +164,9 @@ public class LinkedFilesIndexManager {
     }
 
     public SearchResults search(SearchQuery query) {
+        if (staleIndex.get()) {
+            return new SearchResults();
+        }
         return linkedFilesSearcher.search(query);
     }
 
