@@ -29,7 +29,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added indentation and syntax highlighting for JSON in AI chat answers. [#17181](https://github.com/JabRef/jabref/pull/17181)
 - We added a warning for shortcuts already in use, allowing users to replace the existing shortcut or keep both. [#17240](https://github.com/JabRef/jabref/issues/17240)
 - We added "Delete" and "Retry" to the context menu of AI chat messages and made user messages retryable. [#17151](https://github.com/JabRef/jabref/pull/17151)
-- We fixed an issue where disabling Automatically index all linked files for fulltext search did not stop running indexes. [#17577](https://github.com/JabRef/jabref/issues/17577)
 
 ### Changed
 
@@ -114,8 +113,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
-- We fixed an issue where disabling "Automatically index all linked files for fulltext search" did not stop running indexes. [#17577](https://github.com/JabRef/jabref/issues/17577)
-- We Fixed an issue where te citationcount , day and dayfiled columns sorted alphabetically instead of numerically. [#17459](https://github.com/JabRef/jabref/issues/17459)
+- We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
 
 ### Removed
 
