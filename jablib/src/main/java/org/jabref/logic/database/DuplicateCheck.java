@@ -108,9 +108,9 @@ public class DuplicateCheck {
 
     private static boolean haveDifferentDoisAndPublicationYears(BibEntry one, BibEntry two) {
         boolean differentDois = one.getDOI().filter(doi -> !doi.isShortDoi())
-                                  .flatMap(doi -> two.getDOI().filter(other -> !other.isShortDoi())
-                                                     .map(other -> !doi.equals(other)))
-                                  .orElse(false);
+                                   .flatMap(doi -> two.getDOI().filter(other -> !other.isShortDoi())
+                                                      .map(other -> !doi.equals(other)))
+                                   .orElse(false);
         return differentDois && one.getPublicationDate().flatMap(Date::getYear)
                                    .flatMap(year -> two.getPublicationDate().flatMap(Date::getYear)
                                                        .map(other -> !year.equals(other)))
