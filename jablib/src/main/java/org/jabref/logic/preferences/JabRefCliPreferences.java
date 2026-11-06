@@ -1125,7 +1125,7 @@ public class JabRefCliPreferences implements CliPreferences {
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
         PREFS_NODE.clear();
-        getSharedDatabasePreferences().clear();
+        getSharedDatabasePreferences().clearAllConnections();
 
         initializeAll();
 

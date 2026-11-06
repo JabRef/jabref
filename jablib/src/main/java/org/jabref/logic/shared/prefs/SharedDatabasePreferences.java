@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import org.jabref.logic.shared.DBMSConnectionUrl;
 import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
@@ -44,18 +46,23 @@ public class SharedDatabasePreferences {
     private final Preferences connectionsRoot;
     private final Preferences internalPrefs;
     private final String keyringAccount;
+    /// Opens the system keyring; a `Callable` because opening it throws when no backend is available
+    private final Callable<Keyring> keyringFactory;
 
     /// Opens the connection used last; reach the other stored connections through [#forConnection(String)].
     public SharedDatabasePreferences() {
-        this(Preferences.userRoot().node(PREFERENCES_PATH_NAME), DEFAULT_NODE);
+        this(Preferences.userRoot().node(PREFERENCES_PATH_NAME), DEFAULT_NODE, Keyring::create);
     }
 
-    /// @param connectionsRoot the node holding one child node per stored connection; tests pass their own to keep
-    ///                        away from the user's stored connections
-    SharedDatabasePreferences(Preferences connectionsRoot, String sharedDatabaseID) {
+    /// @param connectionsRoot the node holding one child node per stored connection
+    /// @param keyringFactory  opens the keyring the passwords are stored in
+    ///
+    /// Tests pass their own root and keyring to keep away from the user's stored connections and passwords.
+    SharedDatabasePreferences(Preferences connectionsRoot, String sharedDatabaseID, Callable<Keyring> keyringFactory) {
         this.connectionsRoot = connectionsRoot;
         internalPrefs = connectionsRoot.node(sharedDatabaseID);
         keyringAccount = sharedDatabaseID;
+        this.keyringFactory = keyringFactory;
     }
 
     public Optional<String> getType() {
@@ -80,7 +87,7 @@ public class SharedDatabasePreferences {
 
     /// @return the plain password from the system keyring; empty if none is stored or the keyring is unavailable
     public Optional<String> getPassword() {
-        try (Keyring keyring = Keyring.create()) {
+        try (Keyring keyring = keyringFactory.call()) {
             return Optional.of(keyring.getPassword(KEYRING_SERVICE, keyringAccount)).filter(StringUtil::isNotBlank);
         } catch (PasswordAccessException _) {
             return migrateLegacyPassword();
@@ -146,7 +153,7 @@ public class SharedDatabasePreferences {
     ///
     /// @return whether the keyring operation succeeded
     public boolean setPassword(String password) {
-        try (Keyring keyring = Keyring.create()) {
+        try (Keyring keyring = keyringFactory.call()) {
             if (StringUtil.isBlank(password)) {
                 try {
                     keyring.deletePassword(KEYRING_SERVICE, keyringAccount);
@@ -214,13 +221,8 @@ public class SharedDatabasePreferences {
     /// @throws BackingStoreException if the settings could not be removed
     public boolean remove() throws BackingStoreException {
         boolean passwordCleared = setPassword("");
-        removeSettings();
-        return passwordCleared;
-    }
-
-    /// Removes the settings only, leaving the system keyring untouched.
-    void removeSettings() throws BackingStoreException {
         internalPrefs.removeNode();
+        return passwordCleared;
     }
 
     private boolean hasConnection() {
@@ -262,17 +264,33 @@ public class SharedDatabasePreferences {
             return false;
         }
         if (isUseExpertMode()) {
-            return getJdbcUrl().orElse("").strip().equals(jdbcUrl.strip());
+            return reachesSameDatabase(getJdbcUrl().orElse(""), jdbcUrl);
         }
         return getHost().orElse("").equalsIgnoreCase(host)
                 && getPort().orElse("").equals(port)
                 && getName().orElse("").equals(database);
     }
 
-    /// The text the connection is listed with in the login dialog.
+    /// Compares the server, port, and database a JDBC URL leads to, so that spellings such as an explicit default
+    /// port count as the same database. Text that is not a PostgreSQL URL is compared as written.
+    private static boolean reachesSameDatabase(String jdbcUrl, String otherJdbcUrl) {
+        Optional<DBMSConnectionUrl> parsed = DBMSConnectionUrl.parse(jdbcUrl);
+        Optional<DBMSConnectionUrl> otherParsed = DBMSConnectionUrl.parse(otherJdbcUrl);
+        if (parsed.isEmpty() || otherParsed.isEmpty()) {
+            return jdbcUrl.strip().equals(otherJdbcUrl.strip());
+        }
+        DBMSConnectionUrl url = parsed.get();
+        DBMSConnectionUrl otherUrl = otherParsed.get();
+        return url.host().equalsIgnoreCase(otherUrl.host())
+                && (url.port() == otherUrl.port())
+                && url.database().equals(otherUrl.database());
+    }
+
+    /// The text the connection is listed with in the login dialog. It names the user, which is part of what
+    /// identifies a stored connection.
     public String getDisplayLabel() {
         if (isUseExpertMode()) {
-            return getJdbcUrl().orElse(keyringAccount);
+            return "%s (%s)".formatted(getJdbcUrl().orElse(keyringAccount), getUser().orElse(""));
         }
         return "%s@%s:%s/%s".formatted(
                 getUser().orElse(""),
@@ -283,7 +301,7 @@ public class SharedDatabasePreferences {
 
     /// @return the stored settings of the connection with the given identifier, in the same preferences tree
     public SharedDatabasePreferences forConnection(String sharedDatabaseID) {
-        return new SharedDatabasePreferences(connectionsRoot, sharedDatabaseID);
+        return new SharedDatabasePreferences(connectionsRoot, sharedDatabaseID, keyringFactory);
     }
 
     /// Finds the stored connection for a database that has been connected to before. Connecting to it again
@@ -342,8 +360,25 @@ public class SharedDatabasePreferences {
         return Optional.ofNullable(internalPrefs.get(key, null));
     }
 
-    public static void clearAll() throws BackingStoreException {
-        Preferences.userRoot().node(PREFERENCES_PATH_NAME).clear();
+    /// Removes every stored connection, passwords included, and clears the connection used last.
+    /// Used when all preferences are reset.
+    public void clearAllConnections() throws BackingStoreException {
+        for (String sharedDatabaseId : connectionsRoot.childrenNames()) {
+            if (!DEFAULT_NODE.equals(sharedDatabaseId)) {
+                forConnection(sharedDatabaseId).remove();
+            }
+        }
+        forConnection(DEFAULT_NODE).clear();
+    }
+
+    /// A live connection still holds the password the user typed, which must not reach the keyring when they opted
+    /// out. The choice made for this connection counts; the login dialog's last choice only applies to a connection
+    /// stored for the first time, so that saving one library cannot erase another library's password.
+    boolean shouldRememberPassword() {
+        if (internalPrefs.get(SHARED_DATABASE_REMEMBER_PASSWORD, null) != null) {
+            return getRememberPassword();
+        }
+        return forConnection(DEFAULT_NODE).getRememberPassword();
     }
 
     public void putAllDBMSConnectionProperties(DatabaseConnectionProperties properties) {
@@ -358,9 +393,7 @@ public class SharedDatabasePreferences {
         setExpertMode(properties.isUseExpertMode());
         setJdbcUrl(properties.getJdbcUrl());
 
-        // The login dialog's "Remember password" choice governs every node: a live connection still holds the
-        // password the user typed, which must not reach the keyring when they opted out
-        boolean rememberPassword = forConnection(DEFAULT_NODE).getRememberPassword();
+        boolean rememberPassword = shouldRememberPassword();
         setRememberPassword(rememberPassword);
         setPassword(rememberPassword ? properties.getPassword() : "");
     }

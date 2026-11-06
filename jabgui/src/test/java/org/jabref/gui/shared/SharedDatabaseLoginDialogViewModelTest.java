@@ -25,10 +25,12 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -97,6 +99,16 @@ class SharedDatabaseLoginDialogViewModelTest {
         assertEquals("localhost", viewModel.hostProperty().get());
     }
 
+    @Test
+    void selectingConnectionWithoutStoredPortUsesTheDefaultPort() {
+        viewModel.selectedSavedConnectionProperty().set(null);
+        viewModel.portProperty().set("6543");
+
+        viewModel.selectedSavedConnectionProperty().set(viewModel.getSavedConnections().getFirst());
+
+        assertEquals("5432", viewModel.portProperty().get());
+    }
+
     // [utest->req~shared-database.saved-connections-deletable~1]
     @Test
     void removingDeletesTheConnectionTogetherWithItsDuplicates() throws BackingStoreException {
@@ -123,6 +135,44 @@ class SharedDatabaseLoginDialogViewModelTest {
         assertNull(viewModel.selectedSavedConnectionProperty().get());
         assertEquals("", viewModel.hostProperty().get());
         assertEquals("", viewModel.userProperty().get());
+    }
+
+    @Test
+    void removingResetsTheConnectionOptions() {
+        viewModel.useSSLProperty().set(true);
+        viewModel.rememberPasswordProperty().set(true);
+        viewModel.autosaveProperty().set(true);
+        viewModel.folderProperty().set("/tmp/library.bib");
+
+        viewModel.removeSavedConnection();
+
+        assertEquals(List.of(false, false, false, ""), List.of(
+                viewModel.useSSLProperty().get(),
+                viewModel.rememberPasswordProperty().get(),
+                viewModel.autosaveProperty().get(),
+                viewModel.folderProperty().get()));
+    }
+
+    /// The settings of a removed node can no longer be read
+    @Test
+    void lastUsedConnectionIsComparedBeforeTheConnectionIsRemoved() throws BackingStoreException {
+        viewModel.removeSavedConnection();
+
+        InOrder inOrder = inOrder(lastUsedConnection, storedConnection);
+        inOrder.verify(lastUsedConnection).addressesSameDatabaseAs(storedConnection);
+        inOrder.verify(storedConnection).remove();
+    }
+
+    // [utest->req~shared-database.saved-connections-deletable~1]
+    @Test
+    void removingIsRefusedWhileTheReconnectOfTheConnectionFailed() throws BackingStoreException {
+        when(tabContainer.getUnconnectedSharedDatabaseIds()).thenReturn(List.of("stored"));
+
+        viewModel.removeSavedConnection();
+
+        verify(dialogService).showWarningDialogAndWait(anyString(), anyString());
+        verify(storedConnection, never()).remove();
+        assertEquals(1, viewModel.getSavedConnections().size());
     }
 
     // [utest->req~shared-database.saved-connections-deletable~1]

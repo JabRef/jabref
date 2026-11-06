@@ -9,18 +9,24 @@ import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
 import org.jabref.logic.shared.DBMSType;
 
+import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-/// Works on a node of its own, so neither the developer's stored connections nor the system keyring are touched.
+/// Works on a node and a keyring of its own, so neither the developer's stored connections nor their passwords are touched.
 class SharedDatabasePreferencesTest {
 
     private static final String ID = "stored";
     private static final String OTHER_ID = "other";
 
+    private final Keyring keyring = mock(Keyring.class);
     private Preferences connectionsRoot;
     private SharedDatabasePreferences preferences;
 
@@ -36,7 +42,7 @@ class SharedDatabasePreferencesTest {
     }
 
     private SharedDatabasePreferences storeFieldConnection(String id, String host, String port, String database, String user) {
-        SharedDatabasePreferences stored = new SharedDatabasePreferences(connectionsRoot, id);
+        SharedDatabasePreferences stored = new SharedDatabasePreferences(connectionsRoot, id, () -> keyring);
         stored.setType(DBMSType.POSTGRESQL.toString());
         stored.setHost(host);
         stored.setPort(port);
@@ -46,7 +52,7 @@ class SharedDatabasePreferencesTest {
     }
 
     private SharedDatabasePreferences storeExpertConnection(String id, String jdbcUrl) {
-        SharedDatabasePreferences stored = new SharedDatabasePreferences(connectionsRoot, id);
+        SharedDatabasePreferences stored = new SharedDatabasePreferences(connectionsRoot, id, () -> keyring);
         stored.setUser("alice");
         stored.setExpertMode(true);
         stored.setJdbcUrl(jdbcUrl);
@@ -78,14 +84,14 @@ class SharedDatabasePreferencesTest {
     // [utest->req~shared-database.saved-connections-offered~1]
     @Test
     void savedIdsContainStoredConnectionButNotTheLastUsedOne() {
-        new SharedDatabasePreferences(connectionsRoot, "default").setHost("localhost");
+        new SharedDatabasePreferences(connectionsRoot, "default", () -> keyring).setHost("localhost");
 
         assertEquals(List.of(ID), preferences.listSavedIds());
     }
 
     @Test
     void nodeWithoutConnectionIsNotListed() {
-        new SharedDatabasePreferences(connectionsRoot, OTHER_ID).getHost();
+        new SharedDatabasePreferences(connectionsRoot, OTHER_ID, () -> keyring).getHost();
 
         assertEquals(List.of(ID), preferences.listSavedIds());
     }
@@ -117,9 +123,17 @@ class SharedDatabasePreferencesTest {
     // [utest->req~shared-database.saved-connections-deletable~1]
     @Test
     void removedConnectionIsNotListed() throws BackingStoreException {
-        preferences.removeSettings();
+        preferences.remove();
 
         assertEquals(List.of(), preferences.listSavedIds());
+    }
+
+    // [utest->req~shared-database.saved-connections-deletable~1]
+    @Test
+    void removingConnectionDeletesItsPassword() throws BackingStoreException, PasswordAccessException {
+        preferences.remove();
+
+        verify(keyring).deletePassword("org.jabref.shareddatabase", ID);
     }
 
     // [utest->req~shared-database.saved-connections-unique~1]
@@ -166,7 +180,56 @@ class SharedDatabasePreferencesTest {
     }
 
     @Test
+    void expertModeConnectionIsFoundWhenTheDefaultPortIsWrittenOut() {
+        storeExpertConnection(OTHER_ID, "jdbc:postgresql://db.example.org/jabref");
+
+        assertEquals(Optional.of(OTHER_ID), preferences.findSavedId(expertConnectionProperties("jdbc:postgresql://DB.example.org:5432/jabref")));
+    }
+
+    @Test
+    void expertModeConnectionToAnotherDatabaseIsNotFound() {
+        storeExpertConnection(OTHER_ID, "jdbc:postgresql://db.example.org/jabref");
+
+        assertEquals(Optional.empty(), preferences.findSavedId(expertConnectionProperties("jdbc:postgresql://db.example.org/other")));
+    }
+
+    @Test
     void displayLabelShowsTheConnectionDetails() {
         assertEquals("alice@localhost:5432/jabref", preferences.getDisplayLabel());
+    }
+
+    @Test
+    void displayLabelOfExpertModeConnectionNamesTheUser() {
+        SharedDatabasePreferences expertPreferences = storeExpertConnection(OTHER_ID, "jdbc:postgresql://db.example.org/jabref");
+
+        assertEquals("jdbc:postgresql://db.example.org/jabref (alice)", expertPreferences.getDisplayLabel());
+    }
+
+    /// Saving one library must not erase the password of another library because of the dialog's last choice
+    @Test
+    void connectionKeepsItsOwnRememberPasswordChoice() {
+        preferences.setRememberPassword(true);
+        new SharedDatabasePreferences(connectionsRoot, "default", () -> keyring).setRememberPassword(false);
+
+        assertTrue(preferences.shouldRememberPassword());
+    }
+
+    @Test
+    void newConnectionFollowsTheLastRememberPasswordChoice() {
+        new SharedDatabasePreferences(connectionsRoot, "default", () -> keyring).setRememberPassword(true);
+
+        assertTrue(preferences.shouldRememberPassword());
+    }
+
+    @Test
+    void clearingAllConnectionsRemovesEveryStoredConnection() throws BackingStoreException {
+        storeFieldConnection(OTHER_ID, "localhost", "5432", "other", "alice");
+        SharedDatabasePreferences lastUsed = new SharedDatabasePreferences(connectionsRoot, "default", () -> keyring);
+        lastUsed.setHost("localhost");
+
+        lastUsed.clearAllConnections();
+
+        assertEquals(List.of(), lastUsed.listSavedIds());
+        assertEquals(Optional.empty(), lastUsed.getHost());
     }
 }
