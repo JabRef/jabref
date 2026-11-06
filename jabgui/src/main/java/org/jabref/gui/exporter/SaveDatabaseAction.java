@@ -200,7 +200,7 @@ public class SaveDatabaseAction {
             String sharedDatabaseId = context.getDatabase().getSharedDatabaseID()
                                              .orElseGet(() -> context.getDatabase().generateSharedDatabaseID());
             preferences.getSharedDatabasePreferences().forConnection(sharedDatabaseId)
-                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+                       .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
         SaveResult saveResult = save(file, mode, mayAutoCommit);
