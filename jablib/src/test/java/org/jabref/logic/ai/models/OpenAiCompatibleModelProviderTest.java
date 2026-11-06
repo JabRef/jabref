@@ -33,6 +33,7 @@ class OpenAiCompatibleModelProviderTest {
     void doesNotSupportOtherProviders() {
         assertFalse(provider.supports(AiProvider.HUGGING_FACE));
         assertFalse(provider.supports(AiProvider.GEMINI));
+        assertFalse(provider.supports(AiProvider.DEBUG));
     }
 
     @Test
@@ -105,6 +106,8 @@ class OpenAiCompatibleModelProviderTest {
                 "Should not support HUGGING_FACE");
         assertFalse(provider.supports(AiProvider.GEMINI),
                 "Should not support GEMINI");
+        assertFalse(provider.supports(AiProvider.DEBUG),
+                "Should not support DEBUG");
     }
 
     @Test

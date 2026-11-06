@@ -179,7 +179,7 @@ public class JabRefFrameViewModel {
             return false;
         }
 
-        new SharedDatabaseSessionService().persistConnections(sharedDatabases);
+        new SharedDatabaseSessionService(preferences.getSharedDatabasePreferences()).persistConnections(sharedDatabases);
         // Shared databases still loading or failed to reconnect have no library tab, but their connection settings are
         // still stored and must stay in the list so that the next start tries them again.
         List<String> sharedDatabaseIds = Stream.of(sharedDatabases.keySet(), loadingSharedDatabaseIds, unconnectedSharedDatabaseIds)

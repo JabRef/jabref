@@ -254,6 +254,30 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
     protected void customizeTag(Label tagLabel, Keyword tag) {
     }
 
+    /// While the [#tagsField] has no width yet, GemsFX's `FlowPane` puts every tag on its own row,
+    /// so the first layout pass would reserve one row per tag. The height then drops once the real width is known,
+    /// which makes the editor flicker. Until the field has a width, report the height of a single row instead.
+    /// Both the minimum and the preferred height are overridden because the grid uses the larger of the two.
+    private double singleRowHeight() {
+        return snappedTopInset() + tagsField.prefHeight(-1) + snappedBottomInset();
+    }
+
+    @Override
+    protected double computeMinHeight(double width) {
+        if (tagsField.getWidth() <= 0) {
+            return singleRowHeight();
+        }
+        return super.computeMinHeight(width);
+    }
+
+    @Override
+    protected double computePrefHeight(double width) {
+        if (tagsField.getWidth() <= 0) {
+            return singleRowHeight();
+        }
+        return super.computePrefHeight(width);
+    }
+
     @Override
     public Parent getNode() {
         return this;
