@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -205,7 +206,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
         JSONArray pubTypes = result.getJSONObject("pubTypeList").getJSONArray("pubType");
         List<String> types = new ArrayList<>();
         for (int i = 0; i < pubTypes.length(); i++) {
-            types.add(pubTypes.optString(i, "").toLowerCase());
+            types.add(pubTypes.optString(i, "").toLowerCase(Locale.ROOT));
         }
         if (matchesAny(types, "book chapter") || matchesAny(types, "chapter")) {
             return StandardEntryType.InCollection;
@@ -240,8 +241,8 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
             // First pass: prefer open/free PDF
             for (int i = 0; i < urls.length(); i++) {
                 JSONObject urlEntry = urls.getJSONObject(i);
-                String style = urlEntry.optString("documentStyle", "").toLowerCase();
-                String availability = urlEntry.optString("availability", "").toLowerCase();
+                String style = urlEntry.optString("documentStyle", "").toLowerCase(Locale.ROOT);
+                String availability = urlEntry.optString("availability", "").toLowerCase(Locale.ROOT);
                 String url = urlEntry.optString("url", "");
                 if (url == null || url.isBlank()) {
                     continue;
@@ -253,7 +254,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParser
             // Second pass: any PDF
             for (int i = 0; i < urls.length(); i++) {
                 JSONObject urlEntry = urls.getJSONObject(i);
-                String style = urlEntry.optString("documentStyle", "").toLowerCase();
+                String style = urlEntry.optString("documentStyle", "").toLowerCase(Locale.ROOT);
                 String url = urlEntry.optString("url", "");
                 if (url == null || url.isBlank()) {
                     continue;

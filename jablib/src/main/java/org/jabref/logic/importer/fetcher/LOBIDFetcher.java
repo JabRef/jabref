@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -119,10 +120,10 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
             entry.setField(StandardField.TYPE, types);
         }
 
-        if (types.toLowerCase().contains("book")) {
+        if (types.toLowerCase(Locale.ROOT).contains("book")) {
             entryType = StandardEntryType.Book;
             nametype = StandardField.BOOKTITLE;
-        } else if (types.toLowerCase().contains("article")) {
+        } else if (types.toLowerCase(Locale.ROOT).contains("article")) {
             entryType = StandardEntryType.Article;
         }
         entry.setType(entryType);
