@@ -1,15 +1,10 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.function.Consumer;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.control.TabPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -24,12 +19,12 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
@@ -40,7 +35,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -69,44 +63,12 @@ class CitationRelationsTabTest {
     private CitationRelationsTab tab;
     private BibDatabaseContext databaseContext;
 
-    private static class IsolatingTaskExecutor extends CurrentThreadTaskExecutor {
-        @Override
-        @SuppressWarnings("unchecked")
-        public <V> Future<V> execute(BackgroundTask<V> task) {
-            Runnable onRunning = task.getOnRunning();
-            if (onRunning != null) {
-                onRunning.run();
-            }
-            try {
-                V result;
-                if (task.getClass().getGenericSuperclass() instanceof ParameterizedType type
-                        && type.getActualTypeArguments().length > 0
-                        && TalliesResponse.class.equals(type.getActualTypeArguments()[0])) {
-                    result = (V) new TalliesResponse("", 0, 0, 0, 0, 0, 0);
-                } else {
-                    result = task.call();
-                }
-                Consumer<V> onSuccess = task.getOnSuccess();
-                if (onSuccess != null && !task.isCancelled()) {
-                    onSuccess.accept(result);
-                }
-                return CompletableFuture.completedFuture(result);
-            } catch (Exception exception) {
-                Consumer<Exception> onException = task.getOnException();
-                if (onException != null && !task.isCancelled()) {
-                    onException.accept(exception);
-                }
-                return CompletableFuture.failedFuture(exception);
-            }
-        }
-    }
-
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws FetcherException {
         preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
         searchService = mock(SearchCitationsRelationsService.class);
-        taskExecutor = new IsolatingTaskExecutor();
+        taskExecutor = new CurrentThreadTaskExecutor();
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -163,7 +125,7 @@ class CitationRelationsTabTest {
     }
 
     @Test
-    void switchingToTabRefreshesWhenDoiChanged() throws Exception {
+    void switchingToTabRefreshesWhenDoiChanged() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.DOI, "10.1145/782941.782993");
 
@@ -186,25 +148,6 @@ class CitationRelationsTabTest {
         // Clearing DOI should not trigger citation search
         entry.clearField(StandardField.DOI);
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
-        verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
-    }
-
-    @Test
-    void changingDoiWhileTabSelectedTriggersRefresh() throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.DOI, "10.1145/782941.782993");
-
-        JavaFxExtension.invokeAndWait(() -> {
-            TabPane tabPane = new TabPane(tab);
-            tabPane.getSelectionModel().select(tab);
-            tab.currentEntryProperty().set(entry);
-            tab.notifyAboutFocus(entry);
-        });
-
-        verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
-
-        // Modifying DOI while selected should reactively trigger search
-        JavaFxExtension.invokeAndWait(() -> entry.setField(StandardField.DOI, "10.1038/35057062"));
         verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
     }
 }

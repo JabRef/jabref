@@ -95,7 +95,6 @@ import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import org.controlsfx.control.CheckListView;
 import org.jspecify.annotations.Nullable;
@@ -125,8 +124,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private @Nullable CitationComponents currentCitingComponents;
     private @Nullable CitationComponents currentCitedByComponents;
     private Optional<DOI> lastSearchedDoi = Optional.empty();
-    private @Nullable Subscription doiSubscription;
-    private boolean isLookingUpDoi = false;
 
     private boolean shouldClearSelectionOnDrop = false;
 
@@ -211,7 +208,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void onDoiLookUpError() {
-        isLookingUpDoi = false;
         onDoiMissing();
     }
 
@@ -251,7 +247,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void onDoiMissing() {
-        isLookingUpDoi = false;
         resetEmptyPanels();
         sciteResultsPane.getChildren().clear();
 
@@ -285,9 +280,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             setLabelOn(currentCitedByComponents.listView(), Localization.lang("Looking up DOI..."));
         }
 
-        isLookingUpDoi = true;
         citationsRelationsTabViewModel.lookUpDoi(entry, () -> {
-            isLookingUpDoi = false;
             if (getCurrentEntry() == entry) {
                 refreshCurrentEntryAfterDoiLookup(entry);
             }
@@ -307,7 +300,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void refreshForDoiChange(BibEntry entry, boolean bypassCache) {
-        isLookingUpDoi = false;
         lastSearchedDoi = entry.getDOI();
         if (currentCitingComponents == null
                 || currentCitedByComponents == null
@@ -822,14 +814,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        isLookingUpDoi = false;
-        Optional.ofNullable(doiSubscription).ifPresent(Subscription::unsubscribe);
         lastSearchedDoi = entry.getDOI();
-        doiSubscription = EasyBind.subscribe(entry.getFieldBinding(StandardField.DOI), _ -> {
-            if (isSelected() && !isLookingUpDoi) {
-                refreshIfDoiChanged(entry);
-            }
-        });
 
         citationsRelationsTabViewModel.updateForEntry(entry);
 
@@ -851,14 +836,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         Optional.ofNullable(getCurrentEntry()).ifPresent(this::refreshIfDoiChanged);
     }
 
-    @Override
-    protected void dispose() {
-        isLookingUpDoi = false;
-        Optional.ofNullable(doiSubscription).ifPresent(Subscription::unsubscribe);
-        doiSubscription = null;
-        super.dispose();
-    }
-
     private void searchForRelations(CitationComponents citationComponents,
                                     CitationComponents otherCitationComponents,
                                     boolean bypassCache) {
@@ -871,7 +848,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private void setUpEmptyPanel(CitationComponents citationComponents,
                                  CitationComponents otherCitationComponents) {
-        hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
+        hideNodes(citationComponents.abortButton(), citationComponents.progress());
         showNodes(citationComponents.refreshButton());
 
         HBox hBox = new HBox(4);
