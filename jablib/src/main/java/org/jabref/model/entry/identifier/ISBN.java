@@ -9,10 +9,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -81,12 +79,13 @@ public class ISBN implements Identifier {
     }
 
     private static Optional<ISBN> selectSingleBook(List<ISBN> candidates) {
-        Set<ISBN> isbn13s = candidates.stream()
-                                      .map(ISBN::asIsbn13)
-                                      .flatMap(Optional::stream)
-                                      .collect(Collectors.toSet());
+        List<ISBN> isbn13s = candidates.stream()
+                                       .map(ISBN::asIsbn13)
+                                       .flatMap(Optional::stream)
+                                       .distinct()
+                                       .toList();
         if (isbn13s.size() == 1) {
-            return Optional.of(isbn13s.iterator().next());
+            return Optional.of(isbn13s.getFirst());
         }
         return Optional.empty();
     }
