@@ -27,9 +27,9 @@ public class GroupsFactory {
             SpecialField.READ_STATUS);
 
     // The colors of the flag and eye icons in the entry table, because the group tree paints an icon in the color of its group
-    private static final String RED = "#ff0000";
-    private static final String ORANGE = "#ffa500";
     private static final String GREEN = "#6fcc75";
+    private static final String ORANGE = "#ffa500";
+    private static final String RED = "#ff0000";
 
     private GroupsFactory() {
     }
