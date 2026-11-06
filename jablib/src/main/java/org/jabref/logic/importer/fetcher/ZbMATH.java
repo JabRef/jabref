@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -467,7 +468,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         String normalizedTitle = StringUtil.stripAccents(title);
         normalizedTitle = NON_ALNUM_OR_SPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
         normalizedTitle = WHITESPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
-        return normalizedTitle.trim().toLowerCase();
+        return normalizedTitle.trim().toLowerCase(Locale.ROOT);
     }
 
     private record ScoredEntry(BibEntry entry, double score) {
