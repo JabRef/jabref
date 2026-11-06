@@ -42,13 +42,13 @@ public class MultiMergeFieldRow {
     private EasyObservableValue<String> fieldBinding;
 
     public MultiMergeFieldRow(Field field,
-                             int rowIndex,
-                             MultiMergeEntriesViewModel viewModel,
-                             ToggleGroup headerToggleGroup,
-                             VBox fieldHeader,
-                             VBox fieldEditor,
-                             GridPane optionsGrid,
-                             GuiPreferences preferences) {
+                              int rowIndex,
+                              MultiMergeEntriesViewModel viewModel,
+                              ToggleGroup headerToggleGroup,
+                              VBox fieldHeader,
+                              VBox fieldEditor,
+                              GridPane optionsGrid,
+                              GuiPreferences preferences) {
         this.field = field;
         this.rowIndex = rowIndex;
 

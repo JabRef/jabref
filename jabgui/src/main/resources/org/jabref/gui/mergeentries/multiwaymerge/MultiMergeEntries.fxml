@@ -21,7 +21,7 @@
     <content>
         <VBox spacing="0">
             <ToolBar styleClass="merge-toolbox" prefHeight="42.0" minHeight="42.0">
-                <Label text="%Show diff:"/>
+                <Label text="%Show diff"/>
                 <ComboBox fx:id="diffMode" prefHeight="30.0" prefWidth="150.0"/>
                 <Separator orientation="VERTICAL"/>
                 <Label fx:id="failedSuppliers" styleClass="failed-suppliers-label"/>
