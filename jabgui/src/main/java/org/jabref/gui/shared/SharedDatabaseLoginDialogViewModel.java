@@ -5,6 +5,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.prefs.BackingStoreException;
 
@@ -37,7 +38,6 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
 import org.jabref.logic.shared.DBMSConnectionUrl;
@@ -74,7 +74,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty folder = new SimpleStringProperty("");
     private final BooleanProperty autosave = new SimpleBooleanProperty();
     private final BooleanProperty rememberPassword = new SimpleBooleanProperty();
-    private final boolean keyringAvailable = OS.isKeyringAvailable();
+    private final boolean keyringAvailable;
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final BooleanProperty expertMode = new SimpleBooleanProperty();
     private final StringProperty jdbcUrl = new SimpleStringProperty("");
@@ -87,9 +87,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final AiService aiService;
-    private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
+    /// The connection used last; the other stored connections are reached through it
+    private final SharedDatabasePreferences sharedDatabasePreferences;
     /// The connection whose settings fill the form; a password read later only applies while it still does
-    private SharedDatabasePreferences appliedPreferences = sharedDatabasePreferences;
+    private SharedDatabasePreferences appliedPreferences;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -110,6 +111,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               GuiPreferences preferences,
+                                              SharedDatabasePreferences sharedDatabasePreferences,
+                                              BooleanSupplier keyringAvailability,
                                               AiService aiService,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
@@ -121,6 +124,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.sharedDatabasePreferences = sharedDatabasePreferences;
+        this.appliedPreferences = sharedDatabasePreferences;
+        this.keyringAvailable = keyringAvailability.getAsBoolean();
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
@@ -173,7 +179,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         formValidator = new CompositeValidator();
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, folderValidator, connectionUrlValidator, jdbcUrlValidator);
 
-        savedConnections.setAll(SharedDatabasePreferences.listSavedIds().stream().map(SavedConnection::of).toList());
+        savedConnections.setAll(sharedDatabasePreferences.listSavedIds().stream().map(this::toSavedConnection).toList());
         applyPreferences(sharedDatabasePreferences);
 
         EasyBind.subscribe(selectedSavedConnection, selected -> {
@@ -312,10 +318,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         // A database already stored keeps its identifier, otherwise the list would grow an
         // indistinguishable second entry on every reconnect. Quit and "Save as" reuse it too.
         String sharedDatabaseId = bibDatabaseContext.getDatabase().getSharedDatabaseID()
-                                                    .or(() -> SharedDatabasePreferences.findSavedId(connectionProperties))
+                                                    .or(() -> sharedDatabasePreferences.findSavedId(connectionProperties))
                                                     .orElseGet(() -> bibDatabaseContext.getDatabase().generateSharedDatabaseID());
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseId);
-        setPreferences(new SharedDatabasePreferences(sharedDatabaseId), connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
+        setPreferences(sharedDatabasePreferences.forConnection(sharedDatabaseId), connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
         if (!autosavePath.isEmpty() && shouldAutosave) {
             try {
                 new SaveDatabaseAction(
@@ -431,7 +437,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private void applySavedConnection(SavedConnection savedConnection) {
         // A half-typed URL would keep failing validation and disable "Connect" although the fields are complete
         connectionUrl.set("");
-        applyPreferences(new SharedDatabasePreferences(savedConnection.id()));
+        applyPreferences(sharedDatabasePreferences.forConnection(savedConnection.id()));
     }
 
     // [impl->req~shared-database.saved-connections-deletable~1]
@@ -440,7 +446,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         if (savedConnection == null) {
             return;
         }
-        SharedDatabasePreferences savedPreferences = new SharedDatabasePreferences(savedConnection.id());
+        SharedDatabasePreferences savedPreferences = sharedDatabasePreferences.forConnection(savedConnection.id());
         // Duplicates stored before connections were reused are listed as this one entry, so they go along with it
         List<String> removedIds = savedPreferences.listIdsOfSameDatabase();
         if (isOpen(removedIds)) {
@@ -452,7 +458,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         boolean passwordCleared = true;
         for (String removedId : removedIds) {
             try {
-                passwordCleared &= new SharedDatabasePreferences(removedId).remove();
+                passwordCleared &= sharedDatabasePreferences.forConnection(removedId).remove();
             } catch (BackingStoreException e) {
                 LOGGER.warn("Could not remove the stored shared database connection {}", removedId, e);
                 // The connection stays in the list: hiding an entry that is still stored would offer it again on the next start
@@ -497,12 +503,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         expertMode.set(false);
     }
 
+    private SavedConnection toSavedConnection(String sharedDatabaseId) {
+        return new SavedConnection(sharedDatabaseId, sharedDatabasePreferences.forConnection(sharedDatabaseId).getDisplayLabel());
+    }
+
     /// A stored connection as shown in the "Saved connections" list
     @NullMarked
     public record SavedConnection(String id, String label) {
-        static SavedConnection of(String id) {
-            return new SavedConnection(id, new SharedDatabasePreferences(id).getDisplayLabel());
-        }
     }
 
     public void showSaveDbToFileDialog() {

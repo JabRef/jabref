@@ -45,12 +45,9 @@ public class SharedDatabasePreferences {
     private final Preferences internalPrefs;
     private final String keyringAccount;
 
+    /// Opens the connection used last; reach the other stored connections through [#forConnection(String)].
     public SharedDatabasePreferences() {
-        this(DEFAULT_NODE);
-    }
-
-    public SharedDatabasePreferences(String sharedDatabaseID) {
-        this(Preferences.userRoot().node(PREFERENCES_PATH_NAME), sharedDatabaseID);
+        this(Preferences.userRoot().node(PREFERENCES_PATH_NAME), DEFAULT_NODE);
     }
 
     /// @param connectionsRoot the node holding one child node per stored connection; tests pass their own to keep
@@ -284,19 +281,20 @@ public class SharedDatabasePreferences {
                 getName().orElse(""));
     }
 
+    /// @return the stored settings of the connection with the given identifier, in the same preferences tree
+    public SharedDatabasePreferences forConnection(String sharedDatabaseID) {
+        return new SharedDatabasePreferences(connectionsRoot, sharedDatabaseID);
+    }
+
     /// Finds the stored connection for a database that has been connected to before. Connecting to it again
     /// updates that connection instead of adding a second, indistinguishable one to the list.
     ///
     /// @return the identifier the connection is stored under, empty if the database is not stored yet
-    public static Optional<String> findSavedId(DatabaseConnectionProperties properties) {
-        return findSavedId(Preferences.userRoot().node(PREFERENCES_PATH_NAME), properties);
-    }
-
     // [impl->req~shared-database.saved-connections-unique~1]
-    static Optional<String> findSavedId(Preferences connectionsRoot, DatabaseConnectionProperties properties) {
-        return listSavedIds(connectionsRoot).stream()
-                                            .filter(sharedDatabaseId -> new SharedDatabasePreferences(connectionsRoot, sharedDatabaseId).addresses(properties))
-                                            .findFirst();
+    public Optional<String> findSavedId(DatabaseConnectionProperties properties) {
+        return listSavedIds().stream()
+                             .filter(sharedDatabaseId -> forConnection(sharedDatabaseId).addresses(properties))
+                             .findFirst();
     }
 
     /// Before connections were reused, every save stored the same database under a new identifier. Such duplicates
@@ -307,15 +305,11 @@ public class SharedDatabasePreferences {
     /// reconnect entry, a library file from another computer) creates an empty node.
     ///
     /// @return the identifiers of all stored connections, without the "last used" default node
-    public static List<String> listSavedIds() {
-        return listSavedIds(Preferences.userRoot().node(PREFERENCES_PATH_NAME));
-    }
-
     // [impl->req~shared-database.saved-connections-offered~1]
     // [impl->req~shared-database.saved-connections-unique~1]
-    static List<String> listSavedIds(Preferences connectionsRoot) {
+    public List<String> listSavedIds() {
         List<SharedDatabasePreferences> listed = new ArrayList<>();
-        for (SharedDatabasePreferences stored : listStoredConnections(connectionsRoot)) {
+        for (SharedDatabasePreferences stored : listStoredConnections()) {
             if (listed.stream().noneMatch(stored::addressesSameDatabaseAs)) {
                 listed.add(stored);
             }
@@ -325,17 +319,17 @@ public class SharedDatabasePreferences {
 
     /// @return the identifiers of all stored connections to the same database as this one, this one included
     public List<String> listIdsOfSameDatabase() {
-        return listStoredConnections(connectionsRoot).stream()
-                                                     .filter(this::addressesSameDatabaseAs)
-                                                     .map(stored -> stored.keyringAccount)
-                                                     .toList();
+        return listStoredConnections().stream()
+                                      .filter(this::addressesSameDatabaseAs)
+                                      .map(stored -> stored.keyringAccount)
+                                      .toList();
     }
 
-    private static List<SharedDatabasePreferences> listStoredConnections(Preferences connectionsRoot) {
+    private List<SharedDatabasePreferences> listStoredConnections() {
         try {
             return Arrays.stream(connectionsRoot.childrenNames())
                          .filter(id -> !DEFAULT_NODE.equals(id))
-                         .map(id -> new SharedDatabasePreferences(connectionsRoot, id))
+                         .map(this::forConnection)
                          .filter(SharedDatabasePreferences::hasConnection)
                          .toList();
         } catch (BackingStoreException e) {
@@ -366,7 +360,7 @@ public class SharedDatabasePreferences {
 
         // The login dialog's "Remember password" choice governs every node: a live connection still holds the
         // password the user typed, which must not reach the keyring when they opted out
-        boolean rememberPassword = new SharedDatabasePreferences().getRememberPassword();
+        boolean rememberPassword = forConnection(DEFAULT_NODE).getRememberPassword();
         setRememberPassword(rememberPassword);
         setPassword(rememberPassword ? properties.getPassword() : "");
     }

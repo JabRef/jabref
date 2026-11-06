@@ -80,21 +80,21 @@ class SharedDatabasePreferencesTest {
     void savedIdsContainStoredConnectionButNotTheLastUsedOne() {
         new SharedDatabasePreferences(connectionsRoot, "default").setHost("localhost");
 
-        assertEquals(List.of(ID), SharedDatabasePreferences.listSavedIds(connectionsRoot));
+        assertEquals(List.of(ID), preferences.listSavedIds());
     }
 
     @Test
     void nodeWithoutConnectionIsNotListed() {
         new SharedDatabasePreferences(connectionsRoot, OTHER_ID).getHost();
 
-        assertEquals(List.of(ID), SharedDatabasePreferences.listSavedIds(connectionsRoot));
+        assertEquals(List.of(ID), preferences.listSavedIds());
     }
 
     @Test
     void expertModeConnectionIsListed() {
         storeExpertConnection(OTHER_ID, "jdbc:postgresql://localhost:5432/jabref");
 
-        assertEquals(List.of(OTHER_ID, ID), SharedDatabasePreferences.listSavedIds(connectionsRoot).stream().sorted().toList());
+        assertEquals(List.of(OTHER_ID, ID), preferences.listSavedIds().stream().sorted().toList());
     }
 
     // [utest->req~shared-database.saved-connections-unique~1]
@@ -102,7 +102,7 @@ class SharedDatabasePreferencesTest {
     void duplicateOfTheSameDatabaseIsListedOnce() {
         storeFieldConnection(OTHER_ID, "LOCALHOST", "5432", "jabref", "alice");
 
-        assertEquals(1, SharedDatabasePreferences.listSavedIds(connectionsRoot).size());
+        assertEquals(1, preferences.listSavedIds().size());
     }
 
     // [utest->req~shared-database.saved-connections-deletable~1]
@@ -119,13 +119,13 @@ class SharedDatabasePreferencesTest {
     void removedConnectionIsNotListed() throws BackingStoreException {
         preferences.removeSettings();
 
-        assertEquals(List.of(), SharedDatabasePreferences.listSavedIds(connectionsRoot));
+        assertEquals(List.of(), preferences.listSavedIds());
     }
 
     // [utest->req~shared-database.saved-connections-unique~1]
     @Test
     void connectionOfTheStoredDatabaseIsFound() {
-        assertEquals(Optional.of(ID), SharedDatabasePreferences.findSavedId(connectionsRoot, connectionProperties("localhost", 5432, "jabref", "alice")));
+        assertEquals(Optional.of(ID), preferences.findSavedId(connectionProperties("localhost", 5432, "jabref", "alice")));
     }
 
     /// The dialog sets driver options the stored connection does not carry; they must not make the database look new.
@@ -133,36 +133,36 @@ class SharedDatabasePreferencesTest {
     void connectionIsFoundAlthoughDriverOptionsDiffer() {
         preferences.setUseSSL(true);
 
-        assertEquals(Optional.of(ID), SharedDatabasePreferences.findSavedId(connectionsRoot, connectionProperties("LOCALHOST", 5432, "jabref", "alice")));
+        assertEquals(Optional.of(ID), preferences.findSavedId(connectionProperties("LOCALHOST", 5432, "jabref", "alice")));
     }
 
     @Test
     void connectionOnAnotherPortIsNotFound() {
-        assertEquals(Optional.empty(), SharedDatabasePreferences.findSavedId(connectionsRoot, connectionProperties("localhost", 5433, "jabref", "alice")));
+        assertEquals(Optional.empty(), preferences.findSavedId(connectionProperties("localhost", 5433, "jabref", "alice")));
     }
 
     @Test
     void connectionOfAnotherDatabaseOnTheSameServerIsNotFound() {
-        assertEquals(Optional.empty(), SharedDatabasePreferences.findSavedId(connectionsRoot, connectionProperties("localhost", 5432, "other", "alice")));
+        assertEquals(Optional.empty(), preferences.findSavedId(connectionProperties("localhost", 5432, "other", "alice")));
     }
 
     @Test
     void connectionOfAnotherUserIsNotFound() {
-        assertEquals(Optional.empty(), SharedDatabasePreferences.findSavedId(connectionsRoot, connectionProperties("localhost", 5432, "jabref", "bob")));
+        assertEquals(Optional.empty(), preferences.findSavedId(connectionProperties("localhost", 5432, "jabref", "bob")));
     }
 
     @Test
     void expertModeConnectionIsFoundIgnoringSurroundingWhitespace() {
         storeExpertConnection(OTHER_ID, "jdbc:postgresql://db.example.org:5432/jabref ");
 
-        assertEquals(Optional.of(OTHER_ID), SharedDatabasePreferences.findSavedId(connectionsRoot, expertConnectionProperties("jdbc:postgresql://db.example.org:5432/jabref")));
+        assertEquals(Optional.of(OTHER_ID), preferences.findSavedId(expertConnectionProperties("jdbc:postgresql://db.example.org:5432/jabref")));
     }
 
     @Test
     void expertModeConnectionIsNotConfusedWithTheSameDatabaseEnteredAsFields() {
         storeExpertConnection(OTHER_ID, "jdbc:postgresql://localhost:5432/jabref");
 
-        assertEquals(Optional.of(ID), SharedDatabasePreferences.findSavedId(connectionsRoot, connectionProperties("localhost", 5432, "jabref", "alice")));
+        assertEquals(Optional.of(ID), preferences.findSavedId(connectionProperties("localhost", 5432, "jabref", "alice")));
     }
 
     @Test

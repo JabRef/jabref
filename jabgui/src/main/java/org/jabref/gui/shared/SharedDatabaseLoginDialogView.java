@@ -28,6 +28,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -114,6 +115,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 tabContainer,
                 dialogService,
                 preferences,
+                preferences.getSharedDatabasePreferences(),
+                OS::isKeyringAvailable,
                 aiService,
                 stateManager,
                 entryTypesManager,

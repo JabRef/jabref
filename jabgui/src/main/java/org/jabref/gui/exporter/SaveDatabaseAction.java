@@ -43,7 +43,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileSnapshot;
@@ -200,7 +199,7 @@ public class SaveDatabaseAction {
             // stored under the old ID and leave them behind as a second saved connection.
             String sharedDatabaseId = context.getDatabase().getSharedDatabaseID()
                                              .orElseGet(() -> context.getDatabase().generateSharedDatabaseID());
-            new SharedDatabasePreferences(sharedDatabaseId)
+            preferences.getSharedDatabasePreferences().forConnection(sharedDatabaseId)
                     .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
