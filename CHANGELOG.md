@@ -64,6 +64,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed the linked file tooltip showing the old file name after renaming or moving the file. [#9277](https://github.com/JabRef/jabref/issues/9277)
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
+- We fixed arXiv fallback title matching on systems using Turkish or Azerbaijani language settings. [#17652](https://github.com/JabRef/jabref/pull/17652)
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
 - We fixed the import dialog to remember its download choice independently of the web search preference. [#16332](https://github.com/JabRef/jabref/issues/16332)
 - We fixed an issue where the same shared database could be opened in a second tab. [#16967](https://github.com/JabRef/jabref/pull/16967)
@@ -118,6 +119,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
+- We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
 - We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
 
 ### Removed
