@@ -208,7 +208,7 @@ public class ExportService {
             String extension = exporter.getFileType().getExtensions().getFirst();
             temporaryOutput = Files.createTempFile("jabkit-", "." + extension);
             JournalAbbreviationRepository abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-            exporter.export(databaseContext, temporaryOutput, entries, fileDirForDatabase, abbreviationRepository);
+            exporter.exportToStandardOutput(databaseContext, temporaryOutput, entries, fileDirForDatabase, abbreviationRepository);
             Files.copy(temporaryOutput, System.out);
             System.out.flush();
         } catch (IOException | SaveException | ParserConfigurationException | TransformerException ex) {
