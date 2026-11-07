@@ -20,6 +20,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
@@ -103,6 +104,17 @@ public class DuplicateCheck {
         return editionOne.isPresent() &&
                 editionTwo.isPresent() &&
                 !editionOne.get().equals(editionTwo.get());
+    }
+
+    private static boolean haveDifferentDoisAndPublicationYears(BibEntry one, BibEntry two) {
+        boolean differentDois = one.getDOI().filter(doi -> !doi.isShortDoi())
+                                   .flatMap(doi -> two.getDOI().filter(other -> !other.isShortDoi())
+                                                      .map(other -> !doi.equals(other)))
+                                   .orElse(false);
+        return differentDois && one.getPublicationDate().flatMap(Date::getYear)
+                                   .flatMap(year -> two.getPublicationDate().flatMap(Date::getYear)
+                                                       .map(other -> !year.equals(other)))
+                                   .orElse(false);
     }
 
     private static boolean haveDifferentChaptersOrPagesOfTheSameBook(final BibEntry one, final BibEntry two) {
@@ -315,6 +327,7 @@ public class DuplicateCheck {
         }
 
         if (!areCompatibleTypes(one, two) ||
+                haveDifferentDoisAndPublicationYears(one, two) ||
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;

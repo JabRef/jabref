@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -541,6 +542,61 @@ public class DuplicateCheckTest {
         unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.00X");
 
         assertFalse(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @ParameterizedTest
+    @EnumSource(BibDatabaseMode.class)
+    void annualReportsWithDifferentYearsAndDoisAreNotDuplicates(BibDatabaseMode mode) {
+        BibEntry firstReport = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("EDG2024dei")
+                .withField(StandardField.AUTHOR, "{European Commission. Directorate General for Communication.}")
+                .withField(StandardField.TITLE, "Die EU im Jahr 2023: Gesamtbericht über die Tätigkeit der Europäischen Union.")
+                .withField(StandardField.DATE, "2024")
+                .withField(StandardField.DOI, "10.2775/384133")
+                .withField(StandardField.LOCATION, "LU")
+                .withField(StandardField.PUBLISHER, "Publications Office");
+        BibEntry secondReport = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("EDG2025dei")
+                .withField(StandardField.AUTHOR, "{European Commission. Directorate General for Communication.}")
+                .withField(StandardField.TITLE, "Die EU im Jahr 2024: Gesamtbericht über die Tätigkeit der Europäischen Union.")
+                .withField(StandardField.DATE, "2025")
+                .withField(StandardField.DOI, "10.2775/1211145")
+                .withField(StandardField.LOCATION, "LU")
+                .withField(StandardField.PUBLISHER, "Publications Office");
+
+        assertAll(
+                () -> assertFalse(duplicateChecker.isDuplicate(firstReport, secondReport, mode)),
+                () -> assertFalse(duplicateChecker.isDuplicate(secondReport, firstReport, mode)));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            YEAR, 2024,       2025,       10.2775/384133, 10.2775/1211145,                 false
+            DATE, 2024-01-01, 2025-01-01, 10.2775/384133, 10.2775/1211145,                 false
+            DATE, 2024-01-01, 2024-12-31, 10.2775/384133, 10.2775/1211145,                 true
+            YEAR, 2024,       2025,       10.2775/384133, 10.2775/384133,                  true
+            YEAR, 2024,       2025,       10.2775/384133, https://doi.org/10.2775/384133,  true
+            YEAR, 2024,       2025,       10.2775/384133, 10/abcde,                        true
+            YEAR, 2024,       2025,       10.2775/384133, '',                              true
+            YEAR, 2024,       2025,       10.2775/384133, invalid,                         true
+            YEAR, 2024,       '',         10.2775/384133, 10.2775/1211145,                 true
+            YEAR, 2024,       invalid,    10.2775/384133, 10.2775/1211145,                 true
+            """)
+    void publicationYearAndDoiConflictsRequireBothValues(StandardField dateField, String firstYear, String secondYear, String firstDoi, String secondDoi, boolean expected) {
+        BibEntry first = getSimpleArticle()
+                .withField(StandardField.YEAR, "")
+                .withField(dateField, firstYear)
+                .withField(StandardField.DOI, firstDoi);
+        BibEntry second = getSimpleArticle()
+                .withField(StandardField.YEAR, "")
+                .withField(dateField, secondYear)
+                .withField(StandardField.DOI, secondDoi);
+
+        for (BibDatabaseMode mode : BibDatabaseMode.values()) {
+            assertAll(
+                    () -> assertEquals(expected, duplicateChecker.isDuplicate(first, second, mode)),
+                    () -> assertEquals(expected, duplicateChecker.isDuplicate(second, first, mode)));
+        }
     }
 
     @Test
