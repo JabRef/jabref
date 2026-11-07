@@ -23,7 +23,11 @@ case "$1" in
         for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json"\
                                      "/etc/chromium/native-messaging-hosts/org.jabref.jabref.json"\
                                      "/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json"\
-                                     "/etc/opt/edge/native-messaging-hosts/org.jabref.jabref.json"; do
+                                     "/etc/opt/edge/native-messaging-hosts/org.jabref.jabref.json"\
+                                     "/usr/lib/mozilla/native-messaging-hosts/jabext_bridge.json"\
+                                     "/etc/chromium/native-messaging-hosts/jabext_bridge.json"\
+                                     "/etc/opt/chrome/native-messaging-hosts/jabext_bridge.json"\
+                                     "/etc/opt/edge/native-messaging-hosts/jabext_bridge.json"; do
             if [ -e $NATIVE_MESSAGING_JSON ] && grep --quiet '"path": "/opt' $NATIVE_MESSAGING_JSON; then
                 rm -f $NATIVE_MESSAGING_JSON
             fi
