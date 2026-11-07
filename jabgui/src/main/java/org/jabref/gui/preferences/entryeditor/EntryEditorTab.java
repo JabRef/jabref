@@ -270,7 +270,9 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         TableColumn<String, String> patternColumn = new TableColumn<>(Localization.lang("Fields"));
         patternColumn.setSortable(false);
         patternColumn.setReorderable(false);
-        patternColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
+        // The items stay the stored patterns; only the shown text follows the entry editor's field labels.
+        patternColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(
+                EntryEditorTabModel.CustomizedFieldsTab.fieldDisplayName(cellData.getValue())));
 
         // [impl->req~entry-editor.custom-tabs.extract-field~1]
         TableColumn<String, String> extractColumn = new TableColumn<>(Localization.lang("Extract field"));
@@ -314,7 +316,8 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         actionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
         new ValueTableCellFactory<String, String>()
                 .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(pattern -> Localization.lang("Remove field %0 from currently selected tab", pattern))
+                .withTooltip(pattern -> Localization.lang("Remove field %0 from currently selected tab",
+                        EntryEditorTabModel.CustomizedFieldsTab.fieldDisplayName(pattern)))
                 .withOnMouseClickedEvent(pattern -> _ -> {
                     EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
                     if (tab != null) {
