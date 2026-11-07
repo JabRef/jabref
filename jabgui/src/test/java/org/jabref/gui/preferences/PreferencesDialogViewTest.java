@@ -57,7 +57,7 @@ class PreferencesDialogViewTest extends JavaFxTest {
         stage.setScene(new Scene(new StackPane(), 900, 600));
         stage.show();
         try (MockedConstruction<PreferencesDialogViewModel> ignored = mockConstruction(PreferencesDialogViewModel.class,
-                (viewModel, context) -> {
+                (viewModel, _) -> {
                     when(viewModel.getPreferenceTabs()).thenReturn(FXCollections.observableArrayList(firstTab, secondTab));
                     when(viewModel.getMemoryStickProperty()).thenReturn(new SimpleBooleanProperty());
                 })) {
