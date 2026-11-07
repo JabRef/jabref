@@ -269,33 +269,22 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     private Optional<BibEntry> extractBookMetadata(String pageText) {
-        Optional<String> citationBlock = BookCitationBlock.find(pageText);
-        if (citationBlock.isEmpty()) {
-            return Optional.empty();
-        }
-
-        String block = citationBlock.orElseThrow();
-        BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
-
-        BookTitleAuthorExtractor.findTitle(block)
-                                .ifPresent(title -> bookEntry.withField(StandardField.TITLE, title));
-        BookTitleAuthorExtractor.findAuthors(block)
-                                .ifPresent(authors -> {
-                                    String formattedAuthors = streamlineNames(authors);
-                                    bookEntry.withField(StandardField.AUTHOR, formattedAuthors);
+        return BookCitationBlock.find(pageText)
+                                .map(BookCitationParser::parse)
+                                .map(citation -> {
+                                    BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
+                                    citation.title().ifPresent(title -> bookEntry.withField(StandardField.TITLE, title));
+                                    citation.authors()
+                                            .map(this::streamlineNames)
+                                            .ifPresent(authors -> bookEntry.withField(StandardField.AUTHOR, authors));
+                                    citation.editors()
+                                            .map(this::streamlineNames)
+                                            .ifPresent(editors -> bookEntry.withField(StandardField.EDITOR, editors));
+                                    citation.publisher().ifPresent(publisher -> bookEntry.withField(StandardField.PUBLISHER, publisher));
+                                    citation.year().ifPresent(year -> bookEntry.withField(StandardField.YEAR, year));
+                                    citation.edition().ifPresent(edition -> bookEntry.withField(StandardField.EDITION, edition));
+                                    return bookEntry;
                                 });
-        BookTitleAuthorExtractor.findEditors(block)
-                                .ifPresent(editors -> {
-                                    String formattedEditors = streamlineNames(editors);
-                                    bookEntry.withField(StandardField.EDITOR, formattedEditors);
-                                });
-        BookCitationBlock.findPublisher(block)
-                         .ifPresent(publisher -> bookEntry.withField(StandardField.PUBLISHER, publisher));
-        BookCitationBlock.findYear(block)
-                         .ifPresent(year -> bookEntry.withField(StandardField.YEAR, year));
-        BookCitationBlock.findEdition(block)
-                         .ifPresent(edition -> bookEntry.withField(StandardField.EDITION, edition));
-        return Optional.of(bookEntry);
     }
 
     ParserResult importPaperContent(PDDocument document) throws IOException {
