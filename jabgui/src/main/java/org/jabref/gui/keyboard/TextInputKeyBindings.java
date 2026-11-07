@@ -9,6 +9,7 @@ import org.jabref.model.util.ResultingStringState;
 
 public class TextInputKeyBindings {
 
+    // [impl->req~ux.text-editing.line-boundaries~1]
     public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
@@ -33,15 +34,32 @@ public class TextInputKeyBindings {
                         focusedTextField.nextWord();
                         event.consume();
                     }
-                    case EDITOR_BEGINNING,
-                         EDITOR_UP,
-                         EDITOR_BEGINNING_DOC -> {
+                    case EDITOR_BEGINNING -> {
+                        int caret = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        focusedTextField.positionCaret(text.lastIndexOf('\n', caret - 1) + 1);
+                        event.consume();
+                    }
+                    case EDITOR_END -> {
+                        int caret = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        int lineEnd = text.indexOf('\n', caret);
+                        focusedTextField.positionCaret(lineEnd == -1 ? text.length() : lineEnd);
+                        event.consume();
+                    }
+                    case EDITOR_UP -> {
+                        moveCaretUp(focusedTextField);
+                        event.consume();
+                    }
+                    case EDITOR_BEGINNING_DOC -> {
                         focusedTextField.home();
                         event.consume();
                     }
-                    case EDITOR_END,
-                         EDITOR_DOWN,
-                         EDITOR_END_DOC -> {
+                    case EDITOR_DOWN -> {
+                        moveCaretDown(focusedTextField);
+                        event.consume();
+                    }
+                    case EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
                     }
@@ -71,8 +89,14 @@ public class TextInputKeyBindings {
                     }
                     case EDITOR_KILL_LINE -> {
                         int pos = focusedTextField.getCaretPosition();
-                        focusedTextField.setText(focusedTextField.getText(0, pos));
-                        focusedTextField.positionCaret(pos);
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        int lineEnd = text.indexOf('\n', pos);
+                        if (lineEnd == -1) {
+                            lineEnd = text.length();
+                        } else if (lineEnd == pos) {
+                            lineEnd++;
+                        }
+                        focusedTextField.deleteText(pos, lineEnd);
                         event.consume();
                     }
                     case EDITOR_KILL_WORD -> {
@@ -95,5 +119,33 @@ public class TextInputKeyBindings {
                 }
             });
         }
+    }
+
+    private static void moveCaretUp(TextInputControl control) {
+        int caret = control.getCaretPosition();
+        String text = control.getText(0, control.getLength());
+        int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
+        if (lineStart == 0) {
+            control.positionCaret(0);
+            return;
+        }
+
+        int previousLineEnd = lineStart - 1;
+        int previousLineStart = text.lastIndexOf('\n', previousLineEnd - 1) + 1;
+        control.positionCaret(Math.min(previousLineStart + caret - lineStart, previousLineEnd));
+    }
+
+    private static void moveCaretDown(TextInputControl control) {
+        int caret = control.getCaretPosition();
+        String text = control.getText(0, control.getLength());
+        int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
+        int lineEnd = text.indexOf('\n', caret);
+        if (lineEnd == -1) {
+            control.positionCaret(text.length());
+            return;
+        }
+
+        int nextLineEnd = text.indexOf('\n', lineEnd + 1);
+        control.positionCaret(Math.min(lineEnd + 1 + caret - lineStart, nextLineEnd == -1 ? text.length() : nextLineEnd));
     }
 }

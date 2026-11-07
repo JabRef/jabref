@@ -136,6 +136,22 @@ public class StringManipulator {
         return setWordCase(text, caretPosition, LetterCase.LOWER);
     }
 
+    /// Remove text from the cursor to the next newline, or the newline if the cursor is at it.
+    ///
+    /// @param caretPosition The position of the cursor
+    /// @param text          The string to manipulate
+    /// @return String       The resulting text and caret position.
+    // [impl->req~ux.text-editing.line-boundaries~1]
+    public static ResultingStringState killLine(int caretPosition, String text) {
+        int lineEnd = text.indexOf('\n', caretPosition);
+        if (lineEnd == -1) {
+            lineEnd = text.length();
+        } else if (lineEnd == caretPosition) {
+            lineEnd++;
+        }
+        return new ResultingStringState(caretPosition, text.substring(0, caretPosition) + text.substring(lineEnd));
+    }
+
     /// Remove the next word on the right side of the cursor.
     ///
     /// @param caretPosition The position of the cursor
