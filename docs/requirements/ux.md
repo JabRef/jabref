@@ -48,7 +48,7 @@ Needs: impl
 The main table provides an explicit action that scrolls the currently selected entry to the vertical center of the visible rows.
 Near the beginning or end of the table, the entry is placed as close to the center as the available rows allow.
 
-Needs: impl
+Needs: impl, utest
 
 ## Main table column headers must display user-friendly titles
 `req~maintable.column-headers.user-friendly~1`
