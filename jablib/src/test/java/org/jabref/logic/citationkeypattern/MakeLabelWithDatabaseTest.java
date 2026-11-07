@@ -2,17 +2,19 @@ package org.jabref.logic.citationkeypattern;
 
 import java.util.Optional;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import javafx.beans.property.SimpleObjectProperty;
+import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /// Bracketed patterns themselves are tested at [org.jabref.logic.citationkeypattern.BracketedPatternTest].
 @Execution(ExecutionMode.CONCURRENT)

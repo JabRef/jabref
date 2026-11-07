@@ -2390,5 +2390,4 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 <!-- markdownlint-disable-file MD024 MD033 MD053 -->
 
-
 [def]: https://github.com/JabRef/jabref/issues/17523
