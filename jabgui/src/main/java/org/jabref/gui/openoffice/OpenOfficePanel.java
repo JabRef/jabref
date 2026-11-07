@@ -5,8 +5,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
@@ -46,27 +48,23 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.action.Update;
-import org.jabref.logic.openoffice.style.BstStyle;
+import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
-import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.openoffice.uno.CreationException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
-import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.util.OOResult;
-import org.jabref.model.openoffice.util.OOVoidResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +89,7 @@ public class OpenOfficePanel {
     private final Button exportCitations = new Button(Localization.lang("Export cited"));
     private final Button modifyBibliographyProperties = new Button(Localization.lang("Bibliography properties"));
     private final Button settingsB = new Button(Localization.lang("Settings"));
-    private final Button inferStyle = new Button(Localization.lang("Infer style"));
+    private final Button inferCslStyle = new Button(Localization.lang("Infer style"));
     private final Button help;
     private final VBox vbox = new VBox();
 
@@ -107,14 +105,14 @@ public class OpenOfficePanel {
     private final JStyleLoader jStyleLoader;
     private final CSLStyleLoader cslStyleLoader;
     private final BstStyleLoader bstStyleLoader;
+    private final OpenOfficeStyleCatalog styleCatalog;
+    private final BooleanProperty pageInfoSupported = new SimpleBooleanProperty();
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private OOBibBase ooBase;
+    private OpenOfficeCitationController citationController;
     private OOStyle currentStyle;
-
-    private final SimpleObjectProperty<OOStyle> currentStyleProperty;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            GuiPreferences preferences,
@@ -143,8 +141,6 @@ public class OpenOfficePanel {
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         this.currentStyle = openOfficePreferences.getCurrentStyle();
 
-        this.currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
-
         jStyleLoader = new JStyleLoader(
                 openOfficePreferences,
                 preferences.getLayoutFormatterPreferences(),
@@ -152,6 +148,7 @@ public class OpenOfficePanel {
 
         cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
         bstStyleLoader = new BstStyleLoader(openOfficePreferences);
+        styleCatalog = new OpenOfficeStyleCatalog(jStyleLoader, CSLStyleLoader::getStyles, bstStyleLoader);
 
         ActionFactory factory = new ActionFactory();
 
@@ -185,35 +182,27 @@ public class OpenOfficePanel {
         return vbox;
     }
 
-    /* Note: the style may still be null on return.
-     *
-     * Return true if failed. In this case the dialog is already shown.
-     */
+    /// Returns true when the selected style is ready; otherwise presents the error and leaves the current style unchanged.
     private boolean getOrUpdateTheStyle(String title) {
-        final boolean FAIL = true;
-        final boolean PASS = false;
-
-        currentStyle = openOfficePreferences.getCurrentStyle();
-        currentStyleProperty.set(currentStyle);
-        updateButtonAvailability();
-
-        if (!(currentStyle instanceof JStyle jStyle)) {
-            return PASS;
+        Optional<OOStyle> selected = Optional.ofNullable(openOfficePreferences.getCurrentStyle());
+        if (selected.isEmpty()) {
+            OOError.noValidStyleSelected().setTitle(title).showErrorDialog(dialogService);
+            return false;
         }
-
         try {
-            jStyle = jStyleLoader.getUsedJstyle();
-            jStyle.ensureUpToDate();
-            currentStyle = openOfficePreferences.getCurrentStyle();
-            currentStyleProperty.set(currentStyle);
+            currentStyle = styleCatalog.reload(selected.orElseThrow());
+            if (currentStyle != selected.orElseThrow()) {
+                openOfficePreferences.setCurrentStyle(currentStyle);
+            }
             updateButtonAvailability();
-        } catch (IOException ex) {
-            LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-            String msg = Localization.lang("Unable to reload style file '%0'. %1", jStyle.getPath(), String.valueOf(ex.getMessage()));
-            new OOError(title, msg, ex).showErrorDialog(dialogService);
-            return FAIL;
+            return true;
+        } catch (IOException exception) {
+            String path = selected.orElseThrow().getPath();
+            LOGGER.warn("Unable to reload style file '{}'", path, exception);
+            new OOError(title, Localization.lang("Unable to reload style file '%0'. %1", path, String.valueOf(exception.getMessage())), exception)
+                    .showErrorDialog(dialogService);
+            return false;
         }
-        return PASS;
     }
 
     private void initPanel() {
@@ -223,9 +212,9 @@ public class OpenOfficePanel {
         selectDocument.setTooltip(new Tooltip(Localization.lang("Select which open Writer document to work on")));
         selectDocument.setOnAction(_ -> {
             try {
-                ooBase.guiActionSelectDocument(false);
+                citationController.selectDocument(false);
+                restoreDocumentStyle();
                 currentStyle = openOfficePreferences.getCurrentStyle();
-                currentStyleProperty.set(currentStyle);
                 updateButtonAvailability();
             } catch (WrappedTargetException
                      | NoSuchElementException ex) {
@@ -239,26 +228,10 @@ public class OpenOfficePanel {
             StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader, bstStyleLoader, journalAbbreviationRepository);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
-                             currentStyle = selectedStyle;
-                             currentStyleProperty.set(currentStyle);
-
-                             if (currentStyle instanceof JStyle jStyle) {
-                                 try {
-                                     jStyle.ensureUpToDate();
-                                 } catch (IOException e) {
-                                     LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
-                                 }
-                                 dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
-                             } else if (currentStyle instanceof CitationStyle cslStyle) {
-                                 OOVoidResult<OOError> result = ooBase.writeDocumentCslStyle(cslStyle);
-                                 if (ooBase.testDialog(Localization.lang("Problem modifying citation"), result)) {
-                                     return;
-                                 }
-                                 dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
-                             } else if (currentStyle instanceof BstStyle bstStyle) {
-                                 dialogService.notify(Localization.lang("Currently selected BST style: '%0'", bstStyle.getName()));
+                             openOfficePreferences.setCurrentStyle(selectedStyle);
+                             if (getOrUpdateTheStyle(Localization.lang("Problem modifying citation"))) {
+                                 dialogService.notify(Localization.lang("Currently selected style: '%0'", currentStyle.getName()));
                              }
-                             updateButtonAvailability();
                          });
         });
 
@@ -275,28 +248,28 @@ public class OpenOfficePanel {
         citeSpecial.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
         citeSpecial.setOnAction(_ -> cite(CitationType.AUTHORYEAR_INTEXT, true));
         citeSpecial.setMaxWidth(Double.MAX_VALUE);
-        inferStyle.setTooltip(new Tooltip(Localization.lang("Infer CSL style from document")));
-        inferStyle.setOnAction(_ -> inferStyleFromDocument());
-        inferStyle.setMaxWidth(Double.MAX_VALUE);
+        inferCslStyle.setTooltip(new Tooltip(Localization.lang("Infer CSL style from document")));
+        inferCslStyle.setOnAction(_ -> inferCslStyleFromDocument());
+        inferCslStyle.setMaxWidth(Double.MAX_VALUE);
 
         updateBibliography.setTooltip(new Tooltip(Localization.lang("Make/Sync bibliography")));
 
         updateBibliography.setOnAction(_ -> {
             String title = Localization.lang("Could not update bibliography");
-            if (getOrUpdateTheStyle(title)) {
+            if (!getOrUpdateTheStyle(title)) {
                 return;
             }
             List<BibDatabase> databases = getDatabaseList();
-            ooBase.guiActionUpdateDocument(databases, currentStyle);
+            citationController.refresh(databases, currentStyle);
         });
 
         merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(_ -> ooBase.guiActionMergeCitationGroups(getDatabaseList(), currentStyle));
+        merge.setOnAction(_ -> citationController.mergeCitations(getDatabaseList(), currentStyle));
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
         unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(_ -> ooBase.guiActionSeparateCitations(getDatabaseList(), currentStyle));
+        unmerge.setOnAction(_ -> citationController.separateCitations(getDatabaseList(), currentStyle));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
@@ -304,7 +277,7 @@ public class OpenOfficePanel {
         settingsB.setOnAction(_ -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
         manageCitations.setMaxWidth(Double.MAX_VALUE);
         manageCitations.setOnAction(_ -> {
-            ManageCitationsDialogView dialog = new ManageCitationsDialogView(ooBase);
+            ManageCitationsDialogView dialog = new ManageCitationsDialogView(citationController);
             if (dialog.isOkToShowThisDialog()) {
                 dialogService.showCustomDialogAndWait(dialog);
             }
@@ -329,7 +302,7 @@ public class OpenOfficePanel {
         flow.setVgap(4);
         flow.setHgap(4);
         flow.setPrefWrapLength(200);
-        flow.getChildren().addAll(setStyleFile, cite, citeInText, inferStyle);
+        flow.getChildren().addAll(setStyleFile, cite, citeInText, inferCslStyle);
         flow.getChildren().addAll(citeSpecial, citeEmpty, merge, unmerge);
         flow.getChildren().addAll(manageCitations, exportCitations, modifyBibliographyProperties, settingsB);
 
@@ -345,7 +318,7 @@ public class OpenOfficePanel {
     private void exportEntries() {
         List<BibDatabase> databases = getDatabaseList();
         boolean returnPartialResult = false;
-        Optional<BibDatabase> newDatabase = ooBase.exportCitedHelper(databases, currentStyle, returnPartialResult);
+        Optional<BibDatabase> newDatabase = citationController.exportCited(databases, returnPartialResult);
         if (newDatabase.isPresent()) {
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase.get());
             LibraryTab libraryTab = LibraryTab.createLibraryTab(
@@ -377,12 +350,12 @@ public class OpenOfficePanel {
     }
 
     private void connectAutomatically() {
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
+        OpenOfficeInstallationDetector installationDetector = new OpenOfficeInstallationDetector(openOfficePreferences, dialogService);
 
         final String errorTitle = Localization.lang("Autodetection failed");
         final String progressMessage = Localization.lang("Autodetecting paths...");
 
-        if (officeInstallation.isExecutablePathDefined()) {
+        if (installationDetector.isExecutablePathDefined()) {
             connect();
         } else {
             Task<List<Path>> taskConnectIfInstalled = new Task<>() {
@@ -395,10 +368,10 @@ public class OpenOfficePanel {
             taskConnectIfInstalled.setOnSucceeded(_ -> {
                 List<Path> installations = new ArrayList<>(taskConnectIfInstalled.getValue());
                 if (installations.isEmpty()) {
-                    officeInstallation.selectInstallationPath().ifPresent(installations::add);
+                    installationDetector.selectInstallationPath().ifPresent(installations::add);
                 }
-                Optional<Path> chosenInstallationDirectory = officeInstallation.chooseAmongInstallations(installations);
-                if (chosenInstallationDirectory.isPresent() && officeInstallation.setOpenOfficePreferences(chosenInstallationDirectory.get())) {
+                Optional<Path> chosenInstallationDirectory = installationDetector.chooseAmongInstallations(installations);
+                if (chosenInstallationDirectory.isPresent() && installationDetector.setOpenOfficePreferences(chosenInstallationDirectory.get())) {
                     connect();
                 }
             });
@@ -417,10 +390,10 @@ public class OpenOfficePanel {
         final String errorTitle = Localization.lang("Could not connect to running OpenOffice/LibreOffice.");
         final String extendedErrorTitle = Localization.lang("If connecting manually, please verify program and library paths.");
 
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
+        OpenOfficeInstallationDetector installationDetector = new OpenOfficeInstallationDetector(openOfficePreferences, dialogService);
 
         if (selectedPath.isPresent()) {
-            BackgroundTask.wrap(() -> officeInstallation.setOpenOfficePreferences(selectedPath.get()))
+            BackgroundTask.wrap(() -> installationDetector.setOpenOfficePreferences(selectedPath.get()))
                           .withInitialMessage("Searching for executable")
                           .onFailure(dialogService::showErrorDialogAndWait).onSuccess(value -> {
                               if (value) {
@@ -436,35 +409,30 @@ public class OpenOfficePanel {
     }
 
     private void updateButtonAvailability() {
-        boolean isConnectedToDocument = ooBase != null && !ooBase.isDocumentConnectionMissing();
-        boolean hasStyle = currentStyle != null;
+        boolean connected = citationController != null && !citationController.isDocumentConnectionMissing();
         boolean hasDatabase = !getDatabaseList().isEmpty();
-        boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
-        boolean jstyleSelected = currentStyle instanceof JStyle;
-        boolean cslStyleSelected = currentStyle instanceof CitationStyle;
-        boolean emptyCitationSupported = jstyleSelected || (cslStyleSelected && !openOfficePreferences.getZoteroCompatibilityMode());
-        boolean bstStyleSelected = currentStyle instanceof BstStyle;
-        boolean specialCitationSupported = currentStyle instanceof JStyle jStyle
-                && !jStyle.isNumberEntries()
-                && !jStyle.isCitationKeyCiteMarkers();
-        boolean canGenerateBibliography = (isConnectedToDocument && hasDatabase)
-                && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
+        StyleCapabilities capabilities = connected
+                                         ? Optional.ofNullable(currentStyle).map(citationController::capabilities).orElseGet(OpenOfficePanel::noCapabilities)
+                                         : noCapabilities();
+        OpenOfficeActionAvailability available = OpenOfficeActionAvailability.forCapabilities(connected, hasDatabase, capabilities);
+        selectDocument.setDisable(!connected);
+        setStyleFile.setDisable(!connected);
+        cite.setDisable(!available.cite());
+        citeInText.setDisable(!available.citeInText());
+        citeEmpty.setDisable(!available.citeEmpty());
+        citeSpecial.setDisable(!available.citeSpecial());
+        inferCslStyle.setDisable(!connected);
+        updateBibliography.setDisable(!available.refresh());
+        merge.setDisable(!available.groupEditing());
+        unmerge.setDisable(!available.groupEditing());
+        manageCitations.setDisable(!available.manageCitations());
+        exportCitations.setDisable(!(connected && hasDatabase));
+        modifyBibliographyProperties.setDisable(!available.bibliography());
+        pageInfoSupported.set(connected && capabilities.supportsPageInfo());
+    }
 
-        selectDocument.setDisable(!isConnectedToDocument);
-        setStyleFile.setDisable(!isConnectedToDocument);
-
-        cite.setDisable(!canCite);
-        citeInText.setDisable(!canCite);
-        citeEmpty.setDisable(!canCite || !emptyCitationSupported);
-        citeSpecial.setDisable(!canCite || !specialCitationSupported);
-        inferStyle.setDisable(!isConnectedToDocument || !cslStyleSelected);
-
-        updateBibliography.setDisable(!canGenerateBibliography);
-        merge.setDisable(!isConnectedToDocument || !jstyleSelected);
-        unmerge.setDisable(!isConnectedToDocument || !jstyleSelected);
-        manageCitations.setDisable(!isConnectedToDocument || !jstyleSelected);
-        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
-        modifyBibliographyProperties.setDisable(!canGenerateBibliography);
+    private static StyleCapabilities noCapabilities() {
+        return new StyleCapabilities(Set.of(), false, false, false);
     }
 
     private void connect() {
@@ -473,24 +441,25 @@ public class OpenOfficePanel {
         final String progressMessage = Localization.lang("Autodetecting paths...");
         final String loggerMessage = "Could not connect to running OpenOffice/LibreOffice";
 
-        Task<OOBibBase> connectTask = new Task<>() {
+        Task<OpenOfficeCitationController> connectTask = new Task<>() {
             @Override
-            protected OOBibBase call() throws BootstrapException, CreationException, IOException, InterruptedException {
+            protected OpenOfficeCitationController call() throws BootstrapException, CreationException, IOException, InterruptedException {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
                 Path path = Path.of(openOfficePreferences.getExecutablePath());
-                return createBibBase(path);
+                return createCitationController(path);
             }
         };
 
         connectTask.setOnSucceeded(_ -> {
-            if (ooBase != null) {
-                ooBase.dispose();
+            if (citationController != null) {
+                citationController.dispose();
             }
-            ooBase = connectTask.getValue();
+            citationController = connectTask.getValue();
 
             try {
-                ooBase.guiActionSelectDocument(true);
+                citationController.selectDocument(true);
+                restoreDocumentStyle();
             } catch (WrappedTargetException
                      | NoSuchElementException e) {
                 LOGGER.warn("Unable to connect to document", e);
@@ -499,7 +468,6 @@ public class OpenOfficePanel {
             }
 
             currentStyle = openOfficePreferences.getCurrentStyle();
-            currentStyleProperty.set(currentStyle);
             updateButtonAvailability();
         });
 
@@ -537,8 +505,8 @@ public class OpenOfficePanel {
         taskExecutor.execute(connectTask);
     }
 
-    private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
-        return new OOBibBase(loPath, dialogService, openOfficePreferences, entryTypesManager);
+    private OpenOfficeCitationController createCitationController(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
+        return new OpenOfficeCitationController(loPath, dialogService, openOfficePreferences, entryTypesManager);
     }
 
     private void cite(CitationType citationType, boolean addPageInfo) {
@@ -553,8 +521,6 @@ public class OpenOfficePanel {
             return;
         }
 
-        final BibDatabaseContext bibDatabaseContext = activeDatabase.get();
-
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         if (entries.isEmpty()) {
@@ -564,11 +530,11 @@ public class OpenOfficePanel {
             return;
         }
 
-        if (getOrUpdateTheStyle(errorDialogTitle)) {
+        if (!getOrUpdateTheStyle(errorDialogTitle)) {
             return;
         }
 
-        String pageInfo = null;
+        String pageInfo = "";
         if (addPageInfo) {
             Optional<CiteSpecialDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new CiteSpecialDialogView(openOfficePreferences.getCiteSpecialCitationType()));
             if (citeDialogViewModel.isPresent()) {
@@ -589,35 +555,26 @@ public class OpenOfficePanel {
             return;
         }
 
-        List<BibDatabase> selectedDatabases = getDatabaseList();
-        Optional<Update.SyncOptions> syncOptions =
-                openOfficePreferences.getSyncWhenCiting()
-                ? Optional.of(new Update.SyncOptions(selectedDatabases))
-                : Optional.empty();
-
-        // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
-        if (syncOptions.isPresent() && openOfficePreferences.getSyncWhenCiting()) {
-            syncOptions.get().setUpdateBibliography(true);
-        }
-        ooBase.guiActionInsertEntry(entries,
-                bibDatabaseContext,
-                selectedDatabases,
-                currentStyle,
-                citationType,
-                pageInfo,
-                syncOptions);
+        citationController.insertCitation(entries, getDatabaseList(), currentStyle, citationType, pageInfo);
     }
 
-    private void inferStyleFromDocument() {
+    private void restoreDocumentStyle() {
+        if (openOfficePreferences.getZoteroCompatibilityMode() && !openOfficePreferences.shouldInferCslStyleFromDocument()) {
+            return;
+        }
+        citationController.restoreStyleFromDocument(styleCatalog)
+                          .ifError(error -> citationController.showDialog(error.setTitle(Localization.lang("Could not restore style from document"))));
+    }
+
+    private void inferCslStyleFromDocument() {
         final String errorDialogTitle = Localization.lang("Could not infer CSL style from document");
-        OOResult<Optional<CitationStyle>, OOError> result = ooBase.inferCslStyleFromDocument();
-        if (result.ifError(error -> ooBase.showDialog(error.setTitle(errorDialogTitle))).isError()) {
+        OOResult<Optional<CitationStyle>, OOError> result = citationController.inferCslStyleFromDocument(styleCatalog);
+        if (result.ifError(error -> citationController.showDialog(error.setTitle(errorDialogTitle))).isError()) {
             return;
         }
 
         result.get().ifPresentOrElse(style -> {
             currentStyle = style;
-            currentStyleProperty.set(style);
             updateButtonAvailability();
             dialogService.notify(Localization.lang("Inferred CSL style: '%0'", style.getName()));
         }, () -> dialogService.notify(Localization.lang("No CSL style could be inferred from the document.")));
@@ -682,7 +639,7 @@ public class OpenOfficePanel {
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
-        alwaysAddCitedOnPagesText.disableProperty().bind(currentStyleProperty.map(style -> !(style instanceof JStyle)));
+        alwaysAddCitedOnPagesText.disableProperty().bind(pageInfoSupported.not());
 
         CheckMenuItem onlyUseActiveTab = new CheckMenuItem(Localization.lang("Look up BibTeX entries in the currently selected library only"));
         onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
@@ -706,17 +663,6 @@ public class OpenOfficePanel {
                 new SeparatorMenuItem(),
                 clearConnectionSettings);
 
-        EasyBind.subscribe(currentStyleProperty, newValue -> {
-            updatePreferences(newValue);
-        });
-
         return contextMenu;
-    }
-
-    private void updatePreferences(OOStyle currentStyle) {
-        if (!(currentStyle instanceof CitationStyle)) {
-            openOfficePreferences.setZoteroCompatibilityMode(false);
-            openOfficePreferences.setInferCslStyleFromDocument(false);
-        }
     }
 }

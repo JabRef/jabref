@@ -237,6 +237,50 @@ To run only one test method, use Gradle's standard class and method filter:
 
 Gradle passes sibling checkout paths to all `jablib` test tasks as `MARC2BIBFRAME2_DIR` and `BIBFRAME2MARC_DIR`. The test verifies each checkout is at the pinned commit above. If a sibling checkout is missing, JUnit skips the tests that need it. If the repositories are elsewhere, set those environment variables to their paths before running Gradle.
 
+### LibreOffice Writer integration tests
+
+Run the real-Writer safety gate with:
+
+```sh
+./gradlew :jablib:libreOfficeTest
+```
+
+This dedicated task runs the `LibreOfficeTest`-tagged tests and requires LibreOffice Writer and Pandoc; missing executables are failures, not skipped tests.
+Set `LIBREOFFICE_EXECUTABLE` and `PANDOC_EXECUTABLE` to full executable paths when they are not on `PATH`.
+For example, in PowerShell:
+
+```powershell
+$env:LIBREOFFICE_EXECUTABLE = 'C:\Program Files\LibreOffice\program\soffice.exe'
+$env:PANDOC_EXECUTABLE = 'C:\Program Files\Pandoc\pandoc.exe'
+.\gradlew.bat :jablib:libreOfficeTest
+```
+
+The tests start an isolated headless Writer with a temporary user profile and a loopback-only UNO listener, not an existing office session or the developer's preferences.
+Human-readable golden `.fodt` documents and native Zotero JSON fixtures live under `jablib/src/test/resources/org/jabref/logic/openoffice/integration`.
+The suite exercises canonical JStyle, CSL, and BST citations, cross-family save/reopen round trips, all six stored types, stable identities, per-citation page information, numbering, bibliography ordering, invisible citations, footnotes, tables, repeated superscript refresh, and restored change recording.
+The canonical mark grammar is `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`; the former uid-before-type order is not a fallback format.
+Legacy `JR_cite*` and `CID_n` fixtures remain persistence oracles and must not be read, exported, rewritten, or migrated as canonical citations.
+Rendering failures, including missing Pandoc for BST, must leave preparation targets unchanged.
+
+`CitationFormatConversionWriterTest` covers current canonical ↔ native Zotero conversion on the next CSL citation insertion, with the existing warning, not on preference changes, refresh, or export.
+Conversion changes citation marks only: with synchronization disabled, all bibliography section names, text, and properties remain unchanged; with synchronization enabled, normal handling updates or creates only the target mode's managed bibliography and leaves other-format sections alone.
+There is no bibliography conversion, renaming, consolidation, sidecar, or rejection based on bibliography settings.
+Citation round trips preserve all six canonical types, uids, storage-order keys, every page-info slot, and supported native JSON through save/reopen while the metadata association remains valid.
+The native locator fixture checks a clear pre-write rejection with existing text and JSON unchanged, not locator conversion support.
+Other unsupported native modifiers, unsuitable custom properties, unresolved sources, protected ranges, pending deletions, and stale associated conversion metadata are rejected before actual conversion.
+Stale conversion metadata must not block ordinary native Zotero insertion or refresh.
+
+Storage, `ConversionMetadataTest`, `DocumentSessionTest`, and GUI/controller tests complement the real-Writer suite with codec/property checks, the existing warning order, and owned conversion rollback.
+The older GUI already had undo contexts for insertion including conversion, refresh, merge, and separate; new custom-property deltas and automatic conversion-failure rollback are distinct additions.
+Conversion rollback requires an available, unlocked undo manager and a root context of its own, closes and verifies that context before undoing an ordinary application failure, and never undoes an earlier user action.
+Starting the transaction can clear pre-existing redo history even if rollback restores document state; disconnects, lost ownership, or failed rollback have a distinct recovery error, not a universal recovery guarantee.
+Ordinary applied-style and Zotero preference writes remain raw and are not made undoable by those conversion-specific deltas.
+
+Saved documents and office process logs are in `jablib/build/writer-integration`; standard JUnit XML results are in `jablib/build/test-results/libreOfficeTest` and the HTML report is in `jablib/build/reports/tests/libreOfficeTest`.
+The task executes instead of restoring cached test results; ordinary `:jablib:test` excludes the `LibreOfficeTest` tag.
+These coverage descriptions and commands are instructions, not evidence of a passing run or counts from a new run.
+See the [current overview](openoffice/overview.md), [ordering limitations](openoffice/order-of-appearance.md#visual-ordering-limitations), and fixture directory's `README.md` for the contract and tested-layout limitations.
+
 ### "No matching tests found"
 
 In case the output is "No matching tests found", the wrong test category is used.

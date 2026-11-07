@@ -269,13 +269,12 @@ public class JabRefCliPreferences implements CliPreferences {
     /// contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the
     /// reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO
     /// panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should
-    /// be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
+    /// be used when citing OO_CURRENT_STYLE path to the selected CSL, JStyle, or BST style file
     /// OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size
     /// and position of "Select style" dialog
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
-    public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
     public static final String OO_EXTERNAL_CSL_STYLES = "externalCslStyles";
     public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
@@ -2740,7 +2739,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases()),
                 getBoolean(OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting()),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle()),
                 getCurrentOOStyle(defaultValues.getCurrentStyle(), journalAbbreviationRepository),
                 getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages()),
                 get(OO_CSL_BIBLIOGRAPHY_TITLE, defaultValues.getCslBibliographyTitle()),
@@ -2782,8 +2780,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 (_, _, newValue) -> put(OO_CITE_SPECIAL_CITATION_TYPE, newValue.name()),
                 () -> openOfficePreferences.citeSpecialCitationTypeProperty().set(getCitationTypeFromPrefs(defaultValues.getCiteSpecialCitationType())),
                 () -> openOfficePreferences.citeSpecialCitationTypeProperty().set(defaultValues.getCiteSpecialCitationType()));
-        bindString(openOfficePreferences.currentJStyleProperty(), OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle());
-        // currentStyle is persisted as a style path and reconstructed into a CSL style or JStyle on load, so it needs a custom binding.
+        // currentStyle is persisted as a style path and reconstructed into a CSL style, JStyle, or BST style on load, so it needs a custom binding.
         bindCustom(openOfficePreferences.currentStyleProperty(), OO_CURRENT_STYLE, defaultValues.getCurrentStyle(),
                 (_, _, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()),
                 () -> openOfficePreferences.currentStyleProperty().set(getCurrentOOStyle(defaultValues.getCurrentStyle(), journalAbbreviationRepository)),

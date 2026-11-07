@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -18,7 +20,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.model.openoffice.uno.UnoUserDefinedProperty;
+import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -77,17 +79,14 @@ public final class ZoteroDocumentPreferences {
             NotRemoveableException,
             PropertyVetoException,
             WrappedTargetException {
-        Optional<String> serializedData = readSerializedData(document);
-        String updatedData;
         try {
-            if (serializedData.isPresent()) {
-                // update current preference with styleId
-                updatedData = createOrUpdatePrefWithStyleId(serializedData.get(), citationStyle.getStyleId());
-            } else {
-                // create preference with styleId
-                updatedData = createOrUpdatePrefWithStyleId(EMPTY_XML_DOCUMENT_DATA, citationStyle.getStyleId());
+            for (Map.Entry<String, Optional<String>> property : prepareCitationStyle(document, citationStyle).entrySet()) {
+                if (property.getValue().isPresent()) {
+                    UnoUserDefinedProperty.setStringProperty(document, property.getKey(), property.getValue().orElseThrow());
+                } else {
+                    UnoUserDefinedProperty.removeIfExists(document, property.getKey());
+                }
             }
-            writeProperty(document, ZOTERO_PREF, updatedData);
         } catch (IOException e) {
             LOGGER.warn("Could not serialize Zotero document preferences", e);
             return false;
@@ -195,23 +194,18 @@ public final class ZoteroDocumentPreferences {
         return Optional.of(String.join("", chunks));
     }
 
-    private static void writeProperty(XTextDocument document, String propertyName, String value)
-            throws
-            IllegalTypeException,
-            NotRemoveableException,
-            PropertyVetoException,
-            WrappedTargetException {
+    /// Prepare every property delta before citation conversion starts changing the document.
+    public static Map<String, Optional<String>> prepareCitationStyle(XTextDocument document, CitationStyle citationStyle)
+            throws WrappedTargetException, IOException {
+        String value = createOrUpdatePrefWithStyleId(readSerializedData(document).orElse(EMPTY_XML_DOCUMENT_DATA), citationStyle.getStyleId());
+        String propertyName = ZOTERO_PREF;
+        Map<String, Optional<String>> properties = new LinkedHashMap<>();
         int chunkCount = Math.ceilDiv(value.length(), MAX_LENGTH);
         for (int chunkIndex = 1; chunkIndex <= chunkCount; chunkIndex++) {
             int start = (chunkIndex - 1) * MAX_LENGTH;
             int end = Math.min(chunkIndex * MAX_LENGTH, value.length());
-            UnoUserDefinedProperty.setStringProperty(document, propertyName + "_" + chunkIndex, value.substring(start, end));
+            properties.put(propertyName + "_" + chunkIndex, Optional.of(value.substring(start, end)));
         }
-        removeTrailingChunks(document, propertyName, chunkCount);
-    }
-
-    private static void removeTrailingChunks(XTextDocument document, String propertyName, int lastChunkIndex)
-            throws NotRemoveableException {
         for (String existingProperty : UnoUserDefinedProperty.getListOfNames(document)) {
             Optional<Integer> chunkIndex = getChunkIndex(propertyName, existingProperty);
             if (chunkIndex.isEmpty()) {
@@ -219,10 +213,11 @@ public final class ZoteroDocumentPreferences {
             }
 
             int index = chunkIndex.get();
-            if (index > lastChunkIndex) {
-                UnoUserDefinedProperty.removeIfExists(document, existingProperty);
+            if (index > chunkCount) {
+                properties.put(existingProperty, Optional.empty());
             }
         }
+        return properties;
     }
 
     private static Optional<Integer> getChunkIndex(String propertyName, String existingProperty) {

@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
 
 /// Representation of a CitationStyle. Stores its name, the file path and the style itself.
 /// This is a pure model class. For loading/parsing functionality, see  [CSLStyleUtils] and [CSLStyleLoader].
-public class CitationStyle implements OOStyle {
+public final class CitationStyle implements OOStyle {
 
     // Currently, we have support for only one alphanumeric style, so we hardcode it
     private static final String ALPHANUMERIC_STYLE = "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690";

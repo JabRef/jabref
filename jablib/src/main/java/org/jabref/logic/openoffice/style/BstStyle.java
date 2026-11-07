@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 /// An [OOStyle] backed by a `.bst` file - either an internal (classpath) style bundled with
 /// JabRef or an external (filesystem) style supplied by the user.
 @NullMarked
-public class BstStyle implements OOStyle {
+public final class BstStyle implements OOStyle {
 
     /// Classpath resource paths for the built-in BST styles.
     public static final String INTERNAL_IEEETRAN_PATH = "/resource/openoffice/IEEEtran.bst";
@@ -98,7 +98,7 @@ public class BstStyle implements OOStyle {
 
     /// For external styles returns the absolute filesystem path.
     /// For internal styles returns the classpath resource path (starts with `/resource/openoffice/`).
-    /// This value is persisted by [JabRefCliPreferences] and used to reconstruct the style on startup.
+    /// This value is persisted by [org.jabref.logic.preferences.JabRefCliPreferences] and used to reconstruct the style on startup.
     @Override
     public String getPath() {
         if (filePath != null) {

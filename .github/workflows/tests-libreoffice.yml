@@ -1,0 +1,102 @@
+name: LibreOffice Writer safety gate
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main, main-release, black-forest]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writer-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  writer-integration:
+    name: Required Writer integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+      TZ: UTC
+      SAL_USE_VCLPLUGIN: svp
+      LIBREOFFICE_EXECUTABLE: /usr/bin/soffice
+      PANDOC_EXECUTABLE: /usr/bin/pandoc
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: recursive
+          persist-credentials: false
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Install real Writer and Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends --yes libreoffice-writer pandoc fonts-liberation
+          soffice --version
+          pandoc --version
+      - name: Run OpenOffice unit tests
+        run: >-
+          ./gradlew :jablib:test
+          --tests 'org.jabref.logic.openoffice.*'
+          --rerun --no-build-cache --console=plain
+      - name: Run Writer safety gate
+        run: ./gradlew :jablib:libreOfficeTest --rerun --no-build-cache --console=plain
+      - name: Require executed tests without skips
+        if: success()
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import xml.etree.ElementTree as ET
+          reports = list(pathlib.Path('jablib/build/test-results/libreOfficeTest').glob('TEST-*.xml'))
+          assert reports, 'Writer test reports are missing'
+          suites = [ET.parse(report).getroot() for report in reports]
+          required = {
+              'org.jabref.logic.openoffice.integration.WriterIntegrationTest': 28,
+              'org.jabref.logic.openoffice.integration.ZoteroWriterTest': 25,
+              'org.jabref.logic.openoffice.engine.storage.CanonicalStorageWriterTest': 20,
+              'org.jabref.logic.openoffice.integration.OOTextWriterTest': 6,
+              'org.jabref.logic.openoffice.integration.CitationFormatConversionWriterTest': 48,
+          }
+          by_name = {suite.attrib['name']: suite for suite in suites}
+          for name, minimum in required.items():
+              assert name in by_name, f'Required Writer suite is missing: {name}'
+              assert int(by_name[name].attrib['tests']) >= minimum, f'Tests were not all discovered: {name}'
+          unit_reports = list(pathlib.Path('jablib/build/test-results/test').glob('TEST-*.xml'))
+          assert unit_reports, 'OpenOffice unit test reports are missing'
+          unit_suites = [ET.parse(report).getroot() for report in unit_reports]
+          unit_by_name = {suite.attrib['name']: suite for suite in unit_suites}
+          for name, minimum in {
+              'org.jabref.logic.openoffice.engine.storage.MarkStoreTest': 7,
+              'org.jabref.logic.openoffice.engine.storage.MarkWriterTest': 5,
+              'org.jabref.logic.openoffice.engine.storage.UndoableDocumentPropertiesTest': 8,
+              'org.jabref.logic.openoffice.backend.ReferenceMarkTextWriterTest': 19,
+              'org.jabref.logic.openoffice.engine.ConversionMetadataTest': 19,
+
+              'org.jabref.logic.openoffice.engine.DocumentSessionTest': 8,
+              'org.jabref.logic.openoffice.backend.CanonicalReferenceMarkTest': 5,
+              'org.jabref.logic.openoffice.bst.BstPipelineTest': 7,
+          }.items():
+              assert name in unit_by_name, f'Required OpenOffice unit suite is missing: {name}'
+              assert int(unit_by_name[name].attrib['tests']) >= minimum, f'Unit tests were not all discovered: {name}'
+          suites.extend(unit_suites)
+          for suite in suites:
+              for attribute in ('skipped', 'failures', 'errors'):
+                  assert int(suite.attrib.get(attribute, 0)) == 0, (suite.attrib['name'], attribute)
+          PY
+      - name: Upload Writer documents, process log, and test reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: writer-integration
+          path: |
+            jablib/build/writer-integration/
+            jablib/build/reports/tests/libreOfficeTest/
+            jablib/build/test-results/libreOfficeTest/
+            jablib/build/reports/tests/test/
+            jablib/build/test-results/test/
+          if-no-files-found: error

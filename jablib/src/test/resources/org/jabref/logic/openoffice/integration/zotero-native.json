@@ -1,0 +1,23 @@
+{
+  "citationID": "native-citation",
+  "properties": {
+    "plainCitation": "[native]",
+    "custom": "keep native metadata"
+  },
+  "citationItems": [
+    {
+      "id": "600",
+      "uris": ["http://zotero.org/users/123/items/NATIVE123"],
+      "itemData": {
+        "id": "600",
+        "type": "article-journal",
+        "DOI": "10.123/native",
+        "title": "Native linked title",
+        "author": [{"family": "Native", "given": "Nina"}],
+        "issued": {"date-parts": [[2020]]},
+        "archive-place": "Original archive"
+      }
+    }
+  ],
+  "schema": "https://github.com/citation-style-language/schema/raw/master/csl-citation.json"
+}

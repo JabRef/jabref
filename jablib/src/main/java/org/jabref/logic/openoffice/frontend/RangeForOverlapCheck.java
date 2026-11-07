@@ -1,6 +1,6 @@
 package org.jabref.logic.openoffice.frontend;
 
-import org.jabref.model.openoffice.rangesort.RangeHolder;
+import org.jabref.logic.openoffice.rangesort.RangeHolder;
 
 import com.sun.star.text.XTextRange;
 
