@@ -167,4 +167,14 @@ See [JabRef issue #16332](https://github.com/JabRef/jabref/issues/16332).
 
 Needs: impl, utest
 
+## BibTeX importer must recover citation keys whose comma is missing
+`req~import.bibtex.key-missing-comma~1`
+
+If whitespace separates a citation key from the first field assignment, the text before the whitespace is the citation key and a warning is reported.
+For `@article{key title = {x}}`, the citation key is `key` and the title is `x`.
+
+see: [JabRef issue #17549](https://github.com/JabRef/jabref/issues/17549)
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

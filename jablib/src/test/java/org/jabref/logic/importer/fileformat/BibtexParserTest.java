@@ -455,6 +455,45 @@ class BibtexParserTest {
         assertEquals(List.of(), result.warnings());
     }
 
+    // [utest->req~import.bibtex.key-missing-comma~1]
+    @ParameterizedTest
+    @MethodSource
+    void parseRecognizesCitationKeyWhenCommaIsMissing(String entry, int keyLine) throws IOException {
+        ParserResult result = parser.parse(Reader.of(entry));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("key")
+                .withField(StandardField.TITLE, "x");
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(entry, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+        assertEquals(List.of("Line " + keyLine + ": Found corrupted citation key key (comma missing)."), result.warnings());
+    }
+
+    private static Stream<Arguments> parseRecognizesCitationKeyWhenCommaIsMissing() {
+        return Stream.of(
+                Arguments.of("@article{key title = {x}}", 1),
+                Arguments.of("@article{key title={x}}", 1),
+                Arguments.of("@article{key\n title = {x}}", 1),
+                Arguments.of("@article{key\ntitle={x}}", 1),
+                Arguments.of("@article{key\r\n  title = {x}}", 1),
+                Arguments.of("@article{key \t title\n = {x}}", 1),
+                Arguments.of("@article{\nkey title = {x}}", 2),
+                Arguments.of("@article(key title = {x})", 1));
+    }
+
+    // [utest->req~import.bibtex.key-missing-comma~1]
+    @Test
+    void parseKeepsFollowingEntryIntactAfterMissingComma() throws IOException {
+        String entry = "@article{key title = {x}}\n";
+        String followingEntry = "@article{next, title = {y}}";
+
+        ParserResult result = parser.parse(Reader.of(entry + followingEntry));
+
+        assertEquals(entry, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+        assertEquals(followingEntry, result.getDatabase().getEntries().get(1).getParsedSerialization());
+        assertEquals(List.of("Line 1: Found corrupted citation key key (comma missing)."), result.warnings());
+    }
+
     @Test
     void parseRecognizesEntryWithBigNumbers() throws IOException {
         ParserResult result = parser.parse(Reader.of("""

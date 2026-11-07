@@ -122,7 +122,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
-
+- We fixed an issue where BibTeX entries with a missing comma after the citation key were imported with a wrong key. [#17549](https://github.com/JabRef/jabref/issues/17549)
 ### Removed
 
 - We removed the "Waiting for AI reply..." notification; the AI chat already shows a progress indicator. [#17145](https://github.com/JabRef/jabref/pull/17145)
