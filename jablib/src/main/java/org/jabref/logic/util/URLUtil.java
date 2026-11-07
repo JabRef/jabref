@@ -27,6 +27,22 @@ public class URLUtil {
     // Detect Google search URL
     private static final String GOOGLE_SEARCH_EXP = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
 
+    // Only parameters identifying the campaign or click that led to a link. They never select content.
+    private static final String TRACKING_PARAMETER_EXP = "(?:fbclid|gclid|mc_cid|mc_eid|msclkid|utm_[a-z0-9_]+)=[^&#\\s]*";
+    private static final Pattern TRACKING_PARAMETER_BEFORE_OTHER_PARAMETER = Pattern.compile("(?<=[?&])" + TRACKING_PARAMETER_EXP + "&", Pattern.CASE_INSENSITIVE);
+    private static final Pattern TRACKING_PARAMETER_AT_END_OF_QUERY = Pattern.compile("[?&]" + TRACKING_PARAMETER_EXP, Pattern.CASE_INSENSITIVE);
+
+    /// Removes well-known tracking parameters (such as `utm_source`) from the query of a URL.
+    ///
+    /// All other parameters are kept, because they may be required to reach the content.
+    ///
+    /// @param url the URL string
+    /// @return `url` without tracking parameters
+    public static String removeTrackingParameters(@NonNull String url) {
+        String withoutLeadingParameters = TRACKING_PARAMETER_BEFORE_OTHER_PARAMETER.matcher(url).replaceAll("");
+        return TRACKING_PARAMETER_AT_END_OF_QUERY.matcher(withoutLeadingParameters).replaceAll("");
+    }
+
     /// Cleans URLs returned by Google search.
     /// <h4>Example</h4>
     /// ```text

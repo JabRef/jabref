@@ -85,6 +85,51 @@ class URLUtilTest {
 
     @ParameterizedTest
     @CsvSource(
+            delimiterString = "->",
+            textBlock = """
+                    # only parameter
+                    https://example.org/a?utm_source=newsletter -> https://example.org/a
+                    # several tracking parameters
+                    https://example.org/a?utm_source=newsletter&utm_medium=email&fbclid=abc -> https://example.org/a
+                    # tracking parameter first
+                    https://example.org/a?utm_source=newsletter&id=1 -> https://example.org/a?id=1
+                    # tracking parameter last
+                    https://example.org/a?id=1&utm_source=newsletter -> https://example.org/a?id=1
+                    # tracking parameter in the middle
+                    https://example.org/a?id=1&gclid=abc&type=pdf -> https://example.org/a?id=1&type=pdf
+                    # fragment is kept
+                    https://example.org/a?utm_source=newsletter#section -> https://example.org/a#section
+                    # upper case
+                    https://example.org/a?UTM_SOURCE=newsletter -> https://example.org/a
+                    # empty value
+                    https://example.org/a?utm_source= -> https://example.org/a
+                    """
+    )
+    void removeTrackingParametersRemovesKnownParameters(String input, String expected) {
+        assertEquals(expected, URLUtil.removeTrackingParameters(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                    https://example.org/a
+                    https://example.org/a?id=1&type=pdf
+                    # only a similar name
+                    https://example.org/a?my_utm_source=newsletter
+                    https://example.org/a?utm=newsletter
+                    # not a parameter
+                    https://example.org/utm_source=newsletter
+                    # a question mark without parameters
+                    10.1006/rwei.1999?.0001
+                    10.1006/rwei.1999?
+                    """
+    )
+    void removeTrackingParametersKeepsOtherText(String input) {
+        assertEquals(input, URLUtil.removeTrackingParameters(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
             textBlock = """
                     http://www.google.com
                     https://www.google.com
