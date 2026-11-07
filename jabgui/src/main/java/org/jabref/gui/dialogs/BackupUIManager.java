@@ -29,12 +29,14 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,7 @@ public class BackupUIManager {
                 tabContainer,
                 stateManager,
                 preferences.getExternalApplicationsPreferences(),
+                preferences.getImportFormatPreferences(),
                 originalPath,
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
@@ -102,10 +105,12 @@ public class BackupUIManager {
                                                                  LibraryTabContainer tabContainer,
                                                                  StateManager stateManager,
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
+                                                                 ImportFormatPreferences importFormatPreferences,
                                                                  Path originalPath,
                                                                  Path backupDir) {
+        TaskExecutor taskExecutor = Injector.instantiateModelOrService(TaskExecutor.class);
         return UiTaskExecutor.runInJavaFXThread(() -> showForLibrary(tabContainer, stateManager, originalPath,
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences))));
+                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences, importFormatPreferences, taskExecutor))));
     }
 
     private static <T> T showForLibrary(LibraryTabContainer tabContainer, StateManager stateManager, Path path, Supplier<T> showDialog) {
