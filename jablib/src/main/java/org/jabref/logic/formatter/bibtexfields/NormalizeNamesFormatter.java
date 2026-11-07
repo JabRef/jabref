@@ -22,7 +22,7 @@ public class NormalizeNamesFormatter extends Formatter {
     @Override
     public String format(@NonNull String nameList) {
         AuthorList authorList = AuthorList.parse(nameList);
-        return authorList.getAsLastFirstNamesWithAnd(false);
+        return authorList.getAsBibtex();
     }
 
     @Override
