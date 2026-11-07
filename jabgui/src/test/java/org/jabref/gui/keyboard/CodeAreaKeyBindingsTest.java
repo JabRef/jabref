@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
@@ -29,6 +30,32 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
 class CodeAreaKeyBindingsTest {
+
+    @Test
+    void verticalNavigationMovesAcrossWrappedVisualLines() {
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea codeArea = new CodeArea();
+            codeArea.setWrapText(true);
+            codeArea.setText("A long paragraph that wraps over multiple visible lines without any newline characters. More words to ensure wrapping.");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(codeArea, 150, 200));
+            stage.show();
+            codeArea.applyCss();
+            codeArea.layout();
+            codeArea.select(TextPos.ZERO);
+            KeyBindingRepository repository = mock(KeyBindingRepository.class);
+            when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(KeyBinding.EDITOR_DOWN), Optional.of(KeyBinding.EDITOR_UP));
+
+            CodeAreaKeyBindings.call(codeArea, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.N, false, true, false, false), repository);
+            int nextLine = codeArea.getCaretPosition().offset();
+            assertTrue(nextLine > 0 && nextLine < codeArea.getText().length());
+            codeArea.requestLayout();
+            codeArea.layout();
+
+            CodeAreaKeyBindings.call(codeArea, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.P, false, true, false, false), repository);
+            assertEquals(TextPos.ZERO, codeArea.getCaretPosition());
+        });
+    }
 
     @ParameterizedTest
     @MethodSource("killLineTestData")

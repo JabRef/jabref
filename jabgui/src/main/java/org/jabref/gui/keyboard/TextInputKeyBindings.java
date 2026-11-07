@@ -2,6 +2,9 @@ package org.jabref.gui.keyboard;
 
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.skin.TextAreaSkin;
+import javafx.scene.control.skin.TextInputControlSkin.Direction;
+import javafx.scene.control.skin.TextInputControlSkin.TextUnit;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.logic.util.strings.StringManipulator;
@@ -122,6 +125,10 @@ public class TextInputKeyBindings {
     }
 
     private static void moveCaretUp(TextInputControl control) {
+        if (control.getSkin() instanceof TextAreaSkin skin) {
+            skin.moveCaret(TextUnit.LINE, Direction.UP, false);
+            return;
+        }
         int caret = control.getCaretPosition();
         String text = control.getText(0, control.getLength());
         int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
@@ -136,6 +143,10 @@ public class TextInputKeyBindings {
     }
 
     private static void moveCaretDown(TextInputControl control) {
+        if (control.getSkin() instanceof TextAreaSkin skin) {
+            skin.moveCaret(TextUnit.LINE, Direction.DOWN, false);
+            return;
+        }
         int caret = control.getCaretPosition();
         String text = control.getText(0, control.getLength());
         int lineStart = text.lastIndexOf('\n', caret - 1) + 1;

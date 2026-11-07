@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
@@ -33,6 +34,28 @@ import static org.mockito.Mockito.when;
 class TextInputKeyBindingsTest {
 
     private static final String MULTILINE_TEXT = "First line\nSecond line\nThird line";
+
+    @Test
+    void verticalNavigationMovesAcrossWrappedVisualLines() {
+        JavaFxExtension.invokeAndWait(() -> {
+            TextArea area = new TextArea("A long paragraph that wraps over multiple visible lines without any newline characters. More words to ensure wrapping.");
+            area.setWrapText(true);
+            StackPane root = new StackPane(area);
+            new Scene(root, 150, 200);
+            root.applyCss();
+            root.layout();
+            area.positionCaret(0);
+
+            applyBinding(area, KeyBinding.EDITOR_DOWN);
+            int nextLine = area.getCaretPosition();
+            assertTrue(nextLine > 0 && nextLine < area.getLength());
+            root.requestLayout();
+            root.layout();
+
+            applyBinding(area, KeyBinding.EDITOR_UP);
+            assertEquals(0, area.getCaretPosition());
+        });
+    }
 
     private void applyBinding(TextInputControl control, KeyBinding binding) {
         Scene scene = mock(Scene.class);

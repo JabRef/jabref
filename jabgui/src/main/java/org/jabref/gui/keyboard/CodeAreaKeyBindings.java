@@ -45,7 +45,7 @@ public class CodeAreaKeyBindings {
                     event.consume();
                 }
                 case EDITOR_UP -> {
-                    codeArea.moveParagraphStart();
+                    codeArea.moveUp();
                     event.consume();
                 }
                 case EDITOR_BEGINNING -> {
@@ -57,7 +57,7 @@ public class CodeAreaKeyBindings {
                     event.consume();
                 }
                 case EDITOR_DOWN -> {
-                    codeArea.moveParagraphEnd();
+                    codeArea.moveDown();
                     event.consume();
                 }
                 case EDITOR_END -> {
