@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
@@ -354,7 +355,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     /// @param subtype         the document subtype (ar, cp, re, etc.)
     /// @return appropriate StandardEntryType
     private StandardEntryType determineEntryType(String aggregationType, String subtype) {
-        return switch (subtype.toLowerCase()) {
+        return switch (subtype.toLowerCase(Locale.ROOT)) {
             case "cp" ->
                     StandardEntryType.InProceedings;
             case "bk" ->
@@ -372,7 +373,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
             case "sh" ->
                     StandardEntryType.Article;
             default ->
-                    switch (aggregationType.toLowerCase()) {
+                    switch (aggregationType.toLowerCase(Locale.ROOT)) {
                         case "book" ->
                                 StandardEntryType.Book;
                         case "book series" ->
