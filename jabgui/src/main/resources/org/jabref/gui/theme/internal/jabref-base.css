@@ -1111,12 +1111,66 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-danger-emphasis;
 }
 
-.multi-merge-entries .toggle-button {
-    -fx-border-insets: 0;
-    -fx-background-insets: 0;
-    -fx-border-image-insets: 0;
-    -fx-background-radius: 0.25em;
-    -fx-border-radius: 0.25em;
+.multi-merge-entries .failed-suppliers-label {
+    -fx-text-fill: -color-danger;
+    -fx-font-style: italic;
+    -fx-padding: 0 0 0 8;
+}
+
+.multi-merge-entries .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.multi-merge-entries .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.multi-merge-entries .split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.multi-merge-entries .split-pane > .split-pane-divider {
+    -fx-padding: 0 2 0 2;
+    -fx-background-color: -color-border-light;
+}
+
+.multi-merge-entries .merge-cell {
+    -fx-padding: 3 6 3 6;
+}
+
+.multi-merge-entries .selection-box {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 2;
+    -fx-padding: 4 8 4 8;
+}
+
+.multi-merge-entries .selection-box:hover {
+    -fx-background-color: derive(-color-accent-subtle, 5%);
+    -fx-border-color: derive(-color-accent-subtle, 10%);
+}
+
+.multi-merge-entries .selection-box:selected {
+    -fx-background-color: derive(-color-accent-subtle, 15%);
+    -fx-border-color: -color-accent-subtle;
+}
+
+.multi-merge-entries .merged-field-editor {
+    -fx-background-color: -color-border-light, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-prompt-text-fill: -color-fg-muted;
+}
+
+.multi-merge-entries .merged-field-editor:focused {
+    -fx-highlight-fill: derive(-color-accent-subtle, 20%);
+    -fx-background-color: -color-accent, -color-bg-secondary;
+    -fx-background-insets: 0, 2;
+    -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
 /* ParseLatexResult */
@@ -1356,7 +1410,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-fg-emphasis;
 }
 
-/* ThreeWayMergeView */
+/* ThreeWayMergeView & MultiMergeEntries */
 .three-way-merge .merged-field .styled-text-area {
     -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
@@ -1387,25 +1441,32 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-text-background-color;
 }
 
-.three-way-merge .field-cell:odd {
+.three-way-merge .field-cell:odd,
+.multi-merge-entries .field-cell:odd {
     -fx-background-color: -color-bg-alt;
 }
 
-.three-way-merge .field-cell:even {
+.three-way-merge .field-cell:even,
+.multi-merge-entries .field-cell:even {
     -fx-background-color: -color-bg-secondary;
 }
 
-.three-way-merge .merge-toolbox {
+.three-way-merge .merge-toolbox,
+.multi-merge-entries .merge-toolbox {
     -fx-background-color: -color-bg-tertiary;
 }
 
-.three-way-merge .merge-header-cell .label {
+.three-way-merge .merge-header-cell .label,
+.multi-merge-entries .merge-header-cell .label,
+.multi-merge-entries .merge-header-cell {
     -fx-font-weight: bold;
     -fx-padding: 0.167em 0 0.167em 0;
 }
 
 .three-way-merge .field-name .glyph-icon,
-.three-way-merge .field-name .ikonli-font-icon {
+.three-way-merge .field-name .ikonli-font-icon,
+.multi-merge-entries .field-name .glyph-icon,
+.multi-merge-entries .field-name .ikonli-font-icon {
     -fx-icon-size: 18;
     -fx-icon-color: -color-accent;
 }
