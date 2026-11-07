@@ -32,6 +32,7 @@ public class ApiKeyDialog extends FXDialog {
     private final FetcherViewModel fetcherViewModel;
     private final BooleanProperty apiKeyValid = new SimpleBooleanProperty();
     private RotateTransition rotation;
+    private DelayedExecution clearStatus;
 
     public ApiKeyDialog(WebSearchTabViewModel viewModel, FetcherViewModel fetcherViewModel) {
         super(AlertType.NONE, Localization.lang("API Key for %0", fetcherViewModel.getName()));
@@ -42,21 +43,23 @@ public class ApiKeyDialog extends FXDialog {
                   .load()
                   .setAsDialogPane(this);
 
+        Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        okButton.disableProperty().bind(apiKeyValid.not());
         setResultConverter(this::convertResult);
     }
 
     @FXML
     private void initialize() {
+        clearStatus = new DelayedExecution(STATUS_DURATION, () -> {
+            testButton.setGraphic(null);
+            testButton.setText(Localization.lang("Test connection"));
+        });
         apiKeyField.setText(fetcherViewModel.getApiKey());
 
         apiKeyValid.set(apiKeyField.getText().isEmpty() || fetcherViewModel.shouldUseCustomApiKey());
 
-        Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
-        if (okButton != null) {
-            okButton.disableProperty().bind(apiKeyValid.not());
-        }
-
         apiKeyField.textProperty().addListener((_, _, newValue) -> {
+            clearStatus.cancel();
             apiKeyValid.set(newValue.isEmpty());
             testButton.setGraphic(null);
             testButton.setText(Localization.lang("Test connection"));
@@ -74,17 +77,23 @@ public class ApiKeyDialog extends FXDialog {
 
     @FXML
     private void testApiKey() {
+        clearStatus.cancel();
         testButton.setDisable(true);
         testButton.setText(Localization.lang("Testing..."));
         testButton.setGraphic(rotation.getNode());
         rotation.play();
-        viewModel.checkApiKey(fetcherViewModel, apiKeyField.getText(), this::handleTestResult);
+        String testedKey = apiKeyField.getText();
+        viewModel.checkApiKey(fetcherViewModel, testedKey, success -> handleTestResult(testedKey, success));
     }
 
-    private void handleTestResult(boolean success) {
+    private void handleTestResult(String testedKey, boolean success) {
         Platform.runLater(() -> {
             rotation.stop();
             testButton.setDisable(false);
+
+            if (!testedKey.equals(apiKeyField.getText())) {
+                return;
+            }
 
             testButton.setGraphic(success ? IconTheme.JabRefIcons.SUCCESS.getGraphicNode() : IconTheme.JabRefIcons.ERROR.getGraphicNode());
             testButton.getStyleClass().removeAll("text-success", "text-danger");
@@ -92,10 +101,7 @@ public class ApiKeyDialog extends FXDialog {
             testButton.setText(success ? Localization.lang("API Key Valid") : Localization.lang("API Key Invalid"));
             apiKeyValid.set(success);
 
-            new DelayedExecution(STATUS_DURATION, () -> {
-                testButton.setGraphic(null);
-                testButton.setText(Localization.lang("Test connection"));
-            }).start();
+            clearStatus.start();
         });
     }
 
