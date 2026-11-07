@@ -94,6 +94,30 @@ A shared database that is still connected when JabRef closes is reconnected on t
 
 Needs: impl
 
+## Connected shared databases must be offered in the login dialog
+`req~shared-database.saved-connections-offered~1`
+
+Every shared database that was connected to is stored, so it can be connected to again without retyping the connection details.
+See <https://github.com/JabRef/jabref/issues/12948>.
+
+Needs: impl, utest
+
+## Reconnecting to a stored shared database must not store it a second time
+`req~shared-database.saved-connections-unique~1`
+
+Connecting to a database that is already stored updates that entry instead of adding a second, indistinguishable one.
+Duplicates stored by earlier versions are listed once.
+
+Needs: impl, utest
+
+## A stored shared database connection must be deletable
+`req~shared-database.saved-connections-deletable~1`
+
+Deleting also removes the stored password and stops the database from being reopened on startup.
+A connection whose library is open cannot be deleted, because quitting would store it again.
+
+Needs: impl, utest
+
 ## A failed connection can be retried
 `req~shared-database.reconnect-retry~1`
 
