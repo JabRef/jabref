@@ -27,9 +27,9 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 * _Bug fixing:_ write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
 * Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, () -> doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/) to the test method.
 
-### Use `@ParamterizedTests`
+### Use `@ParameterizedTest`
 
-If possible, use `@ParamterizedTests`.
+If possible, use `@ParameterizedTest`.
 Read more at <https://mikemybytes.com/2021/10/19/parameterize-like-a-pro-with-junit-5-csvsource/>.
 
 Example for a nicely formatted `@CsvSource`
@@ -48,6 +48,25 @@ void convertsToUpperCamelCase(String input, String expected) {
     Assertions.assertEquals(expected, converted);
 }
 ```
+
+## Legacy library migration profiling
+
+Generate a deterministic 100,000-entry migration fixture from the repository root:
+
+```sh
+python3 scripts/bib-file-generator_legacy.py
+```
+
+The script creates `generated-large-legacy-library.bib` and refuses to overwrite an existing file.
+Use `--entries`, `--separator`, and `--output` for smaller fixtures or libraries with a semicolon keyword separator.
+The fixture contains large and overlapping explicit groups, nested hierarchy modes, duplicate and missing citation keys, markings, and special field values stored in keywords.
+It also includes keyword, regular-expression, search, automatic, and legacy smart groups.
+
+Measure parsing separately from `PerformLoadDatabaseMigrations` with a JVM flight recording.
+Migration runs before GUI attachment: only conversions with remaining legacy content run, using temporarily detached entries and a single citation-key index.
+Entries are reinserted in a batch to restore observation and database indices, and the library is marked modified so the converted representation can be saved.
+A localized notification announces migration when legacy content is found.
+Save and reopen the fixture to verify that no conversion runs again; the content checks still run to detect legacy data in mixed-format libraries.
 
 ## Coverage
 
@@ -108,7 +127,7 @@ to the test class. A temporary file is now created by `Files.createFile(path)`. 
 Sometimes it is necessary to load a specific resource or to access the resource directory
 
 ```java
-Path resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
+Path resourceDir = Paths.get(MSBibImportExportRoundTripFilesTest.class.getResource("MsBibImportExportRoundTripTest1.bib").toURI()).getParent();
 ```
 
 When the directory is needed, it is important to first point to an actual existing file. Otherwise the wrong directory will be returned.
@@ -153,7 +172,7 @@ When executing tests in the sub project, the tests of the other sub projects are
 When executing tests in the main project, all tests of the sub projects are executed.
 
 The exceptions are the (SQL) database and fetcher tests.
-They are marked with `@org.jabref.testutils.category.DatabaseTest`.
+They are marked with `@org.jabref.support.DatabaseTest`.
 
 ### Database tests
 
@@ -171,7 +190,7 @@ docker run -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRE
 
 Set the environment variable `DBMS` to `postgres` (or leave it unset)
 
-Then, all DBMS Tests (annotated with `@org.jabref.testutils.category.DatabaseTest`) run properly.
+Then, all DBMS Tests (annotated with `@org.jabref.support.DatabaseTest`) run properly.
 
 ### Fetchers in tests
 
@@ -179,17 +198,44 @@ Then, all DBMS Tests (annotated with `@org.jabref.testutils.category.DatabaseTes
 Since API keys are required and some providers block requests from unknown IP addresses, these tests are not executed by default.
 Detailed information is available at [JabRef's fetcher documentation](fetchers.md).
 
-Each fetcher test is marked by `@org.jabref.testutils.category.FetcherTest`.
+Each fetcher test is marked by `@org.jabref.support.ExternalServicesTest`.
 Some of them are also marked with `@org.jabref.support.DisabledOnCIServer`, to indicate that they are not executed on the CI server.
 These test are not executed on the CI, because the rate limits of the API providers are too often reached during the build process.
 
-Fetcher tests can be run locally by executing the Gradle task `fetcherTest`. This can be done by running the following command in the command line:
+Fetcher tests can be run locally by executing the Gradle task `externalServicesTest`. This can be done by running the following command in the command line:
 
 ```shell
-./gradlew fetcherTest
+./gradlew externalServicesTest
 ```
 
-Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `fetcherTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > fetcherTest`).
+Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `externalServicesTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > externalServicesTest`).
+
+### Converter integration tests
+
+The BIBFRAME converter integration tests are marked with `@Tag("converter")`. They run the Library of Congress MARC-to-BIBFRAME and BIBFRAME-to-MARC converters, so `git`, `make`, and `xsltproc` must be available on `PATH`.
+
+If you do not already have the converter repositories, clone them next to the JabRef checkout. Run these commands from the JabRef checkout root:
+
+```shell
+git clone https://github.com/lcnetdev/marc2bibframe2.git ../marc2bibframe2
+git -C ../marc2bibframe2 checkout ed9abb038214474e8fc8ba4035d01c42fe0246de
+git clone https://github.com/lcnetdev/bibframe2marc.git ../bibframe2marc
+git -C ../bibframe2marc checkout 36a96c813437ac714e8c9479b2f7be56dc78671d
+```
+
+Run the task from the JabRef checkout root:
+
+```shell
+./gradlew :jablib:converterTest
+```
+
+To run only one test method, use Gradle's standard class and method filter:
+
+```shell
+./gradlew :jablib:test --tests "org.jabref.logic.exporter.BibframeConverterIntegrationTest.bookSurvivesConverterChain"
+```
+
+Gradle passes sibling checkout paths to all `jablib` test tasks as `MARC2BIBFRAME2_DIR` and `BIBFRAME2MARC_DIR`. The test verifies each checkout is at the pinned commit above. If a sibling checkout is missing, JUnit skips the tests that need it. If the repositories are elsewhere, set those environment variables to their paths before running Gradle.
 
 ### "No matching tests found"
 
@@ -204,18 +250,18 @@ Example
 ```
 
 This tells Gradle that `PdfMergeMetadataImporterTest` should be executed as database test.
-However, it is marked as `@FetcherTest`.
-Thus, change `:databaseTest` to `:fetcherTest` to get the test running.
+However, it is marked as `@ExternalServicesTest`.
+Thus, change `:databaseTest` to `:externalServicesTest` to get the test running.
 
 ## Advanced testing and further reading
 
 On top of basic unit testing, there are more ways to test a software:
 
 | Type           | Techniques                                 | Tool (Java)                                                             | Kind of tests                                                  | Used In JabRef                                                |
-| -------------- | ------------------------------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
+|----------------|--------------------------------------------|-------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------|
 | Functional     | Dynamics, black box, positive and negative | [JUnit-QuickCheck](https://github.com/pholser/junit-quickcheck)         | Random data generation                                         | No, not intended, because other test kinds seem more helpful. |
 | Functional     | Dynamics, black box, positive and negative | [GraphWalker](https://graphwalker.github.io)                            | Model-based                                                    | No, because the BibDatabase doesn't need to be tests          |
-| Functional     | Dynamics, black box, positive and negative | [TestFX](https://github.com/TestFX/TestFX)                              | GUI Tests                                                      | Yes                                                           |
+| Functional     | Dynamics, black box, positive and negative | [JavaFX](https://openjfx.io/)                                           | GUI tests                                                      | Yes                                                           |
 | Functional     | Dynamics, black box, negative              | [Lincheck](https://github.com/JetBrains/lincheck)                       | Testing concurrent algorithms                                  | No                                                            |
 | Functional     | Dynamics, white box, negative              | [PIT](https://pitest.org)                                               | Mutation                                                       | No                                                            |
 | Functional     | Dynamics, white box, positive and negative | [Mockito](https://site.mockito.org)                                     | Mocking                                                        | Yes                                                           |

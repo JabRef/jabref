@@ -106,7 +106,7 @@ public class GenerateEmbeddingsAiDatabaseListener implements AiDatabaseListener 
                     documentSplitter.get(),
                     context,
                     linkedFile
-            ));
+            ), false);
         }
     }
 }

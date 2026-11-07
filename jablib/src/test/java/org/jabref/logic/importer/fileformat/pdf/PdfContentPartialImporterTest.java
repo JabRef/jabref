@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
@@ -11,10 +12,18 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -76,7 +85,7 @@ class PdfContentPartialImporterTest {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Link to record in KAR and http://kar.kent.ac.uk/51043/  and Document Version and UNSPECIFIED  and Master of Research (MRes) thesis and University of Kent")
                 .withField(StandardField.TITLE, "Kent Academic Repository Full text document (pdf) Citation for published version Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock Losses and Stakeholder Opinions. DOI")
-                .withField(StandardField.YEAR, "5104");
+                .withField(StandardField.YEAR, "2014");
 
         String firstPageContents = """
                 Kent Academic Repository Full text document (pdf)
@@ -92,6 +101,112 @@ class PdfContentPartialImporterTest {
                 Master of Research (MRes) thesis, University of Kent,.""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void yearNotExtractedFromLongerDigitRun() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Universitaetsstr. 38, 70569 Stuttgart, Germany""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.empty(), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"1999-2005", "1999–2005", "1999—2005", "1999  -  2005", "1999 \t— 2005"})
+    void pageRangeSkippedInFavorOfActualYear(String pageRange) {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Proceedings, pp. %s, 2018""".formatted(pageRange);
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2018"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void yearAfterIssueNumberAndDashExtracted() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Journal of Examples, Vol. 1 - 2024""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2024"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void yearInsideIdentifierSkippedInFavorOfActualYear() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Proceedings of IPAC2019, published 2021""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2021"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void implausibleYearInSpringerFooterNotImported() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                A. Persson and J. Stirna (Eds.): PoEM, LNBIP 39, pp. 161-175, 7056.""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.empty(), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void yearRangeInSpringerFooterSkippedInFavorOfActualYear() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                A. Persson and J. Stirna (Eds.): PoEM, LNBIP 39, pp. 161-175, 1999-2005 series, 2009.""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2009"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void implausibleFourDigitNumberSkippedInFavorOfActualYear() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                CH-8092 Zurich, 2018""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2018"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
     }
 
     @Test
@@ -189,5 +304,44 @@ class PdfContentPartialImporterTest {
                 Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/Fritzsch2022.pdf"),
                 Arguments.of("OPIUM: Optimal Package Install/Uninstall Manager", "/pdfs/PdfContentImporter/Tucker2007.pdf")
         );
+    }
+
+    /// The generated PDF mimics pdfTeX output: no space glyphs at all — words are separated by
+    /// `TJ` advances (negative values move the pen right), and kerned pairs such as "To" are drawn
+    /// as separate strings pulled tighter (positive values move left). The kern must not be read as
+    /// a word boundary, and the same-font-size label on page two must not be glued onto the title.
+    @Test
+    void pdfTitleExtractionIgnoresKerningAndTextOfFollowingPages(@TempDir Path tempDir) throws IOException {
+        Path file = tempDir.resolve("kerned-title.pdf");
+        try (PDDocument document = new PDDocument()) {
+            PDFont titleFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+            PDPage firstPage = new PDPage();
+            document.addPage(firstPage);
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, firstPage)) {
+                contentStream.beginText();
+                contentStream.setFont(titleFont, 13);
+                contentStream.newLineAtOffset(72, 750);
+                contentStream.showTextWithPositioning(new Object[] {"Method", -273f, "to", -273f, "Split", -273f, "T", 92f, "opology", -273f, "Models"});
+                contentStream.endText();
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+                contentStream.newLineAtOffset(72, 720);
+                contentStream.showText("Ann Author");
+                contentStream.endText();
+            }
+            PDPage secondPage = new PDPage();
+            document.addPage(secondPage);
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, secondPage)) {
+                contentStream.beginText();
+                contentStream.setFont(titleFont, 13);
+                contentStream.newLineAtOffset(300, 400);
+                contentStream.showText("PaaS B");
+                contentStream.endText();
+            }
+            document.save(file.toFile());
+        }
+
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        assertEquals(Optional.of("Method to Split Topology Models"), result.getFirst().getTitle());
     }
 }

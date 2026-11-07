@@ -74,13 +74,13 @@ public class OS {
                 return false;
             }
             keyring.deletePassword("JabRef", "keyringTest");
-        } catch (BackendNotSupportedException ex) {
+        } catch (BackendNotSupportedException _) {
             LoggerFactory.getLogger(OS.class).warn("Credential store not supported.");
             return false;
-        } catch (PasswordAccessException ex) {
+        } catch (PasswordAccessException _) {
             LoggerFactory.getLogger(OS.class).warn("Password storage in credential store failed.");
             return false;
-        } catch (Exception ex) {
+        } catch (Exception _) {
             LoggerFactory.getLogger(OS.class).warn("Connection to credential store failed");
             return false;
         }

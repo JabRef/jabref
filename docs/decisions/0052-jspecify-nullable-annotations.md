@@ -28,7 +28,7 @@ We want to detect null-safety issues earlier at compile time and improve API cla
 
 Chosen option: "Adopt JSpecify annotations" because it comes out best (see below).
 
-## Consequences
+### Consequences
 
 * Earlier detection of potential NPEs.
 * Clearer API documentation.

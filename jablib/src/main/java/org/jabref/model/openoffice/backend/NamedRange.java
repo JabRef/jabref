@@ -12,7 +12,7 @@ import com.sun.star.text.XTextRange;
 
 /// NamedRange (with NamedRangeManager) attempts to provide a common interface for working with reference mark based and bookmark based text ranges to be used as locations to fill with citation markers. LibreOffice supports name-based lookup and listing names for both (hence the name).
 ///
-/// Note: currently only implemented for refence marks (in NamedRangeReferenceMark and NamedRangeManagerReferenceMark).
+/// Note: currently only implemented for reference marks (in NamedRangeReferenceMark and NamedRangeManagerReferenceMark).
 public interface NamedRange {
 
     String getRangeName();

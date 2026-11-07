@@ -1,23 +1,22 @@
 package org.jabref.gui.mergeentries.threewaymerge.fieldsmerger;
 
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
 public class FieldMergerFactory {
-    private final BibEntryPreferences bibEntryPreferences;
+    private final Character keywordSeparator;
 
-    public FieldMergerFactory(BibEntryPreferences bibEntryPreferences) {
-        this.bibEntryPreferences = bibEntryPreferences;
+    public FieldMergerFactory(Character keywordSeparator) {
+        this.keywordSeparator = keywordSeparator;
     }
 
     public FieldMerger create(Field field) {
         return switch (field) {
             case StandardField.GROUPS ->
-                    new GroupMerger(bibEntryPreferences);
+                    new GroupMerger(keywordSeparator);
             case StandardField.KEYWORDS ->
-                    new KeywordMerger(bibEntryPreferences);
+                    new KeywordMerger(keywordSeparator);
             case StandardField.COMMENT ->
                     new CommentMerger();
             case StandardField.FILE ->

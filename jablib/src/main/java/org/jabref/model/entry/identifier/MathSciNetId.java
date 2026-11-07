@@ -55,7 +55,7 @@ public class MathSciNetId implements Identifier {
     public Optional<URI> getExternalURI() {
         try {
             return Optional.of(new URI("https://www.ams.org/mathscinet-getitem?mr=" + identifier));
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
     }

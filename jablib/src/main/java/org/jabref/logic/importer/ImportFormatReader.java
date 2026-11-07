@@ -13,6 +13,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.fileformat.BibframeImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CffImporter;
@@ -20,8 +21,10 @@ import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
+import org.jabref.logic.importer.fileformat.HayagrivaImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
+import org.jabref.logic.importer.fileformat.MarcXmlImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
@@ -54,7 +57,7 @@ public class ImportFormatReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportFormatReader.class);
 
     /// All import formats.
-    /// Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
+    /// Sorted accordingly to [Importer#compareTo], which defaults to alphabetically by the name
     private final List<Importer> importers = new ArrayList<>(30);
 
     private final ImporterPreferences importerPreferences;
@@ -75,11 +78,13 @@ public class ImportFormatReader {
     }
 
     public void reset() {
+        importers.add(new BibframeImporter());
         importers.add(new CopacImporter());
         importers.add(new EndnoteImporter(citationKeyPatternPreferences));
         importers.add(new EndnoteXmlImporter(importFormatPreferences));
         importers.add(new InspecImporter());
         importers.add(new IsiImporter());
+        importers.add(new MarcXmlImporter());
         importers.add(new MedlineImporter());
         importers.add(new MedlinePlainImporter(importFormatPreferences));
         importers.add(new ModsImporter(importFormatPreferences));
@@ -99,6 +104,7 @@ public class ImportFormatReader {
         importers.add(new CffImporter(citationKeyPatternPreferences));
         importers.add(new BiblioscapeImporter());
         importers.add(new CitaviXmlImporter());
+        importers.add(new HayagrivaImporter());
 
         // Get user-selected imports
         importers.addAll(importerPreferences.getCustomImporters());
@@ -239,7 +245,8 @@ public class ImportFormatReader {
             }
             try {
                 if (!isRecognizedFormat.apply(importer) || importer instanceof ReferImporter) {
-                    // Refer/BibIX should be explicitly chosen by user // TODO: Why - introduced at PR #13118
+                    // Refer/BibIX is recognized by a `%0 ` line, which real EndNote files carry as well, so auto detection
+                    // would route them here instead of to the EndNote importer. Refer/BibIX therefore has to be picked by the user.
                     continue;
                 }
                 ParserResult parserResult = importDatabase.apply(importer);
@@ -277,7 +284,7 @@ public class ImportFormatReader {
             } else {
                 throw new ImportException(parserResult.getErrorMessage());
             }
-        } catch (IOException ignore) {
+        } catch (IOException _) {
             throw new ImportException(Localization.lang("Could not find a suitable import format."));
         }
     }

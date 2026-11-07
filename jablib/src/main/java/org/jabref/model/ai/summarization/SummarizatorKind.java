@@ -9,7 +9,7 @@ public enum SummarizatorKind {
     public static SummarizatorKind safeValueOf(String name) {
         try {
             return SummarizatorKind.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return AiDefaultEnums.SUMMARIZATOR_KIND;
         }
     }

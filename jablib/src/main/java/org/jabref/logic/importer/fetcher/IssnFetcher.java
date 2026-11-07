@@ -14,7 +14,7 @@ import org.jspecify.annotations.NonNull;
 
 /// Fetcher to generate the BibTex entry from an ISSN.
 /// As an ISSN ist just a journal identifier, so we only return journal title and publisher
-/// The idea is to use the {@link JournalInformationFetcher} to do a request for a given ISSN.
+/// The idea is to use the [JournalInformationFetcher] to do a request for a given ISSN.
 
 public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 

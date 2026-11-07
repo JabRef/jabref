@@ -32,9 +32,9 @@ public class UnlinkedFilesCellFactory extends CheckBoxTreeCell<FileNodeViewModel
                                     UnlinkedFilesDialogViewModel viewModel) {
         this.stateManager = stateManager;
         this.viewModel = viewModel;
-        cellContent.setSpacing(10);
-        leftSide.setSpacing(5);
-        jumpIcon.setSpacing(5);
+        cellContent.setSpacing(8);
+        leftSide.setSpacing(4);
+        jumpIcon.setSpacing(4);
 
         new ViewModelListCellFactory<BibEntry>()
                 .withText(entry -> entry.getCitationKey().orElse(Localization.lang("new")))

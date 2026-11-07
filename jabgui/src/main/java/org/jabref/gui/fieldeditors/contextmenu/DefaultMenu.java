@@ -42,7 +42,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
         for (final Formatter caseChanger : Formatters.getCaseChangers()) {
             MenuItem menuItem = new MenuItem(caseChanger.getName());
             EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
-            menuItem.setOnAction(event ->
+            menuItem.setOnAction(_ ->
                     textInputControl.textProperty().set(caseChanger.format(textInputControl.textProperty().get())));
             submenu.getItems().add(menuItem);
         }
@@ -56,7 +56,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
         for (Formatter converter : Formatters.getConverters()) {
             MenuItem menuItem = new MenuItem(converter.getName());
             EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
-            menuItem.setOnAction(event ->
+            menuItem.setOnAction(_ ->
                     textInputControl.textProperty().set(converter.format(textInputControl.textProperty().get())));
             submenu.getItems().add(menuItem);
         }
@@ -67,7 +67,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
     // Icon: DELETE_SWEEP
     private static MenuItem getClearFieldMenuItem(TextInputControl textInputControl) {
         MenuItem menuItem = new MenuItem(Localization.lang("Clear"));
-        menuItem.setOnAction(event -> textInputControl.setText(""));
+        menuItem.setOnAction(_ -> textInputControl.setText(""));
 
         return menuItem;
     }

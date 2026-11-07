@@ -38,7 +38,7 @@ class GenerateCitationKeys implements Callable<Integer> {
     private CitationKeys parentCommand;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Mixin
     private InputOption inputOption = new InputOption();
@@ -81,7 +81,7 @@ class GenerateCitationKeys implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
-        Path inputFile = inputOption.getInputFile();
+        Path inputFile = inputOption.getInputFile(parentCommand.getParent().cliPreferences);
         ParserResult parserResult = ImportService.importBibTexFile(
                 inputFile,
                 parentCommand.getParent().cliPreferences,
@@ -93,9 +93,13 @@ class GenerateCitationKeys implements Callable<Integer> {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
         }
 
-        CitationKeyGenerator keyGenerator = getCitationKeyGenerator(databaseContext);
+        CitationKeyPatternPreferences preferencesToUse = getCitationKeyPatternPreferences();
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferencesToUse);
         for (BibEntry entry : databaseContext.getEntries()) {
-            keyGenerator.generateAndSetKey(entry);
+            // [impl->req~jabkit.cli.citation-key-avoid-overwrite~1]
+            if (!preferencesToUse.shouldAvoidOverwriteCiteKey() || !entry.hasCitationKey()) {
+                keyGenerator.generateAndSetKey(entry);
+            }
         }
 
         ExportService exportService = ExportService.create(parentCommand.getParent().cliPreferences, sharedOptions.porcelain);
@@ -107,10 +111,10 @@ class GenerateCitationKeys implements Callable<Integer> {
         return CommandLine.ExitCode.OK;
     }
 
-    private @NonNull CitationKeyGenerator getCitationKeyGenerator(BibDatabaseContext databaseContext) {
+    private @NonNull CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
         CitationKeyPatternPreferences existingPreferences = parentCommand.getParent().cliPreferences.getCitationKeyPatternPreferences();
 
-        CitationKeyPatternPreferences preferencesToUse = new CitationKeyPatternPreferences(
+        return new CitationKeyPatternPreferences(
                 transliterate != null ? transliterate : existingPreferences.shouldTransliterateFieldsForCitationKey(),
                 avoidOverwrite != null ? avoidOverwrite : existingPreferences.shouldAvoidOverwriteCiteKey(),
                 warnBeforeOverwrite != null ? warnBeforeOverwrite : existingPreferences.shouldWarnBeforeOverwriteCiteKey(),
@@ -122,7 +126,6 @@ class GenerateCitationKeys implements Callable<Integer> {
                 getKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
                 new SimpleObjectProperty<>(keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordSeparator())
         );
-        return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }
 
     /// Creates keyPatterns from preferences and --key-patterns option

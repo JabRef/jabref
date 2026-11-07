@@ -64,12 +64,12 @@ public class FrameDndHandler {
                 // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
                 for (Node destinationTabNode : tabPane.lookupAll(".tab")) {
                     destinationTabNode.setOnDragOver(tabDragEvent -> onTabDragOver(event, tabDragEvent, dndIndicator));
-                    destinationTabNode.setOnDragExited(tabDragEvent -> tabPane.getTabs().remove(dndIndicator));
+                    destinationTabNode.setOnDragExited(_ -> tabPane.getTabs().remove(dndIndicator));
                     destinationTabNode.setOnDragDropped(tabDragEvent -> onTabDragDropped(destinationTabNode, tabDragEvent, dndIndicator));
                 }
                 event.consume();
             });
-            scene.get().setOnDragExited(event -> tabPane.getTabs().remove(dndIndicator));
+            scene.get().setOnDragExited(_ -> tabPane.getTabs().remove(dndIndicator));
             scene.get().setOnDragDropped(event -> onSceneDragDropped(event, dndIndicator));
         });
     }
@@ -108,10 +108,13 @@ public class FrameDndHandler {
 
             boolean success = false;
             if (hasEntries(dragboard)) {
+                List<BibEntry> originalEntries = stateManager.getLocalDragboard().getBibEntries();
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
-                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies);
+                TransferMode mode = tabDragEvent.getTransferMode();
+                org.jabref.model.TransferMode modelTransferMode = from(mode);
+                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, originalEntries, entryCopies, modelTransferMode);
                 success = true;
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
@@ -162,7 +165,7 @@ public class FrameDndHandler {
         }
 
         if (tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
-            tabDragEvent.acceptTransferModes(TransferMode.COPY);
+            tabDragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             tabDragEvent.consume();
         }
     }
@@ -221,7 +224,7 @@ public class FrameDndHandler {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.addSubgroup(groupTreeNodeToCopy.copyNode().getGroup());
         // add all entries of a groupTreeNode to the new library.
-        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries));
+        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries), groupTreeNodeToCopy.getEntriesInGroup(allEntries), org.jabref.model.TransferMode.COPY);
         // List of all children of groupTreeNodeToCopy
         List<GroupTreeNode> children = groupTreeNodeToCopy.getChildren();
 
@@ -259,5 +262,19 @@ public class FrameDndHandler {
         } else {
             return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
         }
+    }
+
+    private static org.jabref.model.TransferMode from(TransferMode javafxTransferMode) {
+        if (javafxTransferMode == null) {
+            return org.jabref.model.TransferMode.NONE;
+        }
+        return switch (javafxTransferMode) {
+            case COPY ->
+                    org.jabref.model.TransferMode.COPY;
+            case MOVE ->
+                    org.jabref.model.TransferMode.MOVE;
+            case LINK ->
+                    org.jabref.model.TransferMode.NONE;
+        };
     }
 }

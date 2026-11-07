@@ -12,6 +12,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -102,7 +103,10 @@ public class AllCitationFetcher implements CitationFetcher {
         }
 
         if (!anySuccess && lastException != null) {
-            throw new FetcherException("All citation providers failed", lastException);
+            throw new FetcherException(
+                    "All citation providers failed",
+                    Localization.lang("No citation providers could return results for this request."),
+                    lastException);
         }
 
         if (lastException != null) {

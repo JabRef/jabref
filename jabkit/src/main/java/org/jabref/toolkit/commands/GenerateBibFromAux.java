@@ -33,7 +33,7 @@ class GenerateBibFromAux implements Callable<Integer> {
     private JabKit argumentProcessor;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Option(names = "--aux", required = true)
     private Path auxFile;
@@ -49,7 +49,7 @@ class GenerateBibFromAux implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
-        Path inputFile = inputOption.getInputFile();
+        Path inputFile = inputOption.getInputFile(argumentProcessor.cliPreferences);
         ParserResult pr = ImportService.importBibTexFile(
                 inputFile,
                 argumentProcessor.cliPreferences,

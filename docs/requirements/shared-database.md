@@ -1,0 +1,142 @@
+---
+parent: Requirements
+---
+# Shared SQL database
+
+## Shared database must propagate changes live to connected clients
+`req~shared-database.live-propagation~1`
+
+Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action. This includes deleting the entire group tree.
+
+Needs: impl, utest
+
+## Shared database must provide atomic metadata snapshots
+`req~shared-database.atomic-metadata-snapshots~1`
+
+When a client changes shared metadata, other clients observe either the complete previous snapshot or the complete new snapshot, never an intermediate subset of the change.
+
+Needs: impl, utest
+
+## Change notifications must contain full mutation details
+`req~shared-database.change-content-in-notification~1`
+
+A field change notification carries the change itself (entry id, field, old and new value, entry version), so receivers apply it directly. Receivers fall back to pulling from the database whenever the notification does not exactly match their local state.
+
+Needs: impl
+
+## Shared database client must batch keystroke-level micro-edits
+`req~shared-database.micro-edit-batching~1`
+
+Keystroke-level edits are not written per keystroke: they are buffered and flushed on the next major change or when the library is closed. A flush notifies the other clients.
+
+Needs: impl
+
+## Shared database client must detect concurrent edits on entries
+`req~shared-database.concurrent-edit-detection~1`
+
+Two clients editing the same entry cannot overwrite each other unnoticed: the second write is refused and offered for merging, even if both writes happen at the same moment. A refused edit keeps its local state until it is merged.
+
+Needs: impl
+
+## Shared database client must offer merge dialog on conflicting edits
+`req~shared-database.conflict-merge-dialog~1`
+
+When a local change is refused because the shared entry has a newer version, the user is told which versions collide and is offered the merge entries dialog showing the local and the shared entry side by side. The merged entry replaces the shared one and becomes the local one. Until the user has decided, the local entry keeps its unsynchronized state; cancelling leaves it unsynchronized.
+
+Needs: impl
+
+## Shared database client must preserve offline changes locally
+`req~shared-database.offline-changes~1`
+
+When the connection to the shared database is lost, the user keeps working: every change is kept locally, survives closing and reopening JabRef, and is synchronized on the next connect to the same database. A kept change whose shared entry was changed meanwhile is offered for merging.
+
+Needs: impl
+
+## Shared database client must reconnect automatically after connection loss
+`req~shared-database.automatic-reconnect~1`
+
+After a connection loss, JabRef reconnects by itself with increasing intervals for as long as the library is open. The user is informed when the connection is lost and when it is back, without being interrupted.
+
+Needs: impl
+
+## Library tab must display loading indicator while connecting to shared database
+`req~shared-database.loading-indicator~1`
+
+While JabRef opens or reconnects a shared database, its library tab displays a loading indicator until the connection completes or fails.
+
+Needs: impl
+
+## Shared database client must migrate legacy database schemas on connect
+`req~shared-database.migration~1`
+
+Connecting to a database created by an earlier JabRef version copies its content into the current table structure. The old tables are kept, so older JabRef versions continue to work.
+
+Needs: impl
+
+## Shared database client must load entries with missing entry types
+`req~shared-database.missing-entry-type~1`
+
+When a shared database entry has a null or blank type, JabRef loads it as `Misc` instead of failing to load the shared database.
+
+Needs: impl, utest
+
+## Shared database login dialog must accept connection URLs
+`req~shared-database.connection-url~1`
+
+The login dialog accepts a connection URL as handed out by hosting providers (`postgres://user:password@host:port/database?...`) or a JDBC URL and fills in the connection details from it. Parameters JabRef has no dedicated setting for are passed on to the driver unchanged.
+
+Needs: impl
+
+## JabRef must reopen connected shared databases on startup
+`req~shared-database.reopen-on-startup~1`
+
+A shared database that is still connected when JabRef closes is reconnected on the next start, like the last opened local libraries. This also covers connections that are not backed by a local file.
+
+Needs: impl
+
+## Connected shared databases must be offered in the login dialog
+`req~shared-database.saved-connections-offered~1`
+
+Every shared database that was connected to is stored, so it can be connected to again without retyping the connection details.
+See <https://github.com/JabRef/jabref/issues/12948>.
+
+Needs: impl, utest
+
+## Reconnecting to a stored shared database must not store it a second time
+`req~shared-database.saved-connections-unique~1`
+
+Connecting to a database that is already stored updates that entry instead of adding a second, indistinguishable one.
+Duplicates stored by earlier versions are listed once.
+
+Needs: impl, utest
+
+## A stored shared database connection must be deletable
+`req~shared-database.saved-connections-deletable~1`
+
+Deleting also removes the stored password and stops the database from being reopened on startup.
+A connection whose library is open cannot be deleted, because quitting would store it again.
+
+Needs: impl, utest
+
+## A failed connection can be retried
+`req~shared-database.reconnect-retry~1`
+
+If connecting fails, on startup or from the connection dialog, the database is shown as a tab carrying the error and a retry button instead of an error dialog. A remembered database stays remembered when JabRef is closed while that tab is open.
+
+Needs: impl
+
+## A database is open in one tab only
+`req~shared-database.single-tab~1`
+
+A shared database identified by its DBMS type, normalized host, port, and database name is never opened in a second tab, whichever way the connection is entered (form fields, JDBC URL, a library file carrying its id, or a remembered connection at startup). Instead, the tab that is already connected or connecting is shown.
+
+Needs: impl, utest
+
+## Shared database cleanup must not block other library tabs
+`req~shared-database.background-close~1`
+
+Closing a shared library prepares pending model changes on the JavaFX thread and flushes them in the background. Reopening the same database and application shutdown wait for cleanup to finish.
+
+Needs: impl, utest
+
+<!-- markdownlint-disable-file MD022 -->

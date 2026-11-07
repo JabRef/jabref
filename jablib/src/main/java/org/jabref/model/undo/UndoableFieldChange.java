@@ -1,0 +1,53 @@
+package org.jabref.model.undo;
+
+import java.util.Objects;
+
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+/// A change of one field of one entry. A `null` value means the field is absent.
+@NullMarked
+public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String before, @Nullable String after) implements BibChange {
+
+    public UndoableFieldChange(FieldChange change) {
+        this(change.entry(), change.field(), change.oldValue(), change.newValue());
+    }
+
+    @Override
+    public UndoableFieldChange inverted() {
+        return new UndoableFieldChange(entry, field, after, before);
+    }
+
+    @Override
+    // [impl->req~logic.undo.stale-change-refused~1]
+    public ApplyResult apply() {
+        String current = entry.getField(field).orElse(null);
+        if (!Objects.equals(current, before)) {
+            return ApplyResult.of(this, "field %s holds '%s', not the recorded '%s'".formatted(field.getName(), current, before));
+        }
+        if (after == null) {
+            entry.clearField(field);
+        } else {
+            entry.setField(field, after);
+        }
+        return ApplyResult.SUCCESS;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        return (object instanceof UndoableFieldChange other)
+                && ChangeIdentity.same(entry, other.entry)
+                && field.equals(other.field)
+                && Objects.equals(before, other.before)
+                && Objects.equals(after, other.after);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ChangeIdentity.hash(entry), field, before, after);
+    }
+}

@@ -28,7 +28,7 @@ import org.jspecify.annotations.NonNull;
 /// Importer for the Refer/Endnote format.
 /// modified to use article number for pages if pages are missing (some
 /// journals, e.g., Physical Review Letters, don't use pages anymore)
-/// <br>
+///
 /// check here for details on the format
 /// <a href="http://libguides.csuchico.edu/c.php?g=414245&p=2822898">...</a>
 public class EndnoteImporter extends Importer {

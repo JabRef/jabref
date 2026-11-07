@@ -15,7 +15,7 @@ public interface Field {
 
     /// Name used for writing to .bib (or as XMP data)
     ///
-    /// However, BibEntryWriter converts to lower case. See {@link org.jabref.logic.bibtex.BibEntryWriter#getFormattedFieldName}
+    /// However, BibEntryWriter converts to lower case. See [org.jabref.logic.bibtex.BibEntryWriter#getFormattedFieldName]
     String getName();
 
     boolean isStandardField();

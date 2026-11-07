@@ -111,6 +111,13 @@ class URLUtilTest {
     }
 
     @Test
+    void createUriKeepsSchemeAndQuery() {
+        String input = "https://journals.plos.org/plosmedicine/article/file?id=10.1371/journal.pmed.1004085&type=printable";
+        URI uri = URLUtil.createUri(input);
+        assertEquals(input, uri.toASCIIString());
+    }
+
+    @Test
     void createUriShouldHandlePipeCharacter() {
         String input = "http://example.com/test|file";
         URI uri = URLUtil.createUri(input);

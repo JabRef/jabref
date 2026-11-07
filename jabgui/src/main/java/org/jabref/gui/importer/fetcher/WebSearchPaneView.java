@@ -62,7 +62,7 @@ public class WebSearchPaneView extends VBox {
     /// Allows triggering search on pressing enter
     private void enableEnterToTriggerSearch(TextField query) {
         query.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER && viewModel.searchEnabledProperty().get()) {
                 viewModel.search();
             }
         });
@@ -110,7 +110,7 @@ public class WebSearchPaneView extends VBox {
         modeIndicator.textProperty().bind(viewModel.searchModeIndicatorProperty());
         modeIndicator.managedProperty().bind(modeIndicator.visibleProperty());
         modeIndicator.visibleProperty().bind(modeIndicator.textProperty().isNotEmpty());
-        modeIndicator.getStyleClass().add("mode-indicator");
+        modeIndicator.getStyleClass().addAll("text-muted");
         modeIndicator.setMaxWidth(Double.MAX_VALUE);
         return modeIndicator;
     }
@@ -120,13 +120,13 @@ public class WebSearchPaneView extends VBox {
         BooleanExpression importerEnabled = preferences.getImporterPreferences().importerEnabledProperty();
         Button search = new Button(Localization.lang("Search"));
         search.setDefaultButton(false);
-        search.setOnAction(event -> viewModel.search());
+        search.setOnAction(_ -> viewModel.search());
         search.setMaxWidth(Double.MAX_VALUE);
-        search.disableProperty().bind(importerEnabled.not());
+        search.disableProperty().bind(viewModel.searchEnabledProperty().not());
         return search;
     }
 
-    /// Creatse help button for currently selected fetcher
+    /// Creates help button for currently selected fetcher
     private StackPane createHelpButtonContainer() {
         StackPane helpButtonContainer = new StackPane();
         ActionFactory factory = new ActionFactory();

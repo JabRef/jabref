@@ -16,10 +16,10 @@
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="650.0" prefWidth="500.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.auximport.FromAuxDialog">
     <content>
-        <VBox spacing="30">
-            <VBox spacing="5.0">
+        <VBox spacing="12">
+            <VBox spacing="4.0">
                 <Label text="%LaTeX AUX file:"/>
-                <HBox spacing="10" alignment="BASELINE_LEFT">
+                <HBox spacing="8" alignment="BASELINE_LEFT">
                     <TextField fx:id="auxFileField" HBox.hgrow="ALWAYS"/>
                     <Button onAction="#browseButtonClicked"
                             styleClass="icon-button,narrow"

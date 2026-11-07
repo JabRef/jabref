@@ -11,7 +11,7 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.keypattern.KeyPatternPropertiesView">
     <HBox alignment="BOTTOM_LEFT" spacing="8.0">
-        <Label styleClass="sectionHeader" text="%Key patterns"/>
+        <Label styleClass="h4,padding-top-12" text="%Key patterns"/>
         <HelpButton helpUrl="https://docs.jabref.org/setup/citationkeypatterns"/>
     </HBox>
     <Label text="%( Note: Press return to commit changes in the table! )"/>

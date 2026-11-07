@@ -15,6 +15,17 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable exception) {
+        if (exception instanceof UncheckedFetcherException ufe) {
+            // FetcherException#getLocalizedMessage embeds the upstream URL,
+            // HTTP status line, and full response body — none of which are
+            // safe to send back to the HTTP client. Log the full chain for
+            // operators, return a generic body to the caller.
+            LOGGER.warn("Plain-citation fetcher failed", ufe.getCause());
+            return Response.serverError()
+                           .entity("Plain-citation fetcher failed.")
+                           .type(MediaType.TEXT_PLAIN)
+                           .build();
+        }
         if (exception instanceof WebApplicationException webex) {
             Response response = webex.getResponse();
             // Preserve responses that already carry their own body and content type — e.g. the

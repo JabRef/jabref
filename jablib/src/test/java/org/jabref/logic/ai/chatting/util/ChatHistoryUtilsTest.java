@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// [utest->req~ai.chat.delete-messages~1]
-// [utest->req~ai.chat.regenerate-response~1]
-// [utest->req~ai.chat.clear-history~1]
+// [utest->feat~ai.chat.delete-messages~1]
+// [utest->feat~ai.chat.regenerate-response~1]
+// [utest->feat~ai.chat.clear-history~1]
 class ChatHistoryUtilsTest {
 
     @Test
@@ -66,6 +66,17 @@ class ChatHistoryUtilsTest {
 
         assertTrue(toRegenerate.isPresent());
         assertEquals("original question", toRegenerate.get());
+    }
+
+    @Test
+    void regenerateOnAiMessageWithoutAssociatedUserDoesNothing() {
+        ChatMessage ai = new ChatMessage("id-ai", Instant.ofEpochMilli(2000), ChatMessage.Role.AI, "ai answer", List.of());
+        List<ChatMessage> history = new ArrayList<>(List.of(ai));
+
+        Optional<String> toRegenerate = ChatHistoryUtils.regenerate(history, ai.id());
+
+        assertTrue(toRegenerate.isEmpty());
+        assertEquals(List.of(ai), history);
     }
 
     @Test

@@ -35,13 +35,6 @@ public class ProtectedTermsPreferences {
         return new ProtectedTermsPreferences();
     }
 
-    public void setAll(ProtectedTermsPreferences preferences) {
-        this.enabledInternalTermLists.setAll(preferences.getEnabledInternalTermLists());
-        this.enabledExternalTermLists.setAll(preferences.getEnabledExternalTermLists());
-        this.disabledInternalTermLists.setAll(preferences.getDisabledInternalTermLists());
-        this.disabledExternalTermLists.setAll(preferences.getDisabledExternalTermLists());
-    }
-
     public ObservableList<String> getEnabledInternalTermLists() {
         return enabledInternalTermLists;
     }

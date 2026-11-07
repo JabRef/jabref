@@ -17,12 +17,6 @@
 		</div>
 		\end{pmid}
 
-		\begin{citeseerurl}
-		<div class="bibtex_citeseer">
-			<a href="http://citeseer.ist.psu.edu/\citeseerurl">cs</a>
-		</div>
-		\end{citeseerurl}
-
 		\begin{file}
 		<div class="bibtex_pdf">
 			\format[FileLink(pdf),WrapContent(<a href=",">pdf</a>)]{\file}

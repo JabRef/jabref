@@ -30,7 +30,7 @@
             <Label text="%Link"/>
             <TextField fx:id="link" prefHeight="25.0"
                        GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
-            <Button id="browse" onAction="#openBrowseDialog"
+            <Button id="linked-file-browse" onAction="#openBrowseDialog"
                     styleClass="icon-button,narrow"
                     prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="2">
                 <graphic>
@@ -42,15 +42,15 @@
             </Button>
 
             <Label text="Description" GridPane.rowIndex="1"/>
-            <TextField fx:id="description" prefHeight="25.0"
+            <TextField fx:id="description" id="linked-file-description" prefHeight="25.0"
                        GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"/>
 
             <Label text="Filetype" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="fileType"
+            <ComboBox fx:id="fileType" id="linked-file-type"
                       GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2"/>
 
             <Label text="%Source URL" GridPane.rowIndex="3"/>
-            <TextField fx:id="sourceUrl" prefHeight="25.0"
+            <TextField fx:id="sourceUrl" id="linked-file-source-url" prefHeight="25.0"
                        GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3"/>
         </GridPane>
     </content>

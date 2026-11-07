@@ -45,13 +45,18 @@
             button1Text="%Regenerate"
             onButton1Click="#regenerate"
             showButton2="true"
-            button2Text="%Cancel"
+            button2Text="%Regenerate with custom parameters"
             onButton2Click="#regenerateCustom"/>
 
     <UniversalStatusPaneView
             fx:id="noFilesPane"
             title="%Unable to generate summary"
             description="%Please attach at least one PDF file to enable summarization of PDF file(s)."/>
+
+    <UniversalStatusPaneView
+            fx:id="noLocalFilePane"
+            title="%Unable to generate summary"
+            description="%The linked file seems to be stored remotely. Download the file to your local device and re-link it to be able to generate a summary."/>
 
     <UniversalStatusPaneView
             fx:id="noSupportedFileTypesPane"

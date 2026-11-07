@@ -1,0 +1,57 @@
+<mods xmlns="http://www.loc.gov/mods/v3" xmlns:zs="http://docs.oasis-open.org/ns/search-ws/sruResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.8" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-8.xsd">
+<titleInfo>
+<title>Developing high quality data models</title>
+</titleInfo>
+<name type="personal" usage="primary">
+<namePart>West, Matthew,</namePart>
+<namePart type="date">1953-</namePart>
+</name>
+<typeOfResource>text</typeOfResource>
+<genre authority="rdacontent">text</genre>
+<originInfo>
+<place>
+<placeTerm authority="marccountry" type="code">mau</placeTerm>
+</place>
+<dateIssued encoding="marc">2011</dateIssued>
+<issuance>monographic</issuance>
+<place>
+<placeTerm type="text">Burlington, MA</placeTerm>
+</place>
+<agent>
+<namePart>Morgan Kaufmann</namePart>
+</agent>
+<dateIssued>c2011</dateIssued>
+</originInfo>
+<language>
+<languageTerm authority="iso639-2b" type="code">eng</languageTerm>
+</language>
+<physicalDescription>
+<form authority="marcform">print</form>
+<form authority="rdamedia" type="media">unmediated</form>
+<form authority="rdacarrier" type="carrier">volume</form>
+<extent>xvii, 389 p. : ill. ; 24 cm.</extent>
+</physicalDescription>
+<note type="statement of responsibility">Matthew West.</note>
+<note>Includes index.</note>
+<subject authority="lcsh">
+<topic>Database design</topic>
+</subject>
+<subject authority="lcsh">
+<topic>Data structures (Computer science)</topic>
+</subject>
+<classification authority="lcc">QA76.9.D26 W47 2011</classification>
+<classification authority="ddc" edition="22">005.7/3</classification>
+<classification authority="bcl">54.10</classification>
+<identifier type="isbn">9780123751065</identifier>
+<identifier type="isbn">0123751063</identifier>
+<identifier type="lccn">2010045158</identifier>
+<identifier type="oclc">665135773</identifier>
+<recordInfo>
+<descriptionStandard>aacr</descriptionStandard>
+<recordContentSource authority="marcorg">DLC</recordContentSource>
+<recordCreationDate encoding="marc">101124</recordCreationDate>
+<recordChangeDate encoding="iso8601">20250607041254.0</recordChangeDate>
+<recordIdentifier>16552360</recordIdentifier>
+<recordOrigin>Converted from MARCXML to MODS version 3.8 using MARC21slim2MODS3-8_XSLT1-0.xsl (Revision 1.172 20230208)</recordOrigin>
+</recordInfo>
+</mods>

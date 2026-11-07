@@ -2,14 +2,13 @@ package org.jabref.gui.relatedwork;
 
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
@@ -34,7 +33,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
     @FXML private ButtonType insertButtonType;
 
     @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
+    @Inject private StateManager stateManager;
 
     private RelatedWorkResultDialogViewModel viewModel;
 
@@ -49,7 +48,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(insertButtonType, getDialogPane(), event -> {
+        ControlHelper.setAction(insertButtonType, getDialogPane(), _ -> {
             if (viewModel.insertComments()) {
                 close();
             }
@@ -63,7 +62,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
                 matchedResults,
                 userName,
                 dialogService,
-                undoManager
+                stateManager.getActiveDatabase().map(stateManager::getUndoManager).orElseThrow()
         );
 
         this.matchedReferenceTable.setItems(viewModel.matchedReferencesProperty());

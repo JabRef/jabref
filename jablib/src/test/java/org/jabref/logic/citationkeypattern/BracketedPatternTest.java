@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/// Tests based on a BibEntry are contained in {@link CitationKeyGeneratorTest}
+/// Tests based on a BibEntry are contained in [CitationKeyGeneratorTest]
 ///
-/// "Complete" entries are tested at {@link org.jabref.logic.citationkeypattern.MakeLabelWithDatabaseTest}
+/// "Complete" entries are tested at [org.jabref.logic.citationkeypattern.MakeLabelWithDatabaseTest]
 @Execution(ExecutionMode.CONCURRENT)
 class BracketedPatternTest {
 

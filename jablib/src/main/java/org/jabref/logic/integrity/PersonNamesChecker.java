@@ -2,6 +2,7 @@ package org.jabref.logic.integrity;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.RemoveBrackets;
@@ -13,6 +14,9 @@ import org.jabref.model.entry.AuthorList;
 import org.jspecify.annotations.Nullable;
 
 public class PersonNamesChecker implements ValueChecker {
+
+    // Unicode-aware to stay consistent with AuthorListParser, which splits tokens on Character.isWhitespace
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.UNICODE_CHARACTER_CLASS);
 
     private final BibDatabaseMode bibMode;
 
@@ -26,7 +30,10 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        String valueTrimmedAndLowerCase = value.trim().toLowerCase(Locale.ROOT);
+        // Stored field values may be wrapped over several lines; the wrapping whitespace is not part of the names
+        String normalizedValue = WHITESPACE.matcher(value).replaceAll(" ").strip();
+
+        String valueTrimmedAndLowerCase = normalizedValue.toLowerCase(Locale.ROOT);
         if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
             return Optional.of(Localization.lang("should start with a name"));
         } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
@@ -34,12 +41,12 @@ public class PersonNamesChecker implements ValueChecker {
         }
 
         // Check format with brackets first to support protected institutional authors
-        if (isStandardFormat(value)) {
+        if (isStandardFormat(normalizedValue)) {
             return Optional.empty();
         }
 
         // Remove all brackets to handle corporate names correctly, e.g., {JabRef}
-        String valueWithoutBrackets = new RemoveBrackets().format(value);
+        String valueWithoutBrackets = new RemoveBrackets().format(normalizedValue);
 
         // Check that the value is in one of the two standard BibTeX formats:
         //  Last, First and ...

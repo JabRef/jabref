@@ -1,43 +1,36 @@
 package org.jabref.gui.welcome.components;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
-import javafx.animation.TranslateTransition;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.edit.OpenBrowserAction;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.util.URLs;
 import org.jabref.logic.l10n.Localization;
 
-public class DonationProvider {
-    private static final int DONATION_INTERVAL_DAYS = 365;
-    private static final double DONATION_POPUP_ANIM_MS = 200;
-    private static final double DONATION_POPUP_TIMEOUT_SECONDS = 15;
-    private static final String DONATION_URL = URLs.DONATE_URL;
+import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
+import com.dlsc.gemsfx.infocenter.NotificationAction;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-    private final StackPane rootPane;
+/// Asks the user for a donation every six months - shown in the notification center.
+///
+/// [impl->req~ux.donation.recurring-prompt~1]
+@NullMarked
+public class DonationProvider {
+    private static final int DONATION_INTERVAL_MONTHS = 6;
+
     private final GuiPreferences preferences;
     private final DialogService dialogService;
-    private HBox donationToast;
-    private DelayedExecution scheduledShow;
-    private DelayedExecution autoHide;
 
-    public DonationProvider(StackPane rootPane, GuiPreferences preferences, DialogService dialogService) {
-        this.rootPane = rootPane;
+    private @Nullable DelayedExecution scheduledShow;
+
+    public DonationProvider(GuiPreferences preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
     }
@@ -46,112 +39,60 @@ public class DonationProvider {
         if (preferences.getDonationPreferences().isNeverShowAgain()) {
             return;
         }
-        int lastShown = preferences.getDonationPreferences().getLastShownEpochDay();
-        scheduleAfterDays(calculateDaysUntilNextPopup(lastShown));
+        if (preferences.getDonationPreferences().getNextNotificationEpochDay() < 0) {
+            dismiss();
+        }
+        scheduleAfterDays(calculateDaysUntilNextNotification(
+                preferences.getDonationPreferences().getNextNotificationEpochDay(),
+                LocalDate.now()));
     }
 
-    public int calculateDaysUntilNextPopup(int lastShownEpochDay) {
-        int today = (int) LocalDate.now().toEpochDay();
-        if (lastShownEpochDay < 0) {
-            return 7; // 7 days after first-launch, show the donation popup
-        }
-        return Math.max(0, DONATION_INTERVAL_DAYS - (today - lastShownEpochDay));
+    public int calculateDaysUntilNextNotification(int nextNotificationEpochDay, LocalDate today) {
+        return (int) Math.max(0, ChronoUnit.DAYS.between(today, LocalDate.ofEpochDay(nextNotificationEpochDay)));
     }
 
-    public void showToast() {
-        if (donationToast != null && rootPane.getChildren().contains(donationToast)) {
-            return;
-        }
+    private void showNotification() {
+        dismiss();
 
-        preferences.getDonationPreferences().setLastShownEpochDay((int) LocalDate.now().toEpochDay());
+        Notifications.DonationNotification notification = new Notifications.DonationNotification(
+                Localization.lang("Support JabRef"),
+                Localization.lang("You’ve been using JabRef for %0 months. Would you like to buy the JabRef team a coffee?", DONATION_INTERVAL_MONTHS),
+                () -> preferences.getDonationPreferences().setNeverShowAgain(true));
 
-        Label title = new Label(Localization.lang("Support JabRef"));
-        title.getStyleClass().add("donation-toast-title");
-        Label subtitle = new Label(Localization.lang("Help us improve JabRef by donating."));
-        subtitle.getStyleClass().add("donation-toast-desc");
-        VBox textBox = new VBox(title, subtitle);
-        textBox.getStyleClass().add("donation-toast-text");
+        notification.getActions().add(new NotificationAction<>(Localization.lang("Dismiss"), _ -> {
+            dismiss();
+            return OnClickBehaviour.HIDE_AND_REMOVE;
+        }));
 
-        Node iconNode = IconTheme.JabRefIcons.DONATE.getGraphicNode();
-        HBox leftContent = new HBox(10, iconNode, textBox);
-        leftContent.setAlignment(Pos.CENTER_LEFT);
+        notification.getActions().add(new NotificationAction<>(Localization.lang("Donate"), _ -> {
+            new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();
+            return OnClickBehaviour.HIDE_AND_REMOVE;
+        }));
 
-        Button neverButton = new Button(Localization.lang("Never show again"));
-        neverButton.getStyleClass().add("donation-btn-ghost");
-        neverButton.setOnAction(_ -> {
-            preferences.getDonationPreferences().setNeverShowAgain(true);
-            hideToast();
-        });
-
-        Button cancelButton = new Button(Localization.lang("Cancel"));
-        cancelButton.getStyleClass().add("donation-btn-secondary");
-        cancelButton.setOnAction(_ -> hideToast());
-
-        Button donateButton = new Button(Localization.lang("Donate"));
-        donateButton.getStyleClass().add("donation-btn-primary");
-        donateButton.setDefaultButton(true);
-        donateButton.setOnAction(_ -> {
-            new OpenBrowserAction(DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();
-            hideToast();
-        });
-
-        HBox rightButtons = new HBox(8, neverButton, cancelButton, donateButton);
-        rightButtons.setAlignment(Pos.CENTER_RIGHT);
-
-        Region textSpacer = new Region();
-        HBox.setHgrow(textSpacer, Priority.ALWAYS);
-
-        donationToast = new HBox(leftContent, textSpacer, rightButtons);
-        donationToast.getStyleClass().add("donation-toast");
-        donationToast.setMaxWidth(Region.USE_PREF_SIZE);
-        donationToast.setMinWidth(Region.USE_PREF_SIZE);
-        donationToast.setTranslateY(-40);
-
-        StackPane.setAlignment(donationToast, Pos.TOP_CENTER);
-        StackPane.setMargin(donationToast, new Insets(16));
-        rootPane.getChildren().add(donationToast);
-
-        TranslateTransition slideDown = new TranslateTransition(Duration.millis(DONATION_POPUP_ANIM_MS), donationToast);
-        slideDown.setFromY(-40);
-        slideDown.setToY(0);
-        slideDown.play();
-
-        if (autoHide != null) {
-            autoHide.cancel();
-        }
-        autoHide = new DelayedExecution(Duration.seconds(DONATION_POPUP_TIMEOUT_SECONDS), this::hideToast);
-        autoHide.start();
+        dialogService.notify(notification);
     }
 
-    private void hideToast() {
-        if (donationToast == null) {
-            return;
-        }
-        TranslateTransition slideUp = new TranslateTransition(Duration.millis(DONATION_POPUP_ANIM_MS), donationToast);
-        slideUp.setFromY(donationToast.getTranslateY());
-        slideUp.setToY(-40);
-        slideUp.setOnFinished(_ -> {
-            rootPane.getChildren().remove(donationToast);
-            donationToast = null;
-            if (autoHide != null) {
-                autoHide.cancel();
-                autoHide = null;
-            }
-        });
-        slideUp.play();
+    private void dismiss() {
+        scheduleNextNotification(LocalDate.now().plusMonths(DONATION_INTERVAL_MONTHS));
     }
 
-    /// Schedules the next donation popup after a specified number of days to take care
+    private void scheduleNextNotification(LocalDate date) {
+        preferences.getDonationPreferences().setNextNotificationEpochDay((int) date.toEpochDay());
+    }
+
+    /// Schedules the next donation notification after a specified number of days to take care
     /// of situation where the user may leave the application open for an extended
     /// period.
     private void scheduleAfterDays(int days) {
         cancelScheduled();
+        int delayDays = days;
         if (days <= 0) {
-            showToast();
-            scheduledShow = new DelayedExecution(Duration.millis(DONATION_INTERVAL_DAYS), this::showIfNeeded);
-        } else {
-            scheduledShow = new DelayedExecution(Duration.hours(days * 24), this::showIfNeeded);
+            showNotification();
+            delayDays = calculateDaysUntilNextNotification(
+                    preferences.getDonationPreferences().getNextNotificationEpochDay(),
+                    LocalDate.now());
         }
+        scheduledShow = new DelayedExecution(Duration.hours(delayDays * 24), this::showIfNeeded);
         scheduledShow.start();
     }
 
@@ -164,13 +105,5 @@ public class DonationProvider {
 
     public void cleanUp() {
         cancelScheduled();
-        if (autoHide != null) {
-            autoHide.cancel();
-            autoHide = null;
-        }
-        if (donationToast != null) {
-            rootPane.getChildren().remove(donationToast);
-            donationToast = null;
-        }
     }
 }

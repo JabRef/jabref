@@ -33,6 +33,7 @@ public class FieldColumn extends MainTableColumn<String> {
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .graphicTooltip(this::createTooltip)
+                .showTooltipRegardlessOfTruncation(tooltip::shouldAlwaysShowTooltip)
                 .install(this);
 
         if (fields.hasExactlyOne()) {

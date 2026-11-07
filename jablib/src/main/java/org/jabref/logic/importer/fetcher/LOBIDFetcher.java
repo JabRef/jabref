@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,9 +51,23 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
     /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new LOBIDQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string.
+    ///
+    /// The query is sent verbatim as the `q` parameter, so raw queries
+    /// bypass [LOBIDQueryTransformer] and are passed unchanged to the catalog.
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", new LOBIDQueryTransformer().transformSearchQuery(queryNode).orElse("")); // search query
-        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber)); // from entry number, starts indexing at 0
+        uriBuilder.addParameter("q", query);
+        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber));
         uriBuilder.addParameter("size", String.valueOf(getPageSize()));
         uriBuilder.addParameter("format", "json");
         return uriBuilder.build().toURL();
@@ -105,10 +120,10 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
             entry.setField(StandardField.TYPE, types);
         }
 
-        if (types.toLowerCase().contains("book")) {
+        if (types.toLowerCase(Locale.ROOT).contains("book")) {
             entryType = StandardEntryType.Book;
             nametype = StandardField.BOOKTITLE;
-        } else if (types.toLowerCase().contains("article")) {
+        } else if (types.toLowerCase(Locale.ROOT).contains("article")) {
             entryType = StandardEntryType.Article;
         }
         entry.setType(entryType);

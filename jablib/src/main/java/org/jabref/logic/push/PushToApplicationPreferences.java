@@ -57,15 +57,6 @@ public class PushToApplicationPreferences {
         return new PushToApplicationPreferences();
     }
 
-    public void setAll(PushToApplicationPreferences preferences) {
-        this.activeApplicationName.set(preferences.getActiveApplicationName());
-        this.commandPaths.clear();
-        this.commandPaths.putAll(preferences.getCommandPaths());
-        this.emacsArguments.set(preferences.getEmacsArguments());
-        this.vimServer.set(preferences.getVimServer());
-        this.citeCommand.set(preferences.getCiteCommand());
-    }
-
     public String getActiveApplicationName() {
         return activeApplicationName.getValue();
     }

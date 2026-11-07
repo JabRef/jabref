@@ -64,6 +64,11 @@ Check the directory `jablib/src/main/resources/csl-locales`.
 If it is missing or empty, run `git submodule update`.
 If still not fixed, run `git reset --hard` **inside that directory**.
 
+### `jabgui/src/main/themes.jabref.org/themes is empty. Run: git submodule update --init`
+
+The themes JabRef bundles come from the submodule `jabgui/src/main/themes.jabref.org`.
+Run `git submodule update --init` and check that `jabgui/src/main/themes.jabref.org/themes` contains the theme directories.
+
 ### `org.jabref.support.CommonArchitectureTest restrictStandardStreams` <span style="color:red">FAILED</span>
 
 Check if you've used `System.out.println(...)` (the standard output stream) to log anything into the console.
@@ -87,7 +92,7 @@ This test is triggered when any kind of documentation is touched (be it the JabR
 ### Failing <b>Fetcher</b> tests
 
 Fetcher tests are run when any file in the `.../fetcher` directory has been touched. If you have changed any fetcher logic, check if the changes are correct. You can look for more details on how to locally [run fetcher tests](https://devdocs.jabref.org/code-howtos/testing.html#fetchers-in-tests).
-Otherwise, since these tests depend on remote services, their failure can also be caused by the network or an external server, and thus can be ignored in the context of your contribution. For more information, you can look at [commiting and pushing changes to fetcher tests](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
+Otherwise, since these tests depend on remote services, their failure can also be caused by the network or an external server, and thus can be ignored in the context of your contribution. For more information, you can look at [committing and pushing changes to fetcher tests](https://devdocs.jabref.org/code-howtos/fetchers.html#committing-and-pushing-changes-to-fetcher-files).
 
 ## Gradle outputs
 
@@ -110,25 +115,27 @@ You probably chose the wrong gradle task:
 
 ### The problem
 
-Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org`, `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
+Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org`, `csl-styles`, `csl-locales`, `ltwa` or `themes.jabref.org` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
 
 ![Changed submodules](../images/submodules.png)
 
 ### Context
 
-JabRef needs external submodules (such as CSL style files) for some of its respective features. These are cloned once when you set up a local development environment, using `--recurse-submodules` (you may have noticed). These submodules, in the main branch, are automatically periodically updated but not fetched into local again when you pull, as they are set to be ignored in `.gitmodules` (this is to avoid merge conflicts). So when remote has updated submodules, and your local has the old ones, when you stage all files, these changes are noticed.  
+JabRef needs external submodules (such as CSL style files) for some of its respective features. These are cloned once when you set up a local development environment, using `--recurse-submodules` (you may have noticed). These submodules, in the main branch, are automatically periodically updated but not fetched into local again when you pull, as they are set to be ignored in `.gitmodules` (this is to avoid merge conflicts). When remote has updated submodules, and your local has the old ones, when you stage all files, these changes are noticed.  
 What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes should ideally not be noticed on staging, as per the `.gitmodules` configuration. However, that is somehow overruled when using IntelliJ's CLI.
   
 ### Fix
 
-For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, and `ltwa`:
+For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, `ltwa`, and `themes.jabref.org`:
 
 ```bash
-git merge origin/main
-git checkout main -- jablib/src/main/abbrv.jabref.org
-git checkout main -- jablib/src/main/resources/csl-styles
-git checkout main -- jablib/src/main/resources/csl-locales
-git checkout main -- jablib/src/main/resources/ltwa
+git fetch upstream --prune
+git merge upstream/main
+git checkout upstream/main -- jablib/src/main/abbrv.jabref.org
+git checkout upstream/main -- jablib/src/main/resources/csl-styles
+git checkout upstream/main -- jablib/src/main/resources/csl-locales
+git checkout upstream/main -- jablib/src/main/resources/ltwa
+git checkout upstream/main -- jabgui/src/main/themes.jabref.org
 git commit -m "Fix submodules"
 git push
 ```

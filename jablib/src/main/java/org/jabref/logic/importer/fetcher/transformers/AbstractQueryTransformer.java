@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ import org.jabref.model.search.query.SearchQueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// In case the transformer contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
+/// In case the transformer contains state for a query transformation (such as the [IEEEQueryTransformer]), it has to be noted at the JavaDoc.
 /// Otherwise, a single instance QueryTransformer can be used.
 public abstract class AbstractQueryTransformer {
     public static final String NO_EXPLICIT_FIELD = "default";
@@ -65,7 +66,7 @@ public abstract class AbstractQueryTransformer {
         String term = query.term();
         String field = NO_EXPLICIT_FIELD;
         if (query.field().isPresent()) {
-            field = String.valueOf(query.field().get().getName()).toLowerCase();
+            field = String.valueOf(query.field().get().getName()).toLowerCase(Locale.ROOT);
         }
         switch (field) {
             case "author" -> {
@@ -75,7 +76,8 @@ public abstract class AbstractQueryTransformer {
                 return Optional.of(handleTitle(term));
             }
             case "journal" -> {
-                return Optional.of(handleJournal(term));
+                String s = handleJournal(term);
+                return s.isEmpty() ? Optional.empty() : Optional.of(s);
             }
             case "year" -> {
                 String s = handleYear(term);

@@ -89,8 +89,8 @@ public class CopyTo extends SimpleCommand {
                 new TransferInformation(sourceDatabaseContext, TransferMode.COPY),
                 entriesToAdd,
                 targetDatabaseContext,
-                Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
-                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
+                params -> Localization.lang("Copied %0 entry(s) to %1, including cross-references", params),
+                params -> Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references", params),
                 dialogService,
                 importHandler,
                 stateManager
@@ -102,8 +102,8 @@ public class CopyTo extends SimpleCommand {
                 new TransferInformation(sourceDatabaseContext, TransferMode.COPY),
                 selectedEntries,
                 targetDatabaseContext,
-                Localization.lang("Copied %0 entry(s) to %1, without cross-references"),
-                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
+                params -> Localization.lang("Copied %0 entry(s) to %1, without cross-references", params),
+                params -> Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references", params),
                 dialogService,
                 importHandler,
                 stateManager

@@ -74,6 +74,7 @@ public class PdfDocumentViewer extends StackPane {
             }
         } else {
             LOGGER.debug("No document provided to viewer, showing placeholder");
+            pdfView.unload();
             pdfView.setVisible(false);
             placeholderLabel.setText(Localization.lang("No PDF available for preview"));
             placeholderLabel.setVisible(true);

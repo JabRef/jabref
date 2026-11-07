@@ -89,7 +89,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                         updateProgress(totalFilesCounter++, totalFilesCount);
                         try {
                             Thread.sleep(300);
-                        } catch (InterruptedException e) {
+                        } catch (InterruptedException _) {
                             if (isCancelled()) {
                                 updateMessage("Cancelled");
                                 break;

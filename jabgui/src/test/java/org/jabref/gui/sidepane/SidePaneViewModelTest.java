@@ -4,8 +4,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,8 +13,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
@@ -26,14 +27,13 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
@@ -46,7 +46,6 @@ class SidePaneViewModelTest {
     FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
     BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
-    UndoManager undoManager = mock(UndoManager.class);
 
     SidePanePreferences sidePanePreferences = new SidePanePreferences(new HashSet<>(), new HashMap<>(), 0);
     ObservableList<SidePaneType> sidePaneComponents = FXCollections.observableArrayList();
@@ -75,7 +74,7 @@ class SidePaneViewModelTest {
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager);
+                new GitHandlerRegistry(mock(GitPreferences.class)));
     }
 
     @Test

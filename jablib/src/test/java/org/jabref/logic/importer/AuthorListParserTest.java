@@ -10,10 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/// Similar tests are available in {@link org.jabref.model.entry.AuthorListTest}
+/// Similar tests are available in [org.jabref.model.entry.AuthorListTest]
 class AuthorListParserTest {
 
     AuthorListParser parser = new AuthorListParser();
@@ -36,6 +37,11 @@ class AuthorListParserTest {
                 Arguments.of("{\\OE}rjan Umlauts", new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
                 Arguments.of("{Company Name, LLC}", new Author("", "", null, "{Company Name, LLC}", null)),
                 Arguments.of("{Society of Automotive Engineers}", new Author("", "", null, "{Society of Automotive Engineers}", null)),
+                // No tokenization within braces even with lowercase letters in the beginning of the words
+                // (lowercase letters can be treated as starts of name prefixes, which changes how the author
+                // last name is parsed). This case checks that the parser prioritises {} as token boundaries and
+                // does not get sidetracked by the lowercase letters even in many words.
+                Arguments.of("{society of automotive engineers}", new Author("", "", null, "{society of automotive engineers}", null)),
 
                 // Demonstrate the "von" part parsing of a non-braced name
                 Arguments.of("Society of Automotive Engineers", new Author("Society", "S.", "of", "Automotive Engineers", null))
@@ -53,6 +59,16 @@ class AuthorListParserTest {
         assertEquals(Optional.of("Z. Yao and D. S. Weld and W-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W-P. Chen, and H. Sun"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Z. Yao, D. S. Weld, et al.",
+            "Z. Yao,D. S. Weld, et al.",
+            "Z. Yao,   D. S. Weld, et al."
+    })
+    void etAlNormalizedToAndOthers(String input) {
+        assertEquals(Optional.of("Z. Yao and D. S. Weld and others"), AuthorListParser.normalizeSimply(input));
+    }
+
     @Test
     void dashedNamesWithSpaceNormalized() {
         assertEquals(Optional.of("Z. Yao and D. S. Weld and W.-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun"));
@@ -66,6 +82,26 @@ class AuthorListParserTest {
                                 Author.OTHERS
                         ),
                         "Alexander Artemenko and others"),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("Alexander", "A.", null, "Artemenko", null),
+                                Author.OTHERS
+                        ),
+                        "Alexander Artemenko et al."),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("John", "J.", null, "Smith", null),
+                                new Author("Jane", "J.", null, "Doe", null),
+                                Author.OTHERS
+                        ),
+                        "Smith, John and Doe, Jane, et al"),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("J.", "J.", null, "Smith", null),
+                                new Author("A.", "A.", null, "Doe", null),
+                                Author.OTHERS
+                        ),
+                        "J. Smith and A. Doe ET AL."),
                 Arguments.of(
                         AuthorList.of(
                                 new Author("I.", "I.", null, "Podadera", null),

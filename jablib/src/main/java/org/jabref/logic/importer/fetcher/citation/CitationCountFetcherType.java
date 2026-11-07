@@ -27,6 +27,15 @@ public enum CitationCountFetcherType {
         return name;
     }
 
+    /// Parses a constant by name, falling back to [#SEMANTIC_SCHOLAR] for unknown/corrupted values.
+    public static CitationCountFetcherType safeValueOf(String name) {
+        try {
+            return CitationCountFetcherType.valueOf(name);
+        } catch (IllegalArgumentException _) {
+            return SEMANTIC_SCHOLAR;
+        }
+    }
+
     public static CitationCountFetcher getCitationCountFetcher(CitationCountFetcherType type, ImporterPreferences importerPreferences) {
         return switch (type) {
             case SEMANTIC_SCHOLAR ->

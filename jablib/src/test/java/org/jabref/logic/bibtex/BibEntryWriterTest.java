@@ -24,7 +24,6 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
-import io.github.adr.linked.ADR;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -846,7 +845,7 @@ class BibEntryWriterTest {
                 .getFirst();
     }
 
-    @ADR(49)
+    // [utest->adr~hardcode-fieldnames~1]
     @Test
     void lowercaseStandardAndPreserveCustomCasing() throws Exception {
         String bibtexEntry = """

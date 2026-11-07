@@ -48,16 +48,6 @@ public class CoreGuiPreferences {
         return new CoreGuiPreferences();
     }
 
-    public void setAll(CoreGuiPreferences preferences) {
-        this.positionX.set(preferences.getPositionX());
-        this.positionY.set(preferences.getPositionY());
-        this.sizeX.set(preferences.getSizeX());
-        this.sizeY.set(preferences.getSizeY());
-        this.windowMaximised.set(preferences.isWindowMaximised());
-        this.horizontalDividerPosition.set(preferences.getHorizontalDividerPosition());
-        this.verticalDividerPosition.set(preferences.getVerticalDividerPosition());
-    }
-
     public double getPositionX() {
         return positionX.get();
     }

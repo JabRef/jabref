@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
@@ -66,7 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/// Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+/// Tests for reading can be found at [org.jabref.logic.importer.fileformat.BibtexImporterTest]
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("exporter")
 class BibDatabaseWriterTest {
@@ -847,6 +848,36 @@ class BibDatabaseWriterTest {
     }
 
     @Test
+    void writeGitAutoPull() throws IOException {
+        metaData.setGitAutoPull(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoPull:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void writeGitAutoCommit() throws IOException {
+        metaData.setGitAutoCommit(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoCommit:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void writeGitAutoPush() throws IOException {
+        metaData.setGitAutoPush(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoPush:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
     void writeAiLibraryId() throws IOException {
         metaData.setAiLibraryId("test-ai-library-id");
 
@@ -984,6 +1015,25 @@ class BibDatabaseWriterTest {
                         "  note = {some note}," + OS.NEWLINE +
                         "}" + OS.NEWLINE,
                 stringWriter.toString());
+    }
+
+    @Test
+    void saveActionsUseConfiguredMutationScheduler() throws IOException {
+        AtomicInteger scheduledMutations = new AtomicInteger();
+        databaseWriter.withMutationScheduler(mutation -> {
+            scheduledMutations.incrementAndGet();
+            mutation.run();
+        });
+        metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(
+                new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "SOME TITLE");
+        database.insertEntry(entry);
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals(1, scheduledMutations.get());
+        assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
     }
 
     @Test

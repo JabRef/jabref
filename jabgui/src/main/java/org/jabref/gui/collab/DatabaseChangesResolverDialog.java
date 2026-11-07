@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,7 +15,6 @@ import javafx.scene.layout.BorderPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -31,9 +28,9 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     private final static Logger LOGGER = LoggerFactory.getLogger(DatabaseChangesResolverDialog.class);
-    /// Reconstructing the details view to preview an {@link DatabaseChange} every time it's selected is a heavy operation.
+    /// Reconstructing the details view to preview an [DatabaseChange] every time it's selected is a heavy operation.
     /// It is also useless because changes are static and if the change data is static then the view doesn't have to change
-    /// either. This cache is used to ensure that we only create the detail view instance once for each {@link DatabaseChange}.
+    /// either. This cache is used to ensure that we only create the detail view instance once for each [DatabaseChange].
     private final Map<DatabaseChange, DatabaseChangeDetailsView> DETAILS_VIEW_CACHE = new HashMap<>();
 
     @FXML
@@ -53,18 +50,16 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     private boolean areAllChangesAccepted;
     private boolean areAllChangesDenied;
 
-    @Inject private UndoManager undoManager;
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
-    @Inject private ThemeManager themeManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private TaskExecutor taskExecutor;
 
-    /// A dialog going through given `changes`, which are diffs to the provided `database`.
-    /// Each accepted change is written to the provided `database`.
+    /// A dialog going through the given `changes`, which are diffs to the provided `database`.
+    /// The dialog collects the user's accept, deny, or merge decisions so callers can apply the resolved changes afterward.
     ///
     /// @param changes  The list of changes
-    /// @param database The database to apply the changes to
+    /// @param database The database whose current state is compared and previewed
     public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle) {
         this.changes = changes;
         this.database = database;
@@ -74,7 +69,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
                   .load()
                   .setAsDialogPane(this);
 
-        this.setResultConverter(button -> {
+        this.setResultConverter(_ -> {
             if (viewModel.areAllChangesResolved()) {
                 LOGGER.info("External changes are resolved successfully");
                 return true;
@@ -93,11 +88,19 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         return areAllChangesDenied;
     }
 
+    public boolean resolvedChangesMatchDisk() {
+        return viewModel.resolvedChangesMatchDisk();
+    }
+
+    public List<DatabaseChange> getResolvedChanges() {
+        return viewModel.getResolvedChanges();
+    }
+
     @FXML
     private void initialize() {
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
         previewViewer.setDatabaseContext(database);
-        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferences, entryTypesManager, previewViewer, taskExecutor);
+        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, preferences, entryTypesManager, previewViewer, taskExecutor);
 
         viewModel = new ExternalChangesResolverViewModel(changes);
 

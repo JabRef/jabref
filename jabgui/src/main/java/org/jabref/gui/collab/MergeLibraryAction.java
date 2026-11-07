@@ -3,16 +3,14 @@ package org.jabref.gui.collab;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
@@ -31,20 +29,17 @@ public class MergeLibraryAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final CountingUndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
 
     public MergeLibraryAction(DialogService dialogService,
                               StateManager stateManager,
                               GuiPreferences preferences,
                               TaskExecutor taskExecutor,
-                              CountingUndoManager undoManager,
                               LibraryTabContainer libraryTabContainer) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.undoManager = undoManager;
         this.libraryTabContainer = libraryTabContainer;
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
@@ -90,21 +85,14 @@ public class MergeLibraryAction extends SimpleCommand {
                 changes,
                 activeDatabase,
                 Localization.lang("External Changes Resolver"));
-        dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
+        Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
+        if (areAllChangesResolved.orElse(false)) {
+            List<DatabaseChange> resolvedChanges = databaseChangesResolverDialog.getResolvedChanges();
 
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-        changes.stream()
-               .filter(DatabaseChange::isAccepted)
-               .forEach(change -> change.applyChange(compoundEdit));
-        compoundEdit.end();
-
-        if (compoundEdit.hasEdits()) {
-            undoManager.addEdit(compoundEdit);
-
-            libraryTabContainer.getLibraryTabs().stream()
-                               .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))
-                               .findFirst()
-                               .ifPresent(LibraryTab::markBaseChanged);
+            stateManager.getUndoManager(activeDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
+                    resolvedChanges.stream()
+                                   .filter(DatabaseChange::isAccepted)
+                                   .forEach(change -> change.applyChange(edit)));
         }
     }
 }

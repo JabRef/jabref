@@ -18,3 +18,5 @@ ignorePatterns:
   - pattern: "^https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator"
   # Automated access blocked by Cloudflare, see issue for context: https://github.com/JabRef/jabref/issues/13404
   - pattern: "onlinelibrary\\.wiley\\.com"
+  # Automated access blocked by SourceForge
+  - pattern: "sourceforge\\.net"

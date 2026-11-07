@@ -6,7 +6,6 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ class Preferences implements Callable<Integer> {
     protected JabKit argumentProcessor;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Override
     public Integer call() {
@@ -47,7 +46,6 @@ class Preferences implements Callable<Integer> {
             try {
                 System.out.println(Localization.lang("Setting all preferences to default values."));
                 parent.argumentProcessor.cliPreferences.clear();
-                new SharedDatabasePreferences().clear();
             } catch (BackingStoreException e) {
                 System.err.println(Localization.lang("Unable to clear preferences."));
                 LOGGER.error("Unable to clear preferences", e);

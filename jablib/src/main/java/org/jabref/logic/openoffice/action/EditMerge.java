@@ -28,6 +28,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.XComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class EditMerge {
     }
 
     /// @return true if modified document
-    public static OOResult<Boolean, JabRefException> mergeCitationGroups(XTextDocument doc, OOFrontend frontend, JStyle style) {
+    public static OOResult<Boolean, JabRefException> mergeCitationGroups(XTextDocument doc, XComponentContext context, OOFrontend frontend, JStyle style) {
         try {
             boolean madeModifications;
 
@@ -65,15 +66,18 @@ public class EditMerge {
                     List<String> citationKeys = OOListUtil.map(newCitations, Citation::getCitationKey);
 
                     /* insertSpaceAfter: no, it is already there (or could be) */
+                    boolean insertSpaceBefore = false;
                     boolean insertSpaceAfter = false;
                     UpdateCitationMarkers.createAndFillCitationGroup(frontend,
                             doc,
+                            context,
                             citationKeys,
                             pageInfos,
                             citationType,
                             OOText.fromString("tmp"),
                             textCursor,
                             style,
+                            insertSpaceBefore,
                             insertSpaceAfter);
                 }
 

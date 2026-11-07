@@ -70,7 +70,7 @@ public record ClipboardContentGenerator(
         }
     }
 
-    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link org.jabref.logic.preview.BstPreviewLayout})
+    /// Generates a plain text string out of the preview (based on [TextBasedPreviewLayout] or [org.jabref.logic.preview.BstPreviewLayout])
     /// and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
     @VisibleForTesting
     static ClipboardContent processPreview(List<String> citations) {
@@ -89,7 +89,7 @@ public record ClipboardContentGenerator(
     }
 
     /// Inserts each citation into a HTML body and copies it to the clipboard.
-    /// The given preview is based on {@link CitationStylePreviewLayout}.
+    /// The given preview is based on [CitationStylePreviewLayout].
     @VisibleForTesting
     static ClipboardContent processHtml(List<String> citations) {
         String result = "<!DOCTYPE html>" + OS.NEWLINE +

@@ -40,7 +40,7 @@ class HayagrivaYamlExporterTest {
                 "Hayagriva YAML",
                 "hayagrivayaml",
                 "hayagrivayaml",
-                null,
+                "",
                 StandardFileType.YAML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder(),
@@ -78,6 +78,26 @@ class HayagrivaYamlExporterTest {
                 "    - Author, Test",
                 "  date: 2020-10-14",
                 "  url: http://example.com");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    final void exportsCorporateAuthorWithoutBraces(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("examplekey")
+                .withField(StandardField.AUTHOR, "{Some company} and M{\\\"u}ller, Hans");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
+
+        List<String> expected = List.of(
+                "examplekey:",
+                "  type: article",
+                "  author:",
+                "    - Some company",
+                "    - Müller, Hans");
 
         assertEquals(expected, Files.readAllLines(file));
     }

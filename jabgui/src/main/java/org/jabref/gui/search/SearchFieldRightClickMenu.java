@@ -22,13 +22,13 @@ public class SearchFieldRightClickMenu {
         ContextMenu contextMenu = new ContextMenu();
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new EditorContextAction(StandardActions.UNDO, searchField)),
-                factory.createMenuItem(StandardActions.REDO, new EditorContextAction(StandardActions.REDO, searchField)),
-                factory.createMenuItem(StandardActions.CUT, new EditorContextAction(StandardActions.CUT, searchField)),
-                factory.createMenuItem(StandardActions.COPY, new EditorContextAction(StandardActions.COPY, searchField)),
-                factory.createMenuItem(StandardActions.PASTE, new EditorContextAction(StandardActions.PASTE, searchField)),
-                factory.createMenuItem(StandardActions.DELETE, new EditorContextAction(StandardActions.DELETE, searchField)),
-                factory.createMenuItem(StandardActions.SELECT_ALL, new EditorContextAction(StandardActions.SELECT_ALL, searchField)),
+                factory.createContextMenuItem(StandardActions.UNDO, new EditorContextAction(StandardActions.UNDO, searchField)),
+                factory.createContextMenuItem(StandardActions.REDO, new EditorContextAction(StandardActions.REDO, searchField)),
+                factory.createContextMenuItem(StandardActions.CUT, new EditorContextAction(StandardActions.CUT, searchField)),
+                factory.createContextMenuItem(StandardActions.COPY, new EditorContextAction(StandardActions.COPY, searchField)),
+                factory.createContextMenuItem(StandardActions.PASTE, new EditorContextAction(StandardActions.PASTE, searchField)),
+                factory.createContextMenuItem(StandardActions.DELETE, new EditorContextAction(StandardActions.DELETE, searchField)),
+                factory.createContextMenuItem(StandardActions.SELECT_ALL, new EditorContextAction(StandardActions.SELECT_ALL, searchField)),
                 new SeparatorMenuItem(),
                 createSearchFromHistorySubMenu(stateManager, searchField));
         return contextMenu;

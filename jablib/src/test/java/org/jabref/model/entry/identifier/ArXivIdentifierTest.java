@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -172,25 +174,22 @@ class ArXivIdentifierTest {
         assertEquals(Optional.of(new URI("https://arxiv.org/abs/0706.0001v1")), parsed.get().getExternalURI());
     }
 
-    @Test
-    void parseHtmlUrl() {
-        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://arxiv.org/html/2511.01348v2");
+    @ParameterizedTest
+    @CsvSource(emptyValue = "", textBlock = """
+            # url                                    , id         , version
+            https://arxiv.org/html/2511.01348v2      , 2511.01348 , 2
+            https://arxiv.org/html/2511.01348        , 2511.01348 , ''
+            http://arxiv.org/html/1502.05795v1       , 1502.05795 , 1
+            # trailing URL fragment (#bib anchor)
+            https://arxiv.org/html/2510.26275v2#bib  , 2510.26275 , 2
+            """)
+    void parseHtmlUrl(String url, String expectedId, String expectedVersion) {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse(url);
 
-        assertEquals(Optional.of(new ArXivIdentifier("2511.01348", "2", "")), parsed);
-    }
-
-    @Test
-    void parseHtmlUrlWithoutVersion() {
-        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://arxiv.org/html/2511.01348");
-
-        assertEquals(Optional.of(new ArXivIdentifier("2511.01348", "", "")), parsed);
-    }
-
-    @Test
-    void parseHttpHtmlUrl() {
-        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/html/1502.05795v1");
-
-        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "1", "")), parsed);
+        assertEquals(Optional.of(new ArXivIdentifier(expectedId, expectedVersion, "")), parsed);
+        // ArXivIdentifier.equals() ignores the version, so assert asString() separately to guard version parsing.
+        String expectedNormalized = expectedId + (expectedVersion.isEmpty() ? "" : "v" + expectedVersion);
+        assertEquals(expectedNormalized, parsed.orElseThrow().asString());
     }
 
     @Test

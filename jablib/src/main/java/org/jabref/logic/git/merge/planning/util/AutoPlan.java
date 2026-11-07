@@ -13,6 +13,7 @@ public final class AutoPlan {
     /// Precondition: this key has passed the semantic conflict gate.
     ///
     /// Rules:
+    ///
     ///  - base == null:
     ///      B0) only local added -> NO-OP (remote − base is empty)
     ///      B1) both added & no overlapping-field disagreement -> add union entry
@@ -22,6 +23,7 @@ public final class AutoPlan {
     ///      B4) otherwise field-level patch: (remote − base) applied where local == base
     ///
     /// Notes:
+    ///
     ///  - We mutate the supplied collections (fieldPatches/newEntries/deletedEntryKeys).
     ///  - This method is side-effect free for all other state.
     public static void generateAutoPlanForKey(String key,

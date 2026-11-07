@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -16,6 +14,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.icore.ConferenceRepository;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -30,7 +29,6 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
     @FXML private Button visitICOREConferencePageButton;
 
     @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
     @Inject private GuiPreferences preferences;
     @Inject private ConferenceRepository conferenceRepository;
 
@@ -38,7 +36,8 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
 
     public ICORERankingEditor(Field field,
                               SuggestionProvider<?> suggestionProvider,
-                              FieldCheckers fieldCheckers) {
+                              FieldCheckers fieldCheckers,
+                              UndoManager undoManager) {
 
         Injector.registerExistingAndInject(this);
 

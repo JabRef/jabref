@@ -9,6 +9,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.TextFieldTableCell;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
@@ -29,6 +30,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML private TableView<String> keywordsTable;
     @FXML private ToggleGroup displayType;
     @Inject private CliPreferences preferences;
+    @Inject private StateManager stateManager;
     private ManageKeywordsViewModel viewModel;
 
     public ManageKeywordsDialog(List<BibEntry> entries) {
@@ -49,7 +51,10 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries);
+        Character keywordSeparator = stateManager.getActiveDatabase()
+                                                 .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
+                                                 .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+        viewModel = new ManageKeywordsViewModel(keywordSeparator, entries, stateManager.getActiveDatabase().map(stateManager::getUndoManager).orElseThrow());
 
         viewModel.displayTypeProperty().bind(
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {
@@ -68,15 +73,15 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
             viewModel.getKeywords().set(event.getTablePosition().getRow(), event.getNewValue());
         });
         keywordsTableMainColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        keywordsTableEditColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
-        keywordsTableDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
+        keywordsTableEditColumn.setCellValueFactory(_ -> BindingsHelper.constantOf(true));
+        keywordsTableDeleteColumn.setCellValueFactory(_ -> BindingsHelper.constantOf(true));
         new ValueTableCellFactory<String, Boolean>()
-                .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
-                .withOnMouseClickedEvent(none -> event -> keywordsTable.edit(keywordsTable.getFocusModel().getFocusedIndex(), keywordsTableMainColumn))
+                .withGraphic(_ -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
+                .withOnMouseClickedEvent(_ -> _ -> keywordsTable.edit(keywordsTable.getFocusModel().getFocusedIndex(), keywordsTableMainColumn))
                 .install(keywordsTableEditColumn);
         new ValueTableCellFactory<String, Boolean>()
-                .withGraphic(none -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
-                .withOnMouseClickedEvent((keyword, none) -> event -> viewModel.removeKeyword(keyword))
+                .withGraphic(_ -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
+                .withOnMouseClickedEvent((keyword, _) -> _ -> viewModel.removeKeyword(keyword))
                 .install(keywordsTableDeleteColumn);
     }
 }

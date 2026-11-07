@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/// Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
+/// Tests in addition to the general tests from [org.jabref.logic.formatter.FormatterTest]
 class NormalizeEnDashesFormatterTest {
 
     private NormalizeEnDashesFormatter formatter;
@@ -31,7 +31,7 @@ class NormalizeEnDashesFormatterTest {
     }
 
     @Test
-    void dashesPreceededByASpaceAreKept() {
+    void dashesPrecededByASpaceAreKept() {
         assertEquals("Example -illustrative", formatter.format("Example -illustrative"));
     }
 

@@ -93,10 +93,10 @@
 - jobName: 'CHANGELOG.md needs to be modified if indicated'
   workflowName: 'Check PR CHANGELOG.md'
   message: >
-    You ticked that you modified `CHANGELOG.md`, but no new entry was found there.
+    The `CHANGELOG.md` checklist item and the actual `CHANGELOG.md` change do not match: either you ticked the item without adding an entry, or you added an entry without ticking the item.
 
 
-    If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
+    If you made changes that are visible to the user, please add a brief description to the `CHANGELOG.md` file, along with the issue number when one exists; otherwise link the pull request.
     If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
     More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
 - jobName: 'CHANGELOG.md - only unreleased touched'
@@ -155,12 +155,12 @@
     Your pull request conflicts with the target branch.
 
 
-    Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code.
+    Please [merge the target branch](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) (`upstream/main` unless the pull request is stacked on another one) with your code.
     For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
 
 
     We strongly recommend using the command line for this process.
-    Using `git merge upstream/main` causes fewer issues with `CHANGELOG.md` and git submodules than most IDE-based tools.
+    Using `git merge upstream/<target branch>` causes fewer issues with `CHANGELOG.md` and git submodules than most IDE-based tools.
 - jobName: 'Source branch is other than "main"'
   workflowName: 'Check PR Modifications'
   message: >
@@ -184,11 +184,12 @@
 
     Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
 
-- jobName: 'PR title must not contain "issue <number>"'
+- jobName: 'PR title describes the change'
   workflowName: 'Check PR Format'
   always: true
   message: >
-    The title of the pull request must not start with "Fix for issue xyz".
+    The title of the pull request must describe the change.
+    It must neither reference an issue number (such as "Fix for issue xyz" or "fix-for-issue-xyz") nor be a branch name or a single word.
     Please use a concise one-line summary that explains what the fix or change actually does.
     Example of a good title: "Prevent crash when importing malformed BibTeX entries".
 - jobName: 'Mandatory Checklist present'
@@ -203,6 +204,13 @@
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `- [x]` (done), `- [ ]` (yet to be done) or `- [/]` (not applicable).
     Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
+- jobName: 'MIT license confirmed'
+  workflowName: 'Check PR Format'
+  always: true
+  message: >
+    The checkbox "I own the copyright of the code submitted and I license it under the MIT license" in the pull request description is not ticked, or its `### Checklist` section was not found.
+    We cannot merge code without the permission to license it under MIT.
+    If you own the code, please tick the box (`- [x]`). Otherwise, please explain the origin of the code in the description.
 - jobName: 'Determine issue number'
   workflowName: 'Link PR to Issue'
   always: true

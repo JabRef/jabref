@@ -1,9 +1,15 @@
 package org.jabref.logic.quality.consistency;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
@@ -21,15 +27,22 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BibliographyConsistencyCheckTest {
 
@@ -69,6 +82,108 @@ class BibliographyConsistencyCheckTest {
                 .build();
 
         entryTypesManager = new BibEntryTypesManager();
+    }
+
+    @ParameterizedTest
+    @EnumSource(BibDatabaseMode.class)
+    void compactReportsMatchExistingCheckerAndExports(BibDatabaseMode mode) throws IOException {
+        List<BibEntry> entries = List.of(
+                new BibEntry(StandardEntryType.Article, "first").withField(StandardField.AUTHOR, "Author").withField(StandardField.DATE, "2026-11").withField(StandardField.JOURNALTITLE, "Journal"),
+                new BibEntry(StandardEntryType.Article, "second").withField(StandardField.TITLE, "Title").withField(bibUrl, "url"),
+                new BibEntry(StandardEntryType.Book, "book").withField(StandardField.AUTHOR, "Author"),
+                new BibEntry(new UnknownEntryType("unknown"), "unknown").withField(StandardField.NOTE, "Note"),
+                new BibEntry(StandardEntryType.Article));
+        var snapshot = BibliographyConsistencyCheck.snapshot(entries, mode, entryTypesManager, () -> false);
+        assertEquivalentReport(entries, snapshot.check(Set.of("*"), () -> false), mode);
+        assertEquivalentReport(List.of(entries.getFirst(), entries.get(2)), snapshot.check(Set.of("first", "book"), () -> false), mode);
+        assertEquivalentReport(List.of(), snapshot.check(Set.of(), () -> false), mode);
+    }
+
+    private void assertEquivalentReport(List<BibEntry> entries, BibliographyConsistencyCheck.Report report, BibDatabaseMode mode) throws IOException {
+        var expected = new BibliographyConsistencyCheck().checkEntries(entries, mode, entryTypesManager, (_, _) -> {
+        });
+        StringWriter expectedCsv = new StringWriter();
+        try (var writer = new BibliographyConsistencyCheckResultCsvWriter(expected, expectedCsv, true, entryTypesManager, mode)) {
+            writer.writeFindings();
+        }
+        StringWriter actualCsv = new StringWriter();
+        report.writeCsv(actualCsv);
+        assertEquals(expectedCsv.toString(), actualCsv.toString());
+        StringWriter expectedTxt = new StringWriter();
+        try (var writer = new BibliographyConsistencyCheckResultTxtWriter(expected, expectedTxt, true, entryTypesManager, mode)) {
+            writer.writeFindings();
+        }
+        StringWriter actualTxt = new StringWriter();
+        report.writeTxt(actualTxt);
+        assertEquals(expectedTxt.toString(), actualTxt.toString());
+        List<ConsistencyMessage> messages = new ArrayList<>();
+        try (var writer = new CapturingWriter(expected, mode, messages)) {
+            writer.writeFindings();
+        }
+        assertEquals(messages, report.messages());
+    }
+
+    @NullMarked
+    private class CapturingWriter extends BibliographyConsistencyCheckResultWriter {
+        private final List<ConsistencyMessage> messages;
+
+        private CapturingWriter(BibliographyConsistencyCheck.Result result, BibDatabaseMode mode, List<ConsistencyMessage> messages) {
+            super(result, Writer.nullWriter(), true, BibliographyConsistencyCheckTest.this.entryTypesManager, mode);
+            this.messages = messages;
+        }
+
+        @Override
+        protected void writeBibEntry(BibEntry entry, EntryTypeReport type) {
+            messages.add(new ConsistencyMessage(getFindingsAsList(entry, type), entry));
+        }
+
+        @Override
+        public void close() {
+        }
+    }
+
+    @Test
+    void compactSnapshotRetainsOriginalNavigationAndCapturedData() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article, "first").withField(StandardField.AUTHOR, "Author");
+        var snapshot = BibliographyConsistencyCheck.snapshot(List.of(entry), BibDatabaseMode.BIBTEX, entryTypesManager, () -> false);
+        var report = snapshot.check(Set.of("*"), () -> false);
+        StringWriter before = new StringWriter();
+        report.writeCsv(before);
+        entry.setField(StandardField.TITLE, "Changed");
+        entry.setCitationKey("changed");
+        StringWriter after = new StringWriter();
+        snapshot.check(Set.of("first"), () -> false).writeCsv(after);
+        assertEquals(before.toString(), after.toString());
+        assertSame(entry, report.messages().getFirst().bibEntry());
+        assertThrows(UnsupportedOperationException.class, () -> report.messages().getFirst().message().set(0, "changed"));
+    }
+
+    @Test
+    void compactReportsMergeFieldsForTypesWithTheSameDisplayName() {
+        List<BibEntry> entries = List.of(
+                new BibEntry(BiblatexNonStandardEntryType.Standard, "first").withField(StandardField.NOTE, "Note"),
+                new BibEntry(BiblatexNonStandardEntryType.Standard, "second"),
+                new BibEntry(IEEETranEntryType.Standard, "third").withField(StandardField.YEAR, "2026"),
+                new BibEntry(IEEETranEntryType.Standard, "fourth"));
+        var snapshot = BibliographyConsistencyCheck.snapshot(entries, BibDatabaseMode.BIBLATEX, entryTypesManager, () -> false);
+
+        var report = snapshot.check(Set.of("*"), () -> false);
+
+        Set<Field> differingFields = report.fieldsByType().get("Standard").stream()
+                                           .filter(Set.of(StandardField.NOTE, StandardField.YEAR)::contains)
+                                           .collect(Collectors.toSet());
+        assertEquals(Set.of(StandardField.NOTE, StandardField.YEAR), differingFields);
+    }
+
+    @Test
+    void compactSnapshotStopsDuringCaptureAndSubsetChecks() {
+        List<BibEntry> entries = List.of(new BibEntry(StandardEntryType.Article, "first"));
+        AtomicInteger checkpoints = new AtomicInteger();
+        assertThrows(CancellationException.class,
+                () -> BibliographyConsistencyCheck.snapshot(entries, BibDatabaseMode.BIBTEX, entryTypesManager, () -> checkpoints.incrementAndGet() >= 3));
+        var snapshot = BibliographyConsistencyCheck.snapshot(entries, BibDatabaseMode.BIBTEX, entryTypesManager, () -> false);
+        checkpoints.set(0);
+        assertThrows(CancellationException.class, () -> snapshot.check(Set.of("*"), () -> checkpoints.incrementAndGet() >= 3));
     }
 
     @Test
@@ -295,7 +410,7 @@ class BibliographyConsistencyCheckTest {
 
         entryTypesManager.addCustomOrModifiedType(newCustomType, bibContext.getMode());
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.ABSTRACT), List.of(third));
@@ -314,7 +429,7 @@ class BibliographyConsistencyCheckTest {
         BibDatabase database = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
@@ -409,6 +524,7 @@ class BibliographyConsistencyCheckTest {
         BibEntry a = new BibEntry(StandardEntryType.Misc, "a")
                 .withField(StandardField.COMMENT, "note")
                 .withField(StandardField.PDF, "file.pdf")
+                .withField(StandardField.FILE, "document.pdf")
                 .withField(new UserSpecificCommentField("XYZ"), "foo")
                 .withField(SpecialField.PRIORITY, "high");
         BibEntry b = new BibEntry(StandardEntryType.Misc, "b")
@@ -447,7 +563,7 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
-    void unsetRequriedFieldsReported() {
+    void unsetRequiredFieldsReported() {
         BibEntry withDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withDate")
                 .withField(StandardField.DATE, "date") // Required in BibLaTeX

@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.DebugAiProvider;
 import org.jabref.logic.ai.chatting.JvmOpenAiChatLanguageModel;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.ai.tokenization.logic.TokenEstimator;
@@ -19,13 +20,13 @@ import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 
-/// Static factory for creating {@link ChatModel} instances.
+/// Static factory for creating [ChatModel] instances.
 ///
-/// Each call creates its own {@link HttpClient} and {@link ExecutorService}.
-/// The returned model implements {@link AutoCloseable}; callers should close it
+/// Each call creates its own [HttpClient] and [ExecutorService].
+/// The returned model implements [AutoCloseable]; callers should close it
 /// when it is no longer needed so the underlying resources are released.
 ///
-/// Returns {@code null} when AI is disabled or the API key is empty.
+/// Returns `null` when AI is disabled or the API key is empty.
 public final class ChatModelFactory {
     private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);
 
@@ -33,7 +34,7 @@ public final class ChatModelFactory {
         throw new UnsupportedOperationException("cannot instantiate a utility class");
     }
 
-    /// Creates a {@link ChatModel} from explicit parameters.
+    /// Creates a [ChatModel] from explicit parameters.
     /// All decisions about provider, model name, API key, etc. must be made by the caller.
     public static ChatModel create(
             AiProvider provider,
@@ -77,12 +78,26 @@ public final class ChatModelFactory {
                                            .temperature(temperature)
                                            .logRequestsAndResponses(true)
                                            .build();
+            case DEBUG ->
+                    new DebugAiProvider();
         };
 
         return new ChatModelImpl(langchainModel, tokenEstimator, provider, modelName, contextWindowSize, httpClient, executorService);
     }
 
     public static ChatModel create(AiPreferences aiPreferences) {
+        if (aiPreferences.getEnableAiDebugProvider()) {
+            // [impl->req~ai.llms.providers.debug~1]
+            return create(
+                    AiProvider.DEBUG,
+                    "debug",
+                    "",
+                    aiPreferences.getTemperature(),
+                    AiProvider.DEBUG.getApiUrl(),
+                    aiPreferences.getContextWindowSize(),
+                    aiPreferences.getTokenEstimatorKind()
+            );
+        }
         return create(
                 aiPreferences.getAiProvider(),
                 aiPreferences.getSelectedChatModel(),

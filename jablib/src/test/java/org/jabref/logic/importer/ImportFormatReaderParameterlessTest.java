@@ -51,5 +51,7 @@ class ImportFormatReaderParameterlessTest {
     @Test
     void hasImporterForFileReturnsTrueForSupportedExtension() {
         assertTrue(reader.hasImporterForFile(Path.of("dropped-file.ris")));
+        assertTrue(reader.hasImporterForFile(Path.of("dropped-file.RIS")));
+        assertTrue(reader.hasImporterForFile(Path.of("dropped-file.Bib")));
     }
 }

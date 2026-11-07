@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "common-misspellings": true,
+    "terminology": {
+      "defaultTerms": false,
+      "terms": [
+        ["bibtex", "BibTeX"]
+      ]
+    }
+  }
+}

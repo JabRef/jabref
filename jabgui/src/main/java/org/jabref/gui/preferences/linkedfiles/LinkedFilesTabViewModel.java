@@ -17,7 +17,6 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -56,10 +55,12 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences filePreferences;
     private final AutoLinkPreferences autoLinkPreferences;
 
-    public LinkedFilesTabViewModel(DialogService dialogService, CliPreferences preferences) {
+    public LinkedFilesTabViewModel(DialogService dialogService,
+                                   FilePreferences filePreferences,
+                                   AutoLinkPreferences autoLinkPreferences) {
         this.dialogService = dialogService;
-        this.filePreferences = preferences.getFilePreferences();
-        this.autoLinkPreferences = preferences.getAutoLinkPreferences();
+        this.filePreferences = filePreferences;
+        this.autoLinkPreferences = autoLinkPreferences;
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
@@ -72,7 +73,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
                         if (!(Files.exists(path) && Files.isDirectory(path))) {
                             return error;
                         }
-                    } catch (InvalidPathException ex) {
+                    } catch (InvalidPathException _) {
                         return error;
                     }
                     // main directory is valid

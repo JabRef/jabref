@@ -28,12 +28,11 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.util.Range;
 
-import io.github.adr.linked.ADR;
 import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Parsing is done at {@link org.jabref.logic.importer.fileformat.BibtexParser}
+/// Parsing is done at [org.jabref.logic.importer.fileformat.BibtexParser]
 public class BibEntryWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
@@ -199,7 +198,7 @@ public class BibEntryWriter {
     ///
     /// @param field The name of the field.
     /// @return The display version of the field name.
-    @ADR(49)
+    // [impl->adr~hardcode-fieldnames~1]
     static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();
         return fieldName + " ".repeat(Math.max(0, indent - fieldName.length())) + " = ";

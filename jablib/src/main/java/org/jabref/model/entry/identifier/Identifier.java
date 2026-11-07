@@ -39,7 +39,9 @@ public interface Identifier {
                              () -> ISBN.parse(trimmedIdentifier),
                              () -> SSRN.parse(trimmedIdentifier),
                              () -> RFC.parse(trimmedIdentifier),
-                             () -> IacrEprint.parse(trimmedIdentifier)
+                             () -> IacrEprint.parse(trimmedIdentifier),
+                             () -> SWHID.parse(trimmedIdentifier)
+
                      )
                      .map(Supplier::get)
                      .filter(Optional::isPresent)

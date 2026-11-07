@@ -39,7 +39,7 @@ body {
     padding-bottom:1em;
 }
 
-.bibtex_url, .bibtex_pmid, .bibtex_doi, .bibtex_citeseer {
+.bibtex_url, .bibtex_pmid, .bibtex_doi {
     display:inline;
 	font-size:small;
 	float:right;
@@ -47,7 +47,7 @@ body {
 	padding-right:1em;
 }
 
-.bibtex_url a, .bibtex_pdf a, .bibtex_pmid a,.bibtex_pmid a:visited, .bibtex_doi a, .bibtex_pdf a:visited, .bibtex_citeseer a , .bibtex_url a:visited, .bibtex_doi a:visited, .bibtex_citeseer a:visited {
+.bibtex_url a, .bibtex_pdf a, .bibtex_pmid a,.bibtex_pmid a:visited, .bibtex_doi a, .bibtex_pdf a:visited, .bibtex_url a:visited, .bibtex_doi a:visited {
 	text-decoration:none;
 	font-weight:bold;
 	color:darkblue;

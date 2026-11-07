@@ -69,7 +69,7 @@ public class AttachFileFromURLAction extends SimpleCommand {
                     taskExecutor,
                     dialogService,
                     preferences);
-            onlineFile.download(true);
+            onlineFile.download(true, stateManager.getUndoManager(databaseContext));
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
         }

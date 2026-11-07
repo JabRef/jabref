@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserFetcher, EntryBasedFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "SemanticScholar";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholar.class);
 
@@ -79,7 +80,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
                 importerPreferences.getApiKey(getName()).ifPresent(
                         key -> jsoupRequest.header("x-api-key", key));
                 html = jsoupRequest.get();
-            } catch (IOException e) {
+            } catch (IOException _) {
                 LOGGER.info("Error for pdf lookup with DOI");
             }
         }
@@ -122,18 +123,35 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     String getURLBySource(String source) throws IOException, FetcherException {
         URLDownload download = new URLDownload(source);
+        importerPreferences.getApiKey(getName()).ifPresent(
+                key -> download.addHeader("x-api-key", key));
         JSONObject json = new JSONObject(download.asString());
-        LOGGER.debug("URL for source: {}", json.get("url").toString());
-        if (!json.has("url")) {
-            throw new FetcherException("Page does not contain field \"url\"");
+        if (!json.has("paperId")) {
+            throw new FetcherException("Page does not contain field \"paperId\"");
         }
-        return json.get("url").toString();
+        String paperId = json.get("paperId").toString();
+        LOGGER.debug("URL for source: https://www.semanticscholar.org/paper/{}", paperId);
+        return "https://www.semanticscholar.org/paper/" + paperId;
     }
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string
+    ///
+    /// The query is sent as the `query` parameter, so raw queries
+    /// bypass [DefaultQueryTransformer] and are passed unchanged to the catalog
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
-        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
+        uriBuilder.addParameter("query", query);
         uriBuilder.addParameter("offset", String.valueOf(pageNumber * getPageSize()));
         uriBuilder.addParameter("limit", String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize())));
         // All fields need to be specified
@@ -143,7 +161,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         return result;
     }
 
-    /// Returns the parser used to convert the response to a list of {@link BibEntry}.
+    /// Returns the parser used to convert the response to a list of [BibEntry].
     @Override
     public Parser getParser() {
         return inputStream -> {
@@ -209,13 +227,13 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     @Override
     public String getName() {
-        return "SemanticScholar";
+        return FETCHER_NAME;
     }
 
-    /// Looks for hits which are matched by the given {@link BibEntry}.
+    /// Looks for hits which are matched by the given [BibEntry].
     ///
     /// @param entry entry to search bibliographic information for
-    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @return a list of [BibEntry], which are matched by the query (may be empty)
     /// @throws FetcherException if an error linked to the Fetcher applies
     @Override
     public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {

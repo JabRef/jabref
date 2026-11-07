@@ -1,5 +1,13 @@
 import org.jabref.gui.icon.JabRefIconProvider;
 
+/// JavaFX desktop application. Contains the views, view models, dialogs and actions;
+/// no business logic beyond glue code (that belongs in `org.jabref.jablib`).
+///
+/// Entry points: `org.jabref.Launcher` (`main`, package not exported), [org.jabref.gui.JabRefGUI],
+/// [org.jabref.gui.frame.JabRefFrame], [org.jabref.gui.LibraryTab].
+///
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html">Architecture and components</a>
+/// @see <a href="https://devdocs.jabref.org/code-howtos/javafx.html">JavaFX code howto</a>
 open module org.jabref {
     requires org.jabref.jablib;
     requires org.jabref.jabls;
@@ -17,7 +25,8 @@ open module org.jabref {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
-    requires javafx.web;
+    requires org.jabref.htmltonode;
+    requires jfx.incubator.richtext;
 
     requires com.tobiasdiez.easybind;
 
@@ -51,6 +60,8 @@ open module org.jabref {
 
     requires reactfx;
 
+    requires tools.maran.svg;
+    requires tools.maran.svg.materialdesign;
     requires tools.maran.svgnode;
     // endregion
 
@@ -83,7 +94,6 @@ open module org.jabref {
     // endregion
 
     // region: data mapping
-    requires jdk.xml.dom;
     // requires com.google.gson;
     requires tools.jackson.core;
     requires tools.jackson.databind;
@@ -118,12 +128,6 @@ open module org.jabref {
     // requires org.apache.commons.logging;
     // endregion
 
-    // region: latex2unicode
-    // requires com.github.tomtung.latex2unicode;
-    // requires fastparse;
-    // requires scala.library;
-    // endregion
-
     // requires jbibtex;
     // requires citeproc.java;
 
@@ -133,6 +137,7 @@ open module org.jabref {
     // requires com.ibm.icu;
 
     requires flexmark;
+    requires flexmark.ext.tables;
     requires flexmark.html2md.converter;
     requires flexmark.util.ast;
     requires flexmark.util.collection;
@@ -174,16 +179,20 @@ open module org.jabref {
 
     requires org.jspecify;
 
+    // region nimbusds / OAuth2
+    requires nimbusds.oauth2.oidc.sdk;
+    // endregion
+
     // region: other libraries (alphabetically)
     // requires cuid;
     requires com.dlsc.pdfviewfx;
     // requires com.sun.jna;
     // requires dd.plist;
-    requires static io.github.eadr;
     // required by okhttp and some AI library
     // requires kotlin.stdlib;
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires veneer;
     // endregion
 }

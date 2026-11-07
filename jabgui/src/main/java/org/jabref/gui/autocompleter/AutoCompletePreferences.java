@@ -56,13 +56,6 @@ public class AutoCompletePreferences {
         return new AutoCompletePreferences();
     }
 
-    public void setAll(AutoCompletePreferences preferences) {
-        this.shouldAutoComplete.set(preferences.shouldAutoComplete());
-        this.firstNameMode.set(preferences.getFirstNameMode());
-        this.nameFormat.set(preferences.getNameFormat());
-        this.completeFields.addAll(preferences.getCompleteFields());
-    }
-
     public boolean shouldAutoComplete() {
         return shouldAutoComplete.get();
     }

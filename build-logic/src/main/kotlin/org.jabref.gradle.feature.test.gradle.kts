@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     id("java")
     id("org.gradlex.java-module-testing")
@@ -36,6 +38,12 @@ tasks.withType<Test>().configureEach {
     // Even in sequential tests, to a "force" cleanup
     // See https://docs.gradle.org/current/userguide/performance.html#b_fork_tests_into_multiple_processes for details.
     forkEvery = 100
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events("FAILED")
+        exceptionFormat = TestExceptionFormat.FULL
+    }
 }
 
 /*

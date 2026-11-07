@@ -32,7 +32,9 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.UrlBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.GenericUrlBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -40,6 +42,8 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
@@ -52,6 +56,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +86,11 @@ public class NewEntryViewModel {
     private final ObjectProperty<IdBasedFetcher> idFetcher;
     private final Validator idFetcherValidator;
     private Task<Optional<BibEntry>> idLookupWorker;
+
+    private final UrlBasedFetcher urlFetcher;
+    private final StringProperty urlText;
+    private final Validator urlTextValidator;
+    private Task<List<BibEntry>> urlWorker;
 
     private final StringProperty interpretText;
     private final Validator interpretTextValidator;
@@ -133,6 +143,16 @@ public class NewEntryViewModel {
                 Objects::nonNull,
                 ValidationMessage.error(Localization.lang("You must select an identifier type.")));
         idLookupWorker = null;
+
+        urlFetcher = new GenericUrlBasedFetcher();
+        urlText = new SimpleStringProperty();
+        urlTextValidator = new FunctionBasedValidator<>(
+                urlText,
+                input -> input != null && URLUtil.isURL(input.trim()),
+                // Same string as the error label in NewEntry.fxml -- this message itself is currently not rendered
+                // anywhere, but FunctionBasedValidator requires one.
+                ValidationMessage.error(Localization.lang("You must provide a valid URL.")));
+        urlWorker = null;
 
         interpretText = new SimpleStringProperty();
         interpretTextValidator = new FunctionBasedValidator<>(
@@ -217,6 +237,14 @@ public class NewEntryViewModel {
         return idFetcherValidator.getValidationStatus().validProperty();
     }
 
+    public StringProperty urlTextProperty() {
+        return urlText;
+    }
+
+    public ReadOnlyBooleanProperty urlTextValidatorProperty() {
+        return urlTextValidator.getValidationStatus().validProperty();
+    }
+
     public StringProperty interpretTextProperty() {
         return interpretText;
     }
@@ -296,12 +324,12 @@ public class NewEntryViewModel {
         }
 
         idLookupWorker.setOnFailed(_ -> {
-            final Throwable exception = idLookupWorker.getException();
-            final String exceptionMessage = exception.getMessage();
-            final String textString = idText.getValue();
-            final String fetcherName = idFetcher.getValue().getName();
+            Throwable exception = idLookupWorker.getException();
+            String exceptionMessage = exception.getMessage();
+            String textString = idText.getValue();
+            String fetcherName = idFetcher.getValue().getName();
 
-            final String dialogTitle = Localization.lang("Failed to lookup identifier");
+            String dialogTitle = Localization.lang("Failed to lookup identifier");
 
             if (exception instanceof FetcherClientException) {
                 dialogService.showInformationDialogAndWait(
@@ -349,7 +377,7 @@ public class NewEntryViewModel {
                 return;
             }
 
-            final ImportHandler handler = new ImportHandler(
+            ImportHandler handler = new ImportHandler(
                     libraryTab.getBibDatabaseContext(),
                     preferences,
                     fileUpdateMonitor,
@@ -366,75 +394,40 @@ public class NewEntryViewModel {
         taskExecutor.execute(idLookupWorker);
     }
 
-    private class WorkerInterpretCitations extends Task<Optional<List<BibEntry>>> {
+    private class WorkerEnterUrl extends Task<List<BibEntry>> {
         @Override
-        protected Optional<List<BibEntry>> call() throws FetcherException {
-            final String text = interpretText.getValue();
-            final boolean textValid = interpretTextValidator.getValidationStatus().isValid();
-            final PlainCitationParserChoice parserChoice = interpretParser.getValue();
-
-            if (text == null || !textValid || parserChoice == null) {
-                return Optional.empty();
-            }
-
-            final PlainCitationParser parser;
-            if (parserChoice == PlainCitationParserChoice.LLM) {
-                parser = PlainCitationParserFactory.getLlmPlainCitationParser(
-                        preferences.getImportFormatPreferences(),
-                        preferences.getAiPreferences(),
-                        aiService.getCurrentChatModel());
-            } else {
-                parser = PlainCitationParserFactory.getPlainCitationParser(
-                        parserChoice,
-                        preferences.getCitationKeyPatternPreferences(),
-                        preferences.getGrobidPreferences(),
-                        preferences.getImportFormatPreferences());
-            }
-
-            final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
-
-            if (entries.isEmpty()) {
-                return Optional.empty();
-            }
-            return Optional.of(entries);
+        protected List<BibEntry> call() throws FetcherException {
+            // No validation needed here: the Create button is disabled while urlTextValidator reports the text as
+            // invalid, and the fetcher validates the URL itself anyway (throwing a FetcherException).
+            return urlFetcher.performSearch(urlText.getValue());
         }
     }
 
-    public void executeInterpretCitations() {
+    public void executeEnterUrl() {
         executing.setValue(true);
 
         cancel();
-        interpretWorker = new WorkerInterpretCitations();
+        urlWorker = new WorkerEnterUrl();
 
-        interpretWorker.setOnFailed(_ -> {
-            final Throwable exception = interpretWorker.getException();
-            final String exceptionMessage = exception.getMessage();
-            final String parserName = interpretParser.getValue().getLocalizedName();
-            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
+        urlWorker.setOnFailed(_ -> {
+            Throwable exception = urlWorker.getException();
+            // URLs can embed credentials or access tokens, so neither the log nor the dialog may contain the raw
+            // URL. FetcherException redacts these in getLocalizedMessage; the same helper redacts the URL for the log.
+            String exceptionMessage = exception.getLocalizedMessage();
+            LOGGER.error("An exception occurred with the URL fetcher when resolving '{}'.", FetcherException.getRedactedUrl(urlText.getValue()), exception);
 
-            final String dialogTitle = Localization.lang("Failed to interpret citations");
-            if (exception instanceof FetcherException) {
-                dialogService.showInformationDialogAndWait(
-                        dialogTitle,
-                        Localization.lang(
-                                "Failed to interpret citations.\n" +
-                                        "The following error was encountered:\n" +
-                                        "%0",
-                                exceptionMessage));
-            } else {
-                dialogService.showInformationDialogAndWait(
-                        dialogTitle,
-                        Localization.lang(
-                                "The following error occurred:\n" +
-                                        "%0",
-                                exceptionMessage));
-            }
+            String dialogTitle = Localization.lang("Failed to create entry from URL");
+            dialogService.showInformationDialogAndWait(
+                    dialogTitle,
+                    Localization.lang("Failed to fetch the URL.\nThe following error was encountered:\n%0", exceptionMessage));
 
             executing.set(false);
         });
 
-        interpretWorker.setOnSucceeded(_ -> {
-            final Optional<List<BibEntry>> result = interpretWorker.getValue();
+        urlWorker.setOnSucceeded(_ -> {
+            // The generic fetcher always returns exactly one entry, but the UrlBasedFetcher contract allows an
+            // implementation to find nothing at the given URL.
+            List<BibEntry> result = urlWorker.getValue();
 
             if (result.isEmpty()) {
                 dialogService.showWarningDialogAndWait(
@@ -442,12 +435,11 @@ public class NewEntryViewModel {
                         Localization.lang(
                                 "An unknown error has occurred.\n" +
                                         "Entries may need to be added manually."));
-                LOGGER.error("An invalid result was returned when parsing citations.");
                 executing.set(false);
                 return;
             }
 
-            final ImportHandler handler = new ImportHandler(
+            ImportHandler handler = new ImportHandler(
                     libraryTab.getBibDatabaseContext(),
                     preferences,
                     fileUpdateMonitor,
@@ -455,27 +447,161 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result.get());
+            handler.importEntriesWithDuplicateCheck(null, result);
 
             executedSuccessfully.set(true);
+            executing.set(false);
+        });
+
+        taskExecutor.execute(urlWorker);
+    }
+
+    private class WorkerInterpretCitations extends Task<Optional<List<BibEntry>>> {
+        @Override
+        protected Optional<List<BibEntry>> call() throws FetcherException {
+            if (!interpretTextValidator.getValidationStatus().isValid()) {
+                return Optional.empty();
+            }
+            return parseCitations(interpretText.getValue(), interpretParser.getValue());
+        }
+    }
+
+    private Optional<List<BibEntry>> parseCitations(@Nullable String text, @Nullable PlainCitationParserChoice parserChoice) throws FetcherException {
+        if (text == null || parserChoice == null) {
+            return Optional.empty();
+        }
+
+        PlainCitationParser parser;
+        if (parserChoice == PlainCitationParserChoice.LLM) {
+            parser = PlainCitationParserFactory.getLlmPlainCitationParser(
+                    preferences.getImportFormatPreferences(),
+                    preferences.getAiPreferences(),
+                    aiService.getCurrentChatModel());
+        } else {
+            parser = PlainCitationParserFactory.getPlainCitationParser(
+                    parserChoice,
+                    preferences.getCitationKeyPatternPreferences(),
+                    preferences.getGrobidPreferences(),
+                    preferences.getImportFormatPreferences());
+        }
+
+        List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
+
+        if (entries.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(entries);
+    }
+
+    public void executeInterpretCitations() {
+        if (interpretParser.getValue() == PlainCitationParserChoice.LLM) {
+            executeInterpretCitationsInBackground();
+            return;
+        }
+
+        executing.setValue(true);
+
+        cancel();
+        interpretWorker = new WorkerInterpretCitations();
+
+        interpretWorker.setOnFailed(_ -> {
+            showInterpretCitationsFailure(interpretWorker.getException());
+            executing.set(false);
+        });
+
+        interpretWorker.setOnSucceeded(_ -> {
+            if (importInterpretedCitations(interpretWorker.getValue())) {
+                executedSuccessfully.set(true);
+            }
             executing.set(false);
         });
 
         taskExecutor.execute(interpretWorker);
     }
 
+    /// LLM responses can take long, so the dialog closes right away and the entries are added once the LLM answered.
+    private void executeInterpretCitationsInBackground() {
+        String text = interpretText.getValue();
+        if (!interpretTextValidator.getValidationStatus().isValid()) {
+            return;
+        }
+
+        // [impl->req~ai.citation-parsing.background~1]
+        BackgroundTask.wrap(() -> parseCitations(text, PlainCitationParserChoice.LLM))
+                      .setTitle(Localization.lang("Parsing citations with LLM"))
+                      .showToUser(true)
+                      .onSuccess(result -> {
+                          if (!stateManager.getOpenDatabases().contains(libraryTab.getBibDatabaseContext())) {
+                              LOGGER.debug("Library closed before the LLM answered; skipping import.");
+                              return;
+                          }
+                          importInterpretedCitations(result);
+                      })
+                      .onFailure(this::showInterpretCitationsFailure)
+                      .executeWith(taskExecutor);
+
+        executedSuccessfully.set(true);
+    }
+
+    private void showInterpretCitationsFailure(Throwable exception) {
+        String exceptionMessage = exception.getMessage();
+        String parserName = interpretParser.getValue().getLocalizedName();
+        LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
+
+        String dialogTitle = Localization.lang("Failed to interpret citations");
+        if (exception instanceof FetcherException) {
+            dialogService.showInformationDialogAndWait(
+                    dialogTitle,
+                    Localization.lang(
+                            "Failed to interpret citations.\n" +
+                                    "The following error was encountered:\n" +
+                                    "%0",
+                            exceptionMessage));
+        } else {
+            dialogService.showInformationDialogAndWait(
+                    dialogTitle,
+                    Localization.lang(
+                            "The following error occurred:\n" +
+                                    "%0",
+                            exceptionMessage));
+        }
+    }
+
+    private boolean importInterpretedCitations(Optional<List<BibEntry>> result) {
+        if (result.isEmpty()) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Invalid result"),
+                    Localization.lang(
+                            "An unknown error has occurred.\n" +
+                                    "Entries may need to be added manually."));
+            LOGGER.error("An invalid result was returned when parsing citations.");
+            return false;
+        }
+
+        ImportHandler handler = new ImportHandler(
+                libraryTab.getBibDatabaseContext(),
+                preferences,
+                fileUpdateMonitor,
+                libraryTab.getUndoManager(),
+                stateManager,
+                dialogService,
+                taskExecutor);
+        handler.importEntriesWithDuplicateCheck(null, result.get());
+        return true;
+    }
+
     private class WorkerSpecifyBibtex extends Task<Optional<List<BibEntry>>> {
         @Override
         protected Optional<List<BibEntry>> call() throws ParseException {
-            final String text = bibtexText.getValue();
-            final boolean textValid = bibtexTextValidator.getValidationStatus().isValid();
+            String text = bibtexText.getValue();
+            boolean textValid = bibtexTextValidator.getValidationStatus().isValid();
 
             if (text == null || !textValid) {
                 return Optional.empty();
             }
 
-            final BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
-            final List<BibEntry> entries = parser.parseEntries(text);
+            BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
+            List<BibEntry> entries = parser.parseEntries(text);
 
             if (entries.isEmpty()) {
                 return Optional.empty();
@@ -491,10 +617,10 @@ public class NewEntryViewModel {
         bibtexWorker = new WorkerSpecifyBibtex();
 
         bibtexWorker.setOnFailed(_ -> {
-            final Throwable exception = interpretWorker.getException();
-            final String exceptionMessage = exception.getMessage();
+            Throwable exception = interpretWorker.getException();
+            String exceptionMessage = exception.getMessage();
 
-            final String dialogTitle = Localization.lang("Failed to parse Bib(La)TeX");
+            String dialogTitle = Localization.lang("Failed to parse Bib(La)TeX");
 
             if (exception instanceof ParseException) {
                 dialogService.showInformationDialogAndWait(
@@ -519,7 +645,7 @@ public class NewEntryViewModel {
         });
 
         bibtexWorker.setOnSucceeded(_ -> {
-            final Optional<List<BibEntry>> result = bibtexWorker.getValue();
+            Optional<List<BibEntry>> result = bibtexWorker.getValue();
 
             if (result.isEmpty()) {
                 dialogService.showWarningDialogAndWait(
@@ -532,7 +658,7 @@ public class NewEntryViewModel {
                 return;
             }
 
-            final ImportHandler handler = new ImportHandler(
+            ImportHandler handler = new ImportHandler(
                     libraryTab.getBibDatabaseContext(),
                     preferences,
                     fileUpdateMonitor,
@@ -552,6 +678,9 @@ public class NewEntryViewModel {
     public void cancel() {
         if (idLookupWorker != null) {
             idLookupWorker.cancel();
+        }
+        if (urlWorker != null) {
+            urlWorker.cancel();
         }
         if (interpretWorker != null) {
             interpretWorker.cancel();

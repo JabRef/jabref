@@ -48,7 +48,7 @@ public class FileNameUniqueness {
     }
 
     /// This function decide whether the newly downloaded file has the same content with other files
-    /// It returns ture when the content is duplicate, while returns false if it is not
+    /// It returns true when the content is duplicate, while returns false if it is not
     ///
     /// @param directory         The directory which saves the files (.pdf, for example)
     /// @param fileName          Suggest name for the newly downloaded file
@@ -77,7 +77,7 @@ public class FileNameUniqueness {
                 try {
                     Files.delete(duplicateFile);
                     messageOnDeletion.accept(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
-                } catch (IOException e) {
+                } catch (IOException _) {
                     LOGGER.error("File '{}' is a duplicate of '{}'. Could not delete '{}'.", fileName, originalFileName, fileName);
                 }
                 return true;

@@ -26,10 +26,14 @@ import org.w3c.dom.NodeList;
 /// @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
 class MSBibEntry {
 
-    /// reduced subset, supports only "CITY , STATE, COUNTRY" <br>
-    /// **\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b** <br>
-    /// WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
-    /// Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
+    /// reduced subset, supports only "CITY , STATE, COUNTRY"
+    ///
+    /// **\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b**
+    ///
+    /// WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more)
+    ///
+    /// Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA
+    ///
     /// tested using http://www.regexpal.com/
     private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
@@ -76,7 +80,7 @@ class MSBibEntry {
         // empty
     }
 
-    /// Create a new {@link MSBibEntry} to import from an XML element
+    /// Create a new [MSBibEntry] to import from an XML element
     public MSBibEntry(Element entry) {
         populateFromXml(entry);
     }
@@ -152,11 +156,11 @@ class MSBibEntry {
         String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
         String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
 
-        Optional<Date> parsedDateAcessed = Date.parse(Optional.ofNullable(yearAccessed),
+        Optional<Date> parsedDateAccessed = Date.parse(Optional.ofNullable(yearAccessed),
                 Optional.ofNullable(monthAccessed),
                 Optional.ofNullable(dayAccessed));
 
-        parsedDateAcessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
+        parsedDateAccessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
 
         NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
@@ -229,7 +233,7 @@ class MSBibEntry {
     /// Gets the dom representation for one entry, used for export
     ///
     /// @param document XmlDocument
-    /// @return XmlElement represenation of one entry
+    /// @return XmlElement representation of one entry
     public Element getEntryDom(Document document) {
         Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Source");
 
@@ -237,7 +241,7 @@ class MSBibEntry {
             addField(document, rootNode, entry.getKey(), entry.getValue());
         }
 
-        Optional.ofNullable(dateAccessed).ifPresent(field -> addDateAcessedFields(document, rootNode));
+        Optional.ofNullable(dateAccessed).ifPresent(_ -> addDateAccessedFields(document, rootNode));
 
         Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
 
@@ -325,7 +329,7 @@ class MSBibEntry {
         allAuthors.appendChild(authorTop);
     }
 
-    private void addDateAcessedFields(Document document, Element rootNode) {
+    private void addDateAccessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
         parsedDateAcesseField.flatMap(Date::getYear)
                              .map(Object::toString)
@@ -333,7 +337,7 @@ class MSBibEntry {
 
         parsedDateAcesseField.flatMap(Date::getMonth)
                              .map(Month::getFullName)
-                             .ifPresent(monthAcessed -> addField(document, rootNode, "Month" + "Accessed", monthAcessed));
+                             .ifPresent(monthAccessed -> addField(document, rootNode, "Month" + "Accessed", monthAccessed));
         parsedDateAcesseField.flatMap(Date::getDay)
                              .map(Object::toString)
                              .ifPresent(dayAccessed -> addField(document, rootNode, "Day" + "Accessed", dayAccessed));

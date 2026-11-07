@@ -38,7 +38,7 @@ public class QueryParser {
             List<Term> sortedTerms = new ArrayList<>(terms);
             sortedTerms.sort(Comparator.comparing(Term::text).reversed());
             return Optional.of(ComplexSearchQuery.fromTerms(sortedTerms));
-        } catch (QueryNodeException | IllegalStateException | IllegalArgumentException ex) {
+        } catch (QueryNodeException | IllegalStateException | IllegalArgumentException _) {
             return Optional.empty();
         }
     }

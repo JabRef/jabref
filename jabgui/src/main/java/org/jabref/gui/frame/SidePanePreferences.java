@@ -69,10 +69,4 @@ public class SidePanePreferences {
     public void setWebSearchFetcherSelected(int webSearchFetcherSelected) {
         this.webSearchFetcherSelected.set(webSearchFetcherSelected);
     }
-
-    public void setAll(SidePanePreferences preferences) {
-        this.setVisiblePanes(preferences.visiblePanes());
-        this.setPreferredPositions(preferences.getPreferredPositions());
-        this.webSearchFetcherSelected.set(preferences.getWebSearchFetcherSelected());
-    }
 }

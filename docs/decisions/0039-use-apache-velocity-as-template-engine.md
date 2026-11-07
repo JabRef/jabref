@@ -43,9 +43,9 @@ Update from 20.10.2025: added pebble
 
 ### Apache Velocity
 
-- Main page: <https://velocity.apache.org/>.
-- User guide: <https://velocity.apache.org/engine/devel/user-guide.html>.
-- Developer guide: <https://velocity.apache.org/engine/devel/developer-guide.html>.
+* Main page: <https://velocity.apache.org/>.
+* User guide: <https://velocity.apache.org/engine/devel/user-guide.html>.
+* Developer guide: <https://velocity.apache.org/engine/devel/developer-guide.html>.
 
 Example:
 
@@ -67,9 +67,9 @@ ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
 
 ### Apache FreeMarker
 
-- Main page: <https://freemarker.apache.org/index.html>.
-- User guide: <https://freemarker.apache.org/docs/dgui.html>.
-- Developer guide: <https://freemarker.apache.org/docs/pgui_quickstart.html>.
+* Main page: <https://freemarker.apache.org/index.html>.
+* User guide: <https://freemarker.apache.org/docs/dgui.html>.
+* Developer guide: <https://freemarker.apache.org/docs/pgui_quickstart.html>.
 
 Example:
 
@@ -94,8 +94,8 @@ Note: There is a modern implementation [FreshMarker](https://gitlab.com/schegge/
 
 ### Thymeleaf
 
-- Main page: <https://www.thymeleaf.org/>.
-- Documentation: <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>.
+* Main page: <https://www.thymeleaf.org/>.
+* Documentation: <https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html>.
 
 Example:
 
@@ -119,9 +119,9 @@ Here are the papers you are analyzing:
 
 Because Handlebars and Mustache have similar syntax, and library mentioned below supports both languages, we decided to merge Handlebars and Mustache into one option.
 
-- Main page: <https://handlebarsjs.com/>.
-- Java port repository and developer guide: <https://github.com/jknack/handlebars.java>.
-- User guide: <https://handlebarsjs.com/guide/>.
+* Main page: <https://handlebarsjs.com/>.
+* Java port repository and developer guide: <https://github.com/jknack/handlebars.java>.
+* User guide: <https://handlebarsjs.com/guide/>.
 
 Example:
 
@@ -143,9 +143,9 @@ Here are the papers you are analyzing:
 
 ### Jinja
 
-- Main page: <https://palletsprojects.com/projects/jinja/>.
-- Java port repository and developer guide: <https://github.com/HubSpot/jinjava>.
-- User guide: <https://jinja.palletsprojects.com/en/stable/templates/>.
+* Main page: <https://palletsprojects.com/projects/jinja/>.
+* Java port repository and developer guide: <https://github.com/HubSpot/jinjava>.
+* User guide: <https://jinja.palletsprojects.com/en/stable/templates/>.
 
 ```text
 You are an AI assistant that analyses research papers. You answer questions about papers.
@@ -168,9 +168,9 @@ Here are the papers you are analyzing:
 
 ### Pebble
 
-- Main page: <https://pebbletemplates.io/>
-- Repository and developer guide: <https://github.com/PebbleTemplates/pebble>
-- User guide: <https://pebbletemplates.io/wiki/>
+* Main page: <https://pebbletemplates.io/>
+* Repository and developer guide: <https://github.com/PebbleTemplates/pebble>
+* User guide: <https://pebbletemplates.io/wiki/>
 
 ```text
 {% for entry in entries %}

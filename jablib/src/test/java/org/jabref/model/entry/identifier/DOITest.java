@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,6 +15,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DOITest {
+
+    @ParameterizedTest
+    @MethodSource("linkSearchTerms")
+    void extractsLinkSearchTerms(String input, Optional<DOI.LinkSearchTerms> expected) {
+        assertEquals(expected, DOI.extractLinkSearchTerms(input));
+    }
+
+    private static Stream<Arguments> linkSearchTerms() {
+        return Stream.of(
+                Arguments.of("https://doi.org/10.1000/foo+bar", Optional.of(new DOI.LinkSearchTerms("10.1000/foo+bar", "10.1000/foo+bar"))),
+                Arguments.of("https://doi.org/10.1000/foo%2Bbar", Optional.of(new DOI.LinkSearchTerms("10.1000/foo+bar", "10.1000/foo%2Bbar"))),
+                Arguments.of("https://doi.org/10.1000%2F182", Optional.of(new DOI.LinkSearchTerms("10.1000/182", "10.1000%2F182"))),
+                Arguments.of("https://doi.org/bfrhmx", Optional.of(new DOI.LinkSearchTerms("bfrhmx", "bfrhmx"))),
+                Arguments.of("https://doi.org/bfr%68mx", Optional.of(new DOI.LinkSearchTerms("bfrhmx", "bfr%68mx"))),
+                Arguments.of("https://example.org/article/10.1000/182", Optional.empty()),
+                Arguments.of("https://doi.org/10.1000/foo%XX", Optional.empty()),
+                Arguments.of("https://doi.org/10.1000/182 other", Optional.empty()));
+    }
 
     private static Stream<Arguments> testData() {
         return Stream.of(
@@ -244,9 +263,13 @@ class DOITest {
         assertEquals(expected, input);
     }
 
-    @Test
-    void equalsWorksFor2017Doi() {
-        assertEquals(new DOI("10.1109/cloud.2017.89"), new DOI("10.1109/CLOUD.2017.89"));
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            10.1109/cloud.2017.89,               10.1109/CLOUD.2017.89
+            https://doi.org/10.1109/cloud.2017.89, 10.1109/cloud.2017.89
+            """)
+    void equalsIgnoresPrefixAndCase(String left, String right) {
+        assertEquals(new DOI(left), new DOI(right));
     }
 
     @Test
@@ -299,7 +322,7 @@ class DOITest {
     }
 
     @Test
-    void emptyOrUndescoreOnlyReturnsEmpty() {
+    void emptyOrUnderscoreOnlyReturnsEmpty() {
         assertEquals(Optional.empty(), DOI.parse("_"));
         assertEquals(Optional.empty(), DOI.parse("\t_"));
         assertEquals(Optional.empty(), DOI.parse("___"));

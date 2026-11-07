@@ -16,5 +16,6 @@ class BuildInfoTest {
     void fileImport() {
         BuildInfo buildInfo = new BuildInfo("/org/jabref/util/build.properties");
         assertEquals("42", buildInfo.version.getFullVersion());
+        assertEquals("crossref@example.org", buildInfo.crossRefEmail);
     }
 }

@@ -53,9 +53,11 @@ public class XMLUtil {
 
     /// Gets the content of a subnode.
     /// For example,
-    /// <pre>{@code <item>
+    /// ```xml
+    /// <item>
     /// <nodeName>content</nodeName>
-    /// </item>}</pre>
+    /// </item>
+    /// ```
     public static Optional<String> getNodeContent(Node item, String nodeName) {
         if (item.getNodeType() != Node.ELEMENT_NODE) {
             return Optional.empty();
@@ -79,10 +81,12 @@ public class XMLUtil {
 
     /// Gets a list of subnodes with the specified tag name.
     /// For example,
-    /// <pre>{@code <item>
+    /// ```xml
+    /// <item>
     /// <node>first hit</node>
     /// <node>second hit</node>
-    /// </item>}</pre>
+    /// </item>
+    /// ```
     public static List<Node> getNodesByName(Node item, String nodeName) {
         if (item.getNodeType() != Node.ELEMENT_NODE) {
             return List.of();
@@ -93,10 +97,12 @@ public class XMLUtil {
 
     /// Gets a the first subnode with the specified tag name.
     /// For example,
-    /// <pre>{@code <item>
+    /// ```xml
+    /// <item>
     /// <node>hit</node>
     /// <node>second hit, but not returned</node>
-    /// </item>}</pre>
+    /// </item>
+    /// ```
     public static Optional<Node> getNode(Node item, String nodeName) {
         return getNodesByName(item, nodeName).stream().findFirst();
     }

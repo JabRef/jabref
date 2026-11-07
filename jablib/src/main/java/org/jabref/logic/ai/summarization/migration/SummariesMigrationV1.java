@@ -44,9 +44,9 @@ import org.slf4j.LoggerFactory;
 /// so MVStore's internal `ObjectDataType` fails with `ClassNotFoundException` before
 /// our code can intercept it.
 ///
-/// **Solution:** Open the map with a custom {@link RawBytesDataType} that reads MVStore's binary
+/// **Solution:** Open the map with a custom [RawBytesDataType] that reads MVStore's binary
 /// page format and returns the raw Java-serialized bytes without invoking the standard
-/// `ObjectInputStream`. Then a {@link ClassRemappingObjectInputStream} deserializes those
+/// `ObjectInputStream`. Then a [ClassRemappingObjectInputStream] deserializes those
 /// bytes while remapping the two deleted class names to current inner types.
 public final class SummariesMigrationV1 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummariesMigrationV1.class);
@@ -92,7 +92,7 @@ public final class SummariesMigrationV1 {
     }
 
     /// Migrates old summary data from a given v1 MVStore file path to v2 repository.
-    /// Package-private to allow direct use in tests without depending on {@link Directories}.
+    /// Package-private to allow direct use in tests without depending on [Directories].
     static void migrate(
             Path oldFilePath,
             String libraryId,
@@ -239,7 +239,7 @@ public final class SummariesMigrationV1 {
     /// - VarInt: byte length of the serialized payload
     /// - N bytes: the raw Java-serialized payload (starts with `0xACED 0x0005`)
     ///
-    /// By returning the raw bytes we defer deserialization to {@link ClassRemappingObjectInputStream},
+    /// By returning the raw bytes we defer deserialization to [ClassRemappingObjectInputStream],
     /// which can remap deleted/moved class names before they ever reach the class loader.
     static class RawBytesDataType extends BasicDataType<byte[]> {
 

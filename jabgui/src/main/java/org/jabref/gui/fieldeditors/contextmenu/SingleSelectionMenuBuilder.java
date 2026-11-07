@@ -3,8 +3,6 @@ package org.jabref.gui.fieldeditors.contextmenu;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.ObservableList;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -18,6 +16,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.linkedfile.OcrLinkedFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -116,9 +115,11 @@ record SingleSelectionMenuBuilder(
                 StandardActions.REDOWNLOAD_FILE,
                 new ContextAction(StandardActions.REDOWNLOAD_FILE, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
+        // An auto-found file is only a suggestion and not part of the entry yet, so "Remove link" would be a lie
+        StandardActions linkAction = selectedLinkedFile.isAutomaticallyFound() ? StandardActions.LINK_FILE : StandardActions.REMOVE_LINK;
         items.add(factory.createMenuItem(
-                StandardActions.REMOVE_LINK,
-                new ContextAction(StandardActions.REMOVE_LINK, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+                linkAction,
+                new ContextAction(linkAction, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
         items.add(factory.createMenuItem(
                 StandardActions.DELETE_FILE,

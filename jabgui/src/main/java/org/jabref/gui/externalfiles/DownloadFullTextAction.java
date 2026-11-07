@@ -1,11 +1,9 @@
 package org.jabref.gui.externalfiles;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javafx.concurrent.Task;
+import java.util.function.Function;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -13,18 +11,23 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Try to download fulltext PDF for selected entry(s) by following URL or DOI link.
+///
+/// [impl->req~fetchers.fulltext-background-search~1]
 public class DownloadFullTextAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFullTextAction.class);
@@ -35,39 +38,51 @@ public class DownloadFullTextAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final UiTaskExecutor taskExecutor;
+    private final Function<BibEntry, Optional<FetcherResult>> fullTextFinder;
 
     public DownloadFullTextAction(DialogService dialogService,
                                   StateManager stateManager,
                                   GuiPreferences preferences,
                                   UiTaskExecutor taskExecutor) {
+        this(dialogService,
+                stateManager,
+                preferences,
+                taskExecutor,
+                entry -> new FulltextFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()).findFullTextPDF(entry));
+    }
+
+    DownloadFullTextAction(DialogService dialogService,
+                           StateManager stateManager,
+                           GuiPreferences preferences,
+                           UiTaskExecutor taskExecutor,
+                           Function<BibEntry, Optional<FetcherResult>> fullTextFinder) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.fullTextFinder = fullTextFinder;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::execute);
+    }
 
-        List<BibEntry> entries = stateManager.getSelectedEntries();
+    private void execute(BibDatabaseContext databaseContext) {
+        List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
         if (entries.isEmpty()) {
             LOGGER.debug("No entry selected for fulltext download.");
             return;
         }
-
-        dialogService.notify(Localization.lang("Looking for full text document..."));
 
         if (entries.size() >= WARNING_LIMIT) {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Download full text documents"),
                     Localization.lang(
                             "You are attempting to download full text documents for %0 entries.\nJabRef will send at least one request per entry to a publisher.",
-                            String.valueOf(stateManager.getSelectedEntries().size())),
+                            String.valueOf(entries.size())),
                     // [impl->req~ui.dialogs.confirmation.naming~1]
                     Localization.lang("Download full text documents"),
                     Localization.lang("Cancel"));
@@ -78,43 +93,65 @@ public class DownloadFullTextAction extends SimpleCommand {
             }
         }
 
-        Task<Map<BibEntry, Optional<FetcherResult>>> findFullTextsTask = new Task<>() {
+        BackgroundTask<List<EntryDownload>> findFullTextsTask = new BackgroundTask<>() {
             @Override
-            protected Map<BibEntry, Optional<FetcherResult>> call() {
-                Map<BibEntry, Optional<FetcherResult>> downloads = new ConcurrentHashMap<>();
+            public List<EntryDownload> call() {
+                List<EntryDownload> downloads = new ArrayList<>(entries.size());
                 int count = 0;
-                for (BibEntry entry : entries) {
-                    FulltextFetchers fetchers = new FulltextFetchers(
-                            preferences.getImportFormatPreferences(),
-                            preferences.getImporterPreferences());
-                    downloads.put(entry, fetchers.findFullTextPDF(entry));
-                    updateProgress(++count, entries.size());
+                // Marked here, not before submission, so a task cancelled while queued leaves no spinner behind
+                UiTaskExecutor.runInJavaFXThread(() -> entries.forEach(EntryLookupsInProgress.FULLTEXT::started));
+                try {
+                    for (BibEntry entry : entries) {
+                        if (isCancelled()) {
+                            break;
+                        }
+
+                        BibEntry lookupSnapshot = new BibEntry(entry);
+                        try {
+                            downloads.add(new EntryDownload(entry, lookupSnapshot, fullTextFinder.apply(lookupSnapshot)));
+                        } finally {
+                            count++;
+                            EntryLookupsInProgress.FULLTEXT.finishedLater(entry);
+                        }
+                        updateProgress(count, entries.size());
+                        updateMessage(Localization.lang("%0/%1 entries", count, entries.size()));
+                    }
+                } finally {
+                    // Entries skipped by a cancellation or a failed lookup
+                    List<BibEntry> notLookedUp = entries.subList(count, entries.size());
+                    notLookedUp.forEach(EntryLookupsInProgress.FULLTEXT::finishedLater);
                 }
                 return downloads;
             }
         };
 
-        findFullTextsTask.setOnSucceeded(value ->
-                downloadFullTexts(findFullTextsTask.getValue(), stateManager.getActiveDatabase().get()));
-
-        dialogService.showProgressDialog(
-                Localization.lang("Download full text documents"),
-                Localization.lang("Looking for full text document..."),
-                findFullTextsTask);
-
-        taskExecutor.execute(findFullTextsTask);
+        findFullTextsTask.setTitle(Localization.lang("Download full text documents"))
+                         .withInitialMessage(Localization.lang("Looking for full text document..."))
+                         .showToUser(true)
+                         .onSuccess(downloads -> downloadFullTexts(downloads, databaseContext))
+                         .executeWith(taskExecutor);
     }
 
-    private void downloadFullTexts(Map<BibEntry, Optional<FetcherResult>> downloads, BibDatabaseContext databaseContext) {
-        for (Map.Entry<BibEntry, Optional<FetcherResult>> download : downloads.entrySet()) {
-            BibEntry entry = download.getKey();
-            Optional<FetcherResult> result = download.getValue();
-            if (result.isPresent()) {
-                addLinkedFileFromURL(databaseContext, result.get(), entry);
-            } else {
-                dialogService.notify(Localization.lang("No full text document found for entry %0.",
-                        entry.getCitationKey().orElse(Localization.lang("undefined"))));
+    private void downloadFullTexts(List<EntryDownload> downloads, BibDatabaseContext databaseContext) {
+        if (!stateManager.getOpenDatabases().contains(databaseContext)) {
+            LOGGER.debug("Library closed before the full text search finished; skipping downloads.");
+            return;
+        }
+
+        for (EntryDownload download : downloads) {
+            BibEntry entry = download.entry();
+            if (!databaseContext.getDatabase().getEntries().contains(entry)) {
+                continue;
             }
+            if (!entry.equals(download.lookupSnapshot())) {
+                LOGGER.debug("Entry changed during full text search; skipping download.");
+                continue;
+            }
+
+            download.result().ifPresentOrElse(
+                    result -> addLinkedFileFromURL(databaseContext, result, entry),
+                    () -> dialogService.notify(Localization.lang("No full text document found for entry %0.",
+                            entry.getCitationKey().orElse(Localization.lang("undefined")))));
         }
     }
 
@@ -124,7 +161,7 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// @param databaseContext the active database
     /// @param result          the fetcher result containing the URL and any required download headers
     /// @param entry           the entry "value"
-    private void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
+    void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
         LinkedFile newLinkedFile = new LinkedFile(result.source(), "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
@@ -135,10 +172,16 @@ public class DownloadFullTextAction extends SimpleCommand {
                     taskExecutor,
                     dialogService,
                     preferences);
-            onlineFile.download(true, result.headers());
+            // The URL is not linked on the entry, so there is no link to keep: a downloaded HTML page (paywall or
+            // consent interstitial instead of the PDF) has to be deleted rather than left orphaned in the file directory.
+            onlineFile.download(false, result.headers(), stateManager.getUndoManager(databaseContext));
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));
         }
+    }
+
+    @NullMarked
+    private record EntryDownload(BibEntry entry, BibEntry lookupSnapshot, Optional<FetcherResult> result) {
     }
 }

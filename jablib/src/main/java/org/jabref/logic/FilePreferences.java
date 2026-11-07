@@ -31,6 +31,7 @@ public class FilePreferences {
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
+    private final BooleanProperty importDialogDownloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
@@ -56,6 +57,7 @@ public class FilePreferences {
                 DEFAULT_FILENAME_PATTERNS[1],        // fileNamePattern
                 "",                                  // fileDirectoryPattern
                 true,                                // downloadLinkedFiles
+                true,                                // importDialogDownloadLinkedFiles
                 true,                                // fulltextIndexLinkedFiles
                 Directories.getUserDirectory(),      // workingDirectory
                 true,                                // createBackup
@@ -79,6 +81,7 @@ public class FilePreferences {
                            String fileNamePattern,
                            String fileDirectoryPattern,
                            boolean downloadLinkedFiles,
+                           boolean importDialogDownloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
                            boolean createBackup,
@@ -99,6 +102,7 @@ public class FilePreferences {
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
+        this.importDialogDownloadLinkedFiles.setValue(importDialogDownloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
         this.createBackup.setValue(createBackup);
@@ -116,29 +120,6 @@ public class FilePreferences {
 
     public static FilePreferences getDefault() {
         return new FilePreferences();
-    }
-
-    public void setAll(FilePreferences preferences) {
-        // userAndHost is always bound to InternalPreferences.getUserAndHost
-        this.mainFileDirectory.set(preferences.mainFileDirectoryProperty().get());
-        this.storeFilesRelativeToBibFile.set(preferences.shouldStoreFilesRelativeToBibFile());
-        this.autoRenameFilesOnChange.set(preferences.shouldAutoRenameFilesOnChange());
-        this.fileNamePattern.set(preferences.getFileNamePattern());
-        this.fileDirectoryPattern.set(preferences.getFileDirectoryPattern());
-        this.downloadLinkedFiles.set(preferences.shouldDownloadLinkedFiles());
-        this.fulltextIndexLinkedFiles.set(preferences.shouldFulltextIndexLinkedFiles());
-        this.workingDirectory.set(preferences.getWorkingDirectory());
-        this.createBackup.set(preferences.shouldCreateBackup());
-        this.backupDirectory.set(preferences.getBackupDirectory());
-        this.confirmDeleteLinkedFile.set(preferences.confirmDeleteLinkedFile());
-        this.moveToTrash.set(preferences.moveToTrash());
-        this.adjustFileLinksOnTransfer.set(preferences.shouldAdjustFileLinksOnTransfer());
-        this.copyLinkedFilesOnTransfer.set(preferences.shouldCopyLinkedFilesOnTransfer());
-        this.moveLinkedFilesOnTransfer.set(preferences.shouldMoveLinkedFilesOnTransfer());
-        this.shouldKeepDownloadUrl.set(preferences.shouldKeepDownloadUrl());
-        this.lastUsedDirectory.set(preferences.getLastUsedDirectory());
-        this.openFileExplorerInFileDirectory.set(preferences.shouldOpenFileExplorerInFileDirectory());
-        this.openFileExplorerInLastUsedDirectory.set(preferences.shouldOpenFileExplorerInLastUsedDirectory());
     }
 
     public String getUserAndHost() {
@@ -215,6 +196,18 @@ public class FilePreferences {
 
     public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
         this.downloadLinkedFiles.set(shouldDownloadLinkedFiles);
+    }
+
+    public boolean shouldImportDialogDownloadLinkedFiles() {
+        return importDialogDownloadLinkedFiles.get();
+    }
+
+    public BooleanProperty importDialogDownloadLinkedFilesProperty() {
+        return importDialogDownloadLinkedFiles;
+    }
+
+    public void setImportDialogDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
+        this.importDialogDownloadLinkedFiles.set(shouldDownloadLinkedFiles);
     }
 
     public boolean shouldFulltextIndexLinkedFiles() {
@@ -371,25 +364,5 @@ public class FilePreferences {
 
     public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
         this.openFileExplorerInLastUsedDirectory.set(value);
-    }
-
-    public FilePreferences withUserHostInfo(ReadOnlyObjectProperty<UserHostInfo> newUserHostInfo) {
-        this.userAndHost.bind(newUserHostInfo);
-        return this;
-    }
-
-    public FilePreferences withMoveToTrash(boolean moveToTrash) {
-        this.moveToTrash.set(moveToTrash);
-        return this;
-    }
-
-    public FilePreferences withMainFileDirectory(Path lastUsedDirectory) {
-        this.mainFileDirectory.set(lastUsedDirectory);
-        return this;
-    }
-
-    public FilePreferences withLastUsedDirectory(Path lastUsedDirectory) {
-        this.lastUsedDirectory.set(lastUsedDirectory);
-        return this;
     }
 }

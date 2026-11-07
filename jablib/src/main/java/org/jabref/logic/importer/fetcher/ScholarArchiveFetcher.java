@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -44,8 +45,22 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
     /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new ScholarArchiveQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string.
+    ///
+    /// The query is sent as the `q` parameter, so raw queries
+    /// bypass [ScholarArchiveQueryTransformer] and are passed unchanged to the catalog.
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", new ScholarArchiveQueryTransformer().transformSearchQuery(queryNode).orElse(""));
+        uriBuilder.addParameter("q", query);
         uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber));
         uriBuilder.addParameter("size", String.valueOf(getPageSize()));
         uriBuilder.addParameter("format", "json");
@@ -104,9 +119,9 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
             // publication type
             String type = biblio.optString("release_type");
             entry.setField(StandardField.TYPE, type);
-            if (type.toLowerCase().contains("book")) {
+            if (type.toLowerCase(Locale.ROOT).contains("book")) {
                 entryType = StandardEntryType.Book;
-            } else if (type.toLowerCase().contains("article")) {
+            } else if (type.toLowerCase(Locale.ROOT).contains("article")) {
                 entryType = StandardEntryType.Article;
             }
             entry.setType(entryType);

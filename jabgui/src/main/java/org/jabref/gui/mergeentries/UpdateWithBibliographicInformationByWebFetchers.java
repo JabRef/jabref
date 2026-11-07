@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeentries;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.gui.DialogService;
@@ -13,6 +14,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class UpdateWithBibliographicInformationByWebFetchers extends SimpleCommand {
@@ -36,30 +38,41 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
 
     @Override
     public void execute() {
-        assert stateManager.getActiveDatabase().isPresent();
+        stateManager.getActiveDatabase().ifPresent(this::updateSelectedEntryIn);
+    }
 
+    private void updateSelectedEntryIn(BibDatabaseContext databaseContext) {
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
-        mergedEntriesView.addSource(Localization.lang("Original Entry"), () -> originalEntry);
+        mergedEntriesView.setTitle(Localization.lang("Merge entry with information"));
+        mergedEntriesView.addSource(Localization.lang("Original entry"), originalEntry);
 
         Set<EntryBasedFetcher> webFetchers = WebFetchers.getEntryBasedFetchers(
                 guiPreferences.getImporterPreferences(),
                 guiPreferences.getImportFormatPreferences(),
                 guiPreferences.getFilePreferences(),
-                stateManager.getActiveDatabase().get()
+                databaseContext
         );
 
         for (EntryBasedFetcher webFetcher : webFetchers) {
             mergedEntriesView.addSource(webFetcher.getName(), () -> {
                 try {
                     return webFetcher.performSearch(originalEntry).stream().findFirst().orElse(null);
-                } catch (FetcherException e) {
+                } catch (FetcherException _) {
                     return null;
                 }
             });
         }
 
-        dialogService.showCustomDialogAndWait(mergedEntriesView);
+        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(mergedEntriesView);
+        new UpdateOriginalEntry(
+                originalEntry,
+                mergedEntry,
+                dialogService,
+                stateManager.getUndoManager(databaseContext),
+                Localization.lang("Merge entry with information"),
+                Localization.lang("Updated entry with merged information"))
+                .update();
     }
 }

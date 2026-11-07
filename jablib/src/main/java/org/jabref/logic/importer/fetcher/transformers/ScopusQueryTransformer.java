@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import java.util.Locale;
 import java.util.Optional;
 
 /// Query transformer for the Scopus Search API.
@@ -53,7 +54,7 @@ public class ScopusQueryTransformer extends YearRangeByFilteringQueryTransformer
             int yearInt = Integer.parseInt(year);
             startYear = Math.min(startYear, yearInt);
             endYear = Math.max(endYear, yearInt);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             // Ignore invalid year
         }
         return "PUBYEAR = " + year;
@@ -84,7 +85,7 @@ public class ScopusQueryTransformer extends YearRangeByFilteringQueryTransformer
 
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
-        return switch (fieldAsString.toLowerCase()) {
+        return switch (fieldAsString.toLowerCase(Locale.ROOT)) {
             case "abstract" ->
                     Optional.of("ABS(" + term + ")");
             case "keywords" ->

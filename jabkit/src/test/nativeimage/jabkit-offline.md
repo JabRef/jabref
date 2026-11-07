@@ -14,10 +14,36 @@ $ "$JABKIT" pseudonymize --porcelain --force --input=src/test/resources/org/jabr
 0
 $ grep -c "Pseudonymizing library" build/tmp/pseudonymize.out
 1
+$ cp src/test/resources/org/jabref/toolkit/commands/merge-current.bib build/tmp/merge-current.bib
+$ "$JABKIT" git merge-driver --porcelain src/test/resources/org/jabref/toolkit/commands/merge-base.bib build/tmp/merge-current.bib src/test/resources/org/jabref/toolkit/commands/merge-other.bib 2>build/tmp/merge-driver.err; echo $?
+0
+$ cat build/tmp/merge-driver.err
+$ grep -c "Newton1999" build/tmp/merge-current.bib
+1
 $ "$JABKIT" convert --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex --output=build/tmp/convert.bib 2>/dev/null; echo $?
 0
 $ grep -c "@Book{" build/tmp/convert.bib
 3
+$ "$JABKIT" convert --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex --output-format=ris --output=build/tmp/convert.ris 2>/dev/null; echo $?
+0
+$ grep -c '^TY  - BOOK$' build/tmp/convert.ris
+3
+$ grep -c '^T1  - Relativity: The special and general theory$' build/tmp/convert.ris
+1
+$ "$JABKIT" convert --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex --output-format=csv --output=build/tmp/convert.csv 2>/dev/null; echo $?
+0
+$ grep -c '^"Citation Key","Author","Title"' build/tmp/convert.csv
+1
+$ grep -c '^"Einstein1920","Einstein, Albert","Relativity: The special and general theory"' build/tmp/convert.csv
+1
+$ "$JABKIT" convert --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex --output-format=html --output=build/tmp/convert.html 2>/dev/null; echo $?
+0
+$ grep -c '^<html>$' build/tmp/convert.html
+1
+$ grep -c 'Relativity: The special and general theory' build/tmp/convert.html
+1
+$ grep -c '^</html>$' build/tmp/convert.html
+1
 $ "$JABKIT" citationkeys generate --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib 2>/dev/null | grep -c "@Book{"
 3
 $ "$JABKIT" generate-bib-from-aux --porcelain --aux=src/test/resources/org/jabref/toolkit/commands/paper.aux --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=build/tmp/generated.bib; echo $?
@@ -25,4 +51,10 @@ $ "$JABKIT" generate-bib-from-aux --porcelain --aux=src/test/resources/org/jabre
 $ grep -c "Darwin1888" build/tmp/generated.bib
 1
 $ grep -c "Einstein1920" build/tmp/generated.bib
+1
+$ "$JABKIT" search --porcelain --query='author =~ Einstein' --input=src/test/resources/org/jabref/toolkit/commands/origin.bib > build/tmp/search.out 2>/dev/null; echo $?
+0
+$ grep -c "^@Book{Einstein1920," build/tmp/search.out
+1
+$ grep -c "^@Book{" build/tmp/search.out
 1

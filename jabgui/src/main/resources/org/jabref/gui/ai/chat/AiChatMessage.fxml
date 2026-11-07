@@ -32,6 +32,14 @@
                 <MenuItem
                         text="%Copy to clipboard"
                         onAction="#onCopyContextMenuClick"/>
+                <MenuItem
+                        fx:id="deleteMenuItem"
+                        text="%Delete"
+                        onAction="#onDeleteClick"/>
+                <MenuItem
+                        fx:id="regenerateMenuItem"
+                        text="%Retry"
+                        onAction="#onRegenerateClick"/>
             </items>
         </ContextMenu>
 
@@ -39,7 +47,7 @@
 
     <VBox fx:id="buttons"
           alignment="TOP_CENTER"
-          spacing="5">
+          spacing="4">
         <Button fx:id="deleteButton"
                 onAction="#onDeleteClick"
                 styleClass="icon-button,narrow">

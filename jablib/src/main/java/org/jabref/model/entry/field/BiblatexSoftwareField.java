@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 import org.jabref.model.entry.types.BiblatexSoftwareEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 public enum BiblatexSoftwareField implements Field {
 
@@ -46,7 +47,7 @@ public enum BiblatexSoftwareField implements Field {
     }
 
     public static <T> Optional<BiblatexSoftwareField> fromName(T type, String name) {
-        if (!(type instanceof BiblatexSoftwareEntryType)) {
+        if (!(type instanceof BiblatexSoftwareEntryType || StandardEntryType.Software == type)) {
             return Optional.empty();
         }
         return Arrays.stream(BiblatexSoftwareField.values())

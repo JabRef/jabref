@@ -1,48 +1,69 @@
 ---
-parent: ai
+parent: AI
+grand_parent: Requirements
 ---
 
 # Ingestion
 `feat~ai.ingestion~1`
 
-Rationale: to process and index document content into a format suitable for retrieval and AI context generation
+Processes and indexes document content into a format suitable for retrieval and AI context generation.
 
-Covers: `feat~ai~1`
+Needs: req
 
-## Support handling of PDF files during ingestion
+## JabRef must support ingestion of PDF files
 `req~ai.ingestion.pdf-handling~1`
 
-Rationale: PDF is a de-facto standard for academic documents
+JabRef extracts and processes text from linked PDF files during ingestion.
+
+Rationale: PDF is the standard format for academic research papers.
 
 Needs: impl
 
-Covers: `feat~ai.ingestion~1`
+Covers:
 
-## Trigger ingestion of files on demand
-`req~ai.ingestion.trigger-on-demand~1`
+- feat~ai.ingestion~1
 
-Rationale: when a person chats with an entry or group, the system must ensure the linked files are processed immediately to provide up-to-date context
+## User can trigger file ingestion on demand
+`feat~ai.ingestion.trigger-on-demand~1`
 
-Needs: impl, pp
+When a person chats with an entry or group, the system must ensure the linked files are processed immediately to provide up-to-date context.
 
-Covers: `feat~ai.ingestion~1`
+Needs: req, impl
 
-## Add automatic ingestion of files
-`req~ai.ingestion.automatic-trigger~1`
-
-Rationale: users may prefer files to be indexed in the background immediately upon upload to reduce wait times during chat interactions
+### A privacy policy banner must be shown when user uses on-demand file ingestion for the first time
+`req~ai.ingestion.trigger-on-demand.privacy-policy~1`
 
 Needs: impl
 
-Covers: `feat~ai.ingestion~1`
+Covers:
 
-## Allow clearing of the embedding cache
-`req~ai.ingestion.clear-cache~1`
+- feat~ai.ingestion.trigger-on-demand~1
 
-Rationale: users need to force a re-ingestion of documents if parsing logic changes or to free up storage space
+## User can enable automatic file ingestion
+`feat~ai.ingestion.automatic-trigger~1`
+
+User may prefer files to be indexed in the background immediately upon upload to reduce wait times during AI chat interactions.
 
 Needs: impl
 
-Covers: `feat~ai.ingestion~1`
+## User can clear embedding cache
+`feat~ai.ingestion.clear-cache~1`
+
+User needs to force a re-ingestion of documents if parsing logic changes or to free up storage space.
+
+Needs: impl
+
+## Stored embeddings must be invalidated and regenerated when embedding model changes
+`req~ai.ingestion.model-change-invalidation~1`
+
+When the effective embedding model differs from the one the stored embeddings were generated with (e.g., after an update changed the default model, or after toggling expert settings), the stored embeddings are removed so that files are ingested again.
+
+Rationale: Embeddings of different models are not comparable and cannot be mixed in the same vector index.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.ingestion~1
 
 <!-- markdownlint-disable-file MD022 -->

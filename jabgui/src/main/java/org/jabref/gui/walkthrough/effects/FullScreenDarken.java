@@ -1,6 +1,6 @@
 package org.jabref.gui.walkthrough.effects;
 
-import javafx.scene.input.MouseEvent;
+import javafx.event.Event;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 
@@ -9,14 +9,9 @@ import org.jspecify.annotations.Nullable;
 
 public final class FullScreenDarken extends BaseWindowEffect {
     private @Nullable Rectangle overlay;
-    private @Nullable Runnable onClickHandler;
 
     public FullScreenDarken(@NonNull Pane pane) {
         super(pane);
-    }
-
-    public void setOnClick(@Nullable Runnable onClickHandler) {
-        this.onClickHandler = onClickHandler;
     }
 
     public void attach() {
@@ -57,12 +52,8 @@ public final class FullScreenDarken extends BaseWindowEffect {
         overlay.setWidth(pane.getWidth());
         overlay.setHeight(pane.getHeight());
 
-        if (onClickHandler != null) {
-            overlay.setOnMouseClicked(this::handleClick);
-            overlay.setMouseTransparent(false);
-        } else {
-            overlay.setMouseTransparent(true);
-        }
+        // Clicks outside the target are swallowed so the user cannot interact with the shaded area
+        overlay.setOnMouseClicked(Event::consume);
 
         overlay.setVisible(true);
     }
@@ -72,12 +63,5 @@ public final class FullScreenDarken extends BaseWindowEffect {
         if (overlay != null) {
             overlay.setVisible(false);
         }
-    }
-
-    private void handleClick(MouseEvent event) {
-        if (onClickHandler != null) {
-            onClickHandler.run();
-        }
-        event.consume();
     }
 }

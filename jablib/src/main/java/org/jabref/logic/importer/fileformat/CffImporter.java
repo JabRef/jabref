@@ -272,7 +272,7 @@ public class CffImporter extends Importer {
         try {
             citation = mapper.readValue(reader, CffFormat.class);
             return (citation != null) && (citation.values.get("title") != null);
-        } catch (JacksonException e) {
+        } catch (JacksonException _) {
             return false;
         }
     }

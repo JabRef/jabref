@@ -39,8 +39,8 @@ import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddings
 import org.jabref.logic.ai.ingestion.util.DocumentSplitterFactory;
 import org.jabref.logic.ai.ingestion.util.FileHasher;
 import org.jabref.logic.ai.preferences.AiPreferences;
-import org.jabref.logic.ai.rag.logic.AnswerEngine;
-import org.jabref.logic.ai.rag.util.AnswerEngineFactory;
+import org.jabref.logic.ai.rag.logic.ResponseEngine;
+import org.jabref.logic.ai.rag.util.ResponseEngineFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ObservablesHelper;
@@ -74,7 +74,7 @@ public class AiChatViewModel extends AbstractViewModel {
     private static final String EXAMPLE_QUESTION_3 = Localization.lang("What are the key findings?");
 
     private final ObjectProperty<State> state = new SimpleObjectProperty<>(State.IDLE);
-    private final ObjectProperty<AnswerEngine> answerEngine = new SimpleObjectProperty<>();
+    private final ObjectProperty<ResponseEngine> responseEngine = new SimpleObjectProperty<>();
     private final ListProperty<FullBibEntry> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final ListProperty<GenerateEmbeddingsTask> generateEmbeddingsTasks = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -140,7 +140,7 @@ public class AiChatViewModel extends AbstractViewModel {
         systemMessageTemplate.bind(aiPreferences.chattingSystemMessageTemplateProperty());
         userMessageTemplate.bind(aiPreferences.chattingUserMessageTemplateProperty());
 
-        this.embeddingModel.bind(ObservablesHelper.createClosableObjectBinding(
+        this.embeddingModel.bind(ObservablesHelper.createObjectBinding(
                 () -> EmbeddingModelFactory.create(aiPreferences, embeddingModelCache),
                 aiPreferences.getEmbeddingsProperties()
         ));
@@ -148,6 +148,11 @@ public class AiChatViewModel extends AbstractViewModel {
         this.documentSplitter.bind(ObservablesHelper.createObjectBinding(
                 () -> DocumentSplitterFactory.create(aiPreferences),
                 aiPreferences.getDocumentSplitterProperties()
+        ));
+
+        this.chatModel.bind(ObservablesHelper.createClosableObjectBinding(
+                () -> ChatModelFactory.create(aiPreferences),
+                aiPreferences.getChatProperties()
         ));
 
         BooleanBinding isAiTurnedOff = aiPreferences.aiFeaturesEnabledCurrentlyProperty().not();
@@ -179,16 +184,14 @@ public class AiChatViewModel extends AbstractViewModel {
     }
 
     private void setupValues() {
-        answerEngine.setValue(AnswerEngineFactory.create(
-                aiPreferences.getAnswerEngineKind(),
+        responseEngine.setValue(ResponseEngineFactory.create(
+                aiPreferences.getResponseEngineKind(),
                 filePreferences,
                 embeddingModel.get(),
                 embeddingStore,
                 aiPreferences.getRagMinScore(),
                 aiPreferences.getRagMaxResultsCount()
         ));
-
-        chatModel.setValue(ChatModelFactory.create(aiPreferences));
     }
 
     private void setupListeners() {
@@ -239,7 +242,7 @@ public class AiChatViewModel extends AbstractViewModel {
                                 return;
                             }
 
-                            // [impl->req~ai.ingestion.trigger-on-demand~1]
+                            // [impl->feat~ai.ingestion.trigger-on-demand~1]
                             GenerateEmbeddingsTask task = ingestionTaskAggregator.start(
                                     new GenerateEmbeddingsTaskRequest(
                                             filePreferences,
@@ -278,11 +281,11 @@ public class AiChatViewModel extends AbstractViewModel {
         window.generateEmbeddingsTasksProperty().bind(generateEmbeddingsTasks);
         window.chatHistoryProperty().bind(chatHistory);
 
-        window.setAnswerEngine(answerEngine.get());
+        window.setResponseEngine(responseEngine.get());
 
         dialogService.showCustomDialogAndWait(window);
 
-        answerEngine.set(window.answerEngineProperty().get());
+        responseEngine.set(window.responseEngineProperty().get());
     }
 
     public void sendMessage(String userMessage) {
@@ -300,7 +303,7 @@ public class AiChatViewModel extends AbstractViewModel {
 
         GenerateRagResponseTask task = new GenerateRagResponseTask(
                 chatModel.get(),
-                answerEngine.get(),
+                responseEngine.get(),
                 chatHistory,
                 entries.get(),
                 systemMessageTemplate.get(),
@@ -320,7 +323,7 @@ public class AiChatViewModel extends AbstractViewModel {
         });
 
         task.onFailure(ex ->
-                // [impl->req~ai.chat.show-errors~1]
+                // [impl->feat~ai.chat.show-errors~1]
                 originalChatHistory.add(ChatMessage.errorMessage(ex)));
 
         task.onFinished(() -> {
@@ -427,8 +430,8 @@ public class AiChatViewModel extends AbstractViewModel {
         return chatModel;
     }
 
-    public ObjectProperty<AnswerEngine> answerEngineProperty() {
-        return answerEngine;
+    public ObjectProperty<ResponseEngine> responseEngineProperty() {
+        return responseEngine;
     }
 
     public ListProperty<GenerateEmbeddingsTask> generateEmbeddingsTasksProperty() {

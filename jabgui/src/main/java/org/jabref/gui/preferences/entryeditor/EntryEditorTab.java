@@ -1,75 +1,71 @@
 package org.jabref.gui.preferences.entryeditor;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.help.HelpFile;
+import org.jabref.gui.theme.StyleClasses;
+import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import com.dlsc.gemsfx.TagsField;
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.textfield.TextFields;
 
-public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabViewModel> implements PreferencesTab {
+import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
-    @FXML private CheckBox openOnNewEntry;
-    @FXML private CheckBox defaultSource;
-    @FXML private CheckBox acceptRecommendations;
-    @FXML private CheckBox enableValidation;
-    @FXML private CheckBox allowIntegerEdition;
-    @FXML private CheckBox journalPopupEnabled;
-    @FXML private CheckBox autoLinkFilesEnabled;
-    @FXML private CheckBox enableMscKeywordDescriptions;
-    @FXML private ComboBox<CitationCountFetcherType> citationCountFetcherCombo;
+public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabViewModel> {
 
-    @FXML private ListView<EntryEditorTabModel> tabConfigsList;
-    @FXML private Button addTabButton;
-    @FXML private Button removeTabButton;
-    @FXML private Button resetTabsButton;
-    @FXML private Button generalFieldsHelp;
+    private final TableView<EditorTabViewModel> tabsTable = new TableView<>();
+    private final TableView<String> fieldsTable = new TableView<>();
+    private final TextField addTabName = new TextField();
+    private final TextField addFieldName = new TextField();
+    private final Label fieldsPlaceholder = new Label();
 
-    @FXML private VBox tabEditorPanel;
-    @FXML private Label tabNameLabel;
-    @FXML private TextField tabNameField;
-    @FXML private Label tabFieldsLabel;
-
-    private boolean syncingFields = false;
+    private final CustomLocalDragboard localDragboard;
 
     public EntryEditorTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new EntryEditorTabViewModel(
+                dialogService,
+                preferences.getEntryEditorPreferences(),
+                preferences.getMrDlibPreferences(),
+                preferences.getAbbreviationPreferences(),
+                taskExecutor);
+        this.localDragboard = Injector.instantiateModelOrService(StateManager.class).getLocalDragboard();
+        buildView();
     }
 
     @Override
@@ -77,191 +73,350 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         return Localization.lang("Entry editor");
     }
 
-    public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences, taskExecutor);
+    private void buildView() {
+        setContent(form()
 
-        openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
-        defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
-        acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
-        enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
-        allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
-        journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());
-        autoLinkFilesEnabled.selectedProperty().bindBidirectional(viewModel.autoLinkFilesEnabledProperty());
-        enableMscKeywordDescriptions.selectedProperty().bindBidirectional(viewModel.enableMscKeywordDescriptionsProperty());
+                .checkbox(Localization.lang("Open editor when a new entry is created"), viewModel.openOnNewEntryProperty())
+                .checkbox(Localization.lang("Automatically search and show unlinked files in the entry editor"), viewModel.autoLinkFilesEnabledProperty())
+                .checkbox(Localization.lang("Show validation messages"), viewModel.enableValidationProperty())
+                .checkbox(Localization.lang("Allow integers in 'edition' field in BibTeX mode"), viewModel.allowIntegerEditionProperty())
+                .checkbox(Localization.lang("Fetch journal information online to show"), viewModel.journalPopupProperty())
+                .checkbox(Localization.lang("Enable MSC keyword descriptions"), viewModel.enableMscKeywordDescriptionsProperty())
+                .checkbox(Localization.lang("Show BibTeX source by default"), viewModel.defaultSourceProperty())
+                .checkbox(Localization.lang("Accept recommendations from Mr. DLib"), viewModel.acceptRecommendationsProperty())
 
-        citationCountFetcherCombo.setItems(FXCollections.observableList(List.of(CitationCountFetcherType.values())));
-        new ViewModelListCellFactory<CitationCountFetcherType>()
-                .withText(CitationCountFetcherType::getName)
-                .install(citationCountFetcherCombo);
-        citationCountFetcherCombo.valueProperty().bindBidirectional(viewModel.citationCountFetcherTypeProperty());
+                .combo(Localization.lang("Citation count fetcher:"),
+                        viewModel.citationCountFetcherTypes(),
+                        viewModel.citationCountFetcherTypeProperty(), CitationCountFetcherType::getName)
 
-        setupTabList();
-        setupTabEditor();
+                .section(Localization.lang("Editor tabs"), tabs -> tabs
+                        .custom(buildTabConfigRegion()))
 
-        ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(
-                StandardActions.HELP,
-                new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()),
-                generalFieldsHelp);
+                .build());
     }
 
-    private void setupTabList() {
-        tabConfigsList.setItems(viewModel.getTabModels());
-        tabConfigsList.setCellFactory(_ -> new TabConfigCell());
-
-        // Sync list selection → viewModel
-        EasyBind.subscribe(tabConfigsList.getSelectionModel().selectedItemProperty(), newItem -> {
-            if (!Objects.equals(newItem, viewModel.selectedTabProperty().get())) {
-                viewModel.selectedTabProperty().set(newItem);
-            }
-        });
-
-        // Sync viewModel → list selection (e.g. after addFieldSetTab)
-        EasyBind.subscribe(viewModel.selectedTabProperty(), newItem -> {
-            if (!Objects.equals(newItem, tabConfigsList.getSelectionModel().getSelectedItem())) {
-                tabConfigsList.getSelectionModel().select(newItem);
-            }
-        });
-
-        removeTabButton.disableProperty().bind(viewModel.canRemoveSelectedTabProperty().not());
+    // [impl->req~entry-editor.custom-tabs~1]
+    private Node buildTabConfigRegion() {
+        HBox columns = new HBox(GAP, buildTabsColumn(), buildFieldsColumn());
+        VBox.setVgrow(columns, Priority.ALWAYS);
+        return columns;
     }
 
-    private void setupTabEditor() {
-        // Right panel visibility tied to field-set selection
-        tabNameLabel.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
-        tabNameLabel.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
-        tabNameField.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
-        tabNameField.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
-        tabFieldsLabel.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
-        tabFieldsLabel.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
+    // region Tabs column
 
-        tabNameField.textProperty().bindBidirectional(viewModel.selectedTabNameProperty());
+    private Node buildTabsColumn() {
+        setupTabsTable();
 
-        TagsField<Field> tabFieldsTagsField = buildFieldTagsField();
-        tabFieldsTagsField.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
-        tabFieldsTagsField.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
-        VBox.setVgrow(tabFieldsTagsField, Priority.ALWAYS);
-        tabEditorPanel.getChildren().add(tabFieldsTagsField);
+        addTabName.setPromptText(Localization.lang("Tab name..."));
+        addTabName.setOnAction(_ -> addTab());
 
-        // Bidirectional sync: viewModel staging ↔ TagsField display.
-        // JavaFX has no bindContentBidirectional for lists; use guarded listeners.
-        viewModel.getSelectedTabFields().addListener((ListChangeListener<Field>) _ -> {
-            if (!syncingFields) {
-                syncingFields = true;
-                tabFieldsTagsField.getTags().setAll(viewModel.getSelectedTabFields());
-                syncingFields = false;
-            }
-        });
-        tabFieldsTagsField.getTags().addListener((ListChangeListener<Field>) _ -> {
-            if (!syncingFields) {
-                syncingFields = true;
-                viewModel.getSelectedTabFields().setAll(tabFieldsTagsField.getTags());
-                syncingFields = false;
-            }
-        });
+        Button addTabButton = new Button();
+        addTabButton.setPrefSize(20.0, 20.0);
+        addTabButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
+        addTabButton.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
+        addTabButton.setTooltip(new Tooltip(Localization.lang("Add new tab")));
+        addTabButton.setOnAction(_ -> addTab());
+        addTabButton.disableProperty().bind(addTabName.textProperty().isEmpty());
+
+        VBox column = new VBox(GAP, tabsTable, new HBox(GAP, addTabName, addTabButton));
+        column.setPrefWidth(280.0);
+        return column;
     }
 
-    private TagsField<Field> buildFieldTagsField() {
-        TagsField<Field> tagsField = new TagsField<>();
+    private void setupTabsTable() {
+        tabsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tabsTable.setPrefHeight(300.0);
+        VBox.setVgrow(tabsTable, Priority.ALWAYS);
 
-        StringConverter<Field> converter = new StringConverter<>() {
-            @Override
-            public String toString(Field field) {
-                return field != null ? field.getName() : "";
-            }
+        TableColumn<EditorTabViewModel, EditorTabViewModel> visibleColumn = new TableColumn<>();
+        visibleColumn.setMinWidth(40.0);
+        visibleColumn.setMaxWidth(40.0);
+        visibleColumn.setResizable(false);
+        visibleColumn.setSortable(false);
+        visibleColumn.setReorderable(false);
+        visibleColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue()));
+        // Only built-in tabs have a visibility flag; custom tabs are shown while they exist and are
+        // removed via the delete action instead.
+        visibleColumn.setCellFactory(_ -> new TableCell<>() {
+            private final CheckBox checkBox = new CheckBox();
+            private BooleanProperty boundVisible;
 
             @Override
-            public Field fromString(String name) {
-                return FieldFactory.parseField(name);
-            }
-        };
-
-        List<Field> suggestions = viewModel.getAllKnownFields();
-
-        tagsField.setConverter(converter);
-        tagsField.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getName));
-        tagsField.setSuggestionProvider(request ->
-                suggestions.stream()
-                           .filter(f -> f.getName().toLowerCase().startsWith(
-                                   request.getUserText().toLowerCase()))
-                           .collect(Collectors.toCollection(ArrayList::new)));
-        tagsField.setMatcher((field, searchText) ->
-                field.getName().toLowerCase().startsWith(searchText.toLowerCase()));
-        tagsField.setComparator(Comparator.comparing(Field::getName));
-        tagsField.setNewItemProducer(converter::fromString);
-        tagsField.setTagViewFactory(field -> buildFieldTag(field, tagsField));
-        tagsField.setShowSearchIcon(false);
-
-        return tagsField;
-    }
-
-    private Node buildFieldTag(Field field, TagsField<Field> tagsField) {
-        Label label = new Label(field.getName());
-        label.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
-        label.setContentDisplay(ContentDisplay.RIGHT);
-        label.getGraphic().setOnMouseClicked(_ -> tagsField.removeTags(field));
-        return label;
-    }
-
-    @FXML
-    void addFieldSetTab() {
-        viewModel.addFieldSetTab();
-    }
-
-    @FXML
-    void removeFieldSetTab() {
-        viewModel.removeSelectedFieldSetTab();
-    }
-
-    @FXML
-    void resetToDefaults() {
-        viewModel.resetToDefaults();
-    }
-
-    // region Cell
-
-    private class TabConfigCell extends ListCell<EntryEditorTabModel> {
-
-        private final CheckBox checkBox = new CheckBox();
-        private final Label nameLabel = new Label();
-        private final HBox container = new HBox(checkBox, nameLabel);
-
-        private boolean updatingCell = false;
-
-        TabConfigCell() {
-            container.getStyleClass().add("entry-editor-tab-cell");
-            checkBox.selectedProperty().addListener((_, _, selected) -> {
-                if (updatingCell) {
+            protected void updateItem(EditorTabViewModel tab, boolean empty) {
+                super.updateItem(tab, empty);
+                if (boundVisible != null) {
+                    checkBox.selectedProperty().unbindBidirectional(boundVisible);
+                    boundVisible = null;
+                }
+                if (empty || (tab == null) || tab.isCustom()) {
+                    setGraphic(null);
                     return;
                 }
-                viewModel.toggleFeatureTabVisibility(getItem());
-            });
-        }
+                boundVisible = tab.visibleProperty();
+                checkBox.selectedProperty().bindBidirectional(boundVisible);
+                setGraphic(checkBox);
+            }
+        });
 
-        @Override
-        protected void updateItem(EntryEditorTabModel config, boolean empty) {
-            super.updateItem(config, empty);
-            if (empty || config == null) {
-                setGraphic(null);
+        TableColumn<EditorTabViewModel, String> nameColumn = new TableColumn<>(Localization.lang("Tabs"));
+        nameColumn.setSortable(false);
+        nameColumn.setReorderable(false);
+        nameColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getDisplayName()));
+
+        TableColumn<EditorTabViewModel, EditorTabViewModel> actionsColumn = new TableColumn<>();
+        actionsColumn.setMinWidth(40.0);
+        actionsColumn.setMaxWidth(40.0);
+        actionsColumn.setResizable(false);
+        actionsColumn.setSortable(false);
+        actionsColumn.setReorderable(false);
+        actionsColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue()));
+        new ValueTableCellFactory<EditorTabViewModel, EditorTabViewModel>()
+                .withGraphic(tab -> tab.isCustom() ? IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode() : null)
+                .withTooltip(tab -> tab.isCustom() ? Localization.lang("Remove tab %0", tab.getDisplayName()) : null)
+                .withOnMouseClickedEvent(tab -> _ -> {
+                    viewModel.removeTab(tab);
+                    fieldsTable.refresh();
+                })
+                .install(actionsColumn);
+
+        tabsTable.getColumns().add(visibleColumn);
+        tabsTable.getColumns().add(nameColumn);
+        tabsTable.getColumns().add(actionsColumn);
+        tabsTable.setItems(viewModel.getTabs());
+
+        new ViewModelTableRowFactory<EditorTabViewModel>()
+                .setOnDragDetected((_, tab, event) -> handleOnDragDetected(tabsTable, DragAndDropDataFormats.ENTRY_EDITOR_TAB, EditorTabViewModel.class, tab, event))
+                .setOnDragDropped((row, _, event) -> handleOnDragDropped(tabsTable, EditorTabViewModel.class, row, event))
+                .setOnDragOver((row, _, event) -> handleOnDragOver(DragAndDropDataFormats.ENTRY_EDITOR_TAB, row, event))
+                .setOnDragExited((row, _, _) -> ControlHelper.removeDroppingPseudoClasses(row))
+                .install(tabsTable);
+
+        EasyBind.subscribe(tabsTable.getSelectionModel().selectedItemProperty(), this::onSelectedTabChanged);
+        // The tab list is filled after construction (setValues), so select the first row once it arrives.
+        viewModel.getTabs().addListener((InvalidationListener) _ -> {
+            if (tabsTable.getSelectionModel().isEmpty() && !tabsTable.getItems().isEmpty()) {
+                tabsTable.getSelectionModel().selectFirst();
+            }
+        });
+    }
+
+    private void onSelectedTabChanged(EditorTabViewModel tab) {
+        if ((tab != null) && tab.isCustom()) {
+            fieldsTable.setItems(tab.getFieldPatterns());
+            fieldsPlaceholder.setText(Localization.lang("This tab has no fields yet."));
+        } else {
+            fieldsTable.setItems(FXCollections.emptyObservableList());
+            fieldsPlaceholder.setText(tab == null
+                                      ? Localization.lang("Select a tab to configure its fields.")
+                                      : Localization.lang("The content of built-in tabs is fixed."));
+        }
+        addFieldName.clear();
+    }
+
+    private void addTab() {
+        viewModel.addCustomTab(addTabName.getText()).ifPresent(tab -> {
+            addTabName.clear();
+            tabsTable.getSelectionModel().select(tab);
+            tabsTable.scrollTo(tab);
+        });
+    }
+
+    // endregion
+
+    // region Fields column
+
+    private Node buildFieldsColumn() {
+        setupFieldsTable();
+
+        addFieldName.setPrefWidth(200.0);
+        addFieldName.setPromptText(Localization.lang("Field name"));
+        addFieldName.setOnAction(_ -> addField());
+        TextFields.bindAutoCompletion(
+                addFieldName,
+                FieldFactory.getAllFieldsWithOutInternal().stream()
+                            .map(Field::getName)
+                            .sorted()
+                            .toList());
+
+        Button addFieldButton = new Button(Localization.lang("Add"));
+        addFieldButton.setOnAction(_ -> addField());
+
+        addFieldName.disableProperty().bind(EasyBind.map(tabsTable.getSelectionModel().selectedItemProperty(),
+                tab -> (tab == null) || !tab.isCustom()));
+        addFieldButton.disableProperty().bind(addFieldName.disabledProperty().or(addFieldName.textProperty().isEmpty()));
+
+        Label regexInfo = new Label(Localization.lang("A field name can also be a regular expression, e.g. \"comment-.*\"."));
+        regexInfo.getStyleClass().add("italic");
+
+        Button resetButton = new Button(Localization.lang("Reset to default tabs"));
+        resetButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
+        resetButton.setOnAction(_ -> resetTabs());
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox bottomRow = new HBox(GAP, addFieldName, addFieldButton, spacer, resetButton);
+
+        VBox column = new VBox(GAP, fieldsTable, bottomRow, regexInfo);
+        HBox.setHgrow(column, Priority.ALWAYS);
+        return column;
+    }
+
+    private void setupFieldsTable() {
+        fieldsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        fieldsTable.setPrefHeight(300.0);
+        fieldsTable.setPlaceholder(fieldsPlaceholder);
+        VBox.setVgrow(fieldsTable, Priority.ALWAYS);
+
+        TableColumn<String, String> patternColumn = new TableColumn<>(Localization.lang("Fields"));
+        patternColumn.setSortable(false);
+        patternColumn.setReorderable(false);
+        patternColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
+
+        // [impl->req~entry-editor.custom-tabs.extract-field~1]
+        TableColumn<String, String> extractColumn = new TableColumn<>(Localization.lang("Extract field"));
+        extractColumn.setMinWidth(130.0);
+        extractColumn.setMaxWidth(130.0);
+        extractColumn.setResizable(false);
+        extractColumn.setSortable(false);
+        extractColumn.setReorderable(false);
+        extractColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(this::createExtractCheckBox)
+                // The tooltip lives on the cell: a disabled checkbox is mouse-transparent, so a
+                // tooltip on the checkbox itself would never show for always-extracted patterns.
+                .withTooltip(pattern -> EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern)
+                                        ? Localization.lang("If checked, the field is not shown in the \"Main\" tab anymore.")
+                                        : Localization.lang("Field not contained in the \"Main\" tab."))
+                .install(extractColumn);
+
+        TableColumn<String, String> warningColumn = new TableColumn<>();
+        warningColumn.setMinWidth(40.0);
+        warningColumn.setMaxWidth(40.0);
+        warningColumn.setResizable(false);
+        warningColumn.setSortable(false);
+        warningColumn.setReorderable(false);
+        warningColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(pattern -> viewModel.isFieldPatternDuplicated(pattern)
+                                        ? IconTheme.JabRefIcons.WARNING.getGraphicNode()
+                                        : null)
+                .withTooltip(pattern -> viewModel.isFieldPatternDuplicated(pattern)
+                                        ? Localization.lang("The field is contained in multiple tabs.")
+                                        : null)
+                .install(warningColumn);
+
+        TableColumn<String, String> actionsColumn = new TableColumn<>();
+        actionsColumn.setMinWidth(40.0);
+        actionsColumn.setMaxWidth(40.0);
+        actionsColumn.setResizable(false);
+        actionsColumn.setSortable(false);
+        actionsColumn.setReorderable(false);
+        actionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(pattern -> Localization.lang("Remove field %0 from currently selected tab", pattern))
+                .withOnMouseClickedEvent(pattern -> _ -> {
+                    EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
+                    if (tab != null) {
+                        viewModel.removeFieldPattern(tab, pattern);
+                        fieldsTable.refresh();
+                    }
+                })
+                .install(actionsColumn);
+
+        fieldsTable.getColumns().add(patternColumn);
+        fieldsTable.getColumns().add(extractColumn);
+        fieldsTable.getColumns().add(warningColumn);
+        fieldsTable.getColumns().add(actionsColumn);
+
+        new ViewModelTableRowFactory<String>()
+                .setOnDragDetected((_, pattern, event) -> handleOnDragDetected(fieldsTable, DragAndDropDataFormats.FIELD, String.class, pattern, event))
+                .setOnDragDropped((row, _, event) -> handleOnDragDropped(fieldsTable, String.class, row, event))
+                .setOnDragOver((row, _, event) -> handleOnDragOver(DragAndDropDataFormats.FIELD, row, event))
+                .setOnDragExited((row, _, _) -> ControlHelper.removeDroppingPseudoClasses(row))
+                .install(fieldsTable);
+    }
+
+    // [impl->req~entry-editor.custom-tabs.extract-field~1]
+    private CheckBox createExtractCheckBox(String pattern) {
+        CheckBox checkBox = new CheckBox();
+        boolean onMainTab = EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern);
+        EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
+        checkBox.setDisable(!onMainTab);
+        checkBox.setSelected(!onMainTab || ((tab != null) && tab.isExtracted(pattern)));
+        checkBox.setOnAction(_ -> {
+            EditorTabViewModel selectedTab = tabsTable.getSelectionModel().getSelectedItem();
+            if (selectedTab == null) {
                 return;
             }
-            updatingCell = true;
-            switch (config) {
-                case EntryEditorTabModel.BuiltInTab builtIn -> {
-                    checkBox.setVisible(true);
-                    checkBox.setManaged(true);
-                    checkBox.setSelected(builtIn.visible());
-                    nameLabel.setText(builtIn.type().displayName());
-                }
-                case EntryEditorTabModel.CustomizedFieldsTab customizedFieldsTab -> {
-                    checkBox.setVisible(false);
-                    checkBox.setManaged(false);
-                    nameLabel.setText(customizedFieldsTab.name());
-                }
+            if (checkBox.isSelected()) {
+                selectedTab.extractFromMainTab(pattern);
+            } else {
+                selectedTab.keepOnMainTab(pattern);
             }
-            updatingCell = false;
-            setGraphic(container);
+        });
+        return checkBox;
+    }
+
+    private void addField() {
+        EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
+        if ((tab == null) || !tab.isCustom()) {
+            return;
         }
+        if (viewModel.addFieldPattern(tab, addFieldName.getText())) {
+            addFieldName.clear();
+            // Recompute the warning cells: the new pattern may now be duplicated across tabs.
+            fieldsTable.refresh();
+        }
+    }
+
+    private void resetTabs() {
+        boolean reset = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Reset to default tabs"),
+                Localization.lang("This will restore the default tabs and remove all custom tabs."),
+                Localization.lang("Reset to default tabs"));
+        if (reset) {
+            viewModel.resetToDefaults();
+            tabsTable.getSelectionModel().selectFirst();
+        }
+    }
+
+    // endregion
+
+    // region Drag & drop row reordering
+
+    private <T> void handleOnDragDetected(TableView<T> table, DataFormat format, Class<T> type, T item, MouseEvent event) {
+        ClipboardContent content = new ClipboardContent();
+        Dragboard dragboard = table.startDragAndDrop(TransferMode.MOVE);
+        content.put(format, "");
+        localDragboard.putValue(type, item);
+        dragboard.setContent(content);
+        event.consume();
+    }
+
+    private <T> void handleOnDragOver(DataFormat format, TableRow<T> row, DragEvent event) {
+        if (event.getDragboard().hasContent(format)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+            ControlHelper.setDroppingPseudoClasses(row, event);
+        }
+    }
+
+    private <T> void handleOnDragDropped(TableView<T> table, Class<T> type, TableRow<T> row, DragEvent event) {
+        if (localDragboard.hasType(type)) {
+            T item = localDragboard.getValue(type);
+            table.getItems().remove(item);
+
+            if (row.isEmpty()) {
+                table.getItems().add(item);
+            } else {
+                // decide based on drop position whether to add the element before or after
+                int offset = event.getY() > (row.getHeight() / 2) ? 1 : 0;
+                table.getItems().add(row.getIndex() + offset, item);
+            }
+            table.getSelectionModel().select(item);
+        }
+        event.setDropCompleted(true);
+        event.consume();
     }
 
     // endregion

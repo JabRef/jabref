@@ -62,6 +62,7 @@ public enum Month {
     }
 
     /// This method accepts three types of months:
+    ///
     /// - Single and Double Digit months from 1 to 12 (01 to 12)
     /// - 3 Digit BibTeX strings (jan, feb, mar...) possibly with # prepended
     /// - Full English month identifiers.
@@ -92,7 +93,7 @@ public enum Month {
         try {
             int number = Integer.parseInt(value);
             return Month.getMonthByNumber(number);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

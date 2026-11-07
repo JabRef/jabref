@@ -9,7 +9,7 @@ import org.jabref.model.entry.identifier.DOI;
 
 /// Used to fix [1588028] export HTML table DOI URL.
 ///
-/// Will prepend "<a href="http://doi.org/">http://doi.org/</a>" or the DOI url with a custom base URL defined in the {@link DOIPreferences}
+/// Will prepend "<a href="http://doi.org/">http://doi.org/</a>" or the DOI url with a custom base URL defined in the [DOIPreferences]
 /// if only DOI and not an URL is given.
 public class DOICheck implements LayoutFormatter {
 

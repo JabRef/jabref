@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.entry.BibEntry;
@@ -13,7 +14,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BstVMTest {
@@ -31,8 +34,33 @@ public class BstVMTest {
     }
 
     @Test
+    void entryFieldsAreReadFromEntryCommand() throws URISyntaxException, IOException {
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
+        assertEquals(Set.of("address", "author", "booktitle", "chapter", "edition", "editor", "howpublished", "institution", "journal", "key", "month", "note", "number", "organization", "pages", "publisher", "school", "series", "title", "type", "volume", "year"), vm.getEntryFields());
+    }
+
+    @Test
+    void fieldSelectionIncludesAliasesAndDateParts() {
+        var selection = new BstVM("ENTRY { journal date } {} {}").getFieldSelection().orElseThrow();
+
+        assertEquals(List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.YEAR),
+                List.of(StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.YEAR, StandardField.TITLE)
+                    .stream().filter(selection).toList());
+    }
+
+    @Test
+    void fieldSelectionIncludesImplicitCrossref() throws URISyntaxException, IOException {
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
+        var selection = vm.getFieldSelection().orElseThrow();
+
+        assertEquals(List.of(StandardField.CROSSREF, StandardField.TITLE),
+                List.of(StandardField.CROSSREF, StandardField.TITLE, StandardField.DOI).stream().filter(selection).toList());
+    }
+
+    @Test
     void abbrv() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
+        assertTrue(vm.hasSortCommand());
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
@@ -46,6 +74,7 @@ public class BstVMTest {
     @Test
     void ieeetran() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("IEEEtran.bst").toURI()));
+        assertFalse(vm.hasSortCommand());
         List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
 
         String expected = """
@@ -232,5 +261,16 @@ public class BstVMTest {
         vm.render(List.of());
 
         assertEquals("colorful morning", vm.getContext().stack().pop());
+    }
+
+    @Test
+    void emptyStacksCanBeParsed() {
+        assertDoesNotThrow(() -> new BstVM("""
+                FUNCTION {empty.block}
+                {
+                    {
+                    }
+                }
+                """));
     }
 }

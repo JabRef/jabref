@@ -121,6 +121,7 @@ class GitSyncServiceTest {
             """;
 
     /// Creates a commit graph with a base commit, one modification by Alice and one modification by Bob
+    ///
     /// 1. Alice commit initial → push to remote
     /// 2. Bob clone remote -> update b → push
     /// 3. Alice update a → pull
@@ -286,6 +287,46 @@ class GitSyncServiceTest {
         assertEquals(normalize(expected), normalize(pushedContent));
         RevCommit head = aliceGit.log().setMaxCount(1).call().iterator().next();
         assertEquals(2, head.getParentCount(), "Expected a two-parent merge commit");
+    }
+
+    @Test
+    void pushCreatesUpstreamForEmptyRemote(@TempDir Path tempDir) throws Exception {
+        Path emptyRemoteDirectory = tempDir.resolve("empty-remote.git");
+        Path localDirectory = tempDir.resolve("local");
+        Path localLibrary = localDirectory.resolve("library.bib");
+
+        try (Git emptyRemote = Git.init()
+                                  .setBare(true)
+                                  .setInitialBranch("main")
+                                  .setDirectory(emptyRemoteDirectory.toFile())
+                                  .call();
+             Git localGit = Git.init()
+                               .setInitialBranch("main")
+                               .setDirectory(localDirectory.toFile())
+                               .call()) {
+            RevCommit localCommit = writeAndCommit(initialContent, "Initial commit", alice, localLibrary, localGit);
+            localGit.remoteAdd()
+                    .setName("origin")
+                    .setUri(new URIish(emptyRemoteDirectory.toUri().toString()))
+                    .call();
+            localGit.getRepository().updateRef("refs/remotes/origin/main").link("refs/heads/main");
+
+            StoredConfig config = localGit.getRepository().getConfig();
+            config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, "main", ConfigConstants.CONFIG_KEY_REMOTE, "origin");
+            config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, "main", ConfigConstants.CONFIG_KEY_MERGE, Constants.R_HEADS + "main");
+            config.save();
+
+            GitPreferences gitPreferences = mock(GitPreferences.class);
+            when(gitPreferences.getUsername()).thenReturn("user");
+            when(gitPreferences.getPat()).thenReturn("personal-access-token");
+            GitHandlerRegistry emptyRemoteRegistry = new GitHandlerRegistry(gitPreferences);
+            GitSyncService syncService = GitSyncService.create(importFormatPreferences, emptyRemoteRegistry);
+
+            PushResult result = syncService.push(new BibDatabaseContext(), localLibrary);
+
+            assertEquals(PushResult.pushed(), result);
+            assertEquals(localCommit.getId(), emptyRemote.getRepository().resolve("refs/heads/main"));
+        }
     }
 
     @Test

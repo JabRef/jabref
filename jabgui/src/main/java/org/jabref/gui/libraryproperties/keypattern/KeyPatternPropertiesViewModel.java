@@ -11,7 +11,7 @@ import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.MetaData;
 
 public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -23,20 +23,17 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
     private final CliPreferences preferences;
 
-    private final BibDatabaseContext databaseContext;
-
-    public KeyPatternPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {
-        this.databaseContext = databaseContext;
+    public KeyPatternPropertiesViewModel(CliPreferences preferences) {
         this.preferences = preferences;
     }
 
     @Override
-    public void setValues() {
-        // empty
+    public void setValues(MetaData metaData) {
+        // The table is filled by the view, which needs the entry types as well as the patterns.
     }
 
     @Override
-    public void storeSettings() {
+    public void storeSettings(MetaData metaData) {
         DatabaseCitationKeyPatterns newKeyPattern = new DatabaseCitationKeyPatterns(preferences.getCitationKeyPatternPreferences().getKeyPatterns());
 
         patternListProperty.forEach(item -> {
@@ -54,7 +51,7 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());
         }
 
-        databaseContext.getMetaData().setCiteKeyPattern(newKeyPattern);
+        metaData.setCiteKeyPattern(newKeyPattern);
     }
 
     public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {

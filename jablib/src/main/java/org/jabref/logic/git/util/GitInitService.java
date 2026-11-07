@@ -11,13 +11,15 @@ import org.jabref.logic.l10n.Localization;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.jspecify.annotations.NonNull;
 
 public final class GitInitService {
     public static void initRepoAndSetRemote(@NonNull Path bibPath, @NonNull String remoteUrl, GitHandlerRegistry gitHandlerRegistry) throws JabRefException {
-        Path expectedRoot = bibPath.toAbsolutePath().getParent();
+        Path libraryFile = GitHandler.resolveToRealPath(bibPath);
+        Path expectedRoot = libraryFile.getParent();
         if (expectedRoot == null) {
             throw new JabRefException("Invalid library path: no parent directory");
         }
@@ -33,7 +35,13 @@ public final class GitInitService {
 
         GitHandler handler = gitHandlerRegistry.get(expectedRoot);
 
-        handler.initIfNeeded();
+        if (GitHandler.findRepositoryRoot(libraryFile).isEmpty()) {
+            try {
+                handler.initAndCommit(libraryFile);
+            } catch (IOException | GitAPIException | JGitInternalException e) {
+                throw translateInitializationFailure(e);
+            }
+        }
 
         try (Git git = handler.open()) {
             StoredConfig config = git.getRepository().getConfig();
@@ -58,8 +66,21 @@ public final class GitInitService {
             config.setString("branch", branch, "remote", "origin");
             config.setString("branch", branch, "merge", "refs/heads/" + branch);
             config.save();
-        } catch (URISyntaxException | IOException | GitAPIException e) {
-            throw new JabRefException("Failed to initialize repository or set remote", e);
+        } catch (URISyntaxException | IOException | GitAPIException | JGitInternalException e) {
+            throw translateInitializationFailure(e);
         }
+    }
+
+    private static JabRefException translateInitializationFailure(Exception exception) {
+        if (GitExceptionUtil.isLockFailure(exception)) {
+            return new JabRefException(
+                    "Failed to initialize repository because it is locked",
+                    Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again."),
+                    exception);
+        }
+        return new JabRefException(
+                "Failed to initialize repository or set remote",
+                Localization.lang("Could not set up the Git repository for this library. Please check the repository location and try again."),
+                exception);
     }
 }

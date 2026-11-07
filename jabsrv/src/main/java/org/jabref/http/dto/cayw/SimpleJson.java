@@ -24,7 +24,7 @@ public record SimpleJson(
         }
 
         return new SimpleJson(
-                bibEntry.getSharedBibEntryData().getSharedID(),
+                bibEntry.getSharedBibEntryData().getSharedIdAsInt(),
                 bibEntry.getCitationKey().get(),
                 properties.getFormattedLocator().orElse(null),
                 properties.getPrefix().orElse(null),

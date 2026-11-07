@@ -77,7 +77,7 @@ bstFunction
     ;
 
 stack
-    : LBRACE stackitem+ RBRACE
+    : LBRACE stackitem* RBRACE
     ;
 
 stackitem

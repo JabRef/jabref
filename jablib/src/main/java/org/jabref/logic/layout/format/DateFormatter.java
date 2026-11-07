@@ -2,6 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
@@ -11,7 +12,7 @@ public class DateFormatter implements ParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString, Locale.US);
         LocalDate date = LocalDate.parse(fieldText, DateTimeFormatter.ISO_LOCAL_DATE);
         return date.format(formatter);
     }

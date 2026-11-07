@@ -1,5 +1,6 @@
 package org.jabref.logic.ocr;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /// Interface for OCR engines.
@@ -11,12 +12,7 @@ public interface OcrEngine {
     ///
     /// @param pdfPath the file to perform OCR on.
     /// @return the result of the OCR operation with the extracted text or an error message.
-    OcrResult performOcrAndEmbedText(Path pdfPath);
-
-    /// Checks if the OCR engine is available for use.
-    ///
-    /// @return true if the engine is available, false otherwise.
-    boolean isAvailable();
+    OcrResult performOcrAndEmbedText(Path pdfPath) throws IOException;
 
     /// Gets the name of the OCR engine.
     ///

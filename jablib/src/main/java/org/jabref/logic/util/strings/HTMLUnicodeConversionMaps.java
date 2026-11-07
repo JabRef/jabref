@@ -364,7 +364,7 @@ public class HTMLUnicodeConversionMaps {
             //                                    U+220F ISOamsb
             /*    prod is NOT the same character as U+03A0 'greek capital letter pi' though
              the same glyph might be used for both  */
-            {"8721", "sum", "$\\sum$"}, // n-ary sumation, U+2211 ISOamsb
+            {"8721", "sum", "$\\sum$"}, // n-ary summation, U+2211 ISOamsb
             /*    sum is NOT the same character as U+03A3 'greek capital letter sigma'
              though the same glyph might be used for both */
             {"8722", "minus", "$-$"}, // minus sign, U+2212 ISOtech

@@ -30,8 +30,8 @@ class OOProcessNumericMarkers {
         }
 
         for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
-            List<CitationMarkerNumericEntry> cits = OOListUtil.map(group.getCitationsInLocalOrder(), e -> e);
-            OOText citMarker = style.getNumCitationMarker2(cits);
+            List<CitationMarkerNumericEntry> citations = OOListUtil.map(group.getCitationsInLocalOrder(), citation -> citation);
+            OOText citMarker = style.getNumCitationMarker2(citations);
             group.setCitationMarker(Optional.of(citMarker));
         }
     }

@@ -8,9 +8,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
-
-import com.airhacks.afterburner.injection.Injector;
 
 /// This class is just a simple wrapper for the soon to be refactored SaveDatabaseAction.
 public class SaveAction extends SimpleCommand {
@@ -23,17 +22,23 @@ public class SaveAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public SaveAction(SaveMethod saveMethod,
                       Supplier<LibraryTab> tabSupplier,
                       DialogService dialogService,
                       GuiPreferences preferences,
-                      StateManager stateManager) {
+                      StateManager stateManager,
+                      BibEntryTypesManager entryTypesManager,
+                      JournalAbbreviationRepository journalAbbreviationRepository) {
         this.saveMethod = saveMethod;
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         if (saveMethod == SaveMethod.SAVE_SELECTED) {
             this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -48,8 +53,9 @@ public class SaveAction extends SimpleCommand {
                 tabSupplier.get(),
                 dialogService,
                 preferences,
-                Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                stateManager);
+                entryTypesManager,
+                stateManager,
+                journalAbbreviationRepository);
 
         switch (saveMethod) {
             case SAVE ->

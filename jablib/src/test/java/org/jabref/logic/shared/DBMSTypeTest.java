@@ -2,7 +2,7 @@ package org.jabref.logic.shared;
 
 import java.util.Optional;
 
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ class DBMSTypeTest {
     }
 
     @Test
-    void fromStringWorksForUnkownString() {
+    void fromStringWorksForUnknownString() {
         assertEquals(Optional.empty(), DBMSType.fromString("unknown"));
     }
 

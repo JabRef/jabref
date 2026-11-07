@@ -4,42 +4,36 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.RadioButton;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeTypes;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
+import org.jabref.gui.theme.ThemePreviewView;
 import org.jabref.gui.util.URLs;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
-import org.jabref.gui.welcome.components.ThemeWireFrame;
 import org.jabref.gui.welcome.quicksettings.viewmodel.ThemeDialogViewModel;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class ThemeDialog extends FXDialog {
-    @FXML private CheckBox themeSyncOs;
-    @FXML private RadioButton lightRadio;
-    @FXML private RadioButton darkRadio;
-    @FXML private RadioButton customRadio;
-    @FXML private ToggleGroup themeGroup;
-    @FXML private TextField customPathField;
-    @FXML private VBox customThemeContainer;
+    @FXML private ComboBox<ThemePreset> theme;
+    @FXML private ComboBox<ThemeColorScheme> themeColorScheme;
+    @FXML private ThemePreviewView themePreview;
     @FXML private HelpButton helpButton;
-    @FXML private ThemeWireFrame lightWireframe;
-    @FXML private ThemeWireFrame darkWireframe;
-    @FXML private ThemeWireFrame customWireframe;
-
+    @FXML private CheckBox customTheme;
+    @FXML private TextField customThemePath;
     private ThemeDialogViewModel viewModel;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
 
     public ThemeDialog(GuiPreferences preferences, DialogService dialogService) {
-        super(Alert.AlertType.NONE, Localization.lang("Change visual theme"));
+        super(Alert.AlertType.NONE, Localization.lang("Change appearance"));
 
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -58,86 +52,38 @@ public class ThemeDialog extends FXDialog {
         });
     }
 
+    /// Themes that pair a dark and a light hue are named after the hue of the selected color scheme.
+    private String themeName(ThemePreset preset) {
+        return preset.getLocalizedName(viewModel.selectedThemeColorSchemeProperty().get());
+    }
+
     @FXML
     private void initialize() {
         viewModel = new ThemeDialogViewModel(preferences, dialogService);
 
-        lightRadio.setUserData(ThemeTypes.LIGHT);
-        darkRadio.setUserData(ThemeTypes.DARK);
-        customRadio.setUserData(ThemeTypes.CUSTOM);
+        new ViewModelListCellFactory<ThemePreset>().withText(this::themeName).install(theme);
+        // The button cell renders only when its item changes, so a name following the color scheme
+        // needs a fresh cell; the popup entries are re-rendered when the view model refreshes the list.
+        viewModel.selectedThemeColorSchemeProperty().addListener(_ -> theme.setButtonCell(
+                new ViewModelListCellFactory<ThemePreset>().withText(this::themeName).call(null)));
+        theme.itemsProperty().bind(viewModel.themesListProperty());
+        theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
 
-        lightWireframe.setThemeType(ThemeTypes.LIGHT);
-        darkWireframe.setThemeType(ThemeTypes.DARK);
-        customWireframe.setThemeType(ThemeTypes.CUSTOM);
+        new ViewModelListCellFactory<ThemeColorScheme>()
+                .withText(ThemeColorScheme::getLocalizedName)
+                .install(themeColorScheme);
+        themeColorScheme.itemsProperty().bind(viewModel.colorSchemeListProperty());
+        themeColorScheme.valueProperty().bindBidirectional(viewModel.selectedThemeColorSchemeProperty());
+        themePreview.bind(viewModel.selectedThemeProperty(), viewModel.selectedThemeColorSchemeProperty());
 
-        customPathField.textProperty().bindBidirectional(viewModel.customPathProperty());
-
-        themeGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
-            if (newValue != null) {
-                ThemeTypes selectedType = (ThemeTypes) newValue.getUserData();
-                viewModel.setSelectedTheme(selectedType);
-                updateThemeVisibility();
-            }
-        });
-
-        themeSyncOs.selectedProperty().addListener(_ -> {
-            viewModel.setThemeSyncOs(themeSyncOs.isSelected());
-            updateThemeVisibility();
-        });
-        themeSyncOs.setSelected(viewModel.shouldThemeSyncOs());
-
-        selectInitialTheme();
-        updateThemeVisibility();
+        customTheme.selectedProperty().bindBidirectional(viewModel.customThemeEnabledProperty());
+        customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
 
         helpButton.setHelpUrl(URLs.CUSTOM_THEME_DOC);
     }
 
-    private void selectInitialTheme() {
-        if (viewModel.shouldThemeSyncOs() || viewModel.getSelectedTheme() == null) {
-            return;
-        }
-
-        switch (viewModel.getSelectedTheme()) {
-            case LIGHT ->
-                    lightRadio.setSelected(true);
-            case DARK ->
-                    darkRadio.setSelected(true);
-            case CUSTOM ->
-                    customRadio.setSelected(true);
-        }
-    }
-
-    private void updateThemeVisibility() {
-        if (viewModel.shouldThemeSyncOs()) {
-            customRadio.getToggleGroup().selectToggle(null);
-        }
-
-        boolean visible = viewModel.getSelectedTheme() == ThemeTypes.CUSTOM;
-
-        customThemeContainer.setVisible(visible);
-        customThemeContainer.setManaged(visible);
-        if (customThemeContainer.getScene() != null) {
-            customThemeContainer.getScene().getWindow().sizeToScene();
-        }
-    }
-
     @FXML
-    private void selectLight() {
-        lightRadio.fire();
-    }
-
-    @FXML
-    private void selectDark() {
-        darkRadio.fire();
-    }
-
-    @FXML
-    private void selectCustom() {
-        customRadio.fire();
-    }
-
-    @FXML
-    private void browseThemeFile() {
-        viewModel.browseForThemeFile();
+    void importTheme() {
+        viewModel.importCSSFile();
     }
 }

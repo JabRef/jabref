@@ -29,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-/// Tests that {@link SummariesMigrationV1} correctly migrates every v1 summaries MVStore
-/// found under {@code src/test/resources/…/summarization/migration/} into the v2 repository.
+/// Tests that [SummariesMigrationV1] correctly migrates every v1 summaries MVStore
+/// found under `src/test/resources/…/summarization/migration/` into the v2 repository.
 ///
 /// Entries (database path + citation key) are discovered dynamically from the MVStore,
-/// so adding {@code summariesN.mv} alongside its matching {@code summariesN.json} is enough
+/// so adding `summariesN.mv` alongside its matching `summariesN.json` is enough
 /// to add a new test case without touching this class.
 ///
 /// The fixed library ID acts as the new identifier created during v1 → v2 migration.

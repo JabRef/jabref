@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -230,9 +231,8 @@ public class MedlinePlainImporter extends Importer {
             }
 
             BibEntry b = new BibEntry(type);
-
-            // create one here
             b.setField(fieldConversionMap);
+            new DoiCleanup().cleanup(b);
             bibitems.add(b);
         }
 
@@ -398,9 +398,9 @@ public class MedlinePlainImporter extends Importer {
         }
     }
 
-    /// Parses a MeSH term from MEDLINE plain format (e.g. {@code *Kidney Diseases/diagnosis/epidemiology})
-    /// into a {@link MeshHeading} and renders it as individual keywords
-    /// (e.g. {@code ["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]}).
+    /// Parses a MeSH term from MEDLINE plain format (e.g. `*Kidney Diseases/diagnosis/epidemiology`)
+    /// into a [MeshHeading] and renders it as individual keywords
+    /// (e.g. `["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]`).
     private List<String> parseMeshTerm(String meshTerm) {
         String term = meshTerm.trim();
         boolean descriptorMajor = term.startsWith("*");

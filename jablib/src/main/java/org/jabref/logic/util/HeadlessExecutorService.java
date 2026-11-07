@@ -81,7 +81,7 @@ public class HeadlessExecutorService implements Executor {
     public <T> List<Future<T>> executeAll(@NonNull Collection<Callable<T>> tasks) {
         try {
             return executorService.invokeAll(tasks);
-        } catch (InterruptedException exception) {
+        } catch (InterruptedException _) {
             // Ignored
             return List.of();
         }
@@ -90,17 +90,17 @@ public class HeadlessExecutorService implements Executor {
     public <T> List<Future<T>> executeAll(@NonNull Collection<Callable<T>> tasks, int timeout, TimeUnit timeUnit) {
         try {
             return executorService.invokeAll(tasks, timeout, timeUnit);
-        } catch (InterruptedException exception) {
+        } catch (InterruptedException _) {
             // Ignored
             return List.of();
         }
     }
 
-    public void executeInterruptableTask(final Runnable runnable, String taskName) {
-        this.lowPriorityExecutorService.execute(new NamedRunnable(taskName, runnable));
+    public Future<?> executeInterruptibleTask(final Runnable runnable, String taskName) {
+        return this.lowPriorityExecutorService.submit(new NamedRunnable(taskName, runnable));
     }
 
-    public void executeInterruptableTaskAndWait(@NonNull Runnable runnable) {
+    public void executeInterruptibleTaskAndWait(@NonNull Runnable runnable) {
         Future<?> future = lowPriorityExecutorService.submit(runnable);
         try {
             future.get();
@@ -168,7 +168,7 @@ public class HeadlessExecutorService implements Executor {
                     LOGGER.error("{} did not terminate", name);
                 }
             }
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException _) {
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
         }

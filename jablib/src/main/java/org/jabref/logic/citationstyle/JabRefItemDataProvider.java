@@ -30,7 +30,7 @@ import org.jbibtex.BibTeXEntry;
 import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
 
-/// Custom {@link ItemDataProvider} that allows to set the data so that we don't have to instantiate a new CSL object
+/// Custom [ItemDataProvider] that allows to set the data so that we don't have to instantiate a new CSL object
 /// every time.
 public class JabRefItemDataProvider implements ItemDataProvider {
 
@@ -48,9 +48,8 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         stringJsonBuilderFactory = new StringJsonBuilderFactory();
     }
 
-    /// Converts the {@link BibEntry} into {@link CSLItemData}.
+    /// Converts the [BibEntry] into [CSLItemData].
     ///
-    /// <br>
     /// <table>
     /// <thead>
     /// <tr>
@@ -200,13 +199,16 @@ public class JabRefItemDataProvider implements ItemDataProvider {
                    .toList();
     }
 
+    public String toJson(BibEntry entry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+        CSLItemData itemData = bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager);
+        return (String) itemData.toJson(stringJsonBuilderFactory.createJsonBuilder());
+    }
+
     public String toJson() {
         List<BibEntry> entries = bibDatabaseContext.getEntries();
         this.setData(entries, bibDatabaseContext, entryTypesManager);
         return entries.stream()
-                      .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
-                      .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
-                      .map(String.class::cast)
+                      .map(entry -> toJson(entry, bibDatabaseContext, entryTypesManager))
                       .collect(Collectors.joining(",", "[", "]"));
     }
 }

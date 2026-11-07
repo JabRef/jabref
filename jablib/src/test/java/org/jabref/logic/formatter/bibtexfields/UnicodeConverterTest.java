@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/// Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
+/// Tests in addition to the general tests from [org.jabref.logic.formatter.FormatterTest]
 class UnicodeConverterTest {
 
     private UnicodeToLatexFormatter formatter;
@@ -30,7 +30,7 @@ class UnicodeConverterTest {
 
             # plain unicode letters
             {\\"{a}}, ä
-            {{$\\Epsilon$}}, \u0395
+            $\\Epsilon$, \u0395
             """)
     void unicode(String expected, String text) {
         assertEquals(expected, formatter.format(text));

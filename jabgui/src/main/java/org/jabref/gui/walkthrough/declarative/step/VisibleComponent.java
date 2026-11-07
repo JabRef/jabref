@@ -19,16 +19,19 @@ public sealed interface VisibleComponent extends WalkthroughStep permits PanelSt
     Optional<NodeResolver> nodeResolver();
 
     /// Custom text for the continue button.
+    ///
     /// - If [Optional#empty()], no continue button is shown.
     /// - If present, the button will be shown with the provided text.
     Optional<String> continueButtonText();
 
     /// Custom text for the skip button.
+    ///
     /// - If [Optional#empty()], no skip button is shown.
     /// - If present, the button will be shown with the provided text.
     Optional<String> skipButtonText();
 
     /// Custom text for the back button.
+    ///
     /// - If [Optional#empty()], no back button is shown.
     /// - If present, the button will be shown with the provided text.
     Optional<String> backButtonText();

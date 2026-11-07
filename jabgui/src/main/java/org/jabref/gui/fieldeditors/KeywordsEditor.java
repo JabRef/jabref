@@ -2,20 +2,18 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.MscCodeUtils;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
-
-import com.airhacks.afterburner.injection.Injector;
 
 public class KeywordsEditor extends TagsEditor {
 
@@ -26,16 +24,18 @@ public class KeywordsEditor extends TagsEditor {
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
                           FieldCheckers fieldCheckers,
-                          CliPreferences preferences) {
+                          CliPreferences preferences,
+                          BibDatabaseContext databaseContext,
+                          UndoManager undoManager) {
 
-        super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.preferences = preferences;
 
         this.viewModel = new KeywordsEditorViewModel(
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                preferences.getBibEntryPreferences(),
+                databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()),
                 undoManager);
 
         setupTagsField(

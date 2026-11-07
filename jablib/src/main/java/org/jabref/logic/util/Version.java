@@ -37,18 +37,18 @@ public class Version {
     private int developmentNum = -1;
     private boolean isDevelopmentVersion;
 
-    /// Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION})
+    /// Dummy constructor to create a local object (and  [Version#UNKNOWN_VERSION])
     private Version() {
     }
 
-    /// Tinylog does not allow for altering existing loging configuraitons after the logger was initialized .
-    /// Lazy initialization to enable tinylog writing to a file (and also still enabling loggin in this class)
+    /// Tinylog does not allow for altering existing logging configurations after the logger was initialized .
+    /// Lazy initialization to enable tinylog writing to a file (and also still enabling logging in this class)
     private static Logger getLogger() {
         return LoggerFactory.getLogger(Version.class);
     }
 
     /// @param version must be in form of following pattern: `(\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?` (e.g., 3.3; 3.4-dev)
-    /// @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
+    /// @return the parsed version or [Version#UNKNOWN_VERSION] if an error occurred
     public static Version parse(String version) {
         if ((version == null) || version.isEmpty() || BuildInfo.UNKNOWN_VERSION.equals(version)
                 || "${version}".equals(version)) {

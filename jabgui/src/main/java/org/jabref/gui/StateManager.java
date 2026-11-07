@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
@@ -26,6 +27,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBinding;
+import org.jspecify.annotations.NonNull;
 
 /// This class manages the GUI-state of JabRef, including:
 ///
@@ -36,7 +38,7 @@ import com.tobiasdiez.easybind.EasyBinding;
 /// - active number of search results
 /// - focus owner
 /// - dialog window sizes/positions
-/// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
+/// - opened AI chat window (controlled by [org.jabref.logic.ai.AiService])
 ///
 public interface StateManager extends SrvStateManager {
 
@@ -46,6 +48,22 @@ public interface StateManager extends SrvStateManager {
 
     OptionalObjectProperty<LibraryTab> activeTabProperty();
 
+    /// The undo journal of the library `context` describes.
+    ///
+    /// Each library has its own, so a caller names the library it is recording against instead of
+    /// holding a journal handed to it when it was built. Which library that is has to be decided
+    /// where the change is made, not where the change lands: a task that finishes after the user
+    /// switched libraries still belongs to the one it ran on.
+    ///
+    /// This is where a library's journal lives, so it hands out the whole of it. A caller that only
+    /// records says so by what it declares — the parameter it passes the journal to, or
+    /// [org.jabref.gui.LibraryTab#getUndoManager], which hands its collaborators the recording half.
+    GuiUndoManager getUndoManager(BibDatabaseContext context);
+
+    /// Discards the journal of a library that is closing, with the changes it holds and the entries
+    /// those changes keep alive.
+    void removeUndoManager(BibDatabaseContext context);
+
     OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type);
 
     StringProperty searchQueryProperty();
@@ -53,6 +71,11 @@ public interface StateManager extends SrvStateManager {
     IntegerProperty searchResultSize(SearchType type);
 
     void setSearchContext(BibDatabaseContext database, SearchContext searchContext);
+
+    /// Drops the [SearchContext] of a library that is closing. It holds the search backends and the
+    /// factories that build them, and those capture the tab that created it, so leaving the
+    /// registration behind keeps the whole closed library alive.
+    void removeSearchContext(BibDatabaseContext database);
 
     void setSelectedEntries(List<BibEntry> newSelectedEntries);
 
@@ -63,6 +86,8 @@ public interface StateManager extends SrvStateManager {
     void clearSelectedGroups(BibDatabaseContext context);
 
     void setActiveDatabase(BibDatabaseContext database);
+
+    void replaceActiveDatabase(@NonNull BibDatabaseContext database);
 
     OptionalObjectProperty<Node> focusOwnerProperty();
 
@@ -93,6 +118,9 @@ public interface StateManager extends SrvStateManager {
     void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow);
 
     void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName);
+
+    /// Closes the group chat windows of a library that is closing and releases their registrations.
+    void closeAiChatWindows(BibDatabaseContext context);
 
     BooleanProperty getEditorShowing();
 

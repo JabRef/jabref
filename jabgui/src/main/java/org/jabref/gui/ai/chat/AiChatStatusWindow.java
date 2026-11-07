@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddingsTask;
-import org.jabref.logic.ai.rag.logic.AnswerEngine;
+import org.jabref.logic.ai.rag.logic.ResponseEngine;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
@@ -28,8 +28,8 @@ public class AiChatStatusWindow extends BaseDialog<Void> {
                   .setAsDialogPane(this);
     }
 
-    public void setAnswerEngine(AnswerEngine answerEngine) {
-        aiChatStatusView.setAnswerEngine(answerEngine);
+    public void setResponseEngine(ResponseEngine responseEngine) {
+        aiChatStatusView.setResponseEngine(responseEngine);
     }
 
     public ObjectProperty<ChatModel> chatModelProperty() {
@@ -40,8 +40,8 @@ public class AiChatStatusWindow extends BaseDialog<Void> {
         return aiChatStatusView.chatHistoryProperty();
     }
 
-    public ObjectProperty<AnswerEngine> answerEngineProperty() {
-        return aiChatStatusView.answerEngineProperty();
+    public ObjectProperty<ResponseEngine> responseEngineProperty() {
+        return aiChatStatusView.responseEngineProperty();
     }
 
     public ListProperty<FullBibEntry> entriesProperty() {

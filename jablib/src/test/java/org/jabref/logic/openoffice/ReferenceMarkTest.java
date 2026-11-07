@@ -18,7 +18,7 @@ class ReferenceMarkTest {
     @MethodSource
     @DisplayName("Test parsing of valid reference marks")
     void validParsing(String name, List<String> expectedCitationKeys, List<Integer> expectedCitationNumbers, String expectedUniqueId, CSLCitationType expectedCitationType) {
-        ReferenceMark referenceMark = new ReferenceMark(name);
+        ReferenceMark referenceMark = ReferenceMark.parse(name).orElseThrow();
 
         assertEquals(expectedCitationKeys, referenceMark.getCitationKeys());
         assertEquals(expectedCitationNumbers, referenceMark.getCitationNumbers());

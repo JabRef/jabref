@@ -8,10 +8,10 @@ import org.jabref.model.entry.field.FieldFactory;
 
 import org.jspecify.annotations.NonNull;
 
-/// Replaces two subsequent whitespaces (and tabs) to one space in case of single-line fields. In case of multine fields,
+/// Replaces two subsequent whitespaces (and tabs) to one space in case of single-line fields. In case of multiline fields,
 /// the field content is kept as is.
 ///
-/// Due to the distinction between single line and multiline fields, this formatter does not implement the interface {@link org.jabref.logic.formatter.Formatter}.
+/// Due to the distinction between single line and multiline fields, this formatter does not implement the interface [org.jabref.logic.formatter.Formatter].
 public class NormalizeWhitespaceFormatter {
 
     // 's' matches a space, tab, new line, carriage return.

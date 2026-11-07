@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -41,7 +42,7 @@ public class ComplexSearchQuery {
         ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         terms.forEach(term -> {
             String termText = term.text();
-            switch (term.field().toLowerCase()) {
+            switch (term.field().toLowerCase(Locale.ROOT)) {
                 case "author" ->
                         builder.author(termText);
                 case "title" ->
@@ -222,7 +223,7 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder fromYearAndToYear(@NonNull Integer fromYear, @NonNull Integer toYear) {
             if (singleYear != null) {
-                throw new IllegalArgumentException("You can not use single year and year range search.");
+                throw new IllegalArgumentException("You cannot use single year and year range search.");
             }
             this.fromYear = fromYear;
             this.toYear = toYear;
@@ -231,7 +232,7 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder singleYear(@NonNull Integer singleYear) {
             if (fromYear != null || toYear != null) {
-                throw new IllegalArgumentException("You can not use single year and year range search.");
+                throw new IllegalArgumentException("You cannot use single year and year range search.");
             }
             this.singleYear = singleYear;
             return this;
@@ -256,7 +257,7 @@ public class ComplexSearchQuery {
         public ComplexSearchQueryBuilder terms(Collection<Term> terms) {
             terms.forEach(term -> {
                 String termText = term.text();
-                switch (term.field().toLowerCase()) {
+                switch (term.field().toLowerCase(Locale.ROOT)) {
                     case "author" ->
                             this.author(termText);
                     case "title" ->
@@ -298,13 +299,13 @@ public class ComplexSearchQuery {
             int toYear = 9999;
             try {
                 fromYear = Integer.parseInt(split[0]);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException _) {
                 // default value already set
             }
             if (split.length > 1) {
                 try {
                     toYear = Integer.parseInt(split[1]);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException _) {
                     // default value already set
                 }
             }

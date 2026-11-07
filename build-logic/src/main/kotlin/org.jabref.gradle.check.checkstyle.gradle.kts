@@ -12,5 +12,9 @@ tasks.withType<Checkstyle>().configureEach {
         xml.required = false
         html.required = true
     }
-    source = fileTree("src") { include("**/*.java") }
+    source = fileTree("src") {
+        include("**/*.java")
+        // Submodule content is checked in its own repository.
+        exclude("main/themes.jabref.org/**")
+    }
 }

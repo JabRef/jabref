@@ -3,8 +3,6 @@ package org.jabref.gui.mergeentries.threewaymerge;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -12,6 +10,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 
@@ -19,13 +18,11 @@ public class MergeEntriesAction extends SimpleCommand {
     private static final int NUMBER_OF_ENTRIES_NEEDED = 2;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final GuiPreferences preferences;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, UndoManager undoManager, GuiPreferences preferences) {
+    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.preferences = preferences;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(NUMBER_OF_ENTRIES_NEEDED, stateManager));
@@ -33,10 +30,10 @@ public class MergeEntriesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::mergeSelectedEntries);
+    }
 
+    private void mergeSelectedEntries(BibDatabaseContext databaseContext) {
         // Check if there are two entries selected
         List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries.size() != 2) {
@@ -68,7 +65,7 @@ public class MergeEntriesAction extends SimpleCommand {
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);
         mergeResultOpt.ifPresentOrElse(entriesMergeResult -> {
-            new MergeTwoEntriesAction(entriesMergeResult, stateManager, undoManager).execute();
+            new MergeTwoEntriesAction(entriesMergeResult, stateManager, stateManager.getUndoManager(databaseContext)).execute();
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

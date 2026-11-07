@@ -3,7 +3,7 @@ package org.jabref.logic.remote;
 public enum RemoteMessage {
     /// Send command line arguments. The message content is of type `String[]`.
     SEND_COMMAND_LINE_ARGUMENTS,
-    /// As a response to {@link #PING}. The message content is an identifier of type `String`.
+    /// As a response to [#PING]. The message content is an identifier of type `String`.
     PONG,
     /// Response signaling that the message was received successfully. No message content.
     OK,

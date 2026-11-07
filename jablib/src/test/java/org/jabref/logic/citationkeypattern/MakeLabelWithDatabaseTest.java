@@ -16,7 +16,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/// Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
+/// Bracketed patterns themselves are tested at [org.jabref.logic.citationkeypattern.BracketedPatternTest].
 @Execution(ExecutionMode.CONCURRENT)
 class MakeLabelWithDatabaseTest {
 

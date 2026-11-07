@@ -7,15 +7,15 @@ import java.util.stream.Collectors;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.mergeentries.multiwaymerge.DiffHighlighting;
+import org.jabref.gui.testutils.JavaFxExtension;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class DiffHighlightingTest {
 
     public static void assertEquals(List<Text> expected, List<Text> actual) {

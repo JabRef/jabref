@@ -24,15 +24,9 @@ public class AbbreviationPreferences {
     private AbbreviationPreferences() {
         this(
                 List.of(), // externalJournalLists
-                true,       // useFJournalField
-                false       // Enable MSC codes as Keyword
+                true,      // useFJournalField
+                false      // Enable MSC codes as Keyword
         );
-    }
-
-    public void setAll(AbbreviationPreferences preferences) {
-        this.externalJournalLists.setAll(preferences.externalJournalLists);
-        this.useFJournalField.set(preferences.shouldUseFJournalField());
-        this.shouldEnableMscKeywordDescriptions.set(preferences.shouldEnableMscKeywordDescriptions());
     }
 
     public static AbbreviationPreferences getDefault() {

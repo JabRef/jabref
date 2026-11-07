@@ -47,6 +47,7 @@ public class FieldEditorsMultilinePropertyTest {
     /// This test is somewhat fragile, as it depends on the structure of FieldEditors.java.
     /// If the structure of FieldEditors.java is changed, this test might fail.
     /// This test performs the following steps:
+    ///
     /// 1. Use Java parser to parse FieldEditors.java and check all if statements in the getForField method.
     /// 2. Match the conditions of if statements to extract the field properties.
     /// 3. Match the created FieldEditor class name with field properties extracted from step 2. This creates a map where:

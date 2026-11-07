@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 
 /// Stores the save order config for a library
 ///
-/// Format: &lt;choice> ({@link OrderType}, a pair of {@link Field} + descending (boolean)
+/// Format: &lt;choice> ([OrderType], a pair of [Field] + descending (boolean))
 ///
 ///
-/// Note that {@link OrderType#TABLE} can only be used as "intermediate" setting. When passing `SaveOrder`
-/// to {@link org.jabref.logic.exporter.BibDatabaseWriter}, the orderType must be different. Reason: The writer
+/// Note that [OrderType#TABLE] can only be used as "intermediate" setting. When passing `SaveOrder`
+/// to [org.jabref.logic.exporter.BibDatabaseWriter], the orderType must be different. Reason: The writer
 /// does not have access to the UI.
 ///
 public class SaveOrder {
@@ -40,7 +40,7 @@ public class SaveOrder {
         OrderType orderType;
         try {
             orderType = OrderType.valueOf(data.getFirst().toUpperCase());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
             if (data.size() > 1 && data.size() % 2 == 1) {
                 LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.getFirst());
                 orderType = OrderType.SPECIFIED;

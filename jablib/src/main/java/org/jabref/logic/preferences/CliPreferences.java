@@ -1,7 +1,9 @@
 package org.jabref.logic.preferences;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.logic.FilePreferences;
@@ -22,6 +24,7 @@ import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.ocr.OcrPreferences;
@@ -30,6 +33,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -60,12 +64,17 @@ public interface CliPreferences {
 
     Map<String, Object> getDefaults();
 
-    /// Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
+    /// Returns the export configuration. The contained SaveConfiguration is a [org.jabref.model.metadata.SelfContainedSaveOrder]
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
 
     void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
+
+    /// Returns the custom entry type decisions the user declined to store, as created by the caller
+    Set<String> getDeclinedCustomEntryTypes();
+
+    void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes);
 
     CleanupPreferences getCleanupPreferences();
 
@@ -80,6 +89,8 @@ public interface CliPreferences {
     RemotePreferences getRemotePreferences();
 
     ProxyPreferences getProxyPreferences();
+
+    CiteDrivePreferences getCiteDrivePreferences();
 
     SSLPreferences getSSLPreferences();
 
@@ -104,6 +115,9 @@ public interface CliPreferences {
     AiPreferences getAiPreferences();
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
+
+    /// @return the shared database connection used last; the other stored connections are reached through it
+    SharedDatabasePreferences getSharedDatabasePreferences();
 
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
 

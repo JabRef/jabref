@@ -1,15 +1,17 @@
 package org.jabref.gui.collab.groupchange;
 
+import java.util.Optional;
+
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.groups.GroupTreeNodeViewModel;
-import org.jabref.gui.groups.UndoableModifySubtree;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableGroupTreeChange;
 
 public final class GroupChange extends DatabaseChange {
     private final GroupDiff groupDiff;
@@ -22,19 +24,19 @@ public final class GroupChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompoundEdit undoEdit) {
-        GroupTreeNode oldRoot = groupDiff.getOriginalGroupRoot();
+    public void applyChange(CompoundEdit undoEdit) {
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
+
+        // Before the root below is installed: a library that had no groups has to end up with none
+        // again when this change is undone, not with the empty root accepting it created.
+        Optional<GroupTreeNode> before = databaseContext.getMetaData().getGroups().map(GroupTreeNode::copySubtree);
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
             GroupTreeNode groupTreeNode = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
-            databaseContext.getMetaData().setGroups(groupTreeNode);
+            databaseContext.getMetaData().setGroups(groupTreeNode, MetaDataChangeSource.JOURNAL);
             return groupTreeNode;
         });
 
-        final UndoableModifySubtree undo = new UndoableModifySubtree(
-                new GroupTreeNodeViewModel(databaseContext.getMetaData().getGroups().orElse(null)),
-                new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
         root.removeAllChildren();
         if (newRoot == null) {
             // I think setting root to null is not possible
@@ -46,8 +48,11 @@ public final class GroupChange extends DatabaseChange {
                 child.copySubtree().moveTo(root);
             }
         }
-
-        undoEdit.addEdit(undo);
+        // Recorded as the whole tree, like every other group operation: a record that holds nodes
+        // is undone silently once a later operation installs a fresh tree, and those nodes are then
+        // no longer the ones the library holds.
+        undoEdit.addEdit(new UndoableGroupTreeChange(
+                databaseContext.getMetaData(), before, databaseContext.getMetaData().getGroups()));
     }
 
     public GroupDiff getGroupDiff() {

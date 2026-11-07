@@ -2,13 +2,14 @@ package org.jabref.gui.theme;
 
 import java.net.URL;
 
-public class StyleSheetDataUrl extends StyleSheet {
+final class StyleSheetDataUrl extends StyleSheet {
 
     private final URL url;
 
     private volatile String dataUrl;
 
-    StyleSheetDataUrl(URL url) {
+    StyleSheetDataUrl(String name, URL url) {
+        super(name);
         this.url = url;
         reload();
     }
@@ -19,13 +20,13 @@ public class StyleSheetDataUrl extends StyleSheet {
     }
 
     @Override
-    public String getWebEngineStylesheet() {
+    String getSceneStylesheetLocation() {
         return dataUrl;
     }
 
     @Override
     void reload() {
-        StyleSheetFile.getDataUrl(url).ifPresentOrElse(createdUrl -> dataUrl = createdUrl, () -> dataUrl = EMPTY_WEBENGINE_CSS);
+        StyleSheetFile.getDataUrl(url).ifPresentOrElse(createdUrl -> dataUrl = createdUrl, () -> dataUrl = DATA_URL_PREFIX);
     }
 
     @Override

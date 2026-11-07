@@ -282,7 +282,7 @@ public class BstFunctions {
 
         if (m.find()) {
             StringBuilder sb = new StringBuilder();
-            m.appendReplacement(sb, m.group(1));
+            m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1)));
             sb.append('.');
             String group2 = m.group(2);
             if (group2 != null) {
@@ -551,8 +551,13 @@ public class BstFunctions {
         }
         Object o1 = stack.pop();
 
+        if (o1 == null) {
+            stack.push(BstVM.TRUE);
+            return;
+        }
+
         if (!(o1 instanceof String)) {
-            LOGGER.warn("Not a string or missing field in operation missing$ (line {})", ctx.start.getLine());
+            LOGGER.warn("Expected a field value in operation missing$ (line {})", ctx.start.getLine());
             stack.push(BstVM.TRUE);
             return;
         }
@@ -653,6 +658,11 @@ public class BstFunctions {
         Object o1 = stack.pop();
         Object o2 = stack.pop();
         Object o3 = stack.pop();
+
+        if ((o1 instanceof Integer) && (o2 instanceof Integer) && (o3 == null)) {
+            stack.push("");
+            return;
+        }
 
         if (!((o1 instanceof Integer length) && (o2 instanceof Integer start) && (o3 instanceof String string))) {
             throw new BstVMException("Expecting two integers and a string for substring$ (line %d)".formatted(ctx.start.getLine()));

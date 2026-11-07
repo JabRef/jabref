@@ -33,7 +33,16 @@ public enum CitationFetcherType {
         return name;
     }
 
-    /// @param aiService required for {@link org.jabref.logic.importer.plaincitation.PlainCitationParser}
+    /// Parses a constant by name, falling back to [#SEMANTIC_SCHOLAR] for unknown/corrupted values.
+    public static CitationFetcherType safeValueOf(String name) {
+        try {
+            return CitationFetcherType.valueOf(name);
+        } catch (IllegalArgumentException _) {
+            return SEMANTIC_SCHOLAR;
+        }
+    }
+
+    /// @param aiService required for [org.jabref.logic.importer.plaincitation.PlainCitationParser]
     public static CitationFetcher getCitationFetcher(
             CitationFetcherType citationFetcherName,
             ImporterPreferences importerPreferences,

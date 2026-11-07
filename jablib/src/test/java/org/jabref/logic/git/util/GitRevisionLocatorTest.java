@@ -3,13 +3,18 @@ package org.jabref.logic.git.util;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.CommitBuilder;
 import org.eclipse.jgit.lib.ConfigConstants;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectInserter;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.URIish;
@@ -87,5 +92,41 @@ class GitRevisionLocatorTest {
         assertEquals(base.getId(), triple.base().get().getId());
         assertEquals(local.getId(), triple.local().getId());
         assertEquals(remote.getId(), triple.remote().getId());
+    }
+
+    @Test
+    void locateMergeCommitsWithUnrelatedHistoriesHasNoBase(@TempDir Path tempDir) throws Exception {
+        Path bibFile = tempDir.resolve("library.bib");
+        git = Git.init().setDirectory(tempDir.toFile()).setInitialBranch("main").call();
+
+        Files.writeString(bibFile, "@article{local}", StandardCharsets.UTF_8);
+        git.add().addFilepattern("library.bib").call();
+        RevCommit local = git.commit().setMessage("local").call();
+
+        ObjectId remoteId;
+        try (ObjectInserter inserter = git.getRepository().newObjectInserter()) {
+            CommitBuilder remoteCommit = new CommitBuilder();
+            remoteCommit.setTreeId(local.getTree());
+            remoteCommit.setAuthor(new PersonIdent(git.getRepository()));
+            remoteCommit.setCommitter(new PersonIdent(git.getRepository()));
+            remoteCommit.setMessage("remote");
+            remoteId = inserter.insert(remoteCommit);
+            inserter.flush();
+        }
+        var remoteRef = git.getRepository().updateRef("refs/heads/remote");
+        remoteRef.setNewObjectId(remoteId);
+        remoteRef.update();
+        git.getRepository().updateRef("refs/remotes/origin/main").link("refs/heads/remote");
+
+        StoredConfig config = git.getRepository().getConfig();
+        config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, "main", ConfigConstants.CONFIG_KEY_REMOTE, "origin");
+        config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, "main", ConfigConstants.CONFIG_KEY_MERGE, Constants.R_HEADS + "main");
+        config.save();
+
+        RevisionTriple triple = new GitRevisionLocator().locateMergeCommits(git);
+
+        assertEquals(Optional.empty(), triple.base());
+        assertEquals(local.getId(), triple.local().getId());
+        assertEquals(remoteId, triple.remote().getId());
     }
 }
