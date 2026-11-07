@@ -125,6 +125,24 @@ Context: [Consistency-check output fixes](https://github.com/JabRef/jabref/pull/
 
 Needs: impl, utest
 
+## Consistency dialog can restrict field columns to a BibTeX style
+`req~ux.consistency.bst-field-columns~2`
+
+The user chooses a `.bst` file and can switch between all columns and the fields its `ENTRY` command declares, their supported aliases, and the implicit `crossref` field. Switching back and forth keeps the chosen style. A pending style load preserves a later choice to show all fields. Entry type and citation key stay visible; entry types without a visible column are not offered.
+
+Needs: impl, utest
+
+## Consistency check must compare only entries selected by an AUX file
+`req~ux.consistency.aux-entry-selection~2`
+
+The user chooses a LaTeX `.aux` file to select cited entries, including citations from nested AUX files. If exactly one `.aux` file lies next to the library file, it is chosen by default after the consistency dialog opens. The decision to open the dialog uses the full-library findings, regardless of the default AUX subset. A wildcard citation selects all library entries. The check recomputes differences within the selected entries and preserves the chosen field restriction. The user switches between all entries and the cited ones; switching keeps the chosen `.aux` file. Unknown citation keys do not select entries; a valid selection without matching entries produces an empty report. Uncited cross-reference parents do not participate in the comparison.
+
+Reading and checking run in the background. Superseded loads stop cooperatively when the selection changes or the dialog closes. Reports share immutable field-presence snapshots and derive cell symbols on demand. A read failure preserves the previous report. Automatic-load failures are logged without opening an error dialog; explicitly selected file failures are shown to the user. An older request cannot replace a newer selection. Exports use the selected-entry report, while entry navigation targets the original library entries.
+
+Context: [AUX selection for consistency checks](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403).
+
+Needs: impl, utest
+
 ## Group creation must allow populating new explicit group from selection
 `req~ux.groups.create-explicit-from-selection~1`
 
@@ -132,11 +150,21 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## The "Close dialog" key binding closes the dialog
+`req~ux.dialogs.close-key-binding~1`
+
+Pressing the "Close dialog" key binding in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
+Its default is <kbd>Esc</kbd>; users can change it in the key binding preferences.
+Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
+Currently, this is only the PDF viewer ("Document viewer").
+
+Needs: impl, utest
+
 ## Open combo box popup must close without closing enclosing dialog on Escape
 `req~ux.combobox.escape-closes-popup-only~1`
 
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
-The enclosing dialog must remain open.
+The enclosing dialog must remain open ([#16596](https://github.com/JabRef/jabref/issues/16596)).
 
 ## Library save must maintain filesystem change detection after completion
 `req~ux.external-library-changes.after-save~1`
@@ -227,6 +255,27 @@ Needs: impl
 The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
 
 Needs: impl
+
+## Donation prompt returns every six months
+`req~ux.donation.recurring-prompt~1`
+
+JabRef asks for a donation six months after the first launch and every six months afterwards.
+Dismissing the prompt hides it until the next time; "Dismiss forever" stops it for good.
+
+Needs: impl
+## Library tab switches must preserve each library's selected groups
+`req~ux.groups.library-switch-preserves-selection~1`
+
+Rationale: The user must be able to switch between libraries and still see the same groups selected ([#1104](https://github.com/JabRef/jabref/issues/1104)).
+
+Needs: impl, utest
+
+## Shared library group updates must preserve selected groups
+`req~ux.groups.shared-update-preserves-selection~1`
+
+When a shared library receives a group-tree update, groups that remain in the updated tree must remain selected.
+
+Needs: impl, utest
 
 ## Assigning an already used keyboard shortcut must require confirmation
 `req~ux.keybindings.duplicate-warning~1`
