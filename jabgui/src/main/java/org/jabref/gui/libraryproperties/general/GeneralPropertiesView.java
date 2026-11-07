@@ -36,6 +36,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField latexFileDirectory;
     @FXML private TextField keywordSeparator;
+    @FXML private TextField libraryName;
+    @FXML private TextField libraryDescription;
     @FXML private Button libSpecificFileDirSwitchId;
     @FXML private Button userSpecificFileDirSwitchId;
     @FXML private Button laTexSpecificFileDirSwitchId;
@@ -93,6 +95,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         latexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
+        libraryName.textProperty().bindBidirectional(viewModel.libraryNameProperty());
+        libraryDescription.textProperty().bindBidirectional(viewModel.libraryDescriptionProperty());
         // Limit the keyword separator to a single character (same as the global preference control)
         UnaryOperator<TextFormatter.Change> singleCharacterFilter =
                 change -> change.getControlNewText().length() <= 1 ? change : null;

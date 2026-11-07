@@ -195,4 +195,16 @@ class PseudonymizationTest {
 
         assertTrue(Files.exists(target));
     }
+
+    @Test
+    void dropsLibraryNameAndDescriptionWhenPseudonymizing() {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
+        context.getMetaData().setLibraryName("secret project");
+        context.getMetaData().setLibraryDescription("secret internal description");
+
+        Pseudonymization.Result result = new Pseudonymization(',').pseudonymizeLibrary(context);
+
+        assertEquals(Optional.empty(), result.bibDatabaseContext().getMetaData().getLibraryName());
+        assertEquals(Optional.empty(), result.bibDatabaseContext().getMetaData().getLibraryDescription());
+    }
 }

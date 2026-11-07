@@ -147,6 +147,10 @@ public class MetaDataParser {
                 } catch (IllegalArgumentException e) {
                     LOGGER.debug("Unknown library abbreviation type: {}", getSingleItem(values), e);
                 }
+            } else if (MetaData.LIBRARY_NAME.equals(entry.getKey())) {
+                metaData.setLibraryName(getSingleItem(values));
+            } else if (MetaData.LIBRARY_DESCRIPTION.equals(entry.getKey())) {
+                metaData.setLibraryDescription(getSingleItem(values));
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
                 defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
             } else if (MetaData.PROTECTED_FLAG_META.equals(entry.getKey())) {
@@ -247,10 +251,12 @@ public class MetaDataParser {
         StringBuilder res = new StringBuilder();
         while ((c = reader.read()) != -1) {
             if (escape) {
-                // at org.jabref.logic.exporter.MetaDataSerializer.serializeMetaData, only MetaData.SEPARATOR_CHARACTER, MetaData.ESCAPE_CHARACTER are quoted
-                // That means ; and \\
+                // MetaDataSerializer quotes ;, \, {, and }.
                 char character = (char) c;
-                if (character != MetaData.SEPARATOR_CHARACTER && character != MetaData.ESCAPE_CHARACTER) {
+                if (character != MetaData.SEPARATOR_CHARACTER
+                        && character != MetaData.ESCAPE_CHARACTER
+                        && character != '{'
+                        && character != '}') {
                     // Keep the escape character
                     res.append("\\");
                 }
