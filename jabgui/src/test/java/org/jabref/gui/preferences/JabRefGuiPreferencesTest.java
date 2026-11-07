@@ -1,10 +1,15 @@
 package org.jabref.gui.preferences;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preview.PreviewPreferences;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.migrations.PreferencesMigrations;
 
 import org.junit.jupiter.api.Test;
 
@@ -115,5 +120,99 @@ class JabRefGuiPreferencesTest {
         assertEquals(command, JabRefGuiPreferences.getCommandArguments(
                 preferences, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, List.of()));
         verify(preferences).putStringList(CONSOLE_COMMAND_ARGUMENTS, command);
+    }
+
+    @Test
+    void storeCustomizedPreviewStylePersistsData() {
+        List<CustomizedPreviewStyle> styles = List.of(
+                new CustomizedPreviewStyle("id1", "name1", "text1"),
+                new CustomizedPreviewStyle("id2", "name2", "text2"),
+                new CustomizedPreviewStyle("id3", "name3", ""),
+                new CustomizedPreviewStyle("id4", "name4", ""),
+                new CustomizedPreviewStyle("id5", "name5", "hello\nworld"));
+        JabRefGuiPreferences jabRefGuiPreferences = new InMemoryGuiPreferences();
+        jabRefGuiPreferences.storeCustomizedPreviewStyle(styles);
+        List<CustomizedPreviewStyle> customizedPreviewStyleList = jabRefGuiPreferences.getCustomizedPreviewStyle(List.of());
+        assertEquals(styles, customizedPreviewStyleList);
+    }
+
+    @Test
+    void storedDefaultStyleEqualsTheDefault() {
+        List<CustomizedPreviewStyle> defaults = PreviewPreferences.getDefault().getCustomizedPreviewStyles();
+        assertEquals(TextBasedPreviewLayout.NAME, defaults.getFirst().id());
+
+        JabRefGuiPreferences jabRefGuiPreferences = new InMemoryGuiPreferences();
+        jabRefGuiPreferences.storeCustomizedPreviewStyle(defaults);
+
+        List<CustomizedPreviewStyle> customizedPreviewStyleList = jabRefGuiPreferences.getCustomizedPreviewStyle(defaults);
+        assertEquals(TextBasedPreviewLayout.NAME, customizedPreviewStyleList.getFirst().id());
+        assertEquals(defaults, customizedPreviewStyleList);
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleMigratedStyleIsReadByLoader() {
+        JabRefGuiPreferences preferences = new InMemoryGuiPreferences();
+        String legacyText = "<b>\\bibtextype</b>__NEWLINE__";
+        preferences.put(JabRefGuiPreferences.PREVIEW_STYLE, legacyText);
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(preferences);
+
+        CustomizedPreviewStyle expected = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
+                TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME,
+                legacyText.replace("__NEWLINE__", "\n"));
+        assertEquals(List.of(expected), preferences.getCustomizedPreviewStyle(List.of()));
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleEmptyListIsNotRemigrated() {
+        JabRefGuiPreferences preferences = new InMemoryGuiPreferences();
+        preferences.put(JabRefGuiPreferences.PREVIEW_STYLE, "<b>\\bibtextype</b>__NEWLINE__");
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(preferences);   // first startup
+        preferences.storeCustomizedPreviewStyle(List.of());                   // user deletes every style
+
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(preferences);   // next startup
+
+        assertEquals(List.of(), preferences.getCustomizedPreviewStyle(List.of()));
+    }
+}
+
+class InMemoryGuiPreferences extends JabRefGuiPreferences {
+    // Used so tests do not persist to local preferences
+    private Map<String, String> store;
+
+    private Map<String, String> store() {
+        if (store == null) {
+            store = new HashMap<>();
+        }
+        return store;
+    }
+
+    @Override
+    public boolean hasKey(String key) {
+        return store().containsKey(key);
+    }
+
+    @Override
+    public String get(String key, String def) {
+        return store().getOrDefault(key, def);
+    }
+
+    @Override
+    public void put(String key, String value) {
+        store().put(key, value);
+    }
+
+    @Override
+    public boolean getBoolean(String key, boolean def) {
+        return store().containsKey(key) ? Boolean.parseBoolean(store().get(key)) : def;
+    }
+
+    @Override
+    public void putBoolean(String key, boolean value) {
+        store().put(key, String.valueOf(value));
+    }
+
+    @Override
+    protected void remove(String key) {
+        store().remove(key);
     }
 }
