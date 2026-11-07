@@ -331,11 +331,20 @@ public class DOI implements Identifier {
 
     public Optional<URI> getExternalURIFromBase(URI base) {
         try {
-            URI uri = new URI(base.getScheme(), base.getHost(), "/" + doi, null);
+            String path = "/" + doi;
+            @Nullable String query = null;
+            int queryIndex = doi.indexOf('?');
+            boolean hasQueryParam = (queryIndex != -1)
+                    && (doi.indexOf('=', queryIndex) != -1);
+
+            if (hasQueryParam) {
+                path = "/" + doi.substring(0, queryIndex);
+                query = doi.substring(queryIndex + 1);
+            }
+
+            URI uri = new URI(base.getScheme(), base.getHost(), path, query, null);
             return Optional.of(uri);
-        } catch (URISyntaxException e) {
-            // should never happen
-            LOGGER.error("{} could not be encoded as URI.", doi, e);
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
     }
