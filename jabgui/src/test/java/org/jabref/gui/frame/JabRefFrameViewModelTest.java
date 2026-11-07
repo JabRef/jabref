@@ -25,6 +25,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -161,5 +162,18 @@ class JabRefFrameViewModelTest extends JavaFxTest {
         interact(() -> assertTrue(viewModel.close()));
 
         verify(preferences.getLastFilesOpenedPreferences()).setLastSharedDatabasesOpened(List.of("shared-1"));
+    }
+
+    @Test
+    void quittingSucceedsWhenAStepAfterClosingTheLibrariesFails() {
+        @SuppressWarnings("unchecked")
+        EasyBinding<Boolean> noTasksRunning = mock(EasyBinding.class);
+        when(noTasksRunning.getValue()).thenReturn(false);
+        when(stateManager.getAnyTasksThatWillNotBeRecoveredRunning()).thenReturn(noTasksRunning);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
+        when(tabContainer.closeTabs(any(), eq(false))).thenReturn(true);
+        when(preferences.getWorkspacePreferences()).thenThrow(new NoClassDefFoundError("org/jabref/logic/preferences/WorkspacePreferences"));
+
+        assertTrue(viewModel.close());
     }
 }
