@@ -230,6 +230,14 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     }
 
     @Override
+    public Optional<BackgroundTask<?>> getBackgroundTask(Task<?> task) {
+        return backgroundTasksPairs.stream()
+                                   .filter(pair -> pair.getValue() == task)
+                                   .<BackgroundTask<?>>map(Pair::getKey)
+                                   .findFirst();
+    }
+
+    @Override
     public EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning() {
         return anyTasksThatWillNotBeRecoveredRunning;
     }
