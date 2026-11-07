@@ -59,6 +59,13 @@ When linked-file full-text indexing is enabled, users must be able to search the
 
 Needs: impl, utest
 
+## Disabling linked-file full-text indexing must stop pending and running indexing
+`req~search.fulltext.disable-indexing~1`
+
+When automatic linked-file indexing is disabled, queued work must not start, and running work must stop after its current file. Re-enabling indexing must not overlap with the cancelled work. [#17577](https://github.com/JabRef/jabref/issues/17577)
+
+Needs: impl, utest
+
 ## Full-text search results must reflect the active library in the entry editor
 `req~jabgui.search.fulltext.entry-editor-results~1`
 
