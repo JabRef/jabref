@@ -1,12 +1,11 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -46,48 +45,56 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
         if (nameDictionary != null) {
             PDEmbeddedFilesNameTreeNode efTree = nameDictionary.getEmbeddedFiles();
             if (efTree != null) {
-                Map<String, PDComplexFileSpecification> names = efTree.getNames();
-                if (names != null) {
-                    allParsedEntries.addAll(extractAndParseFiles(names));
-                } else {
-                    List<PDNameTreeNode<PDComplexFileSpecification>> kids = efTree.getKids();
-                    if (kids != null) {
-                        for (PDNameTreeNode<PDComplexFileSpecification> node : kids) {
-                            names = node.getNames();
-                            allParsedEntries.addAll(extractAndParseFiles(names));
-                        }
-                    }
-                }
+                allParsedEntries.addAll(extractAndParseNameTree(efTree));
             }
         }
         // extract files from annotations
         for (PDPage page : document.getPages()) {
             for (PDAnnotation annotation : page.getAnnotations()) {
                 if (annotation instanceof PDAnnotationFileAttachment annotationFileAttachment) {
-                    Optional<PDEmbeddedFile> embeddedFile = Optional.ofNullable((PDComplexFileSpecification) annotationFileAttachment.getFile())
-                                                                    .flatMap(PdfEmbeddedBibFileImporter::searchEmbeddedFile);
-
-                    // Using traditional `if` statement because of exceptions.
-                    if (embeddedFile.isPresent()) {
-                        allParsedEntries.addAll(extractAndParseFile(embeddedFile.get()));
-                    }
+                    allParsedEntries.addAll(extractAndParseAttachment(annotationFileAttachment));
                 }
             }
         }
         return new ParserResult(allParsedEntries);
     }
 
+    /// External file references and attachments without an embedded file do not contain importable entries.
+    private List<BibEntry> extractAndParseAttachment(PDAnnotationFileAttachment attachment) throws IOException, ParseException {
+        if (!(attachment.getFile() instanceof PDComplexFileSpecification fileSpec)) {
+            return List.of();
+        }
+        Optional<PDEmbeddedFile> embeddedFile = searchEmbeddedFile(fileSpec);
+        if (embeddedFile.isEmpty()) {
+            return List.of();
+        }
+        return extractAndParseFile(embeddedFile.orElseThrow());
+    }
+
+    /// Name-tree nodes can contain names, child nodes, or neither; visit all descendants to find embedded files.
+    private List<BibEntry> extractAndParseNameTree(PDNameTreeNode<PDComplexFileSpecification> node) throws IOException, ParseException {
+        List<BibEntry> entries = new ArrayList<>();
+        Map<String, PDComplexFileSpecification> names = node.getNames();
+        if (names != null) {
+            entries.addAll(extractAndParseFiles(names));
+        }
+        List<PDNameTreeNode<PDComplexFileSpecification>> kids = node.getKids();
+        if (kids != null) {
+            for (PDNameTreeNode<PDComplexFileSpecification> child : kids) {
+                entries.addAll(extractAndParseNameTree(child));
+            }
+        }
+        return entries;
+    }
+
     private List<BibEntry> extractAndParseFiles(Map<String, PDComplexFileSpecification> names) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         for (Map.Entry<String, PDComplexFileSpecification> entry : names.entrySet()) {
             String filename = entry.getKey();
-            FileUtil.getFileExtension(filename);
             if (FileUtil.isBibFile(Path.of(filename))) {
                 Optional<PDEmbeddedFile> embeddedFile = searchEmbeddedFile(entry.getValue());
-
-                // Using traditional `if` statement because of exceptions.
                 if (embeddedFile.isPresent()) {
-                    allParsedEntries.addAll(extractAndParseFile(embeddedFile.get()));
+                    allParsedEntries.addAll(extractAndParseFile(embeddedFile.orElseThrow()));
                 }
             }
         }
@@ -95,20 +102,19 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
     }
 
     private List<BibEntry> extractAndParseFile(PDEmbeddedFile embeddedFile) throws IOException, ParseException {
-        return bibtexParser.parseEntries(embeddedFile.createInputStream());
+        try (InputStream inputStream = embeddedFile.createInputStream()) {
+            return bibtexParser.parseEntries(inputStream);
+        }
     }
 
+    /// Prefer the Unicode variant, followed by platform-specific variants and the generic embedded file.
+    /// Later variants are only read when earlier ones are absent.
     private static Optional<PDEmbeddedFile> searchEmbeddedFile(PDComplexFileSpecification fileSpec) {
-        List<PDEmbeddedFile> places = Arrays.asList(
-                fileSpec.getEmbeddedFileUnicode(),
-                fileSpec.getEmbeddedFileDos(),
-                fileSpec.getEmbeddedFileMac(),
-                fileSpec.getEmbeddedFileUnix(),
-                fileSpec.getEmbeddedFile()
-        );
-
-        // `fileSpec.getEmbedded*()` may return `null`, regardless of what IntelliJ might say here.
-        return places.stream().filter(Objects::nonNull).findFirst();
+        return Optional.ofNullable(fileSpec.getEmbeddedFileUnicode())
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFileDos()))
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFileMac()))
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFileUnix()))
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFile()));
     }
 
     @Override
