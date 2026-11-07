@@ -234,10 +234,38 @@ DialogService dialogService = Injector.instantiateModelOrService(DialogService.c
 JabRef makes heavy use of Properties and Bindings. These are wrappers around Observables. A good explanation on the concept can be found here:
 [JavaFX Bindings and Properties](https://web.archive.org/web/20240921154452/https://edencoding.com/javafx-properties-and-binding-a-complete-guide/)
 
-For observable list-cell tooltip text, use `ViewModelListCellFactory.withTooltipText` with a property or lazy observable.
-Each cell creates one tooltip and binds its text once through the cell's item property using `flatMap`.
-The binding follows the current item and detaches its listeners from the previous item or when the cell becomes empty.
-Use `withStringTooltip` for static text and `withTooltip` for custom tooltips whose resources are managed by the caller.
+## Keyboard shortcuts
+
+Users can change every keyboard shortcut, so views never compare key codes themselves.
+`KeyBindingRepository` maps a `KeyEvent` to the configured `KeyBinding`.
+
+JavaFX delivers a key event in two phases (see [Handling JavaFX Events](https://docs.oracle.com/javase/8/javafx/events-tutorial/processing.htm)):
+
+1. Capturing phase: from the window down to the focused node. Event filters (`addEventFilter`) run here, outermost node first.
+2. Bubbling phase: from the focused node back up to the window. Event handlers (`addEventHandler`) run here, innermost node first. Menu accelerators run last, at the scene.
+
+Use an event filter if the view has to act before the focused control.
+For example, the main window handles its global shortcuts in a filter, and the main table handles copy and paste in a filter before its cells see the key.
+Use an event handler if the focused control should get the key first and the view only acts on the keys the control did not use.
+For example, the entry editor uses a handler, so its text fields keep their own keys.
+
+Consume the event (`event.consume()`) if the view handled it, so that no other node, and no menu accelerator, acts on the same key again.
+Leave the event unconsumed if the view did not handle it.
+
+`KeyBindingDispatcher` implements these rules:
+
+```java
+KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(keyBindingRepository)
+        // runs the action and consumes the event
+        .on(KeyBinding.COPY, copyAction::execute)
+        // runs the action, but other nodes still receive the key
+        .onWithoutConsuming(KeyBinding.CLOSE, tabbed::requestFocus)
+        // consumes the event only if the action returns true
+        .onConditionally(KeyBinding.OPEN_FILE, this::openSelectedFile);
+addEventFilter(KeyEvent.KEY_PRESSED, keyBindingDispatcher::handle);
+```
+
+Keys without a registered action are never consumed.
 
 ## Features missing in JavaFX
 
