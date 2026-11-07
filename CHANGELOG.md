@@ -124,6 +124,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
+- We fixed the "Field will be created" hint staying visible although the "Jump to field" dialog suggested an existing field. [#17060](https://github.com/JabRef/jabref/issues/17060)
 
 ### Removed
 

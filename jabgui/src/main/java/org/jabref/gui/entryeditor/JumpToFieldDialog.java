@@ -1,28 +1,45 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.HoverSelectingAutoCompletionBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
+import org.jspecify.annotations.Nullable;
 
 public class JumpToFieldDialog extends BaseDialog<Void> {
-    @FXML private TextField searchField;
+    HoverSelectingAutoCompletionBinding<String> autoCompletion;
+    @FXML TextField searchField;
     @FXML private Label newFieldHint;
     private final EntryEditor entryEditor;
     private JumpToFieldViewModel viewModel;
+    private boolean resizeScheduled;
+    private double lastResizedPrefHeight = Double.NaN;
+    private final ObjectProperty<@Nullable String> highlightedSuggestion = new SimpleObjectProperty<>();
+    private boolean confirming;
+    private int popupGeneration;
+    private @Nullable String pendingSelection;
 
     public JumpToFieldDialog(EntryEditor entryEditor) {
         this.entryEditor = entryEditor;
@@ -34,8 +51,17 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
         this.getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
+        if (getDialogPane().lookupButton(ButtonType.OK) instanceof Button okButton) {
+            okButton.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    pendingSelection = fieldToUse();
+                }
+            });
+        }
+
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
+                confirming = true;
                 // Closing the dialog restores focus to whatever had it before, which would undo the
                 // focus the jump puts on the field. Therefore jump only once the dialog is gone.
                 Platform.runLater(this::jumpToSelectedField);
@@ -51,26 +77,87 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         viewModel = new JumpToFieldViewModel(this.entryEditor);
         searchField.textProperty().bindBidirectional(viewModel.searchTextProperty());
 
-        // Prefix matching instead of ControlsFX' default substring matching: the popup always preselects
-        // its first suggestion, so "file" would offer (and jump to) "dayfiled" first.
-        AutoCompletionBinding<String> autoCompletion = TextFields.bindAutoCompletion(searchField, request -> {
-            String userText = request.getUserText().toLowerCase(Locale.ROOT);
-            return viewModel.getFieldNames().stream()
-                            .filter(fieldName -> fieldName.toLowerCase(Locale.ROOT).startsWith(userText))
-                            .toList();
-        });
+        // The typed text is offered as the first suggestion, so the popup preselects what the search
+        // field holds unless the user highlights another entry.
+        autoCompletion = new HoverSelectingAutoCompletionBinding<>(searchField,
+                request -> getSuggestions(request.getUserText()));
+
+        trackHighlightedSuggestion();
+
+        newFieldHint.managedProperty().bind(newFieldHint.visibleProperty());
+        newFieldHint.visibleProperty().bind(Bindings.createBooleanBinding(
+                () -> viewModel.isNewField(fieldToUse()), highlightedSuggestion, searchField.textProperty()));
+
+        newFieldHint.visibleProperty().addListener((_, _, _) -> scheduleDialogResize());
+
         // The open suggestion popup swallows Enter, so the dialog never sees it: jump on the
         // completion event instead. This also makes clicking a suggestion jump right away.
         autoCompletion.setOnAutoCompleted(_ -> confirm());
 
-        newFieldHint.managedProperty().bind(newFieldHint.visibleProperty());
-        newFieldHint.visibleProperty().bind(Bindings.createBooleanBinding(
-                () -> viewModel.isNewField(searchField.getText()), searchField.textProperty()));
+        showingProperty().addListener((_, _, showing) -> {
+            if (showing) {
+                highlightedSuggestion.set(null);
+                lastResizedPrefHeight = getDialogPane().prefHeight(-1);
+            }
+        });
 
         searchField.setOnAction(event -> {
             confirm();
             event.consume();
         });
+    }
+
+    private void trackHighlightedSuggestion() {
+        autoCompletion.highlightedSuggestionProperty().addListener((_, _, highlighted) ->
+                highlightedSuggestion.set(highlighted));
+
+        autoCompletion.popupShowingProperty().addListener((_, _, showing) -> {
+            if (showing) {
+                popupGeneration++;
+                return;
+            }
+            int generationAtClose = popupGeneration;
+            Platform.runLater(() -> {
+                if (!confirming && generationAtClose == popupGeneration && !autoCompletion.popupShowingProperty().get()) {
+                    highlightedSuggestion.set(null);
+                }
+            });
+        });
+
+        // New input and focusing the field again start a fresh context: no suggestion applies.
+        searchField.textProperty().addListener((_, _, _) -> {
+            highlightedSuggestion.set(null);
+            pendingSelection = null;
+        });
+        searchField.focusedProperty().addListener((_, _, focused) -> {
+            if (focused) {
+                highlightedSuggestion.set(null);
+                pendingSelection = null;
+            }
+        });
+    }
+
+    private String fieldToUse() {
+        String highlighted = highlightedSuggestion.get();
+        return highlighted == null ? searchField.getText() : highlighted;
+    }
+
+    private List<String> getSuggestions(String userText) {
+        String normalizedUserText = userText.toLowerCase(Locale.ROOT).trim();
+        List<String> matchingFields = viewModel.getFieldNames().stream()
+                                               .filter(fieldName -> fieldName.toLowerCase(Locale.ROOT).startsWith(normalizedUserText))
+                                               .toList();
+        if (userText.isEmpty()) {
+            return matchingFields;
+        }
+        List<String> suggestions = new ArrayList<>(matchingFields.size() + 1);
+        if (StringUtil.isNotBlank(userText)) {
+            suggestions.add(userText);
+        }
+        matchingFields.stream()
+                      .filter(fieldName -> !fieldName.equalsIgnoreCase(userText))
+                      .forEach(suggestions::add);
+        return suggestions;
     }
 
     private void confirm() {
@@ -80,9 +167,36 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         }
     }
 
-    private void jumpToSelectedField() {
-        String selectedField = searchField.getText();
+    private void scheduleDialogResize() {
+        if (resizeScheduled) {
+            return;
+        }
+        resizeScheduled = true;
+        Platform.runLater(() -> {
+            resizeScheduled = false;
+            Optional.ofNullable(getDialogPane().getScene())
+                    .map(Scene::getWindow)
+                    .filter(Window::isShowing)
+                    .ifPresent(window -> {
+                        if (window instanceof Stage stage) {
+                            double currentPrefHeight = getDialogPane().prefHeight(-1);
+                            if (Double.isNaN(lastResizedPrefHeight)) {
+                                lastResizedPrefHeight = currentPrefHeight;
+                            }
+                            double heightDelta = currentPrefHeight - lastResizedPrefHeight;
+                            lastResizedPrefHeight = currentPrefHeight;
+                            if (Math.abs(heightDelta) > 0.01) {
+                                stage.setHeight(stage.getHeight() + heightDelta);
+                            }
+                        }
+                    });
+        });
+    }
 
+    private void jumpToSelectedField() {
+        confirming = false;
+        String selectedField = pendingSelection != null ? pendingSelection : fieldToUse();
+        pendingSelection = null;
         if (StringUtil.isNotBlank(selectedField)) {
             String fieldToJumpTo = selectedField.toLowerCase().strip();
             entryEditor.selectField(fieldToJumpTo);
