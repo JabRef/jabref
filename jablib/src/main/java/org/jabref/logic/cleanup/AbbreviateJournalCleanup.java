@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
@@ -16,31 +18,41 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Abbreviates journal field
+/// Abbreviates journal fields and, when supplied, conference book titles.
 @NullMarked
 public class AbbreviateJournalCleanup implements CleanupJob {
     private final BibDatabase database;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
     private final AbbreviationType abbreviationType;
     private final boolean useFJournalField;
 
     public AbbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
+        this(database, journalAbbreviationRepository, new ConferenceAbbreviationRepository(), abbreviationType, useFJournalField);
+    }
+
+    public AbbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, ConferenceAbbreviationRepository conferenceAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
         this.database = database;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.abbreviationType = abbreviationType;
         this.useFJournalField = useFJournalField;
     }
 
+    // [impl->req~abbreviations.booktitle~1]
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> allChanges = new ArrayList<>();
         // Journal is BibTeX, JournalTitle is BibLaTeX. See also org/jabref/model/entry/EntryConverter.java:20
-        allChanges.addAll(abbreviateField(entry, StandardField.JOURNAL));
-        allChanges.addAll(abbreviateField(entry, StandardField.JOURNALTITLE));
+        allChanges.addAll(abbreviateField(entry, StandardField.JOURNAL, journalAbbreviationRepository));
+        allChanges.addAll(abbreviateField(entry, StandardField.JOURNALTITLE, journalAbbreviationRepository));
+        if (abbreviationType != AbbreviationType.LTWA) {
+            allChanges.addAll(abbreviateField(entry, StandardField.BOOKTITLE, conferenceAbbreviationRepository));
+        }
         return allChanges;
     }
 
-    private List<FieldChange> abbreviateField(BibEntry entry, Field fieldName) {
+    private List<FieldChange> abbreviateField(BibEntry entry, Field fieldName, AbbreviationRepository repository) {
         if (!entry.hasField(fieldName)) {
             return List.of();
         }
@@ -48,7 +60,7 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         String origText = entry.getField(fieldName).orElse("");
         String text = database.resolveForStrings(origText);
 
-        Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
+        Optional<Abbreviation> foundAbbreviation = repository.get(text);
 
         if (foundAbbreviation.isEmpty() && abbreviationType != AbbreviationType.LTWA) {
             // Not found abbreviation -> cannot abbreviate anything.

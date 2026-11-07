@@ -1,6 +1,8 @@
 /// Core library of JabRef: the data model (`org.jabref.model`), the business logic
 /// (`org.jabref.logic`) including importers, exporters, fetchers and search, and the
 /// preferences. Has no JavaFX UI; all other modules build on it.
+/// Journal abbreviation support is in [org.jabref.logic.journals]; conference configuration and lookup are in
+/// [org.jabref.logic.conferences].
 ///
 /// Entry points: [org.jabref.model.database.BibDatabaseContext] (an open library),
 /// [org.jabref.model.entry.BibEntry], [org.jabref.logic.importer.ImportFormatReader],
@@ -30,6 +32,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.citationkeypattern;
     exports org.jabref.logic.exporter;
     exports org.jabref.logic.importer.fileformat;
+    exports org.jabref.logic.conferences;
     exports org.jabref.logic.journals;
     exports org.jabref.logic.l10n;
     exports org.jabref.logic.net;

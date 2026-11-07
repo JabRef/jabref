@@ -2,9 +2,9 @@ package org.jabref.logic.integrity;
 
 import java.util.List;
 
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -14,44 +14,43 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @ResourceLock("Localization.lang")
 class AbbreviationCheckerTest {
 
-    private JournalAbbreviationRepository abbreviationRepository;
+    private ConferenceAbbreviationRepository abbreviationRepository;
     private AbbreviationChecker checker;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
-        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
-        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Test Journal", "T. J."));
+        abbreviationRepository = new ConferenceAbbreviationRepository();
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Test Conference", "T. C."));
         entry = new BibEntry(StandardEntryType.InProceedings);
         checker = new AbbreviationChecker(abbreviationRepository);
     }
 
     @Test
-    void checkEntryComplainsAboutAbbreviatedJournalName() {
-        entry.setField(StandardField.BOOKTITLE, "T. J.");
-        assertNotEquals(List.of(), checker.check(entry));
+    void checkEntryComplainsAboutAbbreviatedConferenceName() {
+        entry.setField(StandardField.BOOKTITLE, "T. C.");
+        assertEquals(List.of(new IntegrityMessage(Localization.lang("abbreviation detected"), entry, StandardField.BOOKTITLE)), checker.check(entry));
     }
 
     @Test
-    void checkEntryDoesNotComplainAboutJournalNameThatHasSameAbbreviation() {
-        entry.setField(StandardField.BOOKTITLE, "Journal");
-        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Journal", "Journal"));
+    void checkEntryDoesNotComplainAboutConferenceNameThatHasSameAbbreviation() {
+        entry.setField(StandardField.BOOKTITLE, "Conference");
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Conference", "Conference"));
         assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
-    void checkEntryDoesNotComplainAboutJournalNameThatHasNoAbbreviation() {
+    void checkEntryDoesNotComplainAboutConferenceNameThatHasNoAbbreviation() {
         entry.setField(StandardField.BOOKTITLE, "Non-Abbreviated-Title");
         assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
-    void checkEntryDoesNotComplainAboutJournalNameThatHasNoInput() {
+    void checkEntryDoesNotComplainAboutConferenceNameThatHasNoInput() {
         assertEquals(List.of(), checker.check(entry));
     }
 

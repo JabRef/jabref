@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -27,10 +28,16 @@ public class CleanupWorker {
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
+    private final ConferenceAbbreviationRepository conferenceAbbreviationRepository;
     private final boolean useFJournalField;
     private final List<JabRefException> failures;
 
     public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, boolean useFJournalField, JournalAbbreviationRepository abbreviationRepository) {
+        this(databaseContext, filePreferences, timestampPreferences, useFJournalField, abbreviationRepository, new ConferenceAbbreviationRepository());
+    }
+
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, boolean useFJournalField, JournalAbbreviationRepository abbreviationRepository, ConferenceAbbreviationRepository conferenceAbbreviationRepository) {
+        this.conferenceAbbreviationRepository = conferenceAbbreviationRepository;
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
@@ -112,15 +119,15 @@ public class CleanupWorker {
             case REMOVE_XMP_METADATA ->
                     new XmpMetadataCleanup(databaseContext, filePreferences);
             case ABBREVIATE_DEFAULT ->
-                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DEFAULT, useFJournalField);
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, conferenceAbbreviationRepository, AbbreviationType.DEFAULT, useFJournalField);
             case ABBREVIATE_DOTLESS ->
-                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.DOTLESS, useFJournalField);
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, conferenceAbbreviationRepository, AbbreviationType.DOTLESS, useFJournalField);
             case ABBREVIATE_SHORTEST_UNIQUE ->
-                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.SHORTEST_UNIQUE, useFJournalField);
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, conferenceAbbreviationRepository, AbbreviationType.SHORTEST_UNIQUE, useFJournalField);
             case ABBREVIATE_LTWA ->
-                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, AbbreviationType.LTWA, useFJournalField);
+                    new AbbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, conferenceAbbreviationRepository, AbbreviationType.LTWA, useFJournalField);
             case UNABBREVIATE ->
-                    new UnabbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository);
+                    new UnabbreviateJournalCleanup(databaseContext.getDatabase(), abbreviationRepository, conferenceAbbreviationRepository);
             default ->
                     throw new UnsupportedOperationException(action.name());
         };
