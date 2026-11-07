@@ -175,8 +175,8 @@ class ImportHandlerTest {
     @Test
     void longImportDiagnosticsAreShortened() {
         List<ImportFilesResultItemViewModel> results = java.util.stream.IntStream.range(0, 20)
-                .mapToObj(index -> new ImportFilesResultItemViewModel(Path.of("file" + index + ".bib"), false, "x".repeat(2000)))
-                .toList();
+                                                                                 .mapToObj(index -> new ImportFilesResultItemViewModel(Path.of("file" + index + ".bib"), false, "x".repeat(2000)))
+                                                                                 .toList();
 
         importHandler.showImportErrors(results);
 

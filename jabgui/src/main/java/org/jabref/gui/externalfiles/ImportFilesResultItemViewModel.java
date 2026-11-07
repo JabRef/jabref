@@ -16,6 +16,7 @@ public class ImportFilesResultItemViewModel {
     private final StringProperty file = new SimpleStringProperty("");
     private final ObjectProperty<JabRefIcon> icon = new SimpleObjectProperty<>(IconTheme.JabRefIcons.WARNING);
     private final StringProperty message = new SimpleStringProperty("");
+
     public enum Status {
         SUCCESS,
         WARNING,
@@ -33,9 +34,12 @@ public class ImportFilesResultItemViewModel {
         this.message.setValue(message);
         this.status = status;
         switch (status) {
-            case SUCCESS -> this.icon.setValue(IconTheme.JabRefIcons.CHECK.withColor(Color.GREEN));
-            case WARNING -> this.icon.setValue(IconTheme.JabRefIcons.WARNING);
-            case FAILURE -> this.icon.setValue(IconTheme.JabRefIcons.WARNING.withColor(Color.RED));
+            case SUCCESS ->
+                    this.icon.setValue(IconTheme.JabRefIcons.CHECK.withColor(Color.GREEN));
+            case WARNING ->
+                    this.icon.setValue(IconTheme.JabRefIcons.WARNING);
+            case FAILURE ->
+                    this.icon.setValue(IconTheme.JabRefIcons.WARNING.withColor(Color.RED));
         }
     }
 
