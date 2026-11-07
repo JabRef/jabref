@@ -54,7 +54,7 @@ public class DefaultLatexParser implements LatexParser {
     public LatexParserResult parse(String citeString) {
         Path path = Path.of("");
         LatexParserResult latexParserResult = new LatexParserResult(path);
-        String[] citeStrings = citeString.split(System.lineSeparator());
+        String[] citeStrings = citeString.split("\\R");
         for (int line = 0; line < citeStrings.length; line++) {
             matchCitation(path, line + 1, citeStrings[line], latexParserResult);
         }
