@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -61,5 +63,48 @@ class GitIgnoreFileFilterTest {
         Files.createFile(subDir.resolve("test.png"));
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
         assertFalse(gitIgnoreFileFilter.accept(subDir.resolve("test.png")));
+    }
+
+    @Test
+    void rejectsFileMatchingPatternWithLiteralOpeningBrace(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                notes{draft.pdf
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertFalse(gitIgnoreFileFilter.accept(dir.resolve("notes{draft.pdf")));
+    }
+
+    @Test
+    void acceptsOtherFilesWhenPatternContainsLiteralOpeningBrace(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                notes{draft.pdf
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertTrue(gitIgnoreFileFilter.accept(dir.resolve("paper.pdf")));
+    }
+
+    @Test
+    void acceptsDefaultIgnoredFileWhenNegatedInGitIgnore(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                !desktop.ini
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertTrue(gitIgnoreFileFilter.accept(dir.resolve("desktop.ini")));
+    }
+
+    @Test
+    void rejectsDefaultIgnoredFileWithoutGitIgnore(@TempDir Path dir) throws IOException {
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertFalse(gitIgnoreFileFilter.accept(dir.resolve("Thumbs.db")));
+    }
+
+    @Test
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "\\ is an invalid filename character in Windows")
+    void acceptsFileWithBackslashInNameWhenPatternLooksLikeDirectory(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), """
+                notes/draft.pdf
+                """);
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
+        assertTrue(gitIgnoreFileFilter.accept(dir.resolve("notes\\draft.pdf")));
     }
 }
