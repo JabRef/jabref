@@ -40,6 +40,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.jabref.gui.testutils.JavaFxExtension.invokeAndWait;
@@ -47,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -157,6 +160,31 @@ class GlobalSearchResultDialogTest {
         });
 
         verify(clipBoardManager).setContent(eq(TransferMode.COPY), any(), any(), any(), any());
+        verify(dialogService, times(0)).showConfirmationDialogAndWait(any(), any(), any(), any());
+    }
+
+    @Test
+    void copiesMultipleEntriesFromSameLibraryWithoutWarning() throws IOException {
+        BibDatabaseContext context = new BibDatabaseContext();
+        registerSearchContext(context);
+        BibEntry first = new BibEntry().withField(StandardField.AUTHOR, "Alice");
+        BibEntry second = new BibEntry().withField(StandardField.AUTHOR, "Alice");
+        context.getDatabase().insertEntry(first);
+        context.getDatabase().insertEntry(second);
+        stateManager.getOpenDatabases().add(context);
+        stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(new org.jabref.model.search.query.SearchQuery("Alice")));
+        when(keyBindingRepository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(KeyBinding.COPY));
+
+        invokeAndWait(() -> {
+            GlobalSearchResultDialog dialog = new GlobalSearchResultDialog(libraryTabContainer);
+            javafx.scene.control.SplitPane container = (javafx.scene.control.SplitPane) dialog.getDialogPane().lookup("#container");
+            SearchResultsTable resultsTable = (SearchResultsTable) container.getItems().getFirst();
+            resultsTable.getSelectionModel().selectAll();
+            resultsTable.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.C, false, true, false, false));
+        });
+
+        verify(clipBoardManager).setContent(eq(TransferMode.COPY), eq(context), eq(List.of(first, second)), any(), any());
+        verify(dialogService, times(0)).showConfirmationDialogAndWait(any(), any(), any(), any());
     }
 
     @Test
@@ -188,8 +216,9 @@ class GlobalSearchResultDialogTest {
         org.mockito.Mockito.verifyNoInteractions(clipBoardManager);
     }
 
-    @Test
-    void copyMultipleEntriesAcrossDifferentLibraries() throws IOException {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void copyingAcrossLibrariesRequiresConfirmation(boolean confirm) throws IOException {
         BibDatabaseContext context1 = new BibDatabaseContext();
         registerSearchContext(context1);
         BibEntry entry1 = new BibEntry().withField(StandardField.AUTHOR, "Alice");
@@ -204,6 +233,7 @@ class GlobalSearchResultDialogTest {
         stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(new org.jabref.model.search.query.SearchQuery("Alice")));
 
         when(keyBindingRepository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(KeyBinding.COPY));
+        when(dialogService.showConfirmationDialogAndWait(any(), any(), any(), any())).thenReturn(confirm);
 
         invokeAndWait(() -> {
             GlobalSearchResultDialog dialog = new GlobalSearchResultDialog(libraryTabContainer);
@@ -218,8 +248,7 @@ class GlobalSearchResultDialogTest {
             resultsTable.fireEvent(copyKeyEvent);
         });
 
-        // Notice: clipBoardManager receives context1 as the single BibDatabaseContext for all entries,
-        // even though entry2 belongs to context2!
-        verify(clipBoardManager).setContent(eq(TransferMode.COPY), eq(context1), any(), any(), any());
+        verify(dialogService).showConfirmationDialogAndWait(any(), any(), any(), any());
+        verify(clipBoardManager, times(confirm ? 1 : 0)).setContent(eq(TransferMode.COPY), eq(context1), eq(List.of(entry1, entry2)), any(), any());
     }
 }

@@ -130,9 +130,18 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                 preferences.getKeyBindingRepository().mapToKeyBinding(event)
                            .filter(KeyBinding.COPY::equals)
                            .ifPresent(_ -> {
-                               List<BibEntryTableViewModel> selected = resultsTable.getSelectionModel().getSelectedItems();
+                               List<BibEntryTableViewModel> selected = List.copyOf(resultsTable.getSelectionModel().getSelectedItems());
                                if (!selected.isEmpty()) {
                                    BibDatabaseContext ctx = selected.getFirst().getBibDatabaseContext();
+                                   if (selected.stream().anyMatch(entry -> !ctx.getUid().equals(entry.getBibDatabaseContext().getUid()))
+                                           && !dialogService.showConfirmationDialogAndWait(
+                                           Localization.lang("Copy entries from multiple libraries"),
+                                           Localization.lang("Entries from different libraries may have conflicting citation keys or string definitions, and linked files may not be resolved correctly. Copying uses string definitions and file context from the first library."),
+                                           Localization.lang("Copy entries"),
+                                           Localization.lang("Cancel"))) {
+                                       event.consume();
+                                       return;
+                                   }
                                    List<BibEntry> entries = selected.stream().map(BibEntryTableViewModel::getEntry).toList();
                                    List<BibtexString> strings = ctx.getDatabase().getUsedStrings(entries);
 
