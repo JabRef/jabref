@@ -46,7 +46,12 @@ public class KeyBindingRepository {
             }
             for (KeyBinding keyBinding : KeyBinding.values()) {
                 if (!this.bindings.containsKey(keyBinding)) {
-                    put(keyBinding, keyBinding.getDefaultKeyBinding());
+                    String defaultBinding = keyBinding.getDefaultKeyBinding();
+                    if (!this.bindings.containsValue(defaultBinding)) {
+                        put(keyBinding, defaultBinding);
+                    } else {
+                        put(keyBinding, "");
+                    }
                 }
             }
         }

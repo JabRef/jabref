@@ -118,4 +118,14 @@ class KeyBindingRepositoryTest {
         assertEquals("shortcut+V", repo.getKeyBindings().get(KeyBinding.PASTE));
         assertEquals(KeyBinding.CENTER_SELECTED_ENTRY.getDefaultKeyBinding(), repo.getKeyBindings().get(KeyBinding.CENTER_SELECTED_ENTRY));
     }
+
+    @Test
+    void missingKeyBindingDoesNotOverrideExistingCustomBinding() {
+        KeyBindingRepository repo = new KeyBindingRepository(
+                List.of(KeyBinding.PASTE.getConstant()),
+                List.of(KeyBinding.CENTER_SELECTED_ENTRY.getDefaultKeyBinding()));
+
+        assertEquals(KeyBinding.CENTER_SELECTED_ENTRY.getDefaultKeyBinding(), repo.getKeyBindings().get(KeyBinding.PASTE));
+        assertEquals("", repo.getKeyBindings().get(KeyBinding.CENTER_SELECTED_ENTRY));
+    }
 }

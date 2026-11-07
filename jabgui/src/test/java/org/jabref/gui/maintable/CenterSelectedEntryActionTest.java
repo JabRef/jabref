@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TableView;
 
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
@@ -24,12 +25,16 @@ class CenterSelectedEntryActionTest {
 
     private StateManager stateManager;
     private MainTable mainTable;
+    private TableView.TableViewSelectionModel selectionModel;
     private ObservableList<BibEntry> selectedEntries;
 
     @BeforeEach
     void setUp() {
         stateManager = mock(StateManager.class);
         mainTable = mock(MainTable.class);
+        selectionModel = mock(TableView.TableViewSelectionModel.class);
+        when(mainTable.getSelectionModel()).thenReturn(selectionModel);
+        when(selectionModel.getSelectedIndex()).thenReturn(0);
         selectedEntries = FXCollections.observableArrayList();
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
     }
@@ -52,6 +57,19 @@ class CenterSelectedEntryActionTest {
     void executeCallsCenterSelectedEntryOnTable() {
         CenterSelectedEntryAction action = new CenterSelectedEntryAction(() -> Optional.of(mainTable), stateManager);
         action.execute();
+        verify(mainTable).centerSelectedEntry();
+    }
+
+    @Test
+    void executeSelectsEntryInTableIfTableSelectionIsEmpty() {
+        BibEntry entry = new BibEntry();
+        selectedEntries.add(entry);
+        when(selectionModel.getSelectedIndex()).thenReturn(-1);
+
+        CenterSelectedEntryAction action = new CenterSelectedEntryAction(() -> Optional.of(mainTable), stateManager);
+        action.execute();
+
+        verify(mainTable).clearAndSelect(entry);
         verify(mainTable).centerSelectedEntry();
     }
 

@@ -14,14 +14,23 @@ import org.jspecify.annotations.NullMarked;
 public class CenterSelectedEntryAction extends SimpleCommand {
 
     private final Supplier<Optional<MainTable>> tableSupplier;
+    private final StateManager stateManager;
 
     public CenterSelectedEntryAction(Supplier<Optional<MainTable>> tableSupplier, StateManager stateManager) {
         this.tableSupplier = tableSupplier;
+        this.stateManager = stateManager;
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
     public void execute() {
-        tableSupplier.get().ifPresent(MainTable::centerSelectedEntry);
+        tableSupplier.get().ifPresent(table -> {
+            if (table.getSelectionModel().getSelectedIndex() < 0) {
+                stateManager.getSelectedEntries().stream()
+                            .findFirst()
+                            .ifPresent(table::clearAndSelect);
+            }
+            table.centerSelectedEntry();
+        });
     }
 }
