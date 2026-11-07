@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -26,7 +32,10 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -36,13 +45,14 @@ public class LinkedFilesIndexerTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
 
     private LuceneIndexer indexer;
+    private BibDatabaseContext context;
 
     @BeforeEach
     void setUp(@TempDir Path indexDir) throws IOException {
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
 
-        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        context = mock(BibDatabaseContext.class);
         when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
         when(context.getFileDirectories(Mockito.any())).thenReturn(List.of(Path.of("src/test/resources/pdfs")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
@@ -53,6 +63,44 @@ public class LinkedFilesIndexerTest {
     @AfterEach
     void tearDown() {
         this.indexer.closeAndWait();
+    }
+
+    @Test
+    void cancelledStartupSkipsGatheringEntries() {
+        BackgroundTask<Void> task = BackgroundTask.wrap(() -> {
+        });
+        task.cancel(false);
+        indexer.updateOnStart(task);
+        verify(context, never()).getEntries();
+    }
+
+    @Test
+    void cancellationStopsGatheringLinkedFiles() throws Exception {
+        BibEntry first = mock(BibEntry.class);
+        BibEntry second = mock(BibEntry.class);
+        CountDownLatch started = new CountDownLatch(1);
+        CompletableFuture<Void> release = new CompletableFuture<>();
+        when(first.getFiles()).thenAnswer(_ -> {
+            started.countDown();
+            release.join();
+            return List.of();
+        });
+        when(second.getFiles()).thenReturn(List.of());
+        when(context.getEntries()).thenReturn(List.of(first, second));
+        BackgroundTask<Void> task = BackgroundTask.wrap(() -> {
+        });
+        try (ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            try {
+                Future<?> indexing = workers.submit(() -> indexer.updateOnStart(task));
+                assertTrue(started.await(5, TimeUnit.SECONDS));
+                task.cancel(false);
+                release.complete(null);
+                indexing.get(5, TimeUnit.SECONDS);
+                verify(second, never()).getFiles();
+            } finally {
+                release.complete(null);
+            }
+        }
     }
 
     @Test
