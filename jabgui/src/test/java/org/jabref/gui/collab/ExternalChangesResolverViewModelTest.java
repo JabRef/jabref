@@ -1,6 +1,7 @@
 package org.jabref.gui.collab;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
@@ -48,6 +49,26 @@ class ExternalChangesResolverViewModelTest {
         assertFalse(viewModel.areAllChangesDenied());
         assertTrue(viewModel.resolvedChangesMatchDisk());
         assertEquals(List.of(change), viewModel.getResolvedChanges());
+    }
+
+    @Test
+        // [utest->req~jabgui.autosaveandbackup.backup-merge-modified~1]
+    void resolvedListenerSeesFinalAcceptedState() {
+        BibEntry entry = new BibEntry().withCitationKey("Key");
+        DatabaseChange change = new EntryAdd(entry, new BibDatabaseContext(), null);
+        ExternalChangesResolverViewModel viewModel = new ExternalChangesResolverViewModel(List.of(change));
+        // The dialog closes itself from this listener and reports these two flags afterwards
+        AtomicBoolean deniedWhenResolved = new AtomicBoolean(true);
+        viewModel.areAllChangesResolvedProperty().addListener((_, _, resolved) -> {
+            if (resolved) {
+                deniedWhenResolved.set(viewModel.areAllChangesDenied());
+            }
+        });
+
+        viewModel.selectedChangeProperty().set(change);
+        viewModel.acceptChange();
+
+        assertFalse(deniedWhenResolved.get());
     }
 
     @Test
