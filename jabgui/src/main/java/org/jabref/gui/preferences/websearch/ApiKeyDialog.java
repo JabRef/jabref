@@ -86,6 +86,7 @@ public class ApiKeyDialog extends FXDialog {
         viewModel.checkApiKey(fetcherViewModel, testedKey, success -> handleTestResult(testedKey, success));
     }
 
+    // [impl->req~ux.preferences.api-key-test-result~1]
     private void handleTestResult(String testedKey, boolean success) {
         Platform.runLater(() -> {
             rotation.stop();

@@ -86,6 +86,7 @@ class PreferencesSearchHandler {
     }
 
     /// @return the first currently visible element the current query highlighted in the given tab, if any
+    // [impl->req~ux.preferences.search-scroll~1]
     public Optional<Node> firstMatch(PreferencesTab tab) {
         return matchedNodes.getOrDefault(tab, List.of()).stream()
                            .filter(PreferencesSearchHandler::isShown)

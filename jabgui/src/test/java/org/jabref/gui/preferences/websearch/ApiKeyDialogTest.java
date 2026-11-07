@@ -48,6 +48,7 @@ class ApiKeyDialogTest extends JavaFxTest {
         dialog.initOwner(stage);
     }
 
+    // [utest->req~ux.preferences.api-key-test-result~1]
     @Test
     void successfulResultDoesNotValidateAnEditedKey() {
         interact(() -> {
@@ -66,6 +67,7 @@ class ApiKeyDialogTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~ux.preferences.api-key-test-result~1]
     @Test
     void clearingTheKeyRemainsAllowedAfterAnOutdatedFailure() {
         interact(() -> {

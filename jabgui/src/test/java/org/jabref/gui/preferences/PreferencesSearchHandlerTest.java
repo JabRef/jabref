@@ -63,6 +63,7 @@ class PreferencesSearchHandlerTest {
         assertTrue(handler.firstMatch(generalTab).isEmpty());
     }
 
+    // [utest->req~ux.preferences.search-scroll~1]
     @Test
     void firstMatchSkipsAMatchInAHiddenRegion() {
         Label hiddenMatch = new Label();

@@ -72,6 +72,7 @@ class PreferencesDialogViewTest extends JavaFxTest {
         Injector.forgetAll();
     }
 
+    // [utest->req~ux.preferences.search-scroll~1]
     @Test
     void searchScrollsToMatchOnAFirstVisitAndClearingSearchReturnsToTop() {
         interact(() -> {
