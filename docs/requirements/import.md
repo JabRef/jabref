@@ -167,4 +167,18 @@ See [JabRef issue #16332](https://github.com/JabRef/jabref/issues/16332).
 
 Needs: impl, utest
 
+## PDF book imports must read publication details from the citation's publication area
+`req~import.pdf.book-citation-publication~1`
+
+Use the publisher and year stated in the DSTU-style citation. Leave both fields unset if the publication area is missing or ambiguous. If the citation lists multiple publishers, leave the publisher unset in the metadata extracted from the PDF. See [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874).
+
+Needs: impl, utest
+
+## PDF book imports must resolve ISBN ambiguity only when local metadata identifies one candidate
+`req~import.pdf.book-isbn-resolution~1`
+
+Equivalent ISBN-10 and ISBN-13 forms count as one candidate. If the ISBN remains ambiguous, keep any extracted book metadata, leave the ISBN unset, and show a warning. See [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874).
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

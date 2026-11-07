@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -29,18 +28,20 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.pdf.BookExtraction;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 
-/// Parses book information page and creates a BibTeX entry from validated ISBN.
+/// Extracts local book metadata and validated ISBNs from a bibliographic page.
 /// If no page qualifies, falls back to parsing research paper information from the first page of the PDF and creates a BibTeX entry.
 ///
 /// Currently, Springer, and IEEE formats are supported.
@@ -212,27 +213,81 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
+    @NonNull
+    public ParserResult importDatabase(@NonNull Path filePath, @NonNull PDDocument document) throws IOException {
+        Optional<BookExtraction> book = extractBook(document);
+        if (book.isEmpty()) {
+            return importPaperContent(document);
+        }
+        return importBook(book.orElseThrow());
+    }
+
+    Optional<BookExtraction> extractBook(PDDocument document) throws IOException {
         List<String> pageTexts = PdfPageScanner.scanPages(document);
         Optional<String> bibliographicPages = BibliographicPageDetector.findBibliographicPage(pageTexts);
         if (bibliographicPages.isEmpty()) {
-            return importPaperContent(document);
+            return Optional.empty();
         }
-        List<ISBN> isbns = ISBN.findAllInText(bibliographicPages.orElseThrow());
-        if (isbns.isEmpty()) {
-            return importPaperContent(document);
+        String pageText = bibliographicPages.orElseThrow();
+        Optional<BibEntry> localBook = extractBookMetadata(pageText);
+
+        List<ISBN> isbns = ISBN.findAllInText(pageText).stream()
+                               .map(ISBN::asIsbn13)
+                               .flatMap(Optional::stream)
+                               .distinct()
+                               .toList();
+        if (isbns.isEmpty() && localBook.isEmpty()) {
+            return Optional.empty();
         }
+        return Optional.of(new BookExtraction(localBook, isbns));
+    }
+
+    ParserResult importBook(BookExtraction book) {
+        Optional<BibEntry> localBook = book.localBook();
+        List<ISBN> isbns = book.isbnCandidates();
         if (isbns.size() > 1) {
-            ParserResult result = new ParserResult();
-            result.addWarning(Localization.lang("More than one ISBN found: Found %0. Not adding.", isbns.stream().map(ISBN::asString).collect(Collectors.joining(", "))));
+            ParserResult result;
+            if (localBook.isEmpty()) {
+                result = new ParserResult();
+            } else {
+                result = new ParserResult(List.of(localBook.orElseThrow()));
+            }
+
+            result.addWarning(Localization.lang("More than one ISBN found"));
             return result;
         }
-        BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
-                .withField(StandardField.ISBN, isbns.getFirst().asString());
+        BibEntry bookEntry;
+        if (localBook.isEmpty()) {
+            bookEntry = new BibEntry(StandardEntryType.Book);
+        } else {
+            bookEntry = new BibEntry(localBook.orElseThrow());
+        }
+        if (isbns.size() == 1) {
+            bookEntry.withField(StandardField.ISBN, isbns.getFirst().asString());
+        }
         return new ParserResult(List.of(bookEntry));
     }
 
-    private ParserResult importPaperContent(PDDocument document) throws IOException {
+    private Optional<BibEntry> extractBookMetadata(String pageText) {
+        return BookCitationBlock.find(pageText)
+                                .map(BookCitationParser::parse)
+                                .map(citation -> {
+                                    BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
+                                    citation.title().ifPresent(title -> bookEntry.withField(StandardField.TITLE, title));
+                                    citation.authors()
+                                            .map(this::streamlineNames)
+                                            .ifPresent(authors -> bookEntry.withField(StandardField.AUTHOR, authors));
+                                    citation.editors()
+                                            .map(this::streamlineNames)
+                                            .ifPresent(editors -> bookEntry.withField(StandardField.EDITOR, editors));
+                                    citation.publisher().ifPresent(publisher -> bookEntry.withField(StandardField.PUBLISHER, publisher));
+                                    citation.year().ifPresent(year -> bookEntry.withField(StandardField.YEAR, year));
+                                    citation.edition().ifPresent(edition -> bookEntry.withField(StandardField.EDITION, edition));
+                                    return bookEntry;
+                                });
+    }
+
+    ParserResult importPaperContent(PDDocument document) throws IOException {
         List<BibEntry> result = new ArrayList<>(1);
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         Optional<String> titleByFontSize = extractTitleFromDocument(document);
