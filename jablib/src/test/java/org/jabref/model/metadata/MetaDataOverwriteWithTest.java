@@ -86,6 +86,7 @@ class MetaDataOverwriteWithTest {
         metaData.setMode(BibDatabaseMode.BIBLATEX);
         metaData.setLibraryAbbreviationType(AbbreviationType.DOTLESS);
         metaData.setSynchronizeWithFile(true);
+        metaData.setMergeConflictedCopies(true);
         metaData.setKeywordSeparator(';');
         metaData.addContentSelector(new ContentSelector(StandardField.AUTHOR, "Einstein"));
         metaData.setLibrarySpecificFileDirectory("/tmp/library");
