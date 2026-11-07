@@ -26,7 +26,6 @@ import javafx.scene.paint.Color;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -36,6 +35,7 @@ import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.migrations.ConvertSearchGroupSyntax;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Keyword;
@@ -352,7 +352,7 @@ public class GroupDialogViewModel {
                     // Otherwise, it means that the user did not accept the migration to the new version.
                     Optional<GroupTreeNode> groups = currentDatabase.getMetaData().getGroups();
                     if (groups.filter(this::groupOrSubgroupIsSearchGroup).isEmpty()) {
-                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1);
+                        currentDatabase.getMetaData().setGroupSearchSyntaxVersion(ConvertSearchGroupSyntax.VERSION_6_0_ALPHA_1);
                     }
                 }
 

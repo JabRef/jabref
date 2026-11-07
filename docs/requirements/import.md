@@ -112,26 +112,18 @@ If an entry's `doi` field is empty and another field contains a DOI, JabRef make
 
 Needs: impl, utest
 
-## Legacy libraries are migrated when opened
-`req~import.bibtex.legacy-migrations~1`
+## Libraries of older JabRef versions are converted after confirmation
+`req~import.legacy-library-migration~1`
 
-Opening a library written by JabRef 2.x/3.x converts its legacy content to the current representation: explicit group memberships stored inside the group tree move to the entries' `groups` field, `__markedentry` markings become groups, and special field values stored in `keywords` move to their own fields.
-The keyword separator used for splitting is the library's own, falling back to the configured one.
+When a library uses a data format of an older JabRef version (group tree of JabRef 3, `__markedentry` field of JabRef 4, special field values stored in `keywords` by JabRef 5.2 and older, search group flags of JabRef 5), JabRef lists the necessary conversions in a dialog after loading the library. The user selects which conversions to perform; a conversion whose old format JabRef no longer writes is always performed. A conversion the library does not need is listed as not applicable. Declined conversions are recorded in the library's metadata and not offered again. Performed conversions and recorded choices mark the library as changed.
 
 Needs: impl, utest
 
 ## Libraries without legacy content must skip legacy migration
 `req~import.bibtex.legacy-migrations.only-when-needed~1`
 
-After conversion and saving, reopening the library does not convert entries or rebuild the entries list again.
+After conversion and saving, reopening the library does not offer a conversion or rebuild the entries list again.
 Legacy content is identified by group membership keys, entry markings, and special field values in keywords, including in mixed-format libraries.
-
-Needs: impl, utest
-
-## Legacy library migration must announce conversion
-`req~import.bibtex.legacy-migrations.announcement~1`
-
-When legacy content is detected during opening, a localized notification names the library before conversion starts.
 
 Needs: impl, utest
 
