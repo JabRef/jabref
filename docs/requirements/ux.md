@@ -256,6 +256,23 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Text editing shortcuts must respect line boundaries
+`req~ux.text-editing.line-boundaries~2`
+
+In multiline entry fields, beginning-of-line and end-of-line shortcuts move within the current newline-delimited line.
+Document navigation shortcuts continue to move to the beginning or end of the whole field.
+In entry fields and the source editor, kill-line removes text from the caret to the next newline, preserving subsequent lines.
+At a line end, kill-line removes the newline and joins the following line; at the document end, it leaves the text unchanged.
+
+Needs: impl, utest
+
+## Vertical text navigation shortcuts must move across visible lines
+`req~ux.text-editing.visual-line-navigation~1`
+
+In multiline entry fields and the source editor, up and down shortcuts move the caret to the adjacent visible line, including within wrapped text.
+
+Needs: impl, utest
+
 ## Donation prompt returns every six months
 `req~ux.donation.recurring-prompt~1`
 
