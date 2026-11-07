@@ -8,18 +8,23 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -39,12 +44,17 @@ public class FileAnnotationTabView {
     @FXML public TextArea content;
     @FXML public TextArea marking;
     @FXML public VBox details;
+    @FXML public Button openAtAnnotationButton;
     private final BibEntry entry;
     private final FileAnnotationCache fileAnnotationCache;
     private FileAnnotationTabViewModel viewModel;
+    private OpenAnnotationAction openAnnotationAction;
 
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private ClipBoardManager clipBoardManager;
+    @Inject private StateManager stateManager;
+    @Inject private GuiPreferences preferences;
+    @Inject private DialogService dialogService;
 
     public FileAnnotationTabView(BibEntry entry, FileAnnotationCache fileAnnotationCache) {
         this.entry = entry;
@@ -54,6 +64,13 @@ public class FileAnnotationTabView {
     @FXML
     public void initialize() {
         viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor, clipBoardManager);
+        openAnnotationAction = new OpenAnnotationAction(
+                files.getSelectionModel().selectedItemProperty(),
+                viewModel.currentAnnotationProperty(),
+                entry,
+                stateManager,
+                preferences,
+                dialogService);
 
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
@@ -71,11 +88,17 @@ public class FileAnnotationTabView {
         annotationList.getSelectionModel().selectFirst();
         annotationList.itemsProperty().get().addListener(
                 (ListChangeListener<? super FileAnnotationViewModel>) _ -> annotationList.getSelectionModel().selectFirst());
+        annotationList.setOnMouseClicked(event -> {
+            if ((MouseButton.PRIMARY == event.getButton()) && (event.getClickCount() == 2)) {
+                openAnnotationAction.execute();
+            }
+        });
 
         // Set-up details pane
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
         marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
         details.disableProperty().bind(viewModel.isAnnotationsEmpty());
+        openAtAnnotationButton.disableProperty().bind(openAnnotationAction.executableProperty().not());
     }
 
     private Node createFileAnnotationNode(FileAnnotationViewModel annotation) {
@@ -124,5 +147,10 @@ public class FileAnnotationTabView {
 
     public void copy() {
         viewModel.copyCurrentAnnotation();
+    }
+
+    @FXML
+    private void openAtAnnotation() {
+        openAnnotationAction.execute();
     }
 }
