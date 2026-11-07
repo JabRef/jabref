@@ -1,4 +1,3 @@
-
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.util.Optional;

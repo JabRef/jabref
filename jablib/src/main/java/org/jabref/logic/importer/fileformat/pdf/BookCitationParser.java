@@ -1,4 +1,3 @@
-
 package org.jabref.logic.importer.fileformat.pdf;
 
 import org.jspecify.annotations.NullMarked;
