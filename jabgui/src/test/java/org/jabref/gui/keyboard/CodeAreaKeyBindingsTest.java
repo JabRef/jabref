@@ -31,6 +31,48 @@ import static org.mockito.Mockito.when;
 @ExtendWith(JavaFxExtension.class)
 class CodeAreaKeyBindingsTest {
 
+    @ParameterizedTest
+    @MethodSource("verticalNavigationBoundaryData")
+        // [utest->req~ux.text-editing.visual-line-navigation~1]
+    void verticalNavigationHandlesShortAndEmptyLines(KeyBinding binding, TextPos start, TextPos expected) {
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea codeArea = new CodeArea();
+            codeArea.setText("abcdefghij\nx\n\nlastline");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(codeArea, 400, 200));
+            stage.show();
+            codeArea.applyCss();
+            codeArea.layout();
+            codeArea.select(start);
+            codeArea.requestLayout();
+            codeArea.layout();
+            KeyBindingRepository repository = mock(KeyBindingRepository.class);
+            when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(binding));
+
+            CodeAreaKeyBindings.call(codeArea, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.N, false, true, false, false), repository);
+
+            assertEquals(expected.index(), codeArea.getCaretPosition().index());
+            assertEquals(expected.offset(), codeArea.getCaretPosition().offset());
+            if (start.equals(expected)) {
+                codeArea.requestLayout();
+                codeArea.layout();
+                CodeAreaKeyBindings.call(codeArea, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.N, false, true, false, false), repository);
+                assertEquals(expected.index(), codeArea.getCaretPosition().index());
+                assertEquals(expected.offset(), codeArea.getCaretPosition().offset());
+            }
+        });
+    }
+
+    private static Stream<Arguments> verticalNavigationBoundaryData() {
+        return Stream.of(
+                Arguments.of(KeyBinding.EDITOR_DOWN, TextPos.ofLeading(0, 8), TextPos.ofLeading(1, 1)),
+                Arguments.of(KeyBinding.EDITOR_DOWN, TextPos.ofLeading(1, 1), TextPos.ofLeading(2, 0)),
+                Arguments.of(KeyBinding.EDITOR_DOWN, TextPos.ofLeading(2, 0), TextPos.ofLeading(3, 0)),
+                Arguments.of(KeyBinding.EDITOR_UP, TextPos.ofLeading(2, 0), TextPos.ofLeading(1, 0)),
+                Arguments.of(KeyBinding.EDITOR_UP, TextPos.ZERO, TextPos.ZERO),
+                Arguments.of(KeyBinding.EDITOR_DOWN, TextPos.ofLeading(3, 8), TextPos.ofLeading(3, 8)));
+    }
+
     @Test
         // [utest->req~ux.text-editing.visual-line-navigation~1]
     void verticalNavigationMovesAcrossWrappedVisualLines() {

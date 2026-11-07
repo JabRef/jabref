@@ -35,6 +35,42 @@ class TextInputKeyBindingsTest {
 
     private static final String MULTILINE_TEXT = "First line\nSecond line\nThird line";
 
+    @ParameterizedTest
+    @MethodSource("verticalNavigationBoundaryData")
+        // [utest->req~ux.text-editing.visual-line-navigation~1]
+    void verticalNavigationHandlesShortAndEmptyLines(KeyBinding binding, int start, int expected) {
+        JavaFxExtension.invokeAndWait(() -> {
+            TextArea area = new TextArea("abcdefghij\nx\n\nlastline");
+            StackPane root = new StackPane(area);
+            new Scene(root, 400, 200);
+            root.applyCss();
+            root.layout();
+            area.positionCaret(start);
+            root.requestLayout();
+            root.layout();
+
+            applyBinding(area, binding);
+
+            assertEquals(expected, area.getCaretPosition());
+            if (start == expected) {
+                root.requestLayout();
+                root.layout();
+                applyBinding(area, binding);
+                assertEquals(expected, area.getCaretPosition());
+            }
+        });
+    }
+
+    private static Stream<Arguments> verticalNavigationBoundaryData() {
+        return Stream.of(
+                Arguments.of(KeyBinding.EDITOR_DOWN, 8, 12),
+                Arguments.of(KeyBinding.EDITOR_DOWN, 12, 13),
+                Arguments.of(KeyBinding.EDITOR_DOWN, 13, 14),
+                Arguments.of(KeyBinding.EDITOR_UP, 13, 11),
+                Arguments.of(KeyBinding.EDITOR_UP, 0, 0),
+                Arguments.of(KeyBinding.EDITOR_DOWN, 22, 22));
+    }
+
     @Test
         // [utest->req~ux.text-editing.visual-line-navigation~1]
     void verticalNavigationMovesAcrossWrappedVisualLines() {
