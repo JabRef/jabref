@@ -10,11 +10,14 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.logic.externalfiles.PdfLocationResolver;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -134,6 +137,31 @@ public class ActionHelper {
         }).orElseOpt(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);
+    }
+
+    public static BooleanExpression isCrossrefPdfPresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {
+        ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+        Binding<Boolean> crossrefPdfIsPresent = EasyBind.valueAt(selectedEntries, 0)
+                                                        .mapObservable(entry -> hasCrossrefPdf(entry, stateManager, preferences))
+                                                        .orElseOpt(false);
+
+        return BooleanExpression.booleanExpression(crossrefPdfIsPresent);
+    }
+
+    /// Re-evaluated when the fields of `entry` change, which covers its `crossref`, and when those of the entry it cross-references change, which covers its files
+    // [impl->req~jabgui.documentviewer.open-crossref-pdf-at-page~1]
+    private static ObservableValue<Boolean> hasCrossrefPdf(BibEntry entry, StateManager stateManager, CliPreferences preferences) {
+        ObservableValue<Optional<BibEntry>> referencedEntry = Bindings.createObjectBinding(
+                () -> stateManager.getActiveDatabase().flatMap(database -> database.getDatabase().getReferencedEntry(entry)),
+                entry.getFieldsObservable());
+        return referencedEntry.flatMap(referenced -> Bindings.createBooleanBinding(
+                () -> stateManager.getActiveDatabase()
+                                  .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase())
+                                                                          .filter(location -> location.fileOwner() != entry)
+                                                                          .flatMap(location -> location.file().findIn(database, preferences.getFilePreferences())))
+                                  .isPresent(),
+                entry.getFieldsObservable(),
+                referenced.map(BibEntry::getFieldsObservable).orElse(FXCollections.emptyObservableMap())));
     }
 
     public static BooleanExpression isPdfFilePresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {

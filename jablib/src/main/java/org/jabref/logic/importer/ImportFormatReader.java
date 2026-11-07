@@ -33,6 +33,7 @@ import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.ReferImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
+import org.jabref.logic.importer.fileformat.pdf.MultiPaperPdfImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
@@ -64,7 +65,7 @@ public class ImportFormatReader {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private BibtexImporter bibtexImporter;
+    private final BibtexImporter bibtexImporter;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
@@ -74,6 +75,7 @@ public class ImportFormatReader {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         reset();
     }
 
@@ -89,6 +91,7 @@ public class ImportFormatReader {
         importers.add(new MedlinePlainImporter(importFormatPreferences));
         importers.add(new ModsImporter(importFormatPreferences));
         importers.add(new MsBibImporter());
+        importers.add(new MultiPaperPdfImporter(importFormatPreferences));
         importers.add(new OvidImporter());
         importers.add(new PdfMergeMetadataImporter(importFormatPreferences));
         importers.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
@@ -110,7 +113,6 @@ public class ImportFormatReader {
         importers.addAll(importerPreferences.getCustomImporters());
 
         // BibTeX as last
-        bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         importers.add(bibtexImporter);
     }
 
@@ -166,15 +168,57 @@ public class ImportFormatReader {
     ///
     /// This method last attempts to read this file as bibtex.
     ///
+    /// A PDF holding several papers is imported like any other PDF, because only the user can decide to split it, see [#importMultiPaperPdf(Path)].
+    ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
+    // [impl->req~logic.importer.multi-paper-pdf~1]
     public ImportResult importWithAutoDetection(Path filePath) throws ImportException {
         ImportResult importResult = importWithAutoDetection(
                 importer -> importer.importDatabase(filePath),
-                importer -> importer.isRecognizedFormat(filePath),
+                importer -> !(importer instanceof MultiPaperPdfImporter) && importer.isRecognizedFormat(filePath),
                 () -> OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileUpdateMonitor)
         );
         importResult.parserResult.setPath(filePath);
         return importResult;
+    }
+
+    /// Imports a PDF holding several papers as one entry per paper and an entry for the whole PDF, followed by the references cited in it.
+    /// A PDF without several papers is imported as by [#importWithAutoDetection(Path)].
+    ///
+    /// @throws ImportException if the PDF holds no papers and its import fails
+    // [impl->req~logic.importer.multi-paper-pdf~1]
+    public ImportResult importMultiPaperPdf(Path pdf) throws ImportException {
+        MultiPaperPdfImporter multiPaperPdfImporter = new MultiPaperPdfImporter(importFormatPreferences);
+        ParserResult papers = multiPaperPdfImporter.importDatabase(pdf);
+        if (!papers.getDatabase().hasEntries()) {
+            return importWithAutoDetection(pdf);
+        }
+        addCitedReferences(pdf, papers);
+        papers.setPath(pdf);
+        return new ImportResult(multiPaperPdfImporter.getName(), papers);
+    }
+
+    /// Imports a PDF holding several papers as one entry, followed by the references cited in it
+    // [impl->req~logic.importer.multi-paper-pdf~1]
+    public ImportResult importPdfAsOneEntry(Path pdf) {
+        PdfMergeMetadataImporter importer = new PdfMergeMetadataImporter(importFormatPreferences);
+        ParserResult pdfEntry = importer.importDatabase(pdf);
+        addCitedReferences(pdf, pdfEntry);
+        pdfEntry.setPath(pdf);
+        return new ImportResult(importer.getName(), pdfEntry);
+    }
+
+    private void addCitedReferences(Path pdf, ParserResult papers) {
+        for (Importer importer : importers) {
+            if (importer instanceof PdfGrobidImporter grobid) {
+                ParserResult references = grobid.importDatabase(pdf);
+                if (references.hasWarnings()) {
+                    LOGGER.warn("Could not read the references cited in {}: {}", pdf, references.getErrorMessage());
+                }
+                papers.getDatabase().insertEntries(references.getDatabase().getEntries());
+                return;
+            }
+        }
     }
 
     /// Tries to import a stream by iterating through the available import filters,
@@ -233,7 +277,7 @@ public class ImportFormatReader {
         // stores ref to best result, gets updated at the next loop
         List<BibEntry> bestResult = null;
         int bestResultFieldCount = 0;
-        String bestFormatName = null;
+        String bestFormatName = "";
 
         // Cycle through all importers:
         for (Importer importer : importers) {
