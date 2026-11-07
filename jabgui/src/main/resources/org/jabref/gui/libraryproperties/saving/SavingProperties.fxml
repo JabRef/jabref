@@ -21,6 +21,12 @@
     <Label styleClass="h4,padding-top-12" text="%Save actions"/>
     <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
 
+    <Label styleClass="h4,padding-top-12" text="%External changes"/>
+    <HBox spacing="8.0" alignment="CENTER_LEFT">
+        <Label text="%Automatically merge external changes"/>
+        <ComboBox fx:id="synchronizeWithFile"/>
+    </HBox>
+
     <Label styleClass="h4,padding-top-12" text="%Journal abbreviation on save"/>
     <HBox spacing="8.0" alignment="CENTER_LEFT">
         <Label text="%Abbreviation style"/>

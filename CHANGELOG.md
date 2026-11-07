@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a warning for shortcuts already in use, allowing users to replace the existing shortcut or keep both. [#17240](https://github.com/JabRef/jabref/issues/17240)
 - We added "Delete" and "Retry" to the context menu of AI chat messages and made user messages retryable. [#17151](https://github.com/JabRef/jabref/pull/17151)
 - We added a list of saved connections to the "Connect to shared database" dialog. [#12948](https://github.com/JabRef/jabref/issues/12948)
+- We added an option to automatically merge changes made to the library file outside JabRef into the open library. [#8431](https://github.com/JabRef/jabref/issues/8431)
 
 ### Changed
 
@@ -124,6 +125,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
+- We fixed an issue where accepting an external change to an entry lost its table position, selection, and open entry editor. [#16813](https://github.com/JabRef/jabref/pull/16813)
 
 ### Removed
 

@@ -45,6 +45,7 @@ public class MetaDataSerializer {
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of("true"));
         }
+        metaData.getSynchronizeWithFile().ifPresent(synchronize -> stringyMetaData.put(MetaData.SYNCHRONIZE_WITH_FILE, List.of(String.valueOf(synchronize))));
         if (metaData.isGitAutoPull()) {
             stringyMetaData.put(MetaData.GIT_AUTO_PULL, List.of("true"));
         }
