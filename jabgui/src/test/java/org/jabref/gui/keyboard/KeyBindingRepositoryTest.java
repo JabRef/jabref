@@ -108,4 +108,14 @@ class KeyBindingRepositoryTest {
 
         assertEquals(Set.of(KeyBinding.CLOSE, KeyBinding.CLEAR_SEARCH), Set.copyOf(conflicts));
     }
+
+    @Test
+    void missingKeyBindingsFallBackToDefaultInKeyBindingsMap() {
+        KeyBindingRepository repo = new KeyBindingRepository(
+                List.of(KeyBinding.PASTE.getConstant()),
+                List.of("shortcut+V"));
+
+        assertEquals("shortcut+V", repo.getKeyBindings().get(KeyBinding.PASTE));
+        assertEquals(KeyBinding.CENTER_SELECTED_ENTRY.getDefaultKeyBinding(), repo.getKeyBindings().get(KeyBinding.CENTER_SELECTED_ENTRY));
+    }
 }

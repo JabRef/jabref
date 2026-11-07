@@ -44,6 +44,11 @@ public class KeyBindingRepository {
             for (int i = 0; i < bindNames.size(); i++) {
                 put(bindNames.get(i), bindings.get(i));
             }
+            for (KeyBinding keyBinding : KeyBinding.values()) {
+                if (!this.bindings.containsKey(keyBinding)) {
+                    put(keyBinding, keyBinding.getDefaultKeyBinding());
+                }
+            }
         }
     }
 

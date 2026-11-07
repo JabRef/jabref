@@ -355,7 +355,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private boolean isFirstRowVisible() {
-        return Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
+        return findVirtualFlow()
                        .map(VirtualFlow::getFirstVisibleCell)
                        .map(cell -> cell.getIndex() == 0)
                        .orElse(true);
@@ -454,6 +454,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         scrollToPreviousMatchCategory();
                         event.consume();
                         break;
+                    case CENTER_SELECTED_ENTRY:
+                        centerSelectedEntry();
+                        event.consume();
+                        break;
                     case OPEN_URL_OR_DOI:
                         openUrlAction.execute();
                         event.consume();
@@ -487,6 +491,49 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         getSelectionModel().clearSelection();
         getSelectionModel().selectLast();
         scrollTo(getItems().size() - 1);
+    }
+
+    /// Scrolls the table so that the currently selected entry is centered vertically among the visible rows.
+    /// Near the beginning or end of the table, the entry is placed as close to the center as possible.
+    // [impl->req~maintable.center-selected~1]
+    public void centerSelectedEntry() {
+        int selectedIndex = getSelectionModel().getSelectedIndex();
+        if (selectedIndex < 0) {
+            return;
+        }
+
+        findVirtualFlow()
+                .flatMap(MainTable::visibleRows)
+                .ifPresentOrElse(
+                        rows -> scrollToCenter(selectedIndex, rows),
+                        () -> scrollTo(selectedIndex));
+    }
+
+    private Optional<VirtualFlow<?>> findVirtualFlow() {
+        return Optional.ofNullable(lookup(".virtual-flow"))
+                       .filter(VirtualFlow.class::isInstance)
+                       .map(node -> (VirtualFlow<?>) node);
+    }
+
+    private static Optional<VisibleRows> visibleRows(VirtualFlow<?> flow) {
+        return Optional.ofNullable(flow.getFirstVisibleCell())
+                       .flatMap(first -> Optional.ofNullable(flow.getLastVisibleCell())
+                                                 .map(last -> new VisibleRows(flow, first.getIndex(), last.getIndex())));
+    }
+
+    private void scrollToCenter(int selectedIndex, VisibleRows rows) {
+        int visibleRowCount = (rows.lastIndex() - rows.firstIndex()) + 1;
+        if (visibleRowCount <= 0) {
+            scrollTo(selectedIndex);
+            return;
+        }
+
+        int lastFullViewportStart = Math.max(0, getItems().size() - visibleRowCount);
+        int centeredViewportStart = Math.clamp(selectedIndex - (visibleRowCount / 2), 0, lastFullViewportStart);
+        rows.flow().scrollToTop(centeredViewportStart);
+    }
+
+    private record VisibleRows(VirtualFlow<?> flow, int firstIndex, int lastIndex) {
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {

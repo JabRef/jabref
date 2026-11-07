@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added centering for the selected entry via the View menu or shortcut (Ctrl+Alt+L). [#16658](https://github.com/JabRef/jabref/issues/16658)
 - We added an option to enable AI provider debugging in expert settings for testing AI features without external API calls. [#17607](https://github.com/JabRef/jabref/pull/17607)
 - We added ISBN extraction from bibliographic pages in PDF books. [#12874](https://github.com/JabRef/jabref/issues/12874)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
