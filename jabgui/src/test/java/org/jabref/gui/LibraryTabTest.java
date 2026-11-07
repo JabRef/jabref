@@ -99,6 +99,26 @@ class LibraryTabTest {
         assertEquals(List.of(), handledFailures);
     }
 
+    /// The tab still holds the placeholder context of the connection that failed; closing it as a loaded
+    /// library would ask that never opened connection for its properties
+    @Test
+    void failedConnectionClosesTheTabWhileItIsStillLoading() {
+        LibraryTab tab = mock(LibraryTab.class);
+        SQLException failure = new SQLException("Connection refused");
+        List<Exception> handledFailures = new ArrayList<>();
+        LibraryTab.SharedDatabaseLoadingCallbacks callbacks = new LibraryTab.SharedDatabaseLoadingCallbacks(
+                tab,
+                mock(TaskExecutor.class),
+                (_, _) -> {
+                },
+                handledFailures::add);
+
+        callbacks.onDatabaseLoadingFailed(failure);
+
+        verify(tab).closeWhileLoading();
+        assertEquals(List.of(failure), handledFailures);
+    }
+
     @Test
     void cancellationSchedulesCleanupWhenConnectionAlreadyCompleted() throws Exception {
         BibDatabaseContext connectedContext = mock(BibDatabaseContext.class);
