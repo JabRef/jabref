@@ -46,7 +46,10 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
@@ -61,6 +64,7 @@ class SourceTabTest {
     private BibEntryTypesManager entryTypesManager;
     private KeyBindingRepository keyBindingRepository;
     private OptionalObjectProperty<BibDatabaseContext> activeDatabase;
+    private DialogService dialogService;
     private StateManager stateManager;
 
     @BeforeEach
@@ -83,12 +87,12 @@ class SourceTabTest {
             when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
             entryTypesManager = mock(BibEntryTypesManager.class);
 
+            dialogService = mock(DialogService.class);
             sourceTab = new SourceTab(
-
                     fieldPreferences,
                     importFormatPreferences,
                     new DummyFileUpdateMonitor(),
-                    mock(DialogService.class),
+                    dialogService,
                     entryTypesManager,
                     keyBindingRepository,
                     stateManager,
@@ -328,5 +332,97 @@ class SourceTabTest {
 
         assertEquals(Optional.of("Edited first entry"), firstEntry.getField(StandardField.TITLE));
         assertEquals(Optional.of("Second entry"), secondEntry.getField(StandardField.TITLE));
+    }
+
+    @Test
+    void leavingSourceTabWithInvalidBibTeXShowsErrorDialog() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Valid title");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            sourceArea.requestFocus();
+            assertTrue(sourceArea.isFocused());
+            sourceArea.clear();
+            sourceArea.appendText("This is plain text with no bibtex entry");
+        });
+        JavaFxExtension.awaitEvents();
+
+        // Switch to different tab
+        JavaFxExtension.invokeAndWait(() -> pane.getSelectionModel().select(1));
+        JavaFxExtension.awaitEvents();
+
+        verify(dialogService, times(1)).showErrorDialogAndWait(anyString());
+        assertEquals(Optional.of("Valid title"), entry.getField(StandardField.TITLE));
+    }
+
+    @Test
+    void leavingSourceTabWithValidBibTeXUpdatesEntry() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Old title");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            sourceArea.clear();
+            sourceArea.appendText("""
+                    @Article{test,
+                      title = {Updated title},
+                    }
+                    """);
+        });
+        JavaFxExtension.awaitEvents();
+
+        // Switch to different tab without manually requesting focus
+        JavaFxExtension.invokeAndWait(() -> pane.getSelectionModel().select(1));
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(Optional.of("Updated title"), entry.getField(StandardField.TITLE));
+    }
+
+    @Test
+    void leavingSourceTabWithMoreThanOneEntryShowsWarningDialog() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Original title");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            sourceArea.clear();
+            sourceArea.appendText("""
+                    @Article{test1,
+                      title = {First},
+                    }
+                    @Article{test2,
+                      title = {Second},
+                    }
+                    """);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> pane.getSelectionModel().select(1));
+        JavaFxExtension.awaitEvents();
+
+        verify(dialogService, times(1)).showWarningDialogAndWait(anyString(), anyString());
+        assertEquals(Optional.of("Original title"), entry.getField(StandardField.TITLE));
     }
 }

@@ -77,6 +77,8 @@ public class SourceTab extends EntryEditorTab {
     private BibTeXCodeArea codeArea;
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
+    private String lastStoredText;
+    private boolean isStoring = false;
 
     public SourceTab(
             FieldPreferences fieldPreferences,
@@ -163,6 +165,12 @@ public class SourceTab extends EntryEditorTab {
             }
         });
 
+        this.selectedProperty().addListener((_, wasSelected, isSelected) -> {
+            if (wasSelected && !isSelected) {
+                storeVisibleSource();
+            }
+        });
+
         this.setContent(codeArea);
     }
 
@@ -175,6 +183,7 @@ public class SourceTab extends EntryEditorTab {
             if (previousEntry == null) {
                 codeArea.setEditable(false);
                 codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), "");
+                lastStoredText = "";
                 return;
             }
 
@@ -182,14 +191,16 @@ public class SourceTab extends EntryEditorTab {
                                                .orElse(BibDatabaseMode.BIBLATEX);
             try {
                 // [impl->req~entry-editor.source-tab.atomic-replacement~1]
-                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(),
-                        getSourceString(previousEntry, mode, fieldPreferences));
+                String sourceString = getSourceString(previousEntry, mode, fieldPreferences);
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), sourceString);
+                lastStoredText = sourceString;
                 codeArea.setEditable(true);
                 Platform.runLater(this::refreshCodeAreaDecorator);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
                 codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                lastStoredText = null;
                 LOGGER.debug("Incorrect entry", ex);
             }
         });
@@ -226,11 +237,22 @@ public class SourceTab extends EntryEditorTab {
 
     // [impl->req~entry-editor.source-tab.atomic-replacement~1] — keep the visible source paired with the entry it was rendered from even while selection changes are still settling
     private void storeVisibleSource() {
-        if (codeArea == null) {
+        if (codeArea == null || isStoring) {
             return;
         }
 
-        storeSource(previousEntry, codeArea.getText());
+        String text = codeArea.getText();
+        if (Objects.equals(text, lastStoredText)) {
+            return;
+        }
+
+        try {
+            isStoring = true;
+            lastStoredText = text;
+            storeSource(previousEntry, text);
+        } finally {
+            isStoring = false;
+        }
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
@@ -243,7 +265,9 @@ public class SourceTab extends EntryEditorTab {
         try {
             parserResult = bibtexParser.parse(Reader.of(text));
         } catch (IOException ex) {
-            validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", ex.getMessage())));
+            String errorMessage = Localization.lang("Failed to parse Bib(La)TeX: %0", ex.getMessage());
+            dialogService.showErrorDialogAndWait(errorMessage);
+            validationMessage.setValue(ValidationMessage.error(errorMessage));
             LOGGER.debug("Incorrect source", ex);
             return;
         }
@@ -308,8 +332,9 @@ public class SourceTab extends EntryEditorTab {
                 // Test if the field is legally set.
                 List<String> errors = FieldWriter.checkBalancedBraces(newValue);
                 if (!errors.isEmpty()) {
-                    validationMessage.setValue(ValidationMessage.error(
-                            Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors))));
+                    String errorMessage = Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors));
+                    dialogService.showErrorDialogAndWait(errorMessage);
+                    validationMessage.setValue(ValidationMessage.error(errorMessage));
                     return;
                 }
 
