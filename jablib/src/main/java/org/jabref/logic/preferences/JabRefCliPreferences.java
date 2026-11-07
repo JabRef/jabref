@@ -1031,22 +1031,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// Deletes an entry from the keyring.
     ///
-    /// @return `false` if the entry still exists afterwards
+    /// @return `false` if deletion could not be confirmed
     private static boolean deleteFromKeyring(Keyring keyring, String service, String account) {
         try {
             keyring.deletePassword(service, account);
             return true;
-        } catch (PasswordAccessException _) {
-            // The keyring reports a missing entry the same way as a failed deletion
-            return !existsInKeyring(keyring, service, account);
-        }
-    }
-
-    private static boolean existsInKeyring(Keyring keyring, String service, String account) {
-        try {
-            keyring.getPassword(service, account);
-            return true;
-        } catch (PasswordAccessException _) {
+        } catch (PasswordAccessException e) {
+            LOGGER.debug("Could not delete keyring entry for {}/{}", service, account, e);
             return false;
         }
     }
@@ -1069,12 +1060,12 @@ public class JabRefCliPreferences implements CliPreferences {
                 if (StringUtil.isNotBlank(entry.getValue())) {
                     keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
                     deleteFromKeyring(keyring, slot.legacyService(), slot.account());
-                } else if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
-                    deleteFromKeyring(keyring, slot.service(), slot.account());
                 } else {
-                    // An empty value at the new location stops the remaining legacy value from being migrated back
-                    LOGGER.warn("Could not delete the legacy secret for {}/{}", slot.legacyService(), slot.account());
-                    keyring.setPassword(slot.service(), slot.account(), "");
+                    // A nonempty blank value suppresses migration and works with keyrings that reject empty values.
+                    keyring.setPassword(slot.service(), slot.account(), " ");
+                    if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
+                        deleteFromKeyring(keyring, slot.service(), slot.account());
+                    }
                 }
             }
         } catch (Exception ex) {

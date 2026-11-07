@@ -134,7 +134,7 @@ class KeyringMigrationTest {
 
             verify(keyring).deletePassword(NEW_SERVICE, ACCOUNT);
             verify(keyring).deletePassword(LEGACY_SERVICE, ACCOUNT);
-            verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+            verify(keyring).setPassword(NEW_SERVICE, ACCOUNT, " ");
         }
     }
 
@@ -150,7 +150,35 @@ class KeyringMigrationTest {
 
             createPreferences(LEGACY_KEY).getProxyPreferences().setPassword("");
 
-            verify(keyring).setPassword(NEW_SERVICE, ACCOUNT, "");
+            verify(keyring).setPassword(NEW_SERVICE, ACCOUNT, " ");
+        }
+    }
+
+    @Test
+    void clearingValueKeepsMarkerWhenLegacyDeletionAndReadFail() throws PasswordAccessException {
+        when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(PLAIN_TEXT);
+        doThrow(new PasswordAccessException("Access denied")).when(keyring).deletePassword(LEGACY_SERVICE, ACCOUNT);
+        when(keyring.getPassword(LEGACY_SERVICE, ACCOUNT)).thenThrow(new PasswordAccessException("Access denied"));
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+
+            createPreferences(LEGACY_KEY).getProxyPreferences().setPassword("");
+
+            verify(keyring).setPassword(NEW_SERVICE, ACCOUNT, " ");
+            verify(keyring, never()).deletePassword(NEW_SERVICE, ACCOUNT);
+        }
+    }
+
+    @Test
+    void blankMarkerSuppressesLegacyMigration() throws PasswordAccessException {
+        when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(" ");
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+
+            assertEquals("", createPreferences(LEGACY_KEY).getProxyPreferences().getPassword());
+            verify(keyring, never()).getPassword(LEGACY_SERVICE, ACCOUNT);
         }
     }
 
