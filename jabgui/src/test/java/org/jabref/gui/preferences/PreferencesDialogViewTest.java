@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -8,6 +9,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Region;
@@ -88,6 +90,24 @@ class PreferencesDialogViewTest extends JavaFxTest {
 
             searchBox().clear();
             assertEquals(0, scrollPane().getVvalue());
+        });
+    }
+
+    @Test
+    void narrowingSearchSelectsTheMatchingTabOnce() {
+        interact(() -> {
+            @SuppressWarnings("unchecked")
+            ListView<PreferencesTab> tabs = (ListView<PreferencesTab>) dialog.getDialogPane().lookup("#preferencesTabList");
+            searchBox().setText("setting");
+            List<String> selectedTabs = new ArrayList<>();
+            tabs.getSelectionModel().selectedItemProperty().addListener((_, _, item) -> {
+                if (item != null) {
+                    selectedTabs.add(item.getTabName());
+                }
+            });
+            searchBox().setText("setting near the bottom");
+
+            assertEquals(List.of("Second"), selectedTabs);
         });
     }
 
