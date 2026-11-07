@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
@@ -10,6 +11,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -148,10 +150,23 @@ public class ImportResultsPage extends WizardPane {
 
     @Override
     public void onEnteringPage(Wizard wizard) {
+        Platform.runLater(() -> hideHeaderGraphic());
         Platform.runLater(() -> {
             if (viewModel.resultTableItems().isEmpty()) {
                 viewModel.startImport();
             }
         });
+    }
+
+    private void hideHeaderGraphic() {
+        if (getScene() == null) {
+            return;
+        }
+        Node headerPanel = getScene().lookup(".header-panel");
+        if (headerPanel instanceof GridPane grid && grid.getChildren().size() > 1) {
+            Node graphicContainer = grid.getChildren().get(1);
+            graphicContainer.setVisible(false);
+            graphicContainer.setManaged(false);
+        }
     }
 }
