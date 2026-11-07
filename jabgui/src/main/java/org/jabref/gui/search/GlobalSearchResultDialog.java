@@ -1,8 +1,13 @@
 package org.jabref.gui.search;
 
+import java.io.IOException;
+import java.util.List;
+
 import javafx.fxml.FXML;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
@@ -11,7 +16,9 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -19,13 +26,22 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.TransferMode;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.BibtexString;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchResultDialog.class);
 
     @FXML private SplitPane container;
     @FXML private ToggleButton keepOnTop;
@@ -40,6 +56,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private BibEntryTypesManager entryTypesManager;
+    @Inject private ClipBoardManager clipBoardManager;
 
     public GlobalSearchResultDialog(LibraryTabContainer libraryTabContainer) {
         this.libraryTabContainer = libraryTabContainer;
@@ -66,6 +84,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferences, stateManager, taskExecutor);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, dialogService, stateManager, taskExecutor);
 
+        resultsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
 
         resultsTable.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
@@ -79,6 +98,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         Stage stage = (Stage) getDialogPane().getScene().getWindow();
 
         setupTableDoubleClickHandler(resultsTable, stage);
+        setupCopyActionBindingHandler(resultsTable);
 
         container.getItems().addAll(resultsTable, previewViewer);
 
@@ -103,6 +123,28 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             preferences.getSearchPreferences().setSearchWindowWidth(getWidth());
             preferences.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());
         });
+    }
+
+    private void setupCopyActionBindingHandler(SearchResultsTable resultsTable) {
+        resultsTable.addEventFilter(KeyEvent.KEY_PRESSED, event ->
+                preferences.getKeyBindingRepository().mapToKeyBinding(event)
+                           .filter(KeyBinding.COPY::equals)
+                           .ifPresent(_ -> {
+                               List<BibEntryTableViewModel> selected = resultsTable.getSelectionModel().getSelectedItems();
+                               if (!selected.isEmpty()) {
+                                   BibDatabaseContext ctx = selected.getFirst().getBibDatabaseContext();
+                                   List<BibEntry> entries = selected.stream().map(BibEntryTableViewModel::getEntry).toList();
+                                   List<BibtexString> strings = ctx.getDatabase().getUsedStrings(entries);
+
+                                   try {
+                                       clipBoardManager.setContent(TransferMode.COPY, ctx, entries, entryTypesManager, strings);
+                                       dialogService.notify(Localization.lang("Copied %0 entry(s)", entries.size()));
+                                   } catch (IOException ex) {
+                                       LOGGER.error("Error while copying the selected entry to clipboard", ex);
+                                   }
+                                   event.consume();
+                               }
+                           }));
     }
 
     private void setupTableDoubleClickHandler(SearchResultsTable resultsTable, Stage stage) {
