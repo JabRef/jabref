@@ -14,13 +14,15 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class SharedDatabaseSessionService {
 
+    private final SharedDatabasePreferences sharedDatabasePreferences;
     private final Function<String, DBMSConnectionProperties> connectionPropertiesFactory;
 
-    public SharedDatabaseSessionService() {
-        this(sharedDatabaseId -> new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseId)));
+    public SharedDatabaseSessionService(SharedDatabasePreferences sharedDatabasePreferences) {
+        this(sharedDatabasePreferences, sharedDatabaseId -> new DBMSConnectionProperties(sharedDatabasePreferences.forConnection(sharedDatabaseId)));
     }
 
-    SharedDatabaseSessionService(Function<String, DBMSConnectionProperties> connectionPropertiesFactory) {
+    SharedDatabaseSessionService(SharedDatabasePreferences sharedDatabasePreferences, Function<String, DBMSConnectionProperties> connectionPropertiesFactory) {
+        this.sharedDatabasePreferences = sharedDatabasePreferences;
         this.connectionPropertiesFactory = connectionPropertiesFactory;
     }
 
@@ -34,7 +36,7 @@ public class SharedDatabaseSessionService {
     /// Persists the connection settings of the shared databases that remain open until quit is confirmed.
     public void persistConnections(Map<String, DatabaseConnectionProperties> sharedDatabases) {
         sharedDatabases.forEach((sharedDatabaseId, connectionProperties) ->
-                new SharedDatabasePreferences(sharedDatabaseId).putAllDBMSConnectionProperties(connectionProperties));
+                sharedDatabasePreferences.forConnection(sharedDatabaseId).putAllDBMSConnectionProperties(connectionProperties));
     }
 
     /// Restores the identifier used to find a shared database's stored connection settings.
