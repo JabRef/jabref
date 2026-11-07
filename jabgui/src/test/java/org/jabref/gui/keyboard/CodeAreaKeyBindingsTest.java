@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 class CodeAreaKeyBindingsTest {
 
     @Test
+        // [utest->req~ux.text-editing.visual-line-navigation~1]
     void verticalNavigationMovesAcrossWrappedVisualLines() {
         JavaFxExtension.invokeAndWait(() -> {
             CodeArea codeArea = new CodeArea();
@@ -59,7 +60,7 @@ class CodeAreaKeyBindingsTest {
 
     @ParameterizedTest
     @MethodSource("killLineTestData")
-        // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~2]
     void killLinePreservesFollowingLines(LineEnding lineEnding, String text, TextPos caretPosition, String expectedText) {
         JavaFxExtension.invokeAndWait(() -> {
             CodeArea codeArea = new CodeArea();

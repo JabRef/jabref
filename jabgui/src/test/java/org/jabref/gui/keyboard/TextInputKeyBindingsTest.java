@@ -36,6 +36,7 @@ class TextInputKeyBindingsTest {
     private static final String MULTILINE_TEXT = "First line\nSecond line\nThird line";
 
     @Test
+        // [utest->req~ux.text-editing.visual-line-navigation~1]
     void verticalNavigationMovesAcrossWrappedVisualLines() {
         JavaFxExtension.invokeAndWait(() -> {
             TextArea area = new TextArea("A long paragraph that wraps over multiple visible lines without any newline characters. More words to ensure wrapping.");
@@ -85,7 +86,7 @@ class TextInputKeyBindingsTest {
     }
 
     @Test
-        // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~2]
     void killLinePreservesFollowingLines() {
         TextArea area = new TextArea(MULTILINE_TEXT);
         area.positionCaret(16);
@@ -111,7 +112,7 @@ class TextInputKeyBindingsTest {
 
     @ParameterizedTest
     @MethodSource("killLineTestData")
-        // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~2]
     void killLinePreservesBoundariesAndCanBeUndone(String text, int caretPosition, String expectedText) {
         TextArea area = new TextArea(text);
         area.positionCaret(caretPosition);
@@ -156,7 +157,7 @@ class TextInputKeyBindingsTest {
 
     @ParameterizedTest
     @MethodSource({"textFieldNavigationTestData", "textAreaNavigationTestData"})
-        // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~2]
     void navigationRespectsLineAndDocumentBoundaries(Supplier<TextInputControl> controlFactory, String text, int caretPosition, KeyBinding binding, int expectedPosition) {
         TextInputControl control = controlFactory.get();
         control.setText(text);

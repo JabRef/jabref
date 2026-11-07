@@ -12,7 +12,8 @@ import org.jabref.model.util.ResultingStringState;
 
 public class TextInputKeyBindings {
 
-    // [impl->req~ux.text-editing.line-boundaries~1]
+    // [impl->req~ux.text-editing.line-boundaries~2]
+    // [impl->req~ux.text-editing.visual-line-navigation~1]
     public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {

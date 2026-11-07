@@ -12,6 +12,7 @@ import jfx.incubator.scene.control.richtext.TextPos;
 
 public class CodeAreaKeyBindings {
 
+    // [impl->req~ux.text-editing.visual-line-navigation~1]
     public static void call(CodeArea codeArea, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         handleMacCursorMovementShortcuts(codeArea, event);
         if (event.isConsumed()) {
@@ -90,7 +91,7 @@ public class CodeAreaKeyBindings {
                     event.consume();
                 }
                 case EDITOR_KILL_LINE -> {
-                    // [impl->req~ux.text-editing.line-boundaries~1]
+                    // [impl->req~ux.text-editing.line-boundaries~2]
                     TextPos caret = codeArea.getCaretPosition();
                     int lineEnd = codeArea.getPlainText(caret.index()).length();
                     TextPos end = TextPos.ofLeading(caret.index(), lineEnd);
