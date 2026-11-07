@@ -4,12 +4,17 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherRetry;
+import org.jabref.logic.importer.FetcherRetryPolicy;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
+import org.jabref.logic.importer.fetcher.FetcherRateLimiter;
 import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -25,6 +30,14 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Semantic Scholar";
+
+    static final FetcherRetryPolicy RETRY_POLICY = new FetcherRetryPolicy(
+            4,
+            Set.of(FetcherRetry.HTTP_TOO_MANY_REQUESTS),
+            Duration.ofSeconds(1),
+            Duration.ofSeconds(10));
+
+    static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerSecond(SemanticScholar.FETCHER_NAME, 1.0);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholarCitationFetcher.class);
 
@@ -74,7 +87,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
         importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
-        CitationsResponse citationsResponse = GSON.fromJson(urlDownload.asString(), CitationsResponse.class);
+        CitationsResponse citationsResponse = GSON.fromJson(download(urlDownload, citationsUrl), CitationsResponse.class);
 
         return citationsResponse.getData()
                                 .stream()
@@ -100,7 +113,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
-        String response = urlDownload.asString();
+        String response = download(urlDownload, referencesUrl);
         ReferencesResponse referencesResponse = GSON.fromJson(response, ReferencesResponse.class);
 
         if (referencesResponse.getData() == null) {
@@ -144,7 +157,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         String result;
         try {
-            result = urlDownload.asString();
+            result = download(urlDownload, referencesUrl);
         } catch (FetcherException e) {
             Optional<String> error = e.getHttpResponse()
                                       .flatMap(response -> Optional.ofNullable(response.responseBody()))
@@ -162,6 +175,14 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
             return Optional.empty();
         }
         return Optional.of(paperDetails.getCitationCount());
+    }
+
+    /// Downloads with retries; every attempt first waits for the shared rate limiter.
+    private static String download(URLDownload urlDownload, URL url) throws FetcherException {
+        return FetcherRetry.executeWithRetryPolicy(RETRY_POLICY, () -> {
+            RATE_LIMITER.acquire(url.toString());
+            return urlDownload.asString();
+        });
     }
 
     private Optional<URI> getApiUrl(String endpoint, BibEntry entry) {

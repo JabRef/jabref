@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 @NullMarked
 // [impl->req~fetchers.rate-limiting~1]
-final class FetcherRateLimiter {
+public final class FetcherRateLimiter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetcherRateLimiter.class);
 
@@ -25,7 +25,7 @@ final class FetcherRateLimiter {
         this.rateLimiter = RateLimiter.create(requestsPerSecond);
     }
 
-    static FetcherRateLimiter ofRequestsPerSecond(String serviceName, double requestsPerSecond) {
+    public static FetcherRateLimiter ofRequestsPerSecond(String serviceName, double requestsPerSecond) {
         return new FetcherRateLimiter(serviceName, requestsPerSecond);
     }
 
@@ -38,7 +38,7 @@ final class FetcherRateLimiter {
         return ofRequestsPerSecond(serviceName, requestsPerSecond);
     }
 
-    void acquire(String requestContext) {
+    public void acquire(String requestContext) {
         double waitingTime = rateLimiter.acquire();
         LOGGER.trace("Thread {} waited {} seconds before requesting '{}' because of the {} API rate limiter",
                 Thread.currentThread().threadId(), waitingTime, requestContext, serviceName);

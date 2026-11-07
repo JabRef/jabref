@@ -5,7 +5,9 @@ import java.net.MalformedURLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.http.SimpleHttpResponse;
@@ -84,6 +86,36 @@ class FetcherRetryTest {
         } finally {
             Thread.interrupted();
         }
+    }
+
+    @Test
+    void countsTimeSpentInsideTheOperationAgainstMaxTotalWait() throws MalformedURLException {
+        FetcherRetryPolicy policy = new FetcherRetryPolicy(
+                3, Set.of(FetcherRetry.HTTP_TOO_MANY_REQUESTS), Duration.ofSeconds(1), Duration.ofSeconds(10));
+        AtomicInteger attempts = new AtomicInteger();
+        List<Duration> delays = new ArrayList<>();
+        AtomicLong now = new AtomicLong();
+        FetcherClientException rateLimited = fetcherClientException(FetcherRetry.HTTP_TOO_MANY_REQUESTS);
+
+        assertThrows(FetcherClientException.class, () -> FetcherRetry.execute(
+                policy,
+                () -> {
+                    attempts.incrementAndGet();
+                    // e.g. waiting for a shared rate limiter or a slow response (of a system getting to many reqs)
+                    now.addAndGet(Duration.ofSeconds(2).toNanos());
+                    throw rateLimited;
+                },
+                delay -> {
+                    delays.add(delay);
+                    now.addAndGet(delay.toNanos());
+                },
+                now::get));
+
+        // attempt 1: sends at 0s, ends at 2s -> wait 1s
+        // attempt 2: sends at 3s, ends at 5s -> wait 2s
+        // attempt 3: sends at 7s, ends at 9s -> waiting 4s would end at 13s, over the 10s budget -> no 4th attempt
+        assertEquals(List.of(Duration.ofSeconds(1), Duration.ofSeconds(2)), delays);
+        assertEquals(3, attempts.get());
     }
 
     private FetcherClientException fetcherClientException(int statusCode) throws MalformedURLException {
