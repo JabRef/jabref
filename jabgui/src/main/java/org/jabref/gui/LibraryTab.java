@@ -604,6 +604,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
     ///
     /// Example: *jabref-authors.bib – testbib
+    // [impl->req~ux.library-name.tab-label~1]
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();
 
