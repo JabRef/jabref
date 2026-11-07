@@ -64,7 +64,7 @@ The following table illustrates how layers and responsibilities are organized ac
 | JabRef layer name | AI layer name | Class name | Purpose | Notes |
 | --- | --- | --- | --- | --- |
 | GUI | JavaFX representation | `AiSummaryTab.fxml` | The UI of the feature | Written in FXML |
-| | JavaFX controller | `AiSummaryTabView.java` | Connects UI components in the FXML and ViewModel | Dumb class |
+| | JavaFX controller | `AiSummaryTabView.java` | Connects UI components in the FXML and ViewModel | Links JavaFX components with ViewModel data and is responsible for the display |
 | | JavaFX ViewModel | `AiSummaryTabViewModel.java` | Handles the user experience | Specific for the GUI |
 | Logic | Utility Logic class | `AiSummaryLogic.java` | This class is made specifically to be a bridge between raw AI algorithms and the UI (in different forms). It is highly configurable and has a lot of parameters, but never touches the UI. And those parameters are observable. | Highly configurable with observables. Useful for all types of UI |
 | | Summarizer on the BibEntry level | `BibEntrySummarizer.java` | A class in the responsibility chain that connects BibEntry type to the raw summarizer algorithm through LinkedFileSummarizer | Responsibility chain |
