@@ -310,7 +310,7 @@ public class ImportHandler {
 
     /// Imports dropped files in the background and reports any import warnings or task failure.
     ///
-    /// @param files files to import into the target library
+    /// @param files        files to import into the target library
     /// @param transferMode how linked files should be handled during import
     public void importDroppedFiles(List<Path> files, TransferMode transferMode) {
         importFilesInBackground(files, transferMode)
