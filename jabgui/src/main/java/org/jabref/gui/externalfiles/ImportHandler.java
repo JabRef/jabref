@@ -308,6 +308,10 @@ public class ImportHandler {
         return dialogService.showCustomDialogAndWait(dialog);
     }
 
+    /// Imports dropped files in the background and reports any import warnings or task failure.
+    ///
+    /// @param files files to import into the target library
+    /// @param transferMode how linked files should be handled during import
     public void importDroppedFiles(List<Path> files, TransferMode transferMode) {
         importFilesInBackground(files, transferMode)
                 .onSuccess(this::showImportErrors)
@@ -338,6 +342,9 @@ public class ImportHandler {
         dialogService.showWarningDialogAndWait(Localization.lang("Import warnings"), paragraphs.toString());
     }
 
+    /// Logs an unexpected import task failure and shows its details to the user.
+    ///
+    /// @param exception failure raised by the import task
     public void showImportFailure(Exception exception) {
         LOGGER.error("Error importing dropped files", exception);
         dialogService.showErrorDialogAndWait(Localization.lang("Import error"), exception);
