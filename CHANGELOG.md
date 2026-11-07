@@ -123,6 +123,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 - We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
+- We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
 
 ### Removed
 
