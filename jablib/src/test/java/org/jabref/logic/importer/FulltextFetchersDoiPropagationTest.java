@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -47,6 +48,9 @@ class FulltextFetchersDoiPropagationTest {
 
         when(fulltextFetcher.getTrustLevel())
                 .thenReturn(TrustLevel.PUBLISHER);
+
+        when(fulltextFetcher.getDownloadHeaders())
+                .thenReturn(Map.of());
 
         // Start a local HTTP server to provide a PDF response
         HttpServer server = HttpServer.create(

@@ -9,6 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.EntryLookupsInProgress;
@@ -20,6 +21,8 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -172,9 +175,21 @@ public class DownloadFullTextAction extends SimpleCommand {
                     taskExecutor,
                     dialogService,
                     preferences);
+            Optional<String> brokenPdfLink = entry.getField(StandardField.DOI)
+                                                  .flatMap(DOI::parse)
+                                                  .flatMap(_ -> entry.getFiles().stream()
+                                                                     .filter(file -> !file.isOnlineLink())
+                                                                     .filter(file -> StandardExternalFileType.PDF.getName()
+                                                                                                                  .equalsIgnoreCase(file.getFileType()))
+                                                                     .filter(file -> file.findIn(databaseContext,
+                                                                             preferences.getFilePreferences()).isEmpty())
+                                                                     .map(LinkedFile::getLink)
+                                                                     .findFirst());
             // The URL is not linked on the entry, so there is no link to keep: a downloaded HTML page (paywall or
             // consent interstitial instead of the PDF) has to be deleted rather than left orphaned in the file directory.
-            onlineFile.download(false, result.headers(), stateManager.getUndoManager(databaseContext));
+            brokenPdfLink.ifPresentOrElse(
+                    link -> onlineFile.downloadReplacing(link, result.headers(), stateManager.getUndoManager(databaseContext)),
+                    () -> onlineFile.download(false, result.headers(), stateManager.getUndoManager(databaseContext)));
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));

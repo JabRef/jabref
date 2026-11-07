@@ -430,14 +430,10 @@ class DownloadFullTextActionTest {
         Object downloadResult = downloadTask.call();
         runSuccessHandler(downloadTask, downloadResult);
 
-        // Assert: the original broken link remains and the downloaded file is added.
-        assertEquals(2, entry.getFiles().size());
-        assertTrue(entry.getFiles().contains(missingFile));
-
-        LinkedFile downloadedFile = entry.getFiles().stream()
-                                         .filter(file -> !file.equals(missingFile))
-                                         .findFirst()
-                                         .orElseThrow();
+        // Assert: the downloaded file replaces the original broken link.
+        assertEquals(1, entry.getFiles().size());
+        assertFalse(entry.getFiles().contains(missingFile));
+        LinkedFile downloadedFile = entry.getFiles().getFirst();
 
         // Assert: the newly downloaded file exists and contains the expected content.
         Path downloadedPath = tempDir.resolve(downloadedFile.getLink());
@@ -544,6 +540,9 @@ class DownloadFullTextActionTest {
 
         when(fulltextFetcher.getTrustLevel())
                 .thenReturn(TrustLevel.PUBLISHER);
+
+        when(fulltextFetcher.getDownloadHeaders())
+                .thenReturn(Map.of());
 
         when(fulltextFetcher.findFullText(any(BibEntry.class)))
                 .thenReturn(Optional.of(URLUtil.create(pdfUrl)));
