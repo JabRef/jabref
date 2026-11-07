@@ -31,6 +31,13 @@ The journal-information popup retrieves journal identity information and metrics
 
 Needs: impl
 
+## User can automatically abbreviate or unabbreviate journal titles in fetched entries
+`feat~fetchers.journal-title-automatic-abbreviation~1`
+
+The user preferences can be set to automatic unabbreviation, abbreviation to a particular abbreviation style, or neither, of journal titles in fetched entries.
+
+Needs: impl, utest
+
 ## XML importers and fetchers must disable external entity resolution
 `req~fetchers.xml-xxe-prevention~1`
 
