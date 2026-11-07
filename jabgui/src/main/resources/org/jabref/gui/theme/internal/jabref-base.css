@@ -1816,3 +1816,11 @@ We want to have a look that matches our icons in the tool-bar */
 .flashing-danger {
     -fx-background-color: -color-danger;
 }
+.side-pane-scroll {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.side-pane-scroll > .viewport {
+    -fx-background-color: transparent;
+}
