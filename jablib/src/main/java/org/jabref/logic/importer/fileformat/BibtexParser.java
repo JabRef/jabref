@@ -766,7 +766,7 @@ public class BibtexParser implements Parser {
         skipWhitespace();
         int keyStartLine = line;
         int keyStartColumn = column;
-        String key = parseKey(closingBracket);
+        String key = parseKey(closingBracket, keyStartLine, keyStartColumn);
 
         // [impl->req~import.bibtex.missing-key-recovery~1]
         if (!key.isEmpty()) {
@@ -916,7 +916,7 @@ public class BibtexParser implements Parser {
                 return token.toString();
             }
 
-            if (Character.isLetterOrDigit((char) character) || (":-_*+./'".indexOf(character) >= 0)) {
+            if (isTextTokenCharacter(character)) {
                 token.append((char) character);
             } else {
                 unread(character);
@@ -1028,7 +1028,7 @@ public class BibtexParser implements Parser {
     }
 
     /// This method is used to parse the citation key of an entry.
-    private String parseKey(char closingBracket) throws IOException {
+    private String parseKey(char closingBracket, int keyStartLine, int keyStartColumn) throws IOException {
         StringBuilder token = new StringBuilder(20);
         int openParentheses = 0;
 
@@ -1060,6 +1060,14 @@ public class BibtexParser implements Parser {
                             Localization.lang("Line %0: Found entry without citation key.", String.valueOf(line)));
                     return "";
                 } else if (Character.isWhitespace((char) character)) {
+                    // [impl->req~import.bibtex.key-missing-comma~1]
+                    if (isFieldsAssignmentNext()) {
+                        unread(character);
+                        parserResult.addWarning(new ParserResult.Range(keyStartLine, keyStartColumn),
+                                Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).",
+                                        String.valueOf(keyStartLine), token.toString()));
+                        return token.toString();
+                    }
                     // We have encountered white space instead of the comma at
                     // the end of
                     // the key. Possibly the comma is missing, so we try to
@@ -1087,6 +1095,30 @@ public class BibtexParser implements Parser {
         }
         unreadBuffer(whitespace);
         return character == '=';
+    }
+
+    private boolean isFieldsAssignmentNext() throws IOException {
+        StringBuilder lookahead = new StringBuilder();
+        readWhitespace(lookahead);
+        int fieldNameLength = 0;
+        while (isTextTokenCharacter(peek())) {
+            lookahead.append((char) read());
+            fieldNameLength++;
+        }
+        readWhitespace(lookahead);
+        boolean isFieldAssignment = (fieldNameLength > 0) && (peek() == '=');
+        unreadBuffer(lookahead);
+        return isFieldAssignment;
+    }
+
+    private void readWhitespace(StringBuilder target) throws IOException {
+        while (Character.isWhitespace((char) peek())) {
+            target.append((char) read());
+        }
+    }
+
+    private boolean isTextTokenCharacter(int character) throws IOException {
+        return Character.isLetterOrDigit((char) character) || (":-_*+./'".indexOf(character) >= 0);
     }
 
     private String parseBracketedText() throws IOException {
