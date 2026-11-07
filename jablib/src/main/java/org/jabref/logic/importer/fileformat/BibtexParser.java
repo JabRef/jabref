@@ -1062,9 +1062,10 @@ public class BibtexParser implements Parser {
                 } else if (Character.isWhitespace((char) character)) {
                     // [impl->req~import.bibtex.key-missing-comma~1]
                     if (isFieldsAssignmentNext()) {
-                        parserResult.addWarning(new ParserResult.Range(keyStartLine, keyStartColumn), Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).",
-                                String.valueOf(keyStartLine),
-                                token.toString()));
+                        unread(character);
+                        parserResult.addWarning(new ParserResult.Range(keyStartLine, keyStartColumn),
+                                Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).",
+                                        String.valueOf(keyStartLine), token.toString()));
                         return token.toString();
                     }
                     // We have encountered white space instead of the comma at

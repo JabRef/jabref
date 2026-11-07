@@ -494,6 +494,23 @@ class BibtexParserTest {
         assertEquals(List.of("Line 1: Found corrupted citation key key (comma missing)."), result.warnings());
     }
 
+    // [utest->req~import.bibtex.key-missing-comma~1]
+    @ParameterizedTest
+    @MethodSource
+    void parseEndsCitationKeyRangeBeforeSeparatorWhenCommaIsMissing(String entry) throws IOException {
+        ParserResult result = parser.parse(Reader.of(entry));
+
+        BibEntry parsedEntry = result.getDatabase().getEntries().getFirst();
+        assertEquals(new ParserResult.Range(1, 10, 1, 13), result.getFieldRange(parsedEntry, InternalField.KEY_FIELD));
+    }
+
+    private static Stream<Arguments> parseEndsCitationKeyRangeBeforeSeparatorWhenCommaIsMissing() {
+        return Stream.of(
+                Arguments.of("@article{key title = {x}}"),
+                Arguments.of("@article{key\n title = {x}}"),
+                Arguments.of("@article{key\r\n title = {x}}"));
+    }
+
     @Test
     void parseRecognizesEntryWithBigNumbers() throws IOException {
         ParserResult result = parser.parse(Reader.of("""
