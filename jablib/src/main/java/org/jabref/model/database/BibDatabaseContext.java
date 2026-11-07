@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -197,10 +198,10 @@ public class BibDatabaseContext {
     /// @return fixed-size record containing absolute paths (if configured)
     public FileDirectories getAllFileDirectories(FilePreferences preferences) {
         Path userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost())
-                                         .map(this::getFileDirectoryPath)
+                                         .flatMap(this::getFileDirectoryPath)
                                          .orElse(null);
         Path librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory()
-                                                    .map(this::getFileDirectoryPath)
+                                                    .flatMap(this::getFileDirectoryPath)
                                                     .orElse(null);
 
         return new FileDirectories(
@@ -210,9 +211,11 @@ public class BibDatabaseContext {
         );
     }
 
-    /// Returns the directory used if neither a user-specific nor a library-specific file directory is set:
-    /// the BIB file directory or the main file directory (according to the (global) preferences).
-    /// In contrast to [#getAllFileDirectories(FilePreferences)], this does not read the directories stored in the library.
+    /// Returns the fallback file directory, which comes after any user-specific and library-specific
+    /// directories in the lookup order.
+    ///
+    /// Depending on the file preferences, this is either the directory containing the `.bib`
+    /// file or the global main file directory. Library metadata is not read.
     public Optional<Path> getFallbackFileDirectory(FilePreferences preferences) {
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
             return getDatabaseDirectory();
@@ -242,21 +245,29 @@ public class BibDatabaseContext {
 
     /// Resolves a file directory as it is stored in the metadata of this library.
     ///
-    /// @return The absolute path for the given directory. A relative directory stays relative if this library has not been saved yet.
-    public Path getFileDirectoryPath(String directory) {
-        Path path = Path.of(directory);
+    /// A relative directory is resolved against the directory of the `.bib` file.
+    /// It stays relative if this library has not been saved yet.
+    /// An empty optional is returned if the directory is not a valid path.
+    public Optional<Path> getFileDirectoryPath(String directory) {
+        Path path;
+        try {
+            path = Path.of(directory);
+        } catch (InvalidPathException e) {
+            LOGGER.debug("Invalid file directory {}", directory, e);
+            return Optional.empty();
+        }
         if (path.isAbsolute()) {
-            return path;
+            return Optional.of(path);
         }
 
         // If this path is relative, we try to interpret it as relative to the file path of this BIB file:
-        return getDatabasePath()
+        return Optional.of(getDatabasePath()
                 .map(databaseFile -> Optional.ofNullable(databaseFile.getParent())
                                              .orElse(Path.of(""))
                                              .resolve(path)
                                              .normalize()
                                              .toAbsolutePath())
-                .orElse(path);
+                .orElse(path));
     }
 
     public @Nullable DatabaseSynchronizer getDBMSSynchronizer() {

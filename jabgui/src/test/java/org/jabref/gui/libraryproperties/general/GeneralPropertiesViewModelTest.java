@@ -201,6 +201,20 @@ class GeneralPropertiesViewModelTest {
         assertEquals(Optional.empty(), databaseContext.getMetaData().getLatexFileDirectory("user"));
     }
 
+    @Test
+    void promptsShowNormalizedDirectories(@TempDir Path tempDir) {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), tempDir.resolve("demo-tool-hint.bib"));
+        FilePreferences filePreferences = createFilePreferences(tempDir.resolve("working"));
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(Path.of(".")));
+        GeneralPropertiesViewModel viewModel = createViewModel(databaseContext, filePreferences);
+        viewModel.setValues(databaseContext.getMetaData());
+
+        assertEquals(Path.of("").toAbsolutePath().toString(), viewModel.librarySpecificDirectoryPromptProperty().get());
+
+        viewModel.librarySpecificDirectoryProperty().set(tempDir.resolve("a").resolve("..").resolve("b").toString());
+        assertEquals(tempDir.resolve("b").toString(), viewModel.userSpecificFileDirectoryPromptProperty().get());
+    }
+
     private static FilePreferences createFilePreferences(Path workingDirectory) {
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUserAndHost()).thenReturn("user");

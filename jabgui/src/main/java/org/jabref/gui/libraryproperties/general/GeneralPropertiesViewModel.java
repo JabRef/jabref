@@ -39,12 +39,8 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralPropertiesViewModel.class);
 
     private final BooleanProperty encodingDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(OS.ENCODINGS));
@@ -116,11 +112,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         // [impl->req~jabgui.libraryproperties.file-directory.effective-prompt~1]
         FilePreferences filePreferences = preferences.getFilePreferences();
         librarySpecificDirectoryPromptProperty.setValue(databaseContext.getFallbackFileDirectory(filePreferences)
-                                                                       .map(directory -> directory.toAbsolutePath().toString())
+                                                                       .map(directory -> directory.toAbsolutePath().normalize().toString())
                                                                        .orElse(""));
         // Same fallback as the LaTeX citations tab uses when no LaTeX file directory is set
         laTexFileDirectoryPromptProperty.setValue(FileUtil.getInitialDirectory(databaseContext, filePreferences.getWorkingDirectory())
                                                           .toAbsolutePath()
+                                                          .normalize()
                                                           .toString());
     }
 
@@ -275,12 +272,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             return Optional.empty();
         }
 
-        try {
-            return Optional.of(databaseContext.getFileDirectoryPath(directory.trim()).toAbsolutePath());
-        } catch (InvalidPathException e) {
-            LOGGER.debug("Could not resolve directory {}", directory, e);
-            return Optional.empty();
-        }
+        return databaseContext.getFileDirectoryPath(directory.trim())
+                              .map(path -> path.toAbsolutePath().normalize());
     }
 
     private Path getBrowseDirectory(String configuredDir) {
