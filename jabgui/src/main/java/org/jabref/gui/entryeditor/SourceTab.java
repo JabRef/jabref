@@ -54,6 +54,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.SyntaxDecorator;
 import jfx.incubator.scene.control.richtext.TextPos;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +78,7 @@ public class SourceTab extends EntryEditorTab {
     private BibTeXCodeArea codeArea;
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
-    private String lastStoredText;
+    private @Nullable String lastStoredText;
     private boolean isStoring = false;
 
     public SourceTab(
@@ -160,7 +161,7 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.addRule(validationMessage);
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
-            if (!onFocus) {
+            if (!onFocus && isSelected()) {
                 storeVisibleSource();
             }
         });
@@ -248,16 +249,17 @@ public class SourceTab extends EntryEditorTab {
 
         try {
             isStoring = true;
-            lastStoredText = text;
-            storeSource(previousEntry, text);
+            if (storeSource(previousEntry, text)) {
+                lastStoredText = text;
+            }
         } finally {
             isStoring = false;
         }
     }
 
-    private void storeSource(BibEntry outOfFocusEntry, String text) {
+    private boolean storeSource(BibEntry outOfFocusEntry, String text) {
         if ((outOfFocusEntry == null) || text.isEmpty()) {
-            return;
+            return true;
         }
 
         BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, fileMonitor);
@@ -269,7 +271,7 @@ public class SourceTab extends EntryEditorTab {
             dialogService.showErrorDialogAndWait(errorMessage);
             validationMessage.setValue(ValidationMessage.error(errorMessage));
             LOGGER.debug("Incorrect source", ex);
-            return;
+            return false;
         }
         BibDatabase database = parserResult.getDatabase();
 
@@ -280,7 +282,7 @@ public class SourceTab extends EntryEditorTab {
                     Localization.lang("Problem with parsing entry"),
                     Localization.lang("Parsing failed because more than one entry was found. Please check your BibTeX syntax.")
             );
-            return;
+            return false;
         }
 
         if (!database.hasEntries()) {
@@ -289,13 +291,13 @@ public class SourceTab extends EntryEditorTab {
                 String errors = parserResult.getErrorMessage();
                 dialogService.showErrorDialogAndWait(errors);
                 validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
-                return;
+                return false;
             } else {
                 LOGGER.warn("No entries found.");
                 String errors = Localization.lang("No entries available");
                 dialogService.showErrorDialogAndWait(errors);
                 validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
-                return;
+                return false;
             }
         }
 
@@ -335,7 +337,7 @@ public class SourceTab extends EntryEditorTab {
                     String errorMessage = Localization.lang("Failed to parse Bib(La)TeX: %0", String.join("\n", errors));
                     dialogService.showErrorDialogAndWait(errorMessage);
                     validationMessage.setValue(ValidationMessage.error(errorMessage));
-                    return;
+                    return false;
                 }
 
                 compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
@@ -357,6 +359,7 @@ public class SourceTab extends EntryEditorTab {
         }
 
         validationMessage.setValue(null);
+        return true;
     }
 
     private void listenForSaveKeybinding(KeyEvent event) {

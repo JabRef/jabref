@@ -425,4 +425,40 @@ class SourceTabTest {
         verify(dialogService, times(1)).showWarningDialogAndWait(anyString(), anyString());
         assertEquals(Optional.of("Original title"), entry.getField(StandardField.TITLE));
     }
+
+    @Test
+    void leavingSourceTabAgainWithSameInvalidContentRetriesValidationAndShowsDialog() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Valid title");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            sourceArea.clear();
+            sourceArea.appendText("This is plain text with no bibtex entry");
+        });
+        JavaFxExtension.awaitEvents();
+
+        // First tab exit: shows dialog 1 time
+        JavaFxExtension.invokeAndWait(() -> pane.getSelectionModel().select(1));
+        JavaFxExtension.awaitEvents();
+
+        verify(dialogService, times(1)).showErrorDialogAndWait(anyString());
+
+        // Return to source tab and exit again without changing the invalid text
+        JavaFxExtension.invokeAndWait(() -> pane.getSelectionModel().select(sourceTab));
+        JavaFxExtension.awaitEvents();
+        JavaFxExtension.invokeAndWait(() -> pane.getSelectionModel().select(1));
+        JavaFxExtension.awaitEvents();
+
+        // Validation must not be skipped: second dialog is shown
+        verify(dialogService, times(2)).showErrorDialogAndWait(anyString());
+        assertEquals(Optional.of("Valid title"), entry.getField(StandardField.TITLE));
+    }
 }
