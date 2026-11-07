@@ -1,8 +1,10 @@
 package org.jabref.gui.preferences;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.css.PseudoClass;
+import javafx.scene.Node;
 
 /// Filters the preference tabs by a search query and highlights the matching elements.
 ///
@@ -24,6 +27,9 @@ class PreferencesSearchHandler {
     private final ListProperty<PreferencesTab> filteredPreferenceTabs;
     private final Map<PreferencesTab, List<SearchableElement>> searchableElements;
 
+    /// The highlighted nodes per tab of the last search, in declaration order, so the dialog can scroll to the first one.
+    private final Map<PreferencesTab, List<Node>> matchedNodes = new HashMap<>();
+
     PreferencesSearchHandler(List<PreferencesTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
         this.searchableElements = preferenceTabs.stream()
@@ -33,6 +39,7 @@ class PreferencesSearchHandler {
 
     public void filterTabs(String query) {
         clearHighlights();
+        matchedNodes.clear();
 
         if (query.isBlank()) {
             filteredPreferenceTabs.setAll(preferenceTabs);
@@ -55,14 +62,34 @@ class PreferencesSearchHandler {
                                                             .filter(element -> element.text().toLowerCase(Locale.ROOT).contains(query))
                                                             .toList();
         matches.forEach(element -> element.node().pseudoClassStateChanged(SEARCH_HIGHLIGHT, true));
+        matchedNodes.put(tab, matches.stream().map(SearchableElement::node).toList());
 
         return keywordMatches || !matches.isEmpty();
+    }
+
+    /// A node in a region hidden by `visibleWhen` (e.g. the AI tab's expert settings) is not laid
+    /// out and thus useless as a scroll target - the first *visible* match is what to scroll to.
+    /// Checked when scrolling, not when searching: the region can be toggled in between.
+    private static boolean isShown(Node node) {
+        for (Node current = node; current != null; current = current.getParent()) {
+            if (!current.isVisible()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void clearHighlights() {
         searchableElements.values().stream()
                           .flatMap(List::stream)
                           .forEach(element -> element.node().pseudoClassStateChanged(SEARCH_HIGHLIGHT, false));
+    }
+
+    /// @return the first currently visible element the current query highlighted in the given tab, if any
+    public Optional<Node> firstMatch(PreferencesTab tab) {
+        return matchedNodes.getOrDefault(tab, List.of()).stream()
+                           .filter(PreferencesSearchHandler::isShown)
+                           .findFirst();
     }
 
     protected ListProperty<PreferencesTab> filteredPreferenceTabsProperty() {

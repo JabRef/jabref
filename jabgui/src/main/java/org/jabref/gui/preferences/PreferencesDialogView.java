@@ -16,6 +16,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 
@@ -90,6 +91,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
             content.getStyleClass().addAll("padding-4", "preferences-tab-content");
+            preferencesContainer.setVvalue(0);
+            searchHandler.firstMatch(tab).ifPresent(this::scrollToSearchMatch);
         });
 
         if (this.preferencesTabToSelectClass != null) {
@@ -109,6 +112,22 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());
 
         viewModel.setValues();
+    }
+
+    /// Brings the first element matching the search query into view.
+    ///
+    /// The content was attached to the scroll pane just above. A tab shown for the first time has a
+    /// content height of 0 until it is laid out, and [ScrollUtils] then reads that as "fits into the
+    /// viewport" and does not scroll - hence the explicit layout pass.
+    /// [javafx.application.Platform#runLater] is no substitute: measured on this dialog, the queued
+    /// task still runs before the pulse's layout and sees the same height of 0.
+    private void scrollToSearchMatch(Node match) {
+        if (preferencesContainer.getScene() == null) {
+            return;
+        }
+        preferencesContainer.applyCss();
+        preferencesContainer.layout();
+        ScrollUtils.scrollIntoScrollPane(preferencesContainer, match.localToScene(match.getBoundsInLocal()));
     }
 
     @FXML
