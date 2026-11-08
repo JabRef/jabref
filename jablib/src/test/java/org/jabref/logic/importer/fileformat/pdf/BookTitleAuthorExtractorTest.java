@@ -25,7 +25,7 @@ class BookTitleAuthorExtractorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Windows 11", "ISO 9001", "C 40", "С 40-річчям", "40 задач", "Фізика С 40"})
+    @ValueSource(strings = {"Windows 11", "ISO 9001", "HTML5", "PHP7", "C40", "C 40", "С 40-річчям", "40 задач", "Фізика С 40"})
     void preservesLegitimateTitleText(String title) {
         assertEquals(Optional.of(title),
                 BookTitleAuthorExtractor.findTitle(title + " / В. Д. Сиротюк. - Харків : Сиция, 2011."));
@@ -155,5 +155,53 @@ class BookTitleAuthorExtractorTest {
         assertEquals(
                 Optional.of("Збірник задач з фізики для 8 класу"),
                 BookTitleAuthorExtractor.findTitle(citation));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r", "\u0085", "\u2028", "\u2029"})
+    void extractsTitleAndAuthorsAcrossWrappedSlash(String lineBreak) {
+        String citation = "Коваль О. П." + lineBreak + "К56 Збірник задач /" + lineBreak
+                + "О. П. Коваль. — Харків : Ранок, 2010.";
+
+        assertEquals(Optional.of("Збірник задач"), BookTitleAuthorExtractor.findTitle(citation));
+        assertEquals(Optional.of("О. П. Коваль"), BookTitleAuthorExtractor.findAuthors(citation));
+        assertEquals(Optional.empty(), BookTitleAuthorExtractor.findEditors(citation));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {".\n— ", ". —\n", ".\r\n– ", ". -\r\n", ".\u0085— ", ". —\u2028", ".\u2029— "})
+    void excludesWrappedPublicationAreaFromContributors(String separator) {
+        String publication = separator + "Харків : Ранок, 2010.";
+
+        assertEquals(Optional.of("О. П. Коваль"),
+                BookTitleAuthorExtractor.findAuthors("Збірник / О. П. Коваль" + publication));
+        assertEquals(Optional.of("О. П. Коваля"),
+                BookTitleAuthorExtractor.findEditors("Збірник / за ред. О. П. Коваля" + publication));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Редько О. П", "Редченко Н. І", "Редакторенко В. Д", "Ред-Коваль О. П"})
+    void preservesSurnamesBeginningWithEditorLabel(String author) {
+        String citation = "Збірник / " + author + ". — Харків : Ранок, 2010.";
+
+        assertEquals(Optional.of(author), BookTitleAuthorExtractor.findAuthors(citation));
+        assertEquals(Optional.empty(), BookTitleAuthorExtractor.findEditors(citation));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"за ред.", "під ред.", "за редакцією", "під редакцією", "редактор", "редактори", "ред.", "редактор:"})
+    void recognizesCompleteEditorLabels(String label) {
+        String citation = "Збірник / " + label + " О. П. Коваля. — Харків : Ранок, 2010.";
+
+        assertEquals(Optional.empty(), BookTitleAuthorExtractor.findAuthors(citation));
+        assertEquals(Optional.of("О. П. Коваля"), BookTitleAuthorExtractor.findEditors(citation));
+    }
+
+    @Test
+    void preservesSlashInsideTitle() {
+        String citation = "HTML5/PHP7 для початківців / О. П. Коваль. — Харків : Ранок, 2010.";
+
+        assertEquals(Optional.of("HTML5/PHP7 для початківців"), BookTitleAuthorExtractor.findTitle(citation));
+        assertEquals(Optional.of("О. П. Коваль"), BookTitleAuthorExtractor.findAuthors(citation));
     }
 }
