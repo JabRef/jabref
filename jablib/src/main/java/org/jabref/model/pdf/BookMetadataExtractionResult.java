@@ -9,8 +9,8 @@ import org.jabref.model.entry.identifier.ISBN;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public record BookExtraction(Optional<BibEntry> localBook, List<ISBN> isbnCandidates) {
-    public BookExtraction {
+public record BookMetadataExtractionResult(Optional<BibEntry> localBook, List<ISBN> isbnCandidates) {
+    public BookMetadataExtractionResult {
         isbnCandidates = List.copyOf(isbnCandidates);
     }
 }

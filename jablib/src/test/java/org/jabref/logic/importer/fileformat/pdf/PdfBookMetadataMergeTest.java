@@ -20,7 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.pdf.BookExtraction;
+import org.jabref.model.pdf.BookMetadataExtractionResult;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -144,7 +144,7 @@ class PdfBookMetadataMergeTest {
         when(preferences.grobidPreferences().isGrobidEnabled()).thenReturn(false);
         Path file = tempDir.resolve("book.pdf");
         BibEntry localEntry = extracted.getDatabase().getEntries().getFirst();
-        BookExtraction book = new BookExtraction(Optional.of(localEntry),
+        BookMetadataExtractionResult book = new BookMetadataExtractionResult(Optional.of(localEntry),
                 localEntry.getField(StandardField.ISBN)
                           .flatMap(org.jabref.model.entry.identifier.ISBN::parse)
                           .stream().toList());

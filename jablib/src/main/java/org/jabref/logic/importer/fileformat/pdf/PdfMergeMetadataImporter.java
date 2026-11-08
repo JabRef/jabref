@@ -35,7 +35,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
-import org.jabref.model.pdf.BookExtraction;
+import org.jabref.model.pdf.BookMetadataExtractionResult;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -165,11 +165,11 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
     private ParserResult importContent(PdfContentImporter contentImporter, PDDocument document,
                                        Map<String, Optional<BibEntry>> isbnCache, Set<ISBN> unresolvedBookIsbns) throws IOException {
-        Optional<BookExtraction> extractedBook = contentImporter.extractBook(document);
+        Optional<BookMetadataExtractionResult> extractedBook = contentImporter.extractBook(document);
         if (extractedBook.isEmpty()) {
             return contentImporter.importPaperContent(document);
         }
-        BookExtraction book = resolveBookIsbn(extractedBook.orElseThrow(), isbnCache);
+        BookMetadataExtractionResult book = resolveBookIsbn(extractedBook.orElseThrow(), isbnCache);
         if (book.isbnCandidates().size() > 1) {
             unresolvedBookIsbns.addAll(book.isbnCandidates());
         }
@@ -177,7 +177,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     // [impl->req~import.pdf.book-isbn-resolution~1]
-    private BookExtraction resolveBookIsbn(BookExtraction book, Map<String, Optional<BibEntry>> isbnCache) {
+    private BookMetadataExtractionResult resolveBookIsbn(BookMetadataExtractionResult book, Map<String, Optional<BibEntry>> isbnCache) {
         if (book.localBook().isEmpty() || book.isbnCandidates().size() < 2
                 || book.isbnCandidates().size() > BookIsbnResolver.MAX_CANDIDATES) {
             return book;
@@ -195,7 +195,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         if (selectedIsbn.isEmpty()) {
             return book;
         }
-        return new BookExtraction(book.localBook(), List.of(selectedIsbn.orElseThrow()));
+        return new BookMetadataExtractionResult(book.localBook(), List.of(selectedIsbn.orElseThrow()));
     }
 
     private Optional<BibEntry> fetchIsbn(String identifier, Map<String, Optional<BibEntry>> isbnCache) {

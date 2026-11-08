@@ -28,7 +28,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.pdf.BookExtraction;
+import org.jabref.model.pdf.BookMetadataExtractionResult;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -215,14 +215,14 @@ public class PdfContentImporter extends PdfImporter {
     @Override
     @NonNull
     public ParserResult importDatabase(@NonNull Path filePath, @NonNull PDDocument document) throws IOException {
-        Optional<BookExtraction> book = extractBook(document);
+        Optional<BookMetadataExtractionResult> book = extractBook(document);
         if (book.isEmpty()) {
             return importPaperContent(document);
         }
         return importBook(book.orElseThrow());
     }
 
-    Optional<BookExtraction> extractBook(PDDocument document) throws IOException {
+    Optional<BookMetadataExtractionResult> extractBook(PDDocument document) throws IOException {
         List<String> pageTexts = PdfPageScanner.scanPages(document);
         Optional<String> bibliographicPages = BibliographicPageDetector.findBibliographicPage(pageTexts);
         if (bibliographicPages.isEmpty()) {
@@ -239,10 +239,10 @@ public class PdfContentImporter extends PdfImporter {
         if (isbns.isEmpty() && localBook.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(new BookExtraction(localBook, isbns));
+        return Optional.of(new BookMetadataExtractionResult(localBook, isbns));
     }
 
-    ParserResult importBook(BookExtraction book) {
+    ParserResult importBook(BookMetadataExtractionResult book) {
         Optional<BibEntry> localBook = book.localBook();
         List<ISBN> isbns = book.isbnCandidates();
         if (isbns.size() > 1) {
