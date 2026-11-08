@@ -261,6 +261,23 @@ Walkthroughs that require preferences must open the preferences dialog directly,
 
 Needs: impl
 
+## Preferences search must bring the first visible match in the selected tab into view
+`req~ux.preferences.search-scroll~1`
+
+When a selected tab contains visible matches for the search, the first match is brought into view, including on the first visit to the tab.
+
+See <https://github.com/JabRef/jabref/pull/17012>.
+
+Needs: impl, utest
+
+## API-key test results must apply only to the tested key
+`req~ux.preferences.api-key-test-result~1`
+
+In Web search preferences, a test result must not change the validation state or report a result for a different current key.
+Clearing the key remains allowed even if an earlier test fails.
+
+Needs: impl, utest
+
 ## Groups walkthrough must prepare example library and groups UI state
 `req~ux.walkthrough.groups-preparation~1`
 
