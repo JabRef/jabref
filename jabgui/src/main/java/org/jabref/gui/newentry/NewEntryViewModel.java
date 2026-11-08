@@ -538,6 +538,7 @@ public class NewEntryViewModel {
                           importInterpretedCitations(result);
                       })
                       .onFailure(this::showInterpretCitationsFailure)
+                      .showsFailureToUser()
                       .executeWith(taskExecutor);
 
         executedSuccessfully.set(true);
