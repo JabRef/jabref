@@ -210,7 +210,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     private List<BibEntry> fetchIdsOfCandidates(List<BibEntry> candidates, Map<String, Optional<BibEntry>> isbnCache,
-                                              Set<ISBN> unresolvedBookIsbns) {
+                                                Set<ISBN> unresolvedBookIsbns) {
         List<BibEntry> fetchedCandidates = new ArrayList<>();
 
         // Collects Ids already looked for - to avoid multiple calls for one id
