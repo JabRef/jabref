@@ -143,7 +143,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                         }
                     })
                     .onFailure(dialogService::showErrorDialogAndWait)
-                    .showFailureToUser(true)
+                    .failureShownByCaller(true)
                     .executeWith(taskExecutor);
         } else {
             cleanup(cleanupPreset, entriesToProcess);

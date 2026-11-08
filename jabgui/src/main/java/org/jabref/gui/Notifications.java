@@ -117,7 +117,7 @@ public class Notifications {
     public static class TaskNotification extends Notification<Task<?>> {
         private final boolean untitled;
 
-        /// @param backgroundTask the task `task` was created from; decides whether a failure needs a notification, see [BackgroundTask#showFailureToUser(boolean)]
+        /// @param backgroundTask the task `task` was created from; decides whether a failure needs a notification, see [BackgroundTask#failureShownByCaller(boolean)]
         public TaskNotification(Task<?> task, BackgroundTask<?> backgroundTask) {
             super(task.getTitle(), task.getMessage());
             setUserObject(task);
@@ -145,7 +145,7 @@ public class Notifications {
             Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.ofNullable(task.getOnFailed());
             task.setOnFailed(event -> {
                 onFailed.ifPresent(handler -> handler.handle(event));
-                if (untitled || backgroundTask.showFailureToUser()) {
+                if (untitled || backgroundTask.failureShownByCaller()) {
                     remove();
                 } else {
                     // Without full progress, the notification would otherwise look like the task is still running

@@ -316,7 +316,7 @@ public class ImportHandler {
         importFilesInBackground(files, transferMode)
                 .onSuccess(this::showImportErrors)
                 .onFailure(this::showImportFailure)
-                .showFailureToUser(true)
+                .failureShownByCaller(true)
                 .executeWith(taskExecutor);
     }
 

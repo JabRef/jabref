@@ -36,7 +36,7 @@ class NotificationsTest {
 
     @Test
     void failedTaskShowingFailureItselfIsRemoved() {
-        runToEnd(BackgroundTask.wrap(FAILING).setTitle("Task").showFailureToUser(true));
+        runToEnd(BackgroundTask.wrap(FAILING).setTitle("Task").failureShownByCaller(true));
 
         assertEquals(List.of(), group.getNotifications());
     }
