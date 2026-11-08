@@ -272,10 +272,10 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
-      - name: textlint write-good (added Markdown lines)
+      - name: textlint write-good (changed Markdown lines)
         if: github.event_name == 'pull_request'
         run: |
-          # Report-only: the existing docs have thousands of findings, so only the lines added by the PR are reported and the step does not fail.
+          # Report-only: the existing docs have thousands of findings, so only the lines changed by the PR are reported and the step does not fail.
           mapfile -t files < <(git diff --name-only --diff-filter=AM HEAD^1 HEAD -- '*.md' ':!CHANGELOG.md')
           if [ ${#files[@]} -eq 0 ]; then
             echo "No changed Markdown files."
@@ -284,8 +284,8 @@ jobs:
           git diff -U0 --diff-filter=AM HEAD^1 HEAD -- '*.md' ':!CHANGELOG.md' | awk '
             /^\+\+\+ b\// { file = substr($0, 7) }
             /^@@ / { split($3, r, ","); n = (2 in r) ? r[2] : 1; for (i = 0; i < n; i++) print "file=" file ",line=" r[1] + i "," }
-          ' > "$RUNNER_TEMP/added-lines"
-          npm run textlint:write-good -- "${files[@]}" | sed "s|${GITHUB_WORKSPACE}/||g" | grep -F -f "$RUNNER_TEMP/added-lines" || true
+          ' > "$RUNNER_TEMP/changed-lines"
+          npm run textlint:write-good -- "${files[@]}" | sed "s|${GITHUB_WORKSPACE}/||g" | grep -F -f "$RUNNER_TEMP/changed-lines" || true
       - name: typos
         run: pipx run typos==1.50.3
 
