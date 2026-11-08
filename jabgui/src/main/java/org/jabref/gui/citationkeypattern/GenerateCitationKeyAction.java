@@ -30,10 +30,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
-
-    private List<BibEntry> entries;
-    private boolean isCanceled;
-
     private final TaskExecutor taskExecutor;
     private final CliPreferences preferences;
 
@@ -53,28 +49,30 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        entries = new ArrayList<>(stateManager.getSelectedEntries());
-        stateManager.getActiveDatabase().ifPresent(this::generateKeysIn);
+        List<BibEntry> selectedEntries = new ArrayList<>(stateManager.getSelectedEntries());
+        stateManager.getActiveDatabase().ifPresent(databaseContext -> generateKeysIn(databaseContext, selectedEntries));
     }
 
-    private void generateKeysIn(BibDatabaseContext databaseContext) {
-        if (entries.isEmpty()) {
+    private void generateKeysIn(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries) {
+        if (selectedEntries.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate citation keys"),
                     Localization.lang("First select the entries you want keys to be generated for."));
             return;
         }
-        dialogService.notify(formatOutputMessage(Localization.lang("Generating citation key for"), entries.size()));
 
-        checkOverwriteKeysChosen();
-
-        if (!this.isCanceled) {
-            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground(databaseContext);
-            backgroundTask.showToUser(true);
-            backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
-            backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
-
-            backgroundTask.executeWith(this.taskExecutor);
+        List<BibEntry> entriesToProcess = getEntriesToProcess(selectedEntries);
+        if (entriesToProcess.isEmpty()) {
+            return;
         }
+
+        dialogService.notify(formatOutputMessage(Localization.lang("Generating citation key for"), entriesToProcess.size()));
+
+        BackgroundTask<Void> backgroundTask = this.generateKeysInBackground(databaseContext, entriesToProcess);
+        backgroundTask.showToUser(true);
+        backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
+        backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entriesToProcess.size()));
+
+        backgroundTask.executeWith(this.taskExecutor);
     }
 
     public static boolean confirmOverwriteKeys(DialogService dialogService, CliPreferences preferences) {
@@ -92,22 +90,24 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    private void checkOverwriteKeysChosen() {
+    private List<BibEntry> getEntriesToProcess(List<BibEntry> selectedEntries) {
+        List<BibEntry> entries = new ArrayList<>(selectedEntries);
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (this.preferences.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
             entries.removeIf(BibEntry::hasCitationKey);
-            // if we're going to override some citation keys warn the user about it
         } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {
+            // If we're going to override some citation keys warn the user about it
             boolean overwriteKeys = confirmOverwriteKeys(dialogService, this.preferences);
 
             // The user doesn't want to override citation keys
             if (!overwriteKeys) {
-                isCanceled = true;
+                return List.of();
             }
         }
+        return entries;
     }
 
-    private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext) {
+    private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext, List<BibEntry> entriesToProcess) {
         UndoManager undoManager = stateManager.getUndoManager(databaseContext);
         CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
         // The keys are written entry by entry in call(), which is also where they are handed over
@@ -129,18 +129,15 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             }
 
             private Void generateKeys() {
-                if (isCanceled) {
-                    return null;
-                }
                 UiTaskExecutor.runInJavaFXThread(() -> {
-                    updateProgress(0, entries.size());
-                    messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
+                    updateProgress(0, entriesToProcess.size());
+                    messageProperty().set(Localization.lang("%0/%1 entries", 0, entriesToProcess.size()));
                 });
                 // generate the new citation keys for each entry
                 CitationKeyGenerator keyGenerator =
                         new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
                 int entriesDone = 0;
-                for (BibEntry entry : entries) {
+                for (BibEntry entry : entriesToProcess) {
                     String newKey = keyGenerator.generateKey(entry);
                     // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
                     Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
@@ -150,8 +147,8 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     entriesDone++;
                     int finalEntriesDone = entriesDone;
                     UiTaskExecutor.runInJavaFXThread(() -> {
-                        updateProgress(finalEntriesDone, entries.size());
-                        messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
+                        updateProgress(finalEntriesDone, entriesToProcess.size());
+                        messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entriesToProcess.size()));
                     });
                 }
                 return null;
@@ -159,7 +156,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         };
 
         return backgroundTask.onSuccess(_ ->
-                dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size())));
+                dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entriesToProcess.size())));
     }
 
     private String formatOutputMessage(String start, int count) {
