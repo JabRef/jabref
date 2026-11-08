@@ -39,10 +39,10 @@ public class AddToGroupAction extends SimpleCommand {
         }
         stateManager.getActiveDatabase().ifPresent(library ->
                 library.getMetaData().getGroups()
-                        .filter(AddToGroupDialogViewModel::hasAssignableGroups)
-                        .ifPresentOrElse(
-                                root -> assignSelectedEntries(library, root),
-                                () -> dialogService.notify(Localization.lang("This library has no group to assign entries to."))));
+                       .filter(AddToGroupDialogViewModel::hasAssignableGroups)
+                       .ifPresentOrElse(
+                               root -> assignSelectedEntries(library, root),
+                               () -> dialogService.notify(Localization.lang("This library has no group to assign entries to."))));
     }
 
     // [impl->feat~groups.assign-entries-by-keyboard~1]
