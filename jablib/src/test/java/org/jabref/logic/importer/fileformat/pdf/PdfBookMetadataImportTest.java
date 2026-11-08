@@ -273,6 +273,27 @@ public class PdfBookMetadataImportTest {
         assertImportedPaper("ordinary-text-isbn.pdf");
     }
 
+    @Test
+    void fallsBackToPaperWhenReferenceListHasRunningHeader() throws IOException, URISyntaxException {
+        String references = """
+                Journal of Examples, page 12
+                References
+                Knuth, D. E. The Art of Computer Programming. Addison-Wesley Publishing, 1997. ISBN 978-0-201-89683-1
+                """;
+
+        try (PDDocument document = loadFixture("ordinary-text-isbn.pdf");
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(references));
+            ParserResult expected = new PdfContentImporter().importPaperContent(document);
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("paper-with-references.pdf"), document);
+
+            assertEquals(expected.getDatabase().getEntries(), result.getDatabase().getEntries());
+            assertEquals(StandardEntryType.InProceedings, result.getDatabase().getEntries().getFirst().getType());
+            assertEquals(List.of(), result.warnings());
+        }
+    }
+
     private void assertExtraction(String fileName, int expectedPage, List<String> expectedIsbns)
             throws IOException, URISyntaxException {
         try (PDDocument document = loadFixture(fileName)) {

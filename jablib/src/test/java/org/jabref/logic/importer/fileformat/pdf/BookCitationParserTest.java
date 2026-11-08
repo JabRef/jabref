@@ -123,4 +123,16 @@ class BookCitationParserTest {
                         Optional.empty(), Optional.empty(), Optional.empty()),
                 BookCitationParser.parse("Chapter 1: HTML5/PHP7"));
     }
+
+    // [utest->req~import.pdf.book-citation-publication~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"Харків : Ранок, 2010–2012.", "Харків : Ранок\nРекомендовано до друку, 2015."})
+    void retainsContributorsWithoutInventingPublicationFields(String publication) {
+        String citation = "Збірник задач / О. П. Коваль. — " + publication;
+
+        assertEquals(new ParsedCitation(
+                        Optional.of("Збірник задач"), Optional.of("О. П. Коваль"), Optional.empty(),
+                        Optional.empty(), Optional.empty(), Optional.empty()),
+                BookCitationParser.parse(citation));
+    }
 }

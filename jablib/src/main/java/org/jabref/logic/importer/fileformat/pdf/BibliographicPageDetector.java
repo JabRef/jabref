@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NullMarked;
@@ -41,8 +42,10 @@ final class BibliographicPageDetector {
     private static final List<Pattern> SIGNALS = List.of(ISBN, UDC, BBK, COPYRIGHT, RIGHTS_RESERVED, PUBLISHER, PRINT_DETAILS);
 
     private static final Pattern REFERENCE_LIST_HEADING = Pattern.compile(
-            "\\A\\s*(references|bibliography|literature|works cited|література|литература|список .*(джерел|літератури|литературы))\\s*$",
+            "^\\h*(references|bibliography|literature|works cited|література|литература|список .*(джерел|літератури|литературы))\\h*$",
             FLAGS | Pattern.MULTILINE);
+
+    private static final Pattern LINE_BREAK = Pattern.compile("\\R");
 
     private static final Pattern ABSTRACT_HEADING = Pattern.compile("^\\h*abstract\\h*$", FLAGS | Pattern.MULTILINE);
     private static final Pattern KEYWORDS_HEADING = Pattern.compile("^\\h*keywords\\h*$", FLAGS | Pattern.MULTILINE);
@@ -64,7 +67,7 @@ final class BibliographicPageDetector {
     }
 
     private static int score(String pageText) {
-        if (REFERENCE_LIST_HEADING.matcher(pageText).find()
+        if (isReferenceList(pageText)
                 || ISBN.matcher(pageText).results().count() > MAX_ISBNS
                 || isConferenceArticle(pageText)) {
             return 0;
@@ -72,6 +75,23 @@ final class BibliographicPageDetector {
         return (int) SIGNALS.stream()
                             .filter(signal -> signal.matcher(pageText).find())
                             .count();
+    }
+
+    private static boolean isReferenceList(String pageText) {
+        String text = LINE_BREAK.matcher(pageText).replaceAll("\n");
+        List<MatchResult> headings = REFERENCE_LIST_HEADING.matcher(text).results().toList();
+        if (headings.isEmpty()) {
+            return false;
+        }
+        Optional<String> citation = BookCitationBlock.find(text);
+        if (citation.isEmpty()) {
+            return true;
+        }
+        // A supported wrapped book title can itself be "Література".
+        String citationText = citation.orElseThrow();
+        int citationStart = text.indexOf(citationText);
+        int citationEnd = citationStart + citationText.length();
+        return headings.stream().anyMatch(heading -> heading.start() < citationStart || heading.end() > citationEnd);
     }
 
     // [impl->req~import.pdf.conference-article-exclusion~1]

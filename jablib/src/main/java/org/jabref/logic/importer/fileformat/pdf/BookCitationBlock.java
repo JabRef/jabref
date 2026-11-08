@@ -42,10 +42,11 @@ final class BookCitationBlock {
     private static final String PLACE_WORD = "\\p{L}[\\p{L}'\\u2019\\u02BC.-]*";
     private static final String PLACE = PLACE_WORD + "(?:" + SPACE + "+" + PLACE_WORD + "){0,2}";
 
-    // The publisher has no digit, dash or copyright sign, so it cannot run on into the pages area or other lines.
+    // Digits, area dashes and copyright signs prevent publisher text from extending into the pages area.
     // The optional pages area ("— 176 с.") is only matched to know where the citation ends.
     private static final Pattern PUBLICATION_AREA = Pattern.compile(
             AREA_SEPARATOR + PLACE + SPACE + "+:" + SPACE + "+(?<publisher>[^\\d\\u2014\\u2013©]+?)," + SPACE + "*(?<year>\\d{4})(?!\\d)"
+                    + "(?!" + SPACE + "*[\\u2014\\u2013-]" + SPACE + "*\\d)"
                     + "(?:" + AREA_SEPARATOR + "\\d+" + SPACE + "*с\\.)?",
             FLAGS);
 
@@ -82,7 +83,7 @@ final class BookCitationBlock {
     /// @return the lines joined with `\n`, or an empty Optional if the page does not hold exactly one publication area
     static Optional<String> find(String bibliographicPageText) {
         String text = LINE_BREAK.matcher(bibliographicPageText).replaceAll("\n");
-        return findSingle(PUBLICATION_AREA, text).map(area -> {
+        return findPublicationArea(text).map(area -> {
             List<String> lines = text.lines().toList();
             int firstLine = findFirstLine(lines, lineNumber(text, area.start()));
             int lastLine = lineNumber(text, area.end());
@@ -97,7 +98,7 @@ final class BookCitationBlock {
     /// @return the publisher, or an empty Optional if there is no single publication area or it names several publishers
     // [impl->req~import.pdf.book-citation-publication~1]
     static Optional<String> findPublisher(String citationBlock) {
-        return findSingle(PUBLICATION_AREA, citationBlock)
+        return findPublicationArea(citationBlock)
                 .map(area -> WHITESPACE.matcher(area.group("publisher")).replaceAll(" ").strip())
                 .filter(publisher -> !publisher.isEmpty())
                 .filter(publisher -> !SEVERAL_PUBLISHERS.matcher(publisher).find());
@@ -109,7 +110,7 @@ final class BookCitationBlock {
     /// @return the four-digit year, or an empty Optional if there is no single publication area
     // [impl->req~import.pdf.book-citation-publication~1]
     static Optional<String> findYear(String citationBlock) {
-        return findSingle(PUBLICATION_AREA, citationBlock)
+        return findPublicationArea(citationBlock)
                 .map(area -> area.group("year"));
     }
 
@@ -120,6 +121,12 @@ final class BookCitationBlock {
     static Optional<String> findEdition(String citationBlock) {
         return findSingle(EDITION, citationBlock)
                 .map(edition -> edition.group("edition"));
+    }
+
+    private static Optional<MatchResult> findPublicationArea(String text) {
+        return findSingle(PUBLICATION_AREA, text)
+                .filter(area -> area.group("publisher").lines().skip(1)
+                                    .noneMatch(line -> STOP_LINE.matcher(line).find()));
     }
 
     private static Optional<MatchResult> findSingle(Pattern pattern, String text) {

@@ -325,4 +325,35 @@ class BookCitationBlockTest {
         assertEquals(Optional.of("2010"), BookCitationBlock.findYear(block));
         assertEquals(Optional.of("2"), BookCitationBlock.findEdition(block));
     }
+
+    // [utest->req~import.pdf.book-citation-publication~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"2010-2012", "2010–2012", "2010—2012", "2010 - 2012", "2010–12", "2010 –\n2012", "2010 -\r\n2012", "2010 —\u2028 2012"})
+    void rejectsPublicationYearRanges(String years) {
+        String block = "К56 Збірник задач / О. П. Коваль. — Харків : Ранок, " + years + ".";
+
+        assertEquals(Optional.empty(), BookCitationBlock.find(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findPublisher(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findYear(block));
+    }
+
+    // [utest->req~import.pdf.book-citation-publication~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"Рекомендовано до друку", "Схвалено до друку", "Рецензенти", "Підписано до друку"})
+    void doesNotExtendPublisherIntoNonCitationLine(String followingLine) {
+        String block = "К56 Збірник задач / О. П. Коваль. — Харків : Ранок\n" + followingLine + ", 2015.";
+
+        assertEquals(Optional.empty(), BookCitationBlock.find(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findPublisher(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findYear(block));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\u2028"})
+    void preservesWrappedPublisherName(String lineBreak) {
+        String block = "К56 Збірник задач / О. П. Коваль. — Харків : Видавництво" + lineBreak + "«Ранок», 2010.";
+
+        assertEquals(Optional.of("Видавництво «Ранок»"), BookCitationBlock.findPublisher(block));
+        assertEquals(Optional.of("2010"), BookCitationBlock.findYear(block));
+    }
 }
