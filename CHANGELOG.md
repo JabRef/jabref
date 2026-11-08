@@ -66,6 +66,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed unreadable linked-file paths and indistinguishable selection backgrounds in the entry editor when using dark mode. [#17364](https://github.com/JabRef/jabref/issues/17364)
 - We fixed the linked file tooltip showing the old file name after renaming or moving the file. [#9277](https://github.com/JabRef/jabref/issues/9277)
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
+- We fixed an issue where keyboard shortcuts added in a newer version were missing from the preferences. [#17708](https://github.com/JabRef/jabref/pull/17708)
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
 - We fixed arXiv fallback title matching on systems using Turkish or Azerbaijani language settings. [#17652](https://github.com/JabRef/jabref/pull/17652)
 - We fixed search and metadata matching in other fetchers on systems using Turkish or Azerbaijani language settings. [#17732](https://github.com/JabRef/jabref/pull/17732)

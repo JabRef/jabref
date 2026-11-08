@@ -44,6 +44,10 @@ public class KeyBindingRepository {
             for (int i = 0; i < bindNames.size(); i++) {
                 put(bindNames.get(i), bindings.get(i));
             }
+            // Bindings introduced after the user saved theirs are missing from the saved lists
+            for (KeyBinding keyBinding : KeyBinding.values()) {
+                this.bindings.putIfAbsent(keyBinding, keyBinding.getDefaultKeyBinding());
+            }
         }
     }
 
