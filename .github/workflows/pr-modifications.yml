@@ -17,7 +17,7 @@ jobs:
   merge_conflict_job:
     name: Find merge conflicts
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -37,7 +37,7 @@ jobs:
 
   no-force-push:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -95,7 +95,7 @@ jobs:
   other_than_main:
     name: Source branch is other than "main"
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (

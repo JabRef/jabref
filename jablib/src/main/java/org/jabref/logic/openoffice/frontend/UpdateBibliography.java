@@ -101,7 +101,7 @@ public class UpdateBibliography {
             CreationException,
             IllegalArgumentException,
             NoDocumentException,
-            WrappedTargetException, IOException {
+            WrappedTargetException {
 
         XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 

@@ -79,6 +79,17 @@ contains only the exported data.
 
 Needs: impl
 
+## JabKit BibTeX conversion must preserve library context
+`req~jabkit.cli.convert-bibtex-context~1`
+
+This includes the library's string definitions and preamble when writing to a file,
+standard output, or the input file itself.
+References to those strings continue to resolve to their original values after conversion.
+
+Source: <https://github.com/JabRef/jabref/issues/17409>
+
+Needs: impl, utest
+
 ## JabKit check commands must support GitHub Actions output format
 `req~jabkit.cli.check-github-actions-output~1`
 
@@ -91,5 +102,15 @@ Windows-style paths (containing `:`) and titles (containing `:` between citation
 are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
+
+## JabKit must preserve existing citation keys when overwrite avoidance is enabled
+`req~jabkit.cli.citation-key-avoid-overwrite~1`
+
+For `citationkeys generate`, when the effective overwrite-avoidance preference is enabled, entries
+with an existing citation key retain it, while entries without a key still receive a generated one.
+When overwrite avoidance is disabled, existing keys may be regenerated. See
+[issue 17458](https://github.com/JabRef/jabref/issues/17458).
+
+Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
