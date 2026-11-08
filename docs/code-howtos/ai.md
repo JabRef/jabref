@@ -59,20 +59,19 @@ The GUI code strongly follows [MVVM pattern](./javafx.md). Though, the GUI code 
 
 ### Example: Layering in Summarization
 
-The following table illustrates how layers and responsibilities are organized across the architecture, using summarization as an example (other subfeatures may differ and have fewer layers, but follow this general separation):
+The following table illustrates how layers and responsibilities are organized across the architecture, using summarization as an example:
 
 | JabRef layer name | AI layer name | Class name | Purpose | Notes |
 | --- | --- | --- | --- | --- |
-| GUI | JavaFX representation | `AiSummaryTab.fxml` | The UI of the feature | Written in FXML |
-| | JavaFX controller | `AiSummaryTabView.java` | Connects UI components in the FXML and ViewModel | Links JavaFX components with ViewModel data and is responsible for the display |
-| | JavaFX ViewModel | `AiSummaryTabViewModel.java` | Handles the user experience | Specific for the GUI |
-| Logic | Utility Logic class | `AiSummaryLogic.java` | This class is made specifically to be a bridge between raw AI algorithms and the UI (in different forms). It is highly configurable and has a lot of parameters, but never touches the UI. And those parameters are observable. | Highly configurable with observables. Useful for all types of UI |
-| | Summarizer on the BibEntry level | `BibEntrySummarizer.java` | A class in the responsibility chain that connects BibEntry type to the raw summarizer algorithm through LinkedFileSummarizer | Responsibility chain |
-| | Summarizer on the LinkedFile level | `LinkedFileSummarizer.java` | A class in the responsibility chain that connects LinkedFile type to the raw summarizer algorithm through FileSummarizer | Responsibility chain |
-| | Summarizer on the File level | `FileSummarizer.java` | A class in the responsibility chain that connects a file (path) type to the raw summarizer algorithm through TextSummarizer | Responsibility chain |
-| | Summarizer on the text level | `TextSummarizer.java` | A class in the responsibility chain that passes raw text to the summarizer | Responsibility chain |
-| | The AI Summarizer | `SummarizationAlgorithm.java` | Raw and specific summarization algorithm. Not designed to be customized, but only created once | Raw algorithm |
-| Model | Type of the AI summarizer | `SummarizatorKind.java` | Just a handy enum to be able to select different kinds of summarizators | Just enum |
+| GUI | JavaFX representation | `AiSummary.fxml` | The UI of the feature | Written in FXML |
+| | JavaFX controller | `AiSummaryView.java` | Connects UI components in the FXML and ViewModel | Links JavaFX components with ViewModel data and is responsible for the display |
+| | JavaFX ViewModel | `AiSummaryViewModel.java` | Handles the user experience | Specific for the GUI |
+| Logic | Summarizer on the BibEntry level | `BibEntrySummarizator.java` | Analyzes a `BibEntry`, extracts linked files, resolves file paths down to text, and delegates to the summarization algorithm | Logic entry point for entry summarization |
+| | The AI Summarizer | `Summarizator.java` | Interface for raw and specific summarization algorithms (e.g., `ChunkedSummarizator`, `FullDocumentSummarizator`) | Raw algorithm |
+| Model | Type of the AI summarizer | `SummarizatorKind.java` | Enum to select different kinds of summarizators | Enum |
+
+> [!NOTE]
+> One can also employ the Chain of Responsibility pattern to break down processing across representation levels. For example, in summarization, responsibilities can be decomposed along: `BibEntry` &rarr; `LinkedFile` &rarr; `File` (path) &rarr; `Text` &rarr; raw summarization algorithm.
 
 ## Internal model (v2)
 
