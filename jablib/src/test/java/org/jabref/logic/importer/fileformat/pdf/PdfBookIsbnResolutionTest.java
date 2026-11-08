@@ -139,7 +139,8 @@ class PdfBookIsbnResolutionTest {
 
             assertEquals(List.of(withPdf(localBook().withField(StandardField.NOTE, "Grobid header metadata"))),
                     result.getDatabase().getEntries());
-            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+            assertEquals(List.of(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                    MATCHING_ISBN + ", " + OTHER_ISBN)), result.warnings());
             verify(isbnFetcher).performSearchById(MATCHING_ISBN);
             verify(isbnFetcher).performSearchById(OTHER_ISBN);
             verifyNoMoreInteractions(isbnFetcher);
@@ -174,7 +175,8 @@ class PdfBookIsbnResolutionTest {
                     .withField(StandardField.DOI, doi)
                     .withField(StandardField.NOTE, "DOI lookup metadata");
             assertEquals(List.of(withPdf(expected)), result.getDatabase().getEntries());
-            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+            assertEquals(List.of(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                    MATCHING_ISBN + ", " + OTHER_ISBN)), result.warnings());
             verify(doiFetchers.constructed().getFirst()).performSearchById(doi);
         }
     }
@@ -239,7 +241,7 @@ class PdfBookIsbnResolutionTest {
             }
             verifyNoMoreInteractions(isbnFetcher);
         } else {
-            assertUnresolved(result);
+            assertUnresolved(result, isbns);
             verifyNoInteractions(isbnFetcher);
         }
     }
@@ -332,7 +334,8 @@ class PdfBookIsbnResolutionTest {
         expected.clearField(StandardField.AUTHOR);
 
         assertEquals(List.of(withPdf(expected)), result.getDatabase().getEntries());
-        assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+        assertEquals(List.of(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                MATCHING_ISBN + ", " + OTHER_ISBN)), result.warnings());
         verifyNoInteractions(isbnFetcher);
     }
 
@@ -354,8 +357,13 @@ class PdfBookIsbnResolutionTest {
     }
 
     private void assertUnresolved(ParserResult result) {
+        assertUnresolved(result, List.of(MATCHING_ISBN, OTHER_ISBN));
+    }
+
+    private void assertUnresolved(ParserResult result, List<String> expectedIsbns) {
         assertEquals(List.of(withPdf(localBook())), result.getDatabase().getEntries());
-        assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+        assertEquals(List.of(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                String.join(", ", expectedIsbns))), result.warnings());
     }
 
     private ParserResult importBook(String isbns) throws IOException, ParseException {

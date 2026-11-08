@@ -117,7 +117,8 @@ class PdfBookMetadataMergeTest {
     @Test
     void retainsAmbiguousBookAndWarningWithoutLookup() throws IOException, ParseException, FetcherException {
         ParserResult extracted = new ParserResult(List.of(localBook()));
-        extracted.addWarning(Localization.lang("More than one ISBN found"));
+        extracted.addWarning(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                ISBN + ", 9780596520687"));
 
         assertMergedBook(extracted, (_, _) -> {
         }, localBook());

@@ -253,7 +253,8 @@ public class PdfContentImporter extends PdfImporter {
                 result = new ParserResult(List.of(localBook.orElseThrow()));
             }
 
-            result.addWarning(Localization.lang("More than one ISBN found"));
+            result.addWarning(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                    String.join(", ", isbns.stream().map(ISBN::asString).toList())));
             return result;
         }
         BibEntry bookEntry;

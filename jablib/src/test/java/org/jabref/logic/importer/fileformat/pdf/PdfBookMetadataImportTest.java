@@ -256,7 +256,8 @@ public class PdfBookMetadataImportTest {
             ParserResult result = new PdfContentImporter().importDatabase(Path.of("book.pdf"), document);
 
             assertEquals(List.of(expectedBook), result.getDatabase().getEntries());
-            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+            assertEquals(List.of(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                    "9780596520687, 9780134685991")), result.warnings());
         }
     }
 
@@ -265,7 +266,8 @@ public class PdfBookMetadataImportTest {
         ParserResult result = importFixture("imprint-multiple-isbns.pdf");
 
         assertEquals(List.of(), result.getDatabase().getEntries());
-        assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+        assertEquals(List.of(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
+                "9780596520687, 9780134685991")), result.warnings());
     }
 
     @Test

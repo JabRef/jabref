@@ -203,7 +203,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
             try {
                 return isbnFetcher.performSearchById(id);
             } catch (FetcherException e) {
-                LOGGER.debug("Fetching failed for ISBN {}", id, e);
+                LOGGER.error("Fetching failed for ISBN {}", id, e);
                 return Optional.empty();
             }
         });
