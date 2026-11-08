@@ -28,10 +28,10 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     }
 
     private MetadataChangeDetailsView(MetadataChange metadataChange,
-                                     GlobalCitationKeyPatterns globalCitationKeyPatterns,
-                                     String leftLabelText,
-                                     Labeled onDisk,
-                                     DiffHighlighter.BasicDiffMethod diffMethod) {
+                                      GlobalCitationKeyPatterns globalCitationKeyPatterns,
+                                      String leftLabelText,
+                                      Labeled onDisk,
+                                      DiffHighlighter.BasicDiffMethod diffMethod) {
         VBox container = new VBox(12);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
