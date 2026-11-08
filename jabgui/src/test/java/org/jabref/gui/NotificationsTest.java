@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 // [utest->req~ux.notifications.finished-task~1]
 @ExtendWith(JavaFxExtension.class)
@@ -47,6 +48,21 @@ class NotificationsTest {
         assertEquals(List.of(notification), group.getNotifications());
         assertEquals(Notification.Type.ERROR, notification.getType());
         assertEquals("", notification.getSummary());
+        assertEquals(List.of(), notification.getActions());
+    }
+
+    @Test
+    void failedTaskHidesProgressBar() {
+        BackgroundTask<Void> backgroundTask = BackgroundTask.wrap(FAILING).setTitle("Task");
+        Task<Void> task = UiTaskExecutor.getJavaFXTask(backgroundTask);
+        Notifications.TaskNotification notification = addNotification(task, backgroundTask);
+        AtomicReference<Optional<Notifications.TaskNotificationView>> view = new AtomicReference<>(Optional.empty());
+        UiTaskExecutor.runAndWaitInJavaFXThread(() -> view.set(Optional.of(new Notifications.TaskNotificationView(notification))));
+
+        task.run();
+        flushJavaFXThread();
+
+        assertFalse(view.get().orElseThrow().progressBar.isVisible());
     }
 
     @Test
