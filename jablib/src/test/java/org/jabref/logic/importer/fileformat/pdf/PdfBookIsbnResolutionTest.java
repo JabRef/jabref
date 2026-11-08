@@ -12,6 +12,7 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -111,6 +112,92 @@ class PdfBookIsbnResolutionTest {
             verify(headers.constructed().getFirst()).importDatabase(any(Path.class), any(PDDocument.class));
             verify(isbnFetcher).performSearchById(MATCHING_ISBN);
             verify(isbnFetcher).performSearchById(OTHER_ISBN);
+            verifyNoMoreInteractions(isbnFetcher);
+        }
+    }
+
+    // [utest->req~import.pdf.book-isbn-resolution~1]
+    @ParameterizedTest
+    @ValueSource(strings = {MATCHING_ISBN, "9780306406157"})
+    void doesNotReintroduceUnresolvedIsbnFromAnotherImporter(String headerIsbn) throws IOException, ParseException, FetcherException {
+        ImportFormatPreferences preferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.grobidPreferences().isGrobidEnabled()).thenReturn(true);
+        when(isbnFetcher.performSearchById(MATCHING_ISBN))
+                .thenReturn(Optional.of(differentYearBook().withField(StandardField.ISBN, MATCHING_ISBN)));
+        when(isbnFetcher.performSearchById(OTHER_ISBN)).thenReturn(Optional.empty());
+        BibEntry header = new BibEntry()
+                .withField(StandardField.ISBN, headerIsbn)
+                .withField(StandardField.NOTE, "Grobid header metadata");
+
+        try (MockedConstruction<PdfGrobidHeaderImporter> headers = mockConstruction(PdfGrobidHeaderImporter.class,
+                (grobid, _) -> when(grobid.importDatabase(any(Path.class), any(PDDocument.class)))
+                        .thenReturn(new ParserResult(List.of(header))))) {
+            importer = new PdfMergeMetadataImporter(preferences, isbnFetcher);
+
+            ParserResult result = importBook(AMBIGUOUS_ISBNS);
+
+            assertEquals(List.of(withPdf(localBook().withField(StandardField.NOTE, "Grobid header metadata"))),
+                    result.getDatabase().getEntries());
+            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+            verify(isbnFetcher).performSearchById(MATCHING_ISBN);
+            verify(isbnFetcher).performSearchById(OTHER_ISBN);
+            verifyNoMoreInteractions(isbnFetcher);
+            assertEquals(Optional.of(headerIsbn), header.getField(StandardField.ISBN));
+        }
+    }
+
+    // [utest->req~import.pdf.book-isbn-resolution~1]
+    @Test
+    void doesNotReintroduceUnresolvedIsbnFromDoiLookup() throws IOException, ParseException, FetcherException {
+        ImportFormatPreferences preferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.grobidPreferences().isGrobidEnabled()).thenReturn(true);
+        when(isbnFetcher.performSearchById(MATCHING_ISBN)).thenReturn(Optional.empty());
+        when(isbnFetcher.performSearchById(OTHER_ISBN)).thenReturn(Optional.empty());
+        String doi = "10.1000/example";
+        BibEntry header = new BibEntry().withField(StandardField.DOI, doi);
+        BibEntry fetched = new BibEntry()
+                .withField(StandardField.ISBN, "9780306406157")
+                .withField(StandardField.NOTE, "DOI lookup metadata");
+
+        try (MockedConstruction<PdfGrobidHeaderImporter> headers = mockConstruction(PdfGrobidHeaderImporter.class,
+                (grobid, _) -> when(grobid.importDatabase(any(Path.class), any(PDDocument.class)))
+                        .thenReturn(new ParserResult(List.of(header))));
+             MockedConstruction<DoiFetcher> doiFetchers = mockConstruction(DoiFetcher.class,
+                     (fetcher, _) -> when(fetcher.performSearchById(doi)).thenReturn(Optional.of(fetched)))) {
+            importer = new PdfMergeMetadataImporter(preferences, isbnFetcher);
+
+            ParserResult result = importBook(AMBIGUOUS_ISBNS);
+
+            BibEntry expected = localBook()
+                    .withField(StandardField.DOI, doi)
+                    .withField(StandardField.NOTE, "DOI lookup metadata");
+            assertEquals(List.of(withPdf(expected)), result.getDatabase().getEntries());
+            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+            verify(doiFetchers.constructed().getFirst()).performSearchById(doi);
+        }
+    }
+
+    @Test
+    void retainsOtherImporterIsbnWhenBookHasNoIsbnCandidates() throws IOException, ParseException, FetcherException {
+        ImportFormatPreferences preferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.grobidPreferences().isGrobidEnabled()).thenReturn(true);
+        when(isbnFetcher.performSearchById(MATCHING_ISBN)).thenReturn(Optional.empty());
+        BibEntry header = new BibEntry().withField(StandardField.ISBN, MATCHING_ISBN);
+
+        try (MockedConstruction<PdfGrobidHeaderImporter> headers = mockConstruction(PdfGrobidHeaderImporter.class,
+                (grobid, _) -> when(grobid.importDatabase(any(Path.class), any(PDDocument.class)))
+                        .thenReturn(new ParserResult(List.of(header))))) {
+            importer = new PdfMergeMetadataImporter(preferences, isbnFetcher);
+
+            ParserResult result = importBook("");
+
+            assertEquals(List.of(withPdf(localBook().withField(StandardField.ISBN, MATCHING_ISBN))),
+                    result.getDatabase().getEntries());
+            assertEquals(List.of(), result.warnings());
+            verify(isbnFetcher).performSearchById(MATCHING_ISBN);
             verifyNoMoreInteractions(isbnFetcher);
         }
     }

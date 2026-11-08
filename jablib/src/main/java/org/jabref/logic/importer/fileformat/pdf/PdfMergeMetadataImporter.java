@@ -104,18 +104,22 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
         Map<String, Optional<BibEntry>> isbnCache = new HashMap<>();
         List<String> warnings = new ArrayList<>();
-        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document, warnings, isbnCache);
+        Set<ISBN> unresolvedBookIsbns = new HashSet<>();
+        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document, warnings, isbnCache, unresolvedBookIsbns);
         if (extractedCandidates.isEmpty()) {
             ParserResult result = new ParserResult();
             warnings.forEach(result::addWarning);
             return result;
         }
 
-        List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates, isbnCache);
+        List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates, isbnCache, unresolvedBookIsbns);
 
         List<BibEntry> allCandidates = new ArrayList<>(fetchedCandidates);
         allCandidates.addAll(extractedCandidates);
         BibEntry entry = mergeCandidates(allCandidates, extractLeadingPagesText(document));
+        if (!unresolvedBookIsbns.isEmpty()) {
+            entry.clearField(StandardField.ISBN);
+        }
 
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
@@ -136,14 +140,14 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document, List<String> warnings,
-                                                    Map<String, Optional<BibEntry>> isbnCache) {
+                                                    Map<String, Optional<BibEntry>> isbnCache, Set<ISBN> unresolvedBookIsbns) {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (PdfImporter metadataImporter : metadataImporters) {
             try {
                 ParserResult importerResult;
                 if (metadataImporter instanceof PdfContentImporter contentImporter) {
-                    importerResult = importContent(contentImporter, document, isbnCache);
+                    importerResult = importContent(contentImporter, document, isbnCache, unresolvedBookIsbns);
                 } else {
                     importerResult = metadataImporter.importDatabase(filePath, document);
                 }
@@ -160,12 +164,15 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     private ParserResult importContent(PdfContentImporter contentImporter, PDDocument document,
-                                       Map<String, Optional<BibEntry>> isbnCache) throws IOException {
+                                       Map<String, Optional<BibEntry>> isbnCache, Set<ISBN> unresolvedBookIsbns) throws IOException {
         Optional<BookExtraction> extractedBook = contentImporter.extractBook(document);
         if (extractedBook.isEmpty()) {
             return contentImporter.importPaperContent(document);
         }
         BookExtraction book = resolveBookIsbn(extractedBook.orElseThrow(), isbnCache);
+        if (book.isbnCandidates().size() > 1) {
+            unresolvedBookIsbns.addAll(book.isbnCandidates());
+        }
         return contentImporter.importBook(book);
     }
 
@@ -202,7 +209,8 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         });
     }
 
-    private List<BibEntry> fetchIdsOfCandidates(List<BibEntry> candidates, Map<String, Optional<BibEntry>> isbnCache) {
+    private List<BibEntry> fetchIdsOfCandidates(List<BibEntry> candidates, Map<String, Optional<BibEntry>> isbnCache,
+                                              Set<ISBN> unresolvedBookIsbns) {
         List<BibEntry> fetchedCandidates = new ArrayList<>();
 
         // Collects Ids already looked for - to avoid multiple calls for one id
@@ -216,6 +224,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
             fetchData(candidate, StandardField.EPRINT, arXivFetcher, fetchedIds, fetchedCandidates);
 
             candidate.getField(StandardField.ISBN)
+                     .filter(_ -> unresolvedBookIsbns.isEmpty())
                      .map(identifier -> ISBN.parse(identifier)
                                             .flatMap(ISBN::asIsbn13)
                                             .map(ISBN::asString)

@@ -2,7 +2,11 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Combines book citation metadata into a structured result.
+/// Entry point for field extraction from an already located Ukrainian DSTU-style citation block.
+///
+/// Supports the implemented citation subset, rather than arbitrary book citation styles.
+/// [BookCitationBlock] handles location and publication areas; [BookTitleAuthorExtractor] handles titles
+/// and contributors. The combined metadata is returned as [ParsedCitation].
 @NullMarked
 final class BookCitationParser {
 
@@ -11,7 +15,7 @@ final class BookCitationParser {
 
     /// Parses a citation block into its metadata fields.
     ///
-    /// @param citationBlock text returned by BookCitationBlock.find
+    /// @param citationBlock text returned by [BookCitationBlock#find]
     /// @return structured citation metadata
     static ParsedCitation parse(String citationBlock) {
         return new ParsedCitation(

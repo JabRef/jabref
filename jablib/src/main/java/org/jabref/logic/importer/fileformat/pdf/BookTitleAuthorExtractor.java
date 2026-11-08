@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,15 +16,16 @@ final class BookTitleAuthorExtractor {
 
     private static final String SPACE = "[\\s\\h]";
 
-    private static final Pattern TITLE_AUTHOR_SEPARATOR = Pattern.compile("\\h+/\\h+");
+    private static final Pattern TITLE_AUTHOR_SEPARATOR = Pattern.compile(SPACE + "+/" + SPACE + "+");
 
-    private static final Pattern AREA_SEPARATOR = Pattern.compile("\\.\\h*[—–-]\\h+");
+    private static final Pattern AREA_SEPARATOR = Pattern.compile("\\." + SPACE + "*[—–-]" + SPACE + "+");
 
-    private static final Pattern CATALOGUE_CODE = Pattern.compile("^\\s*(?:\\p{Lu}[\\p{Lu}\\p{N}]{0,3}\\d{1,3}|[\\p{IsCyrillic}&&\\p{Lu}]\\h+\\d{2,3})\\h+");
+    private static final Pattern CATALOGUE_CODE = Pattern.compile("^\\h*[\\p{IsCyrillic}&&\\p{Lu}]\\h*\\d{2,3}\\h+");
 
     private static final Pattern AUTHOR_HEADING = Pattern.compile("\\p{Lu}[\\p{L}'’ʼ-]+,?\\h+\\p{Lu}\\.(?:\\h*\\p{Lu}\\.)?");
 
-    private static final Pattern EDITOR_LABEL = Pattern.compile("(?iu)^(?:за\\s+ред(?:акцією)?\\.?|під\\s+ред(?:акцією)?\\.?|ред(?:актор(?:и)?)?\\.?)\\s*[:.]?\\s*(.+)$");
+    private static final Pattern EDITOR_LABEL = Pattern.compile("(?iu)^(?:за" + SPACE + "+ред(?:акцією)?|під" + SPACE
+            + "+ред(?:акцією)?|ред(?:актор(?:и)?)?)(?=[:.]|" + SPACE + "|$)\\.?" + SPACE + "*[:.]?" + SPACE + "*(.+)$");
 
     private static final Pattern LINE_BREAK = Pattern.compile("\\R");
 
@@ -68,32 +70,9 @@ final class BookTitleAuthorExtractor {
     /// @param citationBlock the citation block text
     /// @return the author string, or empty if not found
     static Optional<String> findAuthors(String citationBlock) {
-        Optional<String> suffix = afterSlash(citationBlock);
-
-        if (suffix.isEmpty()) {
-            return Optional.empty();
-        }
-
-        String contributors = suffix.orElseThrow();
-
-        Matcher editionOrPublication =
-                AREA_SEPARATOR.matcher(contributors);
-
-        if (editionOrPublication.find()) {
-            contributors = contributors.substring(
-                    0, editionOrPublication.start());
-        }
-
-        contributors = SPACES.matcher(contributors)
-                             .replaceAll(" ").strip();
-
-        if (contributors.isEmpty()
-                || NON_AUTHOR_LABEL.matcher(contributors).find()
-                || EDITOR_LABEL.matcher(contributors).matches()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(contributors);
+        return findContributors(citationBlock)
+                .filter(contributors -> !NON_AUTHOR_LABEL.matcher(contributors).find())
+                .filter(contributors -> !EDITOR_LABEL.matcher(contributors).matches());
     }
 
     /// Extracts explicitly labelled editors.
@@ -101,22 +80,13 @@ final class BookTitleAuthorExtractor {
     /// @param citationBlock the citation block text
     /// @return the editor names, or empty if not found
     static Optional<String> findEditors(String citationBlock) {
-        Optional<String> suffix = afterSlash(citationBlock);
+        Optional<String> contributors = findContributors(citationBlock);
 
-        if (suffix.isEmpty()) {
+        if (contributors.isEmpty()) {
             return Optional.empty();
         }
 
-        String contributors = suffix.orElseThrow();
-
-        Matcher end = AREA_SEPARATOR.matcher(contributors);
-
-        if (end.find()) {
-            contributors = contributors.substring(0, end.start());
-        }
-
-        Matcher editor = EDITOR_LABEL.matcher(
-                SPACES.matcher(contributors).replaceAll(" ").strip());
+        Matcher editor = EDITOR_LABEL.matcher(contributors.orElseThrow());
 
         if (!editor.matches()) {
             return Optional.empty();
@@ -127,6 +97,16 @@ final class BookTitleAuthorExtractor {
         return names.isEmpty()
                ? Optional.empty()
                : Optional.of(names);
+    }
+
+    private static Optional<String> findContributors(String citationBlock) {
+        return afterSlash(citationBlock)
+                .map(suffix -> {
+                    Matcher end = AREA_SEPARATOR.matcher(suffix);
+                    String contributors = end.find() ? suffix.substring(0, end.start()) : suffix;
+                    return SPACES.matcher(contributors).replaceAll(" ").strip();
+                })
+                .filter(contributors -> !contributors.isEmpty());
     }
 
     /// Returns the title portion before the author separator.
@@ -149,30 +129,28 @@ final class BookTitleAuthorExtractor {
             start = 1;
         }
 
-        StringBuilder result = new StringBuilder();
+        StringJoiner result = new StringJoiner(" ");
 
         for (int i = start; i < lines.length; i++) {
             if (!lines[i].isBlank()) {
-                if (!result.isEmpty()) {
-                    result.append(' ');
-                }
-                result.append(lines[i].strip());
+                result.add(lines[i].strip());
             }
         }
 
-        return result.isEmpty()
+        return result.length() == 0
                ? Optional.empty()
                : Optional.of(result.toString());
     }
 
     /// Returns the contributor portion after the author separator.
     private static Optional<String> afterSlash(String citationBlock) {
-        Matcher slash = TITLE_AUTHOR_SEPARATOR.matcher(citationBlock);
+        String text = LINE_BREAK.matcher(citationBlock).replaceAll("\n");
+        Matcher slash = TITLE_AUTHOR_SEPARATOR.matcher(text);
 
         if (!slash.find()) {
             return Optional.empty();
         }
 
-        return Optional.of(citationBlock.substring(slash.end()));
+        return Optional.of(text.substring(slash.end()));
     }
 }

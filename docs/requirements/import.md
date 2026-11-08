@@ -176,7 +176,7 @@ See [JabRef issue #16332](https://github.com/JabRef/jabref/issues/16332).
 
 Needs: impl, utest
 
-## PDF book imports must read publication details from the citation's publication area
+## PDF book imports must extract publication metadata from supported citations in PDF content
 `req~import.pdf.book-citation-publication~1`
 
 Use the publisher and year stated in the DSTU-style citation. Leave both fields unset if the publication area is missing or ambiguous. If the citation lists multiple publishers, leave the publisher unset in the metadata extracted from the PDF. See [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874).

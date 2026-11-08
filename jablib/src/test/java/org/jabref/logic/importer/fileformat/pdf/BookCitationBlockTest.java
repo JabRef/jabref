@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.jspecify.annotations.NullMarked;
@@ -14,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
 class BookCitationBlockTest {
+
+    private static final Pattern LINE_BREAK = Pattern.compile("\\R");
 
     private static final String HEADER = """
             УДК 53(075.3)
@@ -283,5 +286,74 @@ class BookCitationBlockTest {
     @MethodSource("editions")
     void findsEdition(String citation, Optional<String> expectedEdition) {
         assertEquals(expectedEdition, BookCitationBlock.findEdition(citation));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r", "\u0085", "\u2028", "\u2029"})
+    void retainsTitleWhenSlashEndsLine(String lineBreak) {
+        String block = "К56 Збірник задач /\nО. П. Коваль. — Харків : Ранок, 2010.";
+
+        assertEquals(Optional.of(block), BookCitationBlock.find(block.replace("\n", lineBreak)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/", " / ", "\u00A0/\u00A0"})
+    void retainsTitleAboveStandaloneSlashWithAuthorHeading(String slash) {
+        String block = AUTHOR_HEADING + "\nК56 Збірник задач\n" + slash
+                + "\nО. П. Коваль. — Харків : Ранок, 2010.";
+
+        assertEquals(Optional.of(block), BookCitationBlock.find(HEADER + block + "\n" + FOOTER));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/", " / ", "\u00A0/\u00A0"})
+    void doesNotRecoverUnrelatedTextAboveStandaloneSlash(String slash) {
+        String areaLine = "О. П. Коваль. — Харків : Ранок, 2010.";
+        String page = "Довільний текст\n" + slash + "\n" + areaLine;
+
+        assertEquals(Optional.of(areaLine), BookCitationBlock.find(page));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {".\n— ", ". —\n", ".\r\n– ", ". -\r\n", ".\u0085— ", ". —\u2028", ".\u2029— "})
+    void locatesWrappedAreaSeparators(String separator) {
+        String block = "К56 Збірник задач / О. П. Коваль" + separator + "2-ге вид., перероб"
+                + separator + "Харків : Ранок, 2010.";
+
+        assertEquals(Optional.of(LINE_BREAK.matcher(block).replaceAll("\n")), BookCitationBlock.find(block));
+        assertEquals(Optional.of("Ранок"), BookCitationBlock.findPublisher(block));
+        assertEquals(Optional.of("2010"), BookCitationBlock.findYear(block));
+        assertEquals(Optional.of("2"), BookCitationBlock.findEdition(block));
+    }
+
+    // [utest->req~import.pdf.book-citation-publication~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"2010-2012", "2010–2012", "2010—2012", "2010 - 2012", "2010–12", "2010 –\n2012", "2010 -\r\n2012", "2010 —\u2028 2012"})
+    void rejectsPublicationYearRanges(String years) {
+        String block = "К56 Збірник задач / О. П. Коваль. — Харків : Ранок, " + years + ".";
+
+        assertEquals(Optional.empty(), BookCitationBlock.find(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findPublisher(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findYear(block));
+    }
+
+    // [utest->req~import.pdf.book-citation-publication~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"Рекомендовано до друку", "Схвалено до друку", "Рецензенти", "Підписано до друку"})
+    void doesNotExtendPublisherIntoNonCitationLine(String followingLine) {
+        String block = "К56 Збірник задач / О. П. Коваль. — Харків : Ранок\n" + followingLine + ", 2015.";
+
+        assertEquals(Optional.empty(), BookCitationBlock.find(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findPublisher(block));
+        assertEquals(Optional.empty(), BookCitationBlock.findYear(block));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\u2028"})
+    void preservesWrappedPublisherName(String lineBreak) {
+        String block = "К56 Збірник задач / О. П. Коваль. — Харків : Видавництво" + lineBreak + "«Ранок», 2010.";
+
+        assertEquals(Optional.of("Видавництво «Ранок»"), BookCitationBlock.findPublisher(block));
+        assertEquals(Optional.of("2010"), BookCitationBlock.findYear(block));
     }
 }

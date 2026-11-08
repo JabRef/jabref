@@ -9,7 +9,9 @@ import org.jspecify.annotations.NullMarked;
 
 /// Finds the citation of a book on its bibliographic page and reads publisher and year from it.
 ///
-/// Supported is the Ukrainian cataloguing-in-publication record printed on the imprint page:
+/// Supports the Ukrainian cataloguing-in-publication pattern printed on the imprint page.
+/// For the citation-style reference, see [ДСТУ 8302:2015](https://fnd-store.uas.gov.ua/documents/4905).
+/// This parser supports the pattern below, not every citation permitted by the standard:
 ///
 /// ```
 /// Коваль О. П.
@@ -40,16 +42,17 @@ final class BookCitationBlock {
     private static final String PLACE_WORD = "\\p{L}[\\p{L}'\\u2019\\u02BC.-]*";
     private static final String PLACE = PLACE_WORD + "(?:" + SPACE + "+" + PLACE_WORD + "){0,2}";
 
-    // The publisher has no digit, dash or copyright sign, so it cannot run on into the pages area or other lines.
+    // Digits, area dashes and copyright signs prevent publisher text from extending into the pages area.
     // The optional pages area ("— 176 с.") is only matched to know where the citation ends.
     private static final Pattern PUBLICATION_AREA = Pattern.compile(
             AREA_SEPARATOR + PLACE + SPACE + "+:" + SPACE + "+(?<publisher>[^\\d\\u2014\\u2013©]+?)," + SPACE + "*(?<year>\\d{4})(?!\\d)"
+                    + "(?!" + SPACE + "*[\\u2014\\u2013-]" + SPACE + "*\\d)"
                     + "(?:" + AREA_SEPARATOR + "\\d+" + SPACE + "*с\\.)?",
             FLAGS);
 
     private static final Pattern EDITION = Pattern.compile(AREA_SEPARATOR + "(?<edition>\\d+)-\\p{L}{1,3}" + SPACE + "+вид\\.", FLAGS);
 
-    private static final Pattern TITLE_SEPARATOR = Pattern.compile("\\h/(?:\\h|$)");
+    private static final Pattern TITLE_SEPARATOR = Pattern.compile("\\h/(?:\\h|$)|^\\h*/\\h*$");
 
     // Without case-insensitive flags, because \p{Lu} would then match lowercase letters, too
     private static final Pattern AUTHOR_HEADING = Pattern.compile("\\h*\\p{Lu}[\\p{L}'\\u2019\\u02BC-]+,?\\h+\\p{Lu}\\.(?:\\h*\\p{Lu}\\.)?\\h*");
@@ -73,13 +76,14 @@ final class BookCitationBlock {
     /// The title line is the nearest line with a " / " between title and authors, looked for on the line of the
     /// publication area and up to three lines above it. The author heading is looked for up to three lines above
     /// the title line. Both searches stop at a line that cannot belong to a citation, such as a reviewer list,
-    /// and leave it out. Without a title line, the citation is the line of the publication area.
+    /// and leave it out. A slash on its own line is accepted only when an author heading supplies title context.
+    /// Without a title line, the citation is the line of the publication area.
     ///
     /// @param bibliographicPageText the text of the page selected by [BibliographicPageDetector]
     /// @return the lines joined with `\n`, or an empty Optional if the page does not hold exactly one publication area
     static Optional<String> find(String bibliographicPageText) {
         String text = LINE_BREAK.matcher(bibliographicPageText).replaceAll("\n");
-        return findSingle(PUBLICATION_AREA, text).map(area -> {
+        return findPublicationArea(text).map(area -> {
             List<String> lines = text.lines().toList();
             int firstLine = findFirstLine(lines, lineNumber(text, area.start()));
             int lastLine = lineNumber(text, area.end());
@@ -94,7 +98,7 @@ final class BookCitationBlock {
     /// @return the publisher, or an empty Optional if there is no single publication area or it names several publishers
     // [impl->req~import.pdf.book-citation-publication~1]
     static Optional<String> findPublisher(String citationBlock) {
-        return findSingle(PUBLICATION_AREA, citationBlock)
+        return findPublicationArea(citationBlock)
                 .map(area -> WHITESPACE.matcher(area.group("publisher")).replaceAll(" ").strip())
                 .filter(publisher -> !publisher.isEmpty())
                 .filter(publisher -> !SEVERAL_PUBLISHERS.matcher(publisher).find());
@@ -106,7 +110,7 @@ final class BookCitationBlock {
     /// @return the four-digit year, or an empty Optional if there is no single publication area
     // [impl->req~import.pdf.book-citation-publication~1]
     static Optional<String> findYear(String citationBlock) {
-        return findSingle(PUBLICATION_AREA, citationBlock)
+        return findPublicationArea(citationBlock)
                 .map(area -> area.group("year"));
     }
 
@@ -119,8 +123,15 @@ final class BookCitationBlock {
                 .map(edition -> edition.group("edition"));
     }
 
+    private static Optional<MatchResult> findPublicationArea(String text) {
+        return findSingle(PUBLICATION_AREA, text)
+                .filter(area -> area.group("publisher").lines().skip(1)
+                                    .noneMatch(line -> STOP_LINE.matcher(line).find()));
+    }
+
     private static Optional<MatchResult> findSingle(Pattern pattern, String text) {
-        List<MatchResult> matches = pattern.matcher(text).results().limit(2).toList();
+        String normalized = LINE_BREAK.matcher(text).replaceAll("\n");
+        List<MatchResult> matches = pattern.matcher(normalized).results().limit(2).toList();
         return matches.size() == 1 ? Optional.of(matches.getFirst()) : Optional.empty();
     }
 
@@ -130,7 +141,10 @@ final class BookCitationBlock {
                 break;
             }
             if (TITLE_SEPARATOR.matcher(lines.get(line)).find()) {
-                return findHeadingLine(lines, line);
+                int firstLine = findHeadingLine(lines, line);
+                if (!"/".equals(WHITESPACE.matcher(lines.get(line)).replaceAll("")) || firstLine < line) {
+                    return firstLine;
+                }
             }
         }
         return areaLine;

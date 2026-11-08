@@ -175,6 +175,31 @@ public class PdfBookMetadataImportTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r", "\u0085", "\u2028", "\u2029"})
+    void importsWrappedCitationWithoutRemoteMetadata(String lineBreak) throws IOException {
+        String pageText = "УДК 53(075.3)" + lineBreak + "Коваль О. П." + lineBreak
+                + "К56 Збірник задач /" + lineBreak + "О. П. Коваль, Н. І. Ткач." + lineBreak
+                + "— 2-ге вид., перероб. —" + lineBreak + "Харків : Ранок, 2010." + lineBreak
+                + "© Видавництво Ранок, 2010";
+        BibEntry expected = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "Збірник задач")
+                .withField(StandardField.AUTHOR, "О. П. Коваль and Н. І. Ткач")
+                .withField(StandardField.PUBLISHER, "Ранок")
+                .withField(StandardField.YEAR, "2010")
+                .withField(StandardField.EDITION, "2");
+
+        try (PDDocument document = new PDDocument();
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(pageText));
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("wrapped-book.pdf"), document);
+
+            assertEquals(List.of(expected), result.getDatabase().getEntries());
+            assertEquals(List.of(), result.warnings());
+        }
+    }
+
     @Test
     void importsExplicitEditorWithoutAuthor() throws IOException {
         String pageText = """
@@ -246,6 +271,27 @@ public class PdfBookMetadataImportTest {
     @Test
     void fallsBackToPaperImportWhenNoBibliographicPageIsDetected() throws URISyntaxException {
         assertImportedPaper("ordinary-text-isbn.pdf");
+    }
+
+    @Test
+    void fallsBackToPaperWhenReferenceListHasRunningHeader() throws IOException, URISyntaxException {
+        String references = """
+                Journal of Examples, page 12
+                References
+                Knuth, D. E. The Art of Computer Programming. Addison-Wesley Publishing, 1997. ISBN 978-0-201-89683-1
+                """;
+
+        try (PDDocument document = loadFixture("ordinary-text-isbn.pdf");
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(references));
+            ParserResult expected = new PdfContentImporter().importPaperContent(document);
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("paper-with-references.pdf"), document);
+
+            assertEquals(expected.getDatabase().getEntries(), result.getDatabase().getEntries());
+            assertEquals(StandardEntryType.InProceedings, result.getDatabase().getEntries().getFirst().getType());
+            assertEquals(List.of(), result.warnings());
+        }
     }
 
     private void assertExtraction(String fileName, int expectedPage, List<String> expectedIsbns)
