@@ -99,6 +99,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where long entry previews were cut off without a vertical scrollbar. [#17359](https://github.com/JabRef/jabref/issues/17359)
 - We fixed an issue where linked files in the entry editor were not updated immediately upon addition or removal. [#16067](https://github.com/JabRef/jabref/issues/16067)
 - We fixed an issue where the Semantic Scholar API key was ignored when fetching citations and references. [#17291](https://github.com/JabRef/jabref/issues/17291)
+- We fixed API key validation when saving a new or edited key. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
 - We fixed an issue where group selections were lost when changing library tabs. [#1104](https://github.com/JabRef/jabref/issues/1104)
@@ -127,6 +128,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
 - We fixed JabKit BibTeX conversion losing string definitions and preambles, including when overwriting the input file. [#17409](https://github.com/JabRef/jabref/issues/17409)
+- We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
 
 ### Removed
