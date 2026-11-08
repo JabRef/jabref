@@ -271,21 +271,7 @@ public class PdfContentImporter extends PdfImporter {
 
     private Optional<BibEntry> extractBookMetadata(String pageText) {
         return BookCitationBlock.find(pageText)
-                                .map(BookCitationParser::parse)
-                                .map(citation -> {
-                                    BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
-                                    citation.title().ifPresent(title -> bookEntry.withField(StandardField.TITLE, title));
-                                    citation.authors()
-                                            .map(this::streamlineNames)
-                                            .ifPresent(authors -> bookEntry.withField(StandardField.AUTHOR, authors));
-                                    citation.editors()
-                                            .map(this::streamlineNames)
-                                            .ifPresent(editors -> bookEntry.withField(StandardField.EDITOR, editors));
-                                    citation.publisher().ifPresent(publisher -> bookEntry.withField(StandardField.PUBLISHER, publisher));
-                                    citation.year().ifPresent(year -> bookEntry.withField(StandardField.YEAR, year));
-                                    citation.edition().ifPresent(edition -> bookEntry.withField(StandardField.EDITION, edition));
-                                    return bookEntry;
-                                });
+                                .map(citation -> BookCitationParser.parse(citation, this::streamlineNames));
     }
 
     ParserResult importPaperContent(PDDocument document) throws IOException {
