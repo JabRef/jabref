@@ -57,7 +57,7 @@ public abstract class BackgroundTask<V> {
     private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
     private final BooleanProperty showToUser = new SimpleBooleanProperty(false);
     private final BooleanProperty willBeRecoveredAutomatically = new SimpleBooleanProperty(false);
-    private boolean failureShownToUser;
+    private boolean showFailureToUser;
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
@@ -170,13 +170,13 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    public boolean isFailureShownToUser() {
-        return failureShownToUser;
+    public boolean showFailureToUser() {
+        return showFailureToUser;
     }
 
-    /// Declares that the [#onFailure(Consumer)] consumer shows the error to the user, so a visible task needs no separate failure notification.
-    public BackgroundTask<V> showsFailureToUser() {
-        this.failureShownToUser = true;
+    /// Declares whether the [#onFailure(Consumer)] consumer shows the error to the user, so a visible task needs no separate failure notification.
+    public BackgroundTask<V> showFailureToUser(boolean show) {
+        this.showFailureToUser = show;
         return this;
     }
 
