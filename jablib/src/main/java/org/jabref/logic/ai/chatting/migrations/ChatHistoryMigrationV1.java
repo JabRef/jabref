@@ -138,6 +138,8 @@ public final class ChatHistoryMigrationV1 {
                 }
             }
 
+            repository.commit();
+
             LOGGER.debug("Successfully migrated {} of {} chat history maps",
                     migratedMapNames.size(), oldMapNames.size());
         } catch (Exception e) {

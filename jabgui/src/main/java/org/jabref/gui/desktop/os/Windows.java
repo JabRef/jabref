@@ -2,6 +2,7 @@ package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -38,8 +39,17 @@ public class Windows extends NativeDesktop {
 
     @Override
     public void openUrlWithSystemHandler(String url) throws IOException {
+        new ProcessBuilder(urlOpenCommand(url)).start();
+    }
+
+    /// Explorer truncates its argument at the Windows path limit of 260 characters, which OAuth login URLs exceed.
+    /// The URL protocol handler takes the URL unquoted and without that limit.
+    static List<String> urlOpenCommand(String url) {
+        if (url.length() > 260) {
+            return List.of("rundll32.exe", "url.dll,FileProtocolHandler", url);
+        }
         // quote String so explorer handles URL query strings correctly
-        new ProcessBuilder("explorer.exe", "\"" + url + "\"").start();
+        return List.of("explorer.exe", "\"" + url + "\"");
     }
 
     @Override
