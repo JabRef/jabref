@@ -84,7 +84,8 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasksPairs = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final ObservableList<Task<?>> backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);
-    private final FilteredList<Task<?>> runningBackgroundTasks = new FilteredList<>(backgroundTasks, Task::isRunning);
+    private final FilteredList<Pair<BackgroundTask<?>, Task<?>>> runningBackgroundTasksPairs = new FilteredList<>(backgroundTasksPairs, pair -> pair.getValue().isRunning());
+    private final ObservableList<Task<?>> runningBackgroundTasks = EasyBind.map(runningBackgroundTasksPairs, Pair::getValue);
     private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
@@ -230,11 +231,8 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     }
 
     @Override
-    public Optional<BackgroundTask<?>> getBackgroundTask(Task<?> task) {
-        return backgroundTasksPairs.stream()
-                                   .filter(pair -> pair.getValue() == task)
-                                   .<BackgroundTask<?>>map(Pair::getKey)
-                                   .findFirst();
+    public ObservableList<Pair<BackgroundTask<?>, Task<?>>> getRunningBackgroundTasksPairs() {
+        return runningBackgroundTasksPairs;
     }
 
     @Override
