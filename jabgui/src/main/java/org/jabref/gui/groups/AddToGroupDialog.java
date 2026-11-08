@@ -90,10 +90,10 @@ public class AddToGroupDialog extends BaseDialog<Boolean> {
     }
 
     private void showSelectedGroup() {
-        Optional.ofNullable(viewModel.selectedGroupProperty().get()).ifPresentOrElse(
-                group -> {
-                    groupList.getSelectionModel().select(group);
-                    groupList.scrollTo(group);
+        viewModel.getSelectedIndex().ifPresentOrElse(
+                index -> {
+                    groupList.getSelectionModel().select(index);
+                    groupList.scrollTo(index);
                 },
                 () -> groupList.getSelectionModel().clearSelection());
     }

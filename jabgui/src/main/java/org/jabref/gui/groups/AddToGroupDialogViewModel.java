@@ -2,6 +2,8 @@ package org.jabref.gui.groups;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.stream.IntStream;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -16,6 +18,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
@@ -42,18 +45,25 @@ public class AddToGroupDialogViewModel extends AbstractViewModel {
         this.undoManager = undoManager;
 
         List<GroupTreeNode> assignableGroups = root.iterateOverTree()
-                                                   .filter(GroupNodeViewModel::canAddEntriesIn)
+                                                   .filter(AddToGroupDialogViewModel::canTakeEntries)
                                                    .toList();
         groups = new FilteredList<>(FXCollections.observableArrayList(assignableGroups));
 
-        selectedGroup.set(lastUsedGroup.filter(assignableGroups::contains)
-                                       .orElse(groups.isEmpty() ? null : groups.getFirst()));
+        lastUsedGroup.filter(lastUsed -> assignableGroups.stream().anyMatch(group -> group == lastUsed))
+                     .or(() -> groups.stream().findFirst())
+                     .ifPresent(selectedGroup::set);
 
         searchText.addListener((_, _, newText) -> filterGroups(newText));
     }
 
     public static boolean hasAssignableGroups(GroupTreeNode root) {
-        return root.iterateOverTree().anyMatch(GroupNodeViewModel::canAddEntriesIn);
+        return root.iterateOverTree().anyMatch(AddToGroupDialogViewModel::canTakeEntries);
+    }
+
+    /// `canAddEntriesIn` also accepts the subgroups of automatic groups, but adding to them only
+    /// works for groups that can change entries.
+    private static boolean canTakeEntries(GroupTreeNode group) {
+        return GroupNodeViewModel.canAddEntriesIn(group) && group.getGroup() instanceof GroupEntryChanger;
     }
 
     public StringProperty searchTextProperty() {
@@ -76,6 +86,13 @@ public class AddToGroupDialogViewModel extends AbstractViewModel {
         moveSelection(-1);
     }
 
+    /// Compares by identity, because two groups under different parents can be equal.
+    public OptionalInt getSelectedIndex() {
+        return IntStream.range(0, groups.size())
+                        .filter(index -> groups.get(index) == selectedGroup.get())
+                        .findFirst();
+    }
+
     /// @return the group the entries were assigned to, empty if no group is selected
     public Optional<GroupTreeNode> assignEntriesToSelectedGroup() {
         Optional<GroupTreeNode> group = Optional.ofNullable(selectedGroup.get());
@@ -87,7 +104,7 @@ public class AddToGroupDialogViewModel extends AbstractViewModel {
 
     private void filterGroups(String text) {
         groups.setPredicate(group -> StringUtil.containsIgnoreCase(group.getPath(), text));
-        if (!groups.contains(selectedGroup.get())) {
+        if (getSelectedIndex().isEmpty()) {
             selectedGroup.set(groups.isEmpty() ? null : groups.getFirst());
         }
     }
@@ -96,7 +113,7 @@ public class AddToGroupDialogViewModel extends AbstractViewModel {
         if (groups.isEmpty()) {
             return;
         }
-        int newIndex = Math.clamp(groups.indexOf(selectedGroup.get()) + offset, 0, groups.size() - 1);
+        int newIndex = Math.clamp(getSelectedIndex().orElse(-1) + offset, 0, groups.size() - 1);
         selectedGroup.set(groups.get(newIndex));
     }
 }

@@ -11,11 +11,13 @@ import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.RegexKeywordGroup;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 // [utest->feat~groups.assign-entries-by-keyboard~1]
 class AddToGroupDialogViewModelTest {
@@ -139,5 +141,52 @@ class AddToGroupDialogViewModelTest {
         undoManager.undo();
 
         assertEquals(List.of(), included.getEntriesInGroup(List.of(entry)));
+    }
+
+    @Test
+    void leavesOutGroupsThatCannotTakeEntries() {
+        GroupTreeNode automatic = root.getChildren().getLast();
+        automatic.addSubgroup(new RegexKeywordGroup("Regex", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "a.*", false));
+
+        AddToGroupDialogViewModel viewModel = createViewModel(Optional.empty());
+
+        assertEquals(List.of(review, included, excluded), viewModel.getGroups());
+    }
+
+    @Test
+    void preselectsLastUsedGroupAmongEqualGroups() {
+        GroupTreeNode otherIncluded = addSecondReviewWithIncluded();
+
+        AddToGroupDialogViewModel viewModel = createViewModel(Optional.of(otherIncluded));
+
+        assertSame(otherIncluded, viewModel.selectedGroupProperty().get());
+    }
+
+    @Test
+    void selectPreviousStartsFromSelectedAmongEqualGroups() {
+        GroupTreeNode otherIncluded = addSecondReviewWithIncluded();
+        AddToGroupDialogViewModel viewModel = createViewModel(Optional.of(otherIncluded));
+
+        viewModel.selectPrevious();
+
+        assertSame(otherIncluded.getParent().orElseThrow(), viewModel.selectedGroupProperty().get());
+    }
+
+    @Test
+    void searchKeepsSelectedGroupAmongEqualGroups() {
+        GroupTreeNode otherIncluded = addSecondReviewWithIncluded();
+        AddToGroupDialogViewModel viewModel = createViewModel(Optional.of(otherIncluded));
+
+        viewModel.searchTextProperty().set("included");
+
+        assertSame(otherIncluded, viewModel.selectedGroupProperty().get());
+    }
+
+    /// Adds `Second review > Included`, which equals `Review > Included`: same group definition, no children.
+    private GroupTreeNode addSecondReviewWithIncluded() {
+        GroupTreeNode secondReview = root.addSubgroup(new ExplicitGroup("Second review", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode otherIncluded = secondReview.addSubgroup(new ExplicitGroup("Included", GroupHierarchyType.INDEPENDENT, ','));
+        assertEquals(included, otherIncluded);
+        return otherIncluded;
     }
 }
