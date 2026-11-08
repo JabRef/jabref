@@ -46,6 +46,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(JavaFxExtension.class)
 class GroupChangeDetailsViewTest {
 
+    // [utest->req~jabgui.autosaveandbackup.reveal-reviewed-file~1]
     @Test
     void onDiskLinkRevealsTheComparedBackup() {
         JavaFxExtension.invokeAndWait(() -> {
