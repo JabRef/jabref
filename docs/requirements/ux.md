@@ -166,6 +166,15 @@ See <https://github.com/JabRef/jabref/issues/9566>.
 
 Needs: impl, utest
 
+## Library comparison must use entry types customized after the library was opened
+`req~ux.external-library-changes.updated-entry-types~1`
+
+Saving the entry types in the preferences must take effect for libraries that are already open, without restarting JabRef.
+
+See <https://github.com/JabRef/jabref/issues/9566>.
+
+Needs: impl, utest
+
 ## Bulk entry deletion must keep main table responsive
 `req~ux.large-library.bulk-entry-removal~1`
 

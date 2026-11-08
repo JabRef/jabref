@@ -60,7 +60,7 @@ class GitCommitDialogViewModelTest {
                 new CurrentThreadTaskExecutor(),
                 gitHandlerRegistry,
                 importFormatPreferences,
-                new BibEntryTypesManager(),
+                mock(BibEntryTypesManager.class),
                 new DummyFileUpdateMonitor());
     }
 

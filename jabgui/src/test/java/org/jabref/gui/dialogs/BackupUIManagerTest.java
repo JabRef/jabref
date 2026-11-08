@@ -105,7 +105,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 tabContainer,
                 originalFile,
                 preferences,
-                new BibEntryTypesManager(),
+                mock(BibEntryTypesManager.class),
                 mock(FileUpdateMonitor.class),
                 new JabRefGuiStateManager()));
 
@@ -166,7 +166,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 tabContainer,
                 originalFile,
                 preferences,
-                new BibEntryTypesManager(),
+                mock(BibEntryTypesManager.class),
                 mock(FileUpdateMonitor.class),
                 new JabRefGuiStateManager());
 
@@ -196,7 +196,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 tabContainer,
                 originalFile,
                 preferences,
-                new BibEntryTypesManager(),
+                mock(BibEntryTypesManager.class),
                 mock(FileUpdateMonitor.class),
                 new JabRefGuiStateManager()));
 
@@ -224,13 +224,13 @@ class BackupUIManagerTest extends JavaFxTest {
         when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class))).thenAnswer(_ -> {
             if (calls.getAndIncrement() == 0) {
                 BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, innerFile, preferences,
-                        new BibEntryTypesManager(), mock(FileUpdateMonitor.class), stateManager);
+                        mock(BibEntryTypesManager.class), mock(FileUpdateMonitor.class), stateManager);
             }
             return Optional.of(BackupResolverDialog.IGNORE_BACKUP);
         });
 
         interact(() -> BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, outerFile, preferences,
-                new BibEntryTypesManager(), mock(FileUpdateMonitor.class), stateManager));
+                mock(BibEntryTypesManager.class), mock(FileUpdateMonitor.class), stateManager));
 
         InOrder order = inOrder(tabContainer, dialogService);
         order.verify(tabContainer).showLibraryTab(outerTab);
@@ -271,7 +271,7 @@ class BackupUIManagerTest extends JavaFxTest {
         });
 
         interact(() -> BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, originalFile, preferences,
-                new BibEntryTypesManager(), mock(FileUpdateMonitor.class), stateManager));
+                mock(BibEntryTypesManager.class), mock(FileUpdateMonitor.class), stateManager));
 
         assertEquals(affectedTab, selectionDuringDialog.get());
         interact(() -> tabContainer.showLibraryTab(otherTab));

@@ -179,6 +179,25 @@ class BibDatabaseDiffTest {
         assertEquals(List.of(new BibEntryDiff(entryOne, entryTwo)), diff.getEntryDifferences());
     }
 
+    // [utest->req~ux.external-library-changes.updated-entry-types~1]
+    @Test
+    void compareUsesEntryTypesCustomizedAfterFirstComparison() {
+        BibEntry entryOne = createMeasurement("first reading", "lab A");
+        BibEntry entryTwo = createMeasurement("totally other", "lab B");
+        compareEntries(entryOne, entryTwo);
+        BibEntryTypesManager storedEntryTypes = new BibEntryTypesManager();
+        storedEntryTypes.addCustomOrModifiedType(
+                new BibEntryTypeBuilder().withType(MEASUREMENT)
+                                         .withRequiredFields(StandardField.NUMBER)
+                                         .build(),
+                BibDatabaseMode.BIBLATEX);
+
+        entryTypesManager.replaceCustomOrModifiedTypes(storedEntryTypes);
+        BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
+
+        assertEquals(List.of(new BibEntryDiff(entryOne, entryTwo)), diff.getEntryDifferences());
+    }
+
     private BibEntry createMeasurement(String title, String note) {
         return new BibEntry(MEASUREMENT)
                 .withField(StandardField.NUMBER, "M-42")
