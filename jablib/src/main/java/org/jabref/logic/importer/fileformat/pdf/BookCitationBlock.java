@@ -9,7 +9,9 @@ import org.jspecify.annotations.NullMarked;
 
 /// Finds the citation of a book on its bibliographic page and reads publisher and year from it.
 ///
-/// Supported is the Ukrainian cataloguing-in-publication record printed on the imprint page:
+/// Supports the Ukrainian cataloguing-in-publication pattern printed on the imprint page.
+/// For the citation-style reference, see [ДСТУ 8302:2015](https://fnd-store.uas.gov.ua/documents/4905).
+/// This parser supports the pattern below, not every citation permitted by the standard:
 ///
 /// ```
 /// Коваль О. П.
