@@ -37,18 +37,18 @@ public class AddToGroupAction extends SimpleCommand {
         if (!isExecutable()) {
             return;
         }
-        stateManager.getActiveDatabase().ifPresent(database ->
-                database.getMetaData().getGroups()
+        stateManager.getActiveDatabase().ifPresent(library ->
+                library.getMetaData().getGroups()
                         .filter(AddToGroupDialogViewModel::hasAssignableGroups)
                         .ifPresentOrElse(
-                                root -> assignSelectedEntries(database, root),
+                                root -> assignSelectedEntries(library, root),
                                 () -> dialogService.notify(Localization.lang("This library has no group to assign entries to."))));
     }
 
     // [impl->feat~groups.assign-entries-by-keyboard~1]
-    private void assignSelectedEntries(BibDatabaseContext database, GroupTreeNode root) {
+    private void assignSelectedEntries(BibDatabaseContext library, GroupTreeNode root) {
         List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
-        AddToGroupDialogViewModel viewModel = new AddToGroupDialogViewModel(root, entries, stateManager.getUndoManager(database), lastUsedGroup);
+        AddToGroupDialogViewModel viewModel = new AddToGroupDialogViewModel(root, entries, stateManager.getUndoManager(library), lastUsedGroup);
 
         dialogService.showCustomDialogAndWait(new AddToGroupDialog(viewModel))
                      .filter(Boolean::booleanValue)
