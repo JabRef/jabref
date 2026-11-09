@@ -19,7 +19,7 @@
     <content>
         <VBox spacing="10.0">
             <Label text="%Select the entries to be imported:"/>
-            <CheckListView fx:id="entriesListView" VBox.vgrow="ALWAYS"/>
+            <CheckListView fx:id="entriesListView" styleClass="variable-cell-size" VBox.vgrow="ALWAYS"/>
             <HBox fx:id="paginationBox" spacing="10">
                 <HBox HBox.hgrow="ALWAYS"/>
                 <Button fx:id="prevPageButton" onAction="#onPrevPage" text="%Previous"/>

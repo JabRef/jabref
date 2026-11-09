@@ -260,6 +260,18 @@
     -fx-text-fill: -color-fg-emphasis;
 }
 
+.list-view,
+.tree-view,
+.table-view,
+.tree-table-view {
+    -fx-fixed-cell-size: 2em;
+}
+
+/* For lists whose cells have different heights, e.g. multi-line content. */
+.variable-cell-size {
+    -fx-fixed-cell-size: -1;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -color-fg-muted;
 }
@@ -465,7 +477,7 @@
    where a translucent black fill would sink into the panel background. */
 .linked-files-list .list-cell:auto-found {
     -fx-background-color: -color-selection-inactive;
-    -fx-background-radius: 4px;
+    -fx-background-radius: 0.25em;
 }
 
 /* The suggestion background must not mask the list's interaction affordances
@@ -478,7 +490,7 @@
 .linked-files-list:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
     -fx-background-color: -color-bg-secondary, -color-selection;
     -fx-background-insets: 0;
-    -fx-background-radius: 4px;
+    -fx-background-radius: 0.25em;
 }
 
 /* Sidepane */

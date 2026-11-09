@@ -438,6 +438,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
         CheckListView<CitationRelationItem> citedByListView = new CheckListView<>();
+        citingListView.getStyleClass().add("variable-cell-size");
+        citedByListView.getStyleClass().add("variable-cell-size");
         // Allow the list views to expand/shrink with the window size
         citingListView.setMaxHeight(Double.MAX_VALUE);
         citingListView.setMinHeight(0);

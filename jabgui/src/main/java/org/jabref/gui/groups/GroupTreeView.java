@@ -170,8 +170,6 @@ public class GroupTreeView extends BorderPane {
         addSubgroupColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
-        groupTree.fixedCellSizeProperty().bind(preferences.getWorkspacePreferences().cellSizeProperty());
-
         groupTree.setId("group-tree");
         groupTree.getStyleClass().add("group-tree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);

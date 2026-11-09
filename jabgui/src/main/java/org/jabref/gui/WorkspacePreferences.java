@@ -274,8 +274,4 @@ public class WorkspacePreferences {
     public DoubleBinding tableCellSizeProperty() {
         return tableCellSize;
     }
-
-    public DoubleBinding cellSizeProperty() {
-        return cellSize;
-    }
 }
