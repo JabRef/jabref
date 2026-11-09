@@ -18,6 +18,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import com.dlsc.gemsfx.infocenter.Notification;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,8 @@ public class CiteDrivePushAction extends SimpleCommand {
                                         Localization.lang("Import into CiteDrive"),
                                         Localization.lang("Continue on the CiteDrive import page in the browser. If no browser opened, open the import page from here or copy the link."),
                                         Localization.lang("Open import page"),
-                                        importPage, dialogService, nativeDesktop, clipBoardManager));
+                                        importPage, dialogService, nativeDesktop, clipBoardManager,
+                                        Notification.OnClickBehaviour.REMOVE));
                                 nativeDesktop.openBrowserShowPopup(importPage, dialogService);
                             });
                         }
