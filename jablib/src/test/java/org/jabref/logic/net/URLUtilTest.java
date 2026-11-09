@@ -20,6 +20,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class URLUtilTest {
 
     @ParameterizedTest
+    @CsvSource({
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308#abstract",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308?a=1#b",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308"
+    })
+    void removeQueryAndFragment(String expected, String input) {
+        assertEquals(expected, URLUtil.removeQueryAndFragment(input));
+    }
+
+    @ParameterizedTest
     @CsvSource(
             textBlock = """
                     # empty text
