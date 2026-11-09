@@ -250,6 +250,8 @@ public abstract class NativeDesktop {
             ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
             processBuilder.directory(Path.of(absolutePath).toFile());
             Process process = processBuilder.start();
+            // The started program gets no input; closing its stdin pipe releases the handle instead of keeping it until garbage collection
+            process.getOutputStream().close();
 
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);

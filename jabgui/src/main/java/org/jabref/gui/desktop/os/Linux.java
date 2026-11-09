@@ -41,6 +41,8 @@ public class Linux extends NativeDesktop {
     /// Starts the process and drains its output into the debug log, so it cannot block on a full pipe
     private static void startLoggingOutput(ProcessBuilder processBuilder) throws IOException {
         Process process = processBuilder.start();
+        // The started program gets no input; closing its stdin pipe releases the handle instead of keeping it until garbage collection
+        process.getOutputStream().close();
         HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug));
         HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug));
     }
