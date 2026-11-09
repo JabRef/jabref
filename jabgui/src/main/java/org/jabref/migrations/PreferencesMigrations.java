@@ -30,7 +30,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.GrobidUrlMigration;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
-import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -38,6 +37,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
@@ -102,7 +102,27 @@ public class PreferencesMigrations {
         upgradeTheme(preferences);
         migrateFileAnnotationsTabVisibility(preferences);
         upgradeEntryEditorCustomTabs(preferences);
+        upgradeImportDialogDownloadLinkedFiles(preferences);
         GrobidUrlMigration.migrate(preferences);
+    }
+
+    /// Before [#16332](https://github.com/JabRef/jabref/issues/16332), the "Download referenced files" checkbox of the
+    /// import dialog was initialized from and saved to the web search setting `downloadLinkedFiles`. Imports that do not
+    /// come from a web search now have their own preference. It is initialized once from the web search setting, so
+    /// existing users keep their previous choice. New users get the default.
+    // [impl->req~import.dialog.download-linked-files~1]
+    static void upgradeImportDialogDownloadLinkedFiles(JabRefGuiPreferences prefs) {
+        final String WEB_SEARCH_DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
+        final String IMPORT_DIALOG_DOWNLOAD_LINKED_FILES = "importDialogDownloadLinkedFiles";
+
+        if (prefs.hasKey(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES)) {
+            return;
+        }
+
+        boolean initialChoice = prefs.getBoolean(WEB_SEARCH_DOWNLOAD_LINKED_FILES, true);
+        prefs.getFilePreferences().setImportDialogDownloadLinkedFiles(initialChoice);
+        // A property change listener does not persist a value that already equals the default.
+        prefs.putBoolean(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, initialChoice);
     }
 
     /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered
@@ -687,10 +707,25 @@ public class PreferencesMigrations {
         if (!keys.isEmpty() && names.size() == keys.size()) {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
-                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
-                            keys.get(i),
-                            preferences.getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
+                    boolean hasNewEntry;
+                    try {
+                        keyring.getPassword("org.jabref.apikeys", names.get(i));
+                        hasNewEntry = true;
+                    } catch (PasswordAccessException _) {
+                        hasNewEntry = false;
+                    }
+                    if (!hasNewEntry && StringUtil.isNotBlank(keys.get(i))) {
+                        keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
+                        hasNewEntry = true;
+                    }
+                    // Without an entry at the new location, the legacy entry is kept, so that it is migrated when it is read
+                    if (hasNewEntry) {
+                        try {
+                            keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                        } catch (PasswordAccessException _) {
+                            // Already absent, nothing to clear
+                        }
+                    }
                 }
                 preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
             } catch (Exception ex) {

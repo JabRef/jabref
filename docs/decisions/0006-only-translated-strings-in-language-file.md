@@ -6,13 +6,13 @@ nav_order: 6
 
 ## Context and Problem Statement
 
-JabRef has translation files `JabRef_it.properties`, ... There are translated and untranslated strings. Which ones should be in the translation file?
+JabRef has translation files `JabRef_it.properties`, ... Some strings are translated, others are not. Which ones should be in the translation file?
 
 ## Decision Drivers
 
 * Translators should find new strings to translate easily
 * New strings to translate should be written into `JabRef_en.properties` to enable translation by the translators
-* Crowdin should be kept as translation platform, because 1\) it is much easier for the translators than the GitHub workflow and 2\) it is free for OSS projects.
+* Crowdin should be kept as translation platform, because 1) it is much easier for the translators than the GitHub workflow and 2) it is free for OSS projects.
 
 ## Considered Options
 

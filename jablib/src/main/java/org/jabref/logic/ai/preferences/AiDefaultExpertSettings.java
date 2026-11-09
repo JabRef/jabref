@@ -24,4 +24,6 @@ public class AiDefaultExpertSettings {
     public static final ResponseEngineKind RESPONSE_ENGINE_KIND = ResponseEngineKind.EMBEDDINGS_SEARCH;
     public static final int RAG_MAX_RESULTS_COUNT = 10;
     public static final float RAG_MIN_SCORE = 0.3F;
+
+    public static final boolean ENABLE_AI_DEBUG_PROVIDER = false;
 }

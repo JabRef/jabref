@@ -1,5 +1,7 @@
 package org.jabref.gui.welcome.components;
 
+import javafx.beans.binding.Bindings;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -16,6 +18,8 @@ import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.l10n.Localization;
 
 public class Walkthroughs extends VBox {
+    private static final int MIN_VISIBLE_WALKTHROUGHS = 3;
+
     private final Stage stage;
     private final LibraryTabContainer tabContainer;
     private final StateManager stateManager;
@@ -97,6 +101,11 @@ public class Walkthroughs extends VBox {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.getStyleClass().add("walkthroughs-scroll-pane");
         scrollPane.setMaxHeight(Double.MAX_VALUE);
+        // Retain visibility of the first few Walkthroughs, in case the height of the welcome tab exceeds the height of the window.
+        Node lastVisibleButton = content.getChildren().get(MIN_VISIBLE_WALKTHROUGHS - 1);
+        scrollPane.minViewportHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> lastVisibleButton.getBoundsInParent().getMaxY(),
+                lastVisibleButton.boundsInParentProperty()));
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
         return scrollPane;
     }
