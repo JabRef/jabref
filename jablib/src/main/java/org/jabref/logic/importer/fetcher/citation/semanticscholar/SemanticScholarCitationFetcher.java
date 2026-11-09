@@ -87,7 +87,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
         importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
-        CitationsResponse citationsResponse = GSON.fromJson(download(urlDownload, citationsUrl), CitationsResponse.class);
+        CitationsResponse citationsResponse = GSON.fromJson(download(urlDownload), CitationsResponse.class);
 
         return citationsResponse.getData()
                                 .stream()
@@ -113,7 +113,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
-        String response = download(urlDownload, referencesUrl);
+        String response = download(urlDownload);
         ReferencesResponse referencesResponse = GSON.fromJson(response, ReferencesResponse.class);
 
         if (referencesResponse.getData() == null) {
@@ -157,7 +157,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         String result;
         try {
-            result = download(urlDownload, referencesUrl);
+            result = download(urlDownload);
         } catch (FetcherException e) {
             Optional<String> error = e.getHttpResponse()
                                       .flatMap(response -> Optional.ofNullable(response.responseBody()))
@@ -178,9 +178,9 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     /// Downloads with retries; every attempt first waits for the shared rate limiter.
-    private static String download(URLDownload urlDownload, URL url) throws FetcherException {
+    private static String download(URLDownload urlDownload) throws FetcherException {
         return FetcherRetry.executeWithRetryPolicy(RETRY_POLICY, () -> {
-            RATE_LIMITER.acquire(url.toString());
+            RATE_LIMITER.acquire(FETCHER_NAME);
             return urlDownload.asString();
         });
     }

@@ -4,12 +4,14 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherRetry;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
@@ -20,6 +22,11 @@ import org.jabref.model.entry.identifier.DOI;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import dev.failsafe.Failsafe;
+import dev.failsafe.FailsafeException;
+import dev.failsafe.FailsafeExecutor;
+import dev.failsafe.RateLimiter;
+import dev.failsafe.RetryPolicy;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +38,23 @@ public class OpenCitationsFetcher implements CitationFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenCitationsFetcher.class);
     private static final String API_BASE_URL = "https://api.opencitations.net/index/v2";
     private static final Gson GSON = new Gson();
+
+    private static final RetryPolicy<String> RETRY_POLICY = RetryPolicy.<String>builder()
+           .handleIf(OpenCitationsFetcher::isRetryable)
+           .withBackoff(Duration.ofSeconds(1), Duration.ofSeconds(8))
+           .withMaxRetries(4)
+           .withMaxDuration(Duration.ofSeconds(10))
+           .onRetryScheduled(event -> LOGGER.info("Received HTTP 429 from OpenCitations. Retry {} after {}", event.getAttemptCount(), event.getDelay()))
+           .build();
+
+    // Failsafe rejects a request at once if no permit is free. The long maximum makes it wait instead.
+    private static final RateLimiter<String> RATE_LIMITER = RateLimiter.<String>smoothBuilder(Duration.ofSeconds(1))
+           .withMaxWaitTime(Duration.ofSeconds(10))
+           .onSuccess(event -> LOGGER.trace("Waited {} seconds before acquiring RateLimiter because of the {} API rate limiter", event.getElapsedTime().toSeconds(), FETCHER_NAME))
+           .build();
+
+    // The first policy is the outermost one, so each retry draws a new permit.
+    private static final FailsafeExecutor<String> DOWNLOADER = Failsafe.with(RETRY_POLICY, RATE_LIMITER);
 
     private final ImporterPreferences importerPreferences;
     private final CrossRef crossRefFetcher;
@@ -88,7 +112,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
             importerPreferences.getApiKey(getName())
                                .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
 
-            String jsonResponse = urlDownload.asString();
+            String jsonResponse = download(urlDownload);
             CitationItem[] citationItems = GSON.fromJson(jsonResponse, CitationItem[].class);
 
             if (citationItems == null || citationItems.length == 0) {
@@ -109,6 +133,26 @@ public class OpenCitationsFetcher implements CitationFetcher {
         } catch (JsonSyntaxException e) {
             throw new FetcherException("Could not parse JSON response from OpenCitations", e);
         }
+    }
+
+    /// Downloads with retries; every attempt first waits for the shared rate limiter.
+    private static String download(URLDownload urlDownload) throws FetcherException {
+        try {
+            return DOWNLOADER.get(urlDownload::asString);
+        } catch (FailsafeException e) {
+            // Failsafe wraps checked exceptions. The only other one here is InterruptedException, for which it has already restored the interrupt flag.
+            if (e.getCause() instanceof FetcherException fetcherException) {
+                throw fetcherException;
+            }
+            throw new FetcherException("Interrupted while waiting for OpenCitations", e);
+        }
+    }
+
+    private static boolean isRetryable(Throwable throwable) {
+        return throwable instanceof FetcherException fetcherException
+                && fetcherException.getHttpResponse()
+                                   .filter(response -> response.statusCode() == FetcherRetry.HTTP_TOO_MANY_REQUESTS)
+                                   .isPresent();
     }
 
     private BibEntry fetchBibEntryFromIdentifiers(List<CitationItem.IdentifierWithField> identifiers) {
@@ -156,7 +200,7 @@ public class OpenCitationsFetcher implements CitationFetcher {
             importerPreferences.getApiKey(getName())
                                .ifPresent(apiKey -> urlDownload.addHeader("authorization", apiKey));
 
-            String jsonResponse = urlDownload.asString();
+            String jsonResponse = download(urlDownload);
             CountResponse countResponse = GSON.fromJson(jsonResponse, CountResponse.class);
 
             if (countResponse == null) {

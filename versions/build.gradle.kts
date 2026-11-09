@@ -89,6 +89,7 @@ dependencies.constraints {
     api("one.jpro:jmemorybuddy:0.6.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.2")
+    api("dev.failsafe:failsafe:3.3.2")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")

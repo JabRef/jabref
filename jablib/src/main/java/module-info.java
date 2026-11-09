@@ -258,6 +258,8 @@ open module org.jabref.jablib {
     requires com.github.benmanes.caffeine;
     // endregion
 
+    requires dev.failsafe.core;
+
     requires org.jabref.latexconv;
 
     requires jbibtex;
