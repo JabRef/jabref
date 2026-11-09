@@ -7,6 +7,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -29,12 +30,21 @@ public class CiteDrivePushAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
+    private final ClipBoardManager clipBoardManager;
 
-    public CiteDrivePushAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
+    public CiteDrivePushAction(DialogService dialogService,
+                               StateManager stateManager,
+                               GuiPreferences preferences,
+                               OAuthSessionRegistry oAuthSessionRegistry,
+                               NativeDesktop nativeDesktop,
+                               ClipBoardManager clipBoardManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
-        this.citeDriveOAuthService = CiteDriveLoginAction.createOAuthService(dialogService, preferences, oAuthSessionRegistry);
+        this.nativeDesktop = nativeDesktop;
+        this.clipBoardManager = clipBoardManager;
+        this.citeDriveOAuthService = CiteDriveLoginAction.createOAuthService(dialogService, preferences, oAuthSessionRegistry, nativeDesktop, clipBoardManager);
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
@@ -54,6 +64,7 @@ public class CiteDrivePushAction extends SimpleCommand {
                 .getAuthorizedSession()
                 // Async: the token may arrive on the HTTP server thread; the push itself is network I/O
                 .thenAcceptAsync(sessionOpt -> {
+                    CiteDriveLoginAction.removeLoginPageNotifications(dialogService);
                     if (sessionOpt.isEmpty()) {
                         dialogService.notify(Localization.lang("CiteDrive push failed: could not obtain access token."));
                         return;
@@ -62,7 +73,15 @@ public class CiteDrivePushAction extends SimpleCommand {
                     try {
                         if (CiteDrivePush.push(database, entries, session.accessToken(), preferences, dialogService, session.pushEndpoint())) {
                             // [impl->req~citedrive.push.import-page~1]
-                            UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(session.importPage().toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences()));
+                            String importPage = session.importPage().toASCIIString();
+                            UiTaskExecutor.runInJavaFXThread(() -> {
+                                dialogService.notify(new CiteDriveLoginAction.PageNotification(
+                                        Localization.lang("Import into CiteDrive"),
+                                        Localization.lang("Continue on the CiteDrive import page in the browser. If no browser opened, open the import page from here or copy the link."),
+                                        Localization.lang("Open import page"),
+                                        importPage, dialogService, nativeDesktop, clipBoardManager));
+                                nativeDesktop.openBrowserShowPopup(importPage, dialogService);
+                            });
                         }
                     } catch (IOException e) {
                         LOGGER.error("CiteDrive push failed", e);
@@ -70,6 +89,7 @@ public class CiteDrivePushAction extends SimpleCommand {
                     }
                 })
                 .exceptionally(throwable -> {
+                    CiteDriveLoginAction.removeLoginPageNotifications(dialogService);
                     LOGGER.error("CiteDrive push failed", throwable);
                     dialogService.notify(Localization.lang("CiteDrive push failed: %0", CiteDriveLoginAction.describeFailure(throwable)));
                     return null;
