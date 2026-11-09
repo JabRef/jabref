@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,7 +47,7 @@ class XMLCharsTest {
 
         Document document = DocumentBuilderFactory.newInstance()
                                                   .newDocumentBuilder()
-                                                  .parse(new InputSource(new StringReader(xml)));
+                                                  .parse(new InputSource(Reader.of(xml)));
 
         assertEquals(input, document.getDocumentElement().getTextContent());
     }
