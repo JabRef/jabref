@@ -55,7 +55,7 @@ import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.JabRefGuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -136,6 +136,9 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     private final UndoAction undoAction;
     private final RedoAction redoAction;
 
+    /// Shown beside the fields, following their edits
+    private final PreviewViewer previewViewer;
+
     private final ComboBox<EntryType> entryTypeCombo = new ComboBox<>();
 
     /// The entry is not part of the library yet, so its edits are kept out of the library's undo history.
@@ -187,6 +190,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                                                .orElse(new SuggestionProviders());
         this.undoAction = createUndoAction(dialogService, stateManager);
         this.redoAction = createRedoAction(dialogService, stateManager);
+        this.previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
         String defaultOwner = NON_ALPHANUMERIC.matcher(
                 preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
@@ -204,14 +208,18 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         getDialogPane().lookupButton(previousButtonType).setDisable(position == 1);
 
         setUpEntryTypeCombo();
-        getDialogPane().setContent(createContent(stateManager, dialogService, taskExecutor));
+        getDialogPane().setContent(createContent());
         getDialogPane().setPrefSize(DIALOG_PREF_WIDTH, DIALOG_PREF_HEIGHT);
 
         // Registered after the first build, so that neither reacts while the dialog is still being set up
         entryTypeCombo.valueProperty().addListener((_, _, selectedType) ->
                 Optional.ofNullable(selectedType).ifPresent(this::applyEntryType));
         entry.registerListener(this);
-        setOnHidden(_ -> entry.unregisterListener(this));
+        setOnHidden(_ -> {
+            entry.unregisterListener(this);
+            // The viewer listens to the entry, which outlives this dialog of the review
+            previewViewer.clearEntry();
+        });
         getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, this::handleUndoShortcuts);
 
         setResultConverter(buttonType -> {
@@ -242,11 +250,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     }
 
     /// Builds the dialog body: the entry summary above the field rows and the preview
-    ///
-    /// @param stateManager  source of the library state the preview panel reads
-    /// @param dialogService service the preview panel reports through
-    /// @param taskExecutor  executor the preview panel renders on
-    private VBox createContent(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
+    private VBox createContent() {
         Label summary = new Label(entry.getAuthorTitleYear());
         summary.setWrapText(true);
 
@@ -256,12 +260,14 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         ScrollPane scrollPane = new ScrollPane(fieldArea);
         scrollPane.setFitToWidth(true);
 
-        // The preview follows the edits, as next to the entry editor's fields
-        PreviewPanel previewPanel = new PreviewPanel(dialogService, preferences.getKeyBindingRepository(), preferences, taskExecutor, stateManager);
-        previewPanel.setDatabase(databaseContext);
-        previewPanel.setEntry(entry);
+        // The preview follows the edits, as next to the entry editor's fields. The layout has to be set
+        // explicitly: without one the viewer renders nothing, and the database before the entry, because
+        // setting it clears the entry.
+        previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
+        previewViewer.setDatabaseContext(databaseContext);
+        previewViewer.setEntry(entry);
 
-        SplitPane fieldsAndPreview = new SplitPane(scrollPane, previewPanel);
+        SplitPane fieldsAndPreview = new SplitPane(scrollPane, previewViewer);
         fieldsAndPreview.setDividerPositions(FIELDS_DIVIDER_POSITION);
         VBox.setVgrow(fieldsAndPreview, Priority.ALWAYS);
 

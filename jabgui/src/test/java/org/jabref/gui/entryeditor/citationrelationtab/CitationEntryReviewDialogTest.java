@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
@@ -37,11 +36,13 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.util.DialogButtonAssertions;
 import org.jabref.gui.util.FieldsUtil;
+import org.jabref.htmltonode.rich.RichHtmlView;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -103,6 +104,7 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
     private DialogService dialogService;
     private TaskExecutor taskExecutor;
     private BibEntry sampleEntry;
+    private PreviewPreferences previewPreferences;
 
     private @Nullable CitationEntryReviewDialog dialog;
     private @Nullable ListChangeListener<Window> raisedFontSizeListener;
@@ -131,11 +133,9 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
         when(preferences.getExternalApplicationsPreferences().getExternalFileTypes()).thenReturn(FXCollections.emptyObservableSet());
         when(preferences.getAutoLinkPreferences()).thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
 
-        PreviewPreferences previewPreferences = mock(PreviewPreferences.class);
+        previewPreferences = mock(PreviewPreferences.class);
         PreviewLayout previewLayout = new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class));
         doReturn(previewLayout).when(previewPreferences).getSelectedPreviewLayout();
-        when(previewPreferences.layoutCyclePositionProperty()).thenReturn(new SimpleIntegerProperty(0));
-        when(previewPreferences.getLayoutCycle()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getPreviewPreferences()).thenReturn(previewPreferences);
 
         stateManager = mock(StateManager.class);
@@ -383,6 +383,31 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
                             FieldsUtil.getDisplayName(StandardField.JOURNAL),
                             FieldsUtil.getDisplayName(StandardField.YEAR)),
                     labels.stream().distinct().map(FieldNameLabel::getText).toList());
+        });
+    }
+
+    @Test
+    void preview_showsTheEntry_whenTheDialogIsBuilt() {
+        doReturn(new TextBasedPreviewLayout("\\title", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+                .when(previewPreferences).getSelectedPreviewLayout();
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2022")
+                .withField(StandardField.TITLE, "Sample title");
+        interact(() -> {
+            dialog = createDialog(1, 1, entry);
+            dialog.initOwner(primaryStage);
+            dialog.show();
+        });
+        awaitEvents();
+
+        interact(() -> {
+            assertNotNull(dialog);
+            // The viewer renders nothing without a layout, and nothing else in the dialog would notice
+            PreviewViewer previewViewer = findChildren(dialog.getDialogPane(), PreviewViewer.class)
+                    .stream().distinct().findFirst().orElseThrow();
+            assertEquals("Sample title",
+                    ((RichHtmlView) previewViewer.getContent()).toPlainText().trim());
         });
     }
 
