@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -233,23 +234,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // When two entries are equal based on the comparator, the entry that was inserted first should be considered smaller.
         this.setSortPolicy(_ -> true);
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(
-                this.comparatorProperty().map(comparator -> {
-                    if (comparator == null) {
-                        return null;
-                    }
-
-                    return (entry1, entry2) -> {
-                        int result = comparator.compare(entry1, entry2);
-                        if (result != 0) {
-                            return result;
-                        }
-                        // If the entries are equal according to the comparator, compare them by their index in the database.
-                        // The comparison should ideally be based on the database index, but retrieving the index takes log(n). See {@link BibDatabase#indexOf}.
-                        // Using the entry ID is also valid since IDs are monotonically increasing.
-                        return entry1.getEntry().getId().compareTo(entry2.getEntry().getId());
-                    };
-                })
-        );
+                this.comparatorProperty().map(MainTable::thenComparingByInsertionOrder));
 
         UiTaskExecutor.runInJavaFXThread(columnPreferencesApplier::applySortOrder);
 
@@ -350,6 +335,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 scrollTo(indices.getFirst());
             }
         }
+    }
+
+    /// If the entries are equal according to the comparator, compare them by their index in the database.
+    /// The comparison should ideally be based on the database index, but retrieving the index takes log(n), see [org.jabref.model.database.BibDatabase#indexOf].
+    /// Using the entry ID is also valid since IDs are monotonically increasing.
+    private static Comparator<BibEntryTableViewModel> thenComparingByInsertionOrder(Comparator<BibEntryTableViewModel> comparator) {
+        return comparator.thenComparing(entry -> entry.getEntry().getId());
     }
 
     /// Search matches are sorted to the top (or are the only rows left), so a table scrolled down before searching shows none of them.
