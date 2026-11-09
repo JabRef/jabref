@@ -28,6 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
+    api(platform("com.konghq:unirest-java-bom:4.11.4"))
     api(platform("dev.langchain4j:langchain4j-bom:1.23.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
@@ -66,8 +67,6 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.11.4")
-    api("com.konghq:unirest-modules-gson:4.11.3")
     api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
     api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.1")

@@ -463,7 +463,21 @@ jobs:
         if: needs.changes.outputs.run-gradle-ci-full == 'true'
       - name: Run ${{ matrix.module }} tests
         if: needs.changes.outputs.run-gradle-ci-full == 'true'
-        run: xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        timeout-minutes: ${{ matrix.module == 'jabgui' && 30 || 360 }}
+        run: |
+          if [[ "${{ matrix.module }}" == "jabgui" ]]; then
+            (
+              sleep 900
+              echo 'GUI tests are still running; collecting JVM thread dumps.'
+              jcmd -l | while read -r pid description; do
+                echo "Thread dump for $pid $description"
+                timeout 30s jcmd "$pid" Thread.print -l || true
+              done
+            ) &
+            watchdog=$!
+            trap 'pkill -P "$watchdog" || true; kill "$watchdog" 2>/dev/null || true' EXIT
+          fi
+          xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
       - name: Run JabKit portable smoke test
