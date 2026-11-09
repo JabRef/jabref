@@ -444,6 +444,43 @@ class CitationsRelationsTabViewModelTest {
         assertEquals(List.of(existingEntry), bibDatabaseContext.getEntries());
     }
 
+    /// "Keep from import" removes the library's entry, which can be the inspected one. Its citation key then
+    /// resolves to nothing, and the imported entry took its place, so the link would point at the entry itself.
+    // [utest->req~entry-editor.citations.review-inspected-entry-replaced~1]
+    @Test
+    void importReviewedEntries_doesNotCiteRemovedInspectedEntry_whenItsDuplicateIsKeptFromImport() {
+        existingEntry.setField(StandardField.YEAR, "2022");
+        existingEntry.setField(StandardField.TITLE, "Gut microbiota and cognition");
+        BibEntry duplicateOfInspectedEntry = new BibEntry(existingEntry).withCitationKey("Fetched2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT),
+                CitationFetcher.SearchType.CITED_BY,
+                duplicateOfInspectedEntry);
+
+        assertEquals(List.of(Optional.empty()),
+                bibDatabaseContext.getEntries().stream()
+                                  .map(entry -> entry.getField(StandardField.CITES))
+                                  .toList());
+    }
+
+    /// The counterpart for `cites`: the write lands on the inspected entry, which "Keep from import" removed,
+    /// so nothing of it reaches the library.
+    // [utest->req~entry-editor.citations.review-inspected-entry-replaced~1]
+    @Test
+    void importReviewedEntries_doesNotWriteCitesOnRemovedInspectedEntry_whenItsDuplicateIsKeptFromImport() {
+        existingEntry.setField(StandardField.YEAR, "2022");
+        existingEntry.setField(StandardField.TITLE, "Gut microbiota and cognition");
+        BibEntry duplicateOfInspectedEntry = new BibEntry(existingEntry).withCitationKey("Fetched2022");
+
+        importReviewedEntriesResolvingDuplicatesWith(
+                Optional.of(DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT),
+                CitationFetcher.SearchType.CITES,
+                duplicateOfInspectedEntry);
+
+        assertEquals(Optional.empty(), existingEntry.getField(StandardField.CITES));
+    }
+
     // [utest->req~entry-editor.citations.review-link-undoable~1]
     @Test
     void importReviewedEntries_marksLibraryChangedAndUndoesCites_whenEveryAcceptedEntryIsKept() {

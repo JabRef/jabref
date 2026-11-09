@@ -80,6 +80,16 @@ See <https://github.com/JabRef/jabref/pull/17690>.
 
 Needs: impl, utest
 
+## Citation relation must not be recorded when the import replaced the inspected entry
+`req~entry-editor.citations.review-inspected-entry-replaced~1`
+
+Applies to a reviewed entry that duplicates the inspected entry and is resolved with "Keep from import" or "Keep merged", which removes the inspected entry from the library.
+Its citation key then resolves to nothing, and the entry that took its place can have inherited that key, so a link would point at the entry itself.
+
+See <https://github.com/JabRef/jabref/pull/17690>.
+
+Needs: impl, utest
+
 ## Citation entry review must keep its edits out of the library's undo history
 `req~entry-editor.citations.review-edits-outside-library-undo~1`
 

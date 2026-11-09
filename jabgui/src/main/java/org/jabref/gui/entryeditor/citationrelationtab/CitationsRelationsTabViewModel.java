@@ -169,11 +169,17 @@ public class CitationsRelationsTabViewModel {
     /// @param existingEntry   the inspected entry
     /// @param databaseContext library the entries belong to
     // [impl->req~entry-editor.citations.review-links-kept-duplicate~1]
+    // [impl->req~entry-editor.citations.review-inspected-entry-replaced~1]
     private void linkReviewedEntries(List<BibEntry> importedEntries,
                                      List<BibEntry> keptEntries,
                                      CitationFetcher.SearchType searchType,
                                      BibEntry existingEntry,
                                      BibDatabaseContext databaseContext) {
+                                        
+        if (!databaseContext.getDatabase().containsEntryWithId(existingEntry.getId())) {
+            dialogService.notify(Localization.lang("No citation relation recorded for %0", existingEntry.getAuthorTitleYear()));
+            return;
+        }
         List<BibEntry> keptEntriesToLink = determineKeptEntriesToLink(keptEntries, existingEntry, databaseContext);
         if (importedEntries.isEmpty() && keptEntriesToLink.isEmpty()) {
             return;
