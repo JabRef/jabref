@@ -216,7 +216,7 @@
 }
 
 .menu-item JabRefSvgIcon.glyph-icon {
-    -fx-icon-size: 9;
+    -fx-font-size: 1em;
 }
 
 .column-header .glyph-icon {
@@ -535,6 +535,18 @@ JabRefSvgIcon.search-field-icon,
 .global-search-bar .toggle-button:selected .glyph-icon {
     -fx-icon-color: -fx-text-base-color;
 }
+
+.global-search-bar .toggle-button {
+    -fx-padding: 0.25em;
+    -fx-min-width: 2em;
+    -fx-pref-width: 2em;
+    -fx-min-height: 2em;
+}
+
+.global-search-bar .toggle-button JabRefSvgIcon.glyph-icon {
+    -fx-font-size: 1em;
+}
+
 
 /* search text */
 .global-search-bar .label {
