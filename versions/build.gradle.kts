@@ -142,7 +142,7 @@ dependencies.constraints {
     api("org.graalvm.sdk:nativeimage:25.5.5.0.3")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.6.Final")
-    api("org.hisp.dhis:json-tree:1.12.0")
+    api("org.hisp.dhis:json-tree:1.13.0")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jabref:html-to-node:0.3.0")
