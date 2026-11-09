@@ -131,7 +131,8 @@ public class JabRefGUI extends Application {
             // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
             setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
-            Injector.setModelOrService(NativeDesktop.class, NativeDesktop.create(getHostServices(), preferences));
+            NativeDesktop nativeDesktop = NativeDesktop.create(getHostServices(), preferences);
+            Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
             initialize();
 
@@ -147,7 +148,8 @@ public class JabRefGUI extends Application {
                     taskExecutor,
                     gitHandlerRegistry,
                     journalAbbreviationRepository,
-                    oAuthSessionRegistry);
+                    oAuthSessionRegistry,
+                    nativeDesktop);
 
             openWindow();
 

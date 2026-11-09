@@ -27,7 +27,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -43,31 +42,35 @@ public class DeleteFileAction extends SimpleCommand {
     private final BibDatabaseContext databaseContext;
     private final @Nullable LinkedFilesEditorViewModel viewModel;
     private final List<LinkedFileViewModel> filesToDelete;
+    private final NativeDesktop nativeDesktop;
     private boolean success = false;
 
     public DeleteFileAction(DialogService dialogService,
                             FilePreferences filePreferences,
                             BibDatabaseContext databaseContext,
                             @Nullable LinkedFilesEditorViewModel viewModel,
-                            List<LinkedFileViewModel> filesToDelete) {
+                            List<LinkedFileViewModel> filesToDelete,
+                            NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.databaseContext = databaseContext;
         this.viewModel = viewModel;
         this.filesToDelete = List.copyOf(filesToDelete);
+        this.nativeDesktop = nativeDesktop;
     }
 
     /// Called when the user wants to delete a complete entry.
     public DeleteFileAction(DialogService dialogService,
                             FilePreferences filePreferences,
                             BibDatabaseContext databaseContext,
-                            List<LinkedFileViewModel> filesToDelete) {
-        this(dialogService, filePreferences, databaseContext, null, filesToDelete);
+                            List<LinkedFileViewModel> filesToDelete,
+                            NativeDesktop nativeDesktop) {
+        this(dialogService, filePreferences, databaseContext, null, filesToDelete, nativeDesktop);
     }
 
     /// The preference only states the user's wish; the platform may not offer a trash
     private boolean shouldMoveToTrash() {
-        return filePreferences.moveToTrash() && Injector.instantiateModelOrService(NativeDesktop.class).moveToTrashSupported();
+        return filePreferences.moveToTrash() && nativeDesktop.moveToTrashSupported();
     }
 
     private boolean deletionOfCompleteEntry() {
@@ -197,7 +200,7 @@ public class DeleteFileAction extends SimpleCommand {
         try {
             if (shouldMoveToTrash()) {
                 LOGGER.debug("Moving to trash: {}", theFile);
-                Injector.instantiateModelOrService(NativeDesktop.class).moveToTrash(theFile);
+                nativeDesktop.moveToTrash(theFile);
             } else {
                 LOGGER.debug("Deleting: {}", theFile);
                 Files.delete(theFile);

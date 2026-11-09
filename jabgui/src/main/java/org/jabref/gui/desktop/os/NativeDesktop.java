@@ -408,9 +408,10 @@ public abstract class NativeDesktop {
         openFileWithApplication(filePath, application);
     }
 
-    /// Neither blocks nor reports failures, so callers cannot detect that no browser could be started.
+    /// Does not report failures, so callers cannot detect that no browser could be started.
     protected final void showDocument(String uri) {
-        hostServices.showDocument(uri);
+        // On Linux, JavaFX probes the browser candidates with blocking `which` calls; keep them off the calling (often FX) thread
+        HeadlessExecutorService.INSTANCE.execute(() -> hostServices.showDocument(uri));
     }
 
     /// The OS handler dispatches by scheme, e.g., `mailto:` to the mail client.

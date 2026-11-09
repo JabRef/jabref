@@ -30,6 +30,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -111,6 +112,7 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final NativeDesktop nativeDesktop;
     private OOBibBase ooBase;
     private OOStyle currentStyle;
 
@@ -126,11 +128,13 @@ public class OpenOfficePanel {
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
                            ClipBoardManager clipBoardManager,
-                           GitHandlerRegistry gitHandlerRegistry) {
+                           GitHandlerRegistry gitHandlerRegistry,
+                           NativeDesktop nativeDesktop) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -377,7 +381,7 @@ public class OpenOfficePanel {
     }
 
     private void connectAutomatically() {
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService, nativeDesktop);
 
         final String errorTitle = Localization.lang("Autodetection failed");
         final String progressMessage = Localization.lang("Autodetecting paths...");
@@ -417,7 +421,7 @@ public class OpenOfficePanel {
         final String errorTitle = Localization.lang("Could not connect to running OpenOffice/LibreOffice.");
         final String extendedErrorTitle = Localization.lang("If connecting manually, please verify program and library paths.");
 
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService, nativeDesktop);
 
         if (selectedPath.isPresent()) {
             BackgroundTask.wrap(() -> officeInstallation.setOpenOfficePreferences(selectedPath.get()))

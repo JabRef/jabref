@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.linkedfiles;
 
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -69,11 +71,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
                 .section(Localization.lang("Attached files"), attached -> attached
                         .checkbox(Localization.lang("Show confirmation dialog when deleting attached files"), viewModel.confirmLinkedFileDeleteProperty())
                         .checkbox(Localization.lang("Move deleted files to trash (instead of deleting them)"), viewModel.moveToTrashProperty(),
-                                trash -> {
-                                    if (!Injector.instantiateModelOrService(NativeDesktop.class).moveToTrashSupported()) {
-                                        trash.disable();
-                                    }
-                                })
+                                // Hidden instead of disabled: a disabled checkbox would still show the preference's default "checked"
+                                trash -> trash.visibleWhen(new SimpleBooleanProperty(Injector.instantiateModelOrService(NativeDesktop.class).moveToTrashSupported())))
                         .checkbox(Localization.lang("Update linked file paths during entry transfer if the files are accessible"), viewModel.adjustLinkedFilesOnTransferProperty())
                         .checkbox(Localization.lang("Copy linked files on entry transfer when they would otherwise be inaccessible"), viewModel.copyLinkedFilesOnTransferProperty(),
                                 copy -> copy.disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not()))

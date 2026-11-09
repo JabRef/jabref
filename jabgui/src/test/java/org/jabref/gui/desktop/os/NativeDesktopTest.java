@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,7 +87,7 @@ class NativeDesktopTest {
 
         NativeDesktop.create(hostServices, preferencesWith()).openBrowser(URL_WITH_QUERY);
 
-        verify(hostServices).showDocument(URL_WITH_QUERY);
+        verify(hostServices, timeout(5000)).showDocument(URL_WITH_QUERY);
     }
 
     @Test

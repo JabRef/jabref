@@ -19,7 +19,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,15 +39,18 @@ public abstract class SendAsEMailAction extends SimpleCommand {
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
 
     public SendAsEMailAction(DialogService dialogService,
                              GuiPreferences preferences,
                              StateManager stateManager,
-                             TaskExecutor taskExecutor) {
+                             TaskExecutor taskExecutor,
+                             NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
     }
 
     @Override
@@ -75,7 +77,7 @@ public abstract class SendAsEMailAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
         URI uriMailTo = getUriMailTo(entries);
 
-        Injector.instantiateModelOrService(NativeDesktop.class).openMailClient(uriMailTo);
+        nativeDesktop.openMailClient(uriMailTo);
 
         return "%s: %d".formatted(Localization.lang("Entries added to an email"), entries.size());
     }

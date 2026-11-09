@@ -51,6 +51,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -452,7 +453,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
     /// @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
     /// successfully, does not exist in the first place, or the user choose to remove it)
     public boolean delete() {
-        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this));
+        // Looked up instead of injected via constructor (ADR 0055): this class has more than 30 construction sites
+        NativeDesktop nativeDesktop = Injector.instantiateModelOrService(NativeDesktop.class);
+        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this), nativeDesktop);
         deleteFileAction.execute();
         return deleteFileAction.isSuccess();
     }

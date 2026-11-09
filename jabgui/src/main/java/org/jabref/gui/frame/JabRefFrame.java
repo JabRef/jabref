@@ -114,6 +114,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final OAuthSessionRegistry oAuthSessionRegistry;
+    private final NativeDesktop nativeDesktop;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -139,7 +140,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        TaskExecutor taskExecutor,
                        GitHandlerRegistry gitHandlerRegistry,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       OAuthSessionRegistry oAuthSessionRegistry) {
+                       OAuthSessionRegistry oAuthSessionRegistry,
+                       NativeDesktop nativeDesktop) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -152,6 +154,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.oAuthSessionRegistry = oAuthSessionRegistry;
+        this.nativeDesktop = nativeDesktop;
 
         setId("frame");
 
@@ -199,7 +202,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                nativeDesktop);
 
         this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
@@ -262,7 +266,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryEditor,
                 gitHandlerRegistry,
                 journalAbbreviationRepository,
-                oAuthSessionRegistry
+                oAuthSessionRegistry,
+                nativeDesktop
         );
 
         VBox head = new VBox(0, mainMenu, mainToolBar);

@@ -41,6 +41,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopyLinkedFilesAction;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.contextmenu.ContextAction;
 import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
 import org.jabref.gui.icon.IconTheme;
@@ -107,6 +108,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private FileUpdateMonitor fileUpdateMonitor;
     @Inject
     private StateManager stateManager;
+    @Inject
+    private NativeDesktop nativeDesktop;
 
     private LinkedFilesEditorViewModel viewModel;
 
@@ -401,7 +404,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
     private void deleteAttachedFilesWithConfirmation() {
         new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext,
-                viewModel, listView.getSelectionModel().getSelectedItems()).execute();
+                viewModel, listView.getSelectionModel().getSelectedItems(), nativeDesktop).execute();
     }
 
     public LinkedFilesEditorViewModel getViewModel() {

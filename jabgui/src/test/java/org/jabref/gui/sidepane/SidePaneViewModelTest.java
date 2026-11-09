@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -74,7 +75,8 @@ class SidePaneViewModelTest {
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                new GitHandlerRegistry(mock(GitPreferences.class)));
+                new GitHandlerRegistry(mock(GitPreferences.class)),
+                mock(NativeDesktop.class));
     }
 
     @Test
