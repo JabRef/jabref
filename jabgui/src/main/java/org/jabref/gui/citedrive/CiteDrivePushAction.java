@@ -64,7 +64,6 @@ public class CiteDrivePushAction extends SimpleCommand {
                 .getAuthorizedSession()
                 // Async: the token may arrive on the HTTP server thread; the push itself is network I/O
                 .thenAcceptAsync(sessionOpt -> {
-                    CiteDriveLoginAction.removeLoginPageNotifications(dialogService);
                     if (sessionOpt.isEmpty()) {
                         dialogService.notify(Localization.lang("CiteDrive push failed: could not obtain access token."));
                         return;
@@ -89,7 +88,6 @@ public class CiteDrivePushAction extends SimpleCommand {
                     }
                 })
                 .exceptionally(throwable -> {
-                    CiteDriveLoginAction.removeLoginPageNotifications(dialogService);
                     LOGGER.error("CiteDrive push failed", throwable);
                     dialogService.notify(Localization.lang("CiteDrive push failed: %0", CiteDriveLoginAction.describeFailure(throwable)));
                     return null;
