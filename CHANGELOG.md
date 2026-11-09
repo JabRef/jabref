@@ -42,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
 - We now show which web search fetchers have a saved API key. [#16250](https://github.com/JabRef/jabref/issues/16250)
 - We improved the error message shown when Semantic Scholar restricts access to a paper's references. [#17291](https://github.com/JabRef/jabref/issues/17291)
+- We removed the extra encryption of passwords and API keys in the system keyring; existing values are migrated automatically. [#13687](https://github.com/JabRef/jabref/issues/13687)
 - We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 - We changed the HTTP server to list linked PDF files per entry at `GET /libraries/{id}/entries/{citationKey}/files` instead of `entries/pdffiles`. [#17567](https://github.com/JabRef/jabref/pull/17567)
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
@@ -79,6 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where closing a library did not free its memory, so a session that opened and closed several libraries kept all of them in memory. [#16948](https://github.com/JabRef/jabref/pull/16948)
 - We fixed an issue where case-sensitive search (`=!`, `==!`, `=~!`) in linked files ignored the casing and matched text in any casing. [#13048](https://github.com/JabRef/jabref/issues/13048)
 - We fixed linked-file full-text search results missing from the entry editor. [#17367](https://github.com/JabRef/jabref/pull/17367)
+- We fixed an issue where merging a backup file did not prompt the user to save upon exiting. [#12265](https://github.com/JabRef/jabref/issues/12265)
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
@@ -130,6 +132,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed JabKit BibTeX conversion losing string definitions and preambles, including when overwriting the input file. [#17409](https://github.com/JabRef/jabref/issues/17409)
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
+- We fixed an issue where failed tasks kept showing as running in the notification center. [#17124](https://github.com/JabRef/jabref/pull/17124)
 - We fixed an issue where BibTeX entries with a missing comma after the citation key were imported with a wrong key. [#17549](https://github.com/JabRef/jabref/issues/17549)
 
 ### Removed
