@@ -359,27 +359,31 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             return;
         }
         VirtualFlow<?> flow = skin.getFlow();
-        Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).ifPresent(firstVisible -> {
-            // A cell not (yet) bound to a row reports -1
-            if (firstVisible < 0 || firstVisible >= getItems().size() || getItems().get(firstVisible).isMatchedBySearch()) {
-                return;
-            }
-            // Matches are a prefix of the rows, so with a non-match at the top of the viewport, the last match is above it
-            int lastMatch = -1;
-            for (int i = 0; i < firstVisible && getItems().get(i).isMatchedBySearch(); i++) {
-                lastMatch = i;
-            }
-            if (lastMatch < 0) {
-                return;
-            }
-            // VirtualFlow.scrollTo puts a far-away row at the top of the viewport, which would show a single match.
-            // Instead, the last match goes to the bottom, so that the viewport is filled with matches.
-            // The last visible cell may be cut off, therefore it is not counted
-            int fullyVisibleRows = Optional.ofNullable(flow.getLastVisibleCell())
-                                           .map(cell -> Math.max(1, cell.getIndex() - firstVisible))
-                                           .orElse(1);
-            flow.scrollToTop(Math.max(0, lastMatch - fullyVisibleRows + 1));
-        });
+        Optional.ofNullable(flow.getFirstVisibleCell())
+                .map(IndexedCell::getIndex)
+                // A cell not (yet) bound to a row reports -1
+                .filter(firstVisible -> firstVisible >= 0 && firstVisible < getItems().size())
+                .filter(firstVisible -> !getItems().get(firstVisible).isMatchedBySearch())
+                .ifPresent(firstVisible -> scrollToLastMatchAbove(flow, firstVisible));
+    }
+
+    /// Matches are a prefix of the rows, so with a non-match at the top of the viewport, the last match is above it.
+    ///
+    /// `VirtualFlow.scrollTo` puts a far-away row at the top of the viewport, which would show a single match.
+    /// Instead, the last match goes to the bottom, so that the viewport is filled with matches.
+    private void scrollToLastMatchAbove(VirtualFlow<?> flow, int firstVisible) {
+        int lastMatch = -1;
+        for (int i = 0; i < firstVisible && getItems().get(i).isMatchedBySearch(); i++) {
+            lastMatch = i;
+        }
+        if (lastMatch < 0) {
+            return;
+        }
+        // The last visible cell may be cut off, therefore it is not counted
+        int fullyVisibleRows = Optional.ofNullable(flow.getLastVisibleCell())
+                                       .map(cell -> Math.max(1, cell.getIndex() - firstVisible))
+                                       .orElse(1);
+        flow.scrollToTop(Math.max(0, lastMatch - fullyVisibleRows + 1));
     }
 
     private void scrollToNextMatchCategory() {
