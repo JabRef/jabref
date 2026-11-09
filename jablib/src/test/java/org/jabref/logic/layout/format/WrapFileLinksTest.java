@@ -1,11 +1,13 @@
 package org.jabref.logic.layout.format;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,6 +19,15 @@ class WrapFileLinksTest {
     @BeforeEach
     void setUp() {
         formatter = new WrapFileLinks(List.of(), Path.of(""));
+    }
+
+    @Test
+    void absoluteLinkWithoutAnyFileDirectory(@TempDir Path tempDir) throws IOException {
+        Path file = Files.createFile(tempDir.resolve("test.pdf"));
+        WrapFileLinks withoutDirectories = new WrapFileLinks(List.of(), null);
+        withoutDirectories.setArgument("\\p");
+
+        assertEquals(file.toAbsolutePath().toString(), withoutDirectories.format(file.toString()));
     }
 
     @Test
