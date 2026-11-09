@@ -17,9 +17,11 @@ import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -353,9 +355,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     /// Search matches are sorted to the top (or are the only rows left), so a table scrolled down before searching shows none of them.
     /// The table stays where it is as long as at least one match is in view, and otherwise moves the minimal distance, to avoid jumping around while a query is typed.
     private void showSearchMatchesIfNoneVisible() {
-        Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow")).ifPresent(flow -> {
-            int firstVisible = Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).orElse(0);
-            if (firstVisible >= getItems().size() || getItems().get(firstVisible).isMatchedBySearch()) {
+        if (!(getSkin() instanceof MainTableSkin skin)) {
+            return;
+        }
+        VirtualFlow<?> flow = skin.getFlow();
+        Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).ifPresent(firstVisible -> {
+            // A cell not (yet) bound to a row reports -1
+            if (firstVisible < 0 || firstVisible >= getItems().size() || getItems().get(firstVisible).isMatchedBySearch()) {
                 return;
             }
             // Matches are a prefix of the rows, so with a non-match at the top of the viewport, the last match is above it
@@ -363,9 +369,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             for (int i = 0; i < firstVisible && getItems().get(i).isMatchedBySearch(); i++) {
                 lastMatch = i;
             }
-            if (lastMatch >= 0) {
-                flow.scrollTo(lastMatch);
+            if (lastMatch < 0) {
+                return;
             }
+            // VirtualFlow.scrollTo puts a far-away row at the top of the viewport, which would show a single match.
+            // Instead, the last match goes to the bottom, so that the viewport is filled with matches.
+            // The last visible cell may be cut off, therefore it is not counted
+            int fullyVisibleRows = Optional.ofNullable(flow.getLastVisibleCell())
+                                           .map(cell -> Math.max(1, cell.getIndex() - firstVisible))
+                                           .orElse(1);
+            flow.scrollToTop(Math.max(0, lastMatch - fullyVisibleRows + 1));
         });
     }
 
@@ -650,5 +663,21 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(stateManager);
         findUnlinkedFilesAction.execute();
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new MainTableSkin(this);
+    }
+
+    /// Exposes the [VirtualFlow] of the table, which avoids a CSS lookup on each search result
+    private static class MainTableSkin extends TableViewSkin<BibEntryTableViewModel> {
+        MainTableSkin(MainTable table) {
+            super(table);
+        }
+
+        VirtualFlow<?> getFlow() {
+            return getVirtualFlow();
+        }
     }
 }
