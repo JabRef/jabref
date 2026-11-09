@@ -129,6 +129,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
 - We fixed JabKit BibTeX conversion losing string definitions and preambles, including when overwriting the input file. [#17409](https://github.com/JabRef/jabref/issues/17409)
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
+- We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
 - We fixed an issue where backups skipped typed edits and changes merged from a backup were lost on closing. [#16890](https://github.com/JabRef/jabref/pull/16890)
 
 ### Removed
