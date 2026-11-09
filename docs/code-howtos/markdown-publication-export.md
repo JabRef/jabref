@@ -6,6 +6,8 @@ parent: Code Howtos
 
 `MarkdownPublicationExporter` renders entries through
 `resource/layout/markdown-publications/publication.layout`.
+Field values pass through the `MarkdownEscaper` layout formatter, which collapses
+whitespace and escapes characters that would otherwise start Markdown markup.
 The exporter resolves bibliographic fields before rendering and passes a
 validated DOI or URL to the layout. Only HTTP, HTTPS, FTP, and FTPS destinations
 with an authority are accepted; `www.` destinations receive an HTTPS scheme.
