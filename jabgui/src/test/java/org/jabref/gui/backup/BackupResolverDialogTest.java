@@ -251,7 +251,7 @@ class BackupResolverDialogTest extends JavaFxTest {
         Optional<BackupComparison> comparison = backup.flatMap(path -> {
             try {
                 return Optional.of(BackupComparator.compare(original, path, importFormatPreferences()));
-            } catch (IOException e) {
+            } catch (IOException _) {
                 return Optional.empty();
             }
         });
