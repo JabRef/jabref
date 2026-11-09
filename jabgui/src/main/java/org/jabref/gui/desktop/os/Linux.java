@@ -15,6 +15,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.util.HeadlessExecutorService;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -62,10 +63,21 @@ public class Linux extends NativeDesktop {
 
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
-        // The application may carry arguments, e.g. "evince --fullscreen"
-        List<String> command = new ArrayList<>(List.of(application.split(" ")));
+        List<String> command = new ArrayList<>(applicationCommand(application));
         command.add(filePath);
         startProcess(new ProcessBuilder(command));
+    }
+
+    /// The configured application is either the path of an executable, which may contain spaces,
+    /// or a command line with arguments, such as `evince --fullscreen` or `"/opt/My Viewer/viewer" --flag`.
+    @VisibleForTesting
+    static List<String> applicationCommand(String application) {
+        if (Files.isExecutable(Path.of(application))) {
+            return List.of(application);
+        }
+        List<String> command = CommandLineParser.splitLegacyCommandLine(application);
+        // Unbalanced quotes yield no tokens
+        return command.isEmpty() ? List.of(application) : command;
     }
 
     @Override
