@@ -88,4 +88,10 @@ Escaped LaTeX special characters (`\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `\\`
 
 Needs: impl, utest
 
+### Preserve extended name parts on save
+`req~save.names.preserve-extended-parts~1`
+
+When saving, JabRef keeps BibLaTeX extended name format attributes (e.g., `family=`, `given=`, `prefix=`, `useprefix=`) unchanged.
+
+Needs: impl
 <!-- markdownlint-disable-file MD022 -->

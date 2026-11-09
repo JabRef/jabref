@@ -1,6 +1,7 @@
 /// Comparators and diffs for entries, fields and whole libraries.
 ///
 /// - Sorting: comparators implementing `Comparator<BibEntry>`, for example [org.jabref.logic.bibtex.comparator.EntryComparator].
+/// - [org.jabref.logic.bibtex.comparator.NameComparator] compares parsed name lists independently of table display formatting.
 /// - The class [org.jabref.logic.bibtex.comparator.BibEntryCompare] provides comparison based on the set relation.
 /// - A whole library can be compared using [org.jabref.logic.bibtex.comparator.BibDatabaseDiff].
 ///

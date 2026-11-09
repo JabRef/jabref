@@ -1,12 +1,22 @@
 package org.jabref.model.entry;
 
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This is an immutable class that keeps information regarding single author. It is just a container for the information, with very simple methods to access it.
 ///
@@ -21,11 +31,17 @@ public class Author {
 
     public static final RemoveWordEnclosingAndOuterEnclosingBracesFormatter FORMATTER = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
+    private static final Set<String> EXTENDED_NAME_KEYS = Set.of(
+            "family", "family-i", "given", "given-i", "prefix", "prefix-i", "suffix", "suffix-i");
+
+    private static final RemoveEnclosingBracesFormatter ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
+
     private final String givenName;
     private final String givenNameAbbreviated;
     private final String namePrefix;
     private final String familyName;
     private final String nameSuffix;
+    private final Map<String, String> extendedNameParts;
     private Author latexFreeAuthor;
 
     /// Creates the Author object. If any part of the name is absent, `null` must be passed; otherwise other methods may return erroneous results.
@@ -38,6 +54,15 @@ public class Author {
     /// @param familyName           the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
     /// @param nameSuffix           the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
+        this(givenName, givenNameAbbreviated, namePrefix, familyName, nameSuffix, Map.of());
+    }
+
+    /// Retains the original labeled values, including name-level options and explicit initials,
+    /// separately from the normalized name parts used for display.
+    public Author(@Nullable String givenName, @Nullable String givenNameAbbreviated,
+                  @Nullable String namePrefix, @Nullable String familyName, @Nullable String nameSuffix,
+                  @NonNull Map<String, String> extendedNameParts) {
+        this.extendedNameParts = Map.copyOf(extendedNameParts);
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
         if (!StringUtil.isBlank(givenName)) {
@@ -159,7 +184,7 @@ public class Author {
 
     @Override
     public int hashCode() {
-        return Objects.hash(givenNameAbbreviated, givenName, nameSuffix, familyName, namePrefix);
+        return Objects.hash(givenNameAbbreviated, givenName, nameSuffix, familyName, namePrefix, extendedNameParts);
     }
 
     /// Compare this object with the given one.
@@ -176,10 +201,76 @@ public class Author {
                     && Objects.equals(givenNameAbbreviated, that.givenNameAbbreviated)
                     && Objects.equals(namePrefix, that.namePrefix)
                     && Objects.equals(familyName, that.familyName)
-                    && Objects.equals(nameSuffix, that.nameSuffix);
+                    && Objects.equals(nameSuffix, that.nameSuffix)
+                    && extendedNameParts.equals(that.extendedNameParts);
         }
 
         return false;
+    }
+
+    /// Returns immutable labeled BibLaTeX values; conventional names have no labeled values.
+    public @NonNull Map<String, String> getExtendedNameParts() {
+        return extendedNameParts;
+    }
+
+    /// Returns the explicit name-level option, without applying entry or application defaults.
+    /// Absent or invalid values return empty; [#getInvalidUsePrefix()] distinguishes invalid input.
+    /// The original value is retained in [#getExtendedNameParts()] for storage.
+    public @NonNull Optional<Boolean> getUsePrefix() {
+        return getExtendedNameValue("useprefix").flatMap(value -> switch (value) {
+            case "true" ->
+                    Optional.of(true);
+            case "false" ->
+                    Optional.of(false);
+            default ->
+                    Optional.empty();
+        });
+    }
+
+    /// Returns the original invalid value so validation can report it without losing source data.
+    public @NonNull Optional<String> getInvalidUsePrefix() {
+        return Optional.ofNullable(extendedNameParts.get("useprefix"))
+                       .filter(_ -> getUsePrefix().isEmpty());
+    }
+
+    /// Returns explicitly supplied initials, without generating initials or changing punctuation.
+    public @NonNull Optional<String> getExplicitGivenNameInitials() {
+        return getExtendedNameValue("given-i");
+    }
+
+    public @NonNull Optional<String> getExplicitFamilyNameInitials() {
+        return getExtendedNameValue("family-i");
+    }
+
+    public @NonNull Optional<String> getExplicitNamePrefixInitials() {
+        return getExtendedNameValue("prefix-i");
+    }
+
+    public @NonNull Optional<String> getExplicitNameSuffixInitials() {
+        return getExtendedNameValue("suffix-i");
+    }
+
+    private Optional<String> getExtendedNameValue(String key) {
+        return Optional.ofNullable(extendedNameParts.get(key))
+                       .map(String::strip)
+                       .map(ENCLOSING_BRACES_FORMATTER::format)
+                       .map(String::strip);
+    }
+
+    /// Serializes a name without discarding BibLaTeX options, explicit initials or protected values.
+    /// Display formatters should continue to use [#getFamilyGiven(boolean)] or [#getGivenFamily(boolean)].
+    // [impl->req~save.names.preserve-extended-parts~1]
+    public @NonNull String getAsBibtex() {
+        if (extendedNameParts.isEmpty()) {
+            return getFamilyGiven(false);
+        }
+        // Put a name part first so a subsequent parse recognizes the extended syntax even
+        // when an unknown option sorts before all of the standard parts.
+        return extendedNameParts.entrySet().stream()
+                                .sorted(Comparator.comparing((Map.Entry<String, String> part) -> !EXTENDED_NAME_KEYS.contains(part.getKey()))
+                                                  .thenComparing(Map.Entry::getKey))
+                                .map(part -> part.getKey() + "=" + part.getValue())
+                                .collect(Collectors.joining(", "));
     }
 
     /// Returns the first name of the author stored in this object ("First").
@@ -228,11 +319,62 @@ public class Author {
         }
     }
 
+    /// Returns the family-name label for display. Explicit `useprefix=false` excludes the prefix;
+    /// absent or invalid options retain the existing prefix-inclusive display convention.
+    // [impl->req~ui.names.display-extended~1]
+    public String getFamilyNameForDisplay() {
+        if (!getUsePrefix().orElse(true)) {
+            return getFamilyName().orElse("");
+        }
+        return getFullFamilyNameForDisplay();
+    }
+
+    private String getFullFamilyNameForDisplay() {
+        if (extendedNameParts.isEmpty()) {
+            return getNamePrefixAndFamilyName();
+        }
+        String family = getFamilyName().orElse("");
+        return getNamePrefix()
+                .map(prefix -> prefix + ((family.isEmpty() || prefix.endsWith("'") || prefix.endsWith("’")) ? "" : " ") + family)
+                .orElse(family);
+    }
+
+    private Optional<String> getGivenNameForDisplay(boolean abbreviated) {
+        if (!abbreviated) {
+            return getGivenName();
+        }
+        // A latexFree Author keeps the original metadata for serialization; decode only the display value.
+        return getExplicitGivenNameInitials()
+                .map(initials -> latexFreeAuthor == this ? LatexToUnicodeAdapter.format(initials) : initials)
+                .or(this::getGivenNameAbbreviated);
+    }
+
+    private static String joinDisplayParts(String... parts) {
+        return Stream.of(parts).filter(part -> !part.isEmpty()).collect(Collectors.joining(" "));
+    }
+
     /// Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.
+    /// Extended names with `useprefix=false` use 'Last, Jr., First von'; explicit given initials override generated initials.
     ///
     /// @param abbr `true` - abbreviate first name, `false` - do not abbreviate
     /// @return 'von Last, Jr., First' (if `abbr==false`) or 'von Last, Jr., F.' (if `abbr==true`)
     public String getFamilyGiven(boolean abbr) {
+        if (!extendedNameParts.isEmpty()) {
+            StringJoiner result = new StringJoiner(", ");
+            String family = getFamilyNameForDisplay();
+            if (!family.isEmpty()) {
+                result.add(family);
+            }
+            getNameSuffix().ifPresent(result::add);
+            String given = getGivenNameForDisplay(abbr).orElse("");
+            if (!getUsePrefix().orElse(true)) {
+                given = joinDisplayParts(given, getNamePrefix().orElse(""));
+            }
+            if (!given.isEmpty()) {
+                result.add(given);
+            }
+            return result.toString();
+        }
         StringBuilder res = new StringBuilder(getNamePrefixAndFamilyName());
         getNameSuffix().ifPresent(jr -> res.append(", ").append(jr));
         if (abbr) {
@@ -244,10 +386,20 @@ public class Author {
     }
 
     /// Returns the author's name in form 'First von Last, Jr.' with the first name full or abbreviated depending on parameter.
+    /// Prefixes remain part of the full name regardless of `useprefix`; explicit given initials override generated initials.
     ///
     /// @param abbr `true` - abbreviate first name, `false` - do not abbreviate
     /// @return 'First von Last, Jr.' (if `abbr==false`) or 'F. von Last, Jr.' (if `abbr==true`)
     public String getGivenFamily(boolean abbr) {
+        if (!extendedNameParts.isEmpty()) {
+            StringJoiner result = new StringJoiner(", ");
+            String name = joinDisplayParts(getGivenNameForDisplay(abbr).orElse(""), getFullFamilyNameForDisplay());
+            if (!name.isEmpty()) {
+                result.add(name);
+            }
+            getNameSuffix().ifPresent(result::add);
+            return result.toString();
+        }
         StringBuilder res = new StringBuilder();
         if (abbr) {
             getGivenNameAbbreviated().map(firstA -> firstA + ' ').ifPresent(res::append);
@@ -291,7 +443,7 @@ public class Author {
             String von = getNamePrefix().map(LatexToUnicodeAdapter::format).orElse(null);
             String last = getFamilyName().map(LatexToUnicodeAdapter::format).orElse(null);
             String jr = getNameSuffix().map(LatexToUnicodeAdapter::format).orElse(null);
-            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr);
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr, extendedNameParts);
             latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;
         }
         return latexFreeAuthor;

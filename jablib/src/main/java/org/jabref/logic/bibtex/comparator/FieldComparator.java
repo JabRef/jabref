@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
@@ -22,6 +21,8 @@ import org.jabref.model.metadata.SaveOrder;
 public class FieldComparator implements Comparator<BibEntry> {
 
     private static final Collator COLLATOR = getCollator();
+
+    private final NameComparator nameComparator = new NameComparator();
 
     enum FieldType {
         NAME, TYPE, YEAR, MONTH, OTHER
@@ -72,14 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private Optional<String> getFieldValue(BibEntry entry) {
         return fields.getFields().stream()
-                     .map(entry::getFieldOrAliasLatexFree)
-                     .flatMap(Optional::stream)
-                     .findFirst();
-    }
-
-    private Optional<String> getFieldValueRaw(BibEntry entry) {
-        return fields.getFields().stream()
-                     .map(entry::getField)
+                     .map(field -> fieldType == FieldType.NAME ? entry.getFieldOrAlias(field) : entry.getFieldOrAliasLatexFree(field))
                      .flatMap(Optional::stream)
                      .findFirst();
     }
@@ -93,13 +87,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             // Sort by type.
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
-        } else if (fieldType == FieldType.NAME) {
-            // Authors must be fetched as input by the user
-            // (latexFree strips { and }, which define tokenization and hence alphabetization)
-            // This breaks sorting if letters with umlauts and similar symbols are not entered
-            // directly but makes tokenization work correctly.
-            f1 = getFieldValueRaw(e1).orElse(null);
-            f2 = getFieldValueRaw(e2).orElse(null);
         } else {
             f1 = getFieldValue(e1).orElse(null);
             f2 = getFieldValue(e2).orElse(null);
@@ -116,10 +103,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         // Now we know that both f1 and f2 are != null
         if (fieldType == FieldType.NAME) {
-            // If the author is a single token enclosed in braces, the trailing braces are not
-            // trimmed, even though this technically may affect sorting.
-            f1 = AuthorList.fixAuthorForAlphabetization(f1);
-            f2 = AuthorList.fixAuthorForAlphabetization(f2);
+            return nameComparator.compare(f1, f2) * multiplier;
         } else if (fieldType == FieldType.YEAR) {
             int f1year;
             try {

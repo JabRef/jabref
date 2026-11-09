@@ -299,15 +299,16 @@ public class AuthorList implements Iterable<Author> {
             case 0 ->
                     "";
             case 1 ->
-                    authors.getFirst().getNamePrefixAndFamilyName();
+                    authors.getFirst().getFamilyNameForDisplay();
             case 2 ->
-                    authors.getFirst().getNamePrefixAndFamilyName() + " and " + authors.get(1).getNamePrefixAndFamilyName();
+                    authors.getFirst().getFamilyNameForDisplay() + " and " + authors.get(1).getFamilyNameForDisplay();
             default ->
-                    authors.getFirst().getNamePrefixAndFamilyName() + " et al.";
+                    authors.getFirst().getFamilyNameForDisplay() + " et al.";
         };
     }
 
     /// Returns the list of authors separated by commas with last name only; If the list consists of two or more authors, "and" is inserted before the last author's name.
+    /// Each author's explicit `useprefix` option controls inclusion of their prefix in the label.
     ///
     ///
     /// -  "John Smith" ==> "Smith"
@@ -320,7 +321,7 @@ public class AuthorList implements Iterable<Author> {
     /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsLastNames(boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), Author::getNamePrefixAndFamilyName, oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), Author::getFamilyNameForDisplay, oxfordComma);
     }
 
     /// Returns the list of authors separated by commas with first names after last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
@@ -361,6 +362,11 @@ public class AuthorList implements Iterable<Author> {
         return getAuthors().stream()
                            .map(author -> author.getFamilyGiven(abbreviate))
                            .collect(Collectors.joining(" and "));
+    }
+
+    /// Returns the author field for storage, preserving extended BibLaTeX name parts per author.
+    public String getAsBibtex() {
+        return authors.stream().map(Author::getAsBibtex).collect(Collectors.joining(" and "));
     }
 
     /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].
