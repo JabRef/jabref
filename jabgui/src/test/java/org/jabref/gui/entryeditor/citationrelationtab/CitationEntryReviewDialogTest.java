@@ -80,6 +80,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -365,6 +366,31 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
         interact(() -> {
             assertNotNull(dialog);
             DialogButtonAssertions.assertCaptionsAreNotTruncated(dialog.getDialogPane());
+        });
+    }
+
+    // [utest->req~ux.dialogs.close-key-binding~1]
+    @Test
+    void escape_keepsTheReviewOpen_withoutDecidingAboutTheEntry() {
+        interact(() -> {
+            dialog = createDialog(1, 2, sampleEntry);
+            dialog.initOwner(primaryStage);
+            dialog.show();
+        });
+        awaitEvents();
+
+        interact(() -> {
+            assertNotNull(dialog);
+            Event.fireEvent(dialog.getDialogPane(),
+                    new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE, false, false, false, false));
+        });
+        awaitEvents();
+
+        interact(() -> {
+            assertNotNull(dialog);
+            // Neither closed nor answered: the review continues with this entry
+            assertTrue(dialog.isShowing());
+            assertNull(dialog.getResult());
         });
     }
 

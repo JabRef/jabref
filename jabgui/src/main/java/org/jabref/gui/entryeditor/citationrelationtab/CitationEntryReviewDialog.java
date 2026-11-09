@@ -168,9 +168,9 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     /// @param databaseContext   library the entry is reviewed for
     /// @param entryTypesManager source of the selectable entry types
     /// @param preferences       preferences the field editors are built from
-    /// @param stateManager      source of the library's autocompletion suggestions
-    /// @param dialogService     service the preview panel and the undo actions report through
-    /// @param taskExecutor      executor the preview panel renders on
+    /// @param stateManager      source of the library's autocompletion suggestions, and of the undo state the undo actions bind to
+    /// @param dialogService     service the preview and the undo actions report through
+    /// @param taskExecutor      executor the preview renders on
     public CitationEntryReviewDialog(BibEntry entry,
                                      int position,
                                      int total,
@@ -234,6 +234,13 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
             }
             return Decision.CANCEL;
         });
+    }
+
+    /// The review is built up entry by entry, and a stray key press would discard all of it, so the entries
+    /// are left out only through "End review without imports". [impl->req~ux.dialogs.close-key-binding~1]
+    @Override
+    protected boolean closesOnCloseKeyBinding() {
+        return false;
     }
 
     /// Fills the entry type combo box with the types of the library's mode
