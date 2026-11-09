@@ -38,7 +38,7 @@ dependencies {
     api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
     api(platform("org.kordamp.ikonli:ikonli-bom:12.4.0"))
     api(platform("org.slf4j:slf4j-bom:2.0.20"))
-    api(platform("tools.jackson:jackson-bom:3.2.4"))
+    api(platform("tools.jackson:jackson-bom:3.3.0"))
 }
 
 dependencies.constraints {
@@ -56,7 +56,7 @@ dependencies.constraints {
 
     api("com.dlsc.gemsfx:gemsfx:4.7.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
-    api("com.dlsc.pdfviewfx:pdfviewfx:3.6.0")
+    api("com.dlsc.pdfviewfx:pdfviewfx:3.6.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.4.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0")
@@ -71,7 +71,7 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
+    api("com.nimbusds:oauth2-oidc-sdk:11.39")
     api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okio:okio-jvm:3.18.2")
     api("com.squareup.retrofit2:retrofit:3.0.0")
@@ -93,7 +93,7 @@ dependencies.constraints {
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:6.0.1")
+    api("io.github.classgraph:classgraph:6.0.2")
     api("io.github.java-diff-utils:java-diff-utils:4.18")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -140,7 +140,7 @@ dependencies.constraints {
     api("org.graalvm.sdk:nativeimage:25.5.5.0.3")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.6.Final")
-    api("org.hisp.dhis:json-tree:1.12.0")
+    api("org.hisp.dhis:json-tree:1.13.0")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jabref:html-to-node:0.3.0")
@@ -164,7 +164,7 @@ dependencies.constraints {
     api("org.yaml:snakeyaml:2.7")
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svg:1.0.0")
-    api("tools.maran:svg-materialdesign:1.0.0")
+    api("tools.maran:svg-materialdesign:1.0.1")
     api("tools.maran:svgnode:2.0.1")
     // jfx-static-libs must match the JavaFX version above
     api("us.hebi.graalvm:jfx-static-feature:1.1.1")
