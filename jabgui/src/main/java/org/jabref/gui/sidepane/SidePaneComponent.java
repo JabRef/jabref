@@ -7,6 +7,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.actions.SimpleCommand;
@@ -42,6 +43,14 @@ public class SidePaneComponent extends BorderPane {
         setTop(createHeaderView());
         setCenter(contentFactory.create(sidePaneType));
         VBox.setVgrow(this, sidePaneType == SidePaneType.GROUPS ? Priority.ALWAYS : Priority.NEVER);
+
+        if (sidePaneType == SidePaneType.GROUPS) {
+            // keep a few rows visible; the groups list scrolls inside this height
+            setMinHeight(150);
+        } else {
+            // never squeeze or cut off the other panels
+            setMinHeight(Region.USE_PREF_SIZE);
+        }
     }
 
     private Node createHeaderView() {

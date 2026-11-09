@@ -1824,3 +1824,11 @@ We want to have a look that matches our icons in the tool-bar */
 .side-pane-scroll > .viewport {
     -fx-background-color: transparent;
 }
+.side-pane-scroll > .scroll-bar:vertical {
+    -fx-pref-width: 6;
+    -fx-padding: 0 0 0 6;
+    -fx-opacity: 0.6;
+}
+.side-pane-scroll > .scroll-bar:vertical > .track {
+    -fx-background-color: transparent;
+}
