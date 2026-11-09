@@ -129,6 +129,7 @@ public class IconTheme {
     }
 
     public enum JabRefIcons implements JabRefIcon {
+        
         ADD(MaterialDesignP.PLUS_CIRCLE_OUTLINE),
         ADD_FILLED(MaterialDesignP.PLUS_CIRCLE),
         ADD_NOBOX(MaterialDesignP.PLUS),
