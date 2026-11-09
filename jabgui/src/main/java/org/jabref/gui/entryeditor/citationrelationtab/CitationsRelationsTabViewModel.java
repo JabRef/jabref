@@ -175,7 +175,6 @@ public class CitationsRelationsTabViewModel {
                                      CitationFetcher.SearchType searchType,
                                      BibEntry existingEntry,
                                      BibDatabaseContext databaseContext) {
-                                        
         if (!databaseContext.getDatabase().containsEntryWithId(existingEntry.getId())) {
             dialogService.notify(Localization.lang("No citation relation recorded for %0", existingEntry.getAuthorTitleYear()));
             return;

@@ -282,7 +282,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     /// The label and the editor of one field, kept together while the rows are distributed over the
     /// sections they belong to.
     ///
-    /// @param label  label shown in front of the editor
+    /// @param label label shown in front of the editor
     private record FieldRow(Field field, Label label, FieldEditorFX editor) {
     }
 
@@ -440,7 +440,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
 
     /// Resets the unlimited height the text inputs ask for, and lets text areas grow with their text
     ///
-    /// @param node  editor node, searched for text inputs
+    /// @param node editor node, searched for text inputs
     private void normalizeInputHeights(Field field, Node node) {
         switch (node) {
             case EditorTextArea textArea -> {
