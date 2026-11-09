@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,17 +44,22 @@ class OpenAnnotationActionTest {
     private final DialogService dialogService = mock(DialogService.class);
     private final StateManager stateManager = mock(StateManager.class);
     private final ProcessBuilder processBuilder = mock(ProcessBuilder.class);
+    private final Process process = mock(Process.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         ExternalFileType pdfType = mock(ExternalFileType.class);
         when(pdfType.getExtension()).thenReturn("pdf");
         when(pdfType.getOpenWithApplication()).thenReturn(SUMATRA.toString());
 
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(pdfType));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+
+        when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
+        when(process.getErrorStream()).thenReturn(InputStream.nullInputStream());
+        when(processBuilder.start()).thenReturn(process);
     }
 
     /// Both paths carry a space, so the command line also shows that neither is split into two
@@ -69,12 +75,14 @@ class OpenAnnotationActionTest {
                 SUMATRA.toString(), "-reuse-instance", "-page", "7", PDF_FILE.toString()));
     }
 
+    /// Both streams of the reader have to be read, otherwise it blocks as soon as an unread pipe
+    /// fills up with the warnings Qt and GTK readers write.
     @Test
-    void readerOutputIsDiscardedSoAFullPipeCannotBlockIt() {
+    void bothStreamsOfTheReaderAreRead() {
         action().openAtAnnotation(PDF_FILE, annotationOnPage(PAGE), processBuilder);
 
-        verify(processBuilder).redirectOutput(ProcessBuilder.Redirect.DISCARD);
-        verify(processBuilder).redirectError(ProcessBuilder.Redirect.DISCARD);
+        verify(process).getInputStream();
+        verify(process).getErrorStream();
     }
 
     @Test

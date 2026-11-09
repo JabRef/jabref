@@ -21,6 +21,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.pdf.reader.ExternalPdfReader;
 import org.jabref.logic.pdf.reader.ExternalPdfReaders;
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -108,17 +110,21 @@ public class OpenAnnotationAction extends SimpleCommand {
 
     private void openExternally(List<String> commandLine, ProcessBuilder processBuilder) {
         processBuilder.command(commandLine);
-        // Readers write Qt/GTK warnings to stderr and would block once an unread pipe fills up.
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
+        Process process;
         try {
-            processBuilder.start();
+            process = processBuilder.start();
         } catch (IOException e) {
             LOGGER.warn("Could not run {}", commandLine, e);
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Could not call executable '%0'.", commandLine.getFirst()),
                     Localization.lang("Please check the path in the preferences."));
+            return;
         }
+
+        // Readers write Qt/GTK warnings to their streams and would block once an unread pipe fills
+        // up, so both are drained into the log.
+        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getInputStream(), LOGGER::debug));
+        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getErrorStream(), LOGGER::debug));
     }
 
     private void openWithoutPage(Path pdfFile, Path executable) {
