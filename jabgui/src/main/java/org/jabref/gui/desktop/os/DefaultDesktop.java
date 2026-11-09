@@ -1,13 +1,10 @@
 package org.jabref.gui.desktop.os;
 
-import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
 import javafx.application.HostServices;
 
-import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.Directories;
@@ -21,7 +18,6 @@ import org.slf4j.LoggerFactory;
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration/
 @NullMarked
-@AllowedToUseAwt("Requires AWT to open a file")
 public class DefaultDesktop extends NativeDesktop {
 
     public DefaultDesktop(HostServices hostServices, GuiPreferences preferences) {
@@ -29,8 +25,8 @@ public class DefaultDesktop extends NativeDesktop {
     }
 
     @Override
-    protected void openFileWithDefaultApplication(String filePath) throws IOException {
-        Desktop.getDesktop().open(Path.of(filePath).toFile());
+    protected void openFileWithDefaultApplication(String filePath) {
+        showDocument(Path.of(filePath).toUri().toString());
     }
 
     @Override
@@ -45,9 +41,8 @@ public class DefaultDesktop extends NativeDesktop {
     }
 
     @Override
-    protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) throws IOException {
-        File file = filePath.toAbsolutePath().getParent().toFile();
-        Desktop.getDesktop().open(file);
+    protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) {
+        showDocument(filePath.toAbsolutePath().getParent().toUri().toString());
     }
 
     @Override
