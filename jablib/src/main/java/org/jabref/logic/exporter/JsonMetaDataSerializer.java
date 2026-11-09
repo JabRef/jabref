@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.RuleSettings;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -80,7 +81,7 @@ public class JsonMetaDataSerializer {
     /// is what it acts on, so that is what is written.
     static ObjectNode formatting(LintSettings settings) {
         ObjectNode rules = MAPPER.createObjectNode();
-        settings.ruleModes().forEach((selector, mode) -> rules.put(selector.asKey(), mode.asKey()));
+        settings.rules().forEach((selector, ruleSettings) -> putRule(rules, selector.asKey(), ruleSettings));
         settings.unreadRules().forEach((key, json) -> putUnlessStated(rules, key, json));
 
         ObjectNode block = MAPPER.createObjectNode();
@@ -90,6 +91,19 @@ public class JsonMetaDataSerializer {
         }
         settings.unreadKeys().forEach((key, json) -> putUnlessStated(block, key, json));
         return block;
+    }
+
+    /// A mode alone is written as the mode, and an entry only opens into an object where the rule is
+    /// given values, so that the common case stays short in a file people edit by hand.
+    private static void putRule(ObjectNode rules, String key, RuleSettings ruleSettings) {
+        if (ruleSettings.values().isEmpty()) {
+            rules.put(key, ruleSettings.mode().asKey());
+            return;
+        }
+        ObjectNode entry = MAPPER.createObjectNode();
+        entry.put(MetaData.FORMATTING_RULE_MODE, ruleSettings.mode().asKey());
+        ruleSettings.values().forEach(entry::put);
+        rules.set(key, entry);
     }
 
     private static void putUnlessStated(ObjectNode node, String key, String json) {

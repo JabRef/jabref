@@ -61,6 +61,15 @@ A library that asks for no rules is saved as before.
 
 Needs: impl, utest
 
+## A save encloses entries in the bracket the library names
+`req~logic.exporter.entry-bracket~1`
+
+A library may name, through the `entry-brackets` rule, whether its entries are enclosed in braces or in parentheses.
+Wherever that rule runs, a save encloses an entry it writes anew in that bracket, so that a library following what it asks for is left unchanged by a save and by a formatter run.
+A library that names no bracket has its entries written in braces, as before.
+
+Needs: impl, utest
+
 ## Keyword delimiter normalization is a cleanup
 `req~save.keywords.normalize-delimiters~1`
 

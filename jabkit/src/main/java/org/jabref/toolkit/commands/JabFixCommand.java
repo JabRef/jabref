@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 import org.jabref.toolkit.converter.JabFixModeConverter;
 import org.jabref.toolkit.exception.CliException;
 import org.jabref.toolkit.exception.ImportServiceException;
@@ -75,10 +77,11 @@ class JabFixCommand implements Callable<Integer> {
             description = "Mode to apply instead of the library's: a set of rules JabFix ships. Rules the library or --rule name still outrank it. The available modes are listed below.")
     private @Nullable JabFixMode mode;
 
-    @Option(names = {"--rule"}, split = ",", paramLabel = "RULE=MODE",
+    @Option(names = {"--rule"}, split = ",", paramLabel = "RULE=MODE[:NAME=VALUE]",
             description = "How far a rule goes, outranking what the library says about it: off, check (report only) or fix (report and repair). "
+                    + "A rule that takes values is given them after its mode, as in 'entry-brackets=fix:bracket=parentheses'. "
                     + "'field:rule' narrows a rule to one field. Repeatable, and accepts a comma-separated list. The available rules are listed below.")
-    private Map<String, String> ruleModes = new LinkedHashMap<>();
+    private Map<String, String> rules = new LinkedHashMap<>();
 
     @Option(names = {"--save-config"},
             description = "Store --mode and --rule in the library, moving its save actions there as well, so that later runs and JabRef's saves apply them without options. "
@@ -144,7 +147,7 @@ class JabFixCommand implements Callable<Integer> {
     /// [JabFixConfiguration#applied]: `--mode` takes the place of the library's mode, and each rule
     /// `--rule` names outranks what the library says about that rule. A rule `--rule` does not name
     /// goes on doing what the library says. `--rule` is spelled the way the stored configuration is,
-    /// so a rule named twice takes the later mode, like a repeated key there.
+    /// so a rule named twice takes what it was named with later, like a repeated key there.
     ///
     /// A misspelled id is a usage error, not something to pass over: leaving it unreported would let
     /// the user believe a rule had been switched off while it kept running. A library's own settings
@@ -153,13 +156,54 @@ class JabFixCommand implements Callable<Integer> {
         LintSettings run = Optional.ofNullable(mode)
                                    .map(chosen -> LintSettings.NONE.withMode(chosen.getKey()))
                                    .orElse(LintSettings.NONE);
-        rejectUnknownRules(ruleModes.keySet());
-        for (Map.Entry<String, String> rule : ruleModes.entrySet()) {
-            RuleMode ruleMode = knownRuleMode(rule.getValue());
+        rejectUnknownRules(rules.keySet());
+        for (Map.Entry<String, String> rule : rules.entrySet()) {
             // Readable: a key that is not names no rule, and was rejected above.
-            run = run.and(RuleSelector.parse(rule.getKey()).orElseThrow(), ruleMode);
+            RuleSelector selector = RuleSelector.parse(rule.getKey()).orElseThrow();
+            run = run.and(selector, ruleSettings(selector, rule.getValue()));
         }
         return run;
+    }
+
+    /// What `--rule` says about one selector: a mode and, after it, the values the rule takes, each
+    /// as `:name=value`. They are not separated by a comma, which separates the rules of a list.
+    private RuleSettings ruleSettings(RuleSelector selector, String stated) throws CliException {
+        List<String> parts = List.of(stated.split(":", -1));
+        RuleMode ruleMode = knownRuleMode(parts.getFirst());
+        SequencedMap<String, String> values = new LinkedHashMap<>();
+        for (String value : parts.subList(1, parts.size())) {
+            int separator = value.indexOf('=');
+            if (separator < 1) {
+                throw new CliException("Not a rule value: " + value,
+                        Localization.lang("Expected NAME=VALUE after the mode of the rule %0, but found '%1'.", selector.asKey(), value),
+                        CommandLine.ExitCode.USAGE);
+            }
+            values.put(value.substring(0, separator), value.substring(separator + 1));
+        }
+        rejectUnreadableValues(selector, values);
+        return new RuleSettings(ruleMode, values);
+    }
+
+    /// Holds the values the user typed against the rule, like a misspelled id. A rule goes by one set
+    /// of values for a whole run, so it cannot be given any for a single field either, which a
+    /// library's own settings do not read for the same reason.
+    private void rejectUnreadableValues(RuleSelector selector, Map<String, String> values) throws CliException {
+        if (values.isEmpty()) {
+            return;
+        }
+        if (selector.field().isPresent()) {
+            throw new CliException("Rule values on one field: " + selector.asKey(),
+                    Localization.lang("The rule %0 names a field, so it cannot be given values.", selector.asKey()),
+                    CommandLine.ExitCode.USAGE);
+        }
+        boolean readable = RuleSet.known(jabKit.cliPreferences.getFieldPreferences()).rules().stream()
+                                  .filter(rule -> rule.id().equals(selector.ruleId()))
+                                  .anyMatch(rule -> rule.configuredWith(values).isPresent());
+        if (!readable) {
+            throw new CliException("Unreadable rule values: " + selector.ruleId() + " " + values,
+                    Localization.lang("The rule %0 cannot read the values %1.", selector.ruleId(), values.toString()),
+                    CommandLine.ExitCode.USAGE);
+        }
     }
 
     /// Holds the keys the user typed against the rules JabFix knows. One that cannot be read as a

@@ -2,7 +2,9 @@ package org.jabref.logic.lint.rule;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -13,6 +15,7 @@ import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
@@ -45,12 +48,12 @@ class RuleSetTest {
 
     @Test
     void builtInContainsEveryBuiltInRule() {
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment"), RuleSet.builtIn(FIELD_PREFERENCES).ids());
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-brackets", "magic-comment"), RuleSet.builtIn(FIELD_PREFERENCES).ids());
     }
 
     @Test
     void withoutSwitchesTheNamedRuleOff() throws UnknownRuleException {
-        assertEquals(List.of("repeated-whitespace", "entry-parentheses", "magic-comment"),
+        assertEquals(List.of("repeated-whitespace", "entry-brackets", "magic-comment"),
                 RuleSet.builtIn(FIELD_PREFERENCES).without(List.of("surrounding-whitespace")).ids());
     }
 
@@ -67,18 +70,18 @@ class RuleSetTest {
                 () -> RuleSet.builtIn(FIELD_PREFERENCES).without(List.of("surounding-whitespace", "surrounding-whitespace")));
 
         assertEquals(List.of("surounding-whitespace"), exception.getUnknownIds());
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment"), exception.getKnownIds());
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-brackets", "magic-comment"), exception.getKnownIds());
     }
 
     @Test
     void withAppendsARuleFromOutsideThisModule() {
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment", "external"),
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-brackets", "magic-comment", "external"),
                 RuleSet.builtIn(FIELD_PREFERENCES).with(EXTERNAL).ids());
     }
 
     @Test
     void anExternalRuleCanBeSwitchedOffByIdLikeAnyOther() throws UnknownRuleException {
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment"),
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-brackets", "magic-comment"),
                 RuleSet.builtIn(FIELD_PREFERENCES).with(EXTERNAL).without(List.of("external")).ids());
     }
 
@@ -237,6 +240,37 @@ class RuleSetTest {
 
         assertEquals(List.of("surrounding-whitespace"),
                 RuleSet.builtIn(FIELD_PREFERENCES).asConfiguredBy(settings).ids());
+    }
+
+    /// What the library states reaches the rule, which then objects to the other bracket.
+    @Test
+    void configuredByHandsARuleTheValuesTheLibraryStates() {
+        LintSettings settings = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, values("bracket", "parentheses")));
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setParsedSerialization("@Article{key,\n}\n");
+
+        assertEquals(List.of("entry is enclosed in braces instead of parentheses"),
+                scan(configuredBy(settings), entry).stream().map(Finding::message).toList());
+    }
+
+    /// Going by braces instead would rewrite a whole library that asked for something else.
+    @Test
+    void configuredByPassesOverARuleThatCannotReadItsValues() {
+        LintSettings settings = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, values("bracket", "bracket-of-a-newer-jabfix")))
+                                                 .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX);
+
+        assertEquals(List.of("surrounding-whitespace"), configuredBy(settings).ids());
+    }
+
+    @Test
+    void configuredByPassesOverARuleThatTakesNoValuesWhereItIsGivenSome() {
+        LintSettings settings = LintSettings.NONE.and(RuleSelector.of("surrounding-whitespace"), new RuleSettings(RuleMode.FIX, values("except", "title")));
+
+        assertEquals(List.of(), configuredBy(settings).ids());
+    }
+
+    private static SequencedMap<String, String> values(String name, String value) {
+        return new LinkedHashMap<>(Map.of(name, value));
     }
 
     /// Unlike a library's own settings: what a user just typed is held against the rules.

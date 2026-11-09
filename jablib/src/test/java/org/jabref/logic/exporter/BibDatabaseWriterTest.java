@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,7 +37,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.lint.JabFixMode;
 import org.jabref.logic.lint.rule.Finding;
-import org.jabref.logic.lint.rules.EntryParenthesesRule;
+import org.jabref.logic.lint.rules.EntryBracketsRule;
 import org.jabref.logic.os.OS;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -63,6 +64,7 @@ import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -969,7 +971,43 @@ class BibDatabaseWriterTest {
                             .and(RuleSelector.of("repeated-whitespace"), RuleMode.OFF),
                 LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF).withMode("whitespace"),
                 LintSettings.NONE.withMode("mode-of-a-newer-jabfix"),
-                LintSettings.NONE);
+                LintSettings.NONE,
+                inParentheses(RuleMode.FIX),
+                LintSettings.NONE.and(RuleSelector.of(EntryBracketsRule.ID),
+                        new RuleSettings(RuleMode.FIX, new LinkedHashMap<>(Map.of(EntryBracketsRule.BRACKET, "bracket-of-a-newer-jabfix")))));
+    }
+
+    /// The form the decision record describes: a rule given a value opens into an object, its mode
+    /// first, beside rules that only name a mode.
+    // [utest->adr~per-rule-modes-in-the-formatting-configuration~1]
+    @Test
+    void writeFormattingBlockWithARuleGivenAValue() throws IOException {
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                                           .and(RuleSelector.of(EntryBracketsRule.ID),
+                                                   new RuleSettings(RuleMode.CHECK, new LinkedHashMap<>(Map.of(EntryBracketsRule.BRACKET, "parentheses")))));
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "rules" : {
+                      "surrounding-whitespace" : "fix",
+                      "entry-brackets" : {
+                        "mode" : "check",
+                        "bracket" : "parentheses"
+                      }
+                    }
+                  }
+                }
+                }
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+    }
+
+    private static LintSettings inParentheses(RuleMode mode) {
+        return LintSettings.NONE.and(RuleSelector.of(EntryBracketsRule.ID),
+                new RuleSettings(mode, new LinkedHashMap<>(Map.of(EntryBracketsRule.BRACKET, "parentheses"))));
     }
 
     /// A library configured by a newer JabFix still saves here, and is handed back with what it
@@ -1433,11 +1471,108 @@ class BibDatabaseWriterTest {
     @Test
     void anEntryInParenthesesIsEnclosedInBracesAndKeepsItsLayout() throws IOException {
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(IN_PARENTHESES));
-        result.getMetaData().setFormatting(LintSettings.of(RuleSelector.of(EntryParenthesesRule.ID), RuleMode.FIX));
+        result.getMetaData().setFormatting(LintSettings.of(RuleSelector.of(EntryBracketsRule.ID), RuleMode.FIX));
 
         writeParsed(result);
 
         assertEquals(List.of("@Article{ key,", "    title = {A title}", "}"), stringWriter.toString().lines().limit(3).toList());
+    }
+
+    /// The same repair the other way round, for a library that asks for parentheses.
+    @Test
+    void anEntryInBracesIsEnclosedInParenthesesAndKeepsItsLayout() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of("""
+                @Article{ key,
+                    title = {A title}
+                }
+                """));
+        result.getMetaData().setFormatting(inParentheses(RuleMode.FIX));
+
+        writeParsed(result);
+
+        assertEquals(List.of("@Article( key,", "    title = {A title}", ")"), stringWriter.toString().lines().limit(3).toList());
+    }
+
+    /// An edited entry is written anew, so the repair of what was read would not reach the file.
+    // [utest->req~logic.exporter.entry-bracket~1]
+    @Test
+    void anEditedEntryIsWrittenInTheBracketTheLibraryAsksFor() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(IN_PARENTHESES));
+        result.getMetaData().setFormatting(inParentheses(RuleMode.FIX));
+        result.getDatabase().getEntries().getFirst().setField(StandardField.TITLE, "Another title");
+
+        writeParsed(result);
+
+        assertEquals(List.of("@Article(key,", "  title = {Another title},", ")"), stringWriter.toString().lines().limit(3).toList());
+    }
+
+    /// There is nothing read to repair, so the writer alone decides what this entry is enclosed in.
+    @Test
+    void aNewEntryIsWrittenInTheBracketTheLibraryAsksFor() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.FIX));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals(List.of("@Article(key,", "  title = {A title},", ")"), stringWriter.toString().lines().limit(3).toList());
+        assertEquals(List.of(), databaseWriter.getFindings());
+    }
+
+    /// A rule that only reports leaves what was read alone, but what is written anew has to be
+    /// written in something, and only the bracket asked for is not reported next time.
+    @Test
+    void aRuleThatOnlyReportsStillDecidesTheBracketOfAnEntryWrittenAnew() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.CHECK));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("@Article(key,", stringWriter.toString().lines().findFirst().orElseThrow());
+    }
+
+    @Test
+    void aRuleSwitchedOffLeavesAnEntryWrittenAnewInBraces() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.OFF));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("@Article{key,", stringWriter.toString().lines().findFirst().orElseThrow());
+    }
+
+    /// Naming the rule without a value goes by braces, as it did before the rule took one.
+    @Test
+    void aLibraryThatDoesNotAskForParenthesesIsWrittenInBraces() throws IOException {
+        metaData.setFormatting(LintSettings.of(RuleSelector.of(EntryBracketsRule.ID), RuleMode.FIX));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("@Article{key,", stringWriter.toString().lines().findFirst().orElseThrow());
+    }
+
+    /// What a save wrote in parentheses is read back as the same entry, and has nothing left to report.
+    @Test
+    void anEntryWrittenInParenthesesReadsBackTheSameAndIsClean() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.FIX));
+        BibEntry entry = changedEntry().withField(StandardField.TITLE, "A (small) {title}");
+        entry.setChanged(true);
+        database.insertEntry(entry);
+        databaseWriter.writeDatabase(bibtexContext);
+
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+        stringWriter.getBuffer().setLength(0);
+        writeParsed(read);
+
+        assertEquals(List.of(entry), read.getDatabase().getEntries());
+        assertEquals(List.of(), databaseWriter.getFindings());
+    }
+
+    /// Marked changed, since a save only writes an entry anew that has changed, and a wither does not mark it.
+    private static BibEntry changedEntry() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("key").withField(StandardField.TITLE, "A title");
+        entry.setChanged(true);
+        return entry;
     }
 
     private void writeParsed(ParserResult result) throws IOException {

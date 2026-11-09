@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.lint.rules.EntryParenthesesRule;
+import org.jabref.logic.lint.rules.EntryBracketsRule;
 import org.jabref.logic.lint.rules.RepeatedWhitespaceRule;
 import org.jabref.logic.lint.rules.SurroundingWhitespaceRule;
 import org.jabref.model.entry.field.Field;
@@ -22,6 +22,8 @@ import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
 
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The rules a JabFix run applies, in the order it applies them.
 ///
@@ -34,6 +36,7 @@ import org.jspecify.annotations.NullMarked;
 /// otherwise the latter are defeated by noise the former would have removed.
 @NullMarked
 public class RuleSet {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleSet.class);
 
     private final List<Rule> rules;
 
@@ -48,7 +51,7 @@ public class RuleSet {
         List<Rule> shipped = List.of(
                 new SurroundingWhitespaceRule(),
                 new RepeatedWhitespaceRule(fieldPreferences),
-                new EntryParenthesesRule());
+                new EntryBracketsRule());
         Set<String> knownIds = Stream.concat(shipped.stream().map(Rule::id), SaveActionIds.ids().stream())
                                      .collect(Collectors.toUnmodifiableSet());
         return new RuleSet(Stream.concat(shipped.stream(), Stream.of(new MagicCommentRule(knownIds))).toList());
@@ -90,8 +93,8 @@ public class RuleSet {
     /// An entry switched off states no Save Action.
     private static List<FieldFormatterCleanup> statedSaveActions(LintSettings settings, MetaData metaData) {
         List<FieldFormatterCleanup> named =
-                settings.ruleModes().entrySet().stream()
-                        .filter(entry -> entry.getValue() != RuleMode.OFF)
+                settings.rules().entrySet().stream()
+                        .filter(entry -> entry.getValue().mode() != RuleMode.OFF)
                         .flatMap(entry -> asSaveAction(entry.getKey()).stream())
                         .toList();
         List<FieldFormatterCleanup> stated = named.stream()
@@ -189,12 +192,22 @@ public class RuleSet {
     /// field, so each kept rule is wrapped in one that settles it per finding.
     ///
     /// A selector naming no rule of this set is passed over. The settings may have been written by
-    /// a JabFix that knows a rule this one does not, and such a library still has to save.
+    /// a JabFix that knows a rule this one does not, and such a library still has to save. So is a
+    /// rule that cannot read the values they state for it, for the same reason.
     public RuleSet asConfiguredBy(LintSettings settings) {
         return new RuleSet(rules.stream()
                                 .filter(rule -> settings.runs(rule.id()))
+                                .flatMap(rule -> withValues(rule, settings).stream())
                                 .<Rule>map(rule -> new ConfiguredRule(rule, settings))
                                 .toList());
+    }
+
+    private static Optional<Rule> withValues(Rule rule, LintSettings settings) {
+        Optional<Rule> configured = rule.configuredWith(settings.valuesOf(rule.id()));
+        if (configured.isEmpty()) {
+            LOGGER.warn("Passing over the rule '{}', which cannot read the values {}", rule.id(), settings.valuesOf(rule.id()));
+        }
+        return configured;
     }
 
     /// Appends a rule, which is how a rule implemented outside this module joins a run.

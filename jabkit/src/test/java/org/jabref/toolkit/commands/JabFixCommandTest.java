@@ -12,6 +12,8 @@ import org.jabref.toolkit.exception.CliExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -370,10 +372,159 @@ class JabFixCommandTest extends AbstractJabKitTest {
                 )
                 """);
 
-        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", "--rule", "entry-parentheses=check", library.toString()));
+        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", "--rule", "entry-brackets=check", library.toString()));
 
         String findings = commandLine.getStandardOutput();
-        assertTrue(findings.contains("entry is enclosed in parentheses instead of braces [entry-parentheses]"), findings);
+        assertTrue(findings.contains("entry is enclosed in parentheses instead of braces [entry-brackets]"), findings);
+    }
+
+    /// A formatter run writes every entry anew, so it has to write the bracket the library names,
+    /// or `--check` could never be satisfied with a library that does as it asks.
+    @Test
+    void aFormatterRunWritesTheBracketTheLibraryNames(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("braces.bib"), libraryAskingForParentheses("""
+                @Article{key,
+                  author = {Doe, Jane},
+                }
+                """));
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "-p", library.toString()));
+
+        String written = Files.readString(library);
+        assertTrue(written.startsWith("@Article(key,"), written);
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--check", "-p", library.toString()));
+    }
+
+    /// `--rule` says how far the rule goes and nothing about the bracket, which stays the library's.
+    @Test
+    void aRuleNamedOnTheCommandLineGoesByTheBracketTheLibraryNames(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("parenthesized.bib"), libraryAskingForParentheses("""
+                @Article(key,
+                  author = {Doe, Jane},
+                )
+                """));
+
+        commandLine.executeToLog("fix", "--check", "-p", "--rule", "entry-brackets=check", library.toString());
+
+        String findings = commandLine.getStandardOutput();
+        assertFalse(findings.contains("[entry-brackets]"), findings);
+    }
+
+    @Test
+    void saveConfigKeepsTheBracketTheLibraryNames(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("parenthesized.bib"), libraryAskingForParentheses("""
+                @Article(key,
+                  author = {Doe, Jane},
+                )
+                """));
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "-p", "--save-config", "--rule", "entry-brackets=check", library.toString()));
+
+        String written = Files.readString(library);
+        assertTrue(written.contains("\"mode\" : \"check\""), written);
+        assertTrue(written.contains("\"bracket\" : \"parentheses\""), written);
+    }
+
+    /// For this run alone: formatting a library does not hand it a configuration it never had.
+    @Test
+    void aValueNamedOnTheCommandLineConfiguresTheRun(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("braces.bib"), """
+                @Article{key,
+                  author = {Doe, Jane},
+                }
+                """);
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "-p", "--rule", "entry-brackets=fix:bracket=parentheses", library.toString()));
+
+        String written = Files.readString(library);
+        assertTrue(written.startsWith("@Article(key,"), written);
+        assertFalse(written.contains("jabref-meta-0.1.0"), written);
+    }
+
+    /// A list goes on being separated by commas, with the values belonging to the rule before them.
+    @Test
+    void aRuleGivenAValueCanStandInAList(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("sloppy.bib"), """
+                @Article(key,
+                  author = { Doe, Jane },
+                )
+                """);
+
+        commandLine.executeToLog("fix", "--check", "-p", "--rule", "entry-brackets=check:bracket=parentheses,surrounding-whitespace=check", library.toString());
+
+        String findings = commandLine.getStandardOutput();
+        assertFalse(findings.contains("[entry-brackets]"), findings);
+        assertTrue(findings.contains("[surrounding-whitespace]"), findings);
+    }
+
+    @Test
+    void aValueNamedOnTheCommandLineOutranksTheLibrarysForThisRun(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("parenthesized.bib"), libraryAskingForParentheses("""
+                @Article(key,
+                  author = {Doe, Jane},
+                )
+                """));
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "-p", "--rule", "entry-brackets=fix:bracket=braces", library.toString()));
+
+        String written = Files.readString(library);
+        assertTrue(written.startsWith("@Article{key,"), written);
+        assertTrue(written.contains("\"bracket\" : \"parentheses\""), written);
+    }
+
+    @Test
+    void saveConfigStoresAValueNamedOnTheCommandLine(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("braces.bib"), """
+                @Article{key,
+                  author = {Doe, Jane},
+                }
+                """);
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "-p", "--save-config", "--rule", "entry-brackets=fix:bracket=parentheses", library.toString()));
+
+        String written = Files.readString(library);
+        assertTrue(written.startsWith("@Article(key,"), written);
+        assertTrue(written.contains("\"bracket\" : \"parentheses\""), written);
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--check", "-p", library.toString()));
+    }
+
+    /// What a user just typed is held against the rule, unlike what a library stores: passing over
+    /// it would let them believe the rule went by a bracket it does not.
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', textBlock = """
+            entry-brackets=fix:bracket=angle                | The rule entry-brackets cannot read the values {bracket=angle}.
+            entry-brackets=fix:brackets=parentheses         | The rule entry-brackets cannot read the values {brackets=parentheses}.
+            surrounding-whitespace=fix:bracket=parentheses  | The rule surrounding-whitespace cannot read the values {bracket=parentheses}.
+            title:entry-brackets=fix:bracket=parentheses    | The rule title:entry-brackets names a field, so it cannot be given values.
+            entry-brackets=fix:parentheses                  | Expected NAME=VALUE after the mode of the rule entry-brackets, but found 'parentheses'.
+            entry-brackets=fix:                             | Expected NAME=VALUE after the mode of the rule entry-brackets, but found ''.
+            entry-brackets=fix:=parentheses                 | Expected NAME=VALUE after the mode of the rule entry-brackets, but found '=parentheses'.
+            entry-brackets=bracket=parentheses              | Unknown rule mode: bracket=parentheses.
+            entry-brackets=warn:bracket=parentheses         | Unknown rule mode: warn.
+            """)
+    void aValueTheRuleCannotReadIsAUsageError(String rule, String message) {
+        assertEquals(CommandLine.ExitCode.USAGE, commandLine.executeToLog("fix", "--check", "-p", "--rule", rule, inputFile));
+
+        String errors = commandLine.getErrorOutput();
+        assertTrue(errors.contains(message), errors);
+    }
+
+    private static String libraryAskingForParentheses(String entry) {
+        return entry + """
+
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "rules" : {
+                      "entry-brackets" : {
+                        "mode" : "fix",
+                        "bracket" : "parentheses"
+                      }
+                    }
+                  }
+                }
+                }
+                """;
     }
 
     /// Switching a rule off for one run is no reason to report the comments that switch it off.

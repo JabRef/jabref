@@ -58,8 +58,8 @@ class JabFixConfigurationTest {
     void theModeIsExpandedIntoItsRules() {
         MetaData metaData = library(Optional.empty(), Optional.of(LintSettings.NONE.withMode(JabFixMode.WHITESPACE.getKey())));
 
-        assertEquals(JabFixMode.WHITESPACE.getSettings().ruleModes(),
-                JabFixConfiguration.applied(metaData, LintSettings.NONE).ruleModes());
+        assertEquals(JabFixMode.WHITESPACE.getSettings().rules(),
+                JabFixConfiguration.applied(metaData, LintSettings.NONE).rules());
     }
 
     /// A rule the library names is more specific than its mode, so it outranks it.
@@ -113,7 +113,7 @@ class JabFixConfigurationTest {
                 LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX).withMode("mode-of-a-newer-jabfix")));
 
         assertEquals(List.of(RuleSelector.of("surrounding-whitespace")),
-                List.copyOf(JabFixConfiguration.applied(metaData, LintSettings.NONE).ruleModes().keySet()));
+                List.copyOf(JabFixConfiguration.applied(metaData, LintSettings.NONE).rules().keySet()));
     }
 
     /// Save Actions are rule settings of the library, laid over its mode.

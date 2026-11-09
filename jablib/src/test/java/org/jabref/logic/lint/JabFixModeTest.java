@@ -22,7 +22,7 @@ class JabFixModeTest {
     @ParameterizedTest
     @EnumSource(JabFixMode.class)
     void everyModeNamesOnlyRulesThatExist(JabFixMode mode) {
-        assertEquals(List.of(), mode.getSettings().ruleModes().keySet().stream()
+        assertEquals(List.of(), mode.getSettings().rules().keySet().stream()
                                     .map(RuleSelector::ruleId)
                                     .filter(ruleId -> !KNOWN_IDS.contains(ruleId))
                                     .toList());

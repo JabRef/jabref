@@ -1,6 +1,7 @@
 package org.jabref.logic.exporter;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedMap;
 
@@ -9,6 +10,7 @@ import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 
 import org.junit.jupiter.api.Test;
 
@@ -79,13 +81,23 @@ class JsonMetaDataSerializerTest {
     /// what this JabFix acts on, so it must not be written over.
     @Test
     void anUnreadEntryDoesNotReplaceOneStatedUnderTheSameKey() {
-        SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
-        modes.put(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.FIX);
+        SequencedMap<RuleSelector, RuleSettings> rules = new LinkedHashMap<>();
+        rules.put(RuleSelector.on(StandardField.TITLE, "lower-case"), new RuleSettings(RuleMode.FIX));
         SequencedMap<String, String> unreadRules = new LinkedHashMap<>();
         unreadRules.put("title:lower-case", "\"warn\"");
 
         assertEquals("{\"rules\":{\"title:lower-case\":\"fix\"}}",
-                JsonMetaDataSerializer.formatting(new LintSettings(Optional.empty(), modes, unreadRules, new LinkedHashMap<>())).toString());
+                JsonMetaDataSerializer.formatting(new LintSettings(Optional.empty(), rules, unreadRules, new LinkedHashMap<>())).toString());
+    }
+
+    /// An entry only opens into an object where the rule is given values, and its mode comes first.
+    @Test
+    void aRuleGivenValuesIsWrittenAsAnObject() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                                            .and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.CHECK, new LinkedHashMap<>(Map.of("bracket", "parentheses"))));
+
+        assertEquals("{\"rules\":{\"surrounding-whitespace\":\"fix\",\"entry-brackets\":{\"mode\":\"check\",\"bracket\":\"parentheses\"}}}",
+                JsonMetaDataSerializer.formatting(settings).toString());
     }
 
     @Test
@@ -94,7 +106,7 @@ class JsonMetaDataSerializerTest {
         unreadKeys.put(MetaData.FORMATTING_RULES, "\"recommended\"");
         LintSettings settings = new LintSettings(
                 Optional.empty(),
-                LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX).ruleModes(),
+                LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX).rules(),
                 new LinkedHashMap<>(),
                 unreadKeys);
 

@@ -14,6 +14,7 @@ import org.jabref.logic.lint.rules.SurroundingWhitespaceRule;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -73,8 +74,8 @@ public enum JabFixMode {
     }
 
     private static LintSettings repairing(Iterable<RuleSelector> selectors) {
-        SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
-        selectors.forEach(selector -> modes.put(selector, RuleMode.FIX));
-        return new LintSettings(modes);
+        SequencedMap<RuleSelector, RuleSettings> rules = new LinkedHashMap<>();
+        selectors.forEach(selector -> rules.put(selector, new RuleSettings(RuleMode.FIX)));
+        return new LintSettings(rules);
     }
 }

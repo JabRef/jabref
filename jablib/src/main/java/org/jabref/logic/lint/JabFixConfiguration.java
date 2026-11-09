@@ -9,6 +9,7 @@ import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -83,11 +84,11 @@ public final class JabFixConfiguration {
     /// An item switching them off states nothing rather than switching them off, so that it does not
     /// switch off what a mode does on the same fields -- something the item never had a say in.
     static LintSettings saveActionsOf(MetaData metaData) {
-        SequencedMap<RuleSelector, RuleMode> stated = new LinkedHashMap<>();
+        SequencedMap<RuleSelector, RuleSettings> stated = new LinkedHashMap<>();
         metaData.getSaveActions()
                 .filter(FieldFormatterCleanupActions::isEnabled)
                 .ifPresent(item -> item.getConfiguredActions()
-                                       .forEach(saveAction -> stated.put(SaveActionIds.selectorOf(saveAction), RuleMode.FIX)));
+                                       .forEach(saveAction -> stated.put(SaveActionIds.selectorOf(saveAction), new RuleSettings(RuleMode.FIX))));
         return new LintSettings(stated);
     }
 }

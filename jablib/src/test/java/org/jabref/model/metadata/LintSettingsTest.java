@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
 
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -192,6 +193,55 @@ class LintSettingsTest {
                         RuleSelector.of("upper-case"),
                         RuleSelector.of("lower-case"),
                         RuleSelector.on(StandardField.TITLE, "lower-case")),
-                List.copyOf(settings.ruleModes().keySet()));
+                List.copyOf(settings.rules().keySet()));
+    }
+
+    /// A layer saying how far a rule goes has not said anything about what the rule takes, so a run
+    /// that only reports goes by the bracket the library chose.
+    @Test
+    void anOverrideStatingOnlyAModeKeepsTheValues() {
+        LintSettings library = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, inParentheses()));
+
+        LintSettings overridden = library.overriddenBy(LintSettings.of(RuleSelector.of("entry-brackets"), RuleMode.CHECK));
+
+        assertEquals(new RuleSettings(RuleMode.CHECK, inParentheses()), overridden.rules().get(RuleSelector.of("entry-brackets")));
+    }
+
+    @Test
+    void anOverrideStatingAValueReplacesThatValueAlone() {
+        SequencedMap<String, String> underneath = inParentheses();
+        underneath.put("other", "kept");
+        LintSettings library = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, underneath));
+        SequencedMap<String, String> over = new LinkedHashMap<>(Map.of("bracket", "braces"));
+
+        LintSettings overridden = library.overriddenBy(LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, over)));
+
+        assertEquals(Map.of("bracket", "braces", "other", "kept"), overridden.valuesOf("entry-brackets"));
+    }
+
+    /// The rule is built once for a run, so what it takes cannot differ from field to field.
+    @Test
+    void aFieldScopedOverrideLeavesTheValuesOfTheRuleAlone() {
+        LintSettings library = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, inParentheses()));
+
+        LintSettings overridden = library.overriddenBy(LintSettings.of(RuleSelector.on(StandardField.TITLE, "entry-brackets"), RuleMode.CHECK));
+
+        assertEquals(inParentheses(), overridden.valuesOf("entry-brackets"));
+    }
+
+    @Test
+    void aRuleNobodyNamesHasNoValues() {
+        assertEquals(Map.of(), LintSettings.NONE.valuesOf("entry-brackets"));
+    }
+
+    @Test
+    void theValuesDoNotChangeHowFarTheRuleGoes() {
+        LintSettings settings = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.CHECK, inParentheses()));
+
+        assertEquals(RuleMode.CHECK, settings.modeOf("entry-brackets", Optional.empty()));
+    }
+
+    private static SequencedMap<String, String> inParentheses() {
+        return new LinkedHashMap<>(Map.of("bracket", "parentheses"));
     }
 }

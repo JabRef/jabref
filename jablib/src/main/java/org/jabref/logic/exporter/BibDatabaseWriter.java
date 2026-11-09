@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.EntryBracket;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
@@ -39,6 +40,7 @@ import org.jabref.logic.lint.JabFixConfiguration;
 import org.jabref.logic.lint.JabFixResult;
 import org.jabref.logic.lint.rule.Finding;
 import org.jabref.logic.lint.rule.RuleSet;
+import org.jabref.logic.lint.rules.EntryBracketsRule;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
@@ -87,6 +89,9 @@ public class BibDatabaseWriter {
     @Nullable private JournalAbbreviationRepository journalAbbreviationRepository;
     /// Present for a formatter run, with the settings it lays over the library's.
     private Optional<LintSettings> formatterRun = Optional.empty();
+    /// What encloses an entry this save writes anew, which the rules it applies settle. A rule can
+    /// only repair what was read, and what is written anew must not be what it reports next time.
+    private EntryBracket entryBracket = EntryBracket.BRACES;
     private boolean useFJournalField;
     private Consumer<Runnable> mutationScheduler = Runnable::run;
 
@@ -172,6 +177,7 @@ public class BibDatabaseWriter {
         MetaData metaData = bibDatabaseContext.getMetaData();
         LintSettings applied = JabFixConfiguration.applied(metaData, formatterRun.orElse(LintSettings.NONE));
         RuleSet rules = RuleSet.configuredBy(applied, metaData, fieldPreferences);
+        entryBracket = EntryBracketsRule.bracketOf(applied);
 
         JabFixResult result = new JabFix(rules).apply(entries, mutationScheduler);
         findings.addAll(result.findings());
@@ -350,8 +356,9 @@ public class BibDatabaseWriter {
         bibWriter.writeLine(SaveConfiguration.ENCODING_PREFIX + encoding);
     }
 
+    // [impl->req~logic.exporter.entry-bracket~1]
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager, entryBracket);
         bibtexEntryWriter.write(entry, bibWriter, mode, saveConfiguration.shouldReformatFile());
     }
 

@@ -11,6 +11,7 @@ import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
 import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 
 import org.jspecify.annotations.NullMarked;
 import tools.jackson.core.JacksonException;
@@ -70,7 +71,7 @@ public class JsonMetaDataParser {
     /// JabFix may mean something by it, and this one saving the library must not be what loses it.
     private static LintSettings formatting(JsonNode block) {
         Optional<String> mode = Optional.empty();
-        SequencedMap<RuleSelector, RuleMode> ruleModes = new LinkedHashMap<>();
+        SequencedMap<RuleSelector, RuleSettings> rules = new LinkedHashMap<>();
         SequencedMap<String, String> unreadRules = new LinkedHashMap<>();
         SequencedMap<String, String> unreadKeys = new LinkedHashMap<>();
 
@@ -80,22 +81,50 @@ public class JsonMetaDataParser {
             } else if (MetaData.FORMATTING_RULES.equals(item.getKey()) && item.getValue().isObject()) {
                 item.getValue().properties().forEach(rule -> read(rule.getKey(), rule.getValue())
                         .ifPresentOrElse(
-                                ruleMode -> ruleModes.put(ruleMode.getKey(), ruleMode.getValue()),
+                                read -> rules.put(read.getKey(), read.getValue()),
                                 () -> unreadRules.put(rule.getKey(), rule.getValue().toString())));
             } else {
                 unreadKeys.put(item.getKey(), item.getValue().toString());
             }
         }
-        return new LintSettings(mode, ruleModes, unreadRules, unreadKeys);
+        return new LintSettings(mode, rules, unreadRules, unreadKeys);
     }
 
-    /// The selector and the mode of one entry, where this JabFix reads both.
-    private static Optional<Map.Entry<RuleSelector, RuleMode>> read(String key, JsonNode value) {
-        if (!value.isString()) {
+    /// The selector and the settings of one entry, where this JabFix reads both.
+    ///
+    /// Values on an entry naming a field are not read yet: a rule is built once for a run and not
+    /// once per field, so they could not be acted on, and reading them would let the same entry
+    /// quietly mean one thing now and another later.
+    private static Optional<Map.Entry<RuleSelector, RuleSettings>> read(String key, JsonNode value) {
+        return RuleSelector.parse(key)
+                           .flatMap(selector -> ruleSettings(value)
+                                   .filter(settings -> selector.field().isEmpty() || settings.values().isEmpty())
+                                   .map(settings -> Map.entry(selector, settings)));
+    }
+
+    /// An entry is a mode, or an object holding a mode beside the values the rule takes.
+    ///
+    /// Values are strings for now, since no rule takes anything else, and an entry holding something
+    /// else is not read at all rather than read without it.
+    private static Optional<RuleSettings> ruleSettings(JsonNode entry) {
+        if (entry.isString()) {
+            return RuleMode.fromKey(entry.stringValue()).map(RuleSettings::new);
+        }
+        if (!entry.isObject()) {
             return Optional.empty();
         }
-        return RuleSelector.parse(key)
-                           .flatMap(selector -> RuleMode.fromKey(value.stringValue())
-                                                        .map(mode -> Map.entry(selector, mode)));
+        Optional<RuleMode> mode = Optional.empty();
+        SequencedMap<String, String> values = new LinkedHashMap<>();
+        for (Map.Entry<String, JsonNode> item : entry.properties()) {
+            if (!item.getValue().isString()) {
+                return Optional.empty();
+            }
+            if (MetaData.FORMATTING_RULE_MODE.equals(item.getKey())) {
+                mode = RuleMode.fromKey(item.getValue().stringValue());
+            } else {
+                values.put(item.getKey(), item.getValue().stringValue());
+            }
+        }
+        return mode.map(ruleMode -> new RuleSettings(ruleMode, values));
     }
 }

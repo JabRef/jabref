@@ -71,6 +71,39 @@ The comma-separated lists and `/regex/` items that the per-entry magic comments 
 
 A mode is spelled in lower case, and only in lower case. Taking `FIX` as well would mean writing a file back differently from how it was read, for a library that did nothing wrong.
 
+### What an entry holds
+
+An entry is a mode, or an object holding the mode under `mode` and, beside it, the values the rule takes under their own names:
+
+```json
+"formatting": {
+  "rules": {
+    "surrounding-whitespace": "fix",
+    "entry-brackets": {"mode": "fix", "bracket": "parentheses"}
+  }
+}
+```
+
+`entry-brackets` takes one value, `bracket`, which is `braces` or `parentheses`. A rule that takes a value says what it does without one, so `"entry-brackets": "fix"` stays valid and goes by braces.
+
+An entry is written back as an object only where it holds values, and then with its mode first. `{"mode": "fix"}` therefore reads like `"fix"` and comes back as that: such a file is put into this form once, like one whose keys somebody reordered by hand.
+
+An entry is not read, and goes back as it came without the rule running, where it is
+
+* an object without a mode, or with a mode this JabFix does not know, since nothing then says how far the rule goes,
+* an object holding anything but strings, such as the `max` above. No rule takes anything else yet, and running a rule without a value it was given would be doing something the library did not ask for,
+* an object holding values under a key naming a field. A rule is built once for a run and not once per field, so they could not be acted on, and the same key could quietly mean one thing now and another later.
+
+What a value means is up to the rule. A rule that cannot read what it is given, because it takes no value of that name or does not know that value, is passed over with a warning rather than run without it: `"bracket": "angle"` may come from a newer JabFix and `"brackets": "parentheses"` may be a typo, and repairing towards braces would rewrite, on every save, a library that asked for something else. The entry is written back as it came.
+
+A layer stating a mode alone leaves the values stated below it standing, as ESLint does for a severity on its own, and one stating a value replaces that value alone. `jabkit fix --rule entry-brackets=check` therefore reports against the bracket the library chose rather than against braces, and `--save-config` stores it that way.
+
+The command line states values after the mode, each as `:name=value`, as in `--rule entry-brackets=fix:bracket=parentheses`. The comma is not available for this, since it separates the rules of a list: `entry-brackets=fix,bracket=parentheses` is a second rule called `bracket`. What a user typed is held against the rule, as a misspelled id is: a value it cannot read, or one given on `field:rule`, is a usage error rather than passed over. Such a value cannot contain a colon or a comma, which no value needs yet.
+
+The bracket has to reach more than the rule, which can only repair what was read: a save writes an edited entry anew, and a formatter run every entry. `BibDatabaseWriter` therefore asks the rule which bracket to write, wherever the rule runs at all, whether it reports or repairs. Otherwise a library asking for parentheses would be written in braces by the very run meant to bring it in line, and `--check` could never be satisfied with it.
+
+That leaves the writer with braces where the rule does not run, because it is switched off or cannot read its value: an entry written anew is enclosed in them as it always was, which in a formatter run means every entry, whatever it was read with. A magic comment switching the rule off for an entry keeps the rule from reporting it and from touching what was read, but it does not choose what the writer encloses that entry in when it writes it anew, in this bracket or in braces.
+
 ### Consequences
 
 * Good, because a rule has exactly one entry per field it is configured on, so the file cannot state a contradiction about the same rule on the same field.
@@ -84,7 +117,7 @@ A mode is spelled in lower case, and only in lower case. Taking `FIX` as well wo
 
 ### Confirmation
 
-A round trip: a library carrying a block with several rules, one of them written as an object with values, is written, read back, and compares equal. No rule takes values yet, so what that entry pins is that an entry of the long form survives, which is the path a rule that grows values will arrive on. A second test writes a block naming a rule id this JabRef does not know and a mode it does not know, and shows that the library still saves and that the unknown parts survive the round trip rather than being dropped. A third shows that a library without the block is saved exactly as it was before the block existed.
+A round trip: a library carrying a block with several rules, one of them written as an object with a value, is written, read back, and compares equal, and another test pins the text of that form. A second test writes a block naming a rule id this JabRef does not know, a mode it does not know and a value that is no string, and shows that the library still saves and that the unknown parts survive the round trip rather than being dropped. A third shows that a library without the block is saved exactly as it was before the block existed.
 
 ## Pros and Cons of the Options
 
@@ -177,7 +210,7 @@ Which modes JabFix ships with is still open; the current ones are placeholders.
 
 The per-entry syntax stays as it is: a magic comment above an entry switches rules off for that entry (`% jabref-format-ignore surrounding-whitespace author:page-ranges`). That is a suppression of a rule the library switched on, so it reads as "not here", and it does not need the modes this block carries.
 
-The in-memory settings follow this decision: they carry a mode per selector and nothing else, and a rule they do not name does not run.
+The in-memory settings follow this decision: they carry a mode and the values of the rule per selector, and a rule they do not name does not run.
 
 What a library says about itself and what one run of a command asks for are kept apart, because this block is written back: `jabkit fix --rule lower-case=off` must not leave the library configured that way, nor give a formatting block to a library that never had one. The library's own configuration is what is serialized; a command overrides it for that save alone, unless it is asked to store what it was given (`--save-config`).
 

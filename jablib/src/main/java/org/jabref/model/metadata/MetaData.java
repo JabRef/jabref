@@ -63,6 +63,10 @@ public class MetaData {
     /// The rules inside that block. They are one key of it rather than the block itself, so that
     /// the mode can stand beside them without a reader having to know which keys are rule ids.
     public static final String FORMATTING_RULES = "rules";
+
+    /// The mode of a rule whose entry opens into an object, where it stands beside the values the
+    /// rule takes.
+    public static final String FORMATTING_RULE_MODE = "mode";
     public static final String LIBRARY_ABBREVIATION_TYPE = "libraryAbbreviationType";
     public static final String KEYWORD_SEPARATOR = "keywordSeparator";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
