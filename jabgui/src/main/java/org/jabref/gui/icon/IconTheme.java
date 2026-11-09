@@ -12,10 +12,13 @@ import java.util.Optional;
 import java.util.Properties;
 
 import javafx.scene.Node;
+import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
+import org.jabref.logic.os.OS;
 
 import org.jspecify.annotations.NullMarked;
 import org.kordamp.ikonli.Ikon;
@@ -82,6 +85,35 @@ public class IconTheme {
                        .toList();
     }
 
+    /// Applies the JabRef icon set to the given [Stage] on platforms that support window icons (non-macOS).
+    /// On macOS, stage icons are omitted so that macOS LaunchServices and dynamic Asset Catalogs natively manage the Dock icon.
+    public static void applyLogo(Stage stage) {
+        if (!OS.OS_X) {
+            stage.getIcons().addAll(getLogoSet());
+        }
+    }
+
+    /// Applies the specified icon to the given [Stage] on platforms that support window icons (non-macOS).
+    public static void applyLogo(Stage stage, Image image) {
+        if (!OS.OS_X) {
+            stage.getIcons().add(image);
+        }
+    }
+
+    /// Applies the default JabRef icon to the window of the given [Dialog] on platforms that support window icons (non-macOS).
+    public static void applyLogo(Dialog<?> dialog) {
+        applyLogo(dialog, getJabRefIcon());
+    }
+
+    /// Applies the specified icon to the window of the given [Dialog] on platforms that support window icons (non-macOS).
+    public static void applyLogo(Dialog<?> dialog, Image image) {
+        if (!OS.OS_X) {
+            if (dialog.getDialogPane().getScene() != null && dialog.getDialogPane().getScene().getWindow() instanceof Stage stage) {
+                stage.getIcons().add(image);
+            }
+        }
+    }
+
     public static Optional<JabRefIcon> findJabRefIcon(String iconCode) {
         String normalizedIconCode = iconCode.toUpperCase(Locale.ENGLISH);
 
@@ -129,7 +161,7 @@ public class IconTheme {
     }
 
     public enum JabRefIcons implements JabRefIcon {
-        
+
         ADD(MaterialDesignP.PLUS_CIRCLE_OUTLINE),
         ADD_FILLED(MaterialDesignP.PLUS_CIRCLE),
         ADD_NOBOX(MaterialDesignP.PLUS),
