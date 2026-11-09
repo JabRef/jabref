@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /// The "browser" in these tests is a shell script recording its argument, so the assertions catch
@@ -99,6 +100,18 @@ class NativeDesktopTest {
         desktop.openBrowser(urlWithSpace);
 
         verify(desktop).openUrlWithSystemHandler(urlWithSpace);
+    }
+
+    @Test
+    void openBrowserUsesSystemHandlerForMailto() throws IOException {
+        HostServices hostServices = mock(HostServices.class);
+        NativeDesktop desktop = spy(NativeDesktop.create(hostServices, preferencesWith()));
+        doNothing().when(desktop).openUrlWithSystemHandler(anyString());
+
+        desktop.openBrowser("mailto:someone@example.org");
+
+        verify(desktop).openUrlWithSystemHandler("mailto:someone@example.org");
+        verifyNoInteractions(hostServices);
     }
 
     private static GuiPreferences preferencesWith(ExternalFileType... externalFileTypes) {

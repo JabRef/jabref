@@ -285,11 +285,12 @@ public abstract class NativeDesktop {
             openUrlWithSystemHandler(url);
             return;
         }
-        // createUri also produces relative URIs, which only the platform opener can resolve
-        if (uri.isAbsolute()) {
+        // On Windows, HostServices hands every URI to the web browser, also mailto: and links to other programs.
+        // The OS handler dispatches by scheme. createUri also produces relative URIs, which only the OS handler can resolve.
+        if ("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme())) {
             showDocument(uri.toASCIIString());
         } else {
-            openUrlWithSystemHandler(url);
+            openUrlWithSystemHandler(uri.isAbsolute() ? uri.toASCIIString() : url);
         }
     }
 
