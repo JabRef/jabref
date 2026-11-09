@@ -6,13 +6,10 @@ import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.IntStream;
 
 import javafx.collections.ListChangeListener;
 import javafx.scene.Scene;
@@ -28,12 +25,12 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.util.DialogButtonAssertions;
+import org.jabref.logic.bibtex.comparator.BackupComparator;
+import org.jabref.logic.bibtex.comparator.BackupComparison;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BackupFileType;
-import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -55,30 +52,7 @@ import static org.mockito.Mockito.when;
 class BackupResolverDialogTest extends JavaFxTest {
 
     private static final String FONT_SIZE_CLASS = "font-size-12";
-    private static final String CALCULATING = "Calculating...";
     private static final String UNKNOWN = "–";
-
-    private static class DeferringTaskExecutor extends CurrentThreadTaskExecutor {
-        private final List<BackgroundTask<?>> deferredTasks = new ArrayList<>();
-
-        @Override
-        public <V> Future<V> execute(BackgroundTask<V> task) {
-            deferredTasks.add(task);
-            return CompletableFuture.completedFuture(null);
-        }
-
-        void runNextDeferredTask() {
-            super.execute(deferredTasks.removeFirst());
-        }
-
-        int deferredTaskCount() {
-            return deferredTasks.size();
-        }
-
-        boolean firstDeferredTaskIsCancelled() {
-            return deferredTasks.getFirst().isCancelled();
-        }
-    }
 
     private BackupResolverDialog backupResolverDialog;
 
@@ -111,10 +85,9 @@ class BackupResolverDialogTest extends JavaFxTest {
 
         backupResolverDialog = new BackupResolverDialog(
                 Path.of("library.bib"),
-                Path.of("backups"),
-                mock(ExternalApplicationsPreferences.class),
-                mock(ImportFormatPreferences.class),
-                new CurrentThreadTaskExecutor());
+                Optional.empty(),
+                Optional.empty(),
+                mock(ExternalApplicationsPreferences.class));
         backupResolverDialog.initOwner(stage);
         interact(backupResolverDialog::show);
     }
@@ -148,45 +121,6 @@ class BackupResolverDialogTest extends JavaFxTest {
         });
     }
 
-    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
-    // [utest->req~jabgui.backup.restore-dialog-comparison~1]
-    @Test
-    void showsCalculatingUntilIdenticalFileComparisonCompletes(@TempDir Path tempDir) throws IOException {
-        Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{same, title = {Same}}");
-        Path backup = createBackup(original, tempDir.resolve("backups"), "@Article{same, title = {Same}}");
-        DeferringTaskExecutor taskExecutor = new DeferringTaskExecutor();
-
-        BackupResolverDialog dialog = createDialog(original, backup.getParent(), taskExecutor);
-
-        assertEquals(1, taskExecutor.deferredTaskCount());
-        assertEquals(List.of(CALCULATING, CALCULATING, CALCULATING), List.of(
-                textOf(dialog, "currentEntries"),
-                textOf(dialog, "backupEntries"),
-                textOf(dialog, "backupChanges")));
-        assertEquals(List.of(false, false, false), buttonDisabledStates(dialog));
-
-        interact(taskExecutor::runNextDeferredTask);
-
-        assertEquals(List.of("1", "1", "No entry changes"), List.of(
-                textOf(dialog, "currentEntries"),
-                textOf(dialog, "backupEntries"),
-                textOf(dialog, "backupChanges")));
-    }
-
-    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
-    @Test
-    void closingDialogCancelsDeferredComparison(@TempDir Path tempDir) throws IOException {
-        Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{current}");
-        Path backup = createBackup(original, tempDir.resolve("backups"), "@Article{backup}");
-        DeferringTaskExecutor taskExecutor = new DeferringTaskExecutor();
-        BackupResolverDialog dialog = createDialog(original, backup.getParent(), taskExecutor);
-
-        interact(dialog::show);
-        interact(dialog::close);
-
-        assertTrue(taskExecutor.firstDeferredTaskIsCancelled());
-    }
-
     // [utest->req~jabgui.backup.restore-dialog-comparison~1]
     @Test
     void showsFileSummariesAndEntryChanges(@TempDir Path tempDir) throws IOException {
@@ -213,7 +147,7 @@ class BackupResolverDialogTest extends JavaFxTest {
                 }
                 """);
 
-        BackupResolverDialog dialog = createDialog(original, backup.getParent(), new CurrentThreadTaskExecutor());
+        BackupResolverDialog dialog = createDialog(original, backup.getParent());
 
         assertEquals(original.getFileName().toString(), textOf(dialog, "currentName"));
         Hyperlink backupLink = assertInstanceOf(Hyperlink.class, dialog.getDialogPane().lookup("#backupName"));
@@ -232,10 +166,7 @@ class BackupResolverDialogTest extends JavaFxTest {
     void missingBackupShowsUnavailableValues(@TempDir Path tempDir) throws IOException {
         Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{current}");
 
-        BackupResolverDialog dialog = createDialog(
-                original,
-                tempDir.resolve("missing-backups"),
-                new CurrentThreadTaskExecutor());
+        BackupResolverDialog dialog = createDialog(original, tempDir.resolve("missing-backups"));
 
         assertEquals("File not found", textOf(dialog, "backupName"));
         assertEquals(List.of(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN), List.of(
@@ -252,7 +183,7 @@ class BackupResolverDialogTest extends JavaFxTest {
         Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{current}");
         Path backup = createBackup(original, tempDir.resolve("backups"), "");
 
-        BackupResolverDialog dialog = createDialog(original, backup.getParent(), new CurrentThreadTaskExecutor());
+        BackupResolverDialog dialog = createDialog(original, backup.getParent());
 
         assertEquals(List.of("1", "0", "removed: 1, added: 0, modified: 0"), List.of(
                 textOf(dialog, "currentEntries"),
@@ -272,7 +203,7 @@ class BackupResolverDialogTest extends JavaFxTest {
                 """);
         Path backup = createBackup(original, tempDir.resolve("backups"), "@Article{backup}");
 
-        BackupResolverDialog dialog = createDialog(original, backup.getParent(), new CurrentThreadTaskExecutor());
+        BackupResolverDialog dialog = createDialog(original, backup.getParent());
 
         assertEquals(List.of(UNKNOWN, "1", UNKNOWN), List.of(
                 textOf(dialog, "currentEntries"),
@@ -280,41 +211,33 @@ class BackupResolverDialogTest extends JavaFxTest {
                 textOf(dialog, "backupChanges")));
     }
 
-    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
     @Test
-    void largeLibraryComparisonIsDeferred(@TempDir Path tempDir) throws IOException {
-        String largeLibrary = String.join("\n", IntStream.range(0, 5_000)
-                                                         .mapToObj(index -> "@Article{entry" + index + "}")
-                                                         .toList());
-        Path original = Files.writeString(tempDir.resolve("library.bib"), largeLibrary);
-        Path backup = createBackup(original, tempDir.resolve("backups"), largeLibrary);
-        DeferringTaskExecutor taskExecutor = new DeferringTaskExecutor();
-
-        BackupResolverDialog dialog = createDialog(original, backup.getParent(), taskExecutor);
-
-        assertEquals(1, taskExecutor.deferredTaskCount());
-        assertEquals(List.of(CALCULATING, CALCULATING, CALCULATING), List.of(
-                textOf(dialog, "currentEntries"),
-                textOf(dialog, "backupEntries"),
-                textOf(dialog, "backupChanges")));
-    }
-
-    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
-    @Test
-    void showsUnknownValuesWhenDeferredComparisonFails(@TempDir Path tempDir) throws IOException {
+    void failedComparisonShowsUnknownValues(@TempDir Path tempDir) throws IOException {
         Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{current}");
         Path backup = createBackup(original, tempDir.resolve("backups"), "@Article{backup}");
-        DeferringTaskExecutor taskExecutor = new DeferringTaskExecutor();
-        BackupResolverDialog dialog = createDialog(original, backup.getParent(), taskExecutor);
-        Files.delete(backup);
 
-        interact(taskExecutor::runNextDeferredTask);
+        AtomicReference<BackupResolverDialog> dialog = new AtomicReference<>();
+        interact(() -> dialog.set(new BackupResolverDialog(original, Optional.of(backup), Optional.empty(), mock(ExternalApplicationsPreferences.class))));
 
         assertEquals(List.of(UNKNOWN, UNKNOWN, UNKNOWN), List.of(
-                textOf(dialog, "currentEntries"),
-                textOf(dialog, "backupEntries"),
-                textOf(dialog, "backupChanges")));
-        assertEquals(List.of(false, false, false), buttonDisabledStates(dialog));
+                textOf(dialog.get(), "currentEntries"),
+                textOf(dialog.get(), "backupEntries"),
+                textOf(dialog.get(), "backupChanges")));
+        assertEquals(List.of(false, false, false), buttonDisabledStates(dialog.get()));
+    }
+
+    // [utest->req~jabgui.backup.restore-dialog-comparison~1]
+    @Test
+    void explainsWhatRestoreAndIgnoreDo() {
+        awaitEvents();
+
+        AtomicReference<List<String>> texts = new AtomicReference<>();
+        interact(() -> texts.set(backupResolverDialog.getDialogPane().getContent().lookupAll(".label").stream()
+                                                     .map(node -> ((Labeled) node).getText())
+                                                     .toList()));
+
+        assertTrue(texts.get().contains("Restoring overwrites the library file with the backup. Ignoring opens the library file as it is and keeps the backup file."),
+                "Dialog texts: " + texts.get());
     }
 
     private static Path createBackup(Path original, Path backupDirectory, String content) throws IOException {
@@ -322,14 +245,22 @@ class BackupResolverDialogTest extends JavaFxTest {
         return Files.writeString(backup, content);
     }
 
-    private BackupResolverDialog createDialog(Path original, Path backupDirectory, CurrentThreadTaskExecutor taskExecutor) {
+    /// Computes the comparison like [org.jabref.gui.dialogs.BackupUIManager] does before it shows the dialog.
+    private BackupResolverDialog createDialog(Path original, Path backupDirectory) {
+        Optional<Path> backup = BackupFileUtil.getPathOfLatestExistingBackupFile(original, backupDirectory);
+        Optional<BackupComparison> comparison = backup.flatMap(path -> {
+            try {
+                return Optional.of(BackupComparator.compare(original, path, importFormatPreferences()));
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        });
         AtomicReference<BackupResolverDialog> dialog = new AtomicReference<>();
         interact(() -> dialog.set(new BackupResolverDialog(
                 original,
-                backupDirectory,
-                mock(ExternalApplicationsPreferences.class),
-                importFormatPreferences(),
-                taskExecutor)));
+                backup,
+                comparison,
+                mock(ExternalApplicationsPreferences.class))));
         return dialog.get();
     }
 

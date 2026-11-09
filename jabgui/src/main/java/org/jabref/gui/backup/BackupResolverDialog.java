@@ -22,13 +22,8 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.logic.bibtex.comparator.BackupComparator;
 import org.jabref.logic.bibtex.comparator.BackupComparison;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
@@ -43,23 +38,20 @@ public class BackupResolverDialog extends FXDialog {
     private static final String UNKNOWN = "–";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
 
-    private final Label currentEntries;
-    private final Label backupEntries;
-    private final Label backupChanges;
-
     // [impl->req~jabgui.backup.restore-dialog-comparison~1]
+    /// @param backupPath the latest backup of the library, if any
+    /// @param comparison the comparison of the library with that backup, computed before the dialog is shown; absent
+    ///                   if it could not be computed
     public BackupResolverDialog(Path originalPath,
-                                Path backupDir,
-                                ExternalApplicationsPreferences externalApplicationsPreferences,
-                                ImportFormatPreferences importFormatPreferences,
-                                TaskExecutor taskExecutor) {
+                                Optional<Path> backupPath,
+                                Optional<BackupComparison> comparison,
+                                ExternalApplicationsPreferences externalApplicationsPreferences) {
         super(AlertType.CONFIRMATION, Localization.lang("Backup found"), true);
         setHeaderText(null);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
-        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
-        Node backupNameCell = backupPathOpt.<Node>map(path -> backupLink(path, externalApplicationsPreferences))
-                                           .orElseGet(() -> value("backupName", Localization.lang("File not found")));
+        Node backupNameCell = backupPath.<Node>map(path -> backupLink(path, externalApplicationsPreferences))
+                                        .orElseGet(() -> value("backupName", Localization.lang("File not found")));
         GridPane table = new GridPane();
         table.setHgap(12);
         table.setVgap(6);
@@ -69,38 +61,24 @@ public class BackupResolverDialog extends FXDialog {
                 backupNameCell);
         table.addRow(2, new Label(Localization.lang("Size")),
                 value("currentSize", FileUtil.getFileSize(originalPath).orElse(UNKNOWN)),
-                value("backupSize", backupPathOpt.flatMap(FileUtil::getFileSize).orElse(UNKNOWN)));
+                value("backupSize", backupPath.flatMap(FileUtil::getFileSize).orElse(UNKNOWN)));
         table.addRow(3, new Label(Localization.lang("Date modified")),
                 value("currentModified", formatModified(originalPath)),
-                value("backupModified", backupPathOpt.map(this::formatModified).orElse(UNKNOWN)));
-
-        // Create the labels before starting the task as it might finish immediately 
-        String initial = backupPathOpt.isPresent() ? Localization.lang("Calculating...") : UNKNOWN;
-        currentEntries = value("currentEntries", initial);
-        backupEntries = value("backupEntries", initial);
-        backupChanges = value("backupChanges", initial);
-        table.addRow(4, new Label(Localization.lang("Number of entries")), currentEntries, backupEntries);
-        table.addRow(5, new Label(Localization.lang("Changes")), new Label(UNKNOWN), backupChanges);
+                value("backupModified", backupPath.map(this::formatModified).orElse(UNKNOWN)));
+        table.addRow(4, new Label(Localization.lang("Number of entries")),
+                value("currentEntries", comparison.map(result -> format(result.current().entryCount())).orElse(UNKNOWN)),
+                value("backupEntries", comparison.map(result -> format(result.backup().entryCount())).orElse(UNKNOWN)));
+        table.addRow(5, new Label(Localization.lang("Changes")),
+                new Label(UNKNOWN),
+                value("backupChanges", comparison.flatMap(BackupComparison::changes).map(BackupResolverDialog::describeChanges).orElse(UNKNOWN)));
 
         VBox content = new VBox(10,
                 wrapped(Localization.lang("A newer backup of this library was found.")),
                 wrapped(Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used.")),
                 table,
+                wrapped(Localization.lang("Restoring overwrites the library file with the backup. Ignoring opens the library file as it is and keeps the backup file.")),
                 wrapped(Localization.lang("Do you want to recover the library from the backup file?")));
         getDialogPane().setContent(content);
-
-        // [impl->req~jabgui.backup.restore-dialog-non-blocking~1]
-        backupPathOpt.ifPresent(backupPath -> {
-            BackgroundTask<BackupComparison> task = BackgroundTask
-                    .wrap(() -> BackupComparator.compare(originalPath, backupPath, importFormatPreferences))
-                    .onSuccess(this::fillCounts)
-                    .onFailure(e -> {
-                        LOGGER.warn("Could not compare library with backup", e);
-                        setCountsUnknown();
-                    });
-            setOnHidden(_ -> task.cancel());
-            task.executeWith(taskExecutor);
-        });
     }
 
     private static Label header(String text) {
@@ -144,24 +122,12 @@ public class BackupResolverDialog extends FXDialog {
         }
     }
 
-    private void fillCounts(BackupComparison comparison) {
-        currentEntries.setText(format(comparison.current().entryCount()));
-        backupEntries.setText(format(comparison.backup().entryCount()));
-        backupChanges.setText(comparison.changes().map(BackupResolverDialog::describeChanges).orElse(UNKNOWN));
-    }
-
     private static String describeChanges(BackupComparison.ChangeCounts changes) {
         if (changes.added() == 0 && changes.removed() == 0 && changes.modified() == 0) {
             return Localization.lang("No entry changes");
         }
         return Localization.lang("removed: %0, added: %1, modified: %2",
                 String.valueOf(changes.removed()), String.valueOf(changes.added()), String.valueOf(changes.modified()));
-    }
-
-    private void setCountsUnknown() {
-        currentEntries.setText(UNKNOWN);
-        backupEntries.setText(UNKNOWN);
-        backupChanges.setText(UNKNOWN);
     }
 
     private static String format(OptionalInt count) {

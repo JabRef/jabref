@@ -28,7 +28,6 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -65,6 +64,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -229,6 +229,32 @@ class BackupUIManagerTest extends JavaFxTest {
         assertEquals(List.of("TODO"), restored.getMetaData().getGroups().orElseThrow().getChildren().stream().map(GroupTreeNode::getName).toList());
     }
 
+    /// The comparison runs in the task that opens the library. When that task is cancelled, nobody waits for the
+    /// answer anymore, so the dialog is not shown.
+    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
+    @Test
+    void cancelledOpeningShowsNoDialog(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        Path originalFile = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
+        Files.writeString(BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir), "@Article{backup}");
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+
+        Optional<ParserResult> result;
+        boolean stillInterrupted;
+        Thread.currentThread().interrupt();
+        try {
+            result = BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, originalFile, preferences,
+                    mock(FileUpdateMonitor.class), new JabRefGuiStateManager());
+        } finally {
+            stillInterrupted = Thread.interrupted();
+        }
+
+        assertEquals(Optional.empty(), result);
+        assertTrue(stillInterrupted);
+        verify(dialogService, never()).showCustomDialogAndWait(any(BackupResolverDialog.class));
+    }
+
     @Test
     void resolverDialogRaisesTabOfAffectedLibraryFirst(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
@@ -348,8 +374,8 @@ class BackupUIManagerTest extends JavaFxTest {
 
         AtomicReference<List<String>> cells = new AtomicReference<>(List.of());
         interact(() -> {
-            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(),
-                    mock(ExternalApplicationsPreferences.class), mock(ImportFormatPreferences.class), new CurrentThreadTaskExecutor());
+            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, Optional.of(backupFile), Optional.empty(),
+                    mock(ExternalApplicationsPreferences.class));
             Node content = dialog.getDialogPane().getContent();
             cells.set(Stream.of("#currentSize", "#backupSize", "#backupName")
                             .map(id -> ((Labeled) content.lookup(id)).getText())

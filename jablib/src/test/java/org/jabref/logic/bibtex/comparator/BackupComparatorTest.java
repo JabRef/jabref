@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -199,6 +200,51 @@ class BackupComparatorTest {
         Path directory = Files.createDirectory(tempDir.resolve("backup.bib"));
 
         assertThrows(IOException.class, () -> BackupComparator.compare(original, directory, preferences));
+    }
+
+    @Test
+    void keepsParsedFilesForReuse(@TempDir Path tempDir) throws IOException {
+        Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{current}");
+        Path backup = Files.writeString(tempDir.resolve("backup.bib"), "@Article{current}\n@Article{added}");
+
+        BackupComparator.ParsedComparison result = BackupComparator.compareAndKeepParsedFiles(original, backup, preferences, new DummyFileUpdateMonitor());
+
+        assertEquals(1, result.current().orElseThrow().getDatabase().getEntryCount());
+        assertEquals(2, result.backup().orElseThrow().getDatabase().getEntryCount());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0)), result.comparison().changes());
+    }
+
+    /// An unparseable original is still handed to the caller: reviewing the backup can recover it.
+    @Test
+    void keepsUnparseableOriginalForReuse(@TempDir Path tempDir) throws IOException {
+        Path original = Files.writeString(tempDir.resolve("library.bib"), """
+                <<<<<<< HEAD
+                @Article{current}
+                =======
+                @Article{other}
+                >>>>>>> other
+                """);
+        Path backup = Files.writeString(tempDir.resolve("backup.bib"), "@Article{backup}");
+
+        BackupComparator.ParsedComparison result = BackupComparator.compareAndKeepParsedFiles(original, backup, preferences, new DummyFileUpdateMonitor());
+
+        assertTrue(result.current().orElseThrow().isInvalid());
+        assertEquals(OptionalInt.empty(), result.comparison().current().entryCount());
+    }
+
+    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
+    @Test
+    void interruptedThreadStopsComparison(@TempDir Path tempDir) throws IOException {
+        Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
+        Path backup = Files.writeString(tempDir.resolve("backup.bib"), "@Article{backup}");
+
+        Thread.currentThread().interrupt();
+        try {
+            assertThrows(InterruptedIOException.class, () -> BackupComparator.compare(original, backup, preferences));
+        } finally {
+            // Clear the flag, so that it does not leak into other tests
+            Thread.interrupted();
+        }
     }
 
     private static ImportFormatPreferences createPreferences() {
