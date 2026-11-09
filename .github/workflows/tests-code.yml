@@ -466,16 +466,18 @@ jobs:
         timeout-minutes: ${{ matrix.module == 'jabgui' && 30 || 360 }}
         run: |
           if [[ "${{ matrix.module }}" == "jabgui" ]]; then
+            set -m
             (
               sleep 900
               echo 'GUI tests are still running; collecting JVM thread dumps.'
               jcmd -l | while read -r pid description; do
                 echo "Thread dump for $pid $description"
-                timeout 30s jcmd "$pid" Thread.print -l || true
+                timeout --foreground 30s jcmd "$pid" Thread.print -l || true
               done
             ) &
             watchdog=$!
-            trap 'pkill -P "$watchdog" || true; kill "$watchdog" 2>/dev/null || true' EXIT
+            set +m
+            trap 'kill -- "-$watchdog" 2>/dev/null || true; wait "$watchdog" 2>/dev/null || true' EXIT
           fi
           xvfb-run --auto-servernum gradle :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
