@@ -41,6 +41,16 @@ Empty sections are omitted unless they contain a nonempty descendant section.
 
 Needs: impl, utest
 
+## Markdown full publication list must group entries by entry type
+`req~export.markdown-publications.type-headings~1`
+
+The "All publications" section shows a heading for each entry type, one level below the section heading.
+Within a type, entries keep the newest-first order.
+The recent publications section and the Export subgroup sections remain flat lists, because the Export subgroups already define the grouping.
+The type heading is defined in the layout using grouped output (`\begingroup{entrytype}`), see [issue 12729](https://github.com/JabRef/jabref/issues/12729).
+
+Needs: impl, utest
+
 ## Markdown publication links must support portable output
 `req~export.markdown-publications.links~1`
 

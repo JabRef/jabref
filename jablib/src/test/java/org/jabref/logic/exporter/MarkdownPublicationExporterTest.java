@@ -88,6 +88,53 @@ class MarkdownPublicationExporterTest {
                 """, recentSection(output));
     }
 
+    // [utest->req~export.markdown-publications.type-headings~1]
+    @Test
+    void groupsFullListByEntryTypeAndKeepsRecentListFlat(@TempDir Path tempDir) throws Exception {
+        Path output = tempDir.resolve("publications.md");
+        BibEntry newerConferencePaper = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("conference2025")
+                .withField(StandardField.TITLE, "Conference 2025")
+                .withField(StandardField.YEAR, "2025");
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("book2023")
+                .withField(StandardField.TITLE, "Book 2023")
+                .withField(StandardField.YEAR, "2023");
+        BibEntry olderConferencePaper = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("conference2022")
+                .withField(StandardField.TITLE, "Conference 2022")
+                .withField(StandardField.YEAR, "2022");
+
+        createExporter().export(
+                new BibDatabaseContext(),
+                output,
+                List.of(olderConferencePaper, publication(2024), book, newerConferencePaper));
+
+        assertEquals("""
+                ## Recent publications
+
+                * Conference 2025. 2025
+                * Paper 2024. 2024
+                * Book 2023. 2023
+                * Conference 2022. 2022
+
+                ## All publications
+
+                ### Article
+
+                * Paper 2024. 2024
+
+                ### Book
+
+                * Book 2023. 2023
+
+                ### InProceedings
+
+                * Conference 2025. 2025
+                * Conference 2022. 2022
+                """, Files.readString(output).replace("\r\n", "\n"));
+    }
+
     @Test
     void retainsOlderPublicationsInFullList(@TempDir Path tempDir)
             throws Exception {
@@ -114,6 +161,8 @@ class MarkdownPublicationExporterTest {
 
         assertEquals("""
                 ## All publications
+
+                ### Article
 
                 * Paper 2025. 2025
                 * Paper 2024. 2024
@@ -690,7 +739,11 @@ class MarkdownPublicationExporterTest {
         String markdown = export(tempDir, root, List.of(entry));
 
         assertFalse(markdown.contains("### Private notes"));
-        assertFalse(markdown.contains("### "));
+        assertEquals("""
+                ### Article
+
+                * Example paper. 2025
+                """, markdown.substring(markdown.lastIndexOf("### ")));
     }
 
     private ExplicitGroup group(String name) {
@@ -1233,7 +1286,7 @@ class MarkdownPublicationExporterTest {
                 ### \\<img src=x onerror=alert\\(1\\)\\>
 
                 * Paper 2025. 2025
-                """, markdown.substring(markdown.indexOf("### ")));
+                """, markdown.substring(markdown.lastIndexOf("### ")));
     }
 
     @Test
@@ -1250,7 +1303,7 @@ class MarkdownPublicationExporterTest {
                 ### \\[click\\]\\(javascript:alert\\(1\\)\\) &amp;lt;tag&amp;gt;
 
                 * Paper 2025. 2025
-                """, markdown.substring(markdown.indexOf("### ")));
+                """, markdown.substring(markdown.lastIndexOf("### ")));
     }
 
     @ParameterizedTest

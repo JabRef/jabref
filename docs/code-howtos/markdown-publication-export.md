@@ -8,8 +8,11 @@ parent: Code Howtos
 `resource/layout/markdown-publications/publication.layout`.
 Field values pass through the `MarkdownEscaper` layout formatter, which collapses
 whitespace and escapes characters that would otherwise start Markdown markup.
+The "All publications" section shows a heading per entry type. `type-heading.layout` defines it
+with the grouped output `\begingroup{entrytype}`, so the exporter sorts that section by entry type first and
+resets the layout engine's group state before rendering it.
 The exporter resolves bibliographic fields before rendering and passes a
-validated DOI or URL to the layout. Only HTTP, HTTPS, FTP, and FTPS destinations
+validated DOI or URL (`url`) and a portable PDF link (`pdf`) to the layout. Only HTTP, HTTPS, FTP, and FTPS destinations
 with an authority are accepted; `www.` destinations receive an HTTPS scheme.
 Invalid DOIs fall back to a valid URL, otherwise the title remains plain text.
 The original library entries are not modified.

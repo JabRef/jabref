@@ -45,6 +45,10 @@ public class MarkdownPublicationExporter extends Exporter {
     private static final Pattern DAY = Pattern.compile("[0-9]+");
     private static final Pattern HEADING_MARKUP = Pattern.compile("[\\\\`*_{}\\[\\]()#+.!|<>-]");
     private static final Set<String> ONLINE_SCHEMES = Set.of("http", "https", "ftp", "ftps");
+    private static final String LAYOUT_DIRECTORY = "/resource/layout/markdown-publications/";
+    /// Stable sort: keeps the publication date order within each entry type
+    private static final Comparator<BibEntry> BY_TYPE =
+            Comparator.comparing(entry -> entry.getType().getDisplayName(), String.CASE_INSENSITIVE_ORDER);
 
     private final FilePreferences filePreferences;
     private final LayoutFormatterPreferences layoutPreferences;
@@ -134,39 +138,24 @@ public class MarkdownPublicationExporter extends Exporter {
                                                        entry.getField(StandardField.TITLE).orElse("")))
                                        .toList();
 
-        var resource = Optional.ofNullable(
-                                       MarkdownPublicationExporter.class.getResourceAsStream(
-                                               "/resource/layout/markdown-publications/publication.layout"))
-                               .orElseThrow(() ->
-                                       new IOException(Localization.lang("Cannot find Markdown publication layout.")));
-
-        Layout layout;
-        try (Reader reader =
-                     new InputStreamReader(resource, StandardCharsets.UTF_8)) {
-            LayoutHelper helper = new LayoutHelper(
-                    reader,
-                    fileDirectories,
-                    layoutPreferences,
-                    abbreviationRepository
-            );
-            layout = Optional.ofNullable(helper.getLayoutFromText())
-                             .orElseThrow(() ->
-                                     new IOException(Localization.lang("Cannot load Markdown publication layout.")));
-        }
+        PublicationLayouts layouts = new PublicationLayouts(
+                loadLayout("publication.layout", fileDirectories, abbreviationRepository),
+                loadLayout("type-heading.layout", fileDirectories, abbreviationRepository));
 
         StringJoiner sections = new StringJoiner("\n\n", "", "\n");
         sections.add("## " + Localization.lang("Recent publications") + "\n\n"
                 + renderPublications(
                 sorted.stream().limit(5).toList(),
-                layout,
+                layouts.publication(),
                 databaseContext,
                 fileDirectories,
                 linkDestination
         ));
         sections.add("## " + Localization.lang("All publications") + "\n\n"
-                + renderPublications(
+                + renderPublicationsByType(
                 sorted,
-                layout,
+                3,
+                layouts,
                 databaseContext,
                 fileDirectories,
                 linkDestination
@@ -181,7 +170,7 @@ public class MarkdownPublicationExporter extends Exporter {
                                        subgroup,
                                        3,
                                        sorted,
-                                       layout,
+                                       layouts.publication(),
                                        databaseContext,
                                        fileDirectories,
                                        linkDestination
@@ -192,6 +181,29 @@ public class MarkdownPublicationExporter extends Exporter {
         try (AtomicFileWriter writer =
                      new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
             writer.write(sections.toString());
+        }
+    }
+
+    private Layout loadLayout(
+            String fileName,
+            List<Path> fileDirectories,
+            JournalAbbreviationRepository abbreviationRepository) throws IOException {
+        var resource = Optional.ofNullable(
+                                       MarkdownPublicationExporter.class.getResourceAsStream(LAYOUT_DIRECTORY + fileName))
+                               .orElseThrow(() ->
+                                       new IOException(Localization.lang("Cannot find Markdown publication layout.")));
+
+        try (Reader reader =
+                     new InputStreamReader(resource, StandardCharsets.UTF_8)) {
+            LayoutHelper helper = new LayoutHelper(
+                    reader,
+                    fileDirectories,
+                    layoutPreferences,
+                    abbreviationRepository
+            );
+            return Optional.ofNullable(helper.getLayoutFromText())
+                           .orElseThrow(() ->
+                                   new IOException(Localization.lang("Cannot load Markdown publication layout.")));
         }
     }
 
@@ -211,6 +223,39 @@ public class MarkdownPublicationExporter extends Exporter {
                       ))
                       .collect(Collectors.joining())
                       .stripTrailing();
+    }
+
+    /// Renders the entries with a heading for each entry type.
+    ///
+    /// The type heading layout uses the grouped output of the layout engine (`\begingroup`), which prints its text
+    /// only when the entry type differs from the one of the previous entry. Hence, the entries are sorted by type first.
+    // [impl->req~export.markdown-publications.type-headings~1]
+    private String renderPublicationsByType(
+            List<BibEntry> sorted,
+            int headingLevel,
+            PublicationLayouts layouts,
+            BibDatabaseContext databaseContext,
+            List<Path> fileDirectories,
+            Optional<Path> outputFile) {
+        // The layout engine remembers the last group value globally; each section starts a new grouping
+        LayoutHelper.setCurrentGroup("");
+        String headingPrefix = "#".repeat(Math.min(headingLevel, 6)) + " ";
+
+        StringJoiner blocks = new StringJoiner("\n");
+        StringBuilder publications = new StringBuilder();
+        for (BibEntry entry : sorted.stream().sorted(BY_TYPE).toList()) {
+            String typeHeading = layouts.typeHeading().doLayout(entry, databaseContext.getDatabase()).strip();
+            if (!typeHeading.isEmpty()) {
+                if (!publications.isEmpty()) {
+                    blocks.add(publications.toString());
+                    publications.setLength(0);
+                }
+                blocks.add(headingPrefix + typeHeading + "\n");
+            }
+            publications.append(renderPublication(entry, layouts.publication(), databaseContext, fileDirectories, outputFile));
+        }
+        blocks.add(publications.toString());
+        return blocks.toString().stripTrailing();
     }
 
     // [impl->req~export.markdown-publications.groups~1]
@@ -282,30 +327,19 @@ public class MarkdownPublicationExporter extends Exporter {
             BibDatabaseContext databaseContext,
             List<Path> fileDirectories,
             Optional<Path> outputFile) {
-        // Fields are already resolved; do not expand library string macros again after validating the URL.
-        String publication =
-                layout.doLayout(publicationForLayout(entry, databaseContext), new BibDatabase());
-
-        Optional<String> pdfLink = entry.getFiles().stream()
-                                        .filter(this::isPdfAttachment)
-                                        .filter(linkedFile -> !linkedFile.getLink().isBlank())
-                                        .map(linkedFile -> resolvePdfLink(
-                                                linkedFile,
-                                                fileDirectories,
-                                                outputFile
-                                        ))
-                                        .flatMap(Optional::stream)
-                                        .findFirst();
-
-        return pdfLink
-                .map(link -> publication.stripTrailing()
-                        + " [PDF](<"
-                        + link
-                        + ">)\n")
-                .orElse(publication);
+        // Fields are already resolved; do not expand library string macros again after validating the links.
+        return layout.doLayout(
+                publicationForLayout(entry, databaseContext, fileDirectories, outputFile),
+                new BibDatabase());
     }
 
-    private BibEntry publicationForLayout(BibEntry entry, BibDatabaseContext databaseContext) {
+    /// Prepares the values the layout renders: resolved fields, a validated title link (`url`),
+    /// and a PDF link (`pdf`) that is portable relative to the output file.
+    private BibEntry publicationForLayout(
+            BibEntry entry,
+            BibDatabaseContext databaseContext,
+            List<Path> fileDirectories,
+            Optional<Path> outputFile) {
         BibEntry publication = new BibEntry(entry.getType());
         for (StandardField field : List.of(StandardField.AUTHOR, StandardField.TITLE,
                 StandardField.JOURNAL, StandardField.BOOKTITLE, StandardField.YEAR)) {
@@ -321,6 +355,14 @@ public class MarkdownPublicationExporter extends Exporter {
              .or(() -> entry.getResolvedFieldOrAlias(StandardField.URL, databaseContext.getDatabase())
                             .flatMap(this::normalizeOnlineLink))
              .ifPresent(link -> publication.withField(StandardField.URL, link));
+
+        entry.getFiles().stream()
+             .filter(this::isPdfAttachment)
+             .filter(linkedFile -> !linkedFile.getLink().isBlank())
+             .map(linkedFile -> resolvePdfLink(linkedFile, fileDirectories, outputFile))
+             .flatMap(Optional::stream)
+             .findFirst()
+             .ifPresent(link -> publication.withField(StandardField.PDF, link));
         return publication;
     }
 
@@ -445,5 +487,8 @@ public class MarkdownPublicationExporter extends Exporter {
         }
         // Date.parse otherwise silently discards unparseable month/day fields.
         return Date.parse(entry.getField(StandardField.YEAR), month, day);
+    }
+
+    private record PublicationLayouts(Layout publication, Layout typeHeading) {
     }
 }
