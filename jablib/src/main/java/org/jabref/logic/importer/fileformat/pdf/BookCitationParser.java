@@ -21,7 +21,7 @@ final class BookCitationParser {
 
     /// Parses a citation block into its metadata fields.
     ///
-    /// @param citationBlock text returned by [BookCitationBlock#find]
+    /// @param citationBlock  text returned by [BookCitationBlock#find]
     /// @param normalizeNames converts extracted contributor names into a BibTeX name list
     /// @return book entry containing the extracted metadata
     static BibEntry parse(String citationBlock, UnaryOperator<String> normalizeNames) {
