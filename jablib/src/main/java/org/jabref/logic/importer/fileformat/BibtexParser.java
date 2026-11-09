@@ -1117,7 +1117,7 @@ public class BibtexParser implements Parser {
         }
     }
 
-    private boolean isTextTokenCharacter(int character) throws IOException {
+    private boolean isTextTokenCharacter(int character) {
         return Character.isLetterOrDigit((char) character) || (":-_*+./'".indexOf(character) >= 0);
     }
 
