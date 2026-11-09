@@ -458,6 +458,7 @@ public abstract class NativeDesktop {
     }
 
     public boolean moveToTrashSupported() {
-        return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
+        // getDesktop throws if AWT has no desktop integration (e.g., headless or missing GTK); then there is no trash
+        return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
     }
 }
