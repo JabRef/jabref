@@ -24,8 +24,21 @@ public class URLUtil {
     public static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
 
     private static final String URL_EXP = "^(https?|ftp)://.+";
+    // Matches the query part ("?...") and/or the fragment part ("#...") at the end of a URL
+    private static final Pattern QUERY_AND_FRAGMENT = Pattern.compile("[?#].*$");
     // Detect Google search URL
     private static final String GOOGLE_SEARCH_EXP = "^https?://(?:www\\.)?google\\.[\\.a-z]+?/url.*";
+
+    /// Removes the query (e.g., `?utm_source=newsletter`) and the fragment (e.g., `#section`) from a URL.
+    ///
+    /// Example: `https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter` becomes
+    /// `https://doi.org/10.1371/journal.pone.0000308`
+    ///
+    /// @param url the URL string
+    /// @return the URL without query and fragment
+    public static String removeQueryAndFragment(@NonNull String url) {
+        return QUERY_AND_FRAGMENT.matcher(url).replaceFirst("");
+    }
 
     /// Cleans URLs returned by Google search.
     /// <h4>Example</h4>
