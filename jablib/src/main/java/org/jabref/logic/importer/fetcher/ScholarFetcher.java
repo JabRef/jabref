@@ -227,7 +227,7 @@ public class ScholarFetcher implements FulltextFetcher, PagedSearchBasedFetcher,
             urlDownload.addHeader("X-API-Key", apiKey);
             int statusCode = ((HttpURLConnection) urlDownload.openConnection()).getResponseCode();
             return (statusCode >= 200) && (statusCode < 300);
-        } catch (IOException | FetcherException e) {
+        } catch (IOException | FetcherException _) {
             return false;
         }
     }

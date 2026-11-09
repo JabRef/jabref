@@ -195,7 +195,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
         identifierParser = new IdentifierParser(entry);
-        EasyBind.subscribe(textProperty(), ignored -> updateIdentifier());
+        EasyBind.subscribe(textProperty(), _ -> updateIdentifier());
         EasyBind.subscribe(identifier, newIdentifier -> isInvalidIdentifier.set(newIdentifier.isEmpty()));
     }
 }

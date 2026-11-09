@@ -50,7 +50,7 @@ public class EscapeAmpersandsFormatter extends Formatter {
                     inCommandName = false;
                     inCommand = true;
                 } else {
-                    // Or simply the end of this command alltogether:
+                    // Or simply the end of this command altogether:
                     commandName.delete(0, commandName.length());
                     inCommandName = false;
                 }

@@ -14,14 +14,14 @@ The [JabRef Browser Extension (experimental)][ext] already implements a native-m
 [ext]: https://github.com/JabRef/JabRef-Browser-Extension-experimental
 [pr81]: https://github.com/JabRef/JabRef-Browser-Extension-experimental/pull/81
 
-## Sync toggle on the MathSciNet identifier editor
+## MathSciNet identifier editor must display sync toggle
 `req~mathscinet.sync.toggle~1`
 
 The `MR_NUMBER` field's `IdentifierEditor` shows a "Sync with browser" toggle, visible only for this field (not for DOI/ISBN/ISSN/eprint). The toggle's state is a persisted GUI preference, off by default.
 
 Needs: impl
 
-## Sync opens or focuses a JabRef-owned tab
+## MathSciNet browser sync must open or focus dedicated browser tab
 `req~mathscinet.sync.open-or-focus~1`
 
 While the toggle is on and the shown entry has a parseable `MR_NUMBER`, JabRef asks the browser extension (via the bridge) to show that entry's MathSciNet page:
@@ -33,7 +33,7 @@ Implemented on the JabRef side by sending the request; opening/focusing the tab 
 
 Needs: impl
 
-## Sync fires on entry/field changes, not continuously
+## MathSciNet browser sync must trigger on entry and field changes only
 `req~mathscinet.sync.triggers~1`
 
 A sync request is sent when any of the following happens while the toggle is on:
@@ -46,14 +46,14 @@ No request is sent when the toggle is off, when the shown entry has no parseable
 
 Needs: impl
 
-## Extension only ever commands tabs it opened itself
+## Browser extension must manage only tabs opened by JabRef sync
 `req~mathscinet.sync.own-tabs-only~1`
 
 The extension must not enumerate or adopt pre-existing MathSciNet tabs (e.g., ones the user opened manually by clicking the identifier editor's external-link button, or by browsing there directly). It tracks at most one tab id that *it* created via this feature. If that tracked tab is later closed by the user, the next sync request opens a fresh tab rather than failing or reusing an unrelated tab. If the user has since navigated the tracked tab elsewhere, the next sync still navigates that same tab id back to the requested MathSciNet page (identity of the tab is what's tracked, not its current URL).
 
 Entirely implemented in the `JabRef-Browser-Extension-experimental` repo (`mathscinetBridge.js`), not this one, so it is intentionally not linked to an `impl` artifact here — this repo's `traceRequirements` cannot and should not cover it.
 
-## Sync reuses the existing bridge transport
+## MathSciNet browser sync must reuse existing bridge transport
 `req~mathscinet.sync.transport~1`
 
 The feature adds one HTTP endpoint (e.g. `POST /v1/mathscinet/open`) and one native-messaging command to the *same* bridge process and discovery file (`jabext-experimental`) used by the fulltext-fetch protocol — it does not stand up a second bridge, discovery file, or native-messaging host. Requests carry the same bearer-token and loopback-origin checks as `/v1/fulltext`.
@@ -62,7 +62,7 @@ The endpoint/command itself is implemented in the `JabRef-Browser-Extension-expe
 
 Needs: impl
 
-## Sync fails silently when the extension/bridge is unavailable
+## MathSciNet browser sync must fail non-blockingly when bridge is unavailable
 `req~mathscinet.sync.unavailable~1`
 
 If no discovery file is present, the bridge is unreachable, or the request errors, JabRef does not block or interrupt entry editing with a modal dialog. It logs the failure and may show a single non-blocking notification; the identifier text field and its "open in external browser" button keep working regardless of sync state.

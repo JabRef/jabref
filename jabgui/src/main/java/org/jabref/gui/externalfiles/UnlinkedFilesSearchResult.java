@@ -22,7 +22,7 @@ record UnlinkedFilesSearchResult(FileNodeViewModel treeRoot, Map<Path, List<BibE
     static Path normalizePath(Path path) {
         try {
             return path.toRealPath();
-        } catch (IOException e) {
+        } catch (IOException _) {
             return path.toAbsolutePath().normalize();
         }
     }

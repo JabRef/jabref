@@ -113,7 +113,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         latexDirectoryPath.getStyleClass().addAll("font-monospace", "bold");
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
         latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());
-        latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
+        latexDirectoryButton.setOnAction(_ -> viewModel.setLatexDirectory());
         HBox latexDirectoryBox = new HBox(10, latexDirectoryText, latexDirectoryPath, latexDirectoryButton);
         latexDirectoryBox.setAlignment(Pos.CENTER);
         return latexDirectoryBox;

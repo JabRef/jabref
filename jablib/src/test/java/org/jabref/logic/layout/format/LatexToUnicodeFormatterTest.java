@@ -27,7 +27,7 @@ class LatexToUnicodeFormatterTest {
             "ı, \\i",
             "ı, {\\i}"
     })
-    void smallIwithoutDot(String expected, String input) {
+    void smallIWithoutDot(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 
@@ -92,23 +92,23 @@ class LatexToUnicodeFormatterTest {
     }
 
     @Test
-    void iWithDiaresis() {
+    void iWithDiaeresis() {
         assertEquals("ï", formatter.format("\\\"{i}"));
     }
 
     @Test
-    void iWithDiaresisAndEscapedI() {
+    void iWithDiaeresisAndEscapedI() {
         // this might look strange in the test, but is actually a correct translation and renders identically to the above example in the UI
         assertEquals("ı̈", formatter.format("\\\"{\\i}"));
     }
 
     @Test
-    void iWithDiaresisAndUnnecessaryBraces() {
+    void iWithDiaeresisAndUnnecessaryBraces() {
         assertEquals("ï", formatter.format("{\\\"{i}}"));
     }
 
     @Test
-    void upperCaseIWithDiaresis() {
+    void upperCaseIWithDiaeresis() {
         assertEquals("Ï", formatter.format("\\\"{I}"));
     }
 

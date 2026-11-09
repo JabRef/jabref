@@ -374,7 +374,7 @@ class BibEntryTest {
     }
 
     @Test
-    void identicObjectsareEqual() {
+    void identicalObjectsAreEqual() {
         BibEntry otherEntry = entry;
         assertEquals(entry, otherEntry);
     }
@@ -501,27 +501,27 @@ class BibEntryTest {
     }
 
     @Test
-    void putKeywordsPutEmpyListErasesPreviousKeywords() {
+    void putKeywordsPutEmptyListErasesPreviousKeywords() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(List.of(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
-    void putKeywordsPutEmpyListHasChanged() {
+    void putKeywordsPutEmptyListHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         entry.putKeywords(List.of(), ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void putKeywordsPutEmpyListToEmptyBibentry() {
+    void putKeywordsPutEmptyListToEmptyBibentry() {
         entry.putKeywords(List.of(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
-    void putKeywordsPutEmpyListToEmptyBibentryNotChanged() {
+    void putKeywordsPutEmptyListToEmptyBibentryNotChanged() {
         entry.putKeywords(List.of(), ',');
         assertFalse(entry.hasChanged());
     }

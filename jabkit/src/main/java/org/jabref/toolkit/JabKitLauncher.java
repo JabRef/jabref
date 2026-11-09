@@ -25,6 +25,7 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.GrobidUrlMigration;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.BuildInfo;
@@ -54,7 +55,7 @@ import picocli.CommandLine;
 /// It does not open any GUI.
 /// For the GUI application see [org.jabref.Launcher].
 ///
-/// Does not do any preference migrations.
+/// Does not run GUI-specific preference migrations.
 public class JabKitLauncher {
     // J.U.L. bridge to SLF4J must be initialized before any logger is created, see initLogging()
     private static Logger LOGGER;
@@ -70,6 +71,7 @@ public class JabKitLauncher {
 
         try {
             final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
+            GrobidUrlMigration.migrate(preferences);
             Injector.setModelOrService(CliPreferences.class, preferences);
 
             BuildInfo buildInfo = new BuildInfo();

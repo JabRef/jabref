@@ -11,7 +11,7 @@ class CitationOOAdapterUtils {
     }
 
     static boolean hasPrecedingSpace(XTextCursor cursor) {
-        boolean procedingSpaceExists;
+        boolean precedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
         // Check if we're at the start of the document - if yes we set the flag and don't insert a space
@@ -20,14 +20,14 @@ class CitationOOAdapterUtils {
             return true;
         } else {
             // If not at the start of document, check if there is a space before
-            procedingSpaceExists = " ".equals(checkCursor.getString());
+            precedingSpaceExists = " ".equals(checkCursor.getString());
             // If not a space, check if it's a paragraph break
-            if (!procedingSpaceExists) {
-                procedingSpaceExists = checkCursor.getString().matches(LINE_BREAK);
+            if (!precedingSpaceExists) {
+                precedingSpaceExists = checkCursor.getString().matches(LINE_BREAK);
             }
         }
 
-        return procedingSpaceExists;
+        return precedingSpaceExists;
     }
 
     static boolean hasSucceedingSpace(XTextCursor cursor) {

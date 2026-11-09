@@ -37,7 +37,7 @@ public class ReplaceStringView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(replaceButton, getDialogPane(), event -> buttonReplace());
+        ControlHelper.setAction(replaceButton, getDialogPane(), _ -> buttonReplace());
     }
 
     @FXML

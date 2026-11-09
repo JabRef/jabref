@@ -3,14 +3,16 @@ package org.jabref.logic.quality.consistency;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.OrFields;
 
 /// Outputs the findings in a line-oriented `file:line:column:citationKey:field: message` format
 /// suitable for editors and CI tooling.
@@ -19,6 +21,7 @@ import org.jabref.model.entry.field.Field;
 /// [org.jabref.logic.integrity.IntegrityCheckResultErrorFormatWriter]. One line is emitted per
 /// deviating field of a reported entry:
 ///
+/// - a required field that is absent (alternatives such as `author/editor` are reported as one field),
 /// - a field that is absent although other entries of the same type use it, and
 /// - an unknown field that is present although other entries of the same type do not use it.
 ///
@@ -42,29 +45,36 @@ public class BibliographyConsistencyCheckResultErrorFormatWriter extends Bibliog
 
     // [impl->req~jabkit.cli.check-errorformat-output~1]
     @Override
-    protected void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
+    protected void writeBibEntry(BibEntry bibEntry, EntryTypeReport entryTypeReport) throws IOException {
         String citationKey = bibEntry.getCitationKey().orElse("");
-        for (Field field : allReportedFields) {
+        String entryType = entryTypeReport.displayName();
+        List<OrFields> missingRequiredFields = entryTypeReport.getMissingRequiredFields(bibEntry);
+        for (OrFields missingRequiredField : missingRequiredFields) {
+            write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, missingRequiredField,
+                    "required field '%s' is missing".formatted(FieldFactory.serializeOrFields(missingRequiredField)));
+        }
+        for (Field field : entryTypeReport.differingFields()) {
             Optional<String> value = bibEntry.getField(field);
             if (value.isPresent()) {
-                if (!requiredFields.contains(field) && !optionalFields.contains(field)) {
-                    write(parserResult.getFieldRange(bibEntry, field), citationKey, field,
+                if (!entryTypeReport.requiredFields().contains(field) && !entryTypeReport.optionalFields().contains(field)) {
+                    write(parserResult.getFieldRange(bibEntry, field), citationKey, new OrFields(field),
                             "unknown field for entry type %s".formatted(entryType));
                 }
-            } else {
-                write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, field,
+            } else if (missingRequiredFields.stream().noneMatch(orFields -> orFields.contains(field))) {
+                write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, new OrFields(field),
                         "field is absent but used by other entries of entry type %s".formatted(entryType));
             }
         }
     }
 
-    private void write(ParserResult.Range range, String citationKey, Field field, String message) throws IOException {
+    private void write(ParserResult.Range range, String citationKey, OrFields fields, String message) throws IOException {
+        String fieldName = FieldFactory.serializeOrFields(fields);
         writer.append("%s:%d:%d:%s:%s: %s\n".formatted(
                 inputFile,
                 range.startLine(),
                 range.startColumn(),
                 citationKey,
-                field.getName(),
+                fieldName,
                 message));
     }
 

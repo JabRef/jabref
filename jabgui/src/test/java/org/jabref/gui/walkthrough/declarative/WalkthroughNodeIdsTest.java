@@ -37,6 +37,7 @@ class WalkthroughNodeIdsTest {
             Map.entry("LINKED_FILE_DESCRIPTION", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml"),
             Map.entry("LINKED_FILE_TYPE", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml"),
             Map.entry("LINKED_FILE_SOURCE_URL", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml"),
+            Map.entry("FILE_ADD_CHIP", "java/org/jabref/gui/entryeditor/AllFieldsTab.java"),
             Map.entry("GROUP_NAME", "resources/org/jabref/gui/groups/GroupDialog.fxml"),
             Map.entry("GROUP_DESCRIPTION", "resources/org/jabref/gui/groups/GroupDialog.fxml"),
             Map.entry("GROUP_EXPLICIT_RADIO", "resources/org/jabref/gui/groups/GroupDialog.fxml"));

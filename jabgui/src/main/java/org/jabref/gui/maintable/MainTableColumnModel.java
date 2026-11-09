@@ -186,6 +186,28 @@ public class MainTableColumnModel {
                            .toList();
     }
 
+    /// Returns whether this model may appear in the user-editable entry-table column preferences.
+    ///
+    /// Internal helper columns such as `MATCH_CATEGORY`, and typed columns missing their qualifier,
+    /// are valid implementation details but must not be persisted or reconstructed from user input.
+    public boolean isConfigurable() {
+        return switch (getType()) {
+            case MATCH_CATEGORY,
+                 LIBRARY_NAME ->
+                    false;
+            case INDEX,
+                 FILES,
+                 GROUPS,
+                 GROUP_ICONS,
+                 LINKED_IDENTIFIER ->
+                    true;
+            case EXTRAFILE,
+                 NORMALFIELD,
+                 SPECIALFIELD ->
+                    !getQualifier().isBlank();
+        };
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -226,18 +248,18 @@ public class MainTableColumnModel {
             return new MainTableColumnModel(Type.NORMALFIELD, "");
         }
 
-        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
+        String[] splitName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
-        Type type = Type.fromString(splittedName[0]);
+        Type type = Type.fromString(splitName[0]);
         String qualifier = "";
 
         if ((type == Type.NORMALFIELD)
                 || (type == Type.SPECIALFIELD)
                 || (type == Type.EXTRAFILE)) {
-            if (splittedName.length == 1) {
-                qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD
+            if (splitName.length == 1) {
+                qualifier = splitName[0]; // By default the rawColumnName is parsed as NORMALFIELD
             } else {
-                qualifier = splittedName[1];
+                qualifier = splitName[1];
             }
         }
 

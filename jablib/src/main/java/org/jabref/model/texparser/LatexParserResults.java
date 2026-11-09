@@ -44,7 +44,7 @@ public class LatexParserResults {
 
     public Multimap<String, Citation> getCitations() {
         Multimap<String, Citation> citations = HashMultimap.create();
-        parsedTexFiles.forEach((path, result) -> citations.putAll(result.getCitations()));
+        parsedTexFiles.forEach((_, result) -> citations.putAll(result.getCitations()));
         return citations;
     }
 

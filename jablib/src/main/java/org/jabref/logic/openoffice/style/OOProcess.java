@@ -51,7 +51,7 @@ public class OOProcess {
     /// according to style.
     public static void produceCitationMarkers(CitationGroups citationGroups, List<BibDatabase> databases, JStyle style) {
         if (!citationGroups.hasGlobalOrder()) {
-            throw new IllegalStateException("produceCitationMarkers: globalOrder is misssing in citationGroups");
+            throw new IllegalStateException("produceCitationMarkers: globalOrder is missing in citationGroups");
         }
 
         citationGroups.lookupCitations(databases);

@@ -6,7 +6,7 @@ import org.jabref.model.entry.AuthorList;
 ///
 /// - Names are given as first name, von and last name.
 /// - Individual authors separated by comma.
-/// - The and of a list of three or more authors is preceeded by a comma
+/// - The and of a list of three or more authors is preceded by a comma
 /// (Oxford comma)
 ///
 public class AuthorFirstLastOxfordCommas implements LayoutFormatter {

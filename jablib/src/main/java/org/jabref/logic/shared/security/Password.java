@@ -13,7 +13,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-/// [Password] contains methods which are useful to encrypt and decrypt passwords using symetric algorithms.
+/// [Password] contains methods which are useful to encrypt and decrypt passwords using symmetric algorithms.
 public class Password {
 
     private final byte[] phrase;

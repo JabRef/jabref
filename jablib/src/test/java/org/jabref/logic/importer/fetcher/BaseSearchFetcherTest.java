@@ -67,7 +67,7 @@ class BaseSearchFetcherTest {
         Map<String, String> params = new URIBuilder(url.toURI())
                 .getQueryParams()
                 .stream()
-                .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue, (v1, v2) -> v1));
+                .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue, (v1, _) -> v1));
 
         assertEquals("PerformSearch", params.get("func"));
         assertEquals("json", params.get("format"));
@@ -282,7 +282,7 @@ class BaseSearchFetcherTest {
         Map<String, String> params = new URIBuilder(url.toURI())
                 .getQueryParams()
                 .stream()
-                .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue, (v1, v2) -> v1));
+                .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue, (v1, _) -> v1));
 
         assertEquals("PerformSearch", params.get("func"));
         assertEquals("json", params.get("format"));

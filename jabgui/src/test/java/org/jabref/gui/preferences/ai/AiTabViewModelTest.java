@@ -9,6 +9,9 @@ import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.model.ai.AiDefaultEnums;
+import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.llm.PredefinedChatModel;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +20,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @NullMarked
@@ -25,6 +35,8 @@ class AiTabViewModelTest {
 
     private EmbeddingModelMetadataService embeddingModelMetadataService;
     private AiModelService aiModelService;
+    private AiPreferences aiPreferences;
+    private AiPreferences workingAiPreferences;
     private AiTabViewModel viewModel;
 
     @BeforeEach
@@ -36,8 +48,8 @@ class AiTabViewModelTest {
                 Optional.of(new EmbeddingModelMetadata("test-model", OptionalLong.of(1024), OptionalInt.of(256)))
         );
 
-        AiPreferences aiPreferences = AiPreferences.getDefault();
-        AiPreferences workingAiPreferences = AiPreferences.getDefault();
+        aiPreferences = AiPreferences.getDefault();
+        workingAiPreferences = AiPreferences.getDefault();
 
         viewModel = new AiTabViewModel(
                 aiPreferences,
@@ -67,6 +79,69 @@ class AiTabViewModelTest {
 
         assertFalse(enabledViewModel.disableBasicSettingsProperty().get());
         assertFalse(enabledViewModel.disableExpertSettingsProperty().get());
+    }
+
+    @Test
+    void connectionUsesEnteredValues() throws Exception {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("granite4.2:8b");
+        viewModel.apiKeyProperty().set("key");
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.apiBaseUrlProperty().set("http://localhost:11434/v1");
+        when(aiModelService.testConnection(eq(AiProvider.OPEN_AI), eq("granite4.2:8b"), eq("key"), anyDouble(), eq("http://localhost:11434/v1"), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void connectionUsesProviderUrlWithoutExpertSettings() throws Exception {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        viewModel.apiKeyProperty().set("key");
+        viewModel.apiBaseUrlProperty().set("http://localhost:11434/v1");
+        when(aiModelService.testConnection(eq(AiProvider.OPEN_AI), eq("gpt-4o"), eq("key"), anyDouble(), eq(AiProvider.OPEN_AI.getApiUrl()), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void connectionTestSucceeds() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any())).thenReturn("OK");
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.SUCCESS, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
+    }
+
+    @Test
+    void connectionTestShowsOllamaPullCommandForMissingModel() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-oss20b");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("404 - message: model 'gpt-oss20b' not found"));
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.FAILED, viewModel.connectionTestStateProperty().get());
+        assertTrue(viewModel.connectionTestDetailsProperty().get().contains("ollama pull gpt-oss20b"));
+    }
+
+    @Test
+    void connectionTestResultResetsWhenApiKeyChanges() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("401"));
+        viewModel.testConnection();
+
+        viewModel.apiKeyProperty().set("other-key");
+
+        assertEquals(AiTabViewModel.ConnectionTestState.IDLE, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
     }
 
     @Test
@@ -167,5 +242,55 @@ class AiTabViewModelTest {
 
         viewModel.documentSplitterChunkSizeProperty().set(300);
         assertTrue(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void debugProviderNotShownInAiProviders() {
+        // [utest->req~ai.llms.providers.debug~1]
+        assertFalse(viewModel.aiProvidersProperty().contains(AiProvider.DEBUG));
+    }
+
+    @Test
+    void debugModeDoesNotFetchModelsWhenOpeningPreferencesOrChangingProvider() {
+        aiPreferences.setCustomizeExpertSettings(true);
+        aiPreferences.setEnableAiDebugProvider(true);
+
+        viewModel.setValues();
+        viewModel.selectedAiProviderProperty().set(AiProvider.MISTRAL_AI);
+
+        verify(aiModelService, never()).getAvailableModels(any(), any(), nullable(String.class));
+    }
+
+    @Test
+    void enableAiDebugProviderStoredAndReset() {
+        // [utest->req~ai.llms.providers.debug~1]
+        viewModel.setValues();
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.enableAiDebugProviderProperty().set(true);
+        viewModel.storeSettings();
+        assertTrue(workingAiPreferences.getEnableAiDebugProvider());
+
+        viewModel.resetExpertSettings();
+        assertFalse(viewModel.enableAiDebugProviderProperty().get());
+    }
+
+    @Test
+    void connectionTaskUsesDebugProviderWhenDebuggingEnabled() throws Exception {
+        // [utest->req~ai.llms.providers.debug~1]
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.enableAiDebugProviderProperty().set(true);
+        when(aiModelService.testConnection(eq(AiProvider.DEBUG), eq(PredefinedChatModel.DEBUG.getName()), eq(""), anyDouble(), eq(AiProvider.DEBUG.getApiUrl()), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void setValuesWithDebugProviderFallsBackToDefault() {
+        // [utest->req~ai.llms.providers.debug~1]
+        aiPreferences.setAiProvider(AiProvider.DEBUG);
+        viewModel.setValues();
+        assertEquals(AiDefaultEnums.AI_PROVIDER, viewModel.selectedAiProviderProperty().get());
     }
 }

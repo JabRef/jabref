@@ -47,7 +47,7 @@ jobs:
       - name: Get changed docker files
         # in line with dockerimages.yml -> lines 6 and 7
         id: changed-docker-files
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v46
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v46
         with:
           # Avoid using single or double quotes for multiline patterns
           files: |

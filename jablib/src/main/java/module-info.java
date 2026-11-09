@@ -126,10 +126,12 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.preferences;
     exports org.jabref.logic.icore;
     exports org.jabref.model.icore;
+    exports org.jabref.logic.git.merge;
     exports org.jabref.logic.git.merge.planning;
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
+    exports org.jabref.logic.citedrive;
     exports org.jabref.logic.ocr;
 
     // region: AI
@@ -231,6 +233,11 @@ open module org.jabref.jablib {
     requires /*runtime*/ unirest.modules.gson;
     // endregion
 
+    // region nimbusds / OAuth2
+    requires json.smart;
+    requires transitive nimbusds.oauth2.oidc.sdk;
+    // endregion
+
     // region: SQL databases
     requires embedded.postgres;
 
@@ -291,7 +298,7 @@ open module org.jabref.jablib {
     uses org.apache.lucene.codecs.lucene104.Lucene104Codec;
     requires org.apache.lucene.analysis.common;
     requires transitive org.apache.lucene.core;
-    requires transitive org.apache.lucene.highlighter;
+    requires org.apache.lucene.highlighter;
     requires org.apache.lucene.queryparser;
     // endregion
 

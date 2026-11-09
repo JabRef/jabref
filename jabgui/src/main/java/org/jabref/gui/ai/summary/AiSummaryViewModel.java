@@ -32,6 +32,7 @@ import org.jabref.logic.util.ObservablesHelper;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.summarization.AiSummary;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.Nullable;
@@ -42,6 +43,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
         RESTART_NEEDED,
         NO_FILES,
         NO_SUPPORTED_FILE_TYPES,
+        NO_LOCAL_FILE,
         PROCESSING,
         DONE,
         ERROR_WHILE_GENERATING,
@@ -58,7 +60,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
     private final ObjectProperty<Summarizator> summarizator = new SimpleObjectProperty<>();
 
     private final ObjectProperty<GenerateSummaryTask> currentTask = new SimpleObjectProperty<>();
-    private final ChangeListener<TrackedBackgroundTask.Status> taskStateListener = (_, _, value) -> updateByTaskState(value);
+    private @Nullable ChangeListener<TrackedBackgroundTask.Status> taskStateListener;
 
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -105,10 +107,18 @@ public class AiSummaryViewModel extends AbstractViewModel {
                              .map(List::isEmpty)
                 ),
 
+                Map.entry(State.NO_LOCAL_FILE,
+                        entry.map(FullBibEntry::entry)
+                             .map(BibEntry::getFiles)
+                             .map(l -> l.stream()
+                                        .allMatch(LinkedFile::isOnlineLink))
+                ),
+
                 Map.entry(State.NO_SUPPORTED_FILE_TYPES,
                         entry.map(FullBibEntry::entry)
                              .map(BibEntry::getFiles)
                              .map(l -> l.stream()
+                                        .filter(f -> !f.isOnlineLink())
                                         .map(f -> Path.of(f.getLink()))
                                         .noneMatch(UniversalContentParser::isSupportedFileType))
                 ),
@@ -139,6 +149,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
                 propertyExtractor.apply(oldVal).removeListener(taskStateListener);
             }
             if (newVal != null) {
+                taskStateListener = (_, _, value) -> updateByTaskState(newVal, value);
                 propertyExtractor.apply(newVal).addListener(taskStateListener);
             }
         });
@@ -304,6 +315,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
             return;
         }
 
+        error.set(null);
         GenerateSummaryTask task = summarizationTaskAggregator.start(
                 new GenerateSummaryTaskRequest(
                         filePreferences,
@@ -315,15 +327,15 @@ public class AiSummaryViewModel extends AbstractViewModel {
         );
 
         currentTask.set(task);
+        // The task may have finished before the status listener was attached
+        updateByTaskState(task, task.getStatus());
     }
 
-    private void updateByTaskState(TrackedBackgroundTask.Status value) {
-        GenerateSummaryTask task = currentTask.get();
-        if (task == null) {
-            return;
-        }
-
+    private void updateByTaskState(GenerateSummaryTask task, TrackedBackgroundTask.Status value) {
         UiTaskExecutor.runInJavaFXThread(() -> {
+            if (currentTask.get() != task) {
+                return;
+            }
             switch (value) {
                 case TrackedBackgroundTask.Status.ERROR -> {
                     error.set(task.getException());

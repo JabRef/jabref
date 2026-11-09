@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -18,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -36,15 +39,21 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResult;
 import org.jabref.model.search.query.SearchResults;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
+
+    @NullMarked
+    private record SearchDisplay(BibEntry entry, SearchQuery query, SearchResults results) {
+    }
 
     private final StateManager stateManager;
     private final GuiPreferences preferences;
@@ -58,6 +67,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     /// Content available only while an active, valid fulltext search query exists.
     private final ObservableValue<Boolean> contentVisibility;
+    private final ChangeListener<Optional<SearchResults>> searchResultsListener = (_, _, _) -> updateSearch();
+    private final ChangeListener<Optional<SearchQuery>> searchQueryListener;
+    private final ChangeListener<Optional<LibraryTab>> activeTabListener = (_, previous, current) -> {
+        previous.ifPresent(tab -> tab.searchResultsProperty().removeListener(searchResultsListener));
+        current.ifPresent(tab -> tab.searchResultsProperty().addListener(searchResultsListener));
+        updateSearch();
+    };
 
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
@@ -77,14 +93,25 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         setContentDrivenVisibility(contentVisibility);
 
         content = new TextFlow();
+        searchQueryListener = (_, _, _) -> content.getChildren().clear();
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
         content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS.displayName());
 
-        // Rebinding is necessary because of re-rendering of highlighting of matched text
-        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, _) -> updateSearch());
+        stateManager.activeTabProperty().get()
+                    .ifPresent(tab -> tab.searchResultsProperty().addListener(searchResultsListener));
+        stateManager.activeTabProperty().addListener(activeTabListener);
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener(searchQueryListener);
+    }
+
+    @Override
+    protected void dispose() {
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).removeListener(searchQueryListener);
+        stateManager.activeTabProperty().removeListener(activeTabListener);
+        stateManager.activeTabProperty().get()
+                    .ifPresent(tab -> tab.searchResultsProperty().removeListener(searchResultsListener));
     }
 
     @Override
@@ -96,41 +123,46 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         updateSearch();
     }
 
+    // [impl->req~jabgui.search.fulltext.entry-editor-results~1]
     private void updateSearch() {
-        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(searchQuery -> {
-            SearchResults searchResults = searchQuery.getSearchResults();
-            if (searchResults != null && entry != null) {
-                Map<String, List<SearchResult>> searchResultsForEntry = searchResults.getFileSearchResultsForEntry(entry);
-                content.getChildren().clear();
-                if (searchResultsForEntry.isEmpty()) {
-                    content.getChildren().add(new Text(Localization.lang("No search matches.")));
-                } else {
-                    // Iterate through files with search hits
-                    for (Map.Entry<String, List<SearchResult>> iterator : searchResultsForEntry.entrySet()) {
-                        entry.getFiles().stream().filter(file -> file.getLink().equals(iterator.getKey())).findFirst().ifPresent(linkedFile -> {
-                            content.getChildren().addAll(createFileLink(linkedFile), lineSeparator());
-                            // Iterate through pages (within file) with search hits
-                            for (SearchResult searchResult : iterator.getValue()) {
-                                for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
-                                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
-                                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));
-                                }
-                                if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
-                                    Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
-                                    annotationsText.getStyleClass().add("italic");
-                                    content.getChildren().add(annotationsText);
+        content.getChildren().clear();
+        Optional.ofNullable(entry)
+                .flatMap(selectedEntry -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
+                                                      .flatMap(searchQuery -> stateManager.activeTabProperty().get()
+                                                                                          .flatMap(tab -> tab.searchResultsProperty().get())
+                                                                                          .map(results -> new SearchDisplay(selectedEntry, searchQuery, results))))
+                .ifPresent(display -> renderResults(display.entry(), display.query(), display.results()));
+    }
 
-                                    for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
-                                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
-                                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));
-                                    }
-                                }
+    private void renderResults(BibEntry selectedEntry, SearchQuery searchQuery, SearchResults searchResults) {
+        Map<String, List<SearchResult>> searchResultsForEntry = searchResults.getFileSearchResultsForEntry(selectedEntry);
+        if (searchResultsForEntry.isEmpty()) {
+            content.getChildren().add(new Text(Localization.lang("No search matches.")));
+        } else {
+            // Iterate through files with search hits
+            for (Map.Entry<String, List<SearchResult>> iterator : searchResultsForEntry.entrySet()) {
+                selectedEntry.getFiles().stream().filter(file -> file.getLink().equals(iterator.getKey())).findFirst().ifPresent(linkedFile -> {
+                    content.getChildren().addAll(createFileLink(linkedFile), lineSeparator());
+                    // Iterate through pages (within file) with search hits
+                    for (SearchResult searchResult : iterator.getValue()) {
+                        for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
+                            content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
+                            content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));
+                        }
+                        if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
+                            Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
+                            annotationsText.getStyleClass().add("italic");
+                            content.getChildren().add(annotationsText);
+
+                            for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
+                                content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
+                                content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));
                             }
-                        });
+                        }
                     }
-                }
+                });
             }
-        });
+        }
     }
 
     private Text createFileLink(LinkedFile linkedFile) {

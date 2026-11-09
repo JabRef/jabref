@@ -17,7 +17,7 @@ Needs: impl
 
 Needs: impl
 
-## "Embedding search" AI response engine
+## User can query AI chat using embedding search response engine
 `feat~ai.response-engines.embeddings-search~1`
 
 This response engine is suitable when the user wants to perform a semantic search.
@@ -33,7 +33,7 @@ Different prompts are suited for different tasks and affect the LLM output.
 
 Needs: impl
 
-## "Full document" AI response engine
+## User can query AI chat using full document response engine
 `feat~ai.response-engines.full-document~1`
 
 This response engine is suitable when the user wants to get information that depends on the full content of a document.

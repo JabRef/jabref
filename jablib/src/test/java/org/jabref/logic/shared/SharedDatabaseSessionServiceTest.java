@@ -24,7 +24,7 @@ class SharedDatabaseSessionServiceTest {
                 .setUser("jabref")
                 .setPassword("")
                 .createDBMSConnectionProperties();
-        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService(sharedDatabaseId -> connectionProperties);
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService(_ -> connectionProperties);
         LastFilesOpenedPreferences lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
                 List.of(),
                 null,

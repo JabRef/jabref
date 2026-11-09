@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -230,9 +231,8 @@ public class MedlinePlainImporter extends Importer {
             }
 
             BibEntry b = new BibEntry(type);
-
-            // create one here
             b.setField(fieldConversionMap);
+            new DoiCleanup().cleanup(b);
             bibitems.add(b);
         }
 
