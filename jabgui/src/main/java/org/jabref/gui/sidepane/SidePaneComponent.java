@@ -45,10 +45,8 @@ public class SidePaneComponent extends BorderPane {
         VBox.setVgrow(this, sidePaneType == SidePaneType.GROUPS ? Priority.ALWAYS : Priority.NEVER);
 
         if (sidePaneType == SidePaneType.GROUPS) {
-            // keep a few rows visible; the groups list scrolls inside this height
-            setMinHeight(150);
+            setMinHeight(220);
         } else {
-            // never squeeze or cut off the other panels
             setMinHeight(Region.USE_PREF_SIZE);
         }
     }
