@@ -137,6 +137,7 @@ open module org.jabref {
     // requires com.ibm.icu;
 
     requires flexmark;
+    requires flexmark.ext.tables;
     requires flexmark.html2md.converter;
     requires flexmark.util.ast;
     requires flexmark.util.collection;
@@ -177,6 +178,10 @@ open module org.jabref {
     // uses org.eclipse.jgit.lib.Signer;
 
     requires org.jspecify;
+
+    // region nimbusds / OAuth2
+    requires nimbusds.oauth2.oidc.sdk;
+    // endregion
 
     // region: other libraries (alphabetically)
     // requires cuid;

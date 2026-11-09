@@ -55,7 +55,23 @@ As every JabRef feature, AI is divided into 3 layers: GUI, logic, and model. Ins
 The GUI code strongly follows [MVVM pattern](./javafx.md). Though, the GUI code is a bit complicated as:
 
 1. Most of the core GUI components (chat and summary components) are designed as a state machine. Typical states include: loading, presenting the result, error, etc.
-2. These core GUI components are also made that way so it would be possible to rebind them to another `BibEntry`. For the details, take a look at the section [How to add a new AI feature](## How to add a new AI feature).
+2. These core GUI components are also made that way so it would be possible to rebind them to another `BibEntry`. For the details, take a look at the section [How to add a new AI feature](#how-to-add-a-new-ai-feature).
+
+### Example: Layering in Summarization
+
+The following table illustrates how layers and responsibilities are organized across the architecture, using summarization as an example:
+
+| JabRef layer name | AI layer name | Class name | Purpose | Notes |
+| --- | --- | --- | --- | --- |
+| GUI | JavaFX representation | `AiSummary.fxml` | The UI of the feature | Written in FXML |
+| | JavaFX controller | `AiSummaryView.java` | Connects UI components in the FXML and ViewModel | Links JavaFX components with ViewModel data and is responsible for the display |
+| | JavaFX ViewModel | `AiSummaryViewModel.java` | Handles the user experience | Specific for the GUI |
+| Logic | Summarizer on the BibEntry level | `BibEntrySummarizator.java` | Analyzes a `BibEntry`, extracts linked files, resolves file paths down to text, and delegates to the summarization algorithm | Logic entry point for entry summarization |
+| | The AI Summarizer | `Summarizator.java` | Interface for raw and specific summarization algorithms (e.g., `ChunkedSummarizator`, `FullDocumentSummarizator`) | Raw algorithm |
+| Model | Type of the AI summarizer | `SummarizatorKind.java` | Enum to select different kinds of summarizators | Enum |
+
+> [!NOTE]
+> One can also employ the Chain of Responsibility pattern to break down processing across representation levels. For example, in summarization, responsibilities can be decomposed along: `BibEntry` &rarr; `LinkedFile` &rarr; `File` (path) &rarr; `Text` &rarr; raw summarization algorithm.
 
 ## Internal model (v2)
 
@@ -74,8 +90,24 @@ Because JabRef is not build around one global database, but rather it is a `.bib
 
 - In order to uniquely identify a library, an "AI library ID" was introduced (as a metadata field), which is just a UUID. An alternative would be to use the library path, but if the library moves, the path changes, but AI library ID is not.
 - In order to uniquely identify an entry, the citation key is used, but only if it is non-empty and unique.
-- In some cases (that arise potentially often), the conditions above are not met (for example, a library is not saved - it does not have a path, or an entry does not have a citation key), however user is actively working on an entry. In this case the AI features have an *in-memory cache layer*. So whenever a chat or a summary is created for an entry, it is firstly interacted with the in-memory storage layer. The cache is flushed to the on-disk storage at the close of the JabRef.
+- In some cases (that arise potentially often), the conditions above are not met (for example, a library is not saved - it does not have a path, or an entry does not have a citation key), however a user is actively working on an entry. In this case the AI features have an *in-memory cache layer*. Chats are edited through observable lists and saved after a short coalescing delay on a serial background writer when their identifiers are valid. Closing a chat view or switching entries does not discard accepted edits or late responses; removing the entity prevents subsequent saves. Shutdown flushes outstanding changes. Summaries are flushed at shutdown.
 - In order to uniquely identify a file, we use the file hash. An alternative would be to use the file path, but the file could be moved, or defined by a relative path. This is also useful when several libraries cite the same paper, and instead of ingesting
+
+### Chat list changes
+
+The chat listener consumes JavaFX changes immediately and queues detached changed ranges, not the live `ListChangeListener.Change` or a full history copy. The serial writer owns a plain Java list mirror, applies queued changes, and writes it without taking the listener's lock. Edits received during a commit are applied by a later write; no second full-list snapshot is needed. A failed transaction is rolled back, while the in-memory history remains available for retry on another edit or shutdown.
+
+Each cached chat owns its observable history, writer mirror, persistence eligibility, and previous storage identifier. The writer applies each batch of changes before saving the affected chats directly. Revision numbers prevent a completed write from releasing a chat that received more edits during the commit.
+
+Entry identifier validation is reused until entries, citation keys, or the AI library ID change. Chat edits therefore do not repeat the citation-key uniqueness scan while the library's identifying data remains unchanged.
+
+The GUI uses `getForEntryAsync` and `getForGroupAsync` to load histories on the storage worker. It applies results on the JavaFX thread, ignores results from previous selections, and disables chat interaction until the selected history is loaded. Synchronous accessors remain available for callers that can wait for storage.
+
+The cache retains up to 10,000 messages across recently accessed chats; empty chats count as one message. Weak identity indexes preserve sharing when a view or an AI task still holds a history after it leaves this retention cache. Unsaved histories, including chats without valid identifiers and failed writes, remain strongly held until a successful save or explicit removal. Those histories and live consumers can exceed the retention budget. Cache weights are refreshed when histories load or change.
+
+When a library closes, `StateManager` closes its group chat windows and releases their registrations. `releaseLibrary` removes the cache's library listeners and retained histories while allowing pending edits and late responses to finish saving.
+
+For large-library profiling, `python3 scripts/bib-file-generator_groups_latexauthors.py` generates `generated-large-library.bib` with 100,000 entries, groups, and LaTeX author names. Check that the output does not already contain data you need before running the generator. Chat-cache profiling additionally requires representative chat histories and slow-storage scenarios; a large library alone does not exercise chat persistence.
 
 ## [OLD] Internal model (v1)
 
@@ -93,7 +125,7 @@ This section describes the standard pattern used for AI features. If should foll
 1. Define the model of the artifact of your feature (for example, for summarization it is an AI summary, for chatting they are chat messages and chat history).
 2. Define a repository interface (e.g. `SummaryRepository`, `ChatHistoryRepository`) and implement an `MVStore` implementation using the [org.jabref.logic.ai.util.MVStoreBase].
 3. Define a logic class in the `logic` package: either a task (e.g. `GenerateSummaryTask` or a utility class for performing an AI feature. It is recommended to make it "without side-effects" (it does not change or write anything in the system). Firstly, this will help in testing the class, and, secondly, the storage is typically handled in *in-memory cache* layer, that will be discussed next.
-4. Make an in-memory cache storage layer for your feature that has a RAM map between a `BibEntry` (or a group, or some other object that your artifact is linked to) and your model. Sometimes this can be omitted (for example, embeddings do not have the in-memory cache and always use a repository), but generally it is made in order to always have access to the AI feature even if some precondition is not satisfied (for example, storing chat history and summaries requires that there is a database path and a non-empty unique citation key, but in-memory layer allows to work with them as is). At the close of JabRef (or a library) the in-memory cache layer will check the preconditions and only then write the data to the repository.
+4. Make an in-memory cache storage layer for your feature that has a RAM map between a `BibEntry` (or a group, or some other object that your artifact is linked to) and your model. Sometimes this can be omitted (for example, embeddings do not have the in-memory cache and always use a repository), but generally it is made in order to always have access to the AI feature even if some precondition is not satisfied (for example, storing chat history and summaries requires that there is a database path and a non-empty unique citation key, but in-memory layer allows to work with them as is). Check persistence preconditions before writing, and flush outstanding data at shutdown. Chat histories use delayed background writes rather than waiting until shutdown.
 5. Make a `TaskAggregator` class. This is needed in order to be able to switch a component between entries and to deduplicate the tasks. So whenever you want to generate the artifact of your feature, you need to always communicate to the `TaskAggregator` class which will either create a new task or give you an already running one. The `TaskAggregator` also connects the results to the in-memory cache.
 
 The next points are targeted to the GUI of the feature:

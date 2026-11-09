@@ -71,16 +71,8 @@ class StudyFetcher {
         }
     }
 
-    private Optional<String> getCatalogOverride(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
-        return searchQuery.getCatalogSpecific().entrySet().stream()
-                          .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
-                          .map(Map.Entry::getValue)
-                          .filter(v -> v != null && !v.isBlank())
-                          .findFirst();
-    }
-
     private List<BibEntry> performPagedSearch(PagedSearchBasedFetcher basedFetcher, StudyQuery searchQuery) throws FetcherException {
-        Optional<String> catalogOverride = getCatalogOverride(searchQuery, basedFetcher);
+        Optional<String> catalogOverride = searchQuery.getCatalogOverride(basedFetcher.getName());
         int limit = resultLimits.getOrDefault(basedFetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
         int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
         List<BibEntry> fetchResult = new ArrayList<>();
@@ -104,7 +96,7 @@ class StudyFetcher {
     }
 
     private List<BibEntry> performNonPagedSearch(SearchBasedFetcher fetcher, StudyQuery searchQuery) throws FetcherException {
-        Optional<String> catalogOverride = getCatalogOverride(searchQuery, fetcher);
+        Optional<String> catalogOverride = searchQuery.getCatalogOverride(fetcher.getName());
         if (catalogOverride.isPresent()) {
             try {
                 return fetcher.performRawSearchQuery(catalogOverride.get());

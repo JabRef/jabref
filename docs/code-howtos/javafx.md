@@ -234,6 +234,11 @@ DialogService dialogService = Injector.instantiateModelOrService(DialogService.c
 JabRef makes heavy use of Properties and Bindings. These are wrappers around Observables. A good explanation on the concept can be found here:
 [JavaFX Bindings and Properties](https://web.archive.org/web/20240921154452/https://edencoding.com/javafx-properties-and-binding-a-complete-guide/)
 
+For observable list-cell tooltip text, use `ViewModelListCellFactory.withTooltipText` with a property or lazy observable.
+Each cell creates one tooltip and binds its text once through the cell's item property using `flatMap`.
+The binding follows the current item and detaches its listeners from the previous item or when the cell becomes empty.
+Use `withStringTooltip` for static text and `withTooltip` for custom tooltips whose resources are managed by the caller.
+
 ## Features missing in JavaFX
 
 * bidirectional binding in FXML, see [official feature request](https://bugs.openjdk.java.net/browse/JDK-8090665)

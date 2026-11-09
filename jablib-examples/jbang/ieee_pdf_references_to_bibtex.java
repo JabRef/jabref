@@ -15,10 +15,12 @@ import org.tinylog.Logger;
 //FILES tinylog.properties=tinylog.properties
 
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/
-//DEPS org.jabref:jablib:6.0-SNAPSHOT
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
 // JabRef relies on PR https://github.com/unicode-org/icu/pull/2127; for experiments the release version is OK.
 //DEPS com.ibm.icu:icu4j:78.1
-//DEPS com.fasterxml.jackson.core:jackson-annotations:2.20
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.30.1
+//DEPS net.minidev:json-smart:2.6.0
+//DEPS org.jabref:jablib:6.0-SNAPSHOT
 //DEPS tools.jackson.core:jackson-core:3.0.2
 //DEPS tools.jackson.core:jackson-databind:3.0.2
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2

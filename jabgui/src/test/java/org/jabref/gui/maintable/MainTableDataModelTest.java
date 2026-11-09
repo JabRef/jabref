@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -143,24 +144,26 @@ class MainTableDataModelTest {
         BibEntryTableViewModel vmA = model.getViewModelByCitationKey("A").orElseThrow();
         BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
 
-        // First search matches Alice only.
-        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
+        JavaFxExtension.invokeAndWait(() -> {
+            // First search matches Alice only.
+            searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
 
-        assertEquals(Set.of(bibEntryA.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
-        assertTrue(vmA.isMatchedBySearch());
-        assertFalse(vmB.isMatchedBySearch());
-        assertTrue(vmA.isVisibleBySearch());
-        assertFalse(vmB.isVisibleBySearch());
-        assertEquals(1, resultSize.get());
+            assertEquals(Set.of(bibEntryA.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
+            assertTrue(vmA.isMatchedBySearch());
+            assertFalse(vmB.isMatchedBySearch());
+            assertTrue(vmA.isVisibleBySearch());
+            assertFalse(vmB.isVisibleBySearch());
+            assertEquals(1, resultSize.get());
 
-        // Second search matches no entries. The old Alice result should not remain visible.
-        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Charlie")));
+            // Second search matches no entries. The old Alice result should not remain visible.
+            searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Charlie")));
 
-        assertFalse(vmA.isMatchedBySearch());
-        assertFalse(vmB.isMatchedBySearch());
-        assertFalse(vmA.isVisibleBySearch());
-        assertFalse(vmB.isVisibleBySearch());
-        assertEquals(0, resultSize.get());
+            assertFalse(vmA.isMatchedBySearch());
+            assertFalse(vmB.isMatchedBySearch());
+            assertFalse(vmA.isVisibleBySearch());
+            assertFalse(vmB.isVisibleBySearch());
+            assertEquals(0, resultSize.get());
+        });
     }
 
     @Test
@@ -492,8 +495,10 @@ class MainTableDataModelTest {
     private static <V> void executeTask(BackgroundTask<V> task) throws Exception {
         V result = task.call();
 
-        if (task.getOnSuccess() != null) {
-            task.getOnSuccess().accept(result);
+        Consumer<V> onSuccess = task.getOnSuccess();
+        if (onSuccess != null) {
+            // BackgroundTask invokes completion callbacks on the JavaFX thread in production.
+            JavaFxExtension.invokeAndWait(() -> onSuccess.accept(result));
         }
     }
 }

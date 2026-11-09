@@ -66,7 +66,7 @@ class NativeDesktopTest {
     void openBrowserPassesFullUrlToCustomBrowser() throws IOException, InterruptedException {
         ExternalFileType htmlType = new CustomExternalFileType("URL", "html", "text/html", recorder.toString(), "www", IconTheme.JabRefIcons.WWW);
 
-        NativeDesktop.create(mock(HostServices.class), preferencesWith(htmlType)).openBrowser(URL_WITH_QUERY);
+        new Windows(mock(HostServices.class), preferencesWith(htmlType)).openBrowser(URL_WITH_QUERY);
 
         assertEquals(URL_WITH_QUERY, recordedArgument());
     }

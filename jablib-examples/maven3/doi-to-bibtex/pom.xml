@@ -50,7 +50,7 @@
     <dependency>
       <groupId>com.ibm.icu</groupId>
       <artifactId>icu4j</artifactId>
-      <version>78.3</version>
+      <version>79.1</version>
     </dependency>
 
     <dependency>
@@ -83,7 +83,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
