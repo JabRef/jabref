@@ -3,6 +3,7 @@ package org.jabref.logic.util;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.os.OS;
@@ -27,12 +28,11 @@ public class Directories {
     /// Only checks well-known locations: jablib also runs headless, where native calls or external processes are not wanted.
     public static Path getDocumentsDirectory() {
         // Set only if the desktop session exports it; usually, it is defined in ~/.config/user-dirs.dirs only
-        String xdgDocumentsDir = System.getenv("XDG_DOCUMENTS_DIR");
-        if (xdgDocumentsDir != null && Files.isDirectory(Path.of(xdgDocumentsDir))) {
-            return Path.of(xdgDocumentsDir);
-        }
-        Path documents = getUserDirectory().resolve("Documents");
-        return Files.isDirectory(documents) ? documents : getUserDirectory();
+        return Optional.ofNullable(System.getenv("XDG_DOCUMENTS_DIR"))
+                       .map(Path::of)
+                       .filter(Files::isDirectory)
+                       .or(() -> Optional.of(getUserDirectory().resolve("Documents")).filter(Files::isDirectory))
+                       .orElseGet(Directories::getUserDirectory);
     }
 
     public static Path getLogDirectory(Version version) {
