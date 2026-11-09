@@ -26,7 +26,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -255,13 +254,13 @@ public abstract class NativeDesktop {
     }
 
     /// Starts a program that runs independently of JabRef.
-    /// Its output is drained into the debug log, so it cannot block on a full pipe, and its stdin is closed,
-    /// as it never gets input. Otherwise, the pipes would stay open until garbage collection.
+    /// Its output is discarded and its stdin is closed, as it never gets input: no pipe stays open until garbage collection,
+    /// and no thread reads from a long-running program, which would delay JabRef's shutdown.
     protected static void startProcess(ProcessBuilder processBuilder) throws IOException {
-        Process process = processBuilder.start();
+        Process process = processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                                        .redirectError(ProcessBuilder.Redirect.DISCARD)
+                                        .start();
         process.getOutputStream().close();
-        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug));
-        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug));
     }
 
     /// Opens the given URL using the system browser
