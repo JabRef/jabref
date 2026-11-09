@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -118,9 +119,9 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
             // publication type
             String type = biblio.optString("release_type");
             entry.setField(StandardField.TYPE, type);
-            if (type.toLowerCase().contains("book")) {
+            if (type.toLowerCase(Locale.ROOT).contains("book")) {
                 entryType = StandardEntryType.Book;
-            } else if (type.toLowerCase().contains("article")) {
+            } else if (type.toLowerCase(Locale.ROOT).contains("article")) {
                 entryType = StandardEntryType.Article;
             }
             entry.setType(entryType);
