@@ -80,6 +80,16 @@ See <https://github.com/JabRef/jabref/pull/17690>.
 
 Needs: impl, utest
 
+## Citation entry review must keep its edits out of the library's undo history
+`req~entry-editor.citations.review-edits-outside-library-undo~1`
+
+Applies to the field editors and to the entry type of the entry under review.
+The entry under review is a copy that is not in the library, so a step on the library's journal would revert a field of an entry the library never held, and would mark the library as changed although nothing in it changed.
+The review keeps an undo of its own for these edits.
+See <https://github.com/JabRef/jabref/pull/17690>.
+
+Needs: impl, utest
+
 ## Main tab must display fields in single scrollable list
 `req~entry-editor.main-tab.single-list~1`
 

@@ -139,6 +139,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     private final ComboBox<EntryType> entryTypeCombo = new ComboBox<>();
 
     /// The entry is not part of the library yet, so its edits are kept out of the library's undo history.
+    // [impl->req~entry-editor.citations.review-edits-outside-library-undo~1]
     private final JabRefGuiUndoManager reviewUndoManager = new JabRefGuiUndoManager();
 
     /// Editor of every shown field, in display order

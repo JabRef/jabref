@@ -38,6 +38,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.util.DialogButtonAssertions;
 import org.jabref.gui.util.FieldsUtil;
@@ -342,19 +343,13 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
     }
 
     @Test
-    void selectedEntryType_isKept_forEveryDecision() {
+    void selectedEntryType_isKept_whenTheEntryIsReviewedAgain() {
         interact(() -> {
             BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Key2022");
-            CitationEntryReviewDialog reviewDialog = createDialog(1, 1, entry);
+            entryTypeComboOf(createDialog(1, 2, entry)).setValue(StandardEntryType.Book);
 
-            @SuppressWarnings("unchecked")
-            ComboBox<EntryType> entryTypeCombo = (ComboBox<EntryType>) findChildNode(reviewDialog.getDialogPane(), ComboBox.class).orElseThrow();
-            entryTypeCombo.setValue(StandardEntryType.Book);
-
-            for (ButtonType buttonType : reviewDialog.getDialogPane().getButtonTypes()) {
-                reviewDialog.getResultConverter().call(buttonType);
-                assertEquals(StandardEntryType.Book, entry.getType());
-            }
+            // Every visit of an entry builds its own dialog, so the picked type has to come back off the entry
+            assertEquals(StandardEntryType.Book, entryTypeComboOf(createDialog(1, 2, entry)).getValue());
         });
     }
 
@@ -382,10 +377,12 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
                     .withField(StandardField.TITLE, "Sample Title");
             CitationEntryReviewDialog reviewDialog = createDialog(1, 1, entry);
             List<FieldNameLabel> labels = findChildren(reviewDialog.getDialogPane(), FieldNameLabel.class);
-            boolean hasAuthorLabel = labels.stream()
-                                           .anyMatch(label -> "Author".equalsIgnoreCase(label.getText())
-                                                   || FieldsUtil.getDisplayName(StandardField.AUTHOR).equalsIgnoreCase(label.getText()));
-            assertTrue(hasAuthorLabel);
+            assertEquals(List.of(
+                            FieldsUtil.getDisplayName(StandardField.AUTHOR),
+                            FieldsUtil.getDisplayName(StandardField.TITLE),
+                            FieldsUtil.getDisplayName(StandardField.JOURNAL),
+                            FieldsUtil.getDisplayName(StandardField.YEAR)),
+                    labels.stream().distinct().map(FieldNameLabel::getText).toList());
         });
     }
 
@@ -591,6 +588,29 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~entry-editor.citations.review-edits-outside-library-undo~1]
+    @Test
+    void libraryUndoManager_staysEmpty_whenFieldAndEntryTypeAreEdited() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2022")
+                .withField(StandardField.TITLE, "Original title");
+        GuiUndoManager libraryUndoManager = stateManager.getUndoManager(databaseContext);
+        ComboBox<EntryType> entryTypeCombo = showDialogAndFindEntryTypeCombo(entry);
+
+        interact(() -> findTextInput("Original title").setText("Corrected title"));
+        awaitEvents();
+        selectEntryType(entryTypeCombo, StandardEntryType.Book);
+
+        interact(() -> {
+            // An empty journal would say nothing about the edits had they not reached the entry
+            assertEquals(Optional.of("Corrected title"), entry.getField(StandardField.TITLE));
+            assertEquals(StandardEntryType.Book, entry.getType());
+
+            assertEquals(Optional.empty(), libraryUndoManager.undo());
+            assertFalse(libraryUndoManager.hasChangedProperty().get());
+        });
+    }
+
     /// The editors' filter asks `KeyBindingRepository.matches`, which also tries the character combinations of all
     /// other bindings. The headless toolkit of the tests does not support those.
     private void useKeyBindingsWithoutCharacterCombinations() {
@@ -598,6 +618,11 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
         doAnswer(invocation -> keyBindings.checkKeyCombinationEquality(invocation.<KeyBinding>getArgument(1), invocation.<KeyEvent>getArgument(0)))
                 .when(keyBindings).matches(any(), any());
         when(preferences.getKeyBindingRepository()).thenReturn(keyBindings);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ComboBox<EntryType> entryTypeComboOf(CitationEntryReviewDialog dialog) {
+        return (ComboBox<EntryType>) findChildNode(dialog.getDialogPane(), ComboBox.class).orElseThrow();
     }
 
     /// Shows the dialog, because the combo box gets the skin and the behavior that handle its keys only then.
