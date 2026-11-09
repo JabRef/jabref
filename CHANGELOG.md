@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
 - We now show which web search fetchers have a saved API key. [#16250](https://github.com/JabRef/jabref/issues/16250)
 - We improved the error message shown when Semantic Scholar restricts access to a paper's references. [#17291](https://github.com/JabRef/jabref/issues/17291)
+- We removed the extra encryption of passwords and API keys in the system keyring; existing values are migrated automatically. [#13687](https://github.com/JabRef/jabref/issues/13687)
 - We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 - We changed the HTTP server to list linked PDF files per entry at `GET /libraries/{id}/entries/{citationKey}/files` instead of `entries/pdffiles`. [#17567](https://github.com/JabRef/jabref/pull/17567)
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
@@ -132,6 +133,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed JabKit BibTeX conversion losing string definitions and preambles, including when overwriting the input file. [#17409](https://github.com/JabRef/jabref/issues/17409)
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
+- We fixed an issue where failed tasks kept showing as running in the notification center. [#17124](https://github.com/JabRef/jabref/pull/17124)
 - We fixed an issue where accepting an external change to an entry lost its table position, selection, and open entry editor. [#16813](https://github.com/JabRef/jabref/pull/16813)
 
 ### Removed
