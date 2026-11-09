@@ -7,6 +7,7 @@ Fetchers are the implementation of the [search using online services](https://do
 
 | Service                                                                                                                                           | Key Source                                                                                                     | Environment Variable           | Rate Limit                                                                            |
 |:--------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------|---------------------------------------------------------------------------------------|
+| [BibSonomy](https://www.bibsonomy.org/)                                                                                                           | [BibSonomy settings](https://www.bibsonomy.org/settings?selTab=1) (username: `BibSonomyUsername`)              | `BibSonomyApiKey`              | -                                                                                     |
 | [Biodiversity Heritage Library](https://www.biodiversitylibrary.org/)                                                                             | [Biodiversitylibrary](https://about.biodiversitylibrary.org/tools-and-services/developer-and-data-tools/#APIs) | `BiodiversityHeritageApiKey`   | -                                                                                     |
 | [arXiv](https://info.arxiv.org/help/api/index.html)                                                                                               | (none)                                                                                                         | (none)                         | [One request per three seconds](https://info.arxiv.org/help/api/tou.html)             |
 | [DOAJ](https://doaj.org/)                                                                                                                         | (none)                                                                                                         | (none)                         | [2 requests/second](https://doaj.org/api/docs)                                        |
@@ -34,9 +35,11 @@ JabRef supports different kinds of fetchers:
 
 `JournalInformationFetcher` supplies the Entry Editor's journal-information popup. It uses Crossref for journal identity (title, publisher, ISSNs) and OpenAlex for the h-index and yearly work and citation counts. If enabled in the preferences, it uses the configured OpenAlex API key.
 
-There are more fetchers supported by JabRef. Investigate the package `org.jabref.logic.importer`. Another possibility is to investigate the inheritance relation of `WebFetcher` (Ctrl+H in IntelliJ).
+JabRef supports more fetchers. Investigate the package `org.jabref.logic.importer`. Another possibility is to investigate the inheritance relation of `WebFetcher` (Ctrl+H in IntelliJ).
 
 Fetchers with a documented request limit use `FetcherRateLimiter`. Express limits with `ofRequestsPerInterval` when a provider specifies requests per time window; use `ofRequestsPerSecond` for limits returned dynamically by an API. A limiter is shared across all instances of a fetcher so parallel searches respect the provider-wide request rate.
+
+Fetcher comparisons and protocol field names should use locale-independent case conversion. The arXiv title-search fallback compares titles after removing accents, normalizing punctuation and whitespace, and converting to lowercase with `Locale.ROOT`. This keeps title matching independent of the system language. Queries sent to arXiv retain their accented characters.
 
 ## Fulltext Fetchers
 

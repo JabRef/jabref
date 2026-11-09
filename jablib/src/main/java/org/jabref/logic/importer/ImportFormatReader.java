@@ -13,6 +13,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.fileformat.BibframeImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CffImporter;
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
 import org.jabref.logic.importer.fileformat.HayagrivaImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
+import org.jabref.logic.importer.fileformat.MarcXmlImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
@@ -43,7 +45,6 @@ import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class ImportFormatReader {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private BibtexImporter bibtexImporter;
+    private final BibtexImporter bibtexImporter;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
@@ -72,15 +73,18 @@ public class ImportFormatReader {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         reset();
     }
 
     public void reset() {
+        importers.add(new BibframeImporter());
         importers.add(new CopacImporter());
         importers.add(new EndnoteImporter(citationKeyPatternPreferences));
         importers.add(new EndnoteXmlImporter(importFormatPreferences));
         importers.add(new InspecImporter());
         importers.add(new IsiImporter());
+        importers.add(new MarcXmlImporter());
         importers.add(new MedlineImporter());
         importers.add(new MedlinePlainImporter(importFormatPreferences));
         importers.add(new ModsImporter(importFormatPreferences));
@@ -106,7 +110,6 @@ public class ImportFormatReader {
         importers.addAll(importerPreferences.getCustomImporters());
 
         // BibTeX as last
-        bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         importers.add(bibtexImporter);
     }
 
@@ -204,7 +207,7 @@ public class ImportFormatReader {
     /// @param data the string to import
     /// @return an UnknownFormatImport with the imported entries and metadata
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public ImportResult importWithAutoDetection(@NonNull String data) throws ImportException {
+    public ImportResult importWithAutoDetection(String data) throws ImportException {
         return importWithAutoDetection(
                 importer -> importer.importDatabase(data),
                 importer -> importer.isRecognizedFormat(data),
@@ -266,7 +269,7 @@ public class ImportFormatReader {
             }
         }
 
-        if (bestResult != null) {
+        if (bestResult != null && bestFormatName != null) {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
             return new ImportResult(bestFormatName, parserResult);

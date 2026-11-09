@@ -61,6 +61,13 @@ public abstract class MVStoreBase implements AutoCloseable {
         }
     }
 
+    /// Discards everything written since the last [#commit()].
+    public void rollback() {
+        if (mvStore != null) {
+            mvStore.rollback();
+        }
+    }
+
     public void close() {
         if (mvStore != null) {
             mvStore.close();

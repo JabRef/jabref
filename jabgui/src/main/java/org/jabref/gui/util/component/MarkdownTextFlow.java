@@ -3,7 +3,10 @@ package org.jabref.gui.util.component;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -83,6 +86,21 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// Governs whether copying reproduces Markdown markup or the displayed text verbatim.
     private boolean plainText;
 
+    private final Set<Node> formattedCodeBlocks = new HashSet<>();
+    private CodeBlockFormatter codeBlockFormatter = _ -> Optional.empty();
+
+    /// Returns styled content for a fenced code block, or empty to retain its original content.
+    @NullMarked
+    @FunctionalInterface
+    public interface CodeBlockFormatter {
+        Optional<List<CodeBlockSegment>> format(String content);
+    }
+
+    /// Text and its optional CSS style class within a formatted code block.
+    @NullMarked
+    public record CodeBlockSegment(String text, String styleClass) {
+    }
+
     public MarkdownTextFlow(Pane parent) {
         super(parent);
         this.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
@@ -107,22 +125,28 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     public void setMarkdown(@NonNull String markdownText) {
+        setMarkdown(markdownText, _ -> Optional.empty());
+    }
+
+    public void setMarkdown(@NonNull String markdownText, CodeBlockFormatter formatter) {
         super.clearSelection();
         getChildren().clear();
+        formattedCodeBlocks.clear();
         plainText = false;
+        this.codeBlockFormatter = formatter;
 
         if (markdownText.isBlank()) {
             return;
         }
 
-        MarkdownRenderer renderer = new MarkdownRenderer();
-        renderer.render(parser.parse(markdownText));
+        new MarkdownRenderer().render(parser.parse(markdownText));
     }
 
     /// Displays the given text as-is, without interpreting any Markdown syntax.
     public void setPlainText(@NonNull String text) {
         super.clearSelection();
         getChildren().clear();
+        formattedCodeBlocks.clear();
         plainText = true;
 
         if (text.isBlank()) {
@@ -152,7 +176,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                         .getExternalApplicationsPreferences()).execute();
     }
 
-    private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
+    private void addTextNode(@Nullable String content, @Nullable Node astNode, String... styleClasses) {
         if (content == null || content.isEmpty()) {
             return;
         }
@@ -166,6 +190,16 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             }
         }
         getChildren().add(textNode);
+    }
+
+    /// Adds the nodes for a code block, using the configured formatter when applicable.
+    private void addCodeBlockNodes(String content, Node codeBlock) {
+        codeBlockFormatter.format(content).ifPresentOrElse(segments -> {
+            formattedCodeBlocks.add(codeBlock);
+            for (CodeBlockSegment segment : segments) {
+                addTextNode(segment.text(), codeBlock, "markdown-code-block", "font-monospace", segment.styleClass());
+            }
+        }, () -> addTextNode(content, codeBlock, "markdown-code-block", "font-monospace"));
     }
 
     private void addHyperlinkNode(String text, String url, Node astNode, String... styleClasses) {
@@ -218,35 +252,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         StringJoiner result = new StringJoiner("");
         int currentPos = 0;
 
-        for (javafx.scene.Node fxNode : getChildren()) {
-            String renderedText;
-            String markdownText;
-            Node astNode;
+        for (CopySegment segment : buildCopySegments()) {
+            String renderedText = segment.text();
+            Node astNode = segment.astNode();
 
-            switch (fxNode) {
-                case MarkdownAwareText mat -> {
-                    renderedText = mat.getText();
-                    astNode = mat.astNode;
-                    markdownText = getMarkdownRepresentation(astNode, renderedText);
-                }
-                case MarkdownAwareHyperlink mah -> {
-                    renderedText = mah.getText();
-                    astNode = mah.astNode;
-                    markdownText = getMarkdownRepresentation(astNode, renderedText);
-                }
-                case MarkdownAwareTable table -> {
-                    renderedText = "\uFFFC";
-                    astNode = table.astNode;
-                    markdownText = getMarkdownRepresentation(astNode, renderedText);
-                }
-                case null,
-                     default -> {
-                    continue;
-                }
-            }
-
-            // Layout indices count an embedded hyperlink as a single character, see SelectableTextFlow#getTextFlowContent()
-            int segmentLength = fxNode instanceof Text ? renderedText.length() : 1;
+            // Layout indices count an embedded hyperlink or table as a single character, see SelectableTextFlow#getTextFlowContent()
+            int segmentLength = segment.layoutLength();
             int segmentStart = currentPos;
             int segmentEnd = currentPos + segmentLength;
 
@@ -263,7 +274,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 int endInSegment = overlapEnd - segmentStart;
 
                 if (startInSegment == 0 && endInSegment == segmentLength) {
-                    result.add(markdownText);
+                    result.add(getMarkdownRepresentation(astNode, renderedText));
                 } else {
                     String partialText = renderedText.substring(startInSegment, endInSegment);
                     if (astNode instanceof DelimitedNode delimitedNode) {
@@ -285,7 +296,90 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         clipBoardManager.setHtmlContent(htmlRenderer.render(parser.parse(result.toString())), result.toString());
     }
 
-    private String getMarkdownRepresentation(Node astNode, String renderedText) {
+    /// The text of one or more adjacent nodes that belong to the same Markdown node, as needed to
+    /// reconstruct the Markdown markup while copying. A syntax-highlighted code block is rendered as
+    /// one node per token, but copied as a single block. `layoutLength` is the length the segment
+    /// takes in the layout indices: a hyperlink or a table counts as a single character.
+    @NullMarked
+    private record CopySegment(String text, @Nullable Node astNode, int layoutLength) {
+    }
+
+    /// Removes the newlines Flexmark adds around the content of a code block (`\n` at the beginning,
+    /// `\n\n` at the end), keeping blank lines that are part of the code.
+    private static String stripSyntheticNewlines(String content) {
+        if ((content.length() >= 3) && content.startsWith("\n") && content.endsWith("\n\n")) {
+            return content.substring(1, content.length() - 2);
+        }
+        return content;
+    }
+
+    private static boolean isNewlineMarker(String text) {
+        return "\n".equals(text) || "\n\n".equals(text);
+    }
+
+    private List<CopySegment> buildCopySegments() {
+        List<CopySegment> segments = new ArrayList<>();
+        // The nodes of one Markdown node are collected in a builder: a code block has one node per token.
+        StringBuilder pending = new StringBuilder();
+        @Nullable Node pendingNode = null;
+        boolean pendingIsNewlineMarker = false;
+        boolean pendingIsText = false;
+
+        for (javafx.scene.Node fxNode : getChildren()) {
+            String renderedText;
+            Node astNode;
+
+            switch (fxNode) {
+                case MarkdownAwareText markdownText -> {
+                    renderedText = markdownText.getText();
+                    astNode = markdownText.astNode;
+                }
+                case MarkdownAwareHyperlink hyperlink -> {
+                    renderedText = hyperlink.getText();
+                    astNode = hyperlink.astNode;
+                }
+                case MarkdownAwareTable table -> {
+                    renderedText = "\uFFFC";
+                    astNode = table.astNode;
+                }
+                case null,
+                     default -> {
+                    continue;
+                }
+            }
+
+            // Only text nodes are merged: a hyperlink and a table each occupy one layout index.
+            boolean isText = fxNode instanceof Text;
+
+            // The newline nodes between blocks carry the block's node as well, but are copied as newlines.
+            if (isText && pendingIsText && !pending.isEmpty() && (astNode != null) && (astNode == pendingNode) && !pendingIsNewlineMarker) {
+                pending.append(renderedText);
+                continue;
+            }
+
+            if (!pending.isEmpty()) {
+                segments.add(newSegment(pending, pendingNode, pendingIsText));
+            }
+            pending.setLength(0);
+            pending.append(renderedText);
+            pendingNode = astNode;
+            pendingIsNewlineMarker = isNewlineMarker(renderedText);
+            pendingIsText = isText;
+        }
+
+        if (!pending.isEmpty()) {
+            segments.add(newSegment(pending, pendingNode, pendingIsText));
+        }
+
+        return segments;
+    }
+
+    private static CopySegment newSegment(StringBuilder pending, @Nullable Node astNode, boolean isText) {
+        String text = pending.toString();
+        return new CopySegment(text, astNode, isText ? text.length() : 1);
+    }
+
+    private String getMarkdownRepresentation(@Nullable Node astNode, String renderedText) {
         if (renderedText.isBlank() && !(astNode instanceof DelimitedNode)) {
             return renderedText;
         }
@@ -317,9 +411,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 String info = fencedCodeBlock.getInfo().toString();
                 String openingFence = fencedCodeBlock.getOpeningFence().toString();
                 String closingFence = fencedCodeBlock.getClosingFence().toString();
-                // NOTE: Hack. Flexmark always add \n at beginning, \n\n at end.
-                String content = fencedCodeBlock.getContentChars().toString();
-                yield openingFence + info + content.substring(0, content.length() - 1) + closingFence;
+                if (formattedCodeBlocks.contains(fencedCodeBlock)) {
+                    String newline = renderedText.endsWith("\n") ? "" : "\n";
+                    yield openingFence + info + "\n" + renderedText + newline + closingFence;
+                }
+                // The content of a fenced block is its body verbatim, ending with the newline before the fence.
+                yield openingFence + info + "\n" + fencedCodeBlock.getContentChars() + closingFence;
             }
             case IndentedCodeBlock indentedCodeBlock ->
                     indentedCodeBlock.getChars().toString();
@@ -432,29 +529,15 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private void visit(FencedCodeBlock codeBlock) {
             addNewlinesBetweenBlocks(codeBlock);
             String content = codeBlock.getContentChars().toString();
-            /*
-             * NOTE: Flexmark always append \n at the beginning and \n\n at the end.
-             * For example, ```java
-             * public class HelloWorld { ... }
-             * ``` -> contains content `\npublic class HelloWorld { ... }\n\n`
-             * Therefore, we need to remove the first and last characters.
-             */
-            String processedContent = content;
-            if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
-                processedContent = content.substring(1, content.length() - 2);
-            }
-            addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
+            String processedContent = stripSyntheticNewlines(content);
+            addCodeBlockNodes(processedContent, codeBlock);
             previousBlock = codeBlock;
         }
 
         private void visit(IndentedCodeBlock codeBlock) {
             addNewlinesBetweenBlocks(codeBlock);
             String content = codeBlock.getContentChars().toString();
-            // NOTE: Similar to FencedCodeBlock, Flexmark always appends \n at the beginning and \n\n at the end.
-            String processedContent = content;
-            if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
-                processedContent = content.substring(1, content.length() - 2);
-            }
+            String processedContent = stripSyntheticNewlines(content);
             addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
             previousBlock = codeBlock;
         }
@@ -730,9 +813,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     private static class MarkdownAwareText extends Text {
-        private final Node astNode;
+        private final @Nullable Node astNode;
 
-        public MarkdownAwareText(String text, Node astNode) {
+        public MarkdownAwareText(String text, @Nullable Node astNode) {
             super(text);
             this.astNode = astNode;
             setUserData(astNode);

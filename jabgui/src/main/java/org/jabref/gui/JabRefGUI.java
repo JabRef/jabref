@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Pair;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.JabRefFrame;
@@ -32,16 +33,18 @@ import org.jabref.gui.keyboard.WalkthroughKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
+import org.jabref.gui.shared.SharedDatabaseCleanup;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.walkthrough.WalkthroughPane;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.GitSsh;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -54,6 +57,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -103,6 +107,7 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
+    private static OAuthSessionRegistry oAuthSessionRegistry;
     private static LanguageServerController languageServerController;
 
     private Stage mainStage;
@@ -139,7 +144,8 @@ public class JabRefGUI extends Application {
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry,
-                    journalAbbreviationRepository);
+                    journalAbbreviationRepository,
+                    oAuthSessionRegistry);
 
             openWindow();
 
@@ -228,6 +234,9 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
+        JabRefGUI.oAuthSessionRegistry = new OAuthSessionRegistry();
+        Injector.setModelOrService(OAuthSessionRegistry.class, JabRefGUI.oAuthSessionRegistry);
+
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
@@ -242,11 +251,11 @@ public class JabRefGUI extends Application {
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
 
-        stateManager.getRunningBackgroundTasks().addListener((ListChangeListener<? super Task<?>>) change -> {
+        stateManager.getRunningBackgroundTasksPairs().addListener((ListChangeListener<? super Pair<BackgroundTask<?>, Task<?>>>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    for (Task<?> task : change.getAddedSubList()) {
-                        dialogService.notify(new Notifications.TaskNotification(task));
+                    for (Pair<BackgroundTask<?>, Task<?>> pair : change.getAddedSubList()) {
+                        dialogService.notify(new Notifications.TaskNotification(pair.getValue(), pair.getKey()));
                     }
                 }
             }
@@ -531,7 +540,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.shouldEnableHttpServer()) {
-            httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
@@ -544,7 +553,7 @@ public class JabRefGUI extends Application {
             // stop in all cases, because the port might have changed
             httpServerManager.stop();
             if (newValue) {
-                httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+                httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
             }
         });
     }
@@ -552,6 +561,7 @@ public class JabRefGUI extends Application {
     @Override
     public void stop() {
         LOGGER.trace("Stopping JabRef GUI");
+        SharedDatabaseCleanup.awaitAll();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
 

@@ -69,6 +69,17 @@ class ChatHistoryUtilsTest {
     }
 
     @Test
+    void regenerateOnAiMessageWithoutAssociatedUserDoesNothing() {
+        ChatMessage ai = new ChatMessage("id-ai", Instant.ofEpochMilli(2000), ChatMessage.Role.AI, "ai answer", List.of());
+        List<ChatMessage> history = new ArrayList<>(List.of(ai));
+
+        Optional<String> toRegenerate = ChatHistoryUtils.regenerate(history, ai.id());
+
+        assertTrue(toRegenerate.isEmpty());
+        assertEquals(List.of(ai), history);
+    }
+
+    @Test
     void regenerateReturnsNullWhenIdNotFound() {
         List<ChatMessage> history = new ArrayList<>(List.of(
                 ChatMessage.userMessage("question")

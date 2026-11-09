@@ -13,6 +13,7 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
+import org.jabref.model.entry.field.StandardField;
 
 public class SpecialFieldsToSeparateFields implements PostOpenMigration {
     private final KeywordList possibleKeywordsToMigrate;
@@ -30,13 +31,21 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
     }
 
     @Override
-    public void performMigration(ParserResult parserResult) {
-        parserResult.getDatabase().getEntries().forEach(this::migrateEntry);
+    public boolean isMigrationNecessary(ParserResult parserResult) {
+        return parserResult.getDatabase().getEntries().stream()
+                           .filter(entry -> entry.hasField(StandardField.KEYWORDS))
+                           .anyMatch(entry -> possibleKeywordsToMigrate.stream().anyMatch(entry.getKeywords(keywordDelimiter)::contains));
+    }
+
+    @Override
+    public void performMigration(ParserResult parserResult, List<BibEntry> entries) {
+        entries.forEach(this::migrateEntry);
     }
 
     private void migrateEntry(BibEntry entry) {
+        KeywordList keywords = entry.getKeywords(keywordDelimiter);
         for (Keyword keyword : possibleKeywordsToMigrate) {
-            if (entry.getKeywords(keywordDelimiter).contains(keyword) && migrationTable.containsKey(keyword.get())) {
+            if (keywords.contains(keyword) && migrationTable.containsKey(keyword.get())) {
                 entry.setField(migrationTable.get(keyword.get()), keyword.get());
             }
         }

@@ -33,7 +33,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileNameCleaner;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -469,13 +468,9 @@ public class StudyRepository {
     }
 
     private StudyQuery toLockQuery(StudyQuery query, List<String> catalogNames) {
-        Map<String, String> overrides = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        query.getCatalogSpecific().forEach(overrides::putIfAbsent);
-
         Map<String, String> effectiveQueries = new LinkedHashMap<>();
         for (String catalogName : catalogNames) {
-            String override = overrides.get(catalogName);
-            effectiveQueries.put(catalogName, StringUtil.isBlank(override) ? query.getQuery() : override);
+            effectiveQueries.put(catalogName, query.getCatalogOverride(catalogName).orElse(query.getQuery()));
         }
 
         StudyQuery lockQuery = new StudyQuery(query.getQuery());

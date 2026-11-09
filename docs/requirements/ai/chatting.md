@@ -114,6 +114,13 @@ Covers:
 
 - feat~ai.chatting~1
 
+### JSON answers are highlighted in AI chat
+`feat~ai.chat.json-highlighting~1`
+
+An answer that starts or ends with a JSON document, or contains one inside a fenced code block, shows that JSON as a monospaced code block, indented and with syntax highlighting, instead of flowed text. An explanation before or after the JSON is rendered as Markdown.
+
+Needs: impl, utest
+
 ### User can jump to entry PDF from citation links in AI chat
 `feat~ai.chat.jump-to-entry-pdf~1`
 
@@ -124,6 +131,105 @@ An optional `/files/{n}` segment selects the `{n}`-th linked file (1-based); wit
 The page is given as a `#page={page}` fragment, following the PDF Open Parameters known from Acrobat.
 
 Needs: impl, utest
+
+### User can find text in AI chat messages
+`feat~ai.chat.find~2`
+
+Needs: req
+
+#### AI chat must open a find bar at the top right for the configured search shortcut
+`req~ai.chat.find.open~1`
+
+Applies inside an available AI chat, where the shortcut takes precedence over library search.
+The default shortcut is <kbd>Ctrl</kbd> + <kbd>F</kbd>, or <kbd>Cmd</kbd> + <kbd>F</kbd> on macOS.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### Unavailable AI chat must leave the search shortcut to library search
+`req~ai.chat.find.unavailable~1`
+
+Applies when the chat shows a privacy, restart, or no-files notice.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### AI chat find must highlight all case-insensitive occurrences in reading order
+`req~ai.chat.find.matches~1`
+
+Searchable message text includes hyperlink labels and table cells.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### AI chat find must navigate occurrences with the Enter shortcuts
+`req~ai.chat.find.navigation~1`
+
+<kbd>Enter</kbd> moves to the next occurrence; <kbd>Shift</kbd> + <kbd>Enter</kbd> moves to the previous occurrence.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### AI chat find must close for the configured close shortcut from anywhere inside the chat
+`req~ai.chat.find.close~1`
+
+The default shortcut is <kbd>Esc</kbd>.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### AI chat find must restore the previous focus when closed
+`req~ai.chat.find.restore-focus~1`
+
+The previous focus is the focus held before opening the find bar.
+
+Needs: impl, utest
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### AI chat find highlights must follow the active theme
+`req~ai.chat.find.highlight-theme~1`
+
+Needs: impl
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### AI chat find highlights must appear behind the text
+`req~ai.chat.find.highlight-layer~1`
+
+Needs: impl
+
+Covers:
+
+- feat~ai.chat.find~2
+
+#### AI chat find must outline the current occurrence
+`req~ai.chat.find.current-outline~1`
+
+Needs: impl
+
+Covers:
+
+- feat~ai.chat.find~2
 
 ## AI chat with entries
 `feat~ai.chatting.entries~1`
