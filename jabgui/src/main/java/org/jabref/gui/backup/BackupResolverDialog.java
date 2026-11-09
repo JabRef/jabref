@@ -38,10 +38,10 @@ public class BackupResolverDialog extends FXDialog {
     private static final String UNKNOWN = "–";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
 
-    // [impl->req~jabgui.backup.restore-dialog-comparison~1]
     /// @param backupPath the latest backup of the library, if any
     /// @param comparison the comparison of the library with that backup, computed before the dialog is shown; absent
     ///                   if it could not be computed
+    // [impl->req~jabgui.backup.restore-dialog-comparison~1]
     public BackupResolverDialog(Path originalPath,
                                 Optional<Path> backupPath,
                                 Optional<BackupComparison> comparison,
