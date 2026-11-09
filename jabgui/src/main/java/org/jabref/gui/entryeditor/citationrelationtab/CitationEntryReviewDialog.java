@@ -159,8 +159,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     private final Map<FieldListSections.SectionType, Boolean> sectionExpandOverrides =
             new EnumMap<>(FieldListSections.SectionType.class);
 
-    /// Function to build the review dialog for one fetched entry
-    ///
     /// @param entry             copy of the fetched entry, edited in place
     /// @param position          number of this entry within the review
     /// @param total             number of entries to review
@@ -230,7 +228,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         });
     }
 
-    /// Function to fill the entry type combo box with the types of the library's mode
+    /// Fills the entry type combo box with the types of the library's mode
     private void setUpEntryTypeCombo() {
         entryTypeCombo.getItems().setAll(entryTypesManager.getAllTypes(databaseContext.getMode()).stream()
                                                           .map(BibEntryType::getType)
@@ -243,7 +241,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         entryTypeCombo.setMaxWidth(Double.MAX_VALUE);
     }
 
-    /// Function to build the dialog body: the entry summary above the field rows and the preview
+    /// Builds the dialog body: the entry summary above the field rows and the preview
     ///
     /// @param stateManager  source of the library state the preview panel reads
     /// @param dialogService service the preview panel reports through
@@ -278,13 +276,11 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
     /// The label and the editor of one field, kept together while the rows are distributed over the
     /// sections they belong to.
     ///
-    /// @param field  field of the row
     /// @param label  label shown in front of the editor
-    /// @param editor editor of the field
     private record FieldRow(Field field, Label label, FieldEditorFX editor) {
     }
 
-    /// Function to build the rows of the fields to show, replacing the rows of the previous run
+    /// Builds the rows of the fields to show, replacing the rows of the previous run
     private void setupFieldArea() {
         editors.clear();
         fieldGrid.getChildren().clear();
@@ -308,7 +304,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         editors.forEach(this::applyNaturalHeight);
     }
 
-    /// Function to determine the fields to show, and in which order, as the entry editor's "Main" tab does
+    /// Determines the fields to show, and in which order, as the entry editor's "Main" tab does
     private SequencedSet<Field> determineFieldsToShow() {
         Set<Field> setFields = entry.getFields();
         SequencedSet<Field> fields = new LinkedHashSet<>();
@@ -330,9 +326,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return fields;
     }
 
-    /// Function to create the label and the editor of one field, and to remember the editor
-    ///
-    /// @param field field the label and the editor belong to
+    /// Creates the label and the editor of one field, and remembers the editor
     private FieldRow createFieldRow(Field field) {
         FieldEditorFX fieldEditor = FieldEditors.getForField(
                 field,
@@ -349,7 +343,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return new FieldRow(field, new FieldNameLabel(field), fieldEditor);
     }
 
-    /// Function to arrange the entry type row and the rows of the main group in the kept grid
+    /// Arranges the entry type row and the rows of the main group in the kept grid
     ///
     /// @param rows rows of the main group, in display order
     private void layoutMainFields(List<FieldRow> rows) {
@@ -359,12 +353,9 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         addFieldRows(fieldGrid, rows, 1);
     }
 
-    /// Function to create the collapsible pane of one field group
-    ///
     /// Holds the rows of the group and, below them, the chips for its fields without a row.
     /// Collapsed by default while the group has no row.
     ///
-    /// @param type section the fields belong to
     /// @param rows rows of the section, in display order
     private TitledPane createSectionPane(FieldListSections.SectionType type, List<FieldRow> rows) {
         VBox sectionContent = new VBox(FIELD_AREA_SPACING);
@@ -387,7 +378,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return sectionPane;
     }
 
-    /// Function to collect the fields a section offers chips for
+    /// Collects the fields a section offers chips for
     ///
     /// @param type section to offer chips for
     private SequencedSet<Field> sectionMemberFields(FieldListSections.SectionType type) {
@@ -402,9 +393,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return FieldListSections.fieldsOf(type);
     }
 
-    /// Function to give a grid the label column and the editor column
-    ///
-    /// @param grid grid the columns are set on
     private static void configureFieldGrid(GridPane grid) {
         grid.setHgap(GRID_HGAP);
         grid.setVgap(GRID_VGAP);
@@ -418,9 +406,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         grid.getColumnConstraints().setAll(labelColumn, editorColumn);
     }
 
-    /// Function to add one row per field to a grid
-    ///
-    /// @param grid     grid the rows are added to
     /// @param rows     rows to add, in display order
     /// @param firstRow index of the first free row of the grid
     private static void addFieldRows(GridPane grid, List<FieldRow> rows, int firstRow) {
@@ -435,10 +420,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         }
     }
 
-    /// Function to let an editor take the height of its content, as the entry editor's "Main" tab does
-    ///
-    /// @param field  field the editor belongs to
-    /// @param editor editor to size
+    /// Lets an editor take the height of its content, as the entry editor's "Main" tab does
     private void applyNaturalHeight(Field field, FieldEditorFX editor) {
         normalizeInputHeights(field, editor.getNode());
         if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {
@@ -450,9 +432,8 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         }
     }
 
-    /// Function to reset the unlimited height the text inputs ask for, and to let text areas grow with their text
+    /// Resets the unlimited height the text inputs ask for, and lets text areas grow with their text
     ///
-    /// @param field field the input belongs to
     /// @param node  editor node, searched for text inputs
     private void normalizeInputHeights(Field field, Node node) {
         switch (node) {
@@ -484,8 +465,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         }
     }
 
-    /// Function to apply the entry type the user chose
-    ///
     /// Which fields are required follows from the entry type, so the rows are built again.
     ///
     /// @param selectedType entry type chosen in the combo box
@@ -497,7 +476,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         setupFieldArea();
     }
 
-    /// Function to create the buttons which add a field of the main group (chips)
+    /// Creates the buttons which add a field of the main group (chips)
     private Node createMainChipBar() {
         FlowPane chips = new FlowPane();
         chips.getStyleClass().add("gap-4");
@@ -529,8 +508,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return chips;
     }
 
-    /// Function to lay the chips of one group out side by side
-    ///
     /// @param chipFields fields to offer a chip for, in display order
     private FlowPane createChips(List<Field> chipFields) {
         FlowPane chips = new FlowPane();
@@ -539,16 +516,12 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return chips;
     }
 
-    /// Function to pick the chip candidates that belong to the main group
-    ///
     /// @param candidates fields a chip could be offered for
     private Stream<Field> mainGroupChipFields(Collection<Field> candidates) {
         return fieldsWithoutRow(candidates)
                 .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN);
     }
 
-    /// Function to pick the candidates that have no row at the moment
-    ///
     /// @param candidates fields a chip could be offered for
     private Stream<Field> fieldsWithoutRow(Collection<Field> candidates) {
         return candidates.stream()
@@ -556,9 +529,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                          .filter(field -> !FIELDS_NOT_REVIEWED.contains(field));
     }
 
-    /// Function to create the button which adds one field
-    ///
-    /// @param field field the button adds
     private Button createAddChip(Field field) {
         Button chip = new Button(Localization.lang("+ %0", FieldsUtil.getDisplayName(field)));
         chip.getStyleClass().addAll("all-fields-add-chip", "padding-4-12");
@@ -566,10 +536,8 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         return chip;
     }
 
-    /// Function to show the editor of a field the entry has no value for, and to focus it
+    /// Shows the editor of a field the entry has no value for, and focuses it
     /// Used when a chip got clicked
-    ///
-    /// @param field field to show a row for
     private void showFieldEditor(Field field) {
         fieldsShownWithoutValue.add(field);
         setupFieldArea();
@@ -578,14 +546,11 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         Platform.runLater(() -> Platform.runLater(() -> focusEditor(field)));
     }
 
-    /// Function to move the keyboard focus into the editor of one field
-    ///
-    /// @param field field whose editor is focused
     private void focusEditor(Field field) {
         Optional.ofNullable(editors.get(field)).ifPresent(FieldEditorFX::focus);
     }
 
-    /// Function to follow a change of the entry under review
+    /// Follows a change of the entry under review
     ///
     /// Looking up the bibliographic data of a DOI fills in fields that have no row yet, and an undo or redo
     /// can change the entry type, so the rows are built again. Only a changed set of fields or a changed
@@ -648,7 +613,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         };
     }
 
-    /// Function to run an undo or redo without losing the focus of the editor holding it
+    /// Runs an undo or redo without losing the focus of the editor holding it
     ///
     /// Following the change can rebuild the rows, and the focus would then fall through to a button of the dialog,
     /// where the next key press could end the review of this entry.
@@ -667,7 +632,6 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
         }));
     }
 
-    /// Function to find the field whose editor contains the focus owner of the dialog's scene
     private Optional<Field> findFieldOfFocusedEditor() {
         return Optional.ofNullable(getDialogPane().getScene().getFocusOwner())
                        .flatMap(focusOwner -> editors.entrySet().stream()
@@ -676,15 +640,13 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                                                      .findFirst());
     }
 
-    /// Function to check whether a node is the given ancestor or lies below it
-    ///
     /// @param node     node to start from
     /// @param ancestor node to look for among the parents
     private static boolean isSameOrDescendant(Node node, Node ancestor) {
         return Stream.iterate(node, Objects::nonNull, Node::getParent).anyMatch(ancestor::equals);
     }
 
-    /// Function to return the focus to the rebuilt editor of a field, or to the entry type if the field lost its row
+    /// Returns the focus to the rebuilt editor of a field, or to the entry type if the field lost its row
     ///
     /// @param field field whose editor held the focus before the rows were rebuilt
     private void restoreFocus(Field field) {

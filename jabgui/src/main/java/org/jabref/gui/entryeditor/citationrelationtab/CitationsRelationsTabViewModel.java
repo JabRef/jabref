@@ -189,8 +189,6 @@ public class CitationsRelationsTabViewModel {
         }
     }
 
-    /// Function to pick the kept entries a citation relation can be recorded for
-    ///
     /// @param keptEntries     library entries the user kept, one per reviewed entry resolved that way
     /// @param existingEntry   the inspected entry
     /// @param databaseContext library the entries belong to
