@@ -261,6 +261,8 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+          # HEAD is the PR's merge commit; HEAD^1 is the base it was merged into
+          fetch-depth: 2
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
@@ -270,17 +272,20 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
-      - name: textlint write-good (changed Markdown files)
+      - name: textlint write-good (changed Markdown lines)
         if: github.event_name == 'pull_request'
         run: |
-          # Report-only: the existing docs have thousands of findings, so only the Markdown files changed by the PR are checked and the step does not fail.
-          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
-          mapfile -t files < <(git diff --name-only --diff-filter=AM FETCH_HEAD HEAD -- '*.md' ':!CHANGELOG.md')
+          # Report-only: the existing docs have thousands of findings, so only the lines changed by the PR are reported and the step does not fail.
+          mapfile -t files < <(git diff --name-only --diff-filter=AM HEAD^1 HEAD -- '*.md' ':!CHANGELOG.md')
           if [ ${#files[@]} -eq 0 ]; then
             echo "No changed Markdown files."
             exit 0
           fi
-          npm run textlint:write-good -- "${files[@]}" | sed "s|${GITHUB_WORKSPACE}/||g" || true
+          git diff -U0 --diff-filter=AM HEAD^1 HEAD -- '*.md' ':!CHANGELOG.md' | awk '
+            /^\+\+\+ b\// { file = substr($0, 7) }
+            /^@@ / { split($3, r, ","); n = (2 in r) ? r[2] : 1; for (i = 0; i < n; i++) print "file=" file ",line=" r[1] + i "," }
+          ' > "$RUNNER_TEMP/changed-lines"
+          npm run textlint:write-good -- "${files[@]}" | sed "s|${GITHUB_WORKSPACE}/||g" | grep -F -f "$RUNNER_TEMP/changed-lines" || true
       - name: typos
         run: pipx run typos==1.50.3
 
