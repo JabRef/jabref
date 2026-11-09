@@ -3,6 +3,15 @@ parent: Requirements
 ---
 # Import
 
+## JabRef must report warnings when dropped files cannot be imported
+`req~import.dropped-file-diagnostics~1`
+
+The warning identifies affected files and directs the user to the event log for import diagnostics.
+
+Origin: <https://github.com/JabRef/jabref/issues/8625>
+
+Needs: impl, utest
+
 ## JabRef must import MARC21-XML bibliographic records
 `req~import.marc21-xml~1`
 
@@ -150,6 +159,20 @@ Needs: impl, utest
 For the book-import work in [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874), an abstract heading, a keywords heading, and an ACM reference-format citation identifying a contribution to a conference or proceedings together disqualify that page as a book imprint candidate. An ISBN on such a page can belong to the proceedings.
 
 The individual terms are insufficient for exclusion. This rule recognizes a specific article format, not all research papers.
+
+Needs: impl, utest
+
+## The import dialog must remember its download choice
+`req~import.dialog.download-linked-files~1`
+
+The import dialog remembers whether to download referenced files, including after restarting JabRef.
+Confirming an import saves the choice and applies it to that import; canceling leaves the saved choice unchanged.
+The choice is independent of the automatic download setting in Preferences > Web search and is only shown in the import dialog.
+Dialogs opened by JabRef's Web search, including identifier searches, use the Web search preference instead and do not change the saved import choice.
+On first startup, the existing web search setting initializes the dialog preference once; if no setting exists, downloads are enabled by default.
+Later changes to the web search setting must not change the initialized dialog preference, even after restarting.
+
+See [JabRef issue #16332](https://github.com/JabRef/jabref/issues/16332).
 
 Needs: impl, utest
 

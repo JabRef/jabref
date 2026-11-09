@@ -13,7 +13,7 @@ plugins {
 
     id("antlr")
 
-    id("me.champeau.jmh") version "0.7.3"
+    id("me.champeau.jmh") version "0.7.4"
 
     id("com.vanniktech.maven.publish") version "0.37.0"
 
@@ -25,7 +25,7 @@ plugins {
     // See https://github.com/jbangdev/jbang-gradle-plugin/issues/20
     id("dev.jbang") version "0.4.0" apply false
 
-    id("net.ltgt.errorprone") version "5.1.1"
+    id("net.ltgt.errorprone") version "5.2.0"
     id("net.ltgt.nullaway") version "3.3.0"
 }
 

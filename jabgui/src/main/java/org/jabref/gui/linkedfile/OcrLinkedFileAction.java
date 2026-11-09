@@ -1,6 +1,7 @@
 package org.jabref.gui.linkedfile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +65,10 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 dialogService,
                 taskExecutor
         );
+        boolean fileExists = linkedFile.findIn(databaseContext, preferences.getFilePreferences())
+                                       .filter(Files::isRegularFile)
+                                       .isPresent();
+        this.setExecutable(fileExists);
     }
 
     @Override
@@ -104,7 +109,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
         ocrTask.onFailure(exception -> {
             LOGGER.error("Unexpected error during OCR", exception);
             dialogService.notify(Localization.lang("OCR failed. See the logs for the details"));
-        });
+        }).failureShownByCaller(true);
         taskExecutor.execute(ocrTask);
     }
 
