@@ -245,6 +245,7 @@ JavaFX delivers a key event in two phases (see [Handling JavaFX Events](https://
 2. Bubbling phase: from the focused node back up to the window. Event handlers (`addEventHandler`) run here, innermost node first. Menu accelerators run last, at the scene.
 
 Use an event filter if the view has to act before the focused control.
+This is rarely needed: an event handler is the right choice for most views.
 For example, the main window handles its global shortcuts in a filter, and the main table handles copy and paste in a filter before its cells see the key.
 Use an event handler if the focused control should get the key first and the view only acts on the keys the control did not use.
 For example, the entry editor uses a handler, so its text fields keep their own keys.
