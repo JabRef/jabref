@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
@@ -282,18 +281,14 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         citationsRelationsTabViewModel.lookUpDoi(entry, () -> {
             if (getCurrentEntry() == entry) {
-                refreshCurrentEntryAfterDoiLookup(entry);
+                refreshForDoiChange(entry, true);
             }
         });
     }
 
-    private void refreshCurrentEntryAfterDoiLookup(BibEntry entry) {
-        refreshForDoiChange(entry, true);
-    }
-
     private void refreshIfDoiChanged(BibEntry entry) {
         Optional<DOI> currentDoi = entry.getDOI();
-        if (Objects.equals(currentDoi, lastSearchedDoi)) {
+        if (currentDoi.equals(lastSearchedDoi)) {
             return;
         }
         refreshForDoiChange(entry, false);

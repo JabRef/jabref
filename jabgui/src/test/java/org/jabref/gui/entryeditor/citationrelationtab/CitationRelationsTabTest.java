@@ -125,6 +125,21 @@ class CitationRelationsTabTest {
     }
 
     @Test
+    void switchingToTabWithUnchangedDoiDoesNotTriggerAdditionalSearch() throws FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.DOI, "10.1145/782941.782993");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            tab.currentEntryProperty().set(entry);
+            tab.notifyAboutFocus(entry);
+        });
+
+        JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
+
+        verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
+    }
+
+    @Test
     void switchingToTabRefreshesWhenDoiChanged() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.DOI, "10.1145/782941.782993");
@@ -134,20 +149,25 @@ class CitationRelationsTabTest {
             tab.notifyAboutFocus(entry);
         });
 
-        verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
-
-        // Same DOI on focus should not trigger another search
-        JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
-        verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
-
-        // Update DOI on the same entry and focus again
         entry.setField(StandardField.DOI, "10.1038/35057062");
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
-        verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
 
-        // Clearing DOI should not trigger citation search
+        verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
+    }
+
+    @Test
+    void clearingDoiDoesNotTriggerCitationSearch() throws FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.DOI, "10.1145/782941.782993");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            tab.currentEntryProperty().set(entry);
+            tab.notifyAboutFocus(entry);
+        });
+
         entry.clearField(StandardField.DOI);
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
-        verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
+
+        verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
     }
 }
