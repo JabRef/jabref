@@ -66,7 +66,7 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.11.3")
+    api("com.konghq:unirest-java-core:4.11.4")
     api("com.konghq:unirest-modules-gson:4.11.4")
     api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
     api("com.nimbusds:nimbus-jose-jwt:10.10")
