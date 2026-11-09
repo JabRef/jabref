@@ -113,8 +113,10 @@ public class Linux extends NativeDesktop {
             return;
         }
 
-        ProcessBuilder processBuilder = new ProcessBuilder("readlink", ETC_ALTERNATIVES_X_TERMINAL_EMULATOR);
+        ProcessBuilder processBuilder = new ProcessBuilder("readlink", ETC_ALTERNATIVES_X_TERMINAL_EMULATOR)
+                .redirectError(ProcessBuilder.Redirect.DISCARD);
         Process process = processBuilder.start();
+        process.getOutputStream().close();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String emulatorName = reader.readLine();
