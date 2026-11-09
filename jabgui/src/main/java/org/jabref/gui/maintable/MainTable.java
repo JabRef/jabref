@@ -45,6 +45,7 @@ import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingDispatcher;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
@@ -410,6 +411,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
         LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor);
 
+        KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(keyBindings)
+                .on(KeyBinding.SELECT_FIRST_ENTRY, this::clearAndSelectFirst)
+                .on(KeyBinding.SELECT_LAST_ENTRY, this::clearAndSelectLast)
+                .on(KeyBinding.PASTE, pasteAction::execute)
+                .on(KeyBinding.COPY, copyAction::execute)
+                .on(KeyBinding.CUT, cutAction::execute)
+                .on(KeyBinding.DELETE_ENTRY, deleteAction::execute)
+                .on(KeyBinding.SCROLL_TO_NEXT_MATCH_CATEGORY, this::scrollToNextMatchCategory)
+                .on(KeyBinding.SCROLL_TO_PREVIOUS_MATCH_CATEGORY, this::scrollToPreviousMatchCategory)
+                .on(KeyBinding.OPEN_URL_OR_DOI, openUrlAction::execute)
+                .on(KeyBinding.OPEN_FILE, openSelectedEntriesFilesActionFileAction::execute)
+                .on(KeyBinding.MERGE_WITH_FETCHED_ENTRY, mergeWithFetchedEntryAction::execute)
+                .on(KeyBinding.LOOKUP_DOC_IDENTIFIER, lookupIdentifierAction::execute);
+
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
@@ -419,61 +434,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 return;
             }
 
-            Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case SELECT_FIRST_ENTRY:
-                        clearAndSelectFirst();
-                        event.consume();
-                        break;
-                    case SELECT_LAST_ENTRY:
-                        clearAndSelectLast();
-                        event.consume();
-                        break;
-                    case PASTE:
-                        pasteAction.execute();
-                        event.consume();
-                        break;
-                    case COPY:
-                        copyAction.execute();
-                        event.consume();
-                        break;
-                    case CUT:
-                        cutAction.execute();
-                        event.consume();
-                        break;
-                    case DELETE_ENTRY:
-                        deleteAction.execute();
-                        event.consume();
-                        break;
-                    case SCROLL_TO_NEXT_MATCH_CATEGORY:
-                        scrollToNextMatchCategory();
-                        event.consume();
-                        break;
-                    case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
-                        scrollToPreviousMatchCategory();
-                        event.consume();
-                        break;
-                    case OPEN_URL_OR_DOI:
-                        openUrlAction.execute();
-                        event.consume();
-                        break;
-                    case OPEN_FILE:
-                        openSelectedEntriesFilesActionFileAction.execute();
-                        event.consume();
-                        break;
-                    case MERGE_WITH_FETCHED_ENTRY:
-                        mergeWithFetchedEntryAction.execute();
-                        event.consume();
-                        break;
-                    case LOOKUP_DOC_IDENTIFIER:
-                        lookupIdentifierAction.execute();
-                        event.consume();
-                        break;
-                    default:
-                        // Pass other keys to parent
-                }
-            }
+            keyBindingDispatcher.handle(event);
         });
     }
 
