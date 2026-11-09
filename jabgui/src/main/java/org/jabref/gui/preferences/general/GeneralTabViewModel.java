@@ -483,7 +483,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.wrapMainTableTextProperty;
     }
 
-
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
         return this.bibliographyModeListProperty;
     }
