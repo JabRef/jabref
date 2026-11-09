@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.SequencedMap;
 
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
@@ -40,10 +41,10 @@ public class JsonMetaDataParser {
         try {
             root = MAPPER.readTree(json);
         } catch (JacksonException e) {
-            throw new ParseException("Ill-formed JSON metadata comment in BIB file", e);
+            throw new ParseException(Localization.lang("Ill-formed JSON metadata comment in BIB file"), e);
         }
         if (!(root instanceof ObjectNode object)) {
-            throw new ParseException("The JSON metadata comment in the BIB file does not hold an object");
+            throw new ParseException(Localization.lang("The JSON metadata comment in the BIB file does not hold an object"));
         }
         return object;
     }

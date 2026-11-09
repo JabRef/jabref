@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.SequencedMap;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.lint.rule.MagicCommentRule;
 import org.jabref.logic.lint.rule.SaveActionIds;
 import org.jabref.logic.lint.rules.RepeatedWhitespaceRule;
@@ -25,17 +26,17 @@ import org.jspecify.annotations.NullMarked;
 /// These modes are placeholders that show the shape; which ones JabFix ships with is still open.
 @NullMarked
 public enum JabFixMode {
-    WHITESPACE("whitespace", "Repairs whitespace around and inside field values.",
+    WHITESPACE("whitespace", Localization.lang("Repairs whitespace around and inside field values."),
             LintSettings.of(RuleSelector.of(SurroundingWhitespaceRule.ID), RuleMode.FIX)
                         .and(RuleSelector.of(RepeatedWhitespaceRule.ID), RuleMode.FIX)
                         .and(RuleSelector.of(MagicCommentRule.ID), RuleMode.CHECK)),
 
-    REPORT("report", "Reports whitespace around and inside field values without repairing it.",
+    REPORT("report", Localization.lang("Reports whitespace around and inside field values without repairing it."),
             LintSettings.of(RuleSelector.of(SurroundingWhitespaceRule.ID), RuleMode.CHECK)
                         .and(RuleSelector.of(RepeatedWhitespaceRule.ID), RuleMode.CHECK)
                         .and(RuleSelector.of(MagicCommentRule.ID), RuleMode.CHECK)),
 
-    DEFAULT_SAVE_ACTIONS("default-save-actions", "Repairs what JabRef's default Save Actions repair.",
+    DEFAULT_SAVE_ACTIONS("default-save-actions", Localization.lang("Repairs what JabRef's default Save Actions repair."),
             repairing(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.stream().map(SaveActionIds::selectorOf).toList())
                     .and(RuleSelector.of(MagicCommentRule.ID), RuleMode.CHECK));
 

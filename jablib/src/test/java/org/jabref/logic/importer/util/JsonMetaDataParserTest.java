@@ -8,12 +8,14 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ResourceLock("Localization.lang")
 class JsonMetaDataParserTest {
 
     /// So that a library configured by a newer JabRef is handed back with everything it arrived

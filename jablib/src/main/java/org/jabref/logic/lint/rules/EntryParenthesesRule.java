@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.lint.rule.Finding;
 import org.jabref.logic.lint.rule.Rule;
 import org.jabref.model.FieldChange;
@@ -40,14 +41,14 @@ public class EntryParenthesesRule implements Rule {
 
     @Override
     public String description() {
-        return "Encloses an entry in braces instead of parentheses.";
+        return Localization.lang("Encloses an entry in braces instead of parentheses.");
     }
 
     @Override
     public List<Finding> scan(BibEntry entry) {
         return braced(entry)
                 .map(_ -> List.of(new Finding(this, entry, Optional.empty(),
-                        "entry is enclosed in parentheses instead of braces", Optional.of(EntryParenthesesRule::encloseInBraces))))
+                        Localization.lang("entry is enclosed in parentheses instead of braces"), Optional.of(EntryParenthesesRule::encloseInBraces))))
                 .orElse(List.of());
     }
 

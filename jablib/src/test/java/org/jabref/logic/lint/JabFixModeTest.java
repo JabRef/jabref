@@ -7,11 +7,13 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.lint.rule.RuleSet;
 import org.jabref.model.metadata.RuleSelector;
 
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ResourceLock("Localization.lang")
 class JabFixModeTest {
 
     private static final List<String> KNOWN_IDS = RuleSet.known(new FieldPreferences(true, List.of(), List.of())).ids();

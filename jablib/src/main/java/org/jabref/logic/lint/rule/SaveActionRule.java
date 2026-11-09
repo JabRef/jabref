@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.logic.cleanup.CleanupJob;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 
@@ -55,7 +56,7 @@ public class SaveActionRule extends CleanupRule {
     protected String message(FieldChange change) {
         String oldValue = StringUtil.limitStringLength(change.oldValue(), MAX_REPORTED_VALUE_LENGTH);
         return Optional.ofNullable(change.newValue())
-                       .map(newValue -> "\"%s\", should be \"%s\"".formatted(oldValue, StringUtil.limitStringLength(newValue, MAX_REPORTED_VALUE_LENGTH)))
-                       .orElse("\"%s\", should be removed".formatted(oldValue));
+                       .map(newValue -> Localization.lang("\"%0\", should be \"%1\"", oldValue, StringUtil.limitStringLength(newValue, MAX_REPORTED_VALUE_LENGTH)))
+                       .orElse(Localization.lang("\"%0\", should be removed", oldValue));
     }
 }

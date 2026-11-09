@@ -3,6 +3,7 @@ package org.jabref.logic.lint.rules;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.cleanup.CleanupJob;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.lint.rule.CleanupRule;
 import org.jabref.model.FieldChange;
 
@@ -35,7 +36,7 @@ public class RepeatedWhitespaceRule extends CleanupRule {
 
     @Override
     public String description() {
-        return "Collapses repeated whitespace inside a field value to a single space.";
+        return Localization.lang("Collapses repeated whitespace inside a field value to a single space.");
     }
 
     @Override
@@ -45,6 +46,6 @@ public class RepeatedWhitespaceRule extends CleanupRule {
 
     @Override
     protected String message(FieldChange change) {
-        return "value contains repeated whitespace";
+        return Localization.lang("value contains repeated whitespace");
     }
 }

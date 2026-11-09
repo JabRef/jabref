@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -56,7 +57,7 @@ public class MagicCommentRule implements Rule {
 
     @Override
     public String description() {
-        return "Reports a magic comment that names no rule.";
+        return Localization.lang("Reports a magic comment that names no rule.");
     }
 
     @Override
@@ -69,16 +70,16 @@ public class MagicCommentRule implements Rule {
     private Stream<Finding> forRules(BibEntry entry, Suppressions.Token token) {
         Stream<String> unknownIds = token.rules().stream()
                                          .filter(ruleId -> !knownRuleIds.contains(ruleId))
-                                         .map("switches off \"%s\", which is no rule of this run"::formatted);
+                                         .map(ruleId -> Localization.lang("the magic comment switches off \"%0\", which is no rule of this run", ruleId));
         Stream<String> unmatchedRegexes = token.ruleRegexes().stream()
                                                .filter(regex -> knownRuleIds.stream().noneMatch(ruleId -> Suppressions.Token.ruleMatches(regex, ruleId)))
-                                               .map("switches off /%s/, which matches no rule of this run"::formatted);
+                                               .map(regex -> Localization.lang("the magic comment switches off /%0/, which matches no rule of this run", regex));
 
         List<Optional<Field>> reportedOn = token.fields().isEmpty()
                                            ? List.of(Optional.empty())
                                            : token.fields().stream().map(Optional::of).toList();
         return Stream.concat(unknownIds, unmatchedRegexes)
-                     .flatMap(what -> reportedOn.stream().map(field -> finding(entry, field, what)));
+                     .flatMap(message -> reportedOn.stream().map(field -> finding(entry, field, message)));
     }
 
     private Stream<Finding> forFields(BibEntry entry, Suppressions.Token token) {
@@ -86,16 +87,16 @@ public class MagicCommentRule implements Rule {
                                              .filter(field -> field instanceof UnknownField)
                                              .filter(field -> !entry.hasField(field))
                                              .map(field -> finding(entry, Optional.of(field),
-                                                     "names the field \"%s\", which is neither a BibTeX field nor one this entry has".formatted(field.getName())));
+                                                     Localization.lang("the magic comment names the field \"%0\", which is neither a BibTeX field nor one this entry has", field.getName())));
         Stream<Finding> unmatchedRegexes = token.fieldRegexes().stream()
                                                 .filter(regex -> Stream.concat(KNOWN_FIELDS.stream(), entry.getFields().stream())
                                                                        .noneMatch(field -> Suppressions.Token.fieldMatches(regex, field)))
                                                 .map(regex -> finding(entry, Optional.empty(),
-                                                        "names the fields /%s/, which match neither a BibTeX field nor one this entry has".formatted(regex)));
+                                                        Localization.lang("the magic comment names the fields /%0/, which match neither a BibTeX field nor one this entry has", regex)));
         return Stream.concat(missingFields, unmatchedRegexes);
     }
 
-    private Finding finding(BibEntry entry, Optional<Field> field, String what) {
-        return new Finding(this, entry, field, "the magic comment " + what, Optional.empty());
+    private Finding finding(BibEntry entry, Optional<Field> field, String message) {
+        return new Finding(this, entry, field, message, Optional.empty());
     }
 }

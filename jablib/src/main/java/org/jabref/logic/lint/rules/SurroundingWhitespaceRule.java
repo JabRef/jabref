@@ -1,6 +1,7 @@
 package org.jabref.logic.lint.rules;
 
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.lint.rule.FieldValueRule;
 
 import org.jspecify.annotations.NullMarked;
@@ -27,7 +28,7 @@ public class SurroundingWhitespaceRule extends FieldValueRule {
 
     @Override
     public String description() {
-        return "Removes whitespace at the start and end of a field value.";
+        return Localization.lang("Removes whitespace at the start and end of a field value.");
     }
 
     @Override
@@ -37,6 +38,6 @@ public class SurroundingWhitespaceRule extends FieldValueRule {
 
     @Override
     protected String message(String value, String normalized) {
-        return "value has leading or trailing whitespace";
+        return Localization.lang("value has leading or trailing whitespace");
     }
 }

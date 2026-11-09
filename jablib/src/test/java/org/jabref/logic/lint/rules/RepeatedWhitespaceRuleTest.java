@@ -9,9 +9,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ResourceLock("Localization.lang")
 class RepeatedWhitespaceRuleTest {
 
     private final RepeatedWhitespaceRule rule = new RepeatedWhitespaceRule(new FieldPreferences(true, List.of(), List.of()));

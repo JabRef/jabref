@@ -84,6 +84,7 @@ import static org.mockito.Mockito.when;
 /// Tests for reading can be found at [org.jabref.logic.importer.fileformat.BibtexImporterTest]
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("exporter")
+@ResourceLock("Localization.lang")
 class BibDatabaseWriterTest {
 
     private static final String IN_PARENTHESES = """
