@@ -680,7 +680,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .rating {
     -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
-    -fx-padding: 0.5em 0.0em 0.0em 0.0em;
 }
 
 .table-column .rotated > .label {
@@ -886,6 +885,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .rating > .container {
     -fx-spacing: 2;
+    -fx-alignment: center;
 }
 
 .rating > .container > .button {

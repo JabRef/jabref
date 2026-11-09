@@ -9,7 +9,8 @@ import javafx.collections.ObservableList;
 public class ColumnPreferences {
 
     public static final double DEFAULT_COLUMN_WIDTH = 100;
-    public static final double ICON_COLUMN_WIDTH = 16 + 12; // add some additional space to improve appearance
+    public static final double ICON_COLUMN_MARGIN = 12;
+    public static final double ICON_COLUMN_WIDTH = 16 + ICON_COLUMN_MARGIN;
 
     private final ObservableList<MainTableColumnModel> columns;
     private final ObservableList<MainTableColumnModel> columnSortOrder;
