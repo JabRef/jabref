@@ -27,12 +27,12 @@ public class Windows extends NativeDesktop {
     @Override
     protected void openFileWithDefaultApplication(String filePath) throws IOException {
         // quote String so explorer handles URL query strings correctly
-        new ProcessBuilder("explorer.exe", "\"" + filePath + "\"").start();
+        startProcess(new ProcessBuilder("explorer.exe", "\"" + filePath + "\""));
     }
 
     @Override
     public void openUrlWithSystemHandler(String url) throws IOException {
-        new ProcessBuilder(urlOpenCommand(url)).start();
+        startProcess(new ProcessBuilder(urlOpenCommand(url)));
     }
 
     /// Explorer truncates its argument at the Windows path limit of 260 characters, which OAuth login URLs exceed.
@@ -58,18 +58,16 @@ public class Windows extends NativeDesktop {
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
         // filePath may be a URL; Path.of would throw on query characters and mangle the scheme
-        new ProcessBuilder(Path.of(application).toString(), filePath).start();
+        startProcess(new ProcessBuilder(Path.of(application).toString(), filePath));
     }
 
     @Override
     protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) throws IOException {
-        new ProcessBuilder("explorer.exe", "/select,", filePath.toString()).start();
+        startProcess(new ProcessBuilder("explorer.exe", "/select,", filePath.toString()));
     }
 
     @Override
     protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
-        process.directory(Path.of(absolutePath).toFile());
-        process.start();
+        startProcess(new ProcessBuilder("cmd.exe", "/c", "start").directory(Path.of(absolutePath).toFile()));
     }
 }

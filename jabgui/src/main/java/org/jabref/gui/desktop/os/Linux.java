@@ -16,7 +16,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.StreamGobbler;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NullMarked;
@@ -37,15 +36,6 @@ public class Linux extends NativeDesktop {
         super(hostServices, preferences);
     }
 
-    /// Starts the process and drains its output into the debug log, so it cannot block on a full pipe
-    private static void startLoggingOutput(ProcessBuilder processBuilder) throws IOException {
-        Process process = processBuilder.start();
-        // The started program gets no input; closing its stdin pipe releases the handle instead of keeping it until garbage collection
-        process.getOutputStream().close();
-        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug));
-        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug));
-    }
-
     @Override
     protected void openFileWithDefaultApplication(String filePath) {
         HeadlessExecutorService.INSTANCE.execute(() -> {
@@ -55,9 +45,8 @@ public class Linux extends NativeDesktop {
             } catch (IllegalArgumentException _) {
                 LoggerFactory.getLogger(Linux.class).debug("Fail back to xdg-open");
                 try {
-                    String[] cmd = {"xdg-open", filePath};
-                    Runtime.getRuntime().exec(cmd);
-                } catch (Exception e2) {
+                    startProcess(new ProcessBuilder("xdg-open", filePath));
+                } catch (IOException e2) {
                     LoggerFactory.getLogger(Linux.class).warn("Open operation not successful: ", e2);
                 }
             } catch (IOException e) {
@@ -68,7 +57,7 @@ public class Linux extends NativeDesktop {
 
     @Override
     public void openUrlWithSystemHandler(String url) throws IOException {
-        new ProcessBuilder("xdg-open", url).start();
+        startProcess(new ProcessBuilder("xdg-open", url));
     }
 
     @Override
@@ -76,7 +65,7 @@ public class Linux extends NativeDesktop {
         // The application may carry arguments, e.g. "evince --fullscreen"
         List<String> command = new ArrayList<>(List.of(application.split(" ")));
         command.add(filePath);
-        startLoggingOutput(new ProcessBuilder(command));
+        startProcess(new ProcessBuilder(command));
     }
 
     @Override
@@ -101,7 +90,7 @@ public class Linux extends NativeDesktop {
             }
         }
         LoggerFactory.getLogger(Linux.class).debug("Opening folder and selecting file using {}", String.join(" ", cmd));
-        startLoggingOutput(new ProcessBuilder(cmd));
+        startProcess(new ProcessBuilder(cmd));
     }
 
     @Override
@@ -126,7 +115,7 @@ public class Linux extends NativeDesktop {
 
         LoggerFactory.getLogger(Linux.class).debug("Opening terminal using {}", String.join(" ", cmd));
 
-        startLoggingOutput(new ProcessBuilder(cmd).directory(Path.of(absolutePath).toFile()));
+        startProcess(new ProcessBuilder(cmd).directory(Path.of(absolutePath).toFile()));
     }
 
     /// Returns the file name of the program the Debian alternatives link points to, e.g. `gnome-terminal.wrapper`.

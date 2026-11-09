@@ -24,27 +24,27 @@ public class OSX extends NativeDesktop {
 
     @Override
     protected void openFileWithDefaultApplication(String filePath) throws IOException {
-        new ProcessBuilder("/usr/bin/open", filePath).start();
+        startProcess(new ProcessBuilder("/usr/bin/open", filePath));
     }
 
     @Override
     public void openUrlWithSystemHandler(String url) throws IOException {
-        new ProcessBuilder("/usr/bin/open", url).start();
+        startProcess(new ProcessBuilder("/usr/bin/open", url));
     }
 
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
-        new ProcessBuilder("/usr/bin/open", "-a", application, filePath).start();
+        startProcess(new ProcessBuilder("/usr/bin/open", "-a", application, filePath));
     }
 
     @Override
     protected void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException {
-        new ProcessBuilder("/usr/bin/open", "-R", file.toString()).start();
+        startProcess(new ProcessBuilder("/usr/bin/open", "-R", file.toString()));
     }
 
     @Override
     protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        new ProcessBuilder("open", "-a", "Terminal", absolutePath).start();
+        startProcess(new ProcessBuilder("open", "-a", "Terminal", absolutePath));
     }
 
     @Override

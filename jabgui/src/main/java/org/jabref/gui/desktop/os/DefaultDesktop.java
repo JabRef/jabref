@@ -37,7 +37,7 @@ public class DefaultDesktop extends NativeDesktop {
 
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
-        new ProcessBuilder(application, filePath).start();
+        startProcess(new ProcessBuilder(application, filePath));
     }
 
     @Override

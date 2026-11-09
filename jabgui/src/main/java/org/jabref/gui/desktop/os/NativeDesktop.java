@@ -247,21 +247,21 @@ public abstract class NativeDesktop {
         dialogService.notify(Localization.lang("Executing command \"%0\"...", String.join(" ", subcommands)));
 
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
-            processBuilder.directory(Path.of(absolutePath).toFile());
-            Process process = processBuilder.start();
-            // The started program gets no input; closing its stdin pipe releases the handle instead of keeping it until garbage collection
-            process.getOutputStream().close();
-
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
-
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
+            startProcess(new ProcessBuilder(subcommands).directory(Path.of(absolutePath).toFile()));
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", String.join(" ", subcommands)));
         }
+    }
+
+    /// Starts a program that runs independently of JabRef.
+    /// Its output is drained into the debug log, so it cannot block on a full pipe, and its stdin is closed,
+    /// as it never gets input. Otherwise, the pipes would stay open until garbage collection.
+    protected static void startProcess(ProcessBuilder processBuilder) throws IOException {
+        Process process = processBuilder.start();
+        process.getOutputStream().close();
+        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug));
+        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug));
     }
 
     /// Opens the given URL using the system browser
