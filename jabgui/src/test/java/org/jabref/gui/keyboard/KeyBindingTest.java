@@ -12,7 +12,7 @@ import org.junit.jupiter.api.condition.OS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
-// [utest->req~macos.text-editing-shortcuts~1]
+        // [utest->req~macos.text-editing-shortcuts~1]
 class KeyBindingTest {
 
     @Test
