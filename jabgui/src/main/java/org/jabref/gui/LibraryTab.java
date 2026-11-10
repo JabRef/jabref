@@ -251,9 +251,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                     return;
                 }
             }
-            tab.loading.set(false);
-            tab.dataLoadingTask = null;
-            tab.tabContainer.closeTab(tab);
+            tab.closeWhileLoading();
             onFailure.accept(exception);
         }
 
@@ -1071,12 +1069,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         alreadyOpen.ifPresent(other -> {
             LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", loadedContext.getDBMSSynchronizer().getDBName());
             BackgroundTask.wrap(() -> closeSharedDatabase(loadedContext)).executeWith(taskExecutor);
-            loading.set(false);
-            dataLoadingTask = null;
-            tabContainer.closeTab(this);
+            closeWhileLoading();
             tabContainer.showLibraryTab(other);
         });
         return alreadyOpen.isPresent();
+    }
+
+    /// Closes this tab before its loading task is dropped: until loading succeeded, the tab holds the placeholder
+    /// context of a connection that was never opened, and only a loading tab gets the cleanup suited to it in
+    /// [#onClosed(Event)].
+    void closeWhileLoading() {
+        loading.set(false);
+        tabContainer.closeTab(this);
+        dataLoadingTask = null;
     }
 
     private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
