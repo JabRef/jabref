@@ -179,6 +179,8 @@ class ExportServiceTest extends AbstractJabKitTest {
 
                 ## All publications
 
+                ### Article
+
                 * Example paper. 2025
                 """, output.toString(StandardCharsets.UTF_8).replace("\r\n", "\n"));
     }
