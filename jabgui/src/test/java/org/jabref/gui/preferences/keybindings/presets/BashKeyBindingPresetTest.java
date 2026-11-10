@@ -21,7 +21,9 @@ class BashKeyBindingPresetTest {
 
         if (OS.OS_X) {
             assertEquals("ctrl+A", bindings.get(KeyBinding.EDITOR_BEGINNING));
-            assertEquals("alt+BACK_SPACE", bindings.get(KeyBinding.EDITOR_KILL_WORD_BACKWARD));
+            // Option+Backspace and Option+arrow keys are handled natively by the text controls on macOS
+            assertFalse(bindings.containsKey(KeyBinding.EDITOR_KILL_WORD_BACKWARD));
+            assertFalse(bindings.containsKey(KeyBinding.EDITOR_WORD_BACKWARD));
             assertEquals("ctrl+T", bindings.get(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS));
             assertFalse(bindings.containsKey(KeyBinding.EDITOR_CAPITALIZE));
             assertFalse(bindings.containsKey(KeyBinding.EDITOR_LOWERCASE));

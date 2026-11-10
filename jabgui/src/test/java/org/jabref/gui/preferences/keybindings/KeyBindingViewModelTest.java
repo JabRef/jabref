@@ -138,12 +138,13 @@ class KeyBindingViewModelTest {
         KeyBindingViewModel selectedVM = new KeyBindingViewModel(viewModel.getKeyBindingRepository(), binding, binding.getDefaultKeyBinding());
         viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
 
-        // Control (distinct from Shortcut/Cmd on macOS) held with 'A', no other modifiers
+        // Control (distinct from Shortcut/Cmd on macOS) held with 'J', no other modifiers.
+        // 'J' is used, because Control plus most other letters are default macOS text-editing shortcuts
         KeyEvent event = new KeyEvent(
                 KeyEvent.KEY_PRESSED,
-                "A",
-                "A",
-                KeyCode.A,
+                "J",
+                "J",
+                KeyCode.J,
                 false,
                 true,
                 false,
@@ -155,7 +156,7 @@ class KeyBindingViewModelTest {
         viewModel.storeSettings();
 
         Optional<String> saved = liveRepo.get(binding);
-        assertEquals(Optional.of("ctrl+A"), saved);
+        assertEquals(Optional.of("ctrl+J"), saved);
     }
 
     @Test

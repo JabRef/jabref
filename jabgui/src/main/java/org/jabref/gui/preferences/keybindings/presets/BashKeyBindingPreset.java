@@ -22,16 +22,11 @@ public class BashKeyBindingPreset implements KeyBindingPreset {
             keyBindings.put(KeyBinding.EDITOR_DELETE, "ctrl+D");
             keyBindings.put(KeyBinding.EDITOR_BACKWARD, "ctrl+B");
             keyBindings.put(KeyBinding.EDITOR_FORWARD, "ctrl+F");
-            keyBindings.put(KeyBinding.EDITOR_WORD_BACKWARD, "alt+LEFT");
-            keyBindings.put(KeyBinding.EDITOR_WORD_FORWARD, "alt+RIGHT");
             keyBindings.put(KeyBinding.EDITOR_BEGINNING, "ctrl+A");
             keyBindings.put(KeyBinding.EDITOR_END, "ctrl+E");
-            keyBindings.put(KeyBinding.EDITOR_BEGINNING_DOC, "shortcut+UP");
-            keyBindings.put(KeyBinding.EDITOR_END_DOC, "shortcut+DOWN");
             keyBindings.put(KeyBinding.EDITOR_UP, "ctrl+P");
             keyBindings.put(KeyBinding.EDITOR_DOWN, "ctrl+N");
             keyBindings.put(KeyBinding.EDITOR_KILL_LINE, "ctrl+K");
-            keyBindings.put(KeyBinding.EDITOR_KILL_WORD_BACKWARD, "alt+BACK_SPACE");
             keyBindings.put(KeyBinding.EDITOR_INSERT_LINE_AFTER, "ctrl+O");
             keyBindings.put(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, "ctrl+T");
         } else {
