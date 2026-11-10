@@ -106,11 +106,12 @@ class KeyBindingViewModelTest {
         KeyBindingViewModel selectedVM = new KeyBindingViewModel(viewModel.getKeyBindingRepository(), binding, binding.getDefaultKeyBinding());
         viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
 
+        // Shift+Shortcut+J is not used by any default binding, so the duplicate warning does not interfere
         KeyEvent event = new KeyEvent(
                 KeyEvent.KEY_PRESSED,
-                "L",
-                "L",
-                KeyCode.L,
+                "J",
+                "J",
+                KeyCode.J,
                 true,
                 false,
                 false,
@@ -122,7 +123,7 @@ class KeyBindingViewModelTest {
         viewModel.storeSettings();
 
         Optional<String> saved = liveRepo.get(binding);
-        assertEquals(Optional.of("shortcut+shift+L"), saved);
+        assertEquals(Optional.of("shortcut+shift+J"), saved);
     }
 
     @Test
