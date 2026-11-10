@@ -243,15 +243,11 @@ class BackupResolverDialogTest extends JavaFxTest {
         return Files.writeString(backup, content);
     }
 
-    private BackupResolverDialog createDialog(Path original, Path backupDirectory) {
+    private BackupResolverDialog createDialog(Path original, Path backupDirectory) throws IOException {
         Optional<Path> backup = BackupFileUtil.getPathOfLatestExistingBackupFile(original, backupDirectory);
-        Optional<BackupComparison> comparison = backup.flatMap(path -> {
-            try {
-                return Optional.of(BackupComparator.compare(original, path, importFormatPreferences()));
-            } catch (IOException _) {
-                return Optional.empty();
-            }
-        });
+        Optional<BackupComparison> comparison = backup.isPresent()
+                ? Optional.of(BackupComparator.compare(original, backup.orElseThrow(), importFormatPreferences()))
+                : Optional.empty();
         AtomicReference<BackupResolverDialog> dialog = new AtomicReference<>();
         interact(() -> dialog.set(new BackupResolverDialog(
                 original,
