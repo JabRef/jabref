@@ -303,7 +303,6 @@
 
 .table-cell .glyph-icon,
 .tree-table-cell .glyph-icon {
-    -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-fill: -fx-text-background-color;
     -fx-text-fill: -fx-text-background-color;
 }

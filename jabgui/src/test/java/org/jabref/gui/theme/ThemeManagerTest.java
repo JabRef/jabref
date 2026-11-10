@@ -386,7 +386,7 @@ class ThemeManagerTest {
 
         changeFontSize(workSpacePreferences, 9);
 
-        assertEquals(12, applyCssAndGetIconSize(icon)); // 9pt -> 12px
+        assertEquals(15, applyCssAndGetIconSize(icon)); // 1.25em at 9pt (12px)
     }
 
     @Test
@@ -404,7 +404,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void cssSizedIconKeepsItsSize() {
+    void cssSizedIconFollowsFontSizeChanges() {
         var workSpacePreferences = WorkspacePreferences.getDefault();
         workSpacePreferences.setShouldOverrideDefaultFontSize(true);
         var themeManager = createThemeManager(workSpacePreferences);
@@ -417,7 +417,7 @@ class ThemeManagerTest {
         changeFontSize(workSpacePreferences, 20);
         changeFontSize(workSpacePreferences, 9);
 
-        assertEquals(14, applyCssAndGetIconSize(icon)); // 14px
+        assertEquals(15, applyCssAndGetIconSize(icon)); // 1.25em at 9pt (12px)
     }
 
     @Test
