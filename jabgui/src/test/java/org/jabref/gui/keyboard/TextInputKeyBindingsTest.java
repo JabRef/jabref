@@ -2,6 +2,8 @@ package org.jabref.gui.keyboard;
 
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -10,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
@@ -35,6 +38,57 @@ import static org.mockito.Mockito.when;
 class TextInputKeyBindingsTest {
 
     private static final String MULTILINE_TEXT = "First line\nSecond line\nThird line";
+
+    private static TextArea layoutTextAreaWithCaretAt(String text, int caretPosition) {
+        TextArea area = new TextArea(text);
+        StackPane root = new StackPane(area);
+        new Scene(root, 400, 200);
+        root.applyCss();
+        root.layout();
+        area.positionCaret(caretPosition);
+        root.layout();
+        return area;
+    }
+
+    private static String numberedLines(int count) {
+        return IntStream.rangeClosed(1, count).mapToObj(i -> "Line " + i).collect(Collectors.joining("\n"));
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void centerCaretScrollsCaretLineToVerticalCenter() {
+        JavaFxExtension.invokeAndWait(() -> {
+            String text = numberedLines(60);
+            TextArea area = layoutTextAreaWithCaretAt(text, text.indexOf("Line 30"));
+            TextAreaSkin skin = (TextAreaSkin) area.getSkin();
+            double lineHeight = skin.getCaretBounds().getHeight();
+
+            assertTrue(TextInputKeyBindings.centerCaret(area));
+            area.getParent().layout();
+
+            assertEquals(area.getHeight() / 2, skin.getCaretBounds().getCenterY(), lineHeight);
+            assertEquals(text.indexOf("Line 30"), area.getCaretPosition());
+        });
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void centerCaretDoesNotScrollAboveTextStart() {
+        JavaFxExtension.invokeAndWait(() -> {
+            TextArea area = layoutTextAreaWithCaretAt(numberedLines(60), 0);
+
+            assertTrue(TextInputKeyBindings.centerCaret(area));
+
+            assertEquals(0, area.getScrollTop());
+        });
+    }
+
+    @Test
+    void centerCaretIgnoresSingleLineTextField() {
+        TextField textField = new TextField("abc");
+
+        assertFalse(TextInputKeyBindings.centerCaret(textField));
+    }
 
     @Test
         // [utest->req~macos.text-editing-shortcuts~1]

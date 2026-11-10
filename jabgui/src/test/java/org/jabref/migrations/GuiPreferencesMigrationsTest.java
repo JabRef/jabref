@@ -130,6 +130,7 @@ class GuiPreferencesMigrationsTest {
         expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_UP.getConstant()), "ctrl+P");
         expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_DOWN.getConstant()), "ctrl+N");
         expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_KILL_LINE.getConstant()), "ctrl+K");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_CENTER_CARET.getConstant()), "ctrl+L");
         expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_INSERT_LINE_AFTER.getConstant()), "ctrl+O");
         expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getConstant()), "ctrl+T");
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);

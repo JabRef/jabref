@@ -118,6 +118,7 @@ public class CodeAreaKeyBindings {
                     codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
+                // EDITOR_CENTER_CARET is not handled: the incubator CodeArea has no public API to scroll the viewport, see https://github.com/JabRef/jabref/issues/17771
                 case EDITOR_INSERT_LINE_AFTER -> {
                     insertLineAfterCaret(codeArea);
                     event.consume();

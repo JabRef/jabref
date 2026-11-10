@@ -28,6 +28,7 @@ public enum KeyBinding {
     EDITOR_KILL_LINE("Remove all characters caret to end of line", Localization.lang("Remove line after caret"), "", "ctrl+K", KeyBindingCategory.EDITOR),
     EDITOR_KILL_WORD("Remove characters until next word", Localization.lang("Remove characters until next word"), "", KeyBindingCategory.EDITOR),
     EDITOR_KILL_WORD_BACKWARD("Characters until previous word", Localization.lang("Remove the current word backwards"), "", KeyBindingCategory.EDITOR),
+    EDITOR_CENTER_CARET("Center caret in visible area", Localization.lang("Center caret in visible area"), "", "ctrl+L", KeyBindingCategory.EDITOR),
     EDITOR_INSERT_LINE_AFTER("Insert line after caret", Localization.lang("Insert line after caret"), "", "ctrl+O", KeyBindingCategory.EDITOR),
     EDITOR_TRANSPOSE_CHARACTERS("Transpose characters", Localization.lang("Transpose characters"), "", "ctrl+T", KeyBindingCategory.EDITOR),
 

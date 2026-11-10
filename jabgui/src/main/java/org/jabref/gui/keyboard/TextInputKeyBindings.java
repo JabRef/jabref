@@ -1,6 +1,7 @@
 package org.jabref.gui.keyboard;
 
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.skin.TextAreaSkin;
@@ -69,6 +70,11 @@ public class TextInputKeyBindings {
                         focusedTextField.end();
                         event.consume();
                     }
+                    case EDITOR_CENTER_CARET -> {
+                        if (centerCaret(focusedTextField)) {
+                            event.consume();
+                        }
+                    }
                     case EDITOR_INSERT_LINE_AFTER -> {
                         if (insertLineAfterCaret(focusedTextField)) {
                             event.consume();
@@ -136,6 +142,24 @@ public class TextInputKeyBindings {
                 }
             });
         }
+    }
+
+    /// macOS Ctrl+L: scrolls a multi-line [TextArea] so that the caret line is vertically centered, without moving the caret.
+    /// At the beginning and the end of the text, the scrolling stops at the text boundary.
+    ///
+    /// @return true if the text input is a text area whose scroll position was adjusted
+    static boolean centerCaret(TextInputControl textInput) {
+        if (!(textInput instanceof TextArea textArea)
+                || !(textArea.getSkin() instanceof TextAreaSkin skin)
+                || !(textArea.lookup(".scroll-pane") instanceof ScrollPane scrollPane)
+                || (scrollPane.getContent() == null)) {
+            return false;
+        }
+        double scrollTopMax = Math.max(0, scrollPane.getContent().getLayoutBounds().getHeight() - scrollPane.getViewportBounds().getHeight());
+        // Caret bounds are relative to the text area, so they already reflect the current scroll position
+        double scrollTop = textArea.getScrollTop() + skin.getCaretBounds().getCenterY() - (textArea.getHeight() / 2);
+        textArea.setScrollTop(Math.clamp(scrollTop, 0, scrollTopMax));
+        return true;
     }
 
     /// macOS Ctrl+O: inserts a line break at the caret without moving the caret.
