@@ -61,7 +61,7 @@ public class BackupResolverDialog extends FXDialog {
                 value("backupSize", backupPath.flatMap(FileUtil::getFileSize).orElse(UNKNOWN)));
         table.addRow(3, new Label(Localization.lang("Last modified")),
                 value("currentModified", formatModified(originalPath)),
-                value("backupModified", backupPath.map(this::formatModified).orElse(UNKNOWN)));
+                value("backupModified", backupPath.map(BackupResolverDialog::formatModified).orElse(UNKNOWN)));
         table.addRow(4, new Label(Localization.lang("Number of entries")),
                 value("currentEntries", comparison.map(result -> format(result.currentEntryCount())).orElse(UNKNOWN)),
                 value("backupEntries", comparison.map(result -> format(result.backupEntryCount())).orElse(UNKNOWN)));
@@ -110,7 +110,7 @@ public class BackupResolverDialog extends FXDialog {
         return link;
     }
 
-    private String formatModified(Path file) {
+    private static String formatModified(Path file) {
         try {
             return DATE_TIME_FORMATTER.format(Files.getLastModifiedTime(file).toInstant());
         } catch (IOException ex) {

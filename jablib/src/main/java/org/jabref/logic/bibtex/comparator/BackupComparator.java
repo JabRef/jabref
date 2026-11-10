@@ -26,9 +26,7 @@ public final class BackupComparator {
     private BackupComparator() {
     }
 
-    /// Compares the library with its backup. An entry count is absent when its file cannot be parsed reliably;
-    /// changes are absent when either file cannot be compared reliably.
-    /// Added and removed counts describe the backup relative to the current library.
+    /// Compares the library with its backup.
     ///
     /// @throws InterruptedIOException if the calling thread is interrupted
     public static BackupComparison compare(Path original, Path backup, ImportFormatPreferences preferences) throws IOException {
@@ -39,7 +37,7 @@ public final class BackupComparator {
         stopIfInterrupted();
         Optional<ChangeCounts> changes = current.flatMap(currentResult ->
                 candidate.flatMap(candidateResult -> compareEntries(currentResult, candidateResult)));
-        return new BackupComparison(count(current), count(candidate), changes);
+        return new BackupComparison(entryCount(current), entryCount(candidate), changes);
     }
 
     private static void stopIfInterrupted() throws InterruptedIOException {
@@ -71,7 +69,7 @@ public final class BackupComparator {
         return parsed;
     }
 
-    private static OptionalInt count(Optional<ParserResult> parsed) {
+    private static OptionalInt entryCount(Optional<ParserResult> parsed) {
         return parsed.map(result -> OptionalInt.of(countNonEmptyEntries(result)))
                      .orElseGet(OptionalInt::empty);
     }

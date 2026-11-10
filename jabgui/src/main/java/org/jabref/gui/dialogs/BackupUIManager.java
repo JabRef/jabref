@@ -53,6 +53,7 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
+    // [impl->req~jabgui.backup.restore-dialog-non-blocking~2]
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  LibraryTabContainer tabContainer,
                                                                  Path originalPath,
@@ -60,14 +61,18 @@ public class BackupUIManager {
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  StateManager stateManager) {
         Optional<Path> latestBackupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory());
-        Optional<BackupComparison> comparison;
+        Optional<BackupComparison> comparison = Optional.empty();
         try {
             // Not on the shared task pool, where other backup dialogs can block it
-            comparison = compareWithBackup(originalPath, latestBackupPath, preferences.getImportFormatPreferences());
+            if (latestBackupPath.isPresent()) {
+                comparison = Optional.of(BackupComparator.compare(originalPath, latestBackupPath.orElseThrow(), preferences.getImportFormatPreferences()));
+            }
         } catch (InterruptedIOException e) {
             LOGGER.debug("Comparison of {} with its backup was cancelled", originalPath, e);
             Thread.currentThread().interrupt();
             return Optional.empty();
+        } catch (IOException e) {
+            LOGGER.warn("Could not compare library with backup", e);
         }
 
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
@@ -111,23 +116,6 @@ public class BackupUIManager {
             }
             return Optional.empty();
         });
-    }
-
-    // [impl->req~jabgui.backup.restore-dialog-non-blocking~2]
-    private static Optional<BackupComparison> compareWithBackup(Path originalPath,
-                                                                Optional<Path> backupPath,
-                                                                ImportFormatPreferences importFormatPreferences) throws InterruptedIOException {
-        if (backupPath.isEmpty()) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(BackupComparator.compare(originalPath, backupPath.orElseThrow(), importFormatPreferences));
-        } catch (InterruptedIOException e) {
-            throw e;
-        } catch (IOException e) {
-            LOGGER.warn("Could not compare library with backup", e);
-            return Optional.empty();
-        }
     }
 
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
