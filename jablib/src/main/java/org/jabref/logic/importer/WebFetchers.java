@@ -15,6 +15,7 @@ import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BaseSearchFetcher;
+import org.jabref.logic.importer.fetcher.BibSonomyFetcher;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.BvbFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
@@ -165,6 +166,7 @@ public class WebFetchers {
         searchBasedFetchers.add(new GvkFetcher(importFormatPreferences));
         searchBasedFetchers.add(new DnbFetcher(importFormatPreferences));
         searchBasedFetchers.add(new BvbFetcher());
+        searchBasedFetchers.add(new BibSonomyFetcher(importFormatPreferences, importerPreferences));
         searchBasedFetchers.add(new MedlineFetcher(importerPreferences));
         searchBasedFetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         searchBasedFetchers.add(new MathSciNet(importFormatPreferences));
@@ -306,6 +308,7 @@ public class WebFetchers {
         Set<CustomizableKeyFetcher> fetchers = Set.of(
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
                 new BaseSearchFetcher(importerPreferences),
+                new BibSonomyFetcher(importFormatPreferences, importerPreferences),
                 new BiodiversityLibrary(importerPreferences),
                 new CrossRef(importerPreferences),
                 new IEEE(importFormatPreferences, importerPreferences),
