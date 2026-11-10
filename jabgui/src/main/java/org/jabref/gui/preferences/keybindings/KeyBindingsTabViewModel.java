@@ -23,8 +23,10 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
+import org.jabref.gui.preferences.keybindings.presets.MacOsKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.OptionalObjectProperty;
 
 import org.jspecify.annotations.NonNull;
@@ -50,6 +52,9 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
         keyBindingPresets.add(new BashKeyBindingPreset());
         keyBindingPresets.add(new NewEntryBindingPreset());
+        if (OS.OS_X) {
+            keyBindingPresets.add(new MacOsKeyBindingPreset());
+        }
     }
 
     /// Read all keybindings from the keybinding repository and create table keybinding models for them
