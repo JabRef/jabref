@@ -156,7 +156,7 @@ class CitationRelationsTabTest {
     }
 
     @Test
-    void clearingDoiDoesNotTriggerCitationSearch() throws FetcherException {
+    void clearingAndReAddingDoiRefreshesCitations() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.DOI, "10.1145/782941.782993");
 
@@ -169,5 +169,10 @@ class CitationRelationsTabTest {
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
 
         verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
+
+        entry.setField(StandardField.DOI, "10.1145/782941.782993");
+        JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
+
+        verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
     }
 }
