@@ -741,6 +741,29 @@ class AutoSetFileLinksUtilTest {
                 List<LinkedFile> actual = entryA.getFiles();
                 assertEquals(expect, actual);
             }
+
+            @Test
+            void autoLinkMoveNonPdfFileFromRootFolderToSubfolder(@TempDir Path root) throws Exception {
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
+
+                Path folderA = root.resolve("A");
+                Files.createDirectory(folderA);
+                Path fileA = root.resolve("A.docx");
+                Files.createFile(fileA);
+
+                BibEntry entryA = new BibEntry(StandardEntryType.Article);
+                entryA.setCitationKey("WeDoNotCare");
+                entryA.addFile(new LinkedFile("", "A.docx", "Word 2007+"));
+
+                Files.move(fileA, folderA.resolve("A.docx"));
+
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                util.linkAssociatedFiles(List.of(entryA), onLinkedFilesUpdated);
+
+                List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/A.docx"), "Word 2007+"));
+                assertEquals(expect, entryA.getFiles());
+            }
         }
 
         @Nested
@@ -867,6 +890,53 @@ class AutoSetFileLinksUtilTest {
                 List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("A/AAA.pdf"), "PDF"));
                 List<LinkedFile> actual = entryA.getFiles();
                 assertEquals(expect, actual);
+            }
+        }
+
+        @Nested
+        @DisplayName("withoutConfiguredExternalFileTypes")
+        class withoutConfiguredExternalFileTypes {
+
+            @BeforeEach
+            void setUpEmptyExternalFileTypes() {
+                when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet());
+            }
+
+            @Test
+            void autoLinkBrokenLinkedFile(@TempDir Path root) throws Exception {
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
+
+                Path subdir = root.resolve("subdir");
+                Files.createDirectory(subdir);
+                Files.createFile(subdir.resolve("minimal.pdf"));
+
+                BibEntry entryA = new BibEntry(StandardEntryType.Misc);
+                entryA.setCitationKey("minimal");
+                entryA.addFile(new LinkedFile("", "minimal.pdf", "PDF"));
+
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                util.linkAssociatedFiles(List.of(entryA), onLinkedFilesUpdated);
+
+                List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("subdir/minimal.pdf"), "PDF"));
+                assertEquals(expect, entryA.getFiles());
+            }
+
+            @Test
+            void autoLinkNewFileSetsFileType(@TempDir Path root) throws Exception {
+                when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
+
+                Files.createFile(root.resolve("minimal.pdf"));
+
+                BibEntry entryA = new BibEntry(StandardEntryType.Misc);
+                entryA.setCitationKey("minimal");
+
+                AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                        externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+                util.linkAssociatedFiles(List.of(entryA), onLinkedFilesUpdated);
+
+                List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("minimal.pdf"), "PDF"));
+                assertEquals(expect, entryA.getFiles());
             }
         }
     }

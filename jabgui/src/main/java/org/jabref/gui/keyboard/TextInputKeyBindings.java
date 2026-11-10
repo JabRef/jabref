@@ -4,7 +4,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.skin.TextAreaSkin;
-import javafx.scene.control.skin.TextInputControlSkin;
+import javafx.scene.control.skin.TextInputControlSkin.Direction;
+import javafx.scene.control.skin.TextInputControlSkin.TextUnit;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.logic.util.strings.StringManipulator;
@@ -13,6 +14,8 @@ import org.jabref.model.util.ResultingStringState;
 public class TextInputKeyBindings {
 
     // [impl->req~macos.text-editing-shortcuts~1]
+    // [impl->req~ux.text-editing.line-boundaries~2]
+    // [impl->req~ux.text-editing.visual-line-navigation~1]
     public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
@@ -38,23 +41,28 @@ public class TextInputKeyBindings {
                         event.consume();
                     }
                     case EDITOR_BEGINNING -> {
-                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.BEGINNING);
+                        int caret = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        focusedTextField.positionCaret(text.lastIndexOf('\n', caret - 1) + 1);
+                        event.consume();
+                    }
+                    case EDITOR_END -> {
+                        int caret = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        int lineEnd = text.indexOf('\n', caret);
+                        focusedTextField.positionCaret(lineEnd == -1 ? text.length() : lineEnd);
                         event.consume();
                     }
                     case EDITOR_UP -> {
-                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.UP);
+                        moveCaretUp(focusedTextField);
                         event.consume();
                     }
                     case EDITOR_BEGINNING_DOC -> {
                         focusedTextField.home();
                         event.consume();
                     }
-                    case EDITOR_END -> {
-                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.END);
-                        event.consume();
-                    }
                     case EDITOR_DOWN -> {
-                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.DOWN);
+                        moveCaretDown(focusedTextField);
                         event.consume();
                     }
                     case EDITOR_END_DOC -> {
@@ -98,8 +106,14 @@ public class TextInputKeyBindings {
                     }
                     case EDITOR_KILL_LINE -> {
                         int pos = focusedTextField.getCaretPosition();
-                        focusedTextField.setText(focusedTextField.getText(0, pos));
-                        focusedTextField.positionCaret(pos);
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        int lineEnd = text.indexOf('\n', pos);
+                        if (lineEnd == -1) {
+                            lineEnd = text.length();
+                        } else if (lineEnd == pos) {
+                            lineEnd++;
+                        }
+                        focusedTextField.deleteText(pos, lineEnd);
                         event.consume();
                     }
                     case EDITOR_KILL_WORD -> {
@@ -121,23 +135,6 @@ public class TextInputKeyBindings {
                     // CLEAR_SEARCH is handled at org.jabref.gui.search.SearchTextField
                 }
             });
-        }
-    }
-
-    /// Moves the caret by one visual line (UP, DOWN) or to the start/end of the current visual line (BEGINNING, END)
-    /// in a multi-line [TextArea], using the public line navigation of its skin.
-    /// Single-line inputs fall back to the start or end of the text, which is the same position for a single line.
-    static void moveCaretByLine(TextInputControl textInput, TextInputControlSkin.Direction direction) {
-        if (textInput instanceof TextArea && textInput.getSkin() instanceof TextAreaSkin skin) {
-            skin.moveCaret(TextInputControlSkin.TextUnit.LINE, direction, false);
-            return;
-        }
-        if (direction == TextInputControlSkin.Direction.UP || direction == TextInputControlSkin.Direction.BEGINNING) {
-            textInput.home();
-        } else if (direction == TextInputControlSkin.Direction.DOWN || direction == TextInputControlSkin.Direction.END) {
-            textInput.end();
-        } else {
-            throw new IllegalArgumentException("Unsupported direction: " + direction);
         }
     }
 
@@ -169,4 +166,39 @@ public class TextInputKeyBindings {
         textInput.positionCaret(nextCharacterEnd);
     }
 
+    private static void moveCaretUp(TextInputControl control) {
+        if (control.getSkin() instanceof TextAreaSkin skin) {
+            skin.moveCaret(TextUnit.LINE, Direction.UP, false);
+            return;
+        }
+        int caret = control.getCaretPosition();
+        String text = control.getText(0, control.getLength());
+        int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
+        if (lineStart == 0) {
+            control.positionCaret(0);
+            return;
+        }
+
+        int previousLineEnd = lineStart - 1;
+        int previousLineStart = text.lastIndexOf('\n', previousLineEnd - 1) + 1;
+        control.positionCaret(Math.min(previousLineStart + caret - lineStart, previousLineEnd));
+    }
+
+    private static void moveCaretDown(TextInputControl control) {
+        if (control.getSkin() instanceof TextAreaSkin skin) {
+            skin.moveCaret(TextUnit.LINE, Direction.DOWN, false);
+            return;
+        }
+        int caret = control.getCaretPosition();
+        String text = control.getText(0, control.getLength());
+        int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
+        int lineEnd = text.indexOf('\n', caret);
+        if (lineEnd == -1) {
+            control.positionCaret(text.length());
+            return;
+        }
+
+        int nextLineEnd = text.indexOf('\n', lineEnd + 1);
+        control.positionCaret(Math.min(lineEnd + 1 + caret - lineStart, nextLineEnd == -1 ? text.length() : nextLineEnd));
+    }
 }

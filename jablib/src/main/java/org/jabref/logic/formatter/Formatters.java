@@ -18,6 +18,7 @@ import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import org.jabref.logic.formatter.bibtexfields.LatexToUnicodeAwareLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeEnDashesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeIssn;
@@ -68,6 +69,7 @@ public class Formatters {
                 new HtmlToLatexFormatter(),
                 new HtmlToUnicodeFormatter(),
                 new LatexToUnicodeFormatter(),
+                new LatexToUnicodeAwareLatexFormatter(),
                 new UnicodeToLatexFormatter(),
                 new ConvertMSCCodesFormatter(),
                 new TransliterateFormatter()

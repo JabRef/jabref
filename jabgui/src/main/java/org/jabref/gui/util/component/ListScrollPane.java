@@ -23,6 +23,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
 import com.google.common.collect.MapMaker;
+import org.jspecify.annotations.NullMarked;
 
 /// A container for rendering a list of items. it is not that smart as [javafx.scene.control.ListView], which can skip drawing components that are not visible, but it is flexible and supports custom spacing and auto-scroll.
 ///
@@ -175,6 +176,12 @@ public class ListScrollPane<T> extends ScrollPane {
 
     public final ListProperty<T> itemsProperty() {
         return itemsProperty;
+    }
+
+    /// A live, read-only list of the rendered item nodes in display order.
+    @NullMarked
+    public final ObservableList<Node> getRenderedNodes() {
+        return contentContainer.getChildrenUnmodifiable();
     }
 
     public final Function<T, Node> getRenderer() {

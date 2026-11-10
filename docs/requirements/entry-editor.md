@@ -14,6 +14,16 @@ This holds within one library only: switching to a library tab without a selecte
 
 Needs: impl
 
+## Single-line entry fields must return focus to the editor when <kbd>Enter</kbd> accepts their value
+`req~entry-editor.accept-single-line-value~1`
+
+Applies to single-line text controls in the entry editor after their existing action handlers finish.
+An <kbd>Enter</kbd> key handled by an autocomplete popup continues to select its suggestion.
+
+See <https://github.com/JabRef/jabref/issues/17445>.
+
+Needs: impl, utest
+
 ## GUI must initialize validation decoration during startup
 `req~entry-editor.validation-decoration.startup~1`
 
@@ -130,5 +140,21 @@ When changing the selected entry, the Source tab replaces its full document in o
 While a new selection is still settling, saving or leaving the Source tab writes the visible source back to the entry it was rendered from, not the newly selected one.
 
 Needs: impl
+
+## Source tab must preserve BibTeX layout when copying
+`req~entry-editor.source-tab.copy-layout~1`
+
+The HTML and RTF clipboard representations must preserve whitespace and use a monospace font so rich-text applications retain the source's indentation and alignment.
+Originates from <https://github.com/JabRef/jabref/issues/17392>
+
+Needs: impl, utest
+
+## Source tab must preserve BibTeX syntax colors when copying
+`req~entry-editor.source-tab.copy-syntax-colors~1`
+
+The HTML and RTF clipboard representations must preserve the syntax colors of the current theme.
+Originates from <https://github.com/JabRef/jabref/issues/17392>
+
+Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
