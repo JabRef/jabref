@@ -210,7 +210,7 @@ public class IconTheme {
         PRIORITY(MaterialDesignF.FLAG),
         PRIORITY_HIGH(Color.RED, MaterialDesignF.FLAG),
         PRIORITY_MEDIUM(Color.ORANGE, MaterialDesignF.FLAG),
-        PRIORITY_LOW(Color.rgb(100, 149, 237, 1), MaterialDesignF.FLAG),
+        PRIORITY_LOW(Color.rgb(25, 118, 210, 1), MaterialDesignF.FLAG),
         PRINTED(MaterialDesignP.PRINTER),
         RANKING(MaterialDesignS.STAR),
         RANK1(MaterialDesignS.STAR, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE),
