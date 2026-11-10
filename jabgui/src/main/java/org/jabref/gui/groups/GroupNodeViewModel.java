@@ -33,6 +33,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
@@ -128,7 +129,7 @@ public class GroupNodeViewModel {
         this.localDragBoard = localDragBoard;
         this.preferences = preferences;
 
-        displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));
+        displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(localizedName(groupNode.getGroup())));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
             children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
@@ -172,6 +173,15 @@ public class GroupNodeViewModel {
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
         this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferences);
+    }
+
+    /// Group names are serialized, so the generated [MissingKeywordGroup] keeps an English name in the model.
+    /// Only the name shown in the groups panel is localized.
+    private static String localizedName(AbstractGroup group) {
+        if (group instanceof MissingKeywordGroup) {
+            return Localization.lang("No value");
+        }
+        return group.getName();
     }
 
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {

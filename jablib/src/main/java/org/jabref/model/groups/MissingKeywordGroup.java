@@ -2,8 +2,6 @@ package org.jabref.model.groups;
 
 import java.util.Objects;
 
-import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -15,13 +13,15 @@ import org.jspecify.annotations.NullMarked;
 /// so that entries without a value (e.g., without a ranking) can still be found.
 /// The field is split the same way as in [AutomaticKeywordGroup], so a field consisting only of delimiters counts as empty.
 @NullMarked
-@AllowedToUseLogic("Uses Localization for the name of the generated subgroup")
 public class MissingKeywordGroup extends KeywordGroup {
+
+    /// Not localized, because group names are serialized. The user interface localizes the displayed name.
+    private static final String NAME = "No value";
 
     private final Character keywordDelimiter;
 
     public MissingKeywordGroup(GroupHierarchyType context, Field searchField, Character keywordDelimiter) {
-        super(Localization.lang("No value"), context, searchField, "", true);
+        super(NAME, context, searchField, "", true);
         this.keywordDelimiter = keywordDelimiter;
     }
 
