@@ -185,7 +185,7 @@ public enum KeyBinding {
     }
 
     /// @return The default key binding on macOS, where `alt` plus a letter would insert a special character
-    String getDefaultMacKeyBinding() {
+    public String getDefaultMacKeyBinding() {
         return defaultMacBinding;
     }
 

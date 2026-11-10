@@ -336,6 +336,7 @@ Needs: impl, utest
 
 On macOS, text fields, text areas, and the BibTeX source editor must offer the standard macOS text-editing shortcuts as default key bindings: Control+A and Control+E (start and end of line), Control+F and Control+B (forward and backward one character), Control+P and Control+N (up and down one line), Control+O (insert a line break after the caret without moving the caret), and Control+T (transpose the characters around the caret).
 The default key bindings on other platforms remain unchanged.
+Existing macOS settings receive these defaults for editor key bindings that are still unassigned, unless another action already uses the key combination.
 See <https://github.com/JabRef/jabref/issues/16529>.
 
 Needs: impl, utest

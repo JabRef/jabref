@@ -15,8 +15,10 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.KeyCombination;
 
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -87,6 +89,7 @@ public class PreferencesMigrations {
         upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
         upgradeKeyBindingsToJavaFX(preferences);
         upgradeMacKeyBindingDefaults(preferences, OS.OS_X);
+        upgradeMacTextEditingKeyBindingDefaults(preferences, OS.OS_X);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         upgradeBuiltinPreviewName(preferences);
@@ -427,7 +430,8 @@ public class PreferencesMigrations {
             String bindingName = bindNames.get(i);
             String persistedBinding = bindings.get(i);
             for (KeyBinding keyBinding : KeyBinding.values()) {
-                if (keyBinding.getConstant().equals(bindingName)) {
+                // Editor bindings are migrated by upgradeMacTextEditingKeyBindingDefaults, which also checks for conflicts
+                if (keyBinding.getConstant().equals(bindingName) && keyBinding.getCategory() != KeyBindingCategory.EDITOR) {
                     int index = i;
                     keyBinding.getMacDefaultReplacement(persistedBinding)
                               .ifPresent(replacement -> migratedBindings.set(index, replacement));
@@ -438,6 +442,72 @@ public class PreferencesMigrations {
 
         prefs.putStringList(JabRefGuiPreferences.BINDINGS, migratedBindings);
         prefs.putBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    /// Assigns the macOS text-editing defaults (e.g., <kbd>Control</kbd> + <kbd>A</kbd>) to editor key bindings
+    /// persisted while these bindings had no default yet.
+    ///
+    /// - An empty persisted editor binding is treated as the former default, because it cannot be distinguished from
+    ///   a binding the user cleared. The migration runs only once (also if no key bindings are persisted yet),
+    ///   so a binding the user clears afterwards stays cleared.
+    /// - A default is not assigned if another action already uses its key combination, so custom shortcuts keep working.
+    ///   An editor binding missing from the persisted snapshot is then stored as unassigned for the same reason.
+    ///
+    /// See <https://github.com/JabRef/jabref/issues/16529>.
+    static void upgradeMacTextEditingKeyBindingDefaults(JabRefCliPreferences prefs, boolean isMacOs) {
+        if (!isMacOs || prefs.getBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, false)) {
+            return;
+        }
+
+        List<String> bindNames = prefs.getStringList(JabRefGuiPreferences.BIND_NAMES);
+        List<String> bindings = prefs.getStringList(JabRefGuiPreferences.BINDINGS);
+        if (!bindNames.isEmpty() && (bindNames.size() == bindings.size())) {
+            List<String> migratedBindNames = new ArrayList<>(bindNames);
+            List<String> migratedBindings = new ArrayList<>(bindings);
+            for (KeyBinding keyBinding : KeyBinding.values()) {
+                if (keyBinding.getCategory() == KeyBindingCategory.EDITOR) {
+                    migrateMacTextEditingKeyBinding(keyBinding, migratedBindNames, migratedBindings);
+                }
+            }
+            prefs.putStringList(JabRefGuiPreferences.BIND_NAMES, migratedBindNames);
+            prefs.putStringList(JabRefGuiPreferences.BINDINGS, migratedBindings);
+        }
+        prefs.putBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    private static void migrateMacTextEditingKeyBinding(KeyBinding keyBinding, List<String> bindNames, List<String> bindings) {
+        int index = bindNames.indexOf(keyBinding.getConstant());
+        String macDefault = keyBinding.getDefaultMacKeyBinding();
+        if (index == -1) {
+            if (isKeyCombinationInUse(macDefault, bindings)) {
+                bindNames.add(keyBinding.getConstant());
+                bindings.add("");
+            }
+            return;
+        }
+        keyBinding.getMacDefaultReplacement(bindings.get(index))
+                  .filter(replacement -> !isKeyCombinationInUse(replacement, bindings))
+                  .ifPresent(replacement -> bindings.set(index, replacement));
+    }
+
+    private static boolean isKeyCombinationInUse(String keyCombination, List<String> bindings) {
+        return parseKeyCombination(keyCombination)
+                .map(combination -> bindings.stream()
+                                            .map(PreferencesMigrations::parseKeyCombination)
+                                            .anyMatch(binding -> binding.filter(combination::equals).isPresent()))
+                .orElse(false);
+    }
+
+    private static Optional<KeyCombination> parseKeyCombination(String keyCombination) {
+        if (keyCombination.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(KeyCombination.valueOf(keyCombination));
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Ignoring invalid key binding {} during migration", keyCombination, e);
+            return Optional.empty();
+        }
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {

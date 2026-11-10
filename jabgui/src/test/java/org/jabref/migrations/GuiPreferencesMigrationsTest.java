@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.logic.FilePreferences;
@@ -20,9 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -96,6 +99,121 @@ class GuiPreferencesMigrationsTest {
         expectedBindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "shortcut+alt+F");
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
         verify(preferences).putBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    /// Simulates a snapshot persisted before the macOS text-editing defaults existed: all editor bindings are empty.
+    private static List<String> snapshotWithoutTextEditingDefaults(List<String> bindNames) {
+        List<String> bindings = new ArrayList<>(Arrays.stream(KeyBinding.values()).map(KeyBinding::getDefaultKeyBinding).toList());
+        Arrays.stream(KeyBinding.values())
+              .filter(keyBinding -> keyBinding.getCategory() == KeyBindingCategory.EDITOR)
+              .forEach(keyBinding -> bindings.set(bindNames.indexOf(keyBinding.getConstant()), ""));
+        return bindings;
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void upgradeMacTextEditingKeyBindingDefaultsAssignsDefaultsToEmptyEditorBindings() {
+        List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
+        List<String> bindings = snapshotWithoutTextEditingDefaults(bindNames);
+        bindings.set(bindNames.indexOf(KeyBinding.EDITOR_END.getConstant()), "shortcut+shift+E");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        List<String> expectedBindings = new ArrayList<>(bindings);
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_BEGINNING.getConstant()), "ctrl+A");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_DELETE.getConstant()), "ctrl+D");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_BACKWARD.getConstant()), "ctrl+B");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_FORWARD.getConstant()), "ctrl+F");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_UP.getConstant()), "ctrl+P");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_DOWN.getConstant()), "ctrl+N");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_KILL_LINE.getConstant()), "ctrl+K");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_INSERT_LINE_AFTER.getConstant()), "ctrl+O");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getConstant()), "ctrl+T");
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
+        verify(preferences).putBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void upgradeMacTextEditingKeyBindingDefaultsKeepsBindingEmptyIfKeyCombinationIsUsedByOtherAction() {
+        List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
+        List<String> bindings = snapshotWithoutTextEditingDefaults(bindNames);
+        bindings.set(bindNames.indexOf(KeyBinding.CLEANUP.getConstant()), "Ctrl+T");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        ArgumentCaptor<List<String>> migratedBindings = ArgumentCaptor.captor();
+        verify(preferences).putStringList(eq(JabRefGuiPreferences.BINDINGS), migratedBindings.capture());
+        assertEquals("", migratedBindings.getValue().get(bindNames.indexOf(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getConstant())));
+        assertEquals("Ctrl+T", migratedBindings.getValue().get(bindNames.indexOf(KeyBinding.CLEANUP.getConstant())));
+        assertEquals("ctrl+A", migratedBindings.getValue().get(bindNames.indexOf(KeyBinding.EDITOR_BEGINNING.getConstant())));
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void upgradeMacTextEditingKeyBindingDefaultsStoresMissingEditorBindingAsUnassignedIfKeyCombinationIsUsed() {
+        List<String> bindNames = List.of(KeyBinding.CLEANUP.getConstant());
+        List<String> bindings = List.of("ctrl+O");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        verify(preferences).putStringList(JabRefGuiPreferences.BIND_NAMES,
+                List.of(KeyBinding.CLEANUP.getConstant(), KeyBinding.EDITOR_INSERT_LINE_AFTER.getConstant()));
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+O", ""));
+    }
+
+    @Test
+    void upgradeMacTextEditingKeyBindingDefaultsMarksFreshPreferencesAsMigrated() {
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of());
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        verify(preferences, never()).putStringList(eq(JabRefGuiPreferences.BINDINGS), any());
+        verify(preferences).putBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    @Test
+    void upgradeMacTextEditingKeyBindingDefaultsRunsOnlyOnce() {
+        when(preferences.getBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, false)).thenReturn(true);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        verify(preferences, never()).putStringList(any(), any());
+        verify(preferences, never()).putBoolean(eq(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED), anyBoolean());
+    }
+
+    @Test
+    void upgradeMacTextEditingKeyBindingDefaultsLeavesOtherPlatformsUnchanged() {
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, false);
+
+        verify(preferences, never()).putStringList(any(), any());
+        verify(preferences, never()).putBoolean(eq(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED), anyBoolean());
+    }
+
+    @Test
+    void upgradeMacKeyBindingDefaultsLeavesEditorBindingsToTextEditingMigration() {
+        List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
+        List<String> bindings = snapshotWithoutTextEditingDefaults(bindNames);
+        bindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "alt+s");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacKeyBindingDefaults(preferences, true);
+
+        List<String> expectedBindings = new ArrayList<>(bindings);
+        expectedBindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "shortcut+alt+G");
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
     }
 
     @Test
