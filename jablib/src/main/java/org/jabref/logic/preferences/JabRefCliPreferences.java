@@ -2731,9 +2731,9 @@ public class JabRefCliPreferences implements CliPreferences {
         Map<KeyringSlot, String> keys = new HashMap<>();
 
         for (FetcherApiKey apiKey : defaults.getApiKeys()) {
-            names.add(apiKey.getName());
+            names.add(apiKey.name());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
+            keys.put(KeyringSlot.customApiKey(apiKey.name()), apiKey.key());
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
