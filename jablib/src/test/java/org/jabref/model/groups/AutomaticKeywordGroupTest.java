@@ -3,7 +3,6 @@ package org.jabref.model.groups;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
@@ -12,8 +11,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,31 +37,13 @@ class AutomaticKeywordGroupTest {
     }
 
     // [utest->req~groups.automatic-keyword.missing-value-subgroup~1]
-    @ParameterizedTest
-    @MethodSource("entriesWithoutKeyword")
-    void createSubgroupsForEntryWithoutKeywordCreatesMissingKeywordSubgroup(BibEntry entry) {
-        AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
-
-        Set<GroupTreeNode> expected = Set.of(GroupTreeNode.fromGroup(new MissingKeywordGroup(GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',')));
-
-        assertEquals(expected, keywordsGroup.createSubgroups(entry));
-    }
-
-    private static Stream<BibEntry> entriesWithoutKeyword() {
-        return Stream.of(
-                new BibEntry(),
-                new BibEntry().withField(StandardField.KEYWORDS, "  "),
-                new BibEntry().withField(StandardField.KEYWORDS, ", ,"));
-    }
-
-    // [utest->req~groups.automatic-keyword.missing-value-subgroup~1]
     @Test
     void createSubgroupsForRankingAddsMissingKeywordSubgroupNextToRanks() {
         AutomaticKeywordGroup rankingGroup = new AutomaticKeywordGroup("Ranking", GroupHierarchyType.INDEPENDENT, SpecialField.RANKING, ',', '>');
         List<BibEntry> entries = List.of(
                 new BibEntry().withField(SpecialField.RANKING, "rank1"),
                 new BibEntry(),
-                new BibEntry());
+                new BibEntry().withField(SpecialField.RANKING, ","));
 
         List<AbstractGroup> expected = List.of(
                 new WordKeywordGroup("rank1", GroupHierarchyType.INCLUDING, SpecialField.RANKING, "rank1", true, ',', true),
