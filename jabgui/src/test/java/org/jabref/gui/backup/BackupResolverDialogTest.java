@@ -246,8 +246,8 @@ class BackupResolverDialogTest extends JavaFxTest {
     private BackupResolverDialog createDialog(Path original, Path backupDirectory) throws IOException {
         Optional<Path> backup = BackupFileUtil.getPathOfLatestExistingBackupFile(original, backupDirectory);
         Optional<BackupComparison> comparison = backup.isPresent()
-                ? Optional.of(BackupComparator.compare(original, backup.orElseThrow(), importFormatPreferences()))
-                : Optional.empty();
+                                                ? Optional.of(BackupComparator.compare(original, backup.orElseThrow(), importFormatPreferences()))
+                                                : Optional.empty();
         AtomicReference<BackupResolverDialog> dialog = new AtomicReference<>();
         interact(() -> dialog.set(new BackupResolverDialog(
                 original,
