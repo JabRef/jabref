@@ -2,9 +2,7 @@ package org.jabref.gui.dialogs;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -29,7 +27,6 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.comparator.BackupComparator;
-import org.jabref.logic.bibtex.comparator.BackupComparator.ParsedComparison;
 import org.jabref.logic.bibtex.comparator.BackupComparison;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
@@ -56,8 +53,6 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
-    /// Called from the task that opens the library: the comparison of the library with its backup is computed here,
-    /// before the dialog is shown.
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  LibraryTabContainer tabContainer,
                                                                  Path originalPath,
@@ -65,11 +60,11 @@ public class BackupUIManager {
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  StateManager stateManager) {
         Optional<Path> latestBackupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory());
-        Optional<ParsedComparison> parsedComparison;
+        Optional<BackupComparison> comparison;
         try {
-            parsedComparison = compareWithBackup(originalPath, latestBackupPath, preferences.getImportFormatPreferences(), fileUpdateMonitor);
+            // Not on the shared task pool, where other backup dialogs can block it
+            comparison = compareWithBackup(originalPath, latestBackupPath, preferences.getImportFormatPreferences());
         } catch (InterruptedIOException e) {
-            // Opening the library was cancelled, so nobody is waiting for the answer anymore
             LOGGER.debug("Comparison of {} with its backup was cancelled", originalPath, e);
             Thread.currentThread().interrupt();
             return Optional.empty();
@@ -82,7 +77,7 @@ public class BackupUIManager {
                 preferences.getExternalApplicationsPreferences(),
                 originalPath,
                 latestBackupPath,
-                parsedComparison.map(ParsedComparison::comparison));
+                comparison);
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
@@ -112,31 +107,24 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, tabContainer, originalPath, latestBackupPath, parsedComparison, preferences, fileUpdateMonitor, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
     }
 
-    /// Parses the library and its backup once, so that the dialog can show the comparison right away and reviewing the
-    /// backup can reuse the parsed files. Computing it here, in the task that opens the library, avoids waiting for
-    /// the task pool, which may be busy with other libraries whose loading waits for their own backup dialog.
-    ///
-    /// @throws InterruptedIOException if the opening of the library was cancelled during the comparison
-    // [impl->req~jabgui.backup.restore-dialog-non-blocking~1]
-    private static Optional<ParsedComparison> compareWithBackup(Path originalPath,
+    // [impl->req~jabgui.backup.restore-dialog-non-blocking~2]
+    private static Optional<BackupComparison> compareWithBackup(Path originalPath,
                                                                 Optional<Path> backupPath,
-                                                                ImportFormatPreferences importFormatPreferences,
-                                                                FileUpdateMonitor fileUpdateMonitor) throws InterruptedIOException {
+                                                                ImportFormatPreferences importFormatPreferences) throws InterruptedIOException {
         if (backupPath.isEmpty()) {
             return Optional.empty();
         }
         try {
-            return Optional.of(BackupComparator.compareAndKeepParsedFiles(originalPath, backupPath.get(), importFormatPreferences, fileUpdateMonitor));
+            return Optional.of(BackupComparator.compare(originalPath, backupPath.orElseThrow(), importFormatPreferences));
         } catch (InterruptedIOException e) {
             throw e;
-        } catch (IOException | RuntimeException e) {
-            // A failed comparison must not keep the user from deciding about the backup
+        } catch (IOException e) {
             LOGGER.warn("Could not compare library with backup", e);
             return Optional.empty();
         }
@@ -195,8 +183,6 @@ public class BackupUIManager {
             DialogService dialogService,
             LibraryTabContainer tabContainer,
             Path originalPath,
-            Optional<Path> backupPathOpt,
-            Optional<ParsedComparison> parsedComparison,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
             StateManager stateManager) {
@@ -204,18 +190,12 @@ public class BackupUIManager {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
 
             // The database of the originalParserResult will be modified
-            ParserResult originalParserResult = reuseOrLoad(
-                    parsedComparison.flatMap(ParsedComparison::current),
-                    parsedComparison.map(parsed -> parsed.comparison().current()),
-                    originalPath, importFormatPreferences, fileUpdateMonitor);
+            ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, fileUpdateMonitor);
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = backupPathOpt.orElseThrow();
-            BibDatabaseContext backupDatabase = reuseOrLoad(
-                    parsedComparison.flatMap(ParsedComparison::backup),
-                    parsedComparison.map(parsed -> parsed.comparison().backup()),
-                    backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
+            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
+            BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);
 
@@ -246,30 +226,6 @@ public class BackupUIManager {
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);
             return Optional.empty();
-        }
-    }
-
-    /// Reuses the file parsed for the comparison, unless the file changed on disk since then (the user may have kept
-    /// the dialog open for a while).
-    private static ParserResult reuseOrLoad(Optional<ParserResult> parsed,
-                                            Optional<BackupComparison.FileSummary> summary,
-                                            Path path,
-                                            ImportFormatPreferences importFormatPreferences,
-                                            FileUpdateMonitor fileUpdateMonitor) throws IOException {
-        if (parsed.isPresent() && summary.filter(BackupUIManager::isUnchangedOnDisk).isPresent()) {
-            return parsed.get();
-        }
-        return OpenDatabase.loadDatabase(path, importFormatPreferences, fileUpdateMonitor);
-    }
-
-    private static boolean isUnchangedOnDisk(BackupComparison.FileSummary summary) {
-        try {
-            BasicFileAttributes attributes = Files.readAttributes(summary.path(), BasicFileAttributes.class);
-            return attributes.size() == summary.sizeBytes()
-                    && attributes.lastModifiedTime().toInstant().equals(summary.lastModifiedAt());
-        } catch (IOException e) {
-            LOGGER.debug("Could not read attributes of {}", summary.path(), e);
-            return false;
         }
     }
 

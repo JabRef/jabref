@@ -38,9 +38,6 @@ public class BackupResolverDialog extends FXDialog {
     private static final String UNKNOWN = "–";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
 
-    /// @param backupPath the latest backup of the library, if any
-    /// @param comparison the comparison of the library with that backup, computed before the dialog is shown; absent
-    ///                   if it could not be computed
     // [impl->req~jabgui.backup.restore-dialog-comparison~1]
     public BackupResolverDialog(Path originalPath,
                                 Optional<Path> backupPath,
@@ -62,14 +59,14 @@ public class BackupResolverDialog extends FXDialog {
         table.addRow(2, new Label(Localization.lang("Size")),
                 value("currentSize", FileUtil.getFileSize(originalPath).orElse(UNKNOWN)),
                 value("backupSize", backupPath.flatMap(FileUtil::getFileSize).orElse(UNKNOWN)));
-        table.addRow(3, new Label(Localization.lang("Date modified")),
+        table.addRow(3, new Label(Localization.lang("Last modified")),
                 value("currentModified", formatModified(originalPath)),
                 value("backupModified", backupPath.map(this::formatModified).orElse(UNKNOWN)));
         table.addRow(4, new Label(Localization.lang("Number of entries")),
-                value("currentEntries", comparison.map(result -> format(result.current().entryCount())).orElse(UNKNOWN)),
-                value("backupEntries", comparison.map(result -> format(result.backup().entryCount())).orElse(UNKNOWN)));
+                value("currentEntries", comparison.map(result -> format(result.currentEntryCount())).orElse(UNKNOWN)),
+                value("backupEntries", comparison.map(result -> format(result.backupEntryCount())).orElse(UNKNOWN)));
         table.addRow(5, new Label(Localization.lang("Changes")),
-                new Label(UNKNOWN),
+                new Label(),
                 value("backupChanges", comparison.flatMap(BackupComparison::changes).map(BackupResolverDialog::describeChanges).orElse(UNKNOWN)));
 
         VBox content = new VBox(10,

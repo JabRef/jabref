@@ -33,7 +33,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.BibEntryPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.AfterEach;
@@ -123,7 +122,7 @@ class BackupResolverDialogTest extends JavaFxTest {
 
     // [utest->req~jabgui.backup.restore-dialog-comparison~1]
     @Test
-    void showsFileSummariesAndEntryChanges(@TempDir Path tempDir) throws IOException {
+    void showsFileDetailsAndEntryChanges(@TempDir Path tempDir) throws IOException {
         Path original = Files.writeString(tempDir.resolve("library.bib"), """
                 @Article{unchanged,
                   title = {Unchanged},
@@ -236,8 +235,7 @@ class BackupResolverDialogTest extends JavaFxTest {
                                                      .map(node -> ((Labeled) node).getText())
                                                      .toList()));
 
-        assertTrue(texts.get().contains("Restoring overwrites the library file with the backup. Ignoring opens the library file as it is and keeps the backup file."),
-                "Dialog texts: " + texts.get());
+        assertTrue(texts.get().contains("Restoring overwrites the library file with the backup. Ignoring opens the library file as it is and keeps the backup file."));
     }
 
     private static Path createBackup(Path original, Path backupDirectory, String content) throws IOException {
@@ -245,7 +243,6 @@ class BackupResolverDialogTest extends JavaFxTest {
         return Files.writeString(backup, content);
     }
 
-    /// Computes the comparison like [org.jabref.gui.dialogs.BackupUIManager] does before it shows the dialog.
     private BackupResolverDialog createDialog(Path original, Path backupDirectory) {
         Optional<Path> backup = BackupFileUtil.getPathOfLatestExistingBackupFile(original, backupDirectory);
         Optional<BackupComparison> comparison = backup.flatMap(path -> {
@@ -266,7 +263,8 @@ class BackupResolverDialogTest extends JavaFxTest {
 
     private static ImportFormatPreferences importFormatPreferences() {
         ImportFormatPreferences preferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferences.bibEntryPreferences()).thenReturn(new BibEntryPreferences(','));
+        when(preferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.bibEntryPreferences().getImportKeywordDelimiters()).thenReturn(";,");
         return preferences;
     }
 

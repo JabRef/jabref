@@ -229,9 +229,7 @@ class BackupUIManagerTest extends JavaFxTest {
         assertEquals(List.of("TODO"), restored.getMetaData().getGroups().orElseThrow().getChildren().stream().map(GroupTreeNode::getName).toList());
     }
 
-    /// The comparison runs in the task that opens the library. When that task is cancelled, nobody waits for the
-    /// answer anymore, so the dialog is not shown.
-    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
+    // [utest->req~jabgui.backup.restore-dialog-non-blocking~2]
     @Test
     void cancelledOpeningShowsNoDialog(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");

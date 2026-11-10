@@ -9,13 +9,11 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 import org.jabref.logic.bibtex.comparator.BackupComparison.ChangeCounts;
-import org.jabref.logic.bibtex.comparator.BackupComparison.FileSummary;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -28,33 +26,20 @@ public final class BackupComparator {
     private BackupComparator() {
     }
 
-    /// Compares the explicitly selected files. An entry count is absent when its file cannot be parsed reliably;
+    /// Compares the library with its backup. An entry count is absent when its file cannot be parsed reliably;
     /// changes are absent when either file cannot be compared reliably.
     /// Added and removed counts describe the backup relative to the current library.
+    ///
+    /// @throws InterruptedIOException if the calling thread is interrupted
     public static BackupComparison compare(Path original, Path backup, ImportFormatPreferences preferences) throws IOException {
-        return compareAndKeepParsedFiles(original, backup, preferences, new DummyFileUpdateMonitor()).comparison();
-    }
-
-    /// Like [#compare(Path, Path, ImportFormatPreferences)], but also returns the parsed files, so that a caller that
-    /// needs them afterwards (for example to review the backup) does not have to parse both files again.
-    ///
-    /// The comparison stops between its steps when the calling thread is interrupted, e.g. because the task that
-    /// opens the library was cancelled.
-    ///
-    /// @param originalFileMonitor the monitor to parse the original with, as the parsed original may be opened
-    /// @throws InterruptedIOException if the calling thread was interrupted
-    public static ParsedComparison compareAndKeepParsedFiles(Path original, Path backup, ImportFormatPreferences preferences, FileUpdateMonitor originalFileMonitor) throws IOException {
         stopIfInterrupted();
-        ParsedFile current = summarize(original, preferences, originalFileMonitor);
+        Optional<ParserResult> current = parse(original, preferences);
         stopIfInterrupted();
-        ParsedFile candidate = summarize(backup, preferences, new DummyFileUpdateMonitor());
+        Optional<ParserResult> candidate = parse(backup, preferences);
         stopIfInterrupted();
-        Optional<ChangeCounts> changes = current.comparable().flatMap(currentResult ->
-                candidate.comparable().flatMap(candidateResult -> compareEntries(currentResult, candidateResult)));
-        return new ParsedComparison(
-                new BackupComparison(current.summary(), candidate.summary(), changes),
-                current.loaded(),
-                candidate.loaded());
+        Optional<ChangeCounts> changes = current.flatMap(currentResult ->
+                candidate.flatMap(candidateResult -> compareEntries(currentResult, candidateResult)));
+        return new BackupComparison(count(current), count(candidate), changes);
     }
 
     private static void stopIfInterrupted() throws InterruptedIOException {
@@ -63,27 +48,32 @@ public final class BackupComparator {
         }
     }
 
-    private static ParsedFile summarize(Path path, ImportFormatPreferences preferences, FileUpdateMonitor fileMonitor) throws IOException {
+    private static Optional<ParserResult> parse(Path path, ImportFormatPreferences preferences) throws IOException {
         BasicFileAttributes before = Files.readAttributes(path, BasicFileAttributes.class);
         if (!before.isRegularFile()) {
             throw new IOException("Not a regular file: " + path);
         }
 
-        Optional<ParserResult> loaded = Optional.empty();
+        Optional<ParserResult> parsed = Optional.empty();
         try {
-            loaded = Optional.of(OpenDatabase.loadDatabase(path, preferences, fileMonitor));
+            ParserResult result = OpenDatabase.loadDatabase(path, preferences, new DummyFileUpdateMonitor());
+            if (canCompareEntries(result)) {
+                parsed = Optional.of(result);
+            }
         } catch (IOException e) {
             LOGGER.debug("Could not parse backup comparison file {}", path, e);
         }
 
         BasicFileAttributes after = Files.readAttributes(path, BasicFileAttributes.class);
         if (before.size() != after.size() || !before.lastModifiedTime().equals(after.lastModifiedTime())) {
-            loaded = Optional.empty();
+            parsed = Optional.empty();
         }
-        Optional<ParserResult> comparable = loaded.filter(BackupComparator::canCompareEntries);
-        OptionalInt entryCount = comparable.map(result -> OptionalInt.of(countNonEmptyEntries(result)))
-                                           .orElseGet(OptionalInt::empty);
-        return new ParsedFile(new FileSummary(path, after.size(), after.lastModifiedTime().toInstant(), entryCount), loaded, comparable);
+        return parsed;
+    }
+
+    private static OptionalInt count(Optional<ParserResult> parsed) {
+        return parsed.map(result -> OptionalInt.of(countNonEmptyEntries(result)))
+                     .orElseGet(OptionalInt::empty);
     }
 
     private static int countNonEmptyEntries(ParserResult result) {
@@ -122,17 +112,5 @@ public final class BackupComparator {
             return Optional.empty();
         }
         return Optional.of(new ChangeCounts(added, removed, modified));
-    }
-
-    /// The comparison together with the files it parsed. A parsed file is absent when it could not be read or changed
-    /// while it was read. It is present even when it could not be parsed reliably (e.g. it is marked invalid), as the
-    /// caller decides how to handle such a file.
-    @NullMarked
-    public record ParsedComparison(BackupComparison comparison, Optional<ParserResult> current, Optional<ParserResult> backup) {
-    }
-
-    /// `loaded` is the parse of the file; `comparable` is that parse only if its entries can be counted reliably.
-    @NullMarked
-    private record ParsedFile(FileSummary summary, Optional<ParserResult> loaded, Optional<ParserResult> comparable) {
     }
 }

@@ -5,15 +5,12 @@ import java.io.InterruptedIOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.OptionalInt;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.jspecify.annotations.NullMarked;
@@ -33,19 +30,15 @@ class BackupComparatorTest {
     private final ImportFormatPreferences preferences = createPreferences();
 
     @Test
-    void comparesFileMetadataAndIdenticalEntries(@TempDir Path tempDir) throws IOException {
+    void comparesIdenticalEntries(@TempDir Path tempDir) throws IOException {
         String content = "@Article{same, title = {Same}}";
         Path original = Files.writeString(tempDir.resolve("library.bib"), content);
         Path backup = Files.writeString(tempDir.resolve("backup.bib"), content);
-        Instant originalTime = Instant.parse("2026-10-20T12:00:00Z");
-        Instant backupTime = Instant.parse("2026-10-21T12:00:00Z");
-        Files.setLastModifiedTime(original, FileTime.from(originalTime));
-        Files.setLastModifiedTime(backup, FileTime.from(backupTime));
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(new BackupComparison.FileSummary(original, Files.size(original), originalTime, OptionalInt.of(1)), result.current());
-        assertEquals(new BackupComparison.FileSummary(backup, Files.size(backup), backupTime, OptionalInt.of(1)), result.backup());
+        assertEquals(OptionalInt.of(1), result.currentEntryCount());
+        assertEquals(OptionalInt.of(1), result.backupEntryCount());
         assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 0, 0)), result.changes());
     }
 
@@ -56,8 +49,8 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(OptionalInt.of(0), result.current().entryCount());
-        assertEquals(OptionalInt.of(1), result.backup().entryCount());
+        assertEquals(OptionalInt.of(0), result.currentEntryCount());
+        assertEquals(OptionalInt.of(1), result.backupEntryCount());
         assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0)), result.changes());
     }
 
@@ -68,8 +61,7 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(0L, result.backup().sizeBytes());
-        assertEquals(OptionalInt.of(0), result.backup().entryCount());
+        assertEquals(OptionalInt.of(0), result.backupEntryCount());
         assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0)), result.changes());
     }
 
@@ -81,8 +73,8 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(OptionalInt.of(2), result.current().entryCount());
-        assertEquals(OptionalInt.of(1), result.backup().entryCount());
+        assertEquals(OptionalInt.of(2), result.currentEntryCount());
+        assertEquals(OptionalInt.of(1), result.backupEntryCount());
         assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0)), result.changes());
     }
 
@@ -119,8 +111,8 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(OptionalInt.of(1), result.current().entryCount());
-        assertEquals(OptionalInt.of(2), result.backup().entryCount());
+        assertEquals(OptionalInt.of(1), result.currentEntryCount());
+        assertEquals(OptionalInt.of(2), result.backupEntryCount());
         assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0)), result.changes());
     }
 
@@ -137,8 +129,8 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(OptionalInt.empty(), result.current().entryCount());
-        assertEquals(OptionalInt.of(1), result.backup().entryCount());
+        assertEquals(OptionalInt.empty(), result.currentEntryCount());
+        assertEquals(OptionalInt.of(1), result.backupEntryCount());
         assertEquals(Optional.empty(), result.changes());
     }
 
@@ -159,8 +151,8 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(OptionalInt.of(2), result.current().entryCount());
-        assertEquals(OptionalInt.of(1), result.backup().entryCount());
+        assertEquals(OptionalInt.of(2), result.currentEntryCount());
+        assertEquals(OptionalInt.of(1), result.backupEntryCount());
         assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0)), result.changes());
     }
 
@@ -181,8 +173,8 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(OptionalInt.empty(), result.current().entryCount());
-        assertEquals(OptionalInt.of(1), result.backup().entryCount());
+        assertEquals(OptionalInt.empty(), result.currentEntryCount());
+        assertEquals(OptionalInt.of(1), result.backupEntryCount());
         assertEquals(Optional.empty(), result.changes());
     }
 
@@ -202,37 +194,7 @@ class BackupComparatorTest {
         assertThrows(IOException.class, () -> BackupComparator.compare(original, directory, preferences));
     }
 
-    @Test
-    void keepsParsedFilesForReuse(@TempDir Path tempDir) throws IOException {
-        Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{current}");
-        Path backup = Files.writeString(tempDir.resolve("backup.bib"), "@Article{current}\n@Article{added}");
-
-        BackupComparator.ParsedComparison result = BackupComparator.compareAndKeepParsedFiles(original, backup, preferences, new DummyFileUpdateMonitor());
-
-        assertEquals(1, result.current().orElseThrow().getDatabase().getEntryCount());
-        assertEquals(2, result.backup().orElseThrow().getDatabase().getEntryCount());
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0)), result.comparison().changes());
-    }
-
-    /// An unparseable original is still handed to the caller: reviewing the backup can recover it.
-    @Test
-    void keepsUnparseableOriginalForReuse(@TempDir Path tempDir) throws IOException {
-        Path original = Files.writeString(tempDir.resolve("library.bib"), """
-                <<<<<<< HEAD
-                @Article{current}
-                =======
-                @Article{other}
-                >>>>>>> other
-                """);
-        Path backup = Files.writeString(tempDir.resolve("backup.bib"), "@Article{backup}");
-
-        BackupComparator.ParsedComparison result = BackupComparator.compareAndKeepParsedFiles(original, backup, preferences, new DummyFileUpdateMonitor());
-
-        assertTrue(result.current().orElseThrow().isInvalid());
-        assertEquals(OptionalInt.empty(), result.comparison().current().entryCount());
-    }
-
-    // [utest->req~jabgui.backup.restore-dialog-non-blocking~1]
+    // [utest->req~jabgui.backup.restore-dialog-non-blocking~2]
     @Test
     void interruptedThreadStopsComparison(@TempDir Path tempDir) throws IOException {
         Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
@@ -242,14 +204,14 @@ class BackupComparatorTest {
         try {
             assertThrows(InterruptedIOException.class, () -> BackupComparator.compare(original, backup, preferences));
         } finally {
-            // Clear the flag, so that it does not leak into other tests
             Thread.interrupted();
         }
     }
 
     private static ImportFormatPreferences createPreferences() {
         ImportFormatPreferences preferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferences.bibEntryPreferences()).thenReturn(new BibEntryPreferences(','));
+        when(preferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.bibEntryPreferences().getImportKeywordDelimiters()).thenReturn(";,");
         return preferences;
     }
 }
