@@ -48,6 +48,20 @@ class RTFCharsTest {
         assertEquals(expected, formatter.format(input));
     }
 
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            {\\i Hello}, \\em Hello
+            {\\i Hello}, \\it Hello
+            {\\b Hello}, \\bf Hello
+            {\\i H}, \\em H
+            Prefix {\\i Hello}, Prefix \\em Hello
+            {\\i Hello}, \\emph{Hello
+            {\\b Hello}, \\textbf{Hello
+            """)
+    void formatsHighlightingAtEndOfField(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
+    }
+
     @Test
     void complicated() {
         assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
