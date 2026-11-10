@@ -3,35 +3,29 @@ package org.jabref.gui.preferences.keybindings.presets;
 import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.os.OS;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @NullMarked
-// [utest->req~macos.text-editing-shortcuts~1]
-class BashKeyBindingPresetTest {
+class MacOsKeyBindingPresetTest {
 
     @Test
-    void presetUsesPlatformAppropriateEditorBindings() {
-        Map<KeyBinding, String> bindings = new BashKeyBindingPreset().getKeyBindings();
-
-        if (OS.OS_X) {
-            assertEquals("ctrl+A", bindings.get(KeyBinding.EDITOR_BEGINNING));
-            // Option+Backspace and Option+arrow keys are handled natively by the text controls on macOS
-            assertFalse(bindings.containsKey(KeyBinding.EDITOR_KILL_WORD_BACKWARD));
-            assertFalse(bindings.containsKey(KeyBinding.EDITOR_WORD_BACKWARD));
-            assertEquals("ctrl+T", bindings.get(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS));
-            assertFalse(bindings.containsKey(KeyBinding.EDITOR_CAPITALIZE));
-            assertFalse(bindings.containsKey(KeyBinding.EDITOR_LOWERCASE));
-            assertFalse(bindings.containsKey(KeyBinding.EDITOR_UPPERCASE));
-        } else {
-            assertEquals("shortcut+A", bindings.get(KeyBinding.EDITOR_BEGINNING));
-            assertEquals("alt+DELETE", bindings.get(KeyBinding.EDITOR_KILL_WORD_BACKWARD));
-            assertFalse(bindings.containsKey(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS));
-        }
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void presetContainsMacOsTextEditingShortcuts() {
+        assertEquals(Map.of(
+                KeyBinding.EDITOR_DELETE, "ctrl+D",
+                KeyBinding.EDITOR_BACKWARD, "ctrl+B",
+                KeyBinding.EDITOR_FORWARD, "ctrl+F",
+                KeyBinding.EDITOR_BEGINNING, "ctrl+A",
+                KeyBinding.EDITOR_END, "ctrl+E",
+                KeyBinding.EDITOR_UP, "ctrl+P",
+                KeyBinding.EDITOR_DOWN, "ctrl+N",
+                KeyBinding.EDITOR_KILL_LINE, "ctrl+K",
+                KeyBinding.EDITOR_INSERT_LINE_AFTER, "ctrl+O",
+                KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, "ctrl+T"),
+                new MacOsKeyBindingPreset().getKeyBindings());
     }
 }
