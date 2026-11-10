@@ -32,7 +32,6 @@ public class BashKeyBindingPreset implements KeyBindingPreset {
             keyBindings.put(KeyBinding.EDITOR_DOWN, "ctrl+N");
             keyBindings.put(KeyBinding.EDITOR_KILL_LINE, "ctrl+K");
             keyBindings.put(KeyBinding.EDITOR_KILL_WORD_BACKWARD, "alt+BACK_SPACE");
-            keyBindings.put(KeyBinding.EDITOR_CENTER_CARET, "ctrl+L");
             keyBindings.put(KeyBinding.EDITOR_INSERT_LINE_AFTER, "ctrl+O");
             keyBindings.put(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, "ctrl+T");
         } else {

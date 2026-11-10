@@ -60,7 +60,6 @@ class KeyBindingTest {
         assertEquals("ctrl+N", KeyBinding.EDITOR_DOWN.getDefaultMacKeyBinding());
         assertEquals("ctrl+K", KeyBinding.EDITOR_KILL_LINE.getDefaultMacKeyBinding());
         assertEquals("alt+BACK_SPACE", KeyBinding.EDITOR_KILL_WORD_BACKWARD.getDefaultMacKeyBinding());
-        assertEquals("ctrl+L", KeyBinding.EDITOR_CENTER_CARET.getDefaultMacKeyBinding());
         assertEquals("ctrl+O", KeyBinding.EDITOR_INSERT_LINE_AFTER.getDefaultMacKeyBinding());
         assertEquals("ctrl+T", KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getDefaultMacKeyBinding());
         assertEquals("", KeyBinding.EDITOR_CAPITALIZE.getDefaultMacKeyBinding());
