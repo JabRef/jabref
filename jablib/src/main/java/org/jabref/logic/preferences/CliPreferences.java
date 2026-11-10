@@ -33,6 +33,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -114,6 +115,9 @@ public interface CliPreferences {
     AiPreferences getAiPreferences();
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
+
+    /// @return the shared database connection used last; the other stored connections are reached through it
+    SharedDatabasePreferences getSharedDatabasePreferences();
 
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
 
