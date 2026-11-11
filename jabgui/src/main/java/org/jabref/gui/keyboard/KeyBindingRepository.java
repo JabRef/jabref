@@ -35,19 +35,14 @@ public class KeyBindingRepository {
     public KeyBindingRepository(List<String> bindNames, List<String> bindings) {
         this.bindings = new SimpleMapProperty<>(FXCollections.observableMap(new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization))));
 
-        if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {
-            // Use default key bindings
-            for (KeyBinding keyBinding : KeyBinding.values()) {
-                put(keyBinding, keyBinding.getDefaultKeyBinding());
-            }
-        } else {
+        if (!bindNames.isEmpty() && (bindNames.size() == bindings.size())) {
             for (int i = 0; i < bindNames.size(); i++) {
                 put(bindNames.get(i), bindings.get(i));
             }
-            // Bindings introduced after the user saved theirs are missing from the saved lists
-            for (KeyBinding keyBinding : KeyBinding.values()) {
-                this.bindings.putIfAbsent(keyBinding, keyBinding.getDefaultKeyBinding());
-            }
+        }
+        // Covers invalid saved lists as well as bindings introduced after the user saved theirs
+        for (KeyBinding keyBinding : KeyBinding.values()) {
+            this.bindings.putIfAbsent(keyBinding, keyBinding.getDefaultKeyBinding());
         }
     }
 
