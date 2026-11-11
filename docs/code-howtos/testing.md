@@ -216,6 +216,10 @@ Alternatively, if one is using IntelliJ, this can also be done by double-clickin
 The highlighting tests include commands ending at the field boundary, both without a brace group and with a missing closing brace.
 These inputs must preserve the available text without reading past the end of the field.
 
+### RIS layout tests
+
+`LayoutTest` checks that RIS page formatter chains split page ranges with leading whitespace into the expected start and end pages.
+
 ### Converter integration tests
 
 The BIBFRAME converter integration tests are marked with `@Tag("converter")`. They run the Library of Congress MARC-to-BIBFRAME and BIBFRAME-to-MARC converters, so `git`, `make`, and `xsltproc` must be available on `PATH`.

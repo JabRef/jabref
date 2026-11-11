@@ -48,6 +48,12 @@ class LayoutTest {
     }
 
     @Test
+    void risPageRangesWithLeadingWhitespace() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.PAGES, " 345-350");
+        assertEquals("SP  - 345\nEP  - 350", layout("SP  - \\format[FormatChars,FirstPage]{\\pages}__NEWLINE__EP  - \\format[FormatChars,LastPage]{\\pages}", entry));
+    }
+
+    @Test
     void entryTypeForUnknown() throws IOException {
         BibEntry entry = new BibEntry(new UnknownEntryType("unknown")).withField(StandardField.AUTHOR, "test");
 

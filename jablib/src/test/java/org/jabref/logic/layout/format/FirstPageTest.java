@@ -27,6 +27,7 @@ class FirstPageTest {
                 Arguments.of("345", "345"),
                 Arguments.of("345", "345-350"),
                 Arguments.of("345", "345--350"),
+                Arguments.of("345", " 345--350"),
                 Arguments.of("13905", "13905\u201313911"),
                 Arguments.of("13905", "13905\u201413911"),
                 Arguments.of("13905", "13905 \u2013 13911")
