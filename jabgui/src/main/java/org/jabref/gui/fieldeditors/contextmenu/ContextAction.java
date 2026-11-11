@@ -54,6 +54,15 @@ public class ContextAction extends SimpleCommand {
                                     )
                             );
 
+                    case SPLIT_PDF ->
+                            Bindings.createBooleanBinding(
+                                    () -> viewModel.canSplitPdf(linkedFile),
+                                    nonNullDependencies(
+                                            linkedFile.getFile().linkProperty(),
+                                            entryFieldsObservable
+                                    )
+                            );
+
                     case DOWNLOAD_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> linkedFile.getFile().isOnlineLink(),
@@ -109,6 +118,8 @@ public class ContextAction extends SimpleCommand {
                     linkedFile.redownload(viewModel.getUndoManager());
                 }
             }
+            case SPLIT_PDF ->
+                    viewModel.splitPdf(linkedFile);
             case RENAME_FILE_TO_PATTERN ->
                     linkedFile.renameToSuggestion();
             case RENAME_FILE_TO_NAME ->

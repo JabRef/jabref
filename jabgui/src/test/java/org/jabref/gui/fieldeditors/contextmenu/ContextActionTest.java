@@ -178,6 +178,33 @@ class ContextActionTest {
         verify(editorViewModel, times(2)).removeFileLink(fileViewModel);
     }
 
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
+    @Test
+    void splitPdfIsExecutableWhenTheEditorCanSplitThePdf() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        LinkedFilesEditorViewModel editorViewModel = mock(LinkedFilesEditorViewModel.class);
+        when(editorViewModel.canSplitPdf(fileViewModel)).thenReturn(true);
+
+        assertTrue(newAction(StandardActions.SPLIT_PDF, fileViewModel, editorViewModel).isExecutable());
+    }
+
+    @Test
+    void splitPdfIsNotExecutableWhenTheEditorCannotSplitThePdf() {
+        assertFalse(newAction(StandardActions.SPLIT_PDF, mockOfflineExistingFileViewModel()).isExecutable());
+    }
+
+    @Test
+    void shouldExecuteSplitPdf() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        LinkedFilesEditorViewModel editorViewModel = mock(LinkedFilesEditorViewModel.class);
+        when(editorViewModel.canSplitPdf(fileViewModel)).thenReturn(true);
+        ContextAction action = newAction(StandardActions.SPLIT_PDF, fileViewModel, editorViewModel);
+
+        action.execute();
+
+        verify(editorViewModel).splitPdf(fileViewModel);
+    }
+
     private static ContextAction newAction(StandardActions actionType, LinkedFileViewModel fileViewModel) {
         return newAction(actionType, fileViewModel, mock(LinkedFilesEditorViewModel.class));
     }

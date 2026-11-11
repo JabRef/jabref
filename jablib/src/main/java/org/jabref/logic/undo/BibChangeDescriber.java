@@ -6,6 +6,7 @@ import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableChangeType;
 import org.jabref.model.undo.UndoableFieldChange;
+import org.jabref.model.undo.UndoableFileMove;
 import org.jabref.model.undo.UndoableGroupTreeChange;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableInsertString;
@@ -61,6 +62,8 @@ public class BibChangeDescriber {
                     Localization.lang("Insert string %0", insert.string().getName());
             case UndoableRemoveString remove ->
                     Localization.lang("Remove string %0", remove.string().getName());
+            case UndoableFileMove _ ->
+                    Localization.lang("Move files");
         };
     }
 }

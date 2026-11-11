@@ -22,6 +22,7 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.externalfiles.PdfLocationResolver;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -100,11 +101,20 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             if (pdfFiles.isEmpty()) {
                 files.clear();
                 currentDocument.set(null);
-                dialogService.notify(Localization.lang("No PDF files available"));
+                if (!hasCrossReferencedPdf(entries)) {
+                    dialogService.notify(Localization.lang("No PDF files available"));
+                }
             } else {
                 files.setAll(pdfFiles);
             }
         }
+    }
+
+    // [impl->req~jabgui.documentviewer.open-crossref-pdf-at-page~1]
+    private boolean hasCrossReferencedPdf(List<BibEntry> entries) {
+        return stateManager.getActiveDatabase()
+                           .map(database -> entries.stream().anyMatch(entry -> PdfLocationResolver.resolve(entry, database.getDatabase()).isPresent()))
+                           .orElse(false);
     }
 
     private void setCurrentDocument(Path path) {
