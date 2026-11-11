@@ -89,12 +89,23 @@ Context: <https://github.com/JabRef/jabref/pull/17496#discussion_r4308280956>
 
 Needs: impl, utest
 
-## Ignore entry markers on percent-prefixed lines
+## BibTeX importer must ignore entry markers in percent comments
 `req~import.bibtex.percent-comments~1`
 
-Outside BibTeX or BibLaTeX entries, JabRef ignores entry markers on lines whose first non-whitespace character is `%`, including leading library metadata comments.
+Outside entries, a line whose first non-whitespace character is `%` is a comment.
+An `@` in that line does not start an entry.
 
-Immediately adjacent entry markers after legacy encoding declarations remain supported for backwards compatibility.
+For example, the following file contains only the entry `real`, preceded by the comment `% Entry types: @online`:
+
+```bibtex
+% Entry types: @online
+@article{real, author = {Real Author}}
+```
+
+A `%` elsewhere in a line does not start a comment: `Some text 100% of entries @article{first, ...}` contains the entry `first`.
+Files written by old JabRef versions without a line break after the encoding header, such as `% Encoding: UTF-8@article{first, ...}`, also keep the entry `first`.
+
+Origin: <https://github.com/JabRef/jabref/issues/12929>
 
 Needs: impl, utest
 
