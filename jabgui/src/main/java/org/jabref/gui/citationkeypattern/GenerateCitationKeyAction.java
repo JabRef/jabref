@@ -53,6 +53,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        isCanceled = false;
         entries = new ArrayList<>(stateManager.getSelectedEntries());
         stateManager.getActiveDatabase().ifPresent(this::generateKeysIn);
     }

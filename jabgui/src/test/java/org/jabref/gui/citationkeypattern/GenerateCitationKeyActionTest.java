@@ -105,4 +105,30 @@ class GenerateCitationKeyActionTest {
         verify(dialogService, never()).showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any());
         assertEquals(Optional.of("Wang2020a"), remainingWang.getCitationKey());
     }
+
+    @Test
+    void executeGeneratesKeyAfterPreviousExecutionWasCanceled() {
+        useKeyPreferences(false);
+        when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any()))
+                .thenReturn(false);
+
+        GenerateCitationKeyAction action = new GenerateCitationKeyAction(
+                () -> null, dialogService, stateManager, new CurrentThreadTaskExecutor(), preferences);
+
+        JavaFxExtension.invokeAndWait(action::execute);
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(Optional.of("Wang2020a"), remainingWang.getCitationKey());
+
+        BibEntry entryWithoutKey = new BibEntry()
+                .withField(StandardField.AUTHOR, "Smith, Jane")
+                .withField(StandardField.YEAR, "2026");
+        stateManager.getActiveDatabase().get().getDatabase().insertEntry(entryWithoutKey);
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entryWithoutKey));
+
+        JavaFxExtension.invokeAndWait(action::execute);
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(Optional.of("Smith2026"), entryWithoutKey.getCitationKey());
+    }
 }
