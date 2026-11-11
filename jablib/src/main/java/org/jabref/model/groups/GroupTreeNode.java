@@ -59,8 +59,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     ///
     /// @param newGroup the new group (has to be non-null)
     public void setGroup(@NonNull AbstractGroup newGroup) {
-        this.groupProperty.set(newGroup);
-    }
+    this.groupProperty.set(newGroup);
+    notifyAboutDescendantChange(this);
+}
 
     /// Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
     ///
@@ -74,6 +75,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
                                       List<BibEntry> entriesInDatabase) {
         AbstractGroup oldGroup = getGroup();
         groupProperty.set(newGroup);
+        notifyAboutDescendantChange(this);
 
         List<FieldChange> changes = new ArrayList<>();
         boolean shouldRemoveFromOldGroup = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);

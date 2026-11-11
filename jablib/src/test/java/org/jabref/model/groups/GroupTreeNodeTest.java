@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -205,6 +206,25 @@ public class GroupTreeNodeTest {
         node.setGroup(newGroup, true, true, entries);
 
         assertEquals(newGroup, node.getGroup());
+    }
+
+    @Test
+    void setGroupNotifiesParentAboutDescendantChange() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(
+                new ExplicitGroup("Root", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode child = root.addSubgroup(
+                new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT, ','));
+
+        AtomicInteger descendantChanges = new AtomicInteger();
+        root.subscribeToDescendantChanged(_ -> descendantChanges.incrementAndGet());
+
+        child.setGroup(
+                new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT, ','),
+                true,
+                true,
+                entries);
+
+        assertEquals(1, descendantChanges.get());
     }
 
     @Test
