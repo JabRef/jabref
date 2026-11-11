@@ -1,5 +1,8 @@
 package org.jabref.gui.keyboard;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -21,6 +24,14 @@ public class CodeAreaKeyBindings {
         }
 
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
+            if (!codeArea.isEditable() && switch (binding) {
+                case EDITOR_DELETE, EDITOR_INSERT_LINE_AFTER, EDITOR_TRANSPOSE_CHARACTERS,
+                     EDITOR_CAPITALIZE, EDITOR_LOWERCASE, EDITOR_UPPERCASE,
+                     EDITOR_KILL_LINE, EDITOR_KILL_WORD, EDITOR_KILL_WORD_BACKWARD -> true;
+                default -> false;
+            }) {
+                return;
+            }
             switch (binding) {
                 case EDITOR_DELETE -> {
                     codeArea.delete();
@@ -124,8 +135,7 @@ public class CodeAreaKeyBindings {
                     event.consume();
                 }
                 case EDITOR_TRANSPOSE_CHARACTERS -> {
-                    if (!codeArea.hasNonEmptySelection()) {
-                        transposeCharacters(codeArea);
+                    if (!codeArea.hasNonEmptySelection() && transposeCharacters(codeArea)) {
                         event.consume();
                     }
                 }
@@ -144,11 +154,17 @@ public class CodeAreaKeyBindings {
         codeArea.select(caret);
     }
 
-    static void transposeCharacters(CodeArea codeArea) {
-        String text = codeArea.getText();
+    static boolean transposeCharacters(CodeArea codeArea) {
+        if (!codeArea.isEditable()) {
+            return false;
+        }
+        String text = IntStream.range(0, codeArea.getParagraphCount())
+                               .mapToObj(codeArea::getPlainText)
+                               .collect(Collectors.joining("\n"));
         int caret = textPosToOffset(codeArea, codeArea.getCaretPosition());
-        if (caret == 0 || caret >= text.length()) {
-            return;
+        caret = TextInputKeyBindings.transposePivot(text, caret);
+        if (caret < 0) {
+            return false;
         }
 
         int previousCharacterStart = text.offsetByCodePoints(caret, -1);
@@ -159,6 +175,7 @@ public class CodeAreaKeyBindings {
                 offsetToTextPos(codeArea, nextCharacterEnd),
                 replacement);
         codeArea.select(offsetToTextPos(codeArea, nextCharacterEnd));
+        return true;
     }
 
     private static void handleMacCursorMovementShortcuts(CodeArea codeArea, KeyEvent event) {

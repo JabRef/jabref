@@ -9,6 +9,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
+import org.jabref.gui.preferences.keybindings.presets.MacOsKeyBindingPreset;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.support.DisabledOnCIServer;
 
@@ -24,6 +26,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class KeyBindingViewModelTest {
+
+    @Test
+    void macOsPresetClearsBashBindingsAndPreservesConflictingCustomShortcut() {
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.CLEANUP, "ctrl+A");
+        KeyBindingsTabViewModel viewModel = new KeyBindingsTabViewModel(repository, mock(DialogService.class));
+
+        viewModel.loadPreset(new BashKeyBindingPreset());
+        viewModel.loadPreset(new MacOsKeyBindingPreset());
+
+        assertEquals(Optional.of("ctrl+A"), viewModel.getKeyBindingRepository().get(KeyBinding.CLEANUP));
+        assertEquals(Optional.of(""), viewModel.getKeyBindingRepository().get(KeyBinding.EDITOR_BEGINNING));
+        assertEquals(Optional.of(""), viewModel.getKeyBindingRepository().get(KeyBinding.EDITOR_WORD_FORWARD));
+        assertEquals(Optional.of("ctrl+T"), viewModel.getKeyBindingRepository().get(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS));
+    }
 
     @Test
     @DisabledOnCIServer("locally runs fine")

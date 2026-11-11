@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
@@ -205,7 +206,20 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        preset.getKeyBindings().forEach(keyBindingRepository::put);
+        Map<KeyBinding, String> presetBindings = preset.getKeyBindings();
+        if (preset instanceof MacOsKeyBindingPreset) {
+            presetBindings.keySet().forEach(binding -> keyBindingRepository.put(binding, ""));
+            presetBindings.forEach((binding, value) -> {
+                if (value.isEmpty() || keyBindingRepository.getKeyBindings().keySet().stream()
+                        .filter(other -> other != binding)
+                        .map(keyBindingRepository::getKeyCombination)
+                        .noneMatch(combination -> combination.filter(KeyCombination.valueOf(value)::equals).isPresent())) {
+                    keyBindingRepository.put(binding, value);
+                }
+            });
+        } else {
+            presetBindings.forEach(keyBindingRepository::put);
+        }
         setValues();
     }
 

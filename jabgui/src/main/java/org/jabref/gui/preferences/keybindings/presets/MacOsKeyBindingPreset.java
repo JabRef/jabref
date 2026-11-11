@@ -24,7 +24,6 @@ public class MacOsKeyBindingPreset implements KeyBindingPreset {
     public Map<KeyBinding, String> getKeyBindings() {
         return Arrays.stream(KeyBinding.values())
                      .filter(keyBinding -> keyBinding.getCategory() == KeyBindingCategory.EDITOR)
-                     .filter(keyBinding -> !keyBinding.getDefaultMacKeyBinding().isEmpty())
                      .collect(Collectors.toMap(keyBinding -> keyBinding, KeyBinding::getDefaultMacKeyBinding));
     }
 }

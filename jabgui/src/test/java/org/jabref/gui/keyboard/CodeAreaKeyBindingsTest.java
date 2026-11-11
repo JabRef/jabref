@@ -159,6 +159,53 @@ class CodeAreaKeyBindingsTest {
         assertTrue(event.isConsumed());
     }
 
+    @ParameterizedTest
+    @MethodSource("transposeBoundaryData")
+    void transposeMatchesMacOsAtLineBoundaries(String text, TextPos caret, String expected, TextPos expectedCaret) {
+        CodeArea area = new CodeArea();
+        area.setText(text);
+        area.select(caret);
+        CodeAreaKeyBindings.transposeCharacters(area);
+        assertEquals(expected, area.getText());
+        assertEquals(expectedCaret, area.getCaretPosition());
+    }
+
+    private static Stream<Arguments> transposeBoundaryData() {
+        return Stream.of(
+                Arguments.of("teh", TextPos.ofLeading(0, 3), "the", TextPos.ofLeading(0, 3)),
+                Arguments.of("ab\ncd", TextPos.ofLeading(0, 2), "ba\ncd", TextPos.ofLeading(0, 2)),
+                Arguments.of("a\nb", TextPos.ofLeading(0, 1), "a\nb", TextPos.ofLeading(0, 1)),
+                Arguments.of("ab\ncd", TextPos.ofLeading(1, 0), "abc\nd", TextPos.ofLeading(1, 0)));
+    }
+
+    @Test
+    void transposeHandlesCrLfParagraphs() {
+        CodeArea area = new CodeArea();
+        area.getModel().setLineEnding(LineEnding.CRLF);
+        area.setText("ab\r\ncd");
+        area.select(TextPos.ofLeading(1, 1));
+        CodeAreaKeyBindings.transposeCharacters(area);
+        assertEquals("ab\r\ndc", area.getText());
+        assertEquals(TextPos.ofLeading(1, 2), area.getCaretPosition());
+    }
+
+    @Test
+    void readOnlyCodeAreaIgnoresEditingShortcuts() {
+        CodeArea area = new CodeArea();
+        area.setText("abcd");
+        area.select(TextPos.ofLeading(0, 2));
+        area.setEditable(false);
+        KeyBindingRepository repository = mock(KeyBindingRepository.class);
+        for (KeyBinding binding : new KeyBinding[] {KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, KeyBinding.EDITOR_KILL_LINE, KeyBinding.EDITOR_CAPITALIZE}) {
+            when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(binding));
+            KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.T, false, true, false, false);
+            CodeAreaKeyBindings.call(area, event, repository);
+            assertFalse(event.isConsumed());
+            assertEquals("abcd", area.getText());
+            assertEquals(TextPos.ofLeading(0, 2), area.getCaretPosition());
+        }
+    }
+
     @Test
     void transposeCharactersDoesNothingAtDocumentStart() {
         CodeArea codeArea = new CodeArea();

@@ -46,6 +46,14 @@ public class TextInputKeyBindings {
     public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
+                if (!focusedTextField.isEditable() && switch (binding) {
+                    case EDITOR_DELETE, EDITOR_INSERT_LINE_AFTER, EDITOR_TRANSPOSE_CHARACTERS,
+                         EDITOR_CAPITALIZE, EDITOR_LOWERCASE, EDITOR_UPPERCASE,
+                         EDITOR_KILL_LINE, EDITOR_KILL_WORD, EDITOR_KILL_WORD_BACKWARD -> true;
+                    default -> false;
+                }) {
+                    return;
+                }
                 switch (binding) {
                     case EDITOR_DELETE -> {
                         focusedTextField.deleteNextChar();
@@ -107,8 +115,7 @@ public class TextInputKeyBindings {
                         }
                     }
                     case EDITOR_TRANSPOSE_CHARACTERS -> {
-                        if (focusedTextField.getSelection().getLength() == 0) {
-                            transposeCharacters(focusedTextField);
+                        if (focusedTextField.getSelection().getLength() == 0 && transposeCharacters(focusedTextField)) {
                             event.consume();
                         }
                     }
@@ -181,9 +188,14 @@ public class TextInputKeyBindings {
                 || (scrollPane.getContent() == null)) {
             return false;
         }
+        Node viewport = scrollPane.lookup(".viewport");
+        if (viewport == null) {
+            return false;
+        }
         double scrollTopMax = Math.max(0, scrollPane.getContent().getLayoutBounds().getHeight() - scrollPane.getViewportBounds().getHeight());
+        double viewportCenter = textArea.sceneToLocal(viewport.localToScene(viewport.getBoundsInLocal())).getCenterY();
         // Caret bounds are relative to the text area, so they already reflect the current scroll position
-        double scrollTop = textArea.getScrollTop() + skin.getCaretBounds().getCenterY() - (textArea.getHeight() / 2);
+        double scrollTop = textArea.getScrollTop() + skin.getCaretBounds().getCenterY() - viewportCenter;
         textArea.setScrollTop(Math.clamp(scrollTop, 0, scrollTopMax));
         return true;
     }
@@ -202,11 +214,15 @@ public class TextInputKeyBindings {
         return true;
     }
 
-    static void transposeCharacters(TextInputControl textInput) {
+    static boolean transposeCharacters(TextInputControl textInput) {
+        if (!textInput.isEditable()) {
+            return false;
+        }
         String text = textInput.getText();
         int caret = textInput.getCaretPosition();
-        if (caret == 0 || caret >= text.length()) {
-            return;
+        caret = transposePivot(text, caret);
+        if (caret < 0) {
+            return false;
         }
 
         int previousCharacterStart = text.offsetByCodePoints(caret, -1);
@@ -214,6 +230,21 @@ public class TextInputKeyBindings {
         String replacement = text.substring(caret, nextCharacterEnd) + text.substring(previousCharacterStart, caret);
         textInput.replaceText(previousCharacterStart, nextCharacterEnd, replacement);
         textInput.positionCaret(nextCharacterEnd);
+        return true;
+    }
+
+    static int transposePivot(String text, int caret) {
+        if (caret == 0) {
+            return -1;
+        }
+        boolean atLineEnd = caret < text.length() && text.charAt(caret) == '\n';
+        if (caret == text.length() || atLineEnd) {
+            caret = text.offsetByCodePoints(caret, -1);
+            if (caret == 0 || (atLineEnd && text.codePointBefore(caret) == '\n')) {
+                return -1;
+            }
+        }
+        return caret;
     }
 
     private static void moveCaretUp(TextInputControl control) {
