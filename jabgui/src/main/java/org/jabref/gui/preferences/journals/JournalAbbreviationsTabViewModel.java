@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,7 +18,6 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationPreferences;
-import org.jabref.logic.journals.AbbreviationWriter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -49,8 +47,6 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useBuiltInJournalList = new SimpleBooleanProperty(true);
-    private final AtomicLong settingsGeneration = new AtomicLong();
-    private final Object listWriteLock = new Object();
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
 
     private final DialogService dialogService;
@@ -174,7 +170,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     Localization.lang("Journal file %s already added", filePath.toString()));
             return;
         }
-        if (abbreviationsFile.exists()) {
+        var pending = journalAbbreviationRepository.getPendingJournalList(filePath);
+        if (pending.isPresent()) {
+            pending.orElseThrow().stream().map(AbbreviationViewModel::new)
+                   .forEach(abbreviationsFile.abbreviationsProperty()::add);
+        } else if (abbreviationsFile.exists()) {
             try {
                 abbreviationsFile.readAbbreviations();
             } catch (IOException e) {
@@ -308,7 +308,6 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     @Override
     public void storeSettings() {
         // [impl->req~journals.disable-built-in~1]
-        long generation = settingsGeneration.incrementAndGet();
         List<String> journalStringList = journalFiles.stream()
                                                      .filter(path -> !path.isBuiltInListProperty().get())
                                                      .flatMap(path -> path.getAbsolutePath().stream())
@@ -318,25 +317,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         abbreviationsPreferences.setUseFJournalField(useFJournal.get());
         abbreviationsPreferences.setUseBuiltInJournalList(useBuiltInJournalList.get());
         Map<Path, List<Abbreviation>> filesToWrite = snapshotFilesToWrite();
-        BackgroundTask
-                .wrap(() -> {
-                    synchronized (listWriteLock) {
-                        if (generation == settingsGeneration.get()) {
-                            for (Map.Entry<Path, List<Abbreviation>> file : filesToWrite.entrySet()) {
-                                AbbreviationWriter.writeOrCreate(file.getKey(), file.getValue());
-                            }
-                        }
-                    }
-                    return true;
-                })
-                .onSuccess(_ -> {
-                    if (generation == settingsGeneration.get()) {
-                        shouldWriteLists = false;
-                        journalAbbreviationRepository.reload(abbreviationsPreferences, taskExecutor);
-                    }
-                })
-                .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
-                .executeWith(taskExecutor);
+        journalAbbreviationRepository.saveJournalLists(filesToWrite, abbreviationsPreferences, taskExecutor,
+                () -> shouldWriteLists = false);
     }
 
     /// Captures external list contents before background saving so later UI edits cannot change the pending write.

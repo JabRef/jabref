@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +33,9 @@ public class JournalAbbreviationRepository {
     private final StringSimilarity similarity = new StringSimilarity();
     private volatile RepositoryData data;
     private long loadGeneration;
+    private final AtomicLong saveGeneration = new AtomicLong();
+    private final Object saveLock = new Object();
+    private final Map<Path, List<Abbreviation>> pendingJournalWrites = new HashMap<>();
 
     @NullMarked
     private static class RepositoryData {
@@ -100,6 +104,44 @@ public class JournalAbbreviationRepository {
                       .onSuccess(repository -> finishReload(generation, repository))
                       .onFailure(exception -> LOGGER.error("Failed to reload journal abbreviations", exception))
                       .executeWith(executor);
+    }
+
+    public void saveJournalLists(Map<Path, List<Abbreviation>> files, AbbreviationPreferences preferences,
+                                 TaskExecutor executor, Runnable onSuccess) {
+        long generation;
+        Map<Path, List<Abbreviation>> pendingSnapshot;
+        synchronized (pendingJournalWrites) {
+            generation = saveGeneration.incrementAndGet();
+            pendingJournalWrites.putAll(files);
+            pendingSnapshot = Map.copyOf(pendingJournalWrites);
+        }
+        BackgroundTask.wrap(() -> {
+                          synchronized (saveLock) {
+                              if (generation == saveGeneration.get()) {
+                                  for (Map.Entry<Path, List<Abbreviation>> file : pendingSnapshot.entrySet()) {
+                                      AbbreviationWriter.writeOrCreate(file.getKey(), file.getValue());
+                                  }
+                              }
+                          }
+                          return true;
+                      }).onSuccess(_ -> {
+                          if (generation == saveGeneration.get()) {
+                              synchronized (pendingJournalWrites) {
+                                  if (generation == saveGeneration.get()) {
+                                      pendingJournalWrites.clear();
+                                  }
+                              }
+                              onSuccess.run();
+                              reload(preferences, executor);
+                          }
+                      }).onFailure(exception -> LOGGER.error("Failed to store journal preferences", exception))
+                      .executeWith(executor);
+    }
+
+    public Optional<List<Abbreviation>> getPendingJournalList(Path path) {
+        synchronized (pendingJournalWrites) {
+            return Optional.ofNullable(pendingJournalWrites.get(path));
+        }
     }
 
     private synchronized void finishReload(long generation, JournalAbbreviationRepository repository) {

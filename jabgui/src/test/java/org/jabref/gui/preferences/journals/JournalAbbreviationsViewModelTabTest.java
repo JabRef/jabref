@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -243,6 +244,41 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(Optional.of("Abb0"), retained.getDefaultAbbreviation("Full0"));
         assertEquals(Optional.of("Abb1"), retained.getDefaultAbbreviation("Full1"));
         assertEquals(2, JournalAbbreviationLoader.readAbbreviationsFromCsvFile(emptyTestFile).size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void newerSaveFromReopenedPreferencesIsNotOverwrittenByOlderSave(boolean editReopenedList) throws IOException {
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(emptyTestFile.toString()), true, false);
+        List<Runnable> queued = new ArrayList<>();
+        TaskExecutor executor = mock(TaskExecutor.class);
+        when(executor.execute(any())).thenAnswer(invocation -> {
+            BackgroundTask<?> task = invocation.getArgument(0);
+            queued.add(() -> new CurrentThreadTaskExecutor().execute(task));
+            return CompletableFuture.completedFuture(null);
+        });
+        JournalAbbreviationsTabViewModel first = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, repository);
+        first.setValues();
+        queued.removeFirst().run();
+        first.currentFileProperty().set(first.journalFilesProperty().getFirst());
+        first.addAbbreviation(ABBREVIATION_0);
+        first.storeSettings();
+        Runnable olderSave = queued.removeFirst();
+
+        JournalAbbreviationsTabViewModel reopened = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, repository);
+        reopened.setValues();
+        queued.removeFirst().run();
+        reopened.currentFileProperty().set(reopened.journalFilesProperty().getFirst());
+        if (editReopenedList) {
+            reopened.addAbbreviation(ABBREVIATION_1);
+        }
+        reopened.storeSettings();
+        queued.removeFirst().run();
+        olderSave.run();
+
+        assertEquals(editReopenedList ? List.of("Full0", "Full1") : List.of("Full0"), JournalAbbreviationLoader.readAbbreviationsFromCsvFile(emptyTestFile).stream()
+                                                                                                               .map(Abbreviation::getName)
+                                                                                                               .toList());
     }
 
     @Test
