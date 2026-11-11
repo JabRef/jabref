@@ -210,6 +210,12 @@ Fetcher tests can be run locally by executing the Gradle task `externalServicesT
 
 Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `externalServicesTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > externalServicesTest`).
 
+### RTF formatter tests
+
+`RTFCharsTest` covers LaTeX highlighting and character conversion for RTF exports.
+The highlighting tests include commands ending at the field boundary, both without a brace group and with a missing closing brace.
+These inputs must preserve the available text without reading past the end of the field.
+
 ### Converter integration tests
 
 The BIBFRAME converter integration tests are marked with `@Tag("converter")`. They run the Library of Congress MARC-to-BIBFRAME and BIBFRAME-to-MARC converters, so `git`, `make`, and `xsltproc` must be available on `PATH`.

@@ -130,11 +130,11 @@ public class ImportResultsPage extends WizardPane {
     }
 
     private void updateSummary() {
-        int totalCount = viewModel.resultTableItems().size();
-        long successCount = viewModel.resultTableItems().stream().filter(ImportFilesResultItemViewModel::isSuccess).count();
-        long failCount = totalCount - successCount;
+        long successCount = viewModel.resultTableItems().stream().filter(result -> result.status() == ImportFilesResultItemViewModel.Status.SUCCESS).count();
+        long warningCount = viewModel.resultTableItems().stream().filter(result -> result.status() == ImportFilesResultItemViewModel.Status.WARNING).count();
+        long failCount = viewModel.resultTableItems().stream().filter(result -> result.status() == ImportFilesResultItemViewModel.Status.FAILURE).count();
 
-        String summaryText = Localization.lang("Import completed: %0 successful, %1 failed", String.valueOf(successCount), String.valueOf(failCount));
+        String summaryText = Localization.lang("Import completed: %0 successful, %1 with warnings, %2 failed", String.valueOf(successCount), String.valueOf(warningCount), String.valueOf(failCount));
 
         summaryLabel.setText(summaryText);
     }

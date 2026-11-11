@@ -70,23 +70,25 @@ public class XMLChars implements LayoutFormatter {
 
         StringBuilder buffer = new StringBuilder(fieldText.length() * 2);
 
-        for (int i = 0; i < fieldText.length(); i++) {
-            int code = fieldText.charAt(i);
+        int i = 0;
+        while (i < fieldText.length()) {
+            int code = fieldText.codePointAt(i);
 
             // Checking the case when the character is already escaped
             // Just push "&#" to the buffer and keep going from the next char
             if ((code == 38) && (fieldText.charAt(i + 1) == 35)) {
                 i += 2;
                 buffer.append("&#");
-                code = fieldText.charAt(i);
+                code = fieldText.codePointAt(i);
             }
 
             // TODO: Check whether > 125 is correct here or whether it should rather be >=
             if ((code > 125) || forceReplace[code]) {
                 buffer.append("&#").append(code).append(';');
             } else {
-                buffer.append((char) code);
+                buffer.appendCodePoint(code);
             }
+            i += Character.charCount(code);
         }
         fieldText = buffer.toString();
 
