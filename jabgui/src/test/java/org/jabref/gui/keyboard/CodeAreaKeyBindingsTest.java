@@ -16,9 +16,9 @@ import jfx.incubator.scene.control.richtext.LineEnding;
 import jfx.incubator.scene.control.richtext.TextPos;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -193,6 +193,9 @@ class CodeAreaKeyBindingsTest {
     private static Stream<Arguments> transposeBoundaryData() {
         return Stream.of(
                 Arguments.of("teh", TextPos.ofLeading(0, 3), "the", TextPos.ofLeading(0, 3)), // spellchecker:disable-line
+                Arguments.of("a\u0301b", TextPos.ofLeading(0, 2), "ba\u0301", TextPos.ofLeading(0, 3)),
+                Arguments.of("a\u0301b", TextPos.ofLeading(0, 3), "ba\u0301", TextPos.ofLeading(0, 3)),
+                Arguments.of("ab\n\ncd", TextPos.ofLeading(1, 0), "a\nb\ncd", TextPos.ofLeading(1, 1)),
                 Arguments.of("ab\ncd", TextPos.ofLeading(0, 2), "ba\ncd", TextPos.ofLeading(0, 2)),
                 Arguments.of("a\nb", TextPos.ofLeading(0, 1), "a\nb", TextPos.ofLeading(0, 1)),
                 Arguments.of("ab\ncd", TextPos.ofLeading(1, 0), "abc\nd", TextPos.ofLeading(1, 0)));

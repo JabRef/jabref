@@ -1,5 +1,6 @@
 package org.jabref.gui.keyboard;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -169,20 +170,17 @@ public class CodeAreaKeyBindings {
         String text = IntStream.range(0, codeArea.getParagraphCount())
                                .mapToObj(codeArea::getPlainText)
                                .collect(Collectors.joining("\n"));
-        int caret = textPosToOffset(codeArea, codeArea.getCaretPosition());
-        caret = TextInputKeyBindings.transposePivot(text, caret);
-        if (caret < 0) {
+        Optional<int[]> offsets = TextInputKeyBindings.transposeOffsets(text, textPosToOffset(codeArea, codeArea.getCaretPosition()));
+        if (offsets.isEmpty()) {
             return false;
         }
-
-        int previousCharacterStart = text.offsetByCodePoints(caret, -1);
-        int nextCharacterEnd = text.offsetByCodePoints(caret, 1);
-        String replacement = text.substring(caret, nextCharacterEnd) + text.substring(previousCharacterStart, caret);
+        int[] range = offsets.orElseThrow();
+        String replacement = text.substring(range[1], range[2]) + text.substring(range[0], range[1]);
         codeArea.replaceText(
-                offsetToTextPos(codeArea, previousCharacterStart),
-                offsetToTextPos(codeArea, nextCharacterEnd),
+                offsetToTextPos(codeArea, range[0]),
+                offsetToTextPos(codeArea, range[2]),
                 replacement);
-        codeArea.select(offsetToTextPos(codeArea, nextCharacterEnd));
+        codeArea.select(offsetToTextPos(codeArea, range[2]));
         return true;
     }
 

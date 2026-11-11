@@ -479,10 +479,8 @@ public class PreferencesMigrations {
         int index = bindNames.indexOf(keyBinding.getConstant());
         String macDefault = keyBinding.getDefaultMacKeyBinding();
         if (index == -1) {
-            if (isKeyCombinationInUse(macDefault, bindings)) {
-                bindNames.add(keyBinding.getConstant());
-                bindings.add("");
-            }
+            bindNames.add(keyBinding.getConstant());
+            bindings.add(isKeyCombinationInUse(macDefault, bindings) ? "" : macDefault);
             return;
         }
         keyBinding.getMacDefaultReplacement(bindings.get(index))

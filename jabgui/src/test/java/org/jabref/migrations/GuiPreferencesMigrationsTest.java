@@ -3,10 +3,12 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingCategory;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.logic.FilePreferences;
@@ -167,9 +169,14 @@ class GuiPreferencesMigrationsTest {
 
         PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
 
-        verify(preferences).putStringList(JabRefGuiPreferences.BIND_NAMES,
-                List.of(KeyBinding.CLEANUP.getConstant(), KeyBinding.EDITOR_INSERT_LINE_AFTER.getConstant()));
-        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+O", ""));
+        ArgumentCaptor<List<String>> migratedNames = ArgumentCaptor.captor();
+        ArgumentCaptor<List<String>> migratedBindings = ArgumentCaptor.captor();
+        verify(preferences).putStringList(eq(JabRefGuiPreferences.BIND_NAMES), migratedNames.capture());
+        verify(preferences).putStringList(eq(JabRefGuiPreferences.BINDINGS), migratedBindings.capture());
+        KeyBindingRepository repository = new KeyBindingRepository(migratedNames.getValue(), migratedBindings.getValue());
+        assertEquals(Optional.of(""), repository.get(KeyBinding.EDITOR_INSERT_LINE_AFTER));
+        assertEquals(Optional.of("ctrl+T"), repository.get(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS));
+        assertEquals(Optional.of("ctrl+O"), repository.get(KeyBinding.CLEANUP));
     }
 
     @Test

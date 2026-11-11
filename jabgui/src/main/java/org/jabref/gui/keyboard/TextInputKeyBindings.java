@@ -1,5 +1,11 @@
 package org.jabref.gui.keyboard;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -17,6 +23,8 @@ import org.jabref.logic.util.strings.StringManipulator;
 import org.jabref.model.util.ResultingStringState;
 
 public class TextInputKeyBindings {
+
+    private static final Pattern GRAPHEME = Pattern.compile("\\X");
 
     public static ListChangeListener<Window> registerSecondaryWindows(Window mainWindow, KeyBindingRepository keyBindingRepository) {
         EventHandler<KeyEvent> handler = event -> {
@@ -227,32 +235,36 @@ public class TextInputKeyBindings {
             return false;
         }
         String text = textInput.getText();
-        int caret = textInput.getCaretPosition();
-        caret = transposePivot(text, caret);
-        if (caret < 0) {
+        Optional<int[]> offsets = transposeOffsets(text, textInput.getCaretPosition());
+        if (offsets.isEmpty()) {
             return false;
         }
-
-        int previousCharacterStart = text.offsetByCodePoints(caret, -1);
-        int nextCharacterEnd = text.offsetByCodePoints(caret, 1);
-        String replacement = text.substring(caret, nextCharacterEnd) + text.substring(previousCharacterStart, caret);
-        textInput.replaceText(previousCharacterStart, nextCharacterEnd, replacement);
-        textInput.positionCaret(nextCharacterEnd);
+        int[] range = offsets.orElseThrow();
+        String replacement = text.substring(range[1], range[2]) + text.substring(range[0], range[1]);
+        textInput.replaceText(range[0], range[2], replacement);
+        textInput.positionCaret(range[2]);
         return true;
     }
 
-    static int transposePivot(String text, int caret) {
-        if (caret == 0) {
-            return -1;
+    static Optional<int[]> transposeOffsets(String text, int caret) {
+        List<Integer> boundaries = new ArrayList<>();
+        boundaries.add(0);
+        Matcher matcher = GRAPHEME.matcher(text);
+        while (matcher.find()) {
+            boundaries.add(matcher.end());
+        }
+        int index = boundaries.indexOf(caret);
+        if (index <= 0) {
+            return Optional.empty();
         }
         boolean atLineEnd = caret < text.length() && text.charAt(caret) == '\n';
         if (caret == text.length() || atLineEnd) {
-            caret = text.offsetByCodePoints(caret, -1);
-            if (caret == 0 || (atLineEnd && text.codePointBefore(caret) == '\n')) {
-                return -1;
+            index--;
+            if (index == 0 || (atLineEnd && text.charAt(boundaries.get(index) - 1) == '\n')) {
+                return Optional.empty();
             }
         }
-        return caret;
+        return Optional.of(new int[] {boundaries.get(index - 1), boundaries.get(index), boundaries.get(index + 1)});
     }
 
     private static void moveCaretUp(TextInputControl control) {
