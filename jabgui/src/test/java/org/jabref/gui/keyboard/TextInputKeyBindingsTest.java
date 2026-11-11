@@ -181,7 +181,7 @@ class TextInputKeyBindingsTest {
 
     private static Stream<Arguments> transposeBoundaryData() {
         return Stream.of(
-                Arguments.of("teh", 3, "the", 3),
+                Arguments.of("teh", 3, "the", 3), // spellchecker:disable-line
                 Arguments.of("ab\ncd", 2, "ba\ncd", 2),
                 Arguments.of("a\nb", 1, "a\nb", 1),
                 Arguments.of("ab\ncd", 3, "abc\nd", 4));

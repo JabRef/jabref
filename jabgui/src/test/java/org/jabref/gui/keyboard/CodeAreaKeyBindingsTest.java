@@ -192,7 +192,7 @@ class CodeAreaKeyBindingsTest {
 
     private static Stream<Arguments> transposeBoundaryData() {
         return Stream.of(
-                Arguments.of("teh", TextPos.ofLeading(0, 3), "the", TextPos.ofLeading(0, 3)),
+                Arguments.of("teh", TextPos.ofLeading(0, 3), "the", TextPos.ofLeading(0, 3)), // spellchecker:disable-line
                 Arguments.of("ab\ncd", TextPos.ofLeading(0, 2), "ba\ncd", TextPos.ofLeading(0, 2)),
                 Arguments.of("a\nb", TextPos.ofLeading(0, 1), "a\nb", TextPos.ofLeading(0, 1)),
                 Arguments.of("ab\ncd", TextPos.ofLeading(1, 0), "abc\nd", TextPos.ofLeading(1, 0)));
