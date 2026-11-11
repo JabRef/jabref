@@ -759,8 +759,9 @@ class RuleBasedPlainCitationParserTest {
         parser.parsePlainCitation("Smith, J. A title. Journal, 2020. doi:10.1000/xyz123");
         parser.parsePlainCitation("Smith, J. A title. Journal, 2020. https://example.com/page");
         Optional<BibEntry> third = parser.parsePlainCitation("Doe, A. Other title. Journal, 2019.");
-        assertEquals(List.of(Optional.empty(), Optional.empty()),
-                List.of(third.flatMap(entry -> entry.getField(StandardField.DOI)),
+        assertEquals(List.of(Optional.of("Doe, A."), Optional.empty(), Optional.empty()),
+                List.of(third.flatMap(entry -> entry.getField(StandardField.AUTHOR)),
+                        third.flatMap(entry -> entry.getField(StandardField.DOI)),
                         third.flatMap(entry -> entry.getField(StandardField.URL))));
     }
 
@@ -771,6 +772,8 @@ class RuleBasedPlainCitationParserTest {
     void parsesCitationsSeparatedByBlankLine() throws FetcherException {
         List<BibEntry> entries = parser.parseMultiplePlainCitations(
                 "Smith, J. A title. Journal, 2020.\n\nDoe, A. Other title. Journal, 2019.");
+        assertEquals(List.of(Optional.of("Smith, J."), Optional.of("Doe, A.")),
+                entries.stream().map(entry -> entry.getField(StandardField.AUTHOR)).toList());
         assertEquals(List.of(Optional.of("2020"), Optional.of("2019")),
                 entries.stream().map(entry -> entry.getField(StandardField.YEAR)).toList());
     }
@@ -779,6 +782,8 @@ class RuleBasedPlainCitationParserTest {
     @Test
     void lineBreakInsideCitationDoesNotSplitIt() throws FetcherException {
         List<BibEntry> entries = parser.parseMultiplePlainCitations("Smith, J. A title\nspanning two lines. Journal, 2020.");
+        assertEquals(List.of(Optional.of("Smith, J.")),
+                entries.stream().map(entry -> entry.getField(StandardField.AUTHOR)).toList());
         assertEquals(List.of(Optional.of("2020")),
                 entries.stream().map(entry -> entry.getField(StandardField.YEAR)).toList());
     }
