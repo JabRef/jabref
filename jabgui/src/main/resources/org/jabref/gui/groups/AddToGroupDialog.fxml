@@ -9,7 +9,7 @@
     <content>
         <VBox spacing="4">
             <TextField fx:id="searchField" promptText="%Type a group name"/>
-            <ListView fx:id="groupList" prefHeight="250"/>
+            <ListView fx:id="groupList" VBox.vgrow="ALWAYS"/>
         </VBox>
     </content>
 </DialogPane>
