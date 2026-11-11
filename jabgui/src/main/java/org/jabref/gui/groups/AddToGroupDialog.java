@@ -52,7 +52,7 @@ public class AddToGroupDialog extends BaseDialog<Boolean> {
     @FXML
     private void initialize() {
         searchField.textProperty().bindBidirectional(viewModel.searchTextProperty());
-        searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        searchField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             switch (event.getCode()) {
                 case DOWN -> {
                     viewModel.selectNext();
@@ -61,8 +61,6 @@ public class AddToGroupDialog extends BaseDialog<Boolean> {
                 case UP -> {
                     viewModel.selectPrevious();
                     event.consume();
-                }
-                default -> {
                 }
             }
         });
@@ -95,7 +93,7 @@ public class AddToGroupDialog extends BaseDialog<Boolean> {
                     groupList.getSelectionModel().select(index);
                     groupList.scrollTo(index);
                 },
-                () -> groupList.getSelectionModel().clearSelection());
+                groupList.getSelectionModel()::clearSelection);
     }
 
     private void confirm() {

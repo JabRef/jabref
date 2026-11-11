@@ -37,25 +37,30 @@ public class AddToGroupAction extends SimpleCommand {
         if (!isExecutable()) {
             return;
         }
-        stateManager.getActiveDatabase().ifPresent(library ->
-                library.getMetaData().getGroups()
-                       .filter(AddToGroupDialogViewModel::hasAssignableGroups)
-                       .ifPresentOrElse(
-                               root -> assignSelectedEntries(library, root),
-                               () -> dialogService.notify(Localization.lang("This library has no group to assign entries to."))));
+        stateManager.getActiveDatabase().ifPresent(this::assignSelectedEntries);
+    }
+
+    private void assignSelectedEntries(BibDatabaseContext library) {
+        library.getMetaData().getGroups()
+               .filter(AddToGroupDialogViewModel::hasAssignableGroups)
+               .ifPresentOrElse(
+                       root -> showGroupPicker(library, root),
+                       () -> dialogService.notify(Localization.lang("This library has no group to assign entries to.")));
     }
 
     // [impl->feat~groups.assign-entries-by-keyboard~1]
-    private void assignSelectedEntries(BibDatabaseContext library, GroupTreeNode root) {
+    private void showGroupPicker(BibDatabaseContext library, GroupTreeNode root) {
         List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
         AddToGroupDialogViewModel viewModel = new AddToGroupDialogViewModel(root, entries, stateManager.getUndoManager(library), lastUsedGroup);
 
         dialogService.showCustomDialogAndWait(new AddToGroupDialog(viewModel))
                      .filter(Boolean::booleanValue)
                      .flatMap(_ -> viewModel.assignEntriesToSelectedGroup())
-                     .ifPresent(group -> {
-                         lastUsedGroup = Optional.of(group);
-                         dialogService.notify(Localization.lang("Assigned entries to group \"%0\".", group.getName()));
-                     });
+                     .ifPresent(this::rememberAssignedGroup);
+    }
+
+    private void rememberAssignedGroup(GroupTreeNode group) {
+        lastUsedGroup = Optional.of(group);
+        dialogService.notify(Localization.lang("Assigned entries to group \"%0\".", group.getName()));
     }
 }
