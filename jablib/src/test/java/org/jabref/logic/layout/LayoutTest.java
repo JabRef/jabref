@@ -48,6 +48,14 @@ class LayoutTest {
     }
 
     @Test
+    void iso690AuthorNamesPreserveNamesAndOrganizations() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Sandra Smith and John Doe");
+        assertEquals("SMITH, Sandra y DOE, John", layout("\\format[Iso690NamesAuthors]{\\author}", entry));
+        BibEntry organization = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "{Research and Development Institute}");
+        assertEquals("{RESEARCH AND DEVELOPMENT INSTITUTE}", layout("\\format[Iso690NamesAuthors]{\\author}", organization));
+    }
+
+    @Test
     void entryTypeForUnknown() throws IOException {
         BibEntry entry = new BibEntry(new UnknownEntryType("unknown")).withField(StandardField.AUTHOR, "test");
 
