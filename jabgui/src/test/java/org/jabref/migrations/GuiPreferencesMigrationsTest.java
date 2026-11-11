@@ -206,6 +206,7 @@ class GuiPreferencesMigrationsTest {
         List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
         List<String> bindings = snapshotWithoutTextEditingDefaults(bindNames);
         bindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "alt+s");
+        bindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "alt+F");
 
         when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
         when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
@@ -214,6 +215,7 @@ class GuiPreferencesMigrationsTest {
 
         List<String> expectedBindings = new ArrayList<>(bindings);
         expectedBindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "shortcut+alt+G");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "shortcut+alt+F");
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
     }
 
