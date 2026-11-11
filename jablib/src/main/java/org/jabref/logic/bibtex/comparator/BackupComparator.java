@@ -36,6 +36,7 @@ public final class BackupComparator {
         stopIfInterrupted();
         Optional<ChangeCounts> changes = current.flatMap(currentResult ->
                 candidate.flatMap(candidateResult -> compareEntries(currentResult, candidateResult)));
+        stopIfInterrupted();
         return new BackupComparison(entryCount(current), entryCount(candidate), changes);
     }
 

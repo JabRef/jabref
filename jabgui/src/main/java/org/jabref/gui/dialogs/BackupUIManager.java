@@ -63,7 +63,7 @@ public class BackupUIManager {
         Optional<Path> latestBackupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory());
         Optional<BackupComparison> comparison = Optional.empty();
         try {
-            // Not on the shared task pool, where other backup dialogs can block it
+            // Runs on the loading thread, so a cancelled load interrupts the comparison.
             if (latestBackupPath.isPresent()) {
                 comparison = Optional.of(BackupComparator.compare(originalPath, latestBackupPath.orElseThrow(), preferences.getImportFormatPreferences()));
             }
