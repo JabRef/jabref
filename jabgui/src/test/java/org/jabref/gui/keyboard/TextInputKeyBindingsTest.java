@@ -7,15 +7,20 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
@@ -88,6 +93,31 @@ class TextInputKeyBindingsTest {
         TextField textField = new TextField("abc");
 
         assertFalse(TextInputKeyBindings.centerCaret(textField));
+    }
+
+    @Test
+    void transposeShortcutWorksInReopenedInputDialog() {
+        JavaFxExtension.invokeAndWait(() -> {
+            Stage mainWindow = new Stage();
+            KeyBindingRepository repository = new KeyBindingRepository();
+            repository.put(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, "ctrl+T");
+            ListChangeListener<Window> listener = TextInputKeyBindings.registerSecondaryWindows(mainWindow, repository);
+            TextInputDialog dialog = new TextInputDialog("abcd");
+            try {
+                dialog.show();
+                dialog.hide();
+                dialog.show();
+                TextField editor = dialog.getEditor();
+                editor.requestFocus();
+                editor.positionCaret(2);
+                Event.fireEvent(editor, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.T, false, true, false, false));
+                assertEquals("acbd", editor.getText());
+                assertEquals(3, editor.getCaretPosition());
+            } finally {
+                dialog.hide();
+                Window.getWindows().removeListener(listener);
+            }
+        });
     }
 
     @Test

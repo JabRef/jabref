@@ -1,5 +1,8 @@
 package org.jabref.gui.keyboard;
 
+import javafx.collections.ListChangeListener;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
@@ -8,11 +11,34 @@ import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.control.skin.TextInputControlSkin.Direction;
 import javafx.scene.control.skin.TextInputControlSkin.TextUnit;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Window;
 
 import org.jabref.logic.util.strings.StringManipulator;
 import org.jabref.model.util.ResultingStringState;
 
 public class TextInputKeyBindings {
+
+    public static ListChangeListener<Window> registerSecondaryWindows(Window mainWindow, KeyBindingRepository keyBindingRepository) {
+        EventHandler<KeyEvent> handler = event -> {
+            if (event.getTarget() instanceof Node node && node.getScene() != null) {
+                call(node.getScene(), event, keyBindingRepository);
+            }
+        };
+        ListChangeListener<Window> listener = change -> {
+            while (change.next()) {
+                for (Window window : change.getRemoved()) {
+                    window.removeEventFilter(KeyEvent.KEY_PRESSED, handler);
+                }
+                for (Window window : change.getAddedSubList()) {
+                    if (window != mainWindow) {
+                        window.addEventFilter(KeyEvent.KEY_PRESSED, handler);
+                    }
+                }
+            }
+        };
+        Window.getWindows().addListener(listener);
+        return listener;
+    }
 
     // [impl->req~macos.text-editing-shortcuts~1]
     // [impl->req~ux.text-editing.line-boundaries~2]
