@@ -134,7 +134,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
 - We fixed an issue where failed tasks kept showing as running in the notification center. [#17124](https://github.com/JabRef/jabref/pull/17124)
-- We fixed an issue where BibTeX entries with a missing comma after the citation key were imported with a wrong key. [#17549](https://github.com/JabRef/jabref/issues/17549)
 
 ### Removed
 
