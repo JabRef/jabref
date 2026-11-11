@@ -120,11 +120,17 @@ public class BackupResolverDialog extends FXDialog {
     }
 
     private static String describeChanges(BackupComparison.ChangeCounts changes) {
-        if (changes.added() == 0 && changes.removed() == 0 && changes.modified() == 0) {
-            return Localization.lang("No entry changes");
+        boolean noEntryChanges = changes.added() == 0 && changes.removed() == 0 && changes.modified() == 0;
+        if (noEntryChanges) {
+            return changes.otherContentChanged()
+                    ? Localization.lang("No entry changes, but groups, strings or the preamble differ")
+                    : Localization.lang("No changes");
         }
-        return Localization.lang("removed: %0, added: %1, modified: %2",
+        String entryChanges = Localization.lang("removed: %0, added: %1, modified: %2",
                 String.valueOf(changes.removed()), String.valueOf(changes.added()), String.valueOf(changes.modified()));
+        return changes.otherContentChanged()
+                ? Localization.lang("%0; groups, strings or the preamble also differ", entryChanges)
+                : entryChanges;
     }
 
     private static String format(OptionalInt count) {

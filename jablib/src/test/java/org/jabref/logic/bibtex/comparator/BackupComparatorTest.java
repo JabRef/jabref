@@ -39,7 +39,7 @@ class BackupComparatorTest {
 
         assertEquals(OptionalInt.of(1), result.currentEntryCount());
         assertEquals(OptionalInt.of(1), result.backupEntryCount());
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 0, 0)), result.changes());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 0, 0, false)), result.changes());
     }
 
     @Test
@@ -51,7 +51,7 @@ class BackupComparatorTest {
 
         assertEquals(OptionalInt.of(0), result.currentEntryCount());
         assertEquals(OptionalInt.of(1), result.backupEntryCount());
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0)), result.changes());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0, false)), result.changes());
     }
 
     @Test
@@ -62,7 +62,7 @@ class BackupComparatorTest {
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
         assertEquals(OptionalInt.of(0), result.backupEntryCount());
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0)), result.changes());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0, false)), result.changes());
     }
 
     @Test
@@ -75,7 +75,7 @@ class BackupComparatorTest {
 
         assertEquals(OptionalInt.of(2), result.currentEntryCount());
         assertEquals(OptionalInt.of(1), result.backupEntryCount());
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0)), result.changes());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0, false)), result.changes());
     }
 
     @Test
@@ -85,7 +85,7 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 0, 1)), result.changes());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 0, 1, false)), result.changes());
     }
 
     @Test
@@ -113,11 +113,14 @@ class BackupComparatorTest {
 
         assertEquals(OptionalInt.of(1), result.currentEntryCount());
         assertEquals(OptionalInt.of(2), result.backupEntryCount());
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0)), result.changes());
+        // The current file defines @String entries the backup does not, so string definitions differ.
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0, true)), result.changes());
     }
 
+    /// A file that parses with warnings (here an entry the parser skips) is still compared: the counts are only a
+    /// hint, and "Review backup" shows the real diff. Only an invalid parse stops the comparison.
     @Test
-    void doesNotReportIncompleteCountsAfterParserSkipsEntry(@TempDir Path tempDir) throws IOException {
+    void comparesFileThatParsesWithWarnings(@TempDir Path tempDir) throws IOException {
         String content = "@Article{broken, author=\"author {missing bracket\"}";
         Path original = Files.writeString(tempDir.resolve("library.bib"), content);
         Path backup = Files.writeString(tempDir.resolve("backup.bib"), "@Article{good, title = {Good}}");
@@ -129,9 +132,9 @@ class BackupComparatorTest {
 
         BackupComparison result = BackupComparator.compare(original, backup, preferences);
 
-        assertEquals(OptionalInt.empty(), result.currentEntryCount());
+        assertEquals(OptionalInt.of(0), result.currentEntryCount());
         assertEquals(OptionalInt.of(1), result.backupEntryCount());
-        assertEquals(Optional.empty(), result.changes());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(1, 0, 0, false)), result.changes());
     }
 
     @Test
@@ -153,7 +156,7 @@ class BackupComparatorTest {
 
         assertEquals(OptionalInt.of(2), result.currentEntryCount());
         assertEquals(OptionalInt.of(1), result.backupEntryCount());
-        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0)), result.changes());
+        assertEquals(Optional.of(new BackupComparison.ChangeCounts(0, 1, 0, false)), result.changes());
     }
 
     @Test

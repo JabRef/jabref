@@ -9,8 +9,9 @@ import org.jspecify.annotations.NullMarked;
 /// be compared reliably; they do not mean zero entries or zero changes.
 @NullMarked
 public record BackupComparison(OptionalInt currentEntryCount, OptionalInt backupEntryCount, Optional<ChangeCounts> changes) {
-    /// Changes needed to turn the current library into the backup library.
+    /// Changes needed to turn the current library into the backup library. `otherContentChanged` covers differences
+    /// outside the entries themselves: groups and other metadata, string definitions, and the preamble.
     @NullMarked
-    public record ChangeCounts(int added, int removed, int modified) {
+    public record ChangeCounts(int added, int removed, int modified, boolean otherContentChanged) {
     }
 }

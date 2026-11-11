@@ -161,6 +161,30 @@ class BackupResolverDialogTest extends JavaFxTest {
                 textOf(dialog, "backupChanges")));
     }
 
+    // [utest->req~jabgui.backup.restore-dialog-comparison~1]
+    @Test
+    void reportsNonEntryChangesWhenOnlyGroupsDiffer(@TempDir Path tempDir) throws IOException {
+        Path original = Files.writeString(tempDir.resolve("library.bib"), """
+                @Article{entry,
+                  title = {Title},
+                }
+                """);
+        Path backup = createBackup(original, tempDir.resolve("backups"), """
+                @Article{entry,
+                  title = {Title},
+                }
+
+                @Comment{jabref-meta: grouping:
+                0 AllEntriesGroup:;
+                1 StaticGroup:Group\\;0\\;1\\;0x8a8a8aff\\;\\;\\;;
+                }
+                """);
+
+        BackupResolverDialog dialog = createDialog(original, backup.getParent());
+
+        assertEquals("No entry changes, but groups, strings or the preamble differ", textOf(dialog, "backupChanges"));
+    }
+
     @Test
     void missingBackupShowsUnavailableValues(@TempDir Path tempDir) throws IOException {
         Path original = Files.writeString(tempDir.resolve("library.bib"), "@Article{current}");

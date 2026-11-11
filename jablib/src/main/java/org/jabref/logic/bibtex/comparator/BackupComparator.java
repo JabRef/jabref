@@ -12,7 +12,6 @@ import org.jabref.logic.bibtex.comparator.BackupComparison.ChangeCounts;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.jspecify.annotations.NullMarked;
@@ -55,7 +54,7 @@ public final class BackupComparator {
         Optional<ParserResult> parsed = Optional.empty();
         try {
             ParserResult result = OpenDatabase.loadDatabase(path, preferences, new DummyFileUpdateMonitor());
-            if (canCompareEntries(result)) {
+            if (!result.isInvalid()) {
                 parsed = Optional.of(result);
             }
         } catch (IOException e) {
@@ -80,24 +79,12 @@ public final class BackupComparator {
                            .count();
     }
 
-    private static boolean canCompareEntries(ParserResult result) {
-        if (result.isInvalid()) {
-            return false;
-        }
-
-        // Duplicate string definitions do not discard entries. Other warnings may indicate skipped entries.
-        return result.warnings().stream().allMatch(warning ->
-                result.getDatabase().getStringValues().stream().anyMatch(string ->
-                        warning.equals(Localization.lang("Duplicate string name: '%0'", string.getName()))));
-    }
-
     private static Optional<ChangeCounts> compareEntries(ParserResult current, ParserResult candidate) {
-        int currentCount = countNonEmptyEntries(current);
-        int backupCount = countNonEmptyEntries(candidate);
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(current.getDatabaseContext(), candidate.getDatabaseContext());
         int added = 0;
         int removed = 0;
         int modified = 0;
-        for (BibEntryDiff difference : BibDatabaseDiff.compare(current.getDatabaseContext(), candidate.getDatabaseContext()).getEntryDifferences()) {
+        for (BibEntryDiff difference : diff.getEntryDifferences()) {
             if (difference.originalEntry() == null) {
                 added++;
             } else if (difference.newEntry() == null) {
@@ -106,9 +93,9 @@ public final class BackupComparator {
                 modified++;
             }
         }
-        if (currentCount - removed + added != backupCount) {
-            return Optional.empty();
-        }
-        return Optional.of(new ChangeCounts(added, removed, modified));
+        boolean otherContentChanged = diff.getMetaDataDifferences().isPresent()
+                || diff.getPreambleDifferences().isPresent()
+                || !diff.getBibStringDifferences().isEmpty();
+        return Optional.of(new ChangeCounts(added, removed, modified, otherContentChanged));
     }
 }
