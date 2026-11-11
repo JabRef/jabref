@@ -24,7 +24,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
 - We added an automatically generated commit message to the Git commit message box. [#16763](https://github.com/JabRef/jabref/issues/16763)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
+- We added BibSonomy as a web search source. [#5888](https://github.com/JabRef/jabref/issues/5888)
 - We added the cleanup formatter "LaTeX to Unicode-aware LaTeX", which converts LaTeX character commands to Unicode and keeps escaped characters. [#8715](https://github.com/JabRef/jabref/issues/8715)
+- We added a "No value" subgroup to automatic keyword groups, collecting entries without a value such as an unranked entry. [#10264](https://github.com/JabRef/jabref/issues/10264)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)
 - We added restricting the columns of the consistency check to the fields a `.bst` style uses. [#17710](https://github.com/JabRef/jabref/pull/17710)
 - We added consistency checks for entries cited in `.aux` files, automatically selecting a single file beside the library. [#1403](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403)
@@ -42,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
 - We now show which web search fetchers have a saved API key. [#16250](https://github.com/JabRef/jabref/issues/16250)
 - We improved the error message shown when Semantic Scholar restricts access to a paper's references. [#17291](https://github.com/JabRef/jabref/issues/17291)
+- We removed the extra encryption of passwords and API keys in the system keyring; existing values are migrated automatically. [#13687](https://github.com/JabRef/jabref/issues/13687)
 - We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 - We changed the HTTP server to list linked PDF files per entry at `GET /libraries/{id}/entries/{citationKey}/files` instead of `entries/pdffiles`. [#17567](https://github.com/JabRef/jabref/pull/17567)
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
@@ -54,11 +57,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed parsing of plain-text citations with the rule-based citation parser. [#12893](https://github.com/JabRef/jabref/issues/12893)
+- We fixed an issue where the DocBook export wrote invalid XML for emoji and some math symbols. [#17747](https://github.com/JabRef/jabref/issues/17747)
 - We fixed an issue where clicking "Generate" in the AUX file import dialog before parsing caused an exception.
 - We fixed an issue where it was hard to distinguish between enabled/disabled status of search buttons in dark mode and added tooltips. [#11569](https://github.com/JabRef/jabref/issues/11569)
 - We fixed an issue where entries containing dollar signs, backslashes, or unset fields passed to `substring$` caused citation style preview and export to fail. [#12799](https://github.com/JabRef/jabref/issues/12799)
 - We fixed an issue where citationcount, day, and dayfiled columns were sorted alphabetically instead of numerically. [#17459](https://github.com/JabRef/jabref/issues/17459)
 - We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
+- We fixed RTF export failing when a field ends with a LaTeX formatting command without closing braces. [#17766](https://github.com/JabRef/jabref/pull/17766)
 - We fixed JabKit to preserve existing citation keys when generating keys with the avoid-overwrite setting. [#17458](https://github.com/JabRef/jabref/issues/17458)
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
 - We fixed the BibTeX source dialog background in the Citation Relations tab for dark themes. [#13599](https://github.com/JabRef/jabref/issues/13599)
@@ -80,6 +85,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where closing a library did not free its memory, so a session that opened and closed several libraries kept all of them in memory. [#16948](https://github.com/JabRef/jabref/pull/16948)
 - We fixed an issue where case-sensitive search (`=!`, `==!`, `=~!`) in linked files ignored the casing and matched text in any casing. [#13048](https://github.com/JabRef/jabref/issues/13048)
 - We fixed linked-file full-text search results missing from the entry editor. [#17367](https://github.com/JabRef/jabref/pull/17367)
+- We fixed an issue where merging a backup file did not prompt the user to save upon exiting. [#12265](https://github.com/JabRef/jabref/issues/12265)
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
@@ -130,6 +136,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
 - We fixed JabKit BibTeX conversion losing string definitions and preambles, including when overwriting the input file. [#17409](https://github.com/JabRef/jabref/issues/17409)
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
+- We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
+- We fixed an issue where failed tasks kept showing as running in the notification center. [#17124](https://github.com/JabRef/jabref/pull/17124)
 
 ### Removed
 
