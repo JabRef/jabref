@@ -459,10 +459,12 @@ public class ImportHandler {
                       })
                       .onSuccess(existingDuplicateInLibrary -> {
                           if (existingDuplicateInLibrary.isPresent()) {
-                              handleDuplicates(entryToInsert, existingDuplicateInLibrary.get(), decision)
-                                      .thenAccept(duplicateHandledEntry -> {
+                              BibEntry duplicateInLibrary = existingDuplicateInLibrary.get();
+                              getDuplicateDecision(entryToInsert, duplicateInLibrary, decision)
+                                      .thenAccept(decisionResult -> {
+                                          Optional<BibEntry> duplicateHandledEntry = handleDecisionResult(entryToInsert, duplicateInLibrary, decisionResult);
                                           if (duplicateHandledEntry.isEmpty()) {
-                                              tracker.markSkipped();
+                                              markNotImported(duplicateInLibrary, decisionResult.decision(), tracker);
                                               return;
                                           }
                                           continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker);
@@ -476,6 +478,20 @@ public class ImportHandler {
                           }
                           continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker);
                       }).executeWith(taskExecutor);
+    }
+
+    /// Reports an entry that is not imported because of its duplicate. Only some decisions keep the library's entry
+    /// in its place: closing the dialog makes no statement about the entry at all.
+    ///
+    /// @param duplicateInLibrary the library's entry the imported entry duplicates
+    /// @param decision           how the user resolved the duplicate
+    /// @param tracker            tracks the import status of the entry
+    private void markNotImported(BibEntry duplicateInLibrary, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
+        if (decision == DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT || decision == DuplicateResolverDialog.DuplicateResolverResult.AUTOREMOVE_EXACT) {
+            tracker.markKeptExisting(duplicateInLibrary);
+        } else {
+            tracker.markSkipped();
+        }
     }
 
     private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker) {
@@ -536,7 +552,8 @@ public class ImportHandler {
                 .containsDuplicate(targetBibDatabaseContext.getDatabase(), entryToCheck, targetBibDatabaseContext.getMode());
     }
 
-    public CompletableFuture<Optional<BibEntry>> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+    @VisibleForTesting
+    CompletableFuture<Optional<BibEntry>> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
         return getDuplicateDecision(originalEntry, duplicateEntry, decision)
                 .thenApply(decisionResult -> handleDecisionResult(originalEntry, duplicateEntry, decisionResult));
     }
