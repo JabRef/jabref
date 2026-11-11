@@ -37,24 +37,17 @@ public class NumericFieldComparator implements Comparator<String> {
         if (i1present && i2present) {
             return i1 - i2;
         } else if (i1present) {
-            // The first one was parsable, but not the second one.
-            // This means we consider one < two
-            // We assume that "null" is "less than" any other value.
             return 1;
         } else if (i2present) {
-            // The second one was parsable, but not the first one.
-            // This means we consider one > two
-            // We assume that "null" is "less than" any other value.
             return -1;
         } else {
-            if (val1 != null && val2 != null) {
-                return val1.compareTo(val2);
-            } else if (val1 == null) {
+            // We assume that "null" is "less than" any other value.
+            if (val1 == null) {
                 return -1;
-            } else if (val2 == null) {
+            } else if(val2 == null) {
                 return 1;
             } else {
-                return CharSequence.compare(val1, val2);
+                return val1.compareTo(val2);
             }
         }
     }
