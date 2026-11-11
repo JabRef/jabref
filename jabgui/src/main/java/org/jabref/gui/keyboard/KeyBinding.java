@@ -14,6 +14,8 @@ public enum KeyBinding {
     // DELETE BACKWARDS = Rubout
     EDITOR_BACKWARD("Move caret left", Localization.lang("Move caret left"), "", "ctrl+B", KeyBindingCategory.EDITOR),
     EDITOR_FORWARD("Move caret right", Localization.lang("Move caret right"), "", "ctrl+F", KeyBindingCategory.EDITOR),
+    // Word/document navigation and backward word deletion use native control shortcuts; Option+letter
+    // bindings are left empty because those keys can insert characters on macOS keyboard layouts.
     EDITOR_WORD_BACKWARD("Move caret to previous word", Localization.lang("Move caret to previous word"), "", KeyBindingCategory.EDITOR),
     EDITOR_WORD_FORWARD("Move caret to next word", Localization.lang("Move caret to next word"), "", KeyBindingCategory.EDITOR),
     EDITOR_BEGINNING("Move caret to beginning of line", Localization.lang("Move caret to beginning of line"), "", "ctrl+A", KeyBindingCategory.EDITOR),

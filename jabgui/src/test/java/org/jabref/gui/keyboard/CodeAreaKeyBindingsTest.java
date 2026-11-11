@@ -3,6 +3,7 @@ package org.jabref.gui.keyboard;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -16,6 +17,8 @@ import jfx.incubator.scene.control.richtext.TextPos;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -140,6 +143,23 @@ class CodeAreaKeyBindingsTest {
                     Arguments.of(lineEnding, "First" + separator, TextPos.ofLeading(0, 5), "First"),
                     Arguments.of(lineEnding, "First" + separator, TextPos.ofLeading(1, 0), "First\n"),
                     Arguments.of(lineEnding, "", TextPos.ZERO, ""));
+        });
+    }
+
+    @Test
+    @EnabledOnOs(OS.MAC)
+    void optionBackspaceDeletesPreviousWordInCodeArea() {
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea area = new CodeArea();
+            area.setText("hello world");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(area));
+            stage.show();
+            area.requestFocus();
+            area.select(TextPos.ofLeading(0, 11));
+            Event.fireEvent(area, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.BACK_SPACE, false, false, true, false));
+            assertEquals("hello ", area.getText());
+            stage.hide();
         });
     }
 

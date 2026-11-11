@@ -27,6 +27,8 @@ import org.jabref.gui.testutils.JavaFxExtension;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -112,6 +114,22 @@ class TextInputKeyBindingsTest {
         TextField textField = new TextField("abc");
 
         assertFalse(TextInputKeyBindings.centerCaret(textField));
+    }
+
+    @Test
+    @EnabledOnOs(OS.MAC)
+    void optionBackspaceDeletesPreviousWordInTextArea() {
+        JavaFxExtension.invokeAndWait(() -> {
+            TextArea area = new TextArea("hello world");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(area));
+            stage.show();
+            area.requestFocus();
+            area.positionCaret(11);
+            Event.fireEvent(area, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.BACK_SPACE, false, false, true, false));
+            assertEquals("hello ", area.getText());
+            stage.hide();
+        });
     }
 
     @Test
