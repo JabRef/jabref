@@ -47,10 +47,18 @@ public class TextInputKeyBindings {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
                 if (!focusedTextField.isEditable() && switch (binding) {
-                    case EDITOR_DELETE, EDITOR_INSERT_LINE_AFTER, EDITOR_TRANSPOSE_CHARACTERS,
-                         EDITOR_CAPITALIZE, EDITOR_LOWERCASE, EDITOR_UPPERCASE,
-                         EDITOR_KILL_LINE, EDITOR_KILL_WORD, EDITOR_KILL_WORD_BACKWARD -> true;
-                    default -> false;
+                    case EDITOR_DELETE,
+                         EDITOR_INSERT_LINE_AFTER,
+                         EDITOR_TRANSPOSE_CHARACTERS,
+                         EDITOR_CAPITALIZE,
+                         EDITOR_LOWERCASE,
+                         EDITOR_UPPERCASE,
+                         EDITOR_KILL_LINE,
+                         EDITOR_KILL_WORD,
+                         EDITOR_KILL_WORD_BACKWARD ->
+                            true;
+                    default ->
+                            false;
                 }) {
                     return;
                 }

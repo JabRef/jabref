@@ -211,9 +211,9 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             presetBindings.keySet().forEach(binding -> keyBindingRepository.put(binding, ""));
             presetBindings.forEach((binding, value) -> {
                 if (value.isEmpty() || keyBindingRepository.getKeyBindings().keySet().stream()
-                        .filter(other -> other != binding)
-                        .map(keyBindingRepository::getKeyCombination)
-                        .noneMatch(combination -> combination.filter(KeyCombination.valueOf(value)::equals).isPresent())) {
+                                                           .filter(other -> other != binding)
+                                                           .map(keyBindingRepository::getKeyCombination)
+                                                           .noneMatch(combination -> combination.filter(KeyCombination.valueOf(value)::equals).isPresent())) {
                     keyBindingRepository.put(binding, value);
                 }
             });
