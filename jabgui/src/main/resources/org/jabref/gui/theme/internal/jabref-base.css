@@ -624,8 +624,10 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .tags-field > .flow-pane > .tag-view:selected {
-    -fx-background-color: derive(-color-button-default, -20%);
-    -fx-text-fill: -color-fg-emphasis;
+    -fx-background: -color-button-default;
+    -fx-background-color: -color-fg-default, -color-button-default;
+    -fx-background-insets: 0, 0.166667em;
+    -fx-text-fill: -fx-text-background-color;
 }
 
 .tags-field > .flow-pane > .tag-view:drag-over {
@@ -1368,6 +1370,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-accent, -color-bg-secondary;
     -fx-background-insets: 0, 2;
     -fx-highlight-text-fill: -fx-text-inner-color;
+}
+
+.three-way-merge .tags-field > .flow-pane {
+    -fx-alignment: center-left;
 }
 
 .three-way-merge .merge-field-value:selected .selection-box {
