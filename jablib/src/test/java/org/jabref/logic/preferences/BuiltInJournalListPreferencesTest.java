@@ -1,49 +1,50 @@
 package org.jabref.logic.preferences;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.prefs.Preferences;
 
 import org.jspecify.annotations.NullMarked;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @NullMarked
-@Execution(ExecutionMode.SAME_THREAD)
-@ResourceLock("Preferences")
 class BuiltInJournalListPreferencesTest {
-    private static final String KEY = "useBuiltInJournalList";
-    private Optional<String> savedValue = Optional.empty();
+    private final Map<String, Boolean> values = new HashMap<>();
 
-    @BeforeEach
-    void savePreference() {
-        JabRefCliPreferences preferences = new JabRefCliPreferences();
-        savedValue = preferences.hasKey(KEY) ? Optional.of(preferences.get(KEY, "")) : Optional.empty();
-        preferences.remove(KEY);
-    }
-
-    @AfterEach
-    void restorePreference() {
-        JabRefCliPreferences preferences = new JabRefCliPreferences();
-        savedValue.ifPresentOrElse(value -> preferences.put(KEY, value), () -> preferences.remove(KEY));
+    private Preferences isolatedStore() {
+        Preferences store = mock(Preferences.class);
+        when(store.get(anyString(), anyString())).thenAnswer(invocation -> invocation.getArgument(1));
+        when(store.getBoolean(anyString(), anyBoolean())).thenAnswer(invocation ->
+                values.getOrDefault(invocation.getArgument(0), invocation.getArgument(1)));
+        doAnswer(invocation -> {
+            values.put(invocation.getArgument(0), invocation.getArgument(1));
+            return null;
+        }).when(store).putBoolean(anyString(), anyBoolean());
+        return store;
     }
 
     @Test
     void missingPreferenceEnablesBuiltInList() {
-        assertTrue(new JabRefCliPreferences().getAbbreviationPreferences().shouldUseBuiltInJournalList());
+        assertTrue(new JabRefCliPreferences(isolatedStore()).getAbbreviationPreferences().shouldUseBuiltInJournalList());
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void savedChoiceSurvivesReload(boolean enabled) {
-        new JabRefCliPreferences().getAbbreviationPreferences().setUseBuiltInJournalList(enabled);
-        assertEquals(enabled, new JabRefCliPreferences().getAbbreviationPreferences().shouldUseBuiltInJournalList());
+        Preferences store = isolatedStore();
+        var preferences = new JabRefCliPreferences(store).getAbbreviationPreferences();
+        preferences.setUseBuiltInJournalList(!enabled);
+        preferences.setUseBuiltInJournalList(enabled);
+        assertEquals(enabled, new JabRefCliPreferences(store).getAbbreviationPreferences().shouldUseBuiltInJournalList());
     }
 }
