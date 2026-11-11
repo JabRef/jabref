@@ -93,7 +93,7 @@ class ParserResultTest {
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        assertEquals("Line 1: Found corrupted citation key  (comma missing).", parserResult.warnings().getFirst());
+        assertEquals("Line 1: Found corrupted citation key myArticle (comma missing).", parserResult.warnings().getFirst());
     }
 
     @Test
@@ -112,7 +112,7 @@ class ParserResultTest {
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        assertEquals("Line 2: Found corrupted citation key .", parserResult.warnings().getFirst());
+        assertEquals("Line 1: Found corrupted citation key myArticle (comma missing).", parserResult.warnings().getFirst());
     }
 
     @Test
