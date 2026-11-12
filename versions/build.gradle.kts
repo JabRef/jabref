@@ -54,7 +54,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.7.0")
+    api("com.dlsc.gemsfx:gemsfx:4.9.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.6.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -129,7 +129,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.86")
+    api("org.bouncycastle:bcprov-jdk18on:1.87")
     api("org.controlsfx:controlsfx:11.2.6")
     api("org.eclipse.jgit:org.eclipse.jgit:7.8.1.202611041320-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.8.1.202611041320-r")
@@ -168,5 +168,5 @@ dependencies.constraints {
     api("tools.maran:svgnode:2.0.1")
     // jfx-static-libs must match the JavaFX version above
     api("us.hebi.graalvm:jfx-static-feature:1.1.1")
-    api("us.hebi.graalvm:jfx-static-libs:27-2")
+    api("us.hebi.graalvm:jfx-static-libs:27.0.1")
 }
