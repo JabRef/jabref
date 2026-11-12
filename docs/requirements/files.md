@@ -44,7 +44,7 @@ Needs: impl, utest
 
 Apply built-in ignore rules first, followed by `.gitignore` rules from ancestor directories to the current directory. A later matching rule may override an earlier rule, including a built-in rule. Interpret literal braces in patterns as filename characters.
 
-Related issue: https://github.com/JabRef/jabref/issues/17546
+Related issue: [JabRef/jabref#17546](https://github.com/JabRef/jabref/issues/17546)
 
 Needs: impl, utest
 
