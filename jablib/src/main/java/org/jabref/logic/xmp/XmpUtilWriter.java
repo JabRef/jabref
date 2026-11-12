@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.exporter.AtomicFileOutputStream;
-import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -44,7 +43,6 @@ public class XmpUtilWriter {
 
     private static final XmpUtilShared XMP_UTIL_SHARED = new XmpUtilShared();
 
-    private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
     private final XmpPreferences xmpPreferences;
 
     public XmpUtilWriter(XmpPreferences xmpPreferences) {

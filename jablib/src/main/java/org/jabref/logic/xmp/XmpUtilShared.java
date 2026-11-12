@@ -6,13 +6,14 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.jabref.model.strings.LatexToUnicodeAdapter;
+
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.xml.DomXmpParser;
 import org.apache.xmpbox.xml.XmpParsingException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jspecify.annotations.NonNull;
 
 /// XMPUtilShared provides support for reading [org.jabref.logic.xmp.XmpUtilReader] and writing [org.jabref.logic.xmp.XmpUtilWriter] BibTeX data as XMP metadata
 /// in PDF-documents.
