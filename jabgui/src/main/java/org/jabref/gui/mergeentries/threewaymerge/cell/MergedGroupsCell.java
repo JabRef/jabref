@@ -7,6 +7,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.GroupsEditor;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -32,16 +33,14 @@ public class MergedGroupsCell extends ThreeWayMergeCell {
 
     private static GroupsEditor createGroupsEditor(GuiPreferences preferences, StateManager stateManager) {
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElseGet(BibDatabaseContext::new);
-        SuggestionProvider<?> suggestionProvider = stateManager.activeTabProperty().get()
-                                                               .map(LibraryTab::getSuggestionProviders)
-                                                               .orElseGet(SuggestionProviders::new)
-                                                               .getForField(StandardField.GROUPS);
-        FieldCheckers fieldCheckers = new FieldCheckers(
+        SuggestionProviders suggestionProviders = stateManager.activeTabProperty().get()
+                                                              .map(LibraryTab::getSuggestionProviders)
+                                                              .orElseGet(SuggestionProviders::new);
+        SuggestionProvider<?> suggestionProvider = FieldEditors.getSuggestionProvider(StandardField.GROUPS, suggestionProviders, databaseContext.getMetaData());
+        FieldCheckers fieldCheckers = FieldEditors.createFieldCheckers(
                 databaseContext,
-                preferences.getFilePreferences(),
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex(),
-                preferences.getCitationKeyPatternPreferences().getUnwantedCharacters());
+                preferences);
 
         return new GroupsEditor(
                 StandardField.GROUPS,
