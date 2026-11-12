@@ -69,6 +69,7 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
     protected final KeyBindingRepository keyBindingRepository;
 
     private boolean isSortedTagsField = false;
+    private boolean isTagSortingEnabled = true;
     private Optional<Keyword> draggedTag = Optional.empty();
     private long tagOrderUpdateGeneration;
     private boolean tagOrderUpdateScheduled;
@@ -142,10 +143,14 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
         /// Sorting during the list change would mutate the list while the bidirectional binding
         /// is still applying that change.
         tagListProperty.addListener((_, _, _) -> {
-            if (!updatingTagOrder) {
+            if (isTagSortingEnabled && !updatingTagOrder) {
                 scheduleTagOrderUpdate();
             }
         });
+    }
+
+    public void disableTagSorting() {
+        isTagSortingEnabled = false;
     }
 
     private void scheduleTagOrderUpdate() {

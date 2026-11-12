@@ -23,6 +23,7 @@ public class MergedGroupsCell extends ThreeWayMergeCell {
     public MergedGroupsCell(String text, int rowIndex, GuiPreferences preferences, StateManager stateManager) {
         super(text, rowIndex);
         GroupsEditor groupsEditor = createGroupsEditor(preferences, stateManager);
+        groupsEditor.disableTagSorting();
         groupsEditor.getViewModel().textProperty().bindBidirectional(textProperty());
         HBox.setHgrow(groupsEditor, Priority.ALWAYS);
         getChildren().add(groupsEditor);
