@@ -370,7 +370,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Only the chosen occurrence is replaced by [#YEAR_TAG], so other occurrences (in the title) stay untouched.
     /// If there is no year, the value is empty and `input` is returned unchanged.
     private static Extraction<String> findYear(String input) {
-        // [impl->req~import.plain-citation.year-and-pages~1]
+        // [impl->req~import.plain-citation.year~1]
         Matcher parenthesesMatcher = YEAR_IN_PARENTHESES_CANDIDATE_PATTERN.matcher(input);
         while (parenthesesMatcher.find()) {
             String candidate = parenthesesMatcher.group(YEAR_GROUP);
@@ -551,7 +551,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Pages are stored with the BibTeX range separator `--`.
     /// If there are no pages, the value is empty and `input` is returned unchanged.
     private static Extraction<String> findPages(String input) {
-        // [impl->req~import.plain-citation.year-and-pages~1]
+        // [impl->req~import.plain-citation.pages~1]
         int start = -1;
         int end = -1;
         String foundPages = "";
@@ -607,6 +607,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// is kept, because it belongs to an abbreviation (`ACM Trans. Math. Softw.,`).
     /// Placeholder tokens never end up in the title or journal/publisher.
     private static Parts findParts(String input) {
+        // [impl->req~import.plain-citation.venue~1]
         String afterAuthors = input.startsWith(AUTHOR_TAG) ? input.substring(AUTHOR_TAG.length()) : input;
         String remainder = YEAR_IN_PARENTHESES_PATTERN.matcher(afterAuthors).replaceAll(" ");
         remainder = LEADING_NOISE_PATTERN.matcher(remainder).replaceFirst("");
@@ -651,7 +652,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         if (tagMatcher.find()) {
             venuePart = venuePart.substring(0, tagMatcher.start());
         }
-        // [impl->req~import.plain-citation.leading-in~1]
         venuePart = LEADING_VENUE_NOISE_PATTERN.matcher(venuePart).replaceFirst("");
 
         List<String> venueParts = Arrays.stream(venuePart.split(","))
