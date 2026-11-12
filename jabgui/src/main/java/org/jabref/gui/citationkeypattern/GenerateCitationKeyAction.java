@@ -31,9 +31,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    private List<BibEntry> entries;
-    private boolean isCanceled;
-
     private final TaskExecutor taskExecutor;
     private final CliPreferences preferences;
 
@@ -53,12 +50,11 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        isCanceled = false;
-        entries = new ArrayList<>(stateManager.getSelectedEntries());
-        stateManager.getActiveDatabase().ifPresent(this::generateKeysIn);
+        List<BibEntry> entries = new ArrayList<>(stateManager.getSelectedEntries());
+        stateManager.getActiveDatabase().ifPresent(databaseContext -> generateKeysIn(databaseContext, entries));
     }
 
-    private void generateKeysIn(BibDatabaseContext databaseContext) {
+    private void generateKeysIn(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         if (entries.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate citation keys"),
                     Localization.lang("First select the entries you want keys to be generated for."));
@@ -66,16 +62,16 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
         dialogService.notify(formatOutputMessage(Localization.lang("Generating citation key for"), entries.size()));
 
-        checkOverwriteKeysChosen();
-
-        if (!this.isCanceled) {
-            BackgroundTask<Void> backgroundTask = this.generateKeysInBackground(databaseContext);
-            backgroundTask.showToUser(true);
-            backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
-            backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
-
-            backgroundTask.executeWith(this.taskExecutor);
+        if (hasUserCanceledOverwrite(entries)) {
+            return;
         }
+
+        BackgroundTask<Void> backgroundTask = this.generateKeysInBackground(databaseContext, entries);
+        backgroundTask.showToUser(true);
+        backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
+        backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
+
+        backgroundTask.executeWith(this.taskExecutor);
     }
 
     public static boolean confirmOverwriteKeys(DialogService dialogService, CliPreferences preferences) {
@@ -93,22 +89,22 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    private void checkOverwriteKeysChosen() {
+    private boolean hasUserCanceledOverwrite(List<BibEntry> entries) {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (this.preferences.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
             entries.removeIf(BibEntry::hasCitationKey);
+            return false;
             // if we're going to override some citation keys warn the user about it
         } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {
             boolean overwriteKeys = confirmOverwriteKeys(dialogService, this.preferences);
 
             // The user doesn't want to override citation keys
-            if (!overwriteKeys) {
-                isCanceled = true;
-            }
+            return !overwriteKeys;
         }
+        return false;
     }
 
-    private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext) {
+    private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         UndoManager undoManager = stateManager.getUndoManager(databaseContext);
         CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
         // The keys are written entry by entry in call(), which is also where they are handed over
@@ -130,9 +126,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             }
 
             private Void generateKeys() {
-                if (isCanceled) {
-                    return null;
-                }
                 UiTaskExecutor.runInJavaFXThread(() -> {
                     updateProgress(0, entries.size());
                     messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));

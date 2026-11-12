@@ -1,7 +1,10 @@
 package org.jabref.gui.citationkeypattern;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -13,7 +16,9 @@ import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -130,5 +135,48 @@ class GenerateCitationKeyActionTest {
         JavaFxExtension.awaitEvents();
 
         assertEquals(Optional.of("Smith2026"), entryWithoutKey.getCitationKey());
+    }
+
+    @Test
+    void delayedTaskGeneratesKeyWhenSubsequentExecutionIsCanceled() {
+        useKeyPreferences(false);
+        when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any()))
+                .thenReturn(false);
+
+        List<Runnable> queuedTasks = new ArrayList<>();
+        TaskExecutor delayingTaskExecutor = new CurrentThreadTaskExecutor() {
+            @Override
+            public <V> Future<V> execute(BackgroundTask<V> task) {
+                queuedTasks.add(() -> super.execute(task));
+                return CompletableFuture.completedFuture(null);
+            }
+        };
+
+        GenerateCitationKeyAction action = new GenerateCitationKeyAction(
+                () -> null, dialogService, stateManager, delayingTaskExecutor, preferences);
+
+        BibEntry entryWithoutKey = new BibEntry()
+                .withField(StandardField.AUTHOR, "Smith, Jane")
+                .withField(StandardField.YEAR, "2026");
+        stateManager.getActiveDatabase().get().getDatabase().insertEntry(entryWithoutKey);
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entryWithoutKey));
+
+        JavaFxExtension.invokeAndWait(action::execute);
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(Optional.empty(), entryWithoutKey.getCitationKey());
+
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(remainingWang));
+
+        JavaFxExtension.invokeAndWait(action::execute);
+        JavaFxExtension.awaitEvents();
+
+        for (Runnable task : queuedTasks) {
+            JavaFxExtension.invokeAndWait(task);
+        }
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(Optional.of("Smith2026"), entryWithoutKey.getCitationKey());
+        assertEquals(Optional.of("Wang2020a"), remainingWang.getCitationKey());
     }
 }
