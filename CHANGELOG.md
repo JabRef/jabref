@@ -121,6 +121,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where AI chats were lost when JabRef did not quit regularly. [#17177](https://github.com/JabRef/jabref/pull/17177)
 - We fixed an issue where the links at the bottom of the Welcome tab were cut off in small windows. [#17015](https://github.com/JabRef/jabref/issues/17015)
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
+- We fixed an issue where fields added to "Do not wrap when saving" were lost after closing the preferences. [#10154](https://github.com/JabRef/jabref/issues/10154)
 - We fixed an issue where "Automatically set file links" did not work when no external file types were configured. [#15084](https://github.com/JabRef/jabref/issues/15084)
 - We fixed an issue where citing organisations in JStyle format was not sorting or displaying properly in LibreOffice. [#11725](https://github.com/JabRef/jabref/issues/11725)
 - We fixed an issue where "Perform OCR" button remained enabled for broken or missing linked files. [#16736](https://github.com/JabRef/jabref/issues/16736)
