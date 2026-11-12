@@ -156,7 +156,7 @@ Needs: impl
 Pressing the "Close dialog" key binding in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
 Its default is <kbd>Esc</kbd>; users can change it in the key binding preferences.
 Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
-Currently, this is only the PDF viewer ("Document viewer").
+Currently, this is only the PDF viewer ("Document viewer") and the Citation Entry Review.
 
 Needs: impl, utest
 

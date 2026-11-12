@@ -49,6 +49,57 @@ See <https://github.com/JabRef/jabref/issues/17355>.
 
 Needs: impl
 
+## User can review citation entries one by one before adding them
+`feat~entry-editor.citations.review-before-import~1`
+
+Applies to the "Review and add selected entry(s) one by one" button in the "Citations" tab.
+Each selected entry is shown with the entry editor's field editors and a preview, so that its metadata can be corrected before it becomes part of the library.
+Only the entries chosen during the review are imported, once the review is finished.
+See <https://github.com/JabRef/jabref/issues/13598>.
+
+Needs: impl, utest
+
+## Citation relation must be recorded when the reviewer keeps the existing duplicate
+`req~entry-editor.citations.review-links-kept-duplicate~1`
+
+Closing the duplicate dialog links nothing.
+A kept entry without a citation key is reported and left unchanged.
+A kept entry that is no longer in the library when the review ends is not linked.
+An entry does not link to itself.
+See <https://github.com/JabRef/jabref/pull/17690>.
+
+Needs: impl, utest
+
+## Citation link written to an existing library entry after the review must be undoable
+`req~entry-editor.citations.review-link-undoable~1`
+
+Applies to the `cites` field of the inspected entry and of kept entries.
+Recording the write also marks the library as changed, even when the review imported nothing.
+A link on an entry the review imported needs no step of its own, because undoing the import removes the entry.
+See <https://github.com/JabRef/jabref/pull/17690>.
+
+Needs: impl, utest
+
+## Citation relation must not be recorded when the import replaced the inspected entry
+`req~entry-editor.citations.review-inspected-entry-replaced~1`
+
+Applies to a reviewed entry that duplicates the inspected entry and is resolved with "Keep from import" or "Keep merged", which removes the inspected entry from the library.
+Its citation key then resolves to nothing, and the entry that took its place can have inherited that key, so a link would point at the entry itself.
+
+See <https://github.com/JabRef/jabref/pull/17690>.
+
+Needs: impl, utest
+
+## Citation entry review must keep its edits out of the library's undo history
+`req~entry-editor.citations.review-edits-outside-library-undo~1`
+
+Applies to the field editors and to the entry type of the entry under review.
+The entry under review is a copy that is not in the library, so a step on the library's journal would revert a field of an entry the library never held, and would mark the library as changed although nothing in it changed.
+The review keeps an undo of its own for these edits.
+See <https://github.com/JabRef/jabref/pull/17690>.
+
+Needs: impl, utest
+
 ## Main tab must display fields in single scrollable list
 `req~entry-editor.main-tab.single-list~1`
 
