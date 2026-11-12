@@ -22,10 +22,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
+- We added a way to review and edit entries one by one before adding them from the citations tab. [#13598](https://github.com/JabRef/jabref/issues/13598)
 - We added an automatically generated commit message to the Git commit message box. [#16763](https://github.com/JabRef/jabref/issues/16763)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 - We added BibSonomy as a web search source. [#5888](https://github.com/JabRef/jabref/issues/5888)
 - We added the cleanup formatter "LaTeX to Unicode-aware LaTeX", which converts LaTeX character commands to Unicode and keeps escaped characters. [#8715](https://github.com/JabRef/jabref/issues/8715)
+- We added a "No value" subgroup to automatic keyword groups, collecting entries without a value such as an unranked entry. [#10264](https://github.com/JabRef/jabref/issues/10264)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)
 - We added restricting the columns of the consistency check to the fields a `.bst` style uses. [#17710](https://github.com/JabRef/jabref/pull/17710)
 - We added consistency checks for entries cited in `.aux` files, automatically selecting a single file beside the library. [#1403](https://github.com/JabRef/jabref-issue-melting-pot/issues/1403)
@@ -136,6 +138,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where "Copy DOI URL" kept tracking parameters like `?utm_source=newsletter`, producing a broken link. [#17689](https://github.com/JabRef/jabref/issues/17689)
 - We fixed an issue where failed tasks kept showing as running in the notification center. [#17124](https://github.com/JabRef/jabref/pull/17124)
+- We fixed citation key generation to ignore "as" as a function word. [#17523](https://github.com/JabRef/jabref/issues/17523)
 - We fixed an issue where the citations tab did not refresh when an entry's DOI was updated. [#14769](https://github.com/JabRef/jabref/issues/14769)
 
 ### Removed
