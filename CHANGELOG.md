@@ -63,6 +63,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where entries containing dollar signs, backslashes, or unset fields passed to `substring$` caused citation style preview and export to fail. [#12799](https://github.com/JabRef/jabref/issues/12799)
 - We fixed an issue where citationcount, day, and dayfiled columns were sorted alphabetically instead of numerically. [#17459](https://github.com/JabRef/jabref/issues/17459)
 - We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
+- We fixed RIS export producing a wrong start page and an empty end page for page ranges with leading whitespace. [#17774](https://github.com/JabRef/jabref/issues/17774)
 - We fixed RTF export failing when a field ends with a LaTeX formatting command without closing braces. [#17766](https://github.com/JabRef/jabref/pull/17766)
 - We fixed JabKit to preserve existing citation keys when generating keys with the avoid-overwrite setting. [#17458](https://github.com/JabRef/jabref/issues/17458)
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)

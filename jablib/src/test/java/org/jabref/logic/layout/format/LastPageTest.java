@@ -24,9 +24,13 @@ class LastPageTest {
         return Stream.of(
                 Arguments.of("", ""),
                 Arguments.of("", null),
+                Arguments.of("", "   "),
                 Arguments.of("345", "345"),
                 Arguments.of("350", "345-350"),
                 Arguments.of("350", "345--350"),
+                Arguments.of("350", " 345-350"),
+                Arguments.of("350", "345-350 "),
+                Arguments.of("345", " 345"),
                 Arguments.of("", "--"),
                 Arguments.of("13911", "13905\u201313911"),
                 Arguments.of("13911", "13905\u201413911"),
