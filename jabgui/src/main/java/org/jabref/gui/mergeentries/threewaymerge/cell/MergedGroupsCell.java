@@ -22,6 +22,7 @@ import org.jspecify.annotations.NullMarked;
 public class MergedGroupsCell extends ThreeWayMergeCell {
     public MergedGroupsCell(String text, int rowIndex, GuiPreferences preferences, StateManager stateManager) {
         super(text, rowIndex);
+        getStyleClass().add(MergedFieldCell.DEFAULT_STYLE_CLASS);
         GroupsEditor groupsEditor = createGroupsEditor(preferences, stateManager);
         groupsEditor.disableTagSorting();
         groupsEditor.getViewModel().textProperty().bindBidirectional(textProperty());
