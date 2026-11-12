@@ -257,9 +257,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                         .toList());
 
         Set<FetcherApiKey> apiKeysToStore = fetchers.stream()
-                                                     .filter(FetcherViewModel::isCustomizable)
-                                                     .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
-                                                     .collect(Collectors.toSet());
+                                                    .filter(FetcherViewModel::isCustomizable)
+                                                    .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
+                                                    .collect(Collectors.toSet());
 
         Set<FetcherApiKey> newApiKeys = apikeyPersistAvailableProperty.get() ? apiKeysToStore : Set.of();
         boolean persistChanged = importerPreferences.shouldPersistCustomKeys() != apikeyPersistProperty.get();
