@@ -6,14 +6,25 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.jabref.logic.os.OS;
+
 import org.eclipse.jgit.ignore.IgnoreNode;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// [impl->req~jabgui.externalfiles.unlinked-files.search.gitignore-precedence~1]
+// [impl->req~jabgui.externalfiles.unlinked-files.search.gitignore-windows-case~1]
+// [impl->req~jabgui.externalfiles.unlinked-files.search.gitignore-symlink~1]
 public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitIgnoreFileFilter.class);
@@ -26,53 +37,67 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
             Thumbs.db
             """;
 
-    private final IgnoreNode ignoreNode;
-    private final Path baseDir;
+    private final List<Map.Entry<Path, IgnoreNode>> ignoreNodes = new ArrayList<>();
 
     public GitIgnoreFileFilter(Path path) {
-        Path currentPath = path;
-        while ((currentPath != null) && !Files.exists(currentPath.resolve(".gitignore"))) {
-            currentPath = currentPath.getParent();
-        }
-
-        this.ignoreNode = new IgnoreNode();
+        IgnoreNode ignoreNode = new IgnoreNode();
 
         // Always ignore ".gitignore" itself and common defaults.
         // Parsed first, because the last matching rule wins: negations in the user's .gitignore can override these.
-        try (InputStream input = new ByteArrayInputStream(DEFAULT_IGNORES.getBytes(StandardCharsets.UTF_8))) {
+        String defaults = OS.WINDOWS ? DEFAULT_IGNORES.toLowerCase(Locale.ROOT) : DEFAULT_IGNORES;
+        try (InputStream input = new ByteArrayInputStream(defaults.getBytes(StandardCharsets.UTF_8))) {
             ignoreNode.parse(input);
         } catch (IOException e) {
             LOGGER.info("Could not add default ignores", e);
         }
 
-        if (currentPath == null) {
-            this.baseDir = path;
-        } else {
-            this.baseDir = currentPath;
-            Path gitIgnore = currentPath.resolve(".gitignore");
-            try (InputStream input = Files.newInputStream(gitIgnore)) {
-                ignoreNode.parse(input);
-            } catch (IOException e) {
-                LOGGER.info("Could not read .gitignore from {}", gitIgnore, e);
+        ignoreNodes.add(Map.entry(path.toAbsolutePath(), ignoreNode));
+        List<Path> ancestors = new ArrayList<>();
+        for (Path current = path.toAbsolutePath(); current != null; current = current.getParent()) {
+            ancestors.add(current);
+        }
+        for (Path ancestor : ancestors.reversed()) {
+            Path gitIgnore = ancestor.resolve(".gitignore");
+            if (Files.isRegularFile(gitIgnore)) {
+                IgnoreNode node = new IgnoreNode();
+                try {
+                    String rules = Files.readString(gitIgnore);
+                    if (OS.WINDOWS) {
+                        rules = rules.toLowerCase(Locale.ROOT);
+                    }
+                    try (InputStream input = new ByteArrayInputStream(rules.getBytes(StandardCharsets.UTF_8))) {
+                        node.parse(input);
+                    }
+                    ignoreNodes.add(Map.entry(ancestor, node));
+                } catch (IOException e) {
+                    LOGGER.info("Could not read .gitignore from {}", gitIgnore, e);
+                }
             }
         }
     }
 
     @Override
     public boolean accept(Path path) throws IOException {
-        Path relative = safeRelativize(baseDir, path);
-        // Build the path with '/' separators from the path's own components;
-        // a plain string replacement would corrupt names legally containing a backslash
-        String relativeStr = StreamSupport.stream(relative.spliterator(), false)
-                                          .map(Path::toString)
-                                          .collect(Collectors.joining("/"));
-        if (relativeStr.isEmpty()) {
-            return true;
+        return accept(path, Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS));
+    }
+
+    boolean accept(Path path, boolean isDirectory) {
+        boolean ignored = false;
+        for (Map.Entry<Path, IgnoreNode> entry : ignoreNodes) {
+            Path relative = safeRelativize(entry.getKey(), path.toAbsolutePath());
+            String relativeStr = StreamSupport.stream(relative.spliterator(), false).map(Path::toString).collect(Collectors.joining("/"));
+            if (relativeStr.isEmpty()) {
+                continue;
+            }
+            if (OS.WINDOWS) {
+                relativeStr = relativeStr.toLowerCase(Locale.ROOT);
+            }
+            @Nullable Boolean match = entry.getValue().checkIgnored(relativeStr, isDirectory);
+            if (match != null) {
+                ignored = match;
+            }
         }
-        boolean isDirectory = Files.isDirectory(path);
-        Boolean ignored = ignoreNode.checkIgnored(relativeStr, isDirectory);
-        // checkIgnored returns Boolean.TRUE if ignored, Boolean.FALSE if explicitly not ignored, or null if no rule matched
-        return ignored == null || !ignored;
+        return !ignored;
     }
 
     private static Path safeRelativize(Path base, Path child) {
