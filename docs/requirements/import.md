@@ -195,20 +195,29 @@ A parenthesized publication year may separate the full names from the title.
 
 Needs: impl, utest
 
-## Plain citation parser must distinguish year and pages
-`req~import.plain-citation.year-and-pages~1`
+## Plain citation parser must determine the publication year
+`req~import.plain-citation.year~1`
 
-The rule-based plain citation parser prefers a year in parentheses (APA style) as the publication year and ignores years that are part of a URL, of the title, or not plausible as a publication year.
-A page range is not taken as a year, a year is not taken as pages, and volume and issue numbers are not taken as pages.
-
-Needs: impl, utest
-
-## Plain citation parser must preserve leading In in ordinary journal names
-`req~import.plain-citation.leading-in~1`
-
-Journal names such as `In Vitro` retain their leading `In`.
-Only `In` directly before `Proceedings` is treated as a proceedings introducer and removed from the venue.
+The rule-based plain citation parser prefers a year in parentheses (APA style) as the publication year.
+It ignores years that are part of a URL or the title, or that are not plausible as a publication year.
+A number behind `p.`, `pp.`, `vol.`, `no.` or `issue` and a page range are not taken as a year.
 
 Needs: impl, utest
 
+## Plain citation parser must extract page ranges
+`req~import.plain-citation.pages~1`
+
+The rule-based plain citation parser stores a page range such as `127-136` or `pp. 62–68` in the `pages` field, using the BibTeX separator `--`.
+A single number is only taken as a page if it is marked as such (`p. 5`).
+Volume and issue numbers, years, and report numbers such as `rr-02-92` are not taken as pages.
+
+Needs: impl, utest
+
+## Plain citation parser must extract the venue without introductory words
+`req~import.plain-citation.venue~1`
+
+The rule-based plain citation parser stores the journal or publisher name from the text behind the title.
+The introductory `In` of a proceedings reference (`In Proceedings of …`) is not part of the venue, whereas journal names that begin with `In`, such as `In Vitro`, are kept unchanged.
+
+Needs: impl, utest
 <!-- markdownlint-disable-file MD022 -->
