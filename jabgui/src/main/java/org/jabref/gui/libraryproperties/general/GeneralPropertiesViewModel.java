@@ -272,7 +272,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             return Optional.empty();
         }
 
-        return databaseContext.getFileDirectoryPath(directory.trim())
+        return databaseContext.resolveFileDirectory(directory.trim())
                               .map(path -> path.toAbsolutePath().normalize());
     }
 

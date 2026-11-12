@@ -198,10 +198,10 @@ public class BibDatabaseContext {
     /// @return fixed-size record containing absolute paths (if configured)
     public FileDirectories getAllFileDirectories(FilePreferences preferences) {
         Path userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost())
-                                         .flatMap(this::getFileDirectoryPath)
+                                         .map(this::getFileDirectoryPath)
                                          .orElse(null);
         Path librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory()
-                                                    .flatMap(this::getFileDirectoryPath)
+                                                    .map(this::getFileDirectoryPath)
                                                     .orElse(null);
 
         return new FileDirectories(
@@ -248,26 +248,30 @@ public class BibDatabaseContext {
     /// A relative directory is resolved against the directory of the `.bib` file.
     /// It stays relative if this library has not been saved yet.
     /// An empty optional is returned if the directory is not a valid path.
-    public Optional<Path> getFileDirectoryPath(String directory) {
-        Path path;
+    public Optional<Path> resolveFileDirectory(String directory) {
         try {
-            path = Path.of(directory);
+            return Optional.of(getFileDirectoryPath(directory));
         } catch (InvalidPathException e) {
             LOGGER.debug("Invalid file directory {}", directory, e);
             return Optional.empty();
         }
+    }
+
+    /// @return The absolute path for the given directory
+    private Path getFileDirectoryPath(String directory) {
+        Path path = Path.of(directory);
         if (path.isAbsolute()) {
-            return Optional.of(path);
+            return path;
         }
 
         // If this path is relative, we try to interpret it as relative to the file path of this BIB file:
-        return Optional.of(getDatabasePath()
+        return getDatabasePath()
                 .map(databaseFile -> Optional.ofNullable(databaseFile.getParent())
                                              .orElse(Path.of(""))
                                              .resolve(path)
                                              .normalize()
                                              .toAbsolutePath())
-                .orElse(path));
+                .orElse(path);
     }
 
     public @Nullable DatabaseSynchronizer getDBMSSynchronizer() {
