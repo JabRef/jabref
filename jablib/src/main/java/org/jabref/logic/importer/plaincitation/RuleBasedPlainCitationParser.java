@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.cleanup.URLCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -52,12 +54,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// A citation contains a handful of DOI-like parts at most. The limit keeps [#removeDoi] linear for a pasted
     /// publisher link that contains thousands of them: each skipped candidate rescans the text in front of it.
     private static final int MAX_DOI_CANDIDATES = 10;
-
-    private static final Pattern URL_PATTERN = Pattern.compile(
-            "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
-                    "(([\\w\\-]+\\.)+?([\\w\\-.~]+\\/?)*" +
-                    "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
-            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     /// A four-digit number that is not part of a longer number, optionally followed by a second one to form a
     /// range (`2019–2021`). Only the first number is the year.
@@ -281,12 +277,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private static Extraction<List<String>> findUrls(String input) {
-        List<String> urls = new ArrayList<>();
-        Matcher matcher = URL_PATTERN.matcher(input);
-        while (matcher.find()) {
-            String url = input.substring(matcher.start(1), matcher.end());
-            urls.add(stripTrailingUrlPunctuation(url));
-        }
+        Matcher matcher = URLCleanup.URL_PATTERN.matcher(input);
+        List<String> urls = matcher.results().map(MatchResult::group).toList();
         return new Extraction<>(urls, fixSpaces(matcher.replaceAll(URL_TAG)));
     }
 
@@ -367,31 +359,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     private static String collapseWhitespace(String input) {
         return WHITESPACE_PATTERN.matcher(input).replaceAll(" ").strip();
-    }
-
-    /// Removes punctuation at the end of `url` that belongs to the sentence around it. A closing bracket is only
-    /// removed if the URL has no opening partner for it: `https://en.wikipedia.org/wiki/Foo_(bar)` keeps its `)`,
-    /// while `(see https://example.com/page)` loses it.
-    private static String stripTrailingUrlPunctuation(String url) {
-        String result = url;
-        while (!result.isEmpty()) {
-            char last = result.charAt(result.length() - 1);
-            int bracketIndex = ")]}".indexOf(last);
-            if (bracketIndex >= 0) {
-                char opening = "([{".charAt(bracketIndex);
-                if (count(result, opening) >= count(result, last)) {
-                    break;
-                }
-            } else if (".,;:!?'\"".indexOf(last) < 0) {
-                break;
-            }
-            result = result.substring(0, result.length() - 1);
-        }
-        return result;
-    }
-
-    private static long count(String text, char character) {
-        return text.chars().filter(c -> c == character).count();
     }
 
     /// Finds the publication year. A leading APA date (`(1993).`, `(1991a).`) is preferred. Otherwise, the last

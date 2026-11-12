@@ -21,7 +21,7 @@ public class URLCleanup implements CleanupJob {
      * In order to be functional, we made the necessary adjustments regarding Java
      * features (mainly doubled backslashes).
      */
-    private static final String URL_REGEX = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
+    private static final String URL_REGEX = "(?i)\\b((?:(?:https?|ftp)://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
             + "[a-z]{2,4}/)(?:[^\\s()<>\\\\]+|\\(([^\\s()<>\\\\]+|(\\([^\\s()"
             + "<>\\\\]+\\)))*\\))+(?:\\(([^\\s()<>\\\\]+|(\\([^\\s()<>\\\\]+\\"
             + ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
