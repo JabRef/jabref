@@ -26,7 +26,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String YEAR_TAG = "[year_tag]";
     private static final String PAGES_TAG = "[pages_tag]";
 
-    private static final String AUTHORS_GROUP = "AUTHORS";
     private static final String ET_AL_GROUP = "ETAL";
     private static final String FIRSTNAME_GROUP = "FIRSTNAME";
     private static final String FROM_GROUP = "FROM";
@@ -123,23 +122,32 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             "^\\s*et\\s+al\\b\\.?\\s*",
             Pattern.CASE_INSENSITIVE);
 
-    /// `Firstname [Middle] Lastname`, as in `Marc Shapiro and Susan Horwitz.`: the complete authors block, which has to
-    /// end with a period or before a parenthesized year. This pattern is the most ambiguous one, because a title
-    /// such as `Machine Learning.` looks the same. Thus, it is only used if neither of the patterns above found an
-    /// author and a separate title boundary follows the authors block.
+    /// `Firstname [Middle] Lastname`, as in `Marc Shapiro and Susan Horwitz.`. The authors block has to end with a
+    /// period or before a parenthesized year. This pattern is the most ambiguous one, because a title such as
+    /// `Machine Learning.` looks the same. Thus, it is only used if neither of the patterns above found an author and
+    /// a separate title boundary follows the authors block.
     private static final String FULL_NAME_REGEX =
             NAME_WORD_REGEX + "(?:\\s+(?:\\p{Lu}\\.|" + NAME_PARTICLE_REGEX + "|" + NAME_WORD_REGEX + ")){1,3}?" +
                     "(?:\\s+" + NAME_SUFFIX_REGEX + "\\.?)?";
 
     private static final String FULL_NAME_SEPARATOR_REGEX = "(?:\\s*(?:,|&|\\band\\b))+\\s*";
 
-    private static final Pattern FULL_NAME_AUTHORS_PATTERN = Pattern.compile(
-            "^\\s*(?<" + AUTHORS_GROUP + ">" + FULL_NAME_REGEX +
-                    "(?:" + FULL_NAME_SEPARATOR_REGEX + FULL_NAME_REGEX + ")*)" +
-                    "(?:,?\\s+(?<" + ET_AL_GROUP + ">(?i:et\\s+al)))?" +
-                    "(?:\\.(?=\\s|$)|(?=\\s*\\(\\s*\\d{4}\\s*[a-z]?\\s*\\)\\s*\\.))");
+    private static final String ET_AL_REGEX = "(?i:et\\s+al)";
+
+    private static final String FULL_NAME_AUTHORS_END_REGEX = "(?:\\.(?=\\s|$)|(?=\\s*\\(\\s*\\d{4}\\s*[a-z]?\\s*\\)\\s*\\.))";
+
+    /// One full name at the start of the region. Each name is matched on its own (see [#findFullNameAuthors]): a
+    /// single pattern repeating over all names recurses once per name and overflows the stack for long author lists.
+    /// The lookahead lets the lazy name grow until a separator or the end of the authors block follows.
+    private static final Pattern FULL_NAME_AUTHOR_PATTERN = Pattern.compile(
+            "\\s*" + FULL_NAME_REGEX +
+                    "(?=" + FULL_NAME_SEPARATOR_REGEX + "|(?:,?\\s+" + ET_AL_REGEX + ")?" + FULL_NAME_AUTHORS_END_REGEX + ")");
 
     private static final Pattern FULL_NAME_SEPARATOR_PATTERN = Pattern.compile(FULL_NAME_SEPARATOR_REGEX);
+
+    /// The end of a full-name authors block behind its last name, optionally with `et al`
+    private static final Pattern FULL_NAME_AUTHORS_END_PATTERN = Pattern.compile(
+            "(?:,?\\s+(?<" + ET_AL_GROUP + ">" + ET_AL_REGEX + "))?" + FULL_NAME_AUTHORS_END_REGEX);
 
     /// Splits one full name into first name(s) and family name. The first name is as short as possible.
     private static final Pattern FULL_NAME_PATTERN = Pattern.compile(
@@ -494,12 +502,29 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static Extraction<List<String>> findFullNameAuthors(String input) {
         Extraction<List<String>> noAuthors = new Extraction<>(List.of(), input);
 
-        Matcher blockMatcher = FULL_NAME_AUTHORS_PATTERN.matcher(input);
-        if (!blockMatcher.find()) {
+        List<String> names = new ArrayList<>();
+        Matcher nameMatcher = FULL_NAME_AUTHOR_PATTERN.matcher(input);
+        Matcher separatorMatcher = FULL_NAME_SEPARATOR_PATTERN.matcher(input);
+        int namesEnd = 0;
+        int position = 0;
+        while (nameMatcher.region(position, input.length()).lookingAt()) {
+            names.add(nameMatcher.group());
+            namesEnd = nameMatcher.end();
+            if (!separatorMatcher.region(namesEnd, input.length()).lookingAt()) {
+                break;
+            }
+            position = separatorMatcher.end();
+        }
+        if (names.isEmpty()) {
             return noAuthors;
         }
 
-        String remainder = input.substring(blockMatcher.end()).stripLeading();
+        Matcher endMatcher = FULL_NAME_AUTHORS_END_PATTERN.matcher(input).region(namesEnd, input.length());
+        if (!endMatcher.lookingAt()) {
+            return noAuthors;
+        }
+
+        String remainder = input.substring(endMatcher.end()).stripLeading();
         String titleCandidate = remainder;
         Matcher yearMatcher = YEAR_IN_PARENTHESES_CANDIDATE_PATTERN.matcher(remainder);
         if (yearMatcher.lookingAt()) {
@@ -512,15 +537,15 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
 
         List<String> fullNameAuthors = new ArrayList<>();
-        for (String name : FULL_NAME_SEPARATOR_PATTERN.split(blockMatcher.group(AUTHORS_GROUP))) {
-            Matcher nameMatcher = FULL_NAME_PATTERN.matcher(name.strip());
-            if (!nameMatcher.matches()
-                    || INITIALS_WITHOUT_PERIODS_PATTERN.matcher(nameMatcher.group(LASTNAME_GROUP)).matches()) {
+        for (String name : names) {
+            Matcher namePartsMatcher = FULL_NAME_PATTERN.matcher(name.strip());
+            if (!namePartsMatcher.matches()
+                    || INITIALS_WITHOUT_PERIODS_PATTERN.matcher(namePartsMatcher.group(LASTNAME_GROUP)).matches()) {
                 return noAuthors;
             }
-            String familyName = collapseWhitespace(nameMatcher.group(LASTNAME_GROUP));
-            if (nameMatcher.start(SUFFIX_GROUP) >= 0) {
-                String suffix = nameMatcher.group(SUFFIX_GROUP);
+            String familyName = collapseWhitespace(namePartsMatcher.group(LASTNAME_GROUP));
+            if (namePartsMatcher.start(SUFFIX_GROUP) >= 0) {
+                String suffix = namePartsMatcher.group(SUFFIX_GROUP);
                 familyName += ", " + switch (suffix) {
                     case "Jr",
                          "Sr" ->
@@ -529,10 +554,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                             suffix;
                 };
             }
-            fullNameAuthors.add(familyName + ", " + collapseWhitespace(nameMatcher.group(FIRSTNAME_GROUP)));
+            fullNameAuthors.add(familyName + ", " + collapseWhitespace(namePartsMatcher.group(FIRSTNAME_GROUP)));
         }
 
-        if (blockMatcher.start(ET_AL_GROUP) >= 0) {
+        if (endMatcher.start(ET_AL_GROUP) >= 0) {
             fullNameAuthors.add("others");
         }
         return new Extraction<>(fullNameAuthors, fixSpaces(AUTHOR_TAG + " " + remainder));

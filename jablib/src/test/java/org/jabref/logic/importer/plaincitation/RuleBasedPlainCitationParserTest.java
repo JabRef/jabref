@@ -271,6 +271,14 @@ class RuleBasedPlainCitationParserTest {
                 parseField("John Smith, Mary Tan, David Lee, and Alice Wong. Improving AI systems. Journal of Computer Science, 2024.", StandardField.AUTHOR));
     }
 
+    /// A long list of full names must not overflow the stack, which would abort the import of the whole batch.
+    // [utest->req~import.plain-citation.authors~1]
+    @Test
+    void findsLongListOfFullNameAuthors() throws FetcherException {
+        assertEquals(Optional.of("Smith, John and ".repeat(999) + "Smith, John"),
+                parseField("John Smith, ".repeat(999) + "John Smith. A title. Journal, 2020.", StandardField.AUTHOR));
+    }
+
     /// A single author written with a full first name.
     @Test
     void findsSingleAuthorWithFullName() throws FetcherException {
