@@ -211,102 +211,104 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             "^(?:(?:vol(?:ume)?|no|nr|issue|section|pp?|pages?)\\.?+\\s*+)?(?=[^\\d]*\\d)[\\d\\s().:/\\-]+$",
             Pattern.CASE_INSENSITIVE);
 
-    private List<String> urls;
-    private List<String> authors;
-    private String year;
-    private String pages;
-    private String title;
-    private String doi;
-    private boolean isArticle;
-    private String journalOrPublisher;
-
     /// A title enclosed in quotation marks, without the marks, and the offset behind the closing mark.
     private record QuotedTitle(String title, int end) {
     }
 
+    /// The result of one extraction step: the `value` that was found (empty if nothing was found) and the text that
+    /// is left for the following steps (`remainder`).
+    private record Extraction<T>(T value, String remainder) {
+    }
+
+    /// Title and venue of a citation. `isArticle` is `false` if the venue looks like a publisher (several text parts).
+    private record Parts(String title, String journalOrPublisher, boolean isArticle) {
+    }
+
+    /// Everything that was found in one citation.
+    private record ParsedCitation(
+            String doi,
+            List<String> urls,
+            List<String> authors,
+            String year,
+            String pages,
+            Parts parts) {
+
+        /// Text without citation data must not create an entry, otherwise plain prose (`hello`) would be added to the
+        /// library as an `@article`. A title alone is no evidence of a citation, so at least one other field is
+        /// required. A journal or publisher counts, because it is only found behind a title delimiter
+        /// (`.`, `,`, `//` or a quote).
+        boolean containsNothing() {
+            return authors.isEmpty()
+                    && urls.isEmpty()
+                    && year.isEmpty()
+                    && pages.isEmpty()
+                    && doi.isEmpty()
+                    && parts.journalOrPublisher().isEmpty();
+        }
+
+        /// Builds the entry from the parsed fields. `originalCitation` is the citation as entered by the user. It is
+        /// stored in the `comment` field so that nothing is lost, and so that no internal placeholder token ends up
+        /// there.
+        BibEntry toBibEntry(String originalCitation) {
+            EntryType type = parts.isArticle() ? StandardEntryType.Article : StandardEntryType.Book;
+            // An empty value does not create the field (see BibEntry#setField), so missing data yields no empty field
+            return new BibEntry(type)
+                    .withField(StandardField.AUTHOR, String.join(" and ", authors))
+                    .withField(StandardField.URL, String.join(", ", urls))
+                    .withField(StandardField.YEAR, year)
+                    .withField(StandardField.PAGES, pages)
+                    .withField(StandardField.TITLE, parts.title())
+                    .withField(StandardField.DOI, doi)
+                    .withField(parts.isArticle() ? StandardField.JOURNAL : StandardField.PUBLISHER, parts.journalOrPublisher())
+                    .withField(StandardField.COMMENT, originalCitation);
+        }
+    }
+
     @Override
     public Optional<BibEntry> parsePlainCitation(String text) {
-        urls = new ArrayList<>();
-        authors = new ArrayList<>();
-        year = "";
-        pages = "";
-        title = "";
-        doi = "";
-        isArticle = true;
-        journalOrPublisher = "";
+        Extraction<String> doi = findDoi(text);
+        Extraction<List<String>> urls = findUrls(doi.remainder());
+        Extraction<List<String>> authors = findAuthors(urls.remainder());
+        Extraction<String> year = findYear(authors.remainder());
+        Extraction<String> pages = findPages(year.remainder());
+        Parts parts = findParts(pages.remainder());
 
-        String inputWithoutDoi = findDoi(text);
-        String inputWithoutUrls = findUrls(inputWithoutDoi);
-        String inputWithoutAuthors = findAuthors(inputWithoutUrls);
-        String inputWithoutYear = findYear(inputWithoutAuthors);
-        String inputWithoutPages = findPages(inputWithoutYear);
-        findParts(inputWithoutPages);
-
-        if (nothingFound()) {
+        ParsedCitation citation = new ParsedCitation(doi.value(), urls.value(), authors.value(), year.value(), pages.value(), parts);
+        if (citation.containsNothing()) {
             return Optional.empty();
         }
-        return generateEntity(text.strip());
+        return Optional.of(citation.toBibEntry(text.strip()));
     }
 
-    /// Text without citation data must not create an entry, otherwise plain prose (`hello`) would be added to the
-    /// library as an `@article`. A title alone is no evidence of a citation, so at least one other field is required.
-    /// A journal or publisher counts, because it is only found behind a title delimiter (`.`, `,`, `//` or a quote).
-    private boolean nothingFound() {
-        return authors.isEmpty()
-                && urls.isEmpty()
-                && year.isEmpty()
-                && pages.isEmpty()
-                && doi.isEmpty()
-                && journalOrPublisher.isEmpty();
-    }
-
-    /// Builds the entry from the parsed fields. `originalCitation` is the citation as entered by the user. It is
-    /// stored in the `comment` field so that nothing is lost, and so that no internal placeholder token ends up there.
-    private Optional<BibEntry> generateEntity(String originalCitation) {
-        EntryType type = isArticle ? StandardEntryType.Article : StandardEntryType.Book;
-        // An empty value does not create the field (see BibEntry#setField), so missing data yields no empty field
-        return Optional.of(new BibEntry(type)
-                .withField(StandardField.AUTHOR, String.join(" and ", authors))
-                .withField(StandardField.URL, String.join(", ", urls))
-                .withField(StandardField.YEAR, year)
-                .withField(StandardField.PAGES, pages)
-                .withField(StandardField.TITLE, title)
-                .withField(StandardField.DOI, doi)
-                .withField(isArticle ? StandardField.JOURNAL : StandardField.PUBLISHER, journalOrPublisher)
-                .withField(StandardField.COMMENT, originalCitation));
-    }
-
-    private String findUrls(String input) {
+    private static Extraction<List<String>> findUrls(String input) {
+        List<String> urls = new ArrayList<>();
         Matcher matcher = URL_PATTERN.matcher(input);
         while (matcher.find()) {
             String url = input.substring(matcher.start(1), matcher.end());
             urls.add(stripTrailingUrlPunctuation(url));
         }
-        return fixSpaces(matcher.replaceAll(URL_TAG));
+        return new Extraction<>(urls, fixSpaces(matcher.replaceAll(URL_TAG)));
     }
 
-    /// Extracts the first DOI found in `input`, stores its canonical form in [#doi],
-    /// and returns `input` with the matched DOI (including any leading `doi:` or
-    /// `https://doi.org/` prefix) removed so the remaining rules do not re-parse it as a
-    /// URL or title.
+    /// Extracts the first DOI found in `input` and returns its canonical form together with `input`, from which the
+    /// matched DOI (including any leading `doi:` or `https://doi.org/` prefix) is removed, so the remaining rules do
+    /// not re-parse it as a URL or title.
     ///
     /// The DOI is replaced with an empty string rather than a placeholder token: DOIs
     /// typically contain digits, and a token would change how the remaining text is interpreted.
     ///
     /// Called before [#findUrls] so a `doi.org` link is recorded as a DOI rather
     /// than being swallowed by the generic URL rule.
-    /// If no DOI is found, `input` is returned unchanged.
-    private String findDoi(String input) {
+    /// If no DOI is found, the value is empty and `input` is returned unchanged.
+    private static Extraction<String> findDoi(String input) {
         // [impl->req~import.plain-citation.doi~1]
         return DOI.findInText(input)
-                  .map(found -> {
-                      doi = found.asString();
-                      return removeDoi(input);
-                  })
-                  .orElse(input);
+                  .map(found -> removeDoi(input, found.asString()))
+                  .orElseGet(() -> new Extraction<>("", input));
     }
 
     /// Removes exactly one standalone DOI and its prefix. `DOI.replaceInText` would remove a neighbouring URL, too.
+    /// `firstDoi` is the first DOI of `input`. It is the result if the DOI only occurs inside other URLs.
     ///
     /// The occurrences are searched case-insensitively in `input` itself, not in a lowercased copy: lowercasing can
     /// change the length of a text (`İ` becomes two chars), which would shift all offsets behind it.
@@ -316,7 +318,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     ///
     /// Only whitespace is collapsed here. [#fixSpaces] would insert spaces into a URL that is still in the text
     /// (`https://x.org` -> `https: //x. org`), so no URL could be found afterwards.
-    private String removeDoi(String input) {
+    private static Extraction<String> removeDoi(String input, String firstDoi) {
         int searchStart = 0;
         int attempts = 0;
         // The number of candidates is limited (see MAX_DOI_CANDIDATES), so the total work stays linear
@@ -331,8 +333,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             int index = indexOfIgnoreCase(input, candidateDoi, searchStart);
             if (index == -1) {
                 // The DOI is written differently than its canonical form (for example percent-encoded)
-                doi = candidateDoi;
-                return collapseWhitespace(input.substring(0, searchStart) + DOI.replaceInText(remainingInput, ""));
+                return new Extraction<>(candidateDoi,
+                        collapseWhitespace(input.substring(0, searchStart) + DOI.replaceInText(remainingInput, "")));
             }
             String beforeDoi = input.substring(0, index);
             String afterDoi = input.substring(index + candidateDoi.length());
@@ -340,17 +342,15 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             // Checked first: a doi.org link also looks like the beginning of a URL
             Matcher prefixMatcher = DOI_PREFIX_AT_END_PATTERN.matcher(beforeDoi);
             if (prefixMatcher.find()) {
-                doi = candidateDoi;
-                return collapseWhitespace(prefixMatcher.replaceFirst("") + " " + afterDoi);
+                return new Extraction<>(candidateDoi, collapseWhitespace(prefixMatcher.replaceFirst("") + " " + afterDoi));
             }
             if (!URL_BEFORE_DOI_PATTERN.matcher(beforeDoi).find()) {
-                doi = candidateDoi;
-                return collapseWhitespace(beforeDoi + " " + afterDoi);
+                return new Extraction<>(candidateDoi, collapseWhitespace(beforeDoi + " " + afterDoi));
             }
             searchStart = index + candidateDoi.length();
         }
         // The DOI only occurs inside other URLs. They stay whole, and findUrls takes them.
-        return input;
+        return new Extraction<>(firstDoi, input);
     }
 
     /// Finds `needle` in `text` ignoring case, starting at `fromIndex`. The result is an offset in `text` itself
@@ -401,18 +401,21 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// A range behind a publication year (`2020, 1725-1730`) is left for [#findPages]; a title year does not take precedence.
     ///
     /// Only the chosen occurrence is replaced by [#YEAR_TAG], so other occurrences (in the title) stay untouched.
-    private String findYear(String input) {
+    /// If there is no year, the value is empty and `input` is returned unchanged.
+    private static Extraction<String> findYear(String input) {
         // [impl->req~import.plain-citation.year-and-pages~1]
         Matcher parenthesesMatcher = YEAR_IN_PARENTHESES_CANDIDATE_PATTERN.matcher(input);
         while (parenthesesMatcher.find()) {
-            if (isValidYear(parenthesesMatcher.group(YEAR_GROUP))) {
-                year = parenthesesMatcher.group(YEAR_GROUP);
-                return fixSpaces(input.substring(0, parenthesesMatcher.start(YEAR_GROUP))
-                        + YEAR_TAG
-                        + input.substring(parenthesesMatcher.end(YEAR_GROUP)));
+            String candidate = parenthesesMatcher.group(YEAR_GROUP);
+            if (isValidYear(candidate)) {
+                return new Extraction<>(candidate,
+                        fixSpaces(input.substring(0, parenthesesMatcher.start(YEAR_GROUP))
+                                + YEAR_TAG
+                                + input.substring(parenthesesMatcher.end(YEAR_GROUP))));
             }
         }
 
+        String year = "";
         int start = -1;
         int end = -1;
         int titleEnd = findTitleEnd(input);
@@ -433,9 +436,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             end = matcher.end();
         }
         if (start == -1) {
-            return input;
+            return new Extraction<>("", input);
         }
-        return fixSpaces(input.substring(0, start) + YEAR_TAG + input.substring(end));
+        return new Extraction<>(year, fixSpaces(input.substring(0, start) + YEAR_TAG + input.substring(end)));
     }
 
     private static boolean isValidYear(String candidate) {
@@ -480,7 +483,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// Replaces the authors block at the beginning of `input` by [#AUTHOR_TAG]. Both name orders may be mixed
     /// (`Smith, J. and A. Doe`); `et al.` becomes `others`.
-    private String findAuthors(String input) {
+    private static Extraction<List<String>> findAuthors(String input) {
         // [impl->req~import.plain-citation.authors~1]
         Matcher labelMatcher = REFERENCE_LABEL_PATTERN.matcher(input);
         int labelEnd = labelMatcher.lookingAt() ? labelMatcher.end() : 0;
@@ -488,6 +491,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         Matcher lastNameFirstMatcher = LASTNAME_FIRST_AUTHOR_PATTERN.matcher(input);
         Matcher initialsFirstMatcher = INITIALS_FIRST_AUTHOR_PATTERN.matcher(input);
 
+        List<String> authors = new ArrayList<>();
         int authorsEnd = labelEnd;
         while (true) {
             lastNameFirstMatcher.region(authorsEnd, input.length());
@@ -515,15 +519,17 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             authors.add("others");
             rest = rest.substring(etAlMatcher.end());
         }
-        return fixSpaces(AUTHOR_TAG + " " + rest);
+        return new Extraction<>(authors, fixSpaces(AUTHOR_TAG + " " + rest));
     }
 
     /// Finds authors with full first names (`Marc Shapiro and Susan Horwitz.`) at the beginning of `input`.
-    /// Returns `input` unchanged if the beginning is not such an authors block.
-    private String findFullNameAuthors(String input) {
+    /// Returns no authors and `input` unchanged if the beginning is not such an authors block.
+    private static Extraction<List<String>> findFullNameAuthors(String input) {
+        Extraction<List<String>> noAuthors = new Extraction<>(List.of(), input);
+
         Matcher blockMatcher = FULL_NAME_AUTHORS_PATTERN.matcher(input);
         if (!blockMatcher.find()) {
-            return input;
+            return noAuthors;
         }
 
         String remainder = input.substring(blockMatcher.end()).stripLeading();
@@ -535,7 +541,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         if (!TITLE_END_PATTERN.matcher(titleCandidate).find()
                 && matchQuotedTitle(titleCandidate).isEmpty()
                 && !titleCandidate.contains("//")) {
-            return input;
+            return noAuthors;
         }
 
         List<String> fullNameAuthors = new ArrayList<>();
@@ -543,7 +549,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             Matcher nameMatcher = FULL_NAME_PATTERN.matcher(name.strip());
             if (!nameMatcher.matches()
                     || INITIALS_WITHOUT_PERIODS_PATTERN.matcher(nameMatcher.group(LASTNAME_GROUP)).matches()) {
-                return input;
+                return noAuthors;
             }
             String familyName = collapseWhitespace(nameMatcher.group(LASTNAME_GROUP));
             if (nameMatcher.start(SUFFIX_GROUP) >= 0) {
@@ -562,11 +568,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         if (blockMatcher.start(ET_AL_GROUP) >= 0) {
             fullNameAuthors.add("others");
         }
-        authors.addAll(fullNameAuthors);
-        return fixSpaces(AUTHOR_TAG + " " + remainder);
+        return new Extraction<>(fullNameAuthors, fixSpaces(AUTHOR_TAG + " " + remainder));
     }
 
-    private String generateAuthor(String lastName, String initials) {
+    private static String generateAuthor(String lastName, String initials) {
         // fixSpaces turns "W.-P." into "W. -P." - undo that
         String normalizedInitials = collapseWhitespace(SPACED_HYPHEN_PATTERN.matcher(initials).replaceAll("-"));
         return collapseWhitespace(lastName) + ", " + normalizedInitials;
@@ -577,7 +582,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// page (`p. 5`), otherwise the volume number would be mistaken as page.
     ///
     /// Pages are stored with the BibTeX range separator `--`.
-    private String findPages(String input) {
+    /// If there are no pages, the value is empty and `input` is returned unchanged.
+    private static Extraction<String> findPages(String input) {
         // [impl->req~import.plain-citation.year-and-pages~1]
         int start = -1;
         int end = -1;
@@ -611,13 +617,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
 
         if (start == -1) {
-            return input;
+            return new Extraction<>("", input);
         }
-        pages = foundPages;
-        return fixSpaces(input.substring(0, start) + PAGES_TAG + input.substring(end));
+        return new Extraction<>(foundPages, fixSpaces(input.substring(0, start) + PAGES_TAG + input.substring(end)));
     }
 
-    private String fixSpaces(String input) {
+    private static String fixSpaces(String input) {
         return input.replaceAll("[,.!?;:]", "$0 ")
                     .replaceAll("\\p{Lt}", " $0")
                     .replaceAll("\\s+", " ").trim();
@@ -634,7 +639,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// If it is the only part (no comma), its trailing period ends the sentence and is removed; otherwise the period
     /// is kept, because it belongs to an abbreviation (`ACM Trans. Math. Softw.,`).
     /// Placeholder tokens never end up in the title or journal/publisher.
-    private void findParts(String input) {
+    private static Parts findParts(String input) {
         String afterAuthors = input.startsWith(AUTHOR_TAG) ? input.substring(AUTHOR_TAG.length()) : input;
         String remainder = YEAR_IN_PARENTHESES_PATTERN.matcher(afterAuthors).replaceAll(" ");
         remainder = LEADING_NOISE_PATTERN.matcher(remainder).replaceFirst("");
@@ -669,7 +674,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             }
         }
 
-        title = cleanField(titlePart, true);
+        String title = cleanField(titlePart, true);
         if (!containsLetterOrDigit(title)) {
             // Only symbols (for example emojis) are no title
             title = "";
@@ -695,13 +700,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             textParts++;
         }
 
+        String journalOrPublisher = "";
         if (textParts > 0) {
             boolean periodEndsSentence = !venuePart.contains(",");
             journalOrPublisher = cleanField(venueParts.getFirst(), periodEndsSentence);
         }
-        if (textParts > 1) {
-            isArticle = false;
-        }
+        return new Parts(title, journalOrPublisher, textParts <= 1);
     }
 
     /// Removes placeholder tokens, surplus whitespace, and punctuation at the borders of a title or venue.

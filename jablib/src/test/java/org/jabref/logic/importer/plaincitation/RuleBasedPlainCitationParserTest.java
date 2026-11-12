@@ -392,7 +392,7 @@ class RuleBasedPlainCitationParserTest {
     }
 
     // Year
-    // [utest->req~import.plain-citation.year-and-pages~1]
+    // [utest->req~import.plain-citation.year~1]
 
     /// 1701 is the lowest year accepted.
     @ParameterizedTest
@@ -479,7 +479,7 @@ class RuleBasedPlainCitationParserTest {
 
     // Title and journal
 
-    // [utest->req~import.plain-citation.leading-in~1]
+    // [utest->req~import.plain-citation.venue~1]
     @ParameterizedTest
     @ValueSource(strings = {"Smith, J. A title. In Vitro, 2020.",
             "Smith, J. \"A title\" In Vitro, 2020.",
@@ -489,7 +489,7 @@ class RuleBasedPlainCitationParserTest {
         assertEquals(Optional.of("In Vitro"), parseField(citation, StandardField.JOURNAL));
     }
 
-    // [utest->req~import.plain-citation.leading-in~1]
+    // [utest->req~import.plain-citation.venue~1]
     @Test
     void removesInBeforeProceedings() throws FetcherException {
         assertEquals(Optional.of("Proceedings of the Conference"),
@@ -547,7 +547,7 @@ class RuleBasedPlainCitationParserTest {
     }
 
     // Pages
-    // [utest->req~import.plain-citation.year-and-pages~1]
+    // [utest->req~import.plain-citation.pages~1]
 
     /// The `p.`/`pp.` prefix is dropped. Hyphen, en dash and BibTeX `--` ranges and a single page are stored
     /// with the BibTeX range separator `--` (a single page has no separator).
@@ -753,16 +753,20 @@ class RuleBasedPlainCitationParserTest {
         assertEquals(Optional.empty(), parser.parsePlainCitation(text));
     }
 
-    /// The parser keeps its results in fields between the extraction steps, so they must be reset for each call.
+    /// Parsing a citation must not leak any of its fields into the next call.
     @Test
-    void stateIsResetBetweenCalls() throws FetcherException {
-        parser.parsePlainCitation("Smith, J. A title. Journal, 2020. doi:10.1000/xyz123");
-        parser.parsePlainCitation("Smith, J. A title. Journal, 2020. https://example.com/page");
-        Optional<BibEntry> third = parser.parsePlainCitation("Doe, A. Other title. Journal, 2019.");
-        assertEquals(List.of(Optional.of("Doe, A."), Optional.empty(), Optional.empty()),
-                List.of(third.flatMap(entry -> entry.getField(StandardField.AUTHOR)),
-                        third.flatMap(entry -> entry.getField(StandardField.DOI)),
-                        third.flatMap(entry -> entry.getField(StandardField.URL))));
+    void resultsDoNotLeakBetweenCalls() throws FetcherException {
+        parser.parsePlainCitation("Smith, J. A title. Some Journal, 2020, pp. 45-60. doi:10.1000/xyz123 https://example.com/page");
+        Optional<BibEntry> second = parser.parsePlainCitation("Doe, A. Other title.");
+        assertEquals(List.of(Optional.of("Doe, A."), Optional.of("Other title"),
+                        Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()),
+                List.of(second.flatMap(entry -> entry.getField(StandardField.AUTHOR)),
+                        second.flatMap(entry -> entry.getField(StandardField.TITLE)),
+                        second.flatMap(entry -> entry.getField(StandardField.DOI)),
+                        second.flatMap(entry -> entry.getField(StandardField.URL)),
+                        second.flatMap(entry -> entry.getField(StandardField.YEAR)),
+                        second.flatMap(entry -> entry.getField(StandardField.PAGES)),
+                        second.flatMap(entry -> entry.getField(StandardField.JOURNAL))));
     }
 
     // Multiple citations
