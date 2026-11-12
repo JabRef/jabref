@@ -34,9 +34,9 @@
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS net.harawata:appdirs:1.5.0
-//DEPS org.apache.commons:commons-lang3:3.21.0
+//DEPS org.apache.commons:commons-lang3:3.22.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.1
-//DEPS org.bouncycastle:bcprov-jdk18on:1.86
+//DEPS org.bouncycastle:bcprov-jdk18on:1.87
 //DEPS org.postgresql:postgresql:42.7.14
 //DEPS org.slf4j:slf4j-api:2.0.20
 //DEPS org.slf4j:jul-to-slf4j:2.0.20
