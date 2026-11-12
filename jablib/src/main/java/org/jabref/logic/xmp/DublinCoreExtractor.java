@@ -333,7 +333,7 @@ public class DublinCoreExtractor {
 
     /// BibTeX: Source (Custom Field); DC: Source
     private void fillSource(String source) {
-        dcSchema.setSource((XmpUtilShared.toPlainText(source)));
+        dcSchema.setSource(XmpUtilShared.toPlainText(source));
     }
 
     /// All others (+ citation key) get packaged in the dc:relation attribute with `bibtex/` prefix in the content.
@@ -371,7 +371,7 @@ public class DublinCoreExtractor {
                 continue;
             }
 
-            String value = bibEntry.getField(field).get();
+            String value = bibEntry.getField(field).orElseThrow();
             if (field instanceof StandardField standardField) {
                 switch (standardField) {
                     case EDITOR ->
