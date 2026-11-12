@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -14,6 +15,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -23,6 +25,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -51,7 +54,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                 stateManager,
                 preferences,
                 taskExecutor,
-                entry -> new FulltextFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()).findFullTextPDF(entry));
+                entry -> new FulltextFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()).findFullTextPDFAndUpdateDoi(entry));
     }
 
     DownloadFullTextAction(DialogService dialogService,
@@ -111,7 +114,11 @@ public class DownloadFullTextAction extends SimpleCommand {
 
                         BibEntry lookupSnapshot = new BibEntry(entry);
                         try {
-                            downloads.add(new EntryDownload(entry, lookupSnapshot, fullTextFinder.apply(lookupSnapshot)));
+                            BibEntry lookupEntry = new BibEntry(lookupSnapshot);
+                            Optional<FetcherResult> result = fullTextFinder.apply(lookupEntry);
+                            Optional<String> brokenPdfLink = findBrokenPdfLink(lookupSnapshot, databaseContext, result);
+                            downloads.add(new EntryDownload(entry, lookupSnapshot, result, brokenPdfLink,
+                                    lookupEntry.getField(StandardField.DOI).flatMap(DOI::parse).map(DOI::asString)));
                         } finally {
                             count++;
                             EntryLookupsInProgress.FULLTEXT.finishedLater(entry);
@@ -151,8 +158,23 @@ public class DownloadFullTextAction extends SimpleCommand {
                 continue;
             }
 
+            // [impl->req~fetchers.fulltext-doi-persistence~1]
+            if (entry.getField(StandardField.DOI).flatMap(DOI::parse).isEmpty()) {
+                download.doi().ifPresent(doi -> stateManager.getUndoManager(databaseContext).applyEdit(
+                        new UndoableFieldChange(entry, StandardField.DOI, entry.getField(StandardField.DOI).orElse(null), doi)));
+            }
+            // [impl->req~fetchers.fulltext-stale-link~1]
+            if (download.result().isEmpty() && download.doi().isEmpty()) {
+                download.brokenPdfLink().ifPresent(link -> {
+                    List<LinkedFile> files = new ArrayList<>(entry.getFiles());
+                    files.removeIf(file -> file.getLink().equals(link));
+                    stateManager.getUndoManager(databaseContext).applyEdit(new UndoableFieldChange(entry, StandardField.FILE,
+                            entry.getField(StandardField.FILE).orElse(null),
+                            files.isEmpty() ? null : FileFieldWriter.getStringRepresentation(files)));
+                });
+            }
             download.result().ifPresentOrElse(
-                    result -> addLinkedFileFromURL(databaseContext, result, entry),
+                    result -> addLinkedFileFromURL(databaseContext, result, entry, download.brokenPdfLink()),
                     () -> dialogService.notify(Localization.lang("No full text document found for entry %0.",
                             entry.getCitationKey().orElse(Localization.lang("undefined")))));
         }
@@ -164,7 +186,7 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// @param databaseContext the active database
     /// @param result          the fetcher result containing the URL and any required download headers
     /// @param entry           the entry "value"
-    void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
+    void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry, Optional<String> brokenPdfLink) {
         LinkedFile newLinkedFile = new LinkedFile(result.source(), "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
@@ -175,16 +197,6 @@ public class DownloadFullTextAction extends SimpleCommand {
                     taskExecutor,
                     dialogService,
                     preferences);
-            Optional<String> brokenPdfLink = entry.getField(StandardField.DOI)
-                                                  .flatMap(DOI::parse)
-                                                  .flatMap(_ -> entry.getFiles().stream()
-                                                                     .filter(file -> !file.isOnlineLink())
-                                                                     .filter(file -> StandardExternalFileType.PDF.getName()
-                                                                                                                  .equalsIgnoreCase(file.getFileType()))
-                                                                     .filter(file -> file.findIn(databaseContext,
-                                                                             preferences.getFilePreferences()).isEmpty())
-                                                                     .map(LinkedFile::getLink)
-                                                                     .findFirst());
             // The URL is not linked on the entry, so there is no link to keep: a downloaded HTML page (paywall or
             // consent interstitial instead of the PDF) has to be deleted rather than left orphaned in the file directory.
             brokenPdfLink.ifPresentOrElse(
@@ -196,7 +208,27 @@ public class DownloadFullTextAction extends SimpleCommand {
         }
     }
 
+    // [impl->req~fetchers.fulltext-attachment-identity~1]
+    private Optional<String> findBrokenPdfLink(BibEntry entry, BibDatabaseContext databaseContext, Optional<FetcherResult> result) {
+        List<LinkedFile> pdfs = entry.getFiles().stream()
+                                     .filter(file -> StandardExternalFileType.PDF.getName().equalsIgnoreCase(file.getFileType())
+                                             || (file.getFileType().isEmpty() && file.getLink().toLowerCase(Locale.ROOT).endsWith(".pdf")))
+                                     .toList();
+        List<LinkedFile> candidates = pdfs.stream()
+                                          .filter(file -> !file.isOnlineLink())
+                                          .filter(file -> (pdfs.size() == 1 && file.getDescription().isEmpty())
+                                                  || result.map(found -> found.source().toString().equals(file.getSourceUrl())).orElse(false))
+                                          .toList();
+        if (candidates.size() != 1) {
+            return Optional.empty();
+        }
+        return candidates.stream()
+                         .filter(file -> file.findIn(databaseContext, preferences.getFilePreferences()).isEmpty())
+                         .map(LinkedFile::getLink)
+                         .findFirst();
+    }
+
     @NullMarked
-    private record EntryDownload(BibEntry entry, BibEntry lookupSnapshot, Optional<FetcherResult> result) {
+    private record EntryDownload(BibEntry entry, BibEntry lookupSnapshot, Optional<FetcherResult> result, Optional<String> brokenPdfLink, Optional<String> doi) {
     }
 }

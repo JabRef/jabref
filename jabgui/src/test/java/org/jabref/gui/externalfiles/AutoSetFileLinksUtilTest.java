@@ -207,7 +207,7 @@ class AutoSetFileLinksUtilTest {
             AutoSetFileLinksUtil.LinkFilesResult result =
                     util.linkAssociatedFiles(List.of(entryWithExistingFile), onLinkedFilesUpdated);
 
-            assertEquals(List.of(existingFile), entryWithExistingFile.getFiles());
+            assertEquals(List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF")), entryWithExistingFile.getFiles());
             assertEquals(List.of(), result.getChangedEntries());
         }
 

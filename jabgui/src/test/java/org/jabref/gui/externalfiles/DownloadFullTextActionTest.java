@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -46,6 +45,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import com.sun.net.httpserver.HttpServer;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ class DownloadFullTextActionTest {
     private BibDatabaseContext databaseContext;
     private BibEntry entry;
     private FetcherResult fetcherResult;
-    private HttpServer httpServer;
+    private @Nullable HttpServer httpServer;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -163,6 +163,142 @@ class DownloadFullTextActionTest {
     }
 
     @Test
+    void checksMissingPdfDuringLookupRatherThanSuccessCallback(@TempDir Path tempDir) throws Exception {
+        BibDatabaseContext library = spy(databaseContext);
+        stateManager.getOpenDatabases().remove(databaseContext);
+        stateManager.getOpenDatabases().add(library);
+        stateManager.setActiveDatabase(library);
+        doReturn(List.of(tempDir)).when(library).getFileDirectories(any());
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        entry.withFiles(List.of(new LinkedFile(Path.of("missing.pdf"))));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.of(fetcherResult));
+
+        BackgroundTask<?> task = captureTask(action);
+        Object downloads = task.call();
+        verify(library).getFileDirectories(any());
+        org.mockito.Mockito.clearInvocations(library);
+        runSuccessHandler(task, downloads);
+
+        verify(library, org.mockito.Mockito.never()).getFileDirectories(any());
+        assertEquals(List.of(entry), action.downloadedEntries);
+        assertEquals(Optional.of("missing.pdf"), action.brokenPdfLink);
+    }
+
+    // [utest->req~fetchers.fulltext-attachment-identity~1]
+    @Test
+    void doesNotSelectMissingSupplementBeforeArticle() throws Exception {
+        entry.withFiles(List.of(new LinkedFile("Supplement", Path.of("supplement.pdf"), "PDF"),
+                new LinkedFile("", Path.of("article.pdf"), "PDF")));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.of(fetcherResult));
+
+        completeTask(captureTask(action));
+
+        assertEquals(Optional.empty(), action.brokenPdfLink);
+        assertEquals(List.of(new LinkedFile("Supplement", Path.of("supplement.pdf"), "PDF"),
+                new LinkedFile("", Path.of("article.pdf"), "PDF")), entry.getFiles());
+    }
+
+    @Test
+    void selectsArticleBySourceUrlWhilePreservingSupplement(@TempDir Path tempDir) throws Exception {
+        entry.withFiles(List.of(new LinkedFile("Supplement", Path.of("supplement.pdf"), "PDF"),
+                new LinkedFile("Article", Path.of("article.pdf"), "PDF", fetcherResult.source().toString())));
+        BibDatabaseContext library = spy(databaseContext);
+        stateManager.getOpenDatabases().remove(databaseContext);
+        stateManager.getOpenDatabases().add(library);
+        stateManager.setActiveDatabase(library);
+        doReturn(List.of(tempDir)).when(library).getFileDirectories(any());
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.of(fetcherResult));
+
+        completeTask(captureTask(action));
+
+        assertEquals(Optional.of("article.pdf"), action.brokenPdfLink);
+    }
+
+    @Test
+    void keepsExistingPdfWhenLookupFindsNeitherDoiNorDocument(@TempDir Path tempDir) throws Exception {
+        Files.writeString(tempDir.resolve("article.pdf"), "%PDF-1.4");
+        entry.clearField(StandardField.DOI);
+        entry.withFiles(List.of(new LinkedFile(Path.of("article.pdf"))));
+        BibDatabaseContext library = spy(databaseContext);
+        stateManager.getOpenDatabases().remove(databaseContext);
+        stateManager.getOpenDatabases().add(library);
+        stateManager.setActiveDatabase(library);
+        doReturn(List.of(tempDir)).when(library).getFileDirectories(any());
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.empty());
+
+        completeTask(captureTask(action));
+
+        assertEquals(List.of(new LinkedFile(Path.of("article.pdf"))), entry.getFiles());
+    }
+
+    @Test
+    void preservesAmbiguousMissingAttachmentsWhenLookupFails() throws Exception {
+        entry.clearField(StandardField.DOI);
+        entry.withFiles(List.of(new LinkedFile("Supplement", Path.of("supplement.pdf"), "PDF"),
+                new LinkedFile("", Path.of("article.pdf"), "PDF")));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.empty());
+
+        completeTask(captureTask(action));
+
+        assertEquals(List.of(new LinkedFile("Supplement", Path.of("supplement.pdf"), "PDF"),
+                new LinkedFile("", Path.of("article.pdf"), "PDF")), entry.getFiles());
+    }
+
+    @Test
+    void persistsDiscoveredDoiWithoutDocumentAndSupportsUndo() throws Exception {
+        entry.clearField(StandardField.DOI);
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(snapshot -> {
+            snapshot.withField(StandardField.DOI, "10.1000/discovered");
+            return Optional.empty();
+        });
+
+        completeTask(captureTask(action));
+
+        assertEquals(Optional.of("10.1000/discovered"), entry.getField(StandardField.DOI));
+        stateManager.getUndoManager(databaseContext).undo();
+        assertEquals(Optional.empty(), entry.getField(StandardField.DOI));
+    }
+
+    @Test
+    void doesNotPersistDiscoveredDoiWhenEntryChangedDuringLookup() throws Exception {
+        entry.clearField(StandardField.DOI);
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(snapshot -> {
+            snapshot.withField(StandardField.DOI, "10.1000/discovered");
+            return Optional.of(fetcherResult);
+        });
+        BackgroundTask<?> task = captureTask(action);
+        Object downloads = task.call();
+        entry.withField(StandardField.TITLE, "Edited during lookup");
+
+        runSuccessHandler(task, downloads);
+
+        assertEquals(Optional.empty(), entry.getField(StandardField.DOI));
+        assertEquals(List.of(), action.downloadedEntries);
+    }
+
+    @Test
+    void preservesStaleLinkWhenEntryChangedDuringLookup(@TempDir Path tempDir) throws Exception {
+        entry.clearField(StandardField.DOI);
+        entry.withFiles(List.of(new LinkedFile(Path.of("missing.pdf"))));
+        BibDatabaseContext library = spy(databaseContext);
+        stateManager.getOpenDatabases().remove(databaseContext);
+        stateManager.getOpenDatabases().add(library);
+        stateManager.setActiveDatabase(library);
+        doReturn(List.of(tempDir)).when(library).getFileDirectories(any());
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.empty());
+        BackgroundTask<?> task = captureTask(action);
+        Object downloads = task.call();
+        entry.withField(StandardField.TITLE, "Edited during lookup");
+
+        runSuccessHandler(task, downloads);
+
+        assertEquals(List.of(new LinkedFile(Path.of("missing.pdf"))), entry.getFiles());
+    }
+
+    @Test
     void notifiesWhenNoFullTextDocumentIsFound() throws Exception {
         RecordingDownloadFullTextAction action =
                 new RecordingDownloadFullTextAction(_ -> Optional.empty());
@@ -182,7 +318,6 @@ class DownloadFullTextActionTest {
                 .getBytes(StandardCharsets.US_ASCII);
 
         httpServer = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
-        AtomicInteger finderCalls = new AtomicInteger();
 
         httpServer.createContext("/test.pdf", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/pdf");
@@ -227,10 +362,10 @@ class DownloadFullTextActionTest {
                 .thenReturn(externalApplicationsPreferences);
 
         // Make the state manager use the spy instead of the original database context.
-        BibDatabaseContext originalDatabaseContext = databaseContext;
-        databaseContext = spy(originalDatabaseContext);
+        BibDatabaseContext originalLibraryContext = databaseContext;
+        databaseContext = spy(originalLibraryContext);
 
-        stateManager.getOpenDatabases().remove(originalDatabaseContext);
+        stateManager.getOpenDatabases().remove(originalLibraryContext);
         stateManager.getOpenDatabases().add(databaseContext);
         stateManager.setActiveDatabase(databaseContext);
 
@@ -252,24 +387,7 @@ class DownloadFullTextActionTest {
             return CompletableFuture.completedFuture(null);
         }).when(taskExecutor).execute(any(BackgroundTask.class));
 
-        // Arrange: use the real action, with a finder that returns our local PDF URL.
-        DownloadFullTextAction action = new DownloadFullTextAction(
-                dialogService,
-                stateManager,
-                preferences,
-                taskExecutor,
-                snapshot -> {
-                    finderCalls.incrementAndGet();
-
-                    assertNotSame(entry, snapshot);
-                    assertEquals(
-                            Optional.of("10.1000/original"),
-                            snapshot.getField(StandardField.DOI)
-                    );
-
-                    return Optional.of(localFetcherResult);
-                }
-        );
+        DownloadFullTextAction action = new DownloadFullTextAction(dialogService, stateManager, preferences, taskExecutor);
 
         // Act: execute the full-text lookup.
         action.execute();
@@ -278,9 +396,7 @@ class DownloadFullTextActionTest {
 
         // Execute the lookup task.
         BackgroundTask<?> lookupTask = submittedTasks.getFirst();
-        Object downloads = lookupTask.call();
-
-        assertEquals(1, finderCalls.get());
+        Object downloads = lookupWithExistingDoi(lookupTask, localFetcherResult);
 
         // Run the success handler.
         runSuccessHandler(lookupTask, downloads);
@@ -360,10 +476,10 @@ class DownloadFullTextActionTest {
                 .thenReturn(externalApplicationsPreferences);
 
         // Make the state manager use the spy instead of the original database context.
-        BibDatabaseContext originalDatabaseContext = databaseContext;
-        databaseContext = spy(originalDatabaseContext);
+        BibDatabaseContext originalLibraryContext = databaseContext;
+        databaseContext = spy(originalLibraryContext);
 
-        stateManager.getOpenDatabases().remove(originalDatabaseContext);
+        stateManager.getOpenDatabases().remove(originalLibraryContext);
         stateManager.getOpenDatabases().add(databaseContext);
         stateManager.setActiveDatabase(databaseContext);
 
@@ -393,22 +509,7 @@ class DownloadFullTextActionTest {
             return CompletableFuture.completedFuture(null);
         }).when(taskExecutor).execute(any(BackgroundTask.class));
 
-        // Arrange: use the real action, with a finder that returns our local PDF URL.
-        DownloadFullTextAction action = new DownloadFullTextAction(
-                dialogService,
-                stateManager,
-                preferences,
-                taskExecutor,
-                snapshot -> {
-                    assertNotSame(entry, snapshot);
-                    assertEquals(
-                            Optional.of("10.1000/original"),
-                            snapshot.getField(StandardField.DOI)
-                    );
-
-                    return Optional.of(localFetcherResult);
-                }
-        );
+        DownloadFullTextAction action = new DownloadFullTextAction(dialogService, stateManager, preferences, taskExecutor);
 
         // Act: execute the full-text lookup.
         action.execute();
@@ -417,7 +518,7 @@ class DownloadFullTextActionTest {
 
         // Execute the lookup task.
         BackgroundTask<?> lookupTask = submittedTasks.getFirst();
-        Object downloads = lookupTask.call();
+        Object downloads = lookupWithExistingDoi(lookupTask, localFetcherResult);
 
         // Run the success handler.
         runSuccessHandler(lookupTask, downloads);
@@ -448,6 +549,7 @@ class DownloadFullTextActionTest {
         );
     }
 
+    // [utest->req~fetchers.fulltext-doi-persistence~1]
     @Test
     void downloadsAndAttachesFullTextWhenExistingFileIsMissingAndDoiIsDiscoveredFromTitle(
             @TempDir Path tempDir) throws Exception {
@@ -493,10 +595,10 @@ class DownloadFullTextActionTest {
                 .thenReturn(externalApplicationsPreferences);
 
         // Make the state manager use the spy instead of the original database context.
-        BibDatabaseContext originalDatabaseContext = databaseContext;
-        databaseContext = spy(originalDatabaseContext);
+        BibDatabaseContext originalLibraryContext = databaseContext;
+        databaseContext = spy(originalLibraryContext);
 
-        stateManager.getOpenDatabases().remove(originalDatabaseContext);
+        stateManager.getOpenDatabases().remove(originalLibraryContext);
         stateManager.getOpenDatabases().add(databaseContext);
         stateManager.setActiveDatabase(databaseContext);
 
@@ -604,9 +706,8 @@ class DownloadFullTextActionTest {
 
         runSuccessHandler(downloadTask, downloadResult);
 
-        // Assert: the original broken link remains and the downloaded file is added.
-        assertEquals(2, entry.getFiles().size());
-        assertTrue(entry.getFiles().contains(missingFile));
+        assertEquals(1, entry.getFiles().size());
+        assertFalse(entry.getFiles().contains(missingFile));
 
         LinkedFile downloadedFile = entry.getFiles().stream()
                                          .filter(file -> !file.equals(missingFile))
@@ -619,12 +720,19 @@ class DownloadFullTextActionTest {
         assertTrue(Files.exists(downloadedPath));
         assertArrayEquals(pdfContent, Files.readAllBytes(downloadedPath));
 
-        // Assert: DOI discovery did not modify the original database entry.
-        assertTrue(entry.getField(StandardField.DOI).isEmpty());
+        assertEquals(Optional.of("10.1000/discovered"), entry.getField(StandardField.DOI));
     }
 
+    // [utest->req~fetchers.fulltext-stale-link~1]
     @Test
     void doesNotDownloadFullTextWhenDoiCannotBeDiscoveredFromTitle() throws Exception {
+        BibDatabaseContext originalLibrary = databaseContext;
+        databaseContext = spy(originalLibrary);
+        stateManager.getOpenDatabases().remove(originalLibrary);
+        stateManager.getOpenDatabases().add(databaseContext);
+        stateManager.setActiveDatabase(databaseContext);
+        doReturn(List.of()).when(databaseContext).getFileDirectories(any());
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
         // Arrange: configure the entry with a title but no DOI.
         entry.setField(
                 StandardField.TITLE,
@@ -699,6 +807,7 @@ class DownloadFullTextActionTest {
             verify(fulltextFetcher).findFullText(any(BibEntry.class));
         }
 
+        assertEquals(Optional.empty(), entry.getField(StandardField.FILE));
         // Assert: no download task was submitted.
         assertEquals(1, submittedTasks.size());
 
@@ -707,6 +816,8 @@ class DownloadFullTextActionTest {
 
         // Assert: the user was notified that no full-text document was found.
         verify(dialogService).notify(ArgumentMatchers.anyString());
+        stateManager.getUndoManager(databaseContext).undo();
+        assertEquals(List.of(missingFile), entry.getFiles());
     }
 
     @Test
@@ -732,6 +843,25 @@ class DownloadFullTextActionTest {
         captureTask(action).call();
 
         assertEquals(List.of(true), inProgressDuringLookup);
+    }
+
+    private Object lookupWithExistingDoi(BackgroundTask<?> task, FetcherResult result) throws Exception {
+        FulltextFetcher fetcher = mock(FulltextFetcher.class);
+        when(fetcher.getTrustLevel()).thenReturn(TrustLevel.PUBLISHER);
+        when(fetcher.getDownloadHeaders()).thenReturn(Map.of());
+        when(fetcher.findFullText(any())).thenAnswer(invocation -> {
+            BibEntry lookupEntry = invocation.getArgument(0);
+            return lookupEntry.getField(StandardField.DOI)
+                              .filter("10.1000/original"::equals)
+                              .map(_ -> result.source());
+        });
+        try (MockedStatic<WebFetchers> webFetchers = mockStatic(WebFetchers.class)) {
+            webFetchers.when(() -> WebFetchers.getFullTextFetchers(nullable(ImportFormatPreferences.class), nullable(ImporterPreferences.class)))
+                       .thenReturn(Set.of(fetcher));
+            Object downloads = task.call();
+            verify(fetcher).findFullText(argThat(snapshot -> snapshot.getField(StandardField.DOI).equals(Optional.of("10.1000/original"))));
+            return downloads;
+        }
     }
 
     private static void drainJavaFxEvents() throws InterruptedException {
@@ -764,15 +894,17 @@ class DownloadFullTextActionTest {
     private class RecordingDownloadFullTextAction extends DownloadFullTextAction {
         private final List<BibEntry> downloadedEntries = new ArrayList<>();
         private final List<FetcherResult> downloadedResults = new ArrayList<>();
+        private Optional<String> brokenPdfLink = Optional.empty();
 
         RecordingDownloadFullTextAction(Function<BibEntry, Optional<FetcherResult>> fullTextFinder) {
             super(dialogService, stateManager, preferences, taskExecutor, fullTextFinder);
         }
 
         @Override
-        void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
+        void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry, Optional<String> brokenPdfLink) {
             downloadedEntries.add(entry);
             downloadedResults.add(result);
+            this.brokenPdfLink = brokenPdfLink;
         }
     }
 }
