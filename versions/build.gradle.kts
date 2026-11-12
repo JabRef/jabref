@@ -129,7 +129,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.86")
+    api("org.bouncycastle:bcprov-jdk18on:1.87")
     api("org.controlsfx:controlsfx:11.2.6")
     api("org.eclipse.jgit:org.eclipse.jgit:7.8.1.202611041320-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.8.1.202611041320-r")
