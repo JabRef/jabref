@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -20,8 +18,6 @@ import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.util.OptionalObjectProperty;
-
-import org.jspecify.annotations.NonNull;
 
 public class WorkspacePreferences {
 
@@ -40,9 +36,6 @@ public class WorkspacePreferences {
     private final BooleanProperty confirmHideTabBar;
     private final BooleanProperty wrapMainTableText;
     private final ObservableList<String> selectedSlrCatalogs;
-
-    private final DoubleBinding cellSize;
-    private final DoubleBinding tableCellSize;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -69,9 +62,6 @@ public class WorkspacePreferences {
         this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
         this.wrapMainTableText = new SimpleBooleanProperty(wrapMainTableText);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
-
-        cellSize = createCellSizeBinding();
-        tableCellSize = createTableCellSizeBinding();
     }
 
     /// Creates Object with default values
@@ -94,27 +84,6 @@ public class WorkspacePreferences {
 
     public static WorkspacePreferences getDefault() {
         return new WorkspacePreferences();
-    }
-
-    private @NonNull DoubleBinding createCellSizeBinding() {
-        return Bindings.createDoubleBinding(() -> {
-            double cellSize;
-            if (shouldOverrideDefaultFontSize.get()) {
-                cellSize = mainFontSize.get() * 2d;
-            } else {
-                cellSize = DEF_FONT_SIZE * 2d;
-            }
-            return cellSize;
-        }, shouldOverrideDefaultFontSize, mainFontSize);
-    }
-
-    private @NonNull DoubleBinding createTableCellSizeBinding() {
-        return Bindings.createDoubleBinding(() -> {
-            if (wrapMainTableText.get()) {
-                return cellSize.get() * 2;
-            }
-            return cellSize.get();
-        }, cellSize, wrapMainTableText);
     }
 
     public void setAll(WorkspacePreferences preferences) {
@@ -269,9 +238,5 @@ public class WorkspacePreferences {
 
     public void setCustomTheme(Optional<StyleSheet> customTheme) {
         this.customTheme.set(customTheme);
-    }
-
-    public DoubleBinding tableCellSizeProperty() {
-        return tableCellSize;
     }
 }
