@@ -75,6 +75,15 @@ class SaveActionRuleTest {
         assertEquals("\"to be removed\", should be removed", clearNote.scan(entry).getFirst().message());
     }
 
+    /// A URL may well hold what looks like a placeholder of the message.
+    @Test
+    void aValueThatLooksLikeAPlaceholderIsReportedAsItStands() {
+        SaveActionRule trimUrl = new SaveActionRule(new FieldFormatterCleanup(StandardField.URL, new TrimWhitespaceFormatter()));
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.URL, "https://a.org/x%1Fy ");
+
+        assertEquals("\"https://a.org/x%1Fy \", should be \"https://a.org/x%1Fy\"", trimUrl.scan(entry).getFirst().message());
+    }
+
     /// A field value can be as long as an abstract, while a finding is one line.
     @Test
     void aLongValueIsCutShortInTheMessage() {

@@ -163,13 +163,6 @@ A library that only has Save Actions needs no option at all: `jabkit fix` applie
 Findings are written one per line, in the `file:line:column:citationKey[:field]: message [rule-id]` format the `check` commands use, so an editor or a CI log scraper can jump to the place at fault.
 Where that place is comes from the `ParserResult` of the file the library was read from, through `ErrorFormat`, which the integrity and consistency checks report through as well.
 
-## Known issues
-
-The message of a `SaveActionRule` finding is garbled where the old value contains `%1`, as a URL with `%1F` does.
-`Localization.lang` fills its placeholders one after the other, so the `%1` in the value is replaced by the new value as well: `"https://a.org/xhttps://a.org/x%1FyFy ", should be "https://a.org/x%1Fy"`.
-Only the message is affected, not the repair.
-The place to fix it is `LocalizationKeyParams`, which all of JabRef shares.
-
 ## Goal
 
 JabRef has four features that judge or change how a library is written, each configured differently:
