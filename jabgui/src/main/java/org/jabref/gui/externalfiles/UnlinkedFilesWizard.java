@@ -20,6 +20,10 @@ import jakarta.inject.Inject;
 import org.controlsfx.dialog.Wizard;
 
 public class UnlinkedFilesWizard {
+    // Preferred size of every wizard page; this also determines the initial dialog size
+    private static final double PAGE_WIDTH = 650;
+    private static final double PAGE_HEIGHT = 550;
+
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
@@ -34,7 +38,6 @@ public class UnlinkedFilesWizard {
     private SearchConfigurationPage page1;
     private FileSelectionPage page2;
     private ImportResultsPage page3;
-    private boolean cssInstalled = false;
 
     public UnlinkedFilesWizard() {
     }
@@ -44,19 +47,7 @@ public class UnlinkedFilesWizard {
             return;
         }
 
-        cssInstalled = false;
-
-        Scene dialogScene = wizard.getDialog().getDialogPane().getScene();
-
-        if (dialogScene != null) {
-            applyThemeAndStageSettings(dialogScene);
-        } else {
-            wizard.getDialog().getDialogPane().sceneProperty().addListener((_, _, newScene) -> {
-                if (!cssInstalled && newScene != null) {
-                    applyThemeAndStageSettings(newScene);
-                }
-            });
-        }
+        applyThemeAndStageSettings(wizard.getDialog().getDialogPane().getScene());
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(wizard.getDialog());
         page2.shutdown();
@@ -88,9 +79,9 @@ public class UnlinkedFilesWizard {
         page2 = new FileSelectionPage(stateManager, viewModel, preferences.getImportFormatPreferences(), taskExecutor);
         page3 = new ImportResultsPage(viewModel);
 
-        page1.setPrefSize(650, 550);
-        page2.setPrefSize(650, 550);
-        page3.setPrefSize(650, 550);
+        page1.setPrefSize(PAGE_WIDTH, PAGE_HEIGHT);
+        page2.setPrefSize(PAGE_WIDTH, PAGE_HEIGHT);
+        page3.setPrefSize(PAGE_WIDTH, PAGE_HEIGHT);
 
         page1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         page2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -116,14 +107,11 @@ public class UnlinkedFilesWizard {
     }
 
     private void applyThemeAndStageSettings(Scene scene) {
-        if (cssInstalled || !(scene.getWindow() instanceof Stage stage)) {
+        if (!(scene.getWindow() instanceof Stage stage)) {
             return;
         }
-        cssInstalled = true;
         stage.setResizable(true);
-        stage.setWidth(650);
-        stage.setHeight(550);
-        stage.getIcons().addAll(IconTheme.getLogoSet());
+        IconTheme.applyLogo(stage);
         themeManager.updateCssOnScene(scene);
     }
 }
