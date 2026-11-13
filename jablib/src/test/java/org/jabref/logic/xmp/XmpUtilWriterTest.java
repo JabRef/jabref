@@ -264,7 +264,7 @@ class XmpUtilWriterTest {
         new XmpUtilWriter(xmpPreferences).writeXmp(pdf, entry, new BibDatabase());
 
         try (PDDocument document = Loader.loadPDF(pdf.toFile());
-            var stream = document.getDocumentCatalog().getMetadata().createInputStream()) {
+             var stream = document.getDocumentCatalog().getMetadata().createInputStream()) {
             DublinCoreSchema schema = new XmpUtilShared().parseXmpMetadata(stream).getDublinCoreSchema();
             BibEntry exported = new DublinCoreExtractor(schema, xmpPreferences, new BibEntry()).extractBibtexEntry().orElseThrow();
 
@@ -314,7 +314,7 @@ class XmpUtilWriterTest {
         new XmpUtilWriter(xmpPreferences).writeXmp(pdf, entry, new BibDatabase());
 
         try (PDDocument document = Loader.loadPDF(pdf.toFile());
-            var stream = document.getDocumentCatalog().getMetadata().createInputStream()) {
+             var stream = document.getDocumentCatalog().getMetadata().createInputStream()) {
             DublinCoreSchema schema = new XmpUtilShared().parseXmpMetadata(stream).getDublinCoreSchema();
             assertEquals(List.of("bibtex/booktitle/" + booktitle, "bibtex/series/" + series), schema.getRelations());
             assertEquals(booktitle, document.getDocumentInformation().getCustomMetadataValue("bibtex/booktitle"));
