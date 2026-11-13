@@ -38,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a list of saved connections to the "Connect to shared database" dialog. [#12948](https://github.com/JabRef/jabref/issues/12948)
 - We added <kbd>Ctrl</kbd> + <kbd>C</kbd> copy support for selected entries in the global search results window. [#17310](https://github.com/JabRef/jabref/issues/17310)
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
+- We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
 
 ### Changed
 
@@ -60,6 +61,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed the `IfPlural` export formatter treating organizations containing “and” as multiple editors. [#17780](https://github.com/JabRef/jabref/issues/17780)
 - We fixed an issue where the DocBook export wrote invalid XML for emoji and some math symbols. [#17747](https://github.com/JabRef/jabref/issues/17747)
 - We fixed an issue where clicking "Generate" in the AUX file import dialog before parsing caused an exception.
 - We fixed an issue where it was hard to distinguish between enabled/disabled status of search buttons in dark mode and added tooltips. [#11569](https://github.com/JabRef/jabref/issues/11569)
@@ -144,6 +146,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where failed tasks kept showing as running in the notification center. [#17124](https://github.com/JabRef/jabref/pull/17124)
 - We fixed citation key generation to ignore "as" as a function word. [#17523](https://github.com/JabRef/jabref/issues/17523)
 - We fixed missing PDF links and DOI persistence during full-text downloads. [#12947](https://github.com/JabRef/jabref/issues/12947)
+- We fixed dollar signs and backslashes being mishandled in HTML paragraph formatting. [#17778](https://github.com/JabRef/jabref/issues/17778)
 - We fixed an issue where the external changes dialog showed modified entries of custom entry types as removed and added. [#9566](https://github.com/JabRef/jabref/issues/9566)
 
 ### Removed
