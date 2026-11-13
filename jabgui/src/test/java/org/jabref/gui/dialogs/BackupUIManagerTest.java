@@ -392,6 +392,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 tabContainer,
                 originalFile,
                 preferences,
+                mock(BibEntryTypesManager.class),
                 mock(FileUpdateMonitor.class),
                 new JabRefGuiStateManager());
 
@@ -442,6 +443,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 tabContainer,
                 originalFile,
                 preferences,
+                mock(BibEntryTypesManager.class),
                 mock(FileUpdateMonitor.class),
                 new JabRefGuiStateManager());
 
