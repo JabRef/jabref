@@ -119,6 +119,44 @@ class BibDatabaseContextTest {
     }
 
     @Test
+    void resolveFileDirectoryResolvesRelativeDirectoryAgainstBibFileDirectory() {
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("/absolute/subdir").resolve("biblio.bib"));
+        assertEquals(Optional.of(Path.of("/absolute/Literature").toAbsolutePath()), database.resolveFileDirectory("../Literature"));
+    }
+
+    @Test
+    void resolveFileDirectoryKeepsAbsoluteDirectory() {
+        Path directory = Path.of("/other/Literature").toAbsolutePath();
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("/absolute/subdir").resolve("biblio.bib"));
+        assertEquals(Optional.of(directory), database.resolveFileDirectory(directory.toString()));
+    }
+
+    @Test
+    void resolveFileDirectoryKeepsRelativeDirectoryOfUnsavedLibrary() {
+        BibDatabaseContext database = new BibDatabaseContext();
+        assertEquals(Optional.of(Path.of("Literature")), database.resolveFileDirectory("Literature"));
+    }
+
+    @Test
+    void resolveFileDirectoryReturnsEmptyForInvalidDirectory() {
+        BibDatabaseContext database = new BibDatabaseContext();
+        assertEquals(Optional.empty(), database.resolveFileDirectory("invalid\0directory"));
+    }
+
+    @Test
+    void getFallbackFileDirectoryIgnoresInvalidStoredDirectory() {
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("/absolute/subdir").resolve("biblio.bib"));
+        database.getMetaData().setLibrarySpecificFileDirectory("invalid\0directory");
+        assertEquals(Optional.of(Path.of("/absolute/subdir").toAbsolutePath()), database.getFallbackFileDirectory(fileDirPrefs));
+    }
+
+    @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         Path userDirJabRef = Directories.getUserDirectory();
