@@ -256,7 +256,7 @@ Both comments must not be added.
    Note: This rule is not applied for logging. Logging strings should stay in English. I.e., LOGGER.error(\"...\") should contain English text.
 - All labels and texts in the UI should be sentence case (and not title case)
 - Avoid exclamation marks at the end of a sentence. They are more for screaming. Use a dot to end the sentence.
-- Use "BibTeX" as spelling for bibtex in Java strings. In variable names "Bibtex" should be used.
+- Use "BibTeX" as spelling for `bibtex` in Java strings. In variable names, `Bibtex` should be used.
 - New strings should be consistent to other strings. They should also be grouped semantically together.
 - Existing strings should be reused instead of introducing slightly different strings.
 - User dialogs should have proper button labels: NOT yes/no/cancel, but indicating the action which happens when pressing the button
@@ -505,7 +505,7 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ### Branches
 
-- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; CI labels a PR `dev: into-stable` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
+- `main` is the development branch; pull requests target it. `black-forest` in JabRef/jabref-black-forest is the last release plus ported fixes; CI labels a PR `dev: send-to-black-forest` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
 
 ### Commits
 

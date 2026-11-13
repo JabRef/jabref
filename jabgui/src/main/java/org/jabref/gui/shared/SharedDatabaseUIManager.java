@@ -170,6 +170,7 @@ public class SharedDatabaseUIManager {
     /// result to [#openTab(BibDatabaseContext)].
     public BibDatabaseContext connect(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
+        SharedDatabaseCleanup.awaitDatabase(dbmsConnectionProperties);
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         assert dbmsSynchronizer != null;
@@ -252,6 +253,7 @@ public class SharedDatabaseUIManager {
 
         String sharedDatabaseID = sharedDatabaseIDOptional.get();
         DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
+        SharedDatabaseCleanup.awaitDatabase(dbmsConnectionProperties);
 
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
 
