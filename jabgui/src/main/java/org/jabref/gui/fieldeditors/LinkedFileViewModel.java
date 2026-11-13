@@ -504,6 +504,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void download(boolean keepHtmlLink, Map<String, String> headers, UndoManager undoManager) {
+        download(keepHtmlLink, headers, undoManager, linkedFile.getLink());
+    }
+
+    public void downloadReplacing(String linkToReplace, Map<String, String> headers, UndoManager undoManager) {
+        download(false, headers, undoManager, linkToReplace);
+    }
+
+    private void download(boolean keepHtmlLink, Map<String, String> headers, UndoManager undoManager, String linkToReplace) {
         LOGGER.info("Downloading file from {}", linkedFile.getSourceUrl());
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
@@ -520,7 +528,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 taskExecutor,
                 "",
                 keepHtmlLink,
-                undoManager);
+                undoManager,
+                linkToReplace);
         downloadLinkedFileAction.setDownloadHeaders(headers);
         downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
