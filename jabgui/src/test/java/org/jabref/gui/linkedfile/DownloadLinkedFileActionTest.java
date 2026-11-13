@@ -95,6 +95,25 @@ class DownloadLinkedFileActionTest {
     }
 
     @Test
+    void duplicateHtmlReplacementPreservesExistingFileAndLinks() throws IOException {
+        Path original = tempFolder.resolve("paywall.html");
+        Path duplicate = tempFolder.resolve("paywall (1).html");
+        String html = "<html><body>Sign in to read this article</body></html>";
+        Files.writeString(original, html);
+        Files.copy(original, duplicate);
+        List<LinkedFile> originalLinks = List.of(new LinkedFile("Article", Path.of("missing.pdf"), "PDF"),
+                new LinkedFile("Paywall", Path.of("paywall.html"), "URL"));
+        entry.withFiles(originalLinks);
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(tempFolder));
+
+        replacementAction(new JabRefUndoManager()).onSuccess(tempFolder, duplicate);
+
+        assertEquals(html, Files.readString(original));
+        assertFalse(Files.exists(duplicate));
+        assertEquals(originalLinks, entry.getFiles());
+    }
+
+    @Test
     void replacementPreservesDescriptionAndCanBeUndone() {
         LinkedFile missing = new LinkedFile("Article", Path.of("missing.pdf"), "PDF");
         entry.withFiles(List.of(missing));

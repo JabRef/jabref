@@ -171,6 +171,9 @@ public class DownloadFullTextAction extends SimpleCommand {
                     stateManager.getUndoManager(databaseContext).applyEdit(new UndoableFieldChange(entry, StandardField.FILE,
                             entry.getField(StandardField.FILE).orElse(null),
                             files.isEmpty() ? null : FileFieldWriter.getStringRepresentation(files)));
+                    String citationKey = entry.getCitationKey().orElse(Localization.lang("undefined"));
+                    dialogService.notify(Localization.lang("Removed missing file link %0 from entry %1.", link, citationKey));
+                    LOGGER.info("Removed missing file link {} from entry {}.", link, citationKey);
                 });
             }
             download.result().ifPresentOrElse(

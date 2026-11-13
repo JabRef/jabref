@@ -36,6 +36,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.TrustLevel;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -815,7 +816,8 @@ class DownloadFullTextActionTest {
         assertTrue(entry.getField(StandardField.DOI).isEmpty());
 
         // Assert: the user was notified that no full-text document was found.
-        verify(dialogService).notify(ArgumentMatchers.anyString());
+        verify(dialogService).notify(Localization.lang("Removed missing file link %0 from entry %1.", "missing.pdf", Localization.lang("undefined")));
+        verify(dialogService).notify(Localization.lang("No full text document found for entry %0.", Localization.lang("undefined")));
         stateManager.getUndoManager(databaseContext).undo();
         assertEquals(List.of(missingFile), entry.getFiles());
     }

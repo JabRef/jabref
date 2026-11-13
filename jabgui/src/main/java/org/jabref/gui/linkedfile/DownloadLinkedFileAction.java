@@ -218,11 +218,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         }
 
         // [impl->req~fetchers.fulltext-duplicate-replacement~1]
-        downloadedFile = duplicate.orElse(downloadedFile);
+        Path survivingFile = duplicate.orElse(downloadedFile);
 
         // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
         LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
-                downloadedFile,
+                survivingFile,
                 databaseContext.getFileDirectories(filePreferences),
                 externalApplicationsPreferences);
         if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
@@ -248,7 +248,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                         entry.getField(StandardField.FILE).orElse(null),
                         FileFieldWriter.getStringRepresentation(newFiles)));
                 try {
-                    Files.delete(downloadedFile);
+                    Files.deleteIfExists(downloadedFile);
                 } catch (IOException e) {
                     LOGGER.error("Could not delete downloaded file {}.", downloadedFile, e);
                 }
