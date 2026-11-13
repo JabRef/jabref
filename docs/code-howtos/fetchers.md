@@ -47,6 +47,10 @@ Fetcher comparisons and protocol field names should use locale-independent case 
 * the result with the highest priority wins
 * `InterruptedException` | `ExecutionException` | `CancellationException` are ignored
 
+`FulltextFetchers.findFullTextPDF` leaves the supplied entry unchanged. The download action instead calls `findFullTextPDFAndUpdateDoi` on a separate snapshot and applies the discovered DOI through undo history on the JavaFX thread. Lookup results are discarded when the original entry changes or its library closes.
+
+File existence checks run in the background lookup. A missing PDF is replaced only when it is the sole undescribed PDF or uniquely matches the fetched source URL. Ambiguous attachments, including supplements, are preserved. When lookup finds neither a DOI nor a document, the sole undescribed missing PDF link is removed through undo history. Duplicate replacement downloads link the surviving local file.
+
 ### Trust Levels
 
 * `SOURCE` (highest): definitive URL for a particular paper
