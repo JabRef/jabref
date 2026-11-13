@@ -93,4 +93,34 @@ The user can search BibSonomy from the web search panel and import the found ent
 
 Needs: impl, utest
 
+## Full text downloads must preserve ambiguous attachments
+`req~fetchers.fulltext-attachment-identity~1`
+
+Automatic replacement requires either a sole PDF attachment with no description or a unique attachment whose source URL matches the fetched article URL. Other attachments are preserved, including missing supplements.
+
+Needs: impl, utest
+
+## Full text downloads must persist discovered DOIs
+`req~fetchers.fulltext-doi-persistence~1`
+
+A DOI discovered during full text lookup is applied on the JavaFX thread with undo support, only if the original entry has not changed during lookup.
+
+Needs: impl, utest
+
+## Failed full text lookup must remove an unambiguous stale PDF link when no DOI is available
+`req~fetchers.fulltext-stale-link~1`
+
+Only the sole undescribed local PDF link is removed, after its absence was checked in the background. The removal is undoable. Entries edited or removed during lookup are preserved.
+
+Origin: <https://github.com/JabRef/jabref-koppor/issues/380#issuecomment-714070246>
+
+Needs: impl, utest
+
+## Duplicate full text downloads must link the surviving file
+`req~fetchers.fulltext-duplicate-replacement~1`
+
+When a replacement download duplicates an existing file, the missing attachment is replaced with a link to that surviving file. Undo restores the previous attachment.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
