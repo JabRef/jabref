@@ -100,15 +100,15 @@ class ParserResultTest {
     void warningAddedForSpaceInsideCitationKeyImport(@TempDir Path tmpDir) throws IOException {
         // Citation key "my Article" contains a space and the comma is missing, so this goes through fixKey() and not isFieldsAssignmentNext()
         String bibtexEntry = """
-            @article{my Article\s
-               author    = "Author Name",
-               title     = "Title of the Article",
-               journal   = "Journal Name",
-               year      = "2024",
-               pages     = "1-10",
-               publisher = "Publisher Name"
-             }
-            """;
+                @article{my Article\s
+                   author    = "Author Name",
+                   title     = "Title of the Article",
+                   journal   = "Journal Name",
+                   year      = "2024",
+                   pages     = "1-10",
+                   publisher = "Publisher Name"
+                 }
+                """;
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
