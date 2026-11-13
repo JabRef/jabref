@@ -67,10 +67,15 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         KeywordList keywordList = entry.getFieldAsKeywords(field, keywordDelimiter);
-        return keywordList.stream()
-                          .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
-                          .map(this::createGroup)
-                          .collect(Collectors.toSet());
+        Set<GroupTreeNode> subgroups = keywordList.stream()
+                                                  .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
+                                                  .map(this::createGroup)
+                                                  .collect(Collectors.toSet());
+        if (subgroups.isEmpty()) {
+            // [impl->req~groups.automatic-keyword.missing-value-subgroup~1]
+            return Set.of(new GroupTreeNode(new MissingKeywordGroup(GroupHierarchyType.INDEPENDENT, field, keywordDelimiter)));
+        }
+        return subgroups;
     }
 
     private GroupTreeNode createGroup(Keyword keywordChain) {
