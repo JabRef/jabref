@@ -144,6 +144,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where failed tasks kept showing as running in the notification center. [#17124](https://github.com/JabRef/jabref/pull/17124)
 - We fixed citation key generation to ignore "as" as a function word. [#17523](https://github.com/JabRef/jabref/issues/17523)
 - We fixed an issue where keyboard shortcuts added in a newer version were missing from the preferences. [#17708](https://github.com/JabRef/jabref/pull/17708)
+- We fixed missing PDF links and DOI persistence during full-text downloads. [#12947](https://github.com/JabRef/jabref/issues/12947)
 
 ### Removed
 
