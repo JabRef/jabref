@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.preview.BstPreviewLayout;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -127,6 +130,28 @@ class BstPreviewLayoutTest {
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
 
         assertEquals("Error parsing file '" + invalidBst.toString() + "'", preview);
+    }
+
+    @Test
+    void generatePreviewResolvesXDataFields() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry xdata = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("CAT")
+                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                .withField(StandardField.ADDRESS, "Reading, MA")
+                .withField(StandardField.SERIES, "Computers and Typesetting");
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("Knuth")
+                .withField(StandardField.TITLE, "The {\\TeX} Book")
+                .withField(StandardField.YEAR, "1984")
+                .withField(StandardField.AUTHOR, "Knuth, Donald E.")
+                .withField(StandardField.XDATA, "CAT")
+                .withField(StandardField.NUMBER, "1");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(xdata, book)));
+
+        String preview = bstPreviewLayout.generatePreview(book, context);
+
+        assertEquals("D.\u00a0E. Knuth. 𝑇ℎ𝑒 𝐵𝑜𝑜𝑘. Number\u00a01 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
     }
 
     private static BibEntry getSliceTheoremPaper() {

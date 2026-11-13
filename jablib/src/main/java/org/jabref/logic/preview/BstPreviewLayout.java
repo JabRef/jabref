@@ -137,7 +137,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         BibEntry entry = new BibEntry(originalEntry);
         new ConvertToBibtexCleanup().cleanup(entry);
         convertBracedMathToUnicode(entry);
-        String result = bstVM.render(List.of(entry));
+        String result = bstVM.render(List.of(entry), databaseContext.getDatabase());
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
         // Remove all LaTeX comments
