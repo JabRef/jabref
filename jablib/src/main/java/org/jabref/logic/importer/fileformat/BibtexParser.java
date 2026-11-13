@@ -766,7 +766,7 @@ public class BibtexParser implements Parser {
         skipWhitespace();
         int keyStartLine = line;
         int keyStartColumn = column;
-        String key = parseKey(closingBracket, keyStartLine, keyStartColumn);
+        String key = parseKey(closingBracket);
 
         // [impl->req~import.bibtex.missing-key-recovery~1]
         if (!key.isEmpty()) {
@@ -1028,7 +1028,7 @@ public class BibtexParser implements Parser {
     }
 
     /// This method is used to parse the citation key of an entry.
-    private String parseKey(char closingBracket, int keyStartLine, int keyStartColumn) throws IOException {
+    private String parseKey(char closingBracket) throws IOException {
         StringBuilder token = new StringBuilder(20);
         int openParentheses = 0;
 
@@ -1063,9 +1063,9 @@ public class BibtexParser implements Parser {
                     // [impl->req~import.bibtex.key-missing-comma~1]
                     if (isFieldsAssignmentNext()) {
                         unread(character);
-                        parserResult.addWarning(new ParserResult.Range(keyStartLine, keyStartColumn),
+                        parserResult.addWarning(new ParserResult.Range(line, column),
                                 Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).",
-                                        String.valueOf(keyStartLine), token.toString()));
+                                        String.valueOf(line), token.toString()));
                         return token.toString();
                     }
                     // We have encountered white space instead of the comma at
@@ -1105,8 +1105,7 @@ public class BibtexParser implements Parser {
             lookahead.append((char) read());
             fieldNameLength++;
         }
-        readWhitespace(lookahead);
-        boolean isFieldAssignment = (fieldNameLength > 0) && (peek() == '=');
+        boolean isFieldAssignment = (fieldNameLength > 0) && isEqualsSignNext();
         unreadBuffer(lookahead);
         return isFieldAssignment;
     }
