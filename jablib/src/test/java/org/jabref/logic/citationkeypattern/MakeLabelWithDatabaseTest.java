@@ -303,6 +303,14 @@ class MakeLabelWithDatabaseTest {
     }
 
     @Test
+    void generateKeyShorttitleIgnoresAs() {
+        bibtexKeyPattern.setDefaultValue("[shorttitle:lower]");
+        entry.setField(StandardField.TITLE, "Economic Systems as Networks");
+        new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
+        assertEquals(Optional.of("economicsystemsnetworks"), entry.getCitationKey());
+    }
+
+    @Test
     void generateKeyShorttitleUpperModified() {
         bibtexKeyPattern.setDefaultValue("[shorttitle:upper]");
         entry.setField(StandardField.TITLE, "An aweSOme Paper on JabRef");

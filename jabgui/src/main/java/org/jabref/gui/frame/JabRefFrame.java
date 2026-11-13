@@ -3,7 +3,9 @@ package org.jabref.gui.frame;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
@@ -43,6 +45,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingDispatcher;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SearchShortcutTarget;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
@@ -50,6 +53,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
+import org.jabref.gui.shared.SharedDatabaseErrorTab;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -64,11 +68,15 @@ import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -91,6 +99,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public static final String FRAME_TITLE = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
+
+    private static final Map<KeyBinding, EntryType> NEW_ENTRY_KEY_BINDINGS = Map.of(
+            KeyBinding.NEW_ARTICLE, StandardEntryType.Article,
+            KeyBinding.NEW_BOOK, StandardEntryType.Book,
+            KeyBinding.NEW_INBOOK, StandardEntryType.InBook,
+            KeyBinding.NEW_INPROCEEDINGS, StandardEntryType.InProceedings,
+            KeyBinding.NEW_MASTERSTHESIS, StandardEntryType.MastersThesis,
+            KeyBinding.NEW_PHDTHESIS, StandardEntryType.PhdThesis,
+            KeyBinding.NEW_PROCEEDINGS, StandardEntryType.Proceedings,
+            KeyBinding.NEW_TECHREPORT, StandardEntryType.TechReport,
+            KeyBinding.NEW_UNPUBLISHED, StandardEntryType.Unpublished);
 
     private final GuiPreferences preferences;
     private final AiService aiService;
@@ -367,95 +386,56 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initKeyBindings() {
+        KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(preferences.getKeyBindingRepository())
+                .on(KeyBinding.FOCUS_ENTRY_TABLE, () -> getCurrentLibraryTab().getMainTable().requestFocus())
+                .on(KeyBinding.FOCUS_GROUP_LIST, () -> sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus())
+                .on(KeyBinding.NEXT_LIBRARY, () -> tabbedPane.getSelectionModel().selectNext())
+                .on(KeyBinding.PREVIOUS_LIBRARY, () -> tabbedPane.getSelectionModel().selectPrevious())
+                .onWithoutConsuming(KeyBinding.OPEN_GLOBAL_SEARCH_DIALOG, globalSearchBar::openGlobalSearchDialog)
+                .onConditionally(KeyBinding.BACK, () -> navigateHistory(LibraryTab::back))
+                .onConditionally(KeyBinding.FORWARD, () -> navigateHistory(LibraryTab::forward))
+                // Handled here so that it also fires when the keyboard focus is outside the entry editor
+                .onConditionally(KeyBinding.JUMP_TO_FIELD, this::jumpToField)
+                .on(KeyBinding.CLOSE_DATABASE, () -> {
+                    if (getCurrentLibraryTab() == null) {
+                        closeSelectedNonLibraryTab(tabbedPane);
+                    } else {
+                        new CloseDatabaseAction(this, stateManager).execute();
+                    }
+                });
+        NEW_ENTRY_KEY_BINDINGS.forEach((keyBinding, entryType) -> keyBindingDispatcher.onWithoutConsuming(keyBinding,
+                () -> new NewEntryAction(entryType, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute()));
+
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            // Check search before the switch, which only sees the first matching key binding.
+            // Check search before the dispatcher, which only sees the first matching key binding.
             if (handleSearchKeyBinding(event, preferences.getKeyBindingRepository(), globalSearchBar::requestFocus)) {
                 return;
             }
-            Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case FOCUS_ENTRY_TABLE:
-                        getCurrentLibraryTab().getMainTable().requestFocus();
-                        event.consume();
-                        break;
-                    case FOCUS_GROUP_LIST:
-                        sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
-                        event.consume();
-                        break;
-                    case NEXT_LIBRARY:
-                        tabbedPane.getSelectionModel().selectNext();
-                        event.consume();
-                        break;
-                    case PREVIOUS_LIBRARY:
-                        tabbedPane.getSelectionModel().selectPrevious();
-                        event.consume();
-                        break;
-                    case OPEN_GLOBAL_SEARCH_DIALOG:
-                        globalSearchBar.openGlobalSearchDialog();
-                        break;
-                    case NEW_ARTICLE:
-                        new NewEntryAction(StandardEntryType.Article, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_BOOK:
-                        new NewEntryAction(StandardEntryType.Book, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_INBOOK:
-                        new NewEntryAction(StandardEntryType.InBook, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_MASTERSTHESIS:
-                        new NewEntryAction(StandardEntryType.MastersThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_PHDTHESIS:
-                        new NewEntryAction(StandardEntryType.PhdThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_PROCEEDINGS:
-                        new NewEntryAction(StandardEntryType.Proceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_TECHREPORT:
-                        new NewEntryAction(StandardEntryType.TechReport, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_UNPUBLISHED:
-                        new NewEntryAction(StandardEntryType.Unpublished, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_INPROCEEDINGS:
-                        new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case BACK:
-                        if (!(getScene().getFocusOwner() instanceof TextInputControl)
-                                && !(getScene().getFocusOwner() instanceof CodeArea)) {
-                            Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::back);
-                            event.consume();
-                        }
-                        break;
-                    case FORWARD:
-                        if (!(getScene().getFocusOwner() instanceof TextInputControl)
-                                && !(getScene().getFocusOwner() instanceof CodeArea)) {
-                            Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
-                            event.consume();
-                        }
-                        break;
-                    case JUMP_TO_FIELD:
-                        // Handled here so that it also fires when the keyboard focus is outside the entry editor
-                        if (!stateManager.getSelectedEntries().isEmpty()) {
-                            // Jumping to a field is only meaningful with a visible editor, so open it if it is closed
-                            stateManager.getEditorShowing().set(true);
-                            entryEditor.openJumpToFieldDialog();
-                            event.consume();
-                        }
-                        break;
-                    case CLOSE_DATABASE:
-                        if (getCurrentLibraryTab() == null) {
-                            closeSelectedNonLibraryTab(tabbedPane);
-                        } else {
-                            new CloseDatabaseAction(this, stateManager).execute();
-                        }
-                        event.consume();
-                        break;
-                    default:
-                }
-            }
+            keyBindingDispatcher.handle(event);
         });
+    }
+
+    /// History navigation keys are left to text inputs, where they move the caret.
+    ///
+    /// @return whether the navigation was performed
+    private boolean navigateHistory(Consumer<LibraryTab> navigation) {
+        Node focusOwner = getScene().getFocusOwner();
+        if (focusOwner instanceof TextInputControl || focusOwner instanceof CodeArea) {
+            return false;
+        }
+        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(navigation);
+        return true;
+    }
+
+    /// @return whether the jump to field dialog was opened
+    private boolean jumpToField() {
+        if (stateManager.getSelectedEntries().isEmpty()) {
+            return false;
+        }
+        // Jumping to a field is only meaningful with a visible editor, so open it if it is closed
+        stateManager.getEditorShowing().set(true);
+        entryEditor.openJumpToFieldDialog();
+        return true;
     }
 
     private void initBindings() {
@@ -675,6 +655,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
     }
 
+    @Override
+    public void removeSharedDatabaseErrorTabFor(BibDatabaseContext databaseContext) {
+        // Only a shared database carries a synchronizer, so its absence already rules out a matching placeholder.
+        Optional.ofNullable(databaseContext.getDBMSSynchronizer())
+                .map(DatabaseSynchronizer::getConnectionProperties)
+                .ifPresent(this::removeSharedDatabaseErrorTabsFor);
+    }
+
+    /// Matches by database, not by `equals`: a retry entered in expert mode or with other SSL settings still targets
+    /// the database the placeholder stands for.
+    private void removeSharedDatabaseErrorTabsFor(DatabaseConnectionProperties connectionProperties) {
+        tabbedPane.getTabs().removeIf(tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
+                && DBMSConnectionProperties.isSameDatabase(errorTab.getConnectionProperties(), connectionProperties));
+    }
+
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
@@ -781,31 +776,47 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         // [impl->req~shared-database.reopen-on-startup~1]
-        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService(preferences.getSharedDatabasePreferences());
         for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
-            String sharedDatabaseId = reconnection.sharedDatabaseId();
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
-            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
-            // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
-            BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
-            LibraryTab newTab = LibraryTab.createLibraryTab(
-                    () -> manager.connect(reconnection.connectionProperties()),
-                    dummyContext,
-                    dialogService,
-                    aiService,
-                    preferences,
-                    stateManager,
-                    this,
-                    fileUpdateMonitor,
-                    entryTypesManager,
-                    clipBoardManager,
-                    taskExecutor,
-                    gitHandlerRegistry,
-                    (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
-                    exception -> handleSharedDatabaseReconnectionFailure(reconnection, exception));
-            addTab(newTab, true);
-            newTab.startDataLoadingTask();
+            reconnectSharedDatabase(sessionService, reconnection);
         }
+    }
+
+    /// Opens a loading tab for a remembered shared database and connects in the background.
+    private void reconnectSharedDatabase(SharedDatabaseSessionService sessionService, SharedDatabaseSessionService.Reconnection reconnection) {
+        Optional<LibraryTab> existingTab = SharedDatabaseUIManager.findOpenTab(this, reconnection.connectionProperties());
+        if (existingTab.isPresent()) {
+            showLibraryTab(existingTab.orElseThrow());
+            return;
+        }
+        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
+        // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
+        // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
+        BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
+        // The id keeps the database remembered if JabRef quits while this tab is still loading
+        dummyContext.getDatabase().setSharedDatabaseID(reconnection.sharedDatabaseId());
+        LibraryTab newTab = LibraryTab.createLibraryTab(
+                () -> manager.connect(reconnection.connectionProperties()),
+                dummyContext,
+                dialogService,
+                aiService,
+                preferences,
+                stateManager,
+                this,
+                fileUpdateMonitor,
+                entryTypesManager,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
+                exception -> handleSharedDatabaseReconnectionFailure(sessionService, reconnection, exception));
+        Optional<LibraryTab> reservedTab = SharedDatabaseUIManager.reserveTab(this, reconnection.connectionProperties(), newTab);
+        if (reservedTab.isPresent()) {
+            showLibraryTab(reservedTab.orElseThrow());
+            return;
+        }
+        addTab(newTab, true);
+        newTab.startDataLoadingTask();
     }
 
     private void handleSharedDatabaseReconnectionSuccess(SharedDatabaseSessionService sessionService,
@@ -819,12 +830,65 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         sessionService.restoreSharedDatabaseId(bibDatabaseContext, reconnection.sharedDatabaseId());
     }
 
-    private void handleSharedDatabaseReconnectionFailure(SharedDatabaseSessionService.Reconnection reconnection, Exception exception) {
+    /// The failed loading tab has already closed itself; a [SharedDatabaseErrorTab] takes its place instead of a dialog,
+    /// so the connection can be retried and stays remembered for the next session.
+    private void handleSharedDatabaseReconnectionFailure(SharedDatabaseSessionService sessionService,
+                                                         SharedDatabaseSessionService.Reconnection reconnection,
+                                                         Exception exception) {
         LOGGER.error("Could not reconnect to shared database {}", reconnection.sharedDatabaseId(), exception);
-        if (mainStage.isShowing()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                    Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
+        if (!mainStage.isShowing()) {
+            return;
         }
+        // The tab alone is easy to miss among the libraries that did open, so the failure is announced as well.
+        dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()));
+        SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(reconnection.sharedDatabaseId(), reconnection.connectionProperties());
+        errorTab.setRetryAction(tab -> {
+            tab.close();
+            reconnectSharedDatabase(sessionService, reconnection);
+        });
+        errorTab.showError(exception);
+        addSharedDatabaseErrorTab(errorTab);
+    }
+
+    @Override
+    public void showSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
+        // Keep the remembered id while retrying with the settings from the latest attempt.
+        Optional<SharedDatabaseErrorTab> remembered = tabbedPane.getTabs().stream()
+                                                                .filter(SharedDatabaseErrorTab.class::isInstance)
+                                                                .map(SharedDatabaseErrorTab.class::cast)
+                                                                .filter(existing -> DBMSConnectionProperties.isSameDatabase(existing.getConnectionProperties(), errorTab.getConnectionProperties()))
+                                                                .filter(existing -> existing.getSharedDatabaseId().isPresent())
+                                                                .findFirst();
+        if (remembered.isPresent()) {
+            SharedDatabaseErrorTab rememberedTab = remembered.orElseThrow();
+            rememberedTab.updateFailure(errorTab);
+            tabbedPane.getSelectionModel().select(rememberedTab);
+            return;
+        }
+        removeSharedDatabaseErrorTabsFor(errorTab.getConnectionProperties());
+        addSharedDatabaseErrorTab(errorTab);
+        tabbedPane.getSelectionModel().select(errorTab);
+    }
+
+    private void addSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
+        addSharedDatabaseErrorTab(tabbedPane, errorTab, this::showWelcomeTab);
+    }
+
+    static void addSharedDatabaseErrorTab(TabPane tabbedPane, SharedDatabaseErrorTab errorTab, Runnable showWelcomeTab) {
+        errorTab.setOnClosed(_ -> {
+            if (tabbedPane.getTabs().isEmpty()) {
+                showWelcomeTab.run();
+            }
+        });
+        tabbedPane.getTabs().add(errorTab);
+    }
+
+    @Override
+    public List<String> getUnconnectedSharedDatabaseIds() {
+        return tabbedPane.getTabs().stream()
+                         .filter(SharedDatabaseErrorTab.class::isInstance)
+                         .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId().stream())
+                         .toList();
     }
 
     @Override
