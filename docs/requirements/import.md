@@ -176,4 +176,48 @@ See [JabRef issue #16332](https://github.com/JabRef/jabref/issues/16332).
 
 Needs: impl, utest
 
+## Plain citation parser must extract the DOI
+`req~import.plain-citation.doi~1`
+
+The rule-based plain citation parser finds a DOI written with a `doi:`, `DOI:` or `urn:doi:` prefix or as a `doi.org` link, and stores it in the `doi` field.
+Punctuation directly behind the DOI is not part of it, and if a citation contains more than one DOIs, the first one is kept.
+The DOI is removed from the text before the other fields are parsed, so a `doi.org` link is not stored as a URL and the digits of the DOI are not taken as year or pages.
+
+Needs: impl, utest
+
+## Plain citation parser must recognize common author formats
+`req~import.plain-citation.authors~1`
+
+The rule-based plain citation parser reads the authors block at the start of a citation in the formats `Lastname, I. J.`, `I. J. Lastname` and a mix of both, separated by commas, `&` or `and`.
+Name particles stay with the family name, and `et al.` becomes `and others`.
+Full names (`Firstname Lastname`) are only taken as authors if a separate title follows, so that a capitalized title is not mistaken for an author.
+A parenthesized publication year may separate the full names from the title.
+
+Needs: impl, utest
+
+## Plain citation parser must determine the publication year
+`req~import.plain-citation.year~1`
+
+The rule-based plain citation parser prefers a year in parentheses (APA style) as the publication year.
+It ignores years that are part of a URL or the title, or that are not plausible as a publication year.
+A number behind `p.`, `pp.`, `vol.`, `no.` or `issue` and a page range are not taken as a year.
+
+Needs: impl, utest
+
+## Plain citation parser must extract page ranges
+`req~import.plain-citation.pages~1`
+
+The rule-based plain citation parser stores a page range such as `127-136` or `pp. 62–68` in the `pages` field, using the BibTeX separator `--`.
+A single number is only taken as a page if it is marked as such (`p. 5`).
+Volume and issue numbers, years, and report numbers such as `rr-02-92` are not taken as pages.
+
+Needs: impl, utest
+
+## Plain citation parser must extract the venue without introductory words
+`req~import.plain-citation.venue~1`
+
+The rule-based plain citation parser stores the journal or publisher name from the text behind the title.
+The introductory `In` of a proceedings reference (`In Proceedings of …`) is not part of the venue, whereas journal names that begin with `In`, such as `In Vitro`, are kept unchanged.
+
+Needs: impl, utest
 <!-- markdownlint-disable-file MD022 -->

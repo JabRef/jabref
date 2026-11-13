@@ -89,6 +89,12 @@ class URLCleanupTest {
 
                 Arguments.of(
                         new BibEntry().withField(StandardField.URL,
+                                "ftp://ftp.example.org/pub/paper.pdf"),
+                        new BibEntry().withField(StandardField.NOTE,
+                                "\\url{ftp://ftp.example.org/pub/paper.pdf}")),
+
+                Arguments.of(
+                        new BibEntry().withField(StandardField.URL,
                                 "http://userid:password@example.com:8080"),
                         new BibEntry().withField(StandardField.NOTE,
                                 "\\url{http://userid:password@example.com:8080}")),
