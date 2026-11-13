@@ -16,6 +16,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DOITest {
 
+    @ParameterizedTest
+    @MethodSource("linkSearchTerms")
+    void extractsLinkSearchTerms(String input, Optional<DOI.LinkSearchTerms> expected) {
+        assertEquals(expected, DOI.extractLinkSearchTerms(input));
+    }
+
+    private static Stream<Arguments> linkSearchTerms() {
+        return Stream.of(
+                Arguments.of("https://doi.org/10.1000/foo+bar", Optional.of(new DOI.LinkSearchTerms("10.1000/foo+bar", "10.1000/foo+bar"))),
+                Arguments.of("https://doi.org/10.1000/foo%2Bbar", Optional.of(new DOI.LinkSearchTerms("10.1000/foo+bar", "10.1000/foo%2Bbar"))),
+                Arguments.of("https://doi.org/10.1000%2F182", Optional.of(new DOI.LinkSearchTerms("10.1000/182", "10.1000%2F182"))),
+                Arguments.of("https://doi.org/bfrhmx", Optional.of(new DOI.LinkSearchTerms("bfrhmx", "bfrhmx"))),
+                Arguments.of("https://doi.org/bfr%68mx", Optional.of(new DOI.LinkSearchTerms("bfrhmx", "bfr%68mx"))),
+                Arguments.of("https://example.org/article/10.1000/182", Optional.empty()),
+                Arguments.of("https://doi.org/10.1000/foo%XX", Optional.empty()),
+                Arguments.of("https://doi.org/10.1000/182 other", Optional.empty()));
+    }
+
     private static Stream<Arguments> testData() {
         return Stream.of(
                 // PlainDoi
@@ -257,6 +275,29 @@ class DOITest {
     @Test
     void isShortDoiShouldReturnTrueWhenItIsShortDoi() {
         assertTrue(new DOI("10/abcde").isShortDoi());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter&utm_medium=email",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308#abstract",
+            "https://doi.org/10.1371/journal.pone.0000308, https://dx.doi.org/10.1371/journal.pone.0000308?utm_source=newsletter",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org:443/10.1371/journal.pone.0000308?utm_source=newsletter",
+            "https://doi.org/10/gf4gqc, https://doi.org/10/gf4gqc?utm_source=newsletter",
+            "https://doi.org/10/bfrhmx, doi.org/bfrhmx?utm_source=x",
+            "https://doi.org/10/bfrhmx, https://doi.org/bfrhmx?utm_source=x",
+            "https://doi.org/10/bfrhmx, www.doi.org/bfrhmx?utm_source=x",
+            // an encoded question mark is part of the DOI and must be kept
+            "https://doi.org/10.1006/rwei.1999%3F.0001, https://doi.org/10.1006/rwei.1999%3F.0001"
+    })
+    void parseRemovesTrackingParametersFromDoiUrl(String expected, String input) {
+        assertEquals(expected, DOI.parse(input).get().getURIAsASCIIString());
+    }
+
+    @Test
+    void parseKeepsDoiInQueryOfNonResolverUrl() {
+        assertEquals("10.5220/0010404301780189", DOI.parse("https://www.scitepress.org/Link.aspx?doi=10.5220/0010404301780189").get().asString());
     }
 
     @Test

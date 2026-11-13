@@ -102,6 +102,10 @@ public class Launcher {
             JabRefGUI.setup(uiCommands, preferences);
             JabRefGUI.launch(JabRefGUI.class, args);
         } catch (Throwable throwable) {
+            if (LOGGER == null) {
+                // initLogging itself failed; fall back to an unconfigured logger so the cause is not hidden by a NullPointerException
+                LOGGER = LoggerFactory.getLogger(Launcher.class);
+            }
             LOGGER.error("Could not launch JabRef", throwable);
             throw throwable;
         }

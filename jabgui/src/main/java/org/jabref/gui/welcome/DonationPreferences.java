@@ -5,20 +5,23 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class DonationPreferences {
     private final BooleanProperty neverShowAgain = new SimpleBooleanProperty();
-    private final IntegerProperty lastShownEpochDay = new SimpleIntegerProperty();
+    private final IntegerProperty nextNotificationEpochDay = new SimpleIntegerProperty();
 
-    public DonationPreferences(boolean neverShowAgain, int lastShownEpochDay) {
+    public DonationPreferences(boolean neverShowAgain, int nextNotificationEpochDay) {
         this.neverShowAgain.set(neverShowAgain);
-        this.lastShownEpochDay.set(lastShownEpochDay);
+        this.nextNotificationEpochDay.set(nextNotificationEpochDay);
     }
 
     ///  Creates object with default values
     private DonationPreferences() {
         this(
                 false,                    // Donation never show again
-                -1);                      // Donation last shown epoch day
+                -1);                      // No donation notification scheduled yet
     }
 
     public static DonationPreferences getDefault() {
@@ -37,15 +40,15 @@ public class DonationPreferences {
         return neverShowAgain;
     }
 
-    public int getLastShownEpochDay() {
-        return lastShownEpochDay.get();
+    public int getNextNotificationEpochDay() {
+        return nextNotificationEpochDay.get();
     }
 
-    public void setLastShownEpochDay(int value) {
-        this.lastShownEpochDay.set(value);
+    public void setNextNotificationEpochDay(int value) {
+        this.nextNotificationEpochDay.set(value);
     }
 
-    public IntegerProperty lastShownEpochDayProperty() {
-        return lastShownEpochDay;
+    public IntegerProperty nextNotificationEpochDayProperty() {
+        return nextNotificationEpochDay;
     }
 }

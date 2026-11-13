@@ -1,5 +1,6 @@
 package org.jabref.logic.formatter;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,12 +16,15 @@ class FormattersTest {
     /// and a save action stored under its key in a `.bib` file does not resolve back to it.
     @Test
     void allFormattersAreRegistered() {
-        try (ScanResult scanResult = new ClassGraph().enableClassInfo().acceptPackages("org.jabref.logic").scan()) {
-            Set<String> expected = scanResult.getSubclasses(Formatter.class.getName())
-                                             .filter(classInfo -> !classInfo.isAbstract() && !classInfo.isAnonymousInnerClass())
-                                             .getNames()
-                                             .stream()
-                                             .collect(Collectors.toSet());
+        try (ScanResult scanResult = new ClassGraph()
+                .enableClasspath()
+                .enableNonSystemModules()
+                .enableClassInfo()
+                .acceptPackages("org.jabref.logic")
+                .scan()) {
+            Set<String> expected = new HashSet<>(scanResult.getAllSubclasses(Formatter.class.getName())
+                                                           .filter(classInfo -> !classInfo.isAbstract() && !classInfo.isAnonymousClass())
+                                                           .getNames());
             expected.removeAll(Set.of(
                     // Need configuration
                     "org.jabref.logic.formatter.bibtexfields.RegexFormatter",
