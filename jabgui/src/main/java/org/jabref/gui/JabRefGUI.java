@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Pair;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.JabRefFrame;
@@ -56,6 +57,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -249,11 +251,11 @@ public class JabRefGUI extends Application {
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
 
-        stateManager.getRunningBackgroundTasks().addListener((ListChangeListener<? super Task<?>>) change -> {
+        stateManager.getRunningBackgroundTasksPairs().addListener((ListChangeListener<? super Pair<BackgroundTask<?>, Task<?>>>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    for (Task<?> task : change.getAddedSubList()) {
-                        dialogService.notify(new Notifications.TaskNotification(task));
+                    for (Pair<BackgroundTask<?>, Task<?>> pair : change.getAddedSubList()) {
+                        dialogService.notify(new Notifications.TaskNotification(pair.getValue(), pair.getKey()));
                     }
                 }
             }

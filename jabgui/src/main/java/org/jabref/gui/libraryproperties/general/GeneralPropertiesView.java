@@ -89,9 +89,12 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
         librarySpecificFileDirectoryTooltip.setText(Localization.lang("Library-specific file directory"));
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());
+        librarySpecificFileDirectory.promptTextProperty().bind(viewModel.librarySpecificDirectoryPromptProperty());
 
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
+        userSpecificFileDirectory.promptTextProperty().bind(viewModel.userSpecificFileDirectoryPromptProperty());
         latexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        latexFileDirectory.promptTextProperty().bind(viewModel.laTexFileDirectoryPromptProperty());
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
         // Limit the keyword separator to a single character (same as the global preference control)
         UnaryOperator<TextFormatter.Change> singleCharacterFilter =
