@@ -28,7 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
-    api(platform("com.konghq:unirest-java-bom:4.11.4"))
+    api(platform("com.konghq:unirest-java-bom:4.11.5"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.23.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
