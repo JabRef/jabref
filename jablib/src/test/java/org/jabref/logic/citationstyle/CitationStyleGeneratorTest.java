@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -317,6 +318,32 @@ class CitationStyleGeneratorTest {
 
         String actualCitation = CitationStyleGenerator.generateBibliography(List.of(firstEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, bibDatabaseContext, ENTRY_TYPES_MANAGER).getFirst();
         assertEquals(expectedCitation, actualCitation);
+    }
+
+    @Test
+    void handleXDataFields() {
+        BibEntry xdataEntry = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("CAT")
+                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                .withField(StandardField.ADDRESS, "Reading, MA")
+                .withField(StandardField.SERIES, "Computers and Typesetting");
+
+        BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("Knuth")
+                .withField(StandardField.TITLE, "The TeX Book")
+                .withField(StandardField.YEAR, "1984")
+                .withField(StandardField.AUTHOR, "Knuth, Donald E.")
+                .withField(StandardField.XDATA, "CAT")
+                .withField(StandardField.NUMBER, "1");
+
+        String expectedCitation = "[1]D. E. Knuth, The TeX Book. in Computers and Typesetting. Reading, MA: Addison-Wesley, 1984.\n";
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(xdataEntry, bookEntry)));
+
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+        assertEquals(expectedCitation, CitationStyleGenerator.generateBibliography(List.of(bookEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, bibDatabaseContext, ENTRY_TYPES_MANAGER).getFirst());
+
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+        assertEquals(expectedCitation, CitationStyleGenerator.generateBibliography(List.of(bookEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, bibDatabaseContext, ENTRY_TYPES_MANAGER).getFirst());
     }
 
     static Stream<Arguments> cslMapping() {
