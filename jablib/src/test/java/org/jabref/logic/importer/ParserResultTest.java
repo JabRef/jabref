@@ -93,7 +93,28 @@ class ParserResultTest {
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        assertEquals("Line 1: Found corrupted citation key  (comma missing).", parserResult.warnings().getFirst());
+        assertEquals("Line 1: Found corrupted citation key myArticle (comma missing).", parserResult.warnings().getFirst());
+    }
+
+    @Test
+    void warningAddedForSpaceInsideCitationKeyImport(@TempDir Path tmpDir) throws IOException {
+        // Citation key "my Article" contains a space and the comma is missing, so this goes through fixKey() and not isFieldsAssignmentNext()
+        String bibtexEntry = """
+                @article{my Article\s
+                   author    = "Author Name",
+                   title     = "Title of the Article",
+                   journal   = "Journal Name",
+                   year      = "2024",
+                   pages     = "1-10",
+                   publisher = "Publisher Name"
+                 }
+                """;
+        Path tempFile = tmpDir.resolve("invalidBibTex.bib");
+        Files.write(tempFile, bibtexEntry.getBytes());
+        ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+
+        assertEquals("Line 1: Found corrupted citation key Article  (comma missing).", parserResult.warnings().getFirst());
+        assertEquals("myArticle", parserResult.getDatabase().getEntries().getFirst().getCitationKey().orElseThrow());
     }
 
     @Test
@@ -112,7 +133,7 @@ class ParserResultTest {
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        assertEquals("Line 2: Found corrupted citation key .", parserResult.warnings().getFirst());
+        assertEquals("Line 1: Found corrupted citation key myArticle (comma missing).", parserResult.warnings().getFirst());
     }
 
     @Test
