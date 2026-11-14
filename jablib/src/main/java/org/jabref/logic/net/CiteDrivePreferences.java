@@ -33,7 +33,7 @@ public class CiteDrivePreferences {
     private final ObjectProperty<@Nullable RefreshToken> refreshToken;
     private final BooleanProperty persistRefreshToken;
 
-    /// CiteDrive REST API (OAuth and push endpoints); the dev server until CiteDrive goes live
+    /// CiteDrive REST API (OAuth and push endpoints)
     private final StringProperty apiBaseUrl;
     /// CiteDrive web app, where the user completes an import
     private final StringProperty appBaseUrl;
@@ -53,13 +53,14 @@ public class CiteDrivePreferences {
     }
 
     // Creates object with default preference values
+    // [impl->req~citedrive.production-defaults~1]
     private CiteDrivePreferences() {
         this(
                 false, // CiteDrive is opt-in
                 null,  // no refresh token
                 true, // store in keychain
-                "https://api-dev.citedrive.com/",
-                "https://app-dev.citedrive.com/"
+                "https://api.citedrive.com/",
+                "https://app.citedrive.com/"
         );
     }
 
@@ -157,6 +158,10 @@ public class CiteDrivePreferences {
     /// Web page where the user picks which of the pushed entries to import into a CiteDrive project
     public URI getImportPage() {
         return URLUtil.createUri(getAppBaseUrl()).resolve("jabref/import/");
+    }
+
+    public URI getExportPage() {
+        return URLUtil.createUri(getAppBaseUrl()).resolve("jabref/export");
     }
 
     public final synchronized @Nullable RefreshToken getRefreshToken() {

@@ -1,5 +1,6 @@
 package org.jabref.logic.net;
 
+import java.net.URI;
 import java.util.Optional;
 
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
@@ -13,6 +14,24 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @NullMarked
 class CiteDrivePreferencesTest {
+
+    @Test
+    void defaultAddressesUseProductionServer() {
+        // [utest->req~citedrive.production-defaults~1]
+        CiteDrivePreferences preferences = CiteDrivePreferences.getDefault();
+
+        assertEquals("https://api.citedrive.com/", preferences.getApiBaseUrl());
+        assertEquals("https://app.citedrive.com/", preferences.getAppBaseUrl());
+        assertEquals(URI.create("https://app.citedrive.com/jabref/export"), preferences.getExportPage());
+    }
+
+    @Test
+    void exportPageUsesConfiguredWebAddress() {
+        CiteDrivePreferences preferences = CiteDrivePreferences.getDefault();
+        preferences.setAppBaseUrl("https://app.example/");
+
+        assertEquals(URI.create("https://app.example/jabref/export"), preferences.getExportPage());
+    }
 
     @ParameterizedTest
     @CsvSource({
