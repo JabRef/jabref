@@ -90,6 +90,7 @@ public class PreferencesMigrations {
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         upgradeBuiltinPreviewName(preferences);
+        upgradeLegacyCustomPreviewStyle(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
         // backward compatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
@@ -470,7 +471,6 @@ public class PreferencesMigrations {
     /// - Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
     /// - Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
     /// - Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
-    ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
         String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, TextBasedPreviewLayout.DEFAULT);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
@@ -778,5 +778,26 @@ public class PreferencesMigrations {
         }
 
         preferences.getWorkspacePreferences().setCustomTheme(StyleSheet.create(theme));
+    }
+
+    /// The customized preview styles are stored as a numbered series (`previewStyleCustomizedId0`, ...).
+    /// Before that, a single customized style lived under `previewStyle`; it is moved into the series once.
+    /// JabRefGuiPreferences#PREVIEW_STYLE_CUSTOMIZED_MIGRATED is written once and never purged, so an
+    /// emptied list is not migrated again on a later startup.
+    static public void upgradeLegacyCustomPreviewStyle(JabRefCliPreferences prefs) {
+        if (prefs.hasKey(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0")
+                || prefs.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false)) {
+            return;
+        }
+        prefs.putBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);
+
+        String legacyText = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, "");
+        if (StringUtil.isBlank(legacyText) || TextBasedPreviewLayout.DEFAULT.equals(legacyText)) {
+            return;
+        }
+        // Legacy PREVIEW_CYCLE entries reference TextBasedPreviewLayout.NAME, so it doubles as the migrated id
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0", TextBasedPreviewLayout.NAME);
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_NAME + "0", TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME);
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_TEXT + "0", legacyText.replace("\n", "__NEWLINE__"));
     }
 }
