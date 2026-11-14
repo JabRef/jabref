@@ -61,6 +61,9 @@ public interface UndoManager {
     /// so here, or the library looks saved. Saving is what clears it again.
     void markChanged();
 
+    /// Whether there is an undoable step, i.e. whether the library was edited through the undo manager
+    boolean canUndo();
+
     /// Suspends undo and redo for this library while the caller applies changes it has not yet
     /// handed over. The undo UI reads the other end of this through `GuiUndoManager#suspendedBy`.
     ///

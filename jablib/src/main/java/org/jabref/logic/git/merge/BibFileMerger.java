@@ -33,6 +33,9 @@ import org.jspecify.annotations.NullMarked;
 /// The result is written by JabRef's `.bib` writer, which reproduces only what the parser
 /// understood. [MergePreconditions] therefore refuses the merge when writing would lose content,
 /// and `current` is left untouched then.
+///
+/// A library open in JabRef whose file changes on disk is merged the same way, with an in-memory ancestor instead
+/// of a merge-base commit: see [org.jabref.logic.sync.LibraryBaseline].
 @NullMarked
 public final class BibFileMerger {
 
