@@ -156,7 +156,7 @@ Needs: impl
 Pressing the "Close dialog" key binding in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
 Its default is <kbd>Esc</kbd>; users can change it in the key binding preferences.
 Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
-Currently, this is only the PDF viewer ("Document viewer").
+Currently, this is only the PDF viewer ("Document viewer") and the Citation Entry Review.
 
 Needs: impl, utest
 
@@ -249,12 +249,46 @@ Walkthroughs that require preferences must open the preferences dialog directly,
 
 Needs: impl
 
+## Preferences search must bring the first visible match in the selected tab into view
+`req~ux.preferences.search-scroll~1`
+
+When a selected tab contains visible matches for the search, the first match is brought into view, including on the first visit to the tab.
+
+See <https://github.com/JabRef/jabref/pull/17012>.
+
+Needs: impl, utest
+
+## API-key test results must apply only to the tested key
+`req~ux.preferences.api-key-test-result~1`
+
+In Web search preferences, a test result must not change the validation state or report a result for a different current key.
+Clearing the key remains allowed even if an earlier test fails.
+
+Needs: impl, utest
+
 ## Groups walkthrough must prepare example library and groups UI state
 `req~ux.walkthrough.groups-preparation~1`
 
 The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
 
 Needs: impl
+
+## Text editing shortcuts must respect line boundaries
+`req~ux.text-editing.line-boundaries~2`
+
+In multiline entry fields, beginning-of-line and end-of-line shortcuts move within the current newline-delimited line.
+Document navigation shortcuts continue to move to the beginning or end of the whole field.
+In entry fields and the source editor, kill-line removes text from the caret to the next newline, preserving subsequent lines.
+At a line end, kill-line removes the newline and joins the following line; at the document end, it leaves the text unchanged.
+
+Needs: impl, utest
+
+## Vertical text navigation shortcuts must move across visible lines
+`req~ux.text-editing.visual-line-navigation~1`
+
+In multiline entry fields and the source editor, up and down shortcuts move the caret to the adjacent visible line, including within wrapped text.
+
+Needs: impl, utest
 
 ## Donation prompt returns every six months
 `req~ux.donation.recurring-prompt~1`
@@ -282,6 +316,18 @@ Needs: impl, utest
 
 When a user assigns a keyboard shortcut that is already used by other actions, JabRef warns the user, names these actions and lets the user cancel,
 keep both or replace the existing assignments ([#17240](https://github.com/JabRef/jabref/issues/17240)).
+
+Needs: impl, utest
+
+## Finished tasks do not look like they are still running
+`req~ux.notifications.finished-task~1`
+
+A task notification never keeps a running progress bar after its task ended:
+
+- A successful task keeps its notification with full progress until the user dismisses it.
+- A failed task whose own error message is already shown to the user loses its notification.
+- Any other failed task turns into an error notification, without the exception text.
+- A cancelled task, and a finished task without a title, loses its notification.
 
 Needs: impl, utest
 
