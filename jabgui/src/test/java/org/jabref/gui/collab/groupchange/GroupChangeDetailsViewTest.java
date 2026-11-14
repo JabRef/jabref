@@ -1,13 +1,23 @@
 package org.jabref.gui.collab.groupchange;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
+import javafx.scene.Scene;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.collab.DatabaseChangeDetailsView;
+import org.jabref.gui.collab.DatabaseChangeDetailsViewFactory;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.model.groups.ExplicitGroup;
@@ -17,6 +27,7 @@ import org.jabref.model.metadata.MetaData;
 
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,13 +36,40 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @NullMarked
 @ResourceLock("Localization.lang")
 @ExtendWith(JavaFxExtension.class)
 class GroupChangeDetailsViewTest {
+
+    // [utest->req~jabgui.autosaveandbackup.reveal-reviewed-file~1]
+    @Test
+    void onDiskLinkRevealsTheComparedBackup() {
+        JavaFxExtension.invokeAndWait(() -> {
+            Path reviewedBackup = Path.of("custom backups", "reading-list-backup.bib");
+            DialogService dialogService = mock();
+            GuiPreferences preferences = mock();
+            ExternalApplicationsPreferences externalApplications = mock();
+            when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplications);
+            GroupChange change = mock();
+            when(change.getName()).thenReturn("Modified groups tree");
+            when(change.getGroupDiff()).thenReturn(GroupDiff.compare(metadata("Old"), metadata("New")).orElseThrow());
+            var factory = new DatabaseChangeDetailsViewFactory(mock(), dialogService, preferences, mock(), mock(), mock(), Optional.of(reviewedBackup));
+
+            DatabaseChangeDetailsView view = factory.create(change);
+            new Scene(view);
+            view.applyCss();
+            Hyperlink header = assertInstanceOf(Hyperlink.class, view.lookup(".hyperlink"));
+            try (var desktop = mockStatic(NativeDesktop.class)) {
+                header.fire();
+                desktop.verify(() -> NativeDesktop.openFolderAndSelectFile(reviewedBackup, externalApplications, dialogService));
+            }
+        });
+    }
 
     @ParameterizedTest
     @EnumSource(DiffHighlighter.BasicDiffMethod.class)

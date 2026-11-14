@@ -1,6 +1,7 @@
 package org.jabref.gui.collab.metedatachange;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
@@ -14,8 +15,8 @@ import org.jabref.logic.l10n.Localization;
 
 public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
-    public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
-        this(metadataChange, globalCitationKeyPatterns, Localization.lang("In JabRef"), Localization.lang("On disk"), DiffHighlighter.BasicDiffMethod.CHARS);
+    public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns, Labeled onDisk) {
+        this(metadataChange, globalCitationKeyPatterns, Localization.lang("In JabRef"), onDisk, DiffHighlighter.BasicDiffMethod.CHARS);
     }
 
     public MetadataChangeDetailsView(MetadataChange metadataChange,
@@ -23,6 +24,14 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                                      String leftLabelText,
                                      String rightLabelText,
                                      DiffHighlighter.BasicDiffMethod diffMethod) {
+        this(metadataChange, globalCitationKeyPatterns, leftLabelText, new Label(rightLabelText), diffMethod);
+    }
+
+    private MetadataChangeDetailsView(MetadataChange metadataChange,
+                                      GlobalCitationKeyPatterns globalCitationKeyPatterns,
+                                      String leftLabelText,
+                                      Labeled onDisk,
+                                      DiffHighlighter.BasicDiffMethod diffMethod) {
         VBox container = new VBox(12);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
@@ -31,7 +40,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
         // Add views for each detected difference
         for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(globalCitationKeyPatterns)) {
-            addDifferenceView(container, diff, metadataChange, leftLabelText, rightLabelText, diffMethod);
+            addDifferenceView(container, diff, metadataChange, leftLabelText, onDisk, diffMethod);
         }
 
         this.setAllAnchorsAndAttachChild(container);
@@ -47,7 +56,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                                    MetaDataDiff.Difference diff,
                                    MetadataChange metadataChange,
                                    String leftLabelText,
-                                   String rightLabelText,
+                                   Labeled onDisk,
                                    DiffHighlighter.BasicDiffMethod diffMethod) {
         Label typeLabel = new Label(getDifferenceString(diff.differenceType()));
         typeLabel.getStyleClass().add("diff-type-label");
@@ -58,7 +67,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
             container.getChildren().add(GroupChangeDetailsView.createGroupDiffSplitPane(
                     metadataChange.getMetaDataDiff().getOriginalMetaData().getGroups(),
                     metadataChange.getMetaDataDiff().getNewMetaData().getGroups(),
-                    leftLabelText, rightLabelText, diffMethod));
+                    leftLabelText, onDisk, diffMethod));
         } else {
             container.getChildren().add(createDefaultDiffScrollPane(diff));
         }

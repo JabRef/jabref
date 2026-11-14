@@ -1,8 +1,10 @@
 package org.jabref.gui.collab;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -44,6 +46,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     private final List<DatabaseChange> changes;
     private final BibDatabaseContext database;
+    private final Optional<Path> backupPath;
 
     private ExternalChangesResolverViewModel viewModel;
 
@@ -61,6 +64,11 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     /// @param changes  The list of changes
     /// @param database The database whose current state is compared and previewed
     public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle) {
+        this(changes, database, dialogTitle, Optional.empty());
+    }
+
+    public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle, Optional<Path> backupPath) {
+        this.backupPath = backupPath;
         this.changes = changes;
         this.database = database;
 
@@ -100,7 +108,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     private void initialize() {
         PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
         previewViewer.setDatabaseContext(database);
-        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, preferences, entryTypesManager, previewViewer, taskExecutor);
+        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, preferences, entryTypesManager, previewViewer, taskExecutor, backupPath);
 
         viewModel = new ExternalChangesResolverViewModel(changes);
 
