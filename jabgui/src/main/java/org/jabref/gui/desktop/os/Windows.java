@@ -3,53 +3,52 @@ package org.jabref.gui.desktop.os;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
+
+import javafx.application.HostServices;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.Directories;
 
-import com.sun.jna.platform.win32.KnownFolders;
-import com.sun.jna.platform.win32.Shell32Util;
-import com.sun.jna.platform.win32.ShlObj;
-import com.sun.jna.platform.win32.Win32Exception;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NullMarked;
 
 /// This class contains Windows specific implementations for file directories and file/application open handling methods.
 ///
 /// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the [JabKit#initLogging].
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration/
+@NullMarked
 public class Windows extends NativeDesktop {
 
-    @Override
-    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
+    /// Explorer truncates its argument at this limit, so a longer argument names nothing and Explorer
+    /// silently falls back to showing the user's Documents folder. The limit counts the terminating
+    /// NUL character, leaving 259 usable characters.
+    private static final int MAX_PATH = 260;
 
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            openFileWithApplication(filePath, type.get().getOpenWithApplication());
-        } else {
-            // quote String so explorer handles URL query strings correctly
-            String quotePath = "\"" + filePath + "\"";
-            new ProcessBuilder("explorer.exe", quotePath).start();
-        }
+    public Windows(HostServices hostServices, GuiPreferences preferences) {
+        super(hostServices, preferences);
+    }
+
+    @Override
+    protected void openFileWithDefaultApplication(String filePath) throws IOException {
+        startProcess(new ProcessBuilder(shellOpenCommand(filePath)));
     }
 
     @Override
     public void openUrlWithSystemHandler(String url) throws IOException {
-        new ProcessBuilder(urlOpenCommand(url)).start();
+        startProcess(new ProcessBuilder(shellOpenCommand(url)));
     }
 
-    /// Explorer truncates its argument at the Windows path limit of 260 characters, which OAuth login URLs exceed.
-    /// The URL protocol handler takes the URL unquoted and without that limit.
-    static List<String> urlOpenCommand(String url) {
-        if (url.length() > 260) {
-            return List.of("rundll32.exe", "url.dll,FileProtocolHandler", url);
+    /// Hands a file path or URL to the registered handler of the shell. Paths of [#MAX_PATH] characters
+    /// or more, which JabRef's generated file names reach easily, and OAuth login URLs go to the URL
+    /// protocol handler, which takes its argument unquoted and without that limit.
+    // [impl->adr~open-long-windows-paths-with-the-url-protocol-handler~1]
+    static List<String> shellOpenCommand(String pathOrUrl) {
+        if (pathOrUrl.length() >= MAX_PATH) {
+            return List.of("rundll32.exe", "url.dll,FileProtocolHandler", pathOrUrl);
         }
         // quote String so explorer handles URL query strings correctly
-        return List.of("explorer.exe", "\"" + url + "\"");
+        return List.of("explorer.exe", "\"" + pathOrUrl + "\"");
     }
 
     @Override
@@ -63,36 +62,30 @@ public class Windows extends NativeDesktop {
     }
 
     @Override
-    public Path getDefaultFileChooserDirectory() {
-        try {
-            try {
-                return Path.of(Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Documents));
-            } catch (UnsatisfiedLinkError _) {
-                // Windows Vista or earlier
-                return Path.of(Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS));
-            }
-        } catch (Win32Exception e) {
-            // needs to be non-static because of org.jabref.Launcher.addLogToDisk
-            LoggerFactory.getLogger(Windows.class).error("Error accessing folder", e);
-            return Path.of(System.getProperty("user.home"));
-        }
-    }
-
-    @Override
-    public void openFileWithApplication(String filePath, String application) throws IOException {
+    protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
         // filePath may be a URL; Path.of would throw on query characters and mangle the scheme
-        new ProcessBuilder(Path.of(application).toString(), filePath).start();
+        startProcess(new ProcessBuilder(Path.of(application).toString(), filePath));
     }
 
     @Override
-    public void openFolderAndSelectFile(Path filePath) throws IOException {
-        new ProcessBuilder("explorer.exe", "/select,", filePath.toString()).start();
+    protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) throws IOException {
+        startProcess(new ProcessBuilder(revealCommand(filePath)));
+    }
+
+    /// Explorer cannot select a file it cannot address: at [#MAX_PATH] characters or more it ignores the
+    /// whole argument and shows the user's Documents folder. Opening the containing folder without the
+    /// selection at least arrives where the file is.
+    static List<String> revealCommand(Path filePath) {
+        String path = filePath.toString();
+        Path parent = filePath.getParent();
+        if (path.length() < MAX_PATH || parent == null) {
+            return List.of("explorer.exe", "/select,", path);
+        }
+        return shellOpenCommand(parent.toString());
     }
 
     @Override
-    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
-        ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
-        process.directory(Path.of(absolutePath).toFile());
-        process.start();
+    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
+        startProcess(new ProcessBuilder("cmd.exe", "/c", "start").directory(Path.of(absolutePath).toFile()));
     }
 }

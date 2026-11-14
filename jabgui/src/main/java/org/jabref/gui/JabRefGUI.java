@@ -23,6 +23,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -130,6 +131,8 @@ public class JabRefGUI extends Application {
             // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
             setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
+            NativeDesktop nativeDesktop = NativeDesktop.create(getHostServices(), preferences);
+            Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
             initialize();
 
@@ -145,7 +148,8 @@ public class JabRefGUI extends Application {
                     taskExecutor,
                     gitHandlerRegistry,
                     journalAbbreviationRepository,
-                    oAuthSessionRegistry);
+                    oAuthSessionRegistry,
+                    nativeDesktop);
 
             openWindow();
 

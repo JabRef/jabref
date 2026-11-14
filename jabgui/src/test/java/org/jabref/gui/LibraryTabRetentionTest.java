@@ -13,6 +13,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
@@ -99,6 +100,7 @@ class LibraryTabRetentionTest {
         Injector.setModelOrService(TaskExecutor.class, new CurrentThreadTaskExecutor());
         Injector.setModelOrService(GuiPreferences.class, preferences);
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
         Injector.setModelOrService(StateManager.class, stateManager);
         Injector.setModelOrService(UndoManager.class, new JabRefUndoManager());
         Injector.setModelOrService(UndoAction.class, mock(UndoAction.class));

@@ -33,8 +33,8 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     @FXML private Button btnBrowse;
     @FXML private Label icon;
     @Inject private DialogService dialogService;
+    @Inject private NativeDesktop nativeDesktop;
 
-    private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(NativeDesktop.get().getApplicationDirectory()).build();
     private final ExternalFileTypeItemViewModel item;
 
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;
@@ -89,6 +89,9 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     @FXML
     private void openFileChooser(ActionEvent event) {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                .build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> viewModel.selectedApplicationProperty().setValue(path.toAbsolutePath().toString()));
     }
 }

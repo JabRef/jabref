@@ -171,7 +171,7 @@ open module org.jabref {
 
     // requires net.harawata.appdirs;
     // requires com.sun.jna;
-    requires com.sun.jna.platform;
+    // requires com.sun.jna.platform;
 
     requires org.eclipse.jgit;
     // uses org.eclipse.jgit.transport.SshSessionFactory;

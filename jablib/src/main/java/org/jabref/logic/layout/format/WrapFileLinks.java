@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.LinkedFile;
+
+import org.jspecify.annotations.Nullable;
 
 /// This formatter iterates over all file links, or all file links of a specified
 /// type, outputting a format string given as the first argument. The format string
@@ -106,11 +109,11 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private final Map<String, String> replacements = new HashMap<>();
     private final List<Path> fileDirectories;
-    private final Path mainFileDirectory;
+    private final @Nullable Path mainFileDirectory;
     private String fileType;
     private List<FormatEntry> format;
 
-    public WrapFileLinks(List<Path> fileDirectories, Path mainFileDirectory) {
+    public WrapFileLinks(List<Path> fileDirectories, @Nullable Path mainFileDirectory) {
         this.fileDirectories = fileDirectories;
         this.mainFileDirectory = mainFileDirectory;
     }
@@ -202,12 +205,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             sb.append(piv);
                             break;
                         case FILE_PATH:
-                            List<Path> dirs;
-                            if (fileDirectories.isEmpty()) {
-                                dirs = List.of(mainFileDirectory);
-                            } else {
-                                dirs = fileDirectories;
-                            }
+                            // The main file directory is unset by default
+                            List<Path> dirs = fileDirectories.isEmpty()
+                                              ? Optional.ofNullable(mainFileDirectory).map(List::of).orElseGet(List::of)
+                                              : fileDirectories;
 
                             String pathString = flEntry.findIn(dirs)
                                                        .map(path -> path.toAbsolutePath().toString())

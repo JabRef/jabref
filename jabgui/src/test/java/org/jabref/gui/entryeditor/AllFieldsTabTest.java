@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
@@ -145,6 +146,7 @@ class AllFieldsTabTest {
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
         Injector.setModelOrService(GuiPreferences.class, preferences);
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
         Injector.setModelOrService(StateManager.class, stateManager);
         Injector.setModelOrService(UndoManager.class, new JabRefUndoManager());
         // Reset the static clipboards: another test may have left a cleared Mockito mock behind.
