@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -22,9 +23,12 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
+import org.jabref.logic.cleanup.CleanupJob;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
@@ -34,6 +38,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +70,16 @@ public class RelatedArticlesTab extends EntryEditorTab {
         setTooltip(new Tooltip(Localization.lang("Related articles")));
     }
 
+    private void applyJournalAbbreviation(List<BibEntry> entries, Optional<BibDatabaseContext> databaseContext) {
+        JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+
+        Optional<CleanupJob> cleanupJob = AbbreviateCleanupFactory.abbreviateCleanup(
+                databaseContext.map(BibDatabaseContext::getDatabase), repository,
+                preferences.getAbbreviationPreferences());
+
+        cleanupJob.ifPresent(job -> entries.forEach(job::cleanup));
+    }
+
     /// Gets a StackPane of related article information to be displayed in the Related Articles tab
     ///
     /// @param entry The currently selected BibEntry on the JabRef UI.
@@ -84,11 +99,14 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 preferences.getWorkspacePreferences().getLanguage().name(),
                 buildInfo.version,
                 preferences.getMrDlibPreferences());
+
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-
+                    applyJournalAbbreviation(relatedArticles, databaseContext);
                     ImportCleanup cleanup = ImportCleanup.targeting(mode, preferences.getFieldPreferences());
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);

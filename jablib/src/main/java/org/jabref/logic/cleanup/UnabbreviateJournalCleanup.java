@@ -2,6 +2,7 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -18,10 +19,15 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class UnabbreviateJournalCleanup implements CleanupJob {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final BibDatabase database;
+    private final Optional<BibDatabase> database;
 
     public UnabbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository) {
-        this.database = database;
+        this.database = Optional.of(database);
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
+    }
+
+    public UnabbreviateJournalCleanup(JournalAbbreviationRepository journalAbbreviationRepository) {
+        this.database = Optional.empty();
         this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
@@ -47,7 +53,7 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
 
         String text = entry.getFieldLatexFree(field).orElse("");
         String origText = text;
-        text = database.resolveForStrings(origText);
+        text = database.map(db -> db.resolveForStrings(origText)).orElse(origText);
 
         if (!journalAbbreviationRepository.isKnownName(text)) {
             return List.of(); // Cannot do anything if it is not known.

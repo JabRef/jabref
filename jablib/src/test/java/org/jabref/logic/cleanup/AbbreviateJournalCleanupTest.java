@@ -14,6 +14,9 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +25,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 public class AbbreviateJournalCleanupTest {
     private AbbreviateJournalCleanup cleanupWithoutFJournal;
     private AbbreviateJournalCleanup cleanupWithFJournal;
+    private AbbreviateJournalCleanup cleanupWithoutDatabaseOrFJournal;
+    private AbbreviateJournalCleanup cleanupWithoutDatabase;
 
     private JournalAbbreviationRepository repositoryMock;
     private BibDatabase databaseMock;
@@ -37,13 +42,24 @@ public class AbbreviateJournalCleanupTest {
 
         cleanupWithoutFJournal = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT, false);
         cleanupWithFJournal = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT, true);
+        cleanupWithoutDatabaseOrFJournal = new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DEFAULT, false);
+        cleanupWithoutDatabase = new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DEFAULT, true);
     }
 
-    @Test
-    void repositoryDoesNotRecognizeJournalNameNoChange() {
+    @ParameterizedTest
+    @CsvSource({
+            "true, true",
+            "true, false",
+            "false, true",
+            "false, false"
+    })
+    void repositoryDoesNotRecognizeJournalNameNoChange(boolean withDatabase, boolean useFJournalField) {
+        AbbreviateJournalCleanup cleanup = withDatabase
+                                           ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT, useFJournalField)
+                                           : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DEFAULT, useFJournalField);
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Some Unknown Journal");
 
-        List<FieldChange> changes = cleanupWithoutFJournal.cleanup(entry);
+        List<FieldChange> changes = cleanup.cleanup(entry);
 
         assertEquals(List.of(), changes);
 
@@ -52,13 +68,15 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalSuccessfulWithFJournalFalse() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalSuccessfulWithFJournalFalse(boolean withDatabase) {
         Abbreviation abbreviation = new Abbreviation("Journal of Foo", "J. Foo");
         Mockito.when(repositoryMock.get("Journal of Foo")).thenReturn(Optional.of(abbreviation));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Journal of Foo");
-        List<FieldChange> changes = cleanupWithoutFJournal.cleanup(entry);
+        AbbreviateJournalCleanup cleanup = withDatabase ? cleanupWithoutFJournal : cleanupWithoutDatabaseOrFJournal;
+        List<FieldChange> changes = cleanup.cleanup(entry);
 
         List<FieldChange> expected = List.of(
                 new FieldChange(entry, StandardField.JOURNAL, "Journal of Foo", "J. Foo")
@@ -70,13 +88,15 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalAlreadyAbbreviatedNoChange() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalAlreadyAbbreviatedNoChange(boolean withDatabase) {
         Abbreviation abbreviation = new Abbreviation("Journal of Foo", "J. Foo");
         Mockito.when(repositoryMock.get("J. Foo")).thenReturn(Optional.of(abbreviation));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "J. Foo");
-        List<FieldChange> changes = cleanupWithoutFJournal.cleanup(entry);
+        AbbreviateJournalCleanup cleanup = withDatabase ? cleanupWithoutFJournal : cleanupWithoutDatabaseOrFJournal;
+        List<FieldChange> changes = cleanup.cleanup(entry);
 
         assertEquals(List.of(), changes);
 
@@ -85,13 +105,15 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalAndSetFJournal() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalAndSetFJournal(boolean withDatabase) {
         Abbreviation abbreviation = new Abbreviation("Canadian Journal of Math", "Can. J. Math.");
         Mockito.when(repositoryMock.get("Canadian Journal of Math")).thenReturn(Optional.of(abbreviation));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Canadian Journal of Math");
-        List<FieldChange> changes = cleanupWithFJournal.cleanup(entry);
+        AbbreviateJournalCleanup cleanup = withDatabase ? cleanupWithFJournal : cleanupWithoutDatabase;
+        List<FieldChange> changes = cleanup.cleanup(entry);
 
         List<FieldChange> expected = List.of(
                 new FieldChange(entry, AMSField.FJOURNAL, null, "Canadian Journal of Math"),
@@ -105,13 +127,15 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalTitleField() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalTitleField(boolean withDatabase) {
         Abbreviation abbreviation = new Abbreviation("Physical Review Letters", "Phys. Rev. Lett.");
         Mockito.when(repositoryMock.get("Physical Review Letters")).thenReturn(Optional.of(abbreviation));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNALTITLE, "Physical Review Letters");
-        List<FieldChange> changes = cleanupWithoutFJournal.cleanup(entry);
+        AbbreviateJournalCleanup cleanup = withDatabase ? cleanupWithoutFJournal : cleanupWithoutDatabaseOrFJournal;
+        List<FieldChange> changes = cleanup.cleanup(entry);
 
         List<FieldChange> expected = List.of(
                 new FieldChange(entry, StandardField.JOURNALTITLE, "Physical Review Letters", "Phys. Rev. Lett.")
@@ -134,8 +158,9 @@ public class AbbreviateJournalCleanupTest {
         Mockito.verify(databaseMock).resolveForStrings("Journal of Foo");
     }
 
-    @Test
-    void oldFJournalIsOverwrittenWhenUseFJournalIsTrue() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void oldFJournalIsOverwrittenWhenUseFJournalIsTrue(boolean withDatabase) {
         Abbreviation abbreviation = new Abbreviation("Journal of Foo", "J. Foo");
         Mockito.when(repositoryMock.get("Journal of Foo")).thenReturn(Optional.of(abbreviation));
 
@@ -143,7 +168,8 @@ public class AbbreviateJournalCleanupTest {
                 .withField(StandardField.JOURNAL, "Journal of Foo")
                 .withField(AMSField.FJOURNAL, "Some old text");
 
-        List<FieldChange> changes = cleanupWithFJournal.cleanup(entry);
+        AbbreviateJournalCleanup cleanup = withDatabase ? cleanupWithFJournal : cleanupWithoutDatabase;
+        List<FieldChange> changes = cleanup.cleanup(entry);
 
         List<FieldChange> expected = List.of(
                 new FieldChange(entry, AMSField.FJOURNAL, "Some old text", "Journal of Foo"),
@@ -217,18 +243,37 @@ public class AbbreviateJournalCleanupTest {
     }
 
     @Test
-    void repositoryReturnsSameStringNoChanges() {
+    void resolveStringsWithoutDatabaseNoChange() {
+        Abbreviation abbreviation = new Abbreviation("Journal of Foo", "J. Foo");
+        Mockito.when(repositoryMock.get("Journal of Foo")).thenReturn(Optional.of(abbreviation));
+        Mockito.when(databaseMock.resolveForStrings("MACRO_JOURNAL")).thenReturn("Journal of Foo");
+
+        BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "MACRO_JOURNAL");
+        List<FieldChange> changes = cleanupWithoutDatabaseOrFJournal.cleanup(entry);
+
+        assertEquals(List.of(), changes);
+
+        BibEntry expectedEntry = new BibEntry()
+                .withField(StandardField.JOURNAL, "MACRO_JOURNAL");
+        assertEquals(expectedEntry, entry);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void repositoryReturnsSameStringNoChanges(boolean withDatabase) {
         Abbreviation abbreviation = new Abbreviation("Journal of Foo", "Journal of Foo");
         Mockito.when(repositoryMock.get("Journal of Foo")).thenReturn(Optional.of(abbreviation));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Journal of Foo");
-        List<FieldChange> changes = cleanupWithFJournal.cleanup(entry);
+        AbbreviateJournalCleanup cleanup = withDatabase ? cleanupWithFJournal : cleanupWithoutDatabase;
+        List<FieldChange> changes = cleanup.cleanup(entry);
 
         assertEquals(List.of(), changes);
     }
 
-    @Test
-    void journalTitleAndJournalBothRecognized() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void journalTitleAndJournalBothRecognized(boolean withDatabase) {
         Abbreviation abbreviationJournal = new Abbreviation("Journal of Bar", "J. Bar");
         Abbreviation abbreviationTitle = new Abbreviation("Review Letters", "Rev. Lett.");
 
@@ -239,7 +284,7 @@ public class AbbreviateJournalCleanupTest {
                 .withField(StandardField.JOURNAL, "Journal of Bar")
                 .withField(StandardField.JOURNALTITLE, "Review Letters");
 
-        AbbreviateJournalCleanup testCleanup = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT, true);
+        AbbreviateJournalCleanup testCleanup = withDatabase ? cleanupWithFJournal : cleanupWithoutDatabase;
         List<FieldChange> changes = testCleanup.cleanup(entry);
 
         List<FieldChange> expected = List.of(
@@ -259,13 +304,16 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalDotlessNoFjournal() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalDotlessNoFjournal(boolean withDatabase) {
         Abbreviation abbr = new Abbreviation("Long Name", "L. N.", "LN");
         Mockito.when(repositoryMock.get("Long Name")).thenReturn(Optional.of(abbr));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Long Name");
-        AbbreviateJournalCleanup dotlessCleanup = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, false);
+        AbbreviateJournalCleanup dotlessCleanup = withDatabase
+                                                  ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, false)
+                                                  : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DOTLESS, false);
 
         List<FieldChange> changes = dotlessCleanup.cleanup(entry);
 
@@ -279,13 +327,16 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalDotlessWithFjournal() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalDotlessWithFjournal(boolean withDatabase) {
         Abbreviation abbr = new Abbreviation("Long Name", "L. N.", "LN");
         Mockito.when(repositoryMock.get("Long Name")).thenReturn(Optional.of(abbr));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Long Name");
-        AbbreviateJournalCleanup dotlessCleanup = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, true);
+        AbbreviateJournalCleanup dotlessCleanup = withDatabase
+                                                  ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, true)
+                                                  : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DOTLESS, true);
 
         List<FieldChange> changes = dotlessCleanup.cleanup(entry);
 
@@ -301,13 +352,16 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalShortestUniqueNoFjournal() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalShortestUniqueNoFjournal(boolean withDatabase) {
         Abbreviation abbr = new Abbreviation("Physical Review Letters", "Phys. Rev. Lett.", "PRL");
         Mockito.when(repositoryMock.get("Physical Review Letters")).thenReturn(Optional.of(abbr));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Physical Review Letters");
-        AbbreviateJournalCleanup shortestCleanup = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, false);
+        AbbreviateJournalCleanup shortestCleanup = withDatabase
+                                                   ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, false)
+                                                   : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.SHORTEST_UNIQUE, false);
 
         List<FieldChange> changes = shortestCleanup.cleanup(entry);
 
@@ -321,13 +375,16 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void abbreviateJournalShortestUniqueWithFjournal() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void abbreviateJournalShortestUniqueWithFjournal(boolean withDatabase) {
         Abbreviation abbr = new Abbreviation("Physical Review Letters", "Phys. Rev. Lett.", "PRL");
         Mockito.when(repositoryMock.get("Physical Review Letters")).thenReturn(Optional.of(abbr));
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Physical Review Letters");
-        AbbreviateJournalCleanup shortestCleanup = new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, true);
+        AbbreviateJournalCleanup shortestCleanup = withDatabase
+                                                   ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, true)
+                                                   : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.SHORTEST_UNIQUE, true);
 
         List<FieldChange> changes = shortestCleanup.cleanup(entry);
 
@@ -343,8 +400,9 @@ public class AbbreviateJournalCleanupTest {
         assertEquals(expectedEntry, entry);
     }
 
-    @Test
-    void ampersandStaysEscaped() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void ampersandStaysEscaped(boolean withDatabase) {
         Abbreviation abbr = new Abbreviation("Aachen & Berlin", "A & B", "AB");
         Mockito.when(repositoryMock.get("A & B")).thenReturn(Optional.of(abbr));
         Mockito.when(repositoryMock.get("A \\& B")).thenReturn(Optional.of(abbr));
@@ -353,8 +411,12 @@ public class AbbreviateJournalCleanupTest {
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "A \\& B");
         BibEntry expected = new BibEntry(entry).withField(AMSField.FJOURNAL, "Aachen \\& Berlin");
-        new UnabbreviateJournalCleanup(databaseMock, repositoryMock).cleanup(entry);
-        new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DEFAULT, true).cleanup(entry);
+        UnabbreviateJournalCleanup unabbreviateCleanup = withDatabase
+                                                         ? new UnabbreviateJournalCleanup(databaseMock, repositoryMock)
+                                                         : new UnabbreviateJournalCleanup(repositoryMock);
+        AbbreviateJournalCleanup abbreviateCleanup = withDatabase ? cleanupWithFJournal : cleanupWithoutDatabase;
+        unabbreviateCleanup.cleanup(entry);
+        abbreviateCleanup.cleanup(entry);
         assertEquals(expected, entry);
     }
 }
