@@ -10,7 +10,7 @@ parent: Decision Records
 JabRef's [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration) supports [CSL styles](https://citationstyles.org/) and [JStyles](https://jstyles.jabref.org/), but not [BST](https://text2bib.org/bsts) (BibTeX style) files, although many publishers still distribute only `.bst`.
 Initial BST support existed in the OpenOffice panel but was removed as unfinished ([#602](https://github.com/JabRef/jabref/pull/602), tracked in [#624](https://github.com/JabRef/jabref/issues/624)); the [stated blocker](https://github.com/JabRef/jabref/pull/602#issuecomment-167756642) was that `.bst` files such as `IEEEtran.bst` emit "quite a bit of non-trivial latex code to parse".
 
-Supporting BST in LibreOffice documents is the goal. The open question is: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
+Supporting BST in LibreOffice documents is the goal. The open question is: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextWriter` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
 **How do we convert BST's LaTeX output into `OOText`?**
 
 Every option below produces BST-styled citations in a LibreOffice document. They differ only in who parses the LaTeX and what formatting survives.
@@ -21,7 +21,7 @@ Every option below produces BST-styled citations in a LibreOffice document. They
 * Preservation of semantic formatting (italics, bold, small caps) rather than flattening to plain text
 * Long-term maintenance burden of any LaTeX parser JabRef would own
 * Dependency footprint and portability across Windows, macOS, and Linux
-* Reuse of existing, reviewed JabRef code (`CSLFormatUtils.transformHTML`, `OOTextIntoOO`, the numbering logic in `CSLReferenceMarkManager`)
+* Reuse of existing, reviewed JabRef code (`CSLFormatUtils.transformHTML`, `OOTextWriter`, the numbering logic in `CSLReferenceMarkManager`)
 * The feature has stalled twice; a credible answer to the known blocker is required
 
 ## Considered Options
@@ -103,7 +103,7 @@ A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `
 
 ### Hybrid: Pandoc primary with SnuggleTeX-based pure-Java fallback
 
-Description: keep Pandoc as the primary converter; when it is not available, fall back to a limited, in-process path leveraging SnuggleTeX-backed LaTeX→Unicode and preview-style transforms for inline emphasis/quotes. The fallback would map only the subset supported by `OOTextIntoOO` and document reduced fidelity.
+Description: keep Pandoc as the primary converter; when it is not available, fall back to a limited, in-process path leveraging SnuggleTeX-backed LaTeX→Unicode and preview-style transforms for inline emphasis/quotes. The fallback would map only the subset supported by `OOTextWriter` and document reduced fidelity.
 
 * Good, because BST bibliography would work without installing Pandoc (lower barrier)
 * Good, because it is fully in-process and reuses existing JabRef code (preview transforms, `LatexToUnicodeAdapter`)
@@ -113,7 +113,7 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 
 ## More Information
 
-The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `BSTFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
+The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `BSTFormatUtils.transformHTML` -> `OOText` -> `OOTextWriter.write`.
 `BSTFormatUtils` will be an analogue of the existing `CSLStyleUtils`, with it dealing with conversion of pandoc-flavored HTML to OO-flavored HTML.
 Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL. An analogous `BSTReferenceMarkManager` is to be implemented to support appearance-first as well as `.bst`-style defined bibliography ordering.
 

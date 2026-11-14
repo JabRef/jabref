@@ -5,6 +5,27 @@ grand_parent: Code Howtos
 ---
 # Code reorganization
 
+This page retains the historical JStyle reorganization notes, with an updated diagram of the current citation integration.
+The directory descriptions, code sketches, and committed evidence links below are historical records; removed backends do not provide compatibility in the current engine.
+See the [current overview](overview.md), [ADR-0080](../../decisions/0080-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) for the active contract.
+
+The current GUI gateway is `OpenOfficeCitationController`, with concise action methods and GUI instances named `citationController`; document selection is handled by `OpenOfficeDocumentConnection`.
+`DocumentCitations` is an action-local facade over a mutable citation model and live Writer storage, not a document subtype or immutable snapshot; core instances are named `documentCitations`.
+`OpenOfficeDocumentConnection.disposeAllBridges()` globally disposes client-side UNO bridges without closing Writer documents or the office application.
+The current UNO text writer is `OOTextWriter`, named for its `OOText` input and the `OOFormat` vocabulary; it is not a style renderer.
+The former `OOProcess` and `OOFormatBibliography` responsibilities now belong to the JStyle citation-processing and bibliography-formatting helpers, coordinated by the shared engine.
+
+Canonical marks use `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`, with no uid-before-type fallback.
+The framework retains the next-CSL-citation-insertion conversion trigger and existing warning; only current canonical and native Zotero citation marks are converted, never legacy `JR_cite*` or `CID_n` marks.
+With bibliography synchronization disabled, every bibliography section's name, text, and properties remain unchanged; with it enabled, normal handling updates only the target mode's managed bibliography, leaving other-format sections alone.
+There is no bibliography conversion, renaming, consolidation, or metadata sidecar.
+`ConversionMetadata` preserves citation identities, all six types, page information, and supported native JSON while the association remains valid; unsupported native citation modifiers fail before conversion to avoid content loss.
+Stale associated metadata blocks actual conversion only, not ordinary native insertion or refresh.
+
+The older GUI already grouped insertion including conversion, refresh, merge, and separate in undo contexts; those contexts did not restore custom document properties, as the old Manage citations comment explicitly documented for page information.
+`UndoableDocumentProperties` now supplies custom deltas for page information and citation conversion metadata, with prepared style-property deltas additionally included during conversion; ordinary applied-style and Zotero preference writes remain raw and not undoable by that mechanism.
+The owned root-context rollback in `DocumentSession` is new failure recovery to prevent ordinary failed conversions from leaving partially replaced citations; it does not introduce undo grouping for the first time or guarantee recovery from every UNO failure.
+
 Why
 
 * Separate backend
@@ -16,7 +37,10 @@ Why
 
 ### Layers
 
-![Layers](layers-v1.svg)
+![Current Writer citation integration layers](layers-v1.svg)
+
+The diagram shows the current shared canonical pipeline, separate native Zotero strategy, pure model, and common Writer infrastructure.
+The directory-by-directory notes below describe the earlier reorganization, not the current package layout.
 
 ### By directories
 

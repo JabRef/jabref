@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 /// 3) If the entries are not numbered, a citation marker must be produced for each entry. This
 /// operation is performed for each JabRef BibEntry.
 @AllowedToUseClassGetResource("Required for jstyle loading")
-public class JStyle implements Comparable<JStyle>, OOStyle {
+public final class JStyle implements Comparable<JStyle>, OOStyle {
 
     public static final String ITALIC_ET_AL = "ItalicEtAl";
     public static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
@@ -467,12 +467,11 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         }
     }
 
-    /// Convenience method for checking the property for whether we use number citations or
-    /// author-year citations.
+    /// Whether numbered citations are effective. Citation-key markers take precedence over numbering.
     ///
     /// @return true if we use numbered citations, false otherwise.
     public boolean isNumberEntries() {
-        return (Boolean) getProperty(IS_NUMBER_ENTRIES);
+        return !isCitationKeyCiteMarkers() && (Boolean) getProperty(IS_NUMBER_ENTRIES);
     }
 
     /// Convenience method for checking the property for whether we sort the bibliography
@@ -672,12 +671,16 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         defaultBibLayout = layout;
     }
 
+    public OOText formatCitationKeys(List<String> keys) {
+        return JStyleCitationKeyFormatter.format(keys, this);
+    }
+
     /// Format a number-based citation marker for the given entries.
     ///
     /// @return The text for the citation.
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries) {
         final int minGroupingCount = this.getMinimumGroupingCount();
-        return JStyleGetNumericCitationMarker.getNumCitationMarker2(this,
+        return JStyleNumericCitationFormatter.getNumCitationMarker2(this,
                 entries,
                 minGroupingCount);
     }
@@ -685,18 +688,18 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     /// For some tests we need to override minGroupingCount.
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries,
                                         int minGroupingCount) {
-        return JStyleGetNumericCitationMarker.getNumCitationMarker2(this,
+        return JStyleNumericCitationFormatter.getNumCitationMarker2(this,
                 entries,
                 minGroupingCount);
     }
 
     /// Format a number-based bibliography label for the given number.
     public OOText getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry entry) {
-        return JStyleGetNumericCitationMarker.getNumCitationMarkerForBibliography(this, entry);
+        return JStyleNumericCitationFormatter.getNumCitationMarkerForBibliography(this, entry);
     }
 
     public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
-        return JStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
+        return JStyleCitationFormatter.getNormalizedCitationMarker(this, entry, Optional.empty());
     }
 
     /// Format the marker for the in-text citation according to this
@@ -720,7 +723,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
                                        boolean inParenthesis,
                                        NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
-        return JStyleGetCitationMarker.createCitationMarker(this,
+        return JStyleCitationFormatter.createCitationMarker(this,
                 citationMarkerEntries,
                 inParenthesis,
                 nonUniqueCitationMarkerHandling);
@@ -732,7 +735,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
                                        CitationType citationType,
                                        NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
-        return JStyleGetCitationMarker.createCitationMarker(this,
+        return JStyleCitationFormatter.createCitationMarker(this,
                 citationMarkerEntries,
                 citationType,
                 nonUniqueCitationMarkerHandling);

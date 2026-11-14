@@ -5,6 +5,7 @@ import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.jabref.gradle.EmbeddedPostgresBinaries
+import java.time.Duration
 import java.util.Calendar
 
 plugins {
@@ -330,7 +331,7 @@ tasks.test {
     systemProperty("prism.order", "sw")
 
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "ExternalServicesTest", "ConverterTest")
+        excludeTags("DatabaseTest", "ExternalServicesTest", "ConverterTest", "LibreOfficeTest")
     }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
@@ -379,6 +380,26 @@ tasks.register<Test>("databaseTest") {
         includeTags("DatabaseTest")
     }
     maxParallelForks = 1
+}
+
+tasks.register<Test>("libreOfficeTest") {
+    description = "Runs the required real-Writer safety gate (LibreOffice and Pandoc must be installed)"
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform {
+        includeTags("LibreOfficeTest")
+    }
+    maxParallelForks = 1
+    forkEvery = 0
+    systemProperty("junit.jupiter.execution.parallel.enabled", "false")
+    systemProperty("jabref.writer.artifacts", layout.buildDirectory.dir("writer-integration").get().asFile.absolutePath)
+    jvmArgs("-javaagent:${configurations.mockitoAgent.get().asPath}")
+    timeout = Duration.ofMinutes(10)
+    // Writer/Pandoc installations are external inputs: a cached green run is not a safety gate.
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
+    testLogging.events("PASSED", "FAILED", "SKIPPED")
 }
 
 tasks.register<Test>("converterTest") {

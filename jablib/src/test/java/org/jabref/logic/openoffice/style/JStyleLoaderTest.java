@@ -163,33 +163,19 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void getDefaultUsedStyleWhenEmpty() {
-        when(preferences.getCurrentJStyle()).thenReturn(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
-        preferences.clearCurrentJStyle();
+    void loadingExternalStylesPreservesCurrentStyleSelection() {
+        preferences = OpenOfficePreferences.getDefault();
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        JStyle style = loader.getUsedJstyle();
-        assertTrue(style.isValid());
-        assertEquals(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
-        assertEquals(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentJStyle());
-    }
+        JStyle selectedStyle = loader.getStyles().getLast();
+        preferences.setCurrentStyle(selectedStyle);
+        loader.addStyleIfValid(jStyleFile);
 
-    @Test
-    void getStoredUsedStyle() {
-        when(preferences.getCurrentJStyle()).thenReturn(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        JStyle style = loader.getUsedJstyle();
-        assertTrue(style.isValid());
-        assertEquals(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, style.getPath());
-        assertEquals(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, preferences.getCurrentJStyle());
-    }
 
-    @Test
-    void getDefaultUsedStyleWhenIncorrect() {
-        when(preferences.getCurrentJStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
-        loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        JStyle style = loader.getUsedJstyle();
-        assertTrue(style.isValid());
-        assertEquals(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
+        assertEquals(selectedStyle, preferences.getCurrentStyle());
+        assertEquals(List.of(jStyleFile.toString()), preferences.getExternalJStyles());
+        assertEquals(List.of(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, jStyleFile.toString()),
+                loader.getStyles().stream().map(JStyle::getPath).toList());
     }
 
     @Test

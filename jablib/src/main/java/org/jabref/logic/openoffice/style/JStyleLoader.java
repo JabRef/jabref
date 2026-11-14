@@ -122,18 +122,4 @@ public class JStyleLoader {
         }
         return false;
     }
-
-    public JStyle getUsedJstyle() {
-        String filename = openOfficePreferences.getCurrentJStyle();
-        if (filename != null) {
-            for (JStyle style : getStyles()) {
-                if (filename.equals(style.getPath())) {
-                    return style;
-                }
-            }
-        }
-        // Pick the first internal
-        openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
-        return internalStyles.getFirst();
-    }
 }

@@ -24,7 +24,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     private static final String HTML_BOLD_END_TAG = "</b>";
     private static final String HTML_BOLD_START_TAG = "<b>";
 
-    private final OOBibBase ooBase;
+    private final OpenOfficeCitationController citationController;
 
     @FXML private TableView<CitationEntryViewModel> citationsTableView;
     @FXML private TableColumn<CitationEntryViewModel, String> citation;
@@ -34,8 +34,8 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
     private ManageCitationsDialogViewModel viewModel;
 
-    public ManageCitationsDialogView(OOBibBase ooBase) {
-        this.ooBase = ooBase;
+    public ManageCitationsDialogView(OpenOfficeCitationController citationController) {
+        this.citationController = citationController;
 
         ViewLoader.view(this)
                   .load()
@@ -53,7 +53,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
+        viewModel = new ManageCitationsDialogViewModel(citationController, dialogService);
 
         citation.setCellValueFactory(cellData -> cellData.getValue().citationProperty());
         new ValueTableCellFactory<CitationEntryViewModel, String>().withGraphic(this::getText).install(citation);

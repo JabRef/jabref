@@ -5,74 +5,82 @@ grand_parent: Code Howtos
 ---
 # Order of appearance of citation groups
 
-The order of appearance of citations is decided on two levels:
+The canonical Writer integration separates three orders:
 
-1. their order within each citation group (`localOrder`), and
-2. the order of the citation groups that appear as citation markers in the text (`globalOrder`).
+- **Storage order** is the key order encoded in a group's reference mark. Page-info property indexes always address this order.
+- **Local order** is a renderer's presentation order inside one group. JStyle uses `MultiCiteChronological` to choose year/author/title or author/year/title ordering, and numeric marker formatting can sort by assigned numbers.
+- **Global order** is the order of citation groups in the document. It contributes to first-appearance numbering and JStyle author-year disambiguation.
 
-This page is about the latter: how to decide the order of appearance (numbering sequence) of a set of citation markers?
+Sorting for presentation does not rewrite storage order or move page information to a different citation.
+Bibliography sorting is a separate renderer decision: first-appearance order is not necessarily the bibliography order.
+See the [overview](overview.md#rendering-numbering-and-style-changes) for the family-specific numbering rules.
 
-## Conceptually
+## UNO text containers and comparisons
 
-In a continuous text it is easy: take the textual order of citation markers.
+Writer exposes the document body, footnotes, table cells, and other text through `XText` and `XTextRange` interfaces.
+Textual range comparison is meaningful only within a compatible text container.
+Comparing a body range directly with a range in a footnote or table cell does not establish a global order.
 
-In the presence of figures, tables, footnotes/endnotes possibly far from the location they are referred to in the text or wrapped around with text it becomes less obvious what is the correct order.
+`DocumentOrder` therefore partitions ranges by their original `XText` before sorting them textually.
+This shared algorithm is used for canonical JabRef citations with JStyle, CSL, and BST styles.
+Zotero mode has its own storage and ordering strategy; do not assume this algorithm defines that mode's behavior.
 
-Examples:
+## Canonical numbering order
 
-* References in footnotes: are they _after_ the page content, or number them as if they appeared at the footnote mark? (JabRef does the latter)
-* A figure with references in its caption. Text may flow on either or both sides.\
-  Where should we insert these in the sequence?
-* In a two-column layout, a text frame or figure mostly, but not fully in the second column: shall we consider it part of the second column?
+`DocumentOrder.inDocumentOrder` prepares and sorts the canonical groups as follows:
 
-## Technically
+1. Read each canonical group's Writer range from `MarkStore`.
+2. Partition by the original `XText` and sort within each partition.
+3. Assign `indexInPosition` from that textual order.
+4. For ranges inside footnotes, substitute the corresponding body footnote-mark range.
+5. When an unlocked functional view cursor is available, obtain visual positions and sort top-to-bottom, then left-to-right, then by `indexInPosition`.
+6. Otherwise, use textual ordering within the mapped text-container partitions and log a warning.
 
-In LibreOffice, a document has a main text that supports the [XText](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XText.html) interface.\
-This allows several types of [XTextContent](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextContent.html) to be inserted.
+Mapping a footnote citation to its body anchor counts it where the footnote is referenced, not at the bottom of the page.
+Several citations in one footnote then share an anchor, so `indexInPosition` preserves their order within that footnote.
+`DocumentOrder.withInsertion` includes an in-memory pending group in this process before its reference mark is created.
+This lets insertion render the whole cited set before changing existing document content.
 
-* Some of these allow text inside with further insertions.
+Visual positions require moving Writer's view cursor, which is restored after sorting.
+The view cursor cannot perform this work while document controllers are locked.
+Canonical insert and refresh therefore order and render before entering `DocumentSession`'s controller-locked write phase.
+A missing/nonfunctional view cursor, externally locked controllers, or a visual-sort failure triggers the textual fallback with a warning.
 
-### Anchors
+### Visual ordering limitations
 
-* Many, but not all XTextContent types support getting a "technical" insertion point or text range through [getAnchor](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextContent.html#ae82a8b42f6b2578549b68b4483a877d3).
-* In Libreoffice positioning both a frame and its anchor seems hard: moving the frame tends to also move the anchor.
-* Consequence: producing an order of appearance for the citation groups based solely on `getAnchor` calls may be impossible.
-  * Allowing or requiring the user to insert "logical anchors" for frames and other "floating" parts might help to alleviate these problems.
+**Visual order is not guaranteed reading order for every Writer layout.**
+The algorithm uses view coordinates, not a column-aware or page-aware reading-order model.
 
-### Sorting within a `Text`
+- In a two-column layout, a citation near the top of the second column can sort before a citation near the bottom of the first column.
+- With pages displayed side by side, a citation on the right-hand page can sort before a lower citation on the left-hand page.
+- Floating frames and captions do not have a universally correct position in the reading sequence; their anchors and displayed positions can differ.
 
-The text ranges occupied by the citation markers support the [XTextRange](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextRange.html) interface.
+Sharing the JStyle ordering algorithm with CSL and BST does not fix these limitations.
+Avoid describing this as correct multi-column ordering or as a guarantee for arbitrary tables and frames.
+Golden-document tests establish the tested layouts, not every possible Writer layout.
 
-* These provide access to the XText they are contained in.
-* The [Text](https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1text_1_1Text.html) service may support (optional) the [XTextRangeCompare](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextRangeCompare.html) interface, that allows two XTextRange values to be compared if both belong to this `Text`
+### Textual fallback limitations
 
-### Visual ordering
+The fallback orders comparable ranges within each text container and retains the footnote tie-break indexes.
+It does not infer a reading sequence between unrelated body, table-cell, or frame containers.
+Their partition order is not a guarantee of global reading order.
+The warning matters: falling back avoids an invalid cross-container comparison but can change numbering relative to a successful visual pass.
 
-* The cursor used by the user is available as an [XTextViewCursor](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextViewCursor.html)
-* If we can get it and can set its position in the document to each XTextRange to be sorted, and ask its [getPosition](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextViewCursor.html#a9b2bafd342ef75b5d504a9313dbb1389) to provide coordinates "relative to the top left position of the first page of the document.", then we can sort by these coordinates in top-to-bottom left-to-right order.
-* Note: in some cases, for example when the cursor is in a comment (as in `Libreoffice:[menu:Insert]/[Comment]`), the XTextViewCursor is not available (I know of no way to get it).
-* In some other cases, for example when an image is selected, the XTextViewCursor we normally receive is not 'functional': we cannot position it for getting coordinates for the citation marks. The [FunctionalTextViewCursor](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/model/openoffice/rangesort/FunctionalTextViewCursor.java) class can solve this case by accessing and manipulating the cursor through [XSelectionSupplier](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1view_1_1XSelectionSupplier.html)
+## Group editing order and protected footnotes
 
-Consequences of getting these visual coordinates and using them to order the citation markers
+Group editing does not use mapped footnote anchors as replacement edit ranges.
+Merge scans unmapped textual order within text containers through `DocumentOrder.withinTextContainers`, not visual numbering order.
+Merge considers NORMAL groups only, with no intervening nonblank text or paragraph break, and never combines citations from different text containers.
+Several citations in one footnote remain distinct ranges for this adjacency check.
+Separate also acts on NORMAL groups and preserves each citation's page info in storage order.
 
-* allows uniform handling of the markers. Works in footnotes, tables, frames (apparently anywhere)
-* requires moving the user visible cursor to each position and with [screen refresh](https://github.com/antalk2/jabref/blob/improve-reversibility-rebased-03/src/main/java/org/jabref/model/openoffice/uno/UnoScreenRefresh.java) enabled.\
-  `(problem)` This results in some user-visible flashing and scrolling around in the document view.
-* The expression "relative to the top left position of the first page of the document" is understood literally, "as on the screen".\
-  `(problem)` Showing pages side by side or using a two-column layout will result in markers in the top half of the second column or page to be sorted before those on the bottom of the first column of the first page.
+Footnote body anchors are protected ranges whenever the footnote contains a managed citation.
+Canonical overlap checks include those anchors so inserting or rewriting a body citation cannot erase a footnote that owns citations.
+These protection checks are separate from mapping footnotes for numbering.
 
-## JabRef
+## Verification
 
-JabRef uses the following steps for sorting citation markers (providing `globalOrder`):
-
-1. the textranges of citation marks in footnotes are replaced by the textranges of the footnote marks.
-2. get the positions (coordinates) of these marks
-3. sort in top-to-bottom left-to-right order
-
-`(problem)` In JabRef5.2 the positions of citation marks within the same footnote become indistinguishable, thus their order after sorting may differ from their order in the footnote text.\
-This caused problems for
-
-1. numbering order\
-   `(solved)` by keeping track of the order-in-footnote of citation markers during sorting using [getIndexInPosition](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/model/openoffice/rangesort/RangeSortable.java#L21))
-2. `click:Merge`: It examines _consecutive_ pairs of citation groups if they can be merged. Wrong order may result in not discovering some mergeable pairs or attempting to merge in wrong order.\
-   `(solved)` by not using visual order, only XTextRangeCompare-based [order within each XText](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/logic/openoffice/action/EditMerge.java#L325))
+`WriterIntegrationTest` exercises canonical citations in the body, a footnote, and a table, including save/reopen and style-family changes.
+`CanonicalStorageWriterTest` checks footnote-anchor ordering/protection and measures insertion/writing plus visual ordering for about 300 citations.
+Those checks do not establish a latency budget for the complete renderer pipeline or correct numbering in multi-column layouts.
+For execution requirements and saved Writer artifacts, see [Writer integration testing](../testing.md#libreoffice-writer-integration-tests).

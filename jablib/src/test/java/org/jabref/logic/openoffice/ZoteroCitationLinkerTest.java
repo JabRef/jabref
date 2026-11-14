@@ -1,7 +1,10 @@
 package org.jabref.logic.openoffice;
 
 import java.util.List;
+import java.util.Map;
 
+import org.jabref.logic.openoffice.ZoteroCitationLinker.LinkPlan;
+import org.jabref.logic.openoffice.ZoteroCitationLinker.LinkUpdate;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -15,6 +18,7 @@ import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ZoteroCitationLinkerTest {
     private static final String ZOTERO_URI = "http://zotero.org/users/123/items/ABCD1234";
@@ -71,6 +75,42 @@ class ZoteroCitationLinkerTest {
                 ENTRY_TYPES_MANAGER);
 
         assertEquals(referenceMarkName, updatedReferenceMarkName);
+    }
+
+    @Test
+    void plannedLinksContainOriginalAndUpdatedIdentityJsonAndUriMapping() {
+        String original = zoteroReferenceMarkName("10.123/example");
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Smith2020").withField(StandardField.DOI, "10.123/example");
+        LinkPlan plan = ZoteroCitationLinker.planLinks(List.of(original, "JABREF_legacy CID_1 uid NORMAL"),
+                new BibDatabaseContext(new BibDatabase(List.of(entry))), ENTRY_TYPES_MANAGER);
+        LinkUpdate update = plan.updates().getFirst();
+
+        assertEquals(1, plan.updates().size());
+        assertEquals(original, update.originalName());
+        assertEquals(update.updatedName(), plan.updatedName(original));
+        assertEquals(ZoteroReferenceMark.getCSLJson(update.updatedName()), update.citationJson());
+        assertEquals(Map.of("Smith2020", ZOTERO_URI), plan.zoteroUriByCitationKey());
+        assertEquals("keep-me", getCitationJson(update.updatedName()).getAsJsonObject("properties").get("plainCitation").getAsString());
+        assertEquals(List.of(ZOTERO_URI), getCitationJson(original).getAsJsonArray("citationItems").get(0).getAsJsonObject().getAsJsonArray("uris").asList().stream().map(value -> value.getAsString()).toList());
+    }
+
+    @Test
+    void ambiguousDuplicatesProduceNoPlannedRename() {
+        String original = zoteroReferenceMarkName("10.123/example");
+        BibEntry first = new BibEntry(StandardEntryType.Article).withCitationKey("first").withField(StandardField.DOI, "10.123/example");
+        BibEntry second = new BibEntry(StandardEntryType.Article).withCitationKey("second").withField(StandardField.DOI, "10.123/example");
+        LinkPlan plan = ZoteroCitationLinker.planLinks(List.of(original), new BibDatabaseContext(new BibDatabase(List.of(first, second))), ENTRY_TYPES_MANAGER);
+
+        assertEquals(List.of(), plan.updates());
+        assertEquals(original, plan.updatedName(original));
+    }
+
+    @Test
+    void plannedLinksExposeImmutableCollections() {
+        LinkPlan plan = ZoteroCitationLinker.planLinks(List.of(), new BibDatabaseContext(new BibDatabase()), ENTRY_TYPES_MANAGER);
+
+        assertThrows(UnsupportedOperationException.class, () -> plan.updates().add(new ZoteroCitationLinker.LinkUpdate("old", "new", "{}")));
+        assertThrows(UnsupportedOperationException.class, () -> plan.zoteroUriByCitationKey().put("key", ZOTERO_URI));
     }
 
     private static String zoteroReferenceMarkName(String doi) {
