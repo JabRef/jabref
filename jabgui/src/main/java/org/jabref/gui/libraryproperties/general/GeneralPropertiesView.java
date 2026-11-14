@@ -91,9 +91,12 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
         librarySpecificFileDirectoryTooltip.setText(Localization.lang("Library-specific file directory"));
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());
+        librarySpecificFileDirectory.promptTextProperty().bind(viewModel.librarySpecificDirectoryPromptProperty());
 
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
+        userSpecificFileDirectory.promptTextProperty().bind(viewModel.userSpecificFileDirectoryPromptProperty());
         latexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        latexFileDirectory.promptTextProperty().bind(viewModel.laTexFileDirectoryPromptProperty());
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
         libraryName.textProperty().bindBidirectional(viewModel.libraryNameProperty());
         libraryDescription.textProperty().bindBidirectional(viewModel.libraryDescriptionProperty());
