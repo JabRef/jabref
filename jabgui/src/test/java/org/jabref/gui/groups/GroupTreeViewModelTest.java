@@ -98,6 +98,7 @@ class GroupTreeViewModelTest {
                 false,
                 false,
                 false,
+                false,
                 "Imported entries"
         ));
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(

@@ -2169,6 +2169,14 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestMergeConflictedCopies() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: mergeConflictedCopies:true;}"));
+
+        assertEquals(Optional.of(true), result.getMetaData().getMergeConflictedCopies());
+    }
+
+    @Test
     void integrationTestGitAutoPull() throws IOException {
         ParserResult result = parser
                 .parse(Reader.of("@comment{jabref-meta: gitAutoPull:true;}"));
