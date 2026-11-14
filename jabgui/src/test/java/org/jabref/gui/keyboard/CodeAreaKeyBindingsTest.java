@@ -3,6 +3,7 @@ package org.jabref.gui.keyboard;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -13,7 +14,10 @@ import org.jabref.gui.testutils.JavaFxExtension;
 import jfx.incubator.scene.control.richtext.CodeArea;
 import jfx.incubator.scene.control.richtext.LineEnding;
 import jfx.incubator.scene.control.richtext.TextPos;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,6 +33,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
+@NullMarked
+        // [utest->req~macos.text-editing-shortcuts~1]
 class CodeAreaKeyBindingsTest {
 
     @ParameterizedTest
@@ -138,6 +144,101 @@ class CodeAreaKeyBindingsTest {
                     Arguments.of(lineEnding, "First" + separator, TextPos.ofLeading(1, 0), "First\n"),
                     Arguments.of(lineEnding, "", TextPos.ZERO, ""));
         });
+    }
+
+    @Test
+    @EnabledOnOs(OS.MAC)
+    void optionBackspaceDeletesPreviousWordInCodeArea() {
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea area = new CodeArea();
+            area.setText("hello world");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(area));
+            stage.show();
+            area.requestFocus();
+            area.select(TextPos.ofLeading(0, 11));
+            Event.fireEvent(area, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.BACK_SPACE, false, false, true, false));
+            assertEquals("hello ", area.getText());
+            stage.hide();
+        });
+    }
+
+    @Test
+    void transposeCharactersAroundCaret() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abcd");
+        codeArea.select(TextPos.ofLeading(0, 2));
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, "ctrl+T");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.T, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        assertEquals("acbd", codeArea.getText());
+        assertEquals(TextPos.ofLeading(0, 3), codeArea.getCaretPosition());
+        assertTrue(event.isConsumed());
+    }
+
+    @ParameterizedTest
+    @MethodSource("transposeBoundaryData")
+    void transposeMatchesMacOsAtLineBoundaries(String text, TextPos caret, String expected, TextPos expectedCaret) {
+        CodeArea area = new CodeArea();
+        area.setText(text);
+        area.select(caret);
+        CodeAreaKeyBindings.transposeCharacters(area);
+        assertEquals(expected, area.getText());
+        assertEquals(expectedCaret, area.getCaretPosition());
+    }
+
+    private static Stream<Arguments> transposeBoundaryData() {
+        return Stream.of(
+                Arguments.of("teh", TextPos.ofLeading(0, 3), "the", TextPos.ofLeading(0, 3)), // spellchecker:disable-line
+                Arguments.of("a\u0301b", TextPos.ofLeading(0, 2), "ba\u0301", TextPos.ofLeading(0, 3)),
+                Arguments.of("a\u0301b", TextPos.ofLeading(0, 3), "ba\u0301", TextPos.ofLeading(0, 3)),
+                Arguments.of("ab\n\ncd", TextPos.ofLeading(1, 0), "a\nb\ncd", TextPos.ofLeading(1, 1)),
+                Arguments.of("ab\ncd", TextPos.ofLeading(0, 2), "ba\ncd", TextPos.ofLeading(0, 2)),
+                Arguments.of("a\nb", TextPos.ofLeading(0, 1), "a\nb", TextPos.ofLeading(0, 1)),
+                Arguments.of("ab\ncd", TextPos.ofLeading(1, 0), "abc\nd", TextPos.ofLeading(1, 0)));
+    }
+
+    @Test
+    void transposeHandlesCrLfParagraphs() {
+        CodeArea area = new CodeArea();
+        area.getModel().setLineEnding(LineEnding.CRLF);
+        area.setText("ab\r\ncd");
+        area.select(TextPos.ofLeading(1, 1));
+        CodeAreaKeyBindings.transposeCharacters(area);
+        assertEquals("ab\r\ndc", area.getText());
+        assertEquals(TextPos.ofLeading(1, 2), area.getCaretPosition());
+    }
+
+    @Test
+    void readOnlyCodeAreaIgnoresEditingShortcuts() {
+        CodeArea area = new CodeArea();
+        area.setText("abcd");
+        area.select(TextPos.ofLeading(0, 2));
+        area.setEditable(false);
+        KeyBindingRepository repository = mock(KeyBindingRepository.class);
+        for (KeyBinding binding : new KeyBinding[] {KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, KeyBinding.EDITOR_KILL_LINE, KeyBinding.EDITOR_CAPITALIZE}) {
+            when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(binding));
+            KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.T, false, true, false, false);
+            CodeAreaKeyBindings.call(area, event, repository);
+            assertFalse(event.isConsumed());
+            assertEquals("abcd", area.getText());
+            assertEquals(TextPos.ofLeading(0, 2), area.getCaretPosition());
+        }
+    }
+
+    @Test
+    void transposeCharactersDoesNothingAtDocumentStart() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abcd");
+        codeArea.select(TextPos.ofLeading(0, 0));
+
+        CodeAreaKeyBindings.transposeCharacters(codeArea);
+
+        assertEquals("abcd", codeArea.getText());
+        assertEquals(TextPos.ofLeading(0, 0), codeArea.getCaretPosition());
     }
 
     @Test
@@ -314,5 +415,92 @@ class CodeAreaKeyBindingsTest {
 
         verifyNoInteractions(codeArea);
         assertFalse(event.isConsumed());
+    }
+
+    @Test
+    void ctrlPMovesCaretUpOneLine() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_UP, "ctrl+P");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.P, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        verify(codeArea).moveUp();
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void ctrlNMovesCaretDownOneLine() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_DOWN, "ctrl+N");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.N, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        verify(codeArea).moveDown();
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void insertLineAfterCaretSplitsLineAndKeepsCaret() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("  title = {Hello}");
+        codeArea.select(TextPos.ofLeading(0, 8));
+
+        CodeAreaKeyBindings.insertLineAfterCaret(codeArea);
+
+        assertEquals(2, codeArea.getParagraphCount());
+        assertEquals("  title ", codeArea.getPlainText(0));
+        assertEquals("= {Hello}", codeArea.getPlainText(1));
+        assertEquals(0, codeArea.getCaretPosition().index());
+        assertEquals(8, codeArea.getCaretPosition().offset());
+    }
+
+    @Test
+    void insertLineAfterCaretAtEndOfLineKeepsCaretOnSameLine() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abc");
+        codeArea.select(TextPos.ofLeading(0, 3));
+
+        CodeAreaKeyBindings.insertLineAfterCaret(codeArea);
+
+        assertEquals(2, codeArea.getParagraphCount());
+        assertEquals("abc", codeArea.getPlainText(0));
+        assertEquals("", codeArea.getPlainText(1));
+        assertEquals(0, codeArea.getCaretPosition().index());
+        assertEquals(3, codeArea.getCaretPosition().offset());
+    }
+
+    @Test
+    void insertLineAfterCaretDoesNothingWhenNotEditable() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abc");
+        codeArea.select(TextPos.ofLeading(0, 1));
+        codeArea.setEditable(false);
+
+        CodeAreaKeyBindings.insertLineAfterCaret(codeArea);
+
+        assertEquals(1, codeArea.getParagraphCount());
+        assertEquals("abc", codeArea.getPlainText(0));
+    }
+
+    @Test
+    void ctrlOInsertsLineAfterCaret() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abcdef");
+        codeArea.select(TextPos.ofLeading(0, 3));
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_INSERT_LINE_AFTER, "ctrl+O");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.O, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        assertTrue(event.isConsumed());
+        assertEquals("abc", codeArea.getPlainText(0));
+        assertEquals("def", codeArea.getPlainText(1));
+        assertEquals(0, codeArea.getCaretPosition().index());
+        assertEquals(3, codeArea.getCaretPosition().offset());
     }
 }

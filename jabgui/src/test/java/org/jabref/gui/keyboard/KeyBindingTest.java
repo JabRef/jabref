@@ -1,5 +1,8 @@
 package org.jabref.gui.keyboard;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -9,6 +12,7 @@ import org.junit.jupiter.api.condition.OS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
+        // [utest->req~macos.text-editing-shortcuts~1]
 class KeyBindingTest {
 
     @Test
@@ -42,5 +46,49 @@ class KeyBindingTest {
     @Test
     void bindingsWithoutMacSpecificDefaultAreIdenticalOnAllPlatforms() {
         assertEquals(KeyBinding.SEARCH.getDefaultNonMacKeyBinding(), KeyBinding.SEARCH.getDefaultMacKeyBinding());
+    }
+
+    @Test
+    void macOsEditorDefaultsUseNativeControlAndCommandBindings() {
+        assertEquals("ctrl+D", KeyBinding.EDITOR_DELETE.getDefaultMacKeyBinding());
+        assertEquals("ctrl+B", KeyBinding.EDITOR_BACKWARD.getDefaultMacKeyBinding());
+        assertEquals("ctrl+F", KeyBinding.EDITOR_FORWARD.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_WORD_BACKWARD.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_WORD_FORWARD.getDefaultMacKeyBinding());
+        assertEquals("ctrl+A", KeyBinding.EDITOR_BEGINNING.getDefaultMacKeyBinding());
+        assertEquals("ctrl+E", KeyBinding.EDITOR_END.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_BEGINNING_DOC.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_END_DOC.getDefaultMacKeyBinding());
+        assertEquals("ctrl+P", KeyBinding.EDITOR_UP.getDefaultMacKeyBinding());
+        assertEquals("ctrl+N", KeyBinding.EDITOR_DOWN.getDefaultMacKeyBinding());
+        assertEquals("ctrl+K", KeyBinding.EDITOR_KILL_LINE.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_KILL_WORD_BACKWARD.getDefaultMacKeyBinding());
+        assertEquals("ctrl+L", KeyBinding.EDITOR_CENTER_CARET.getDefaultMacKeyBinding());
+        assertEquals("ctrl+O", KeyBinding.EDITOR_INSERT_LINE_AFTER.getDefaultMacKeyBinding());
+        assertEquals("ctrl+T", KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_CAPITALIZE.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_LOWERCASE.getDefaultMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_UPPERCASE.getDefaultMacKeyBinding());
+    }
+
+    @Test
+    void macOsEditorDefaultsDoNotChangeNonMacOsBindings() {
+        assertEquals("", KeyBinding.EDITOR_BEGINNING.getDefaultNonMacKeyBinding());
+        assertEquals("", KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getDefaultNonMacKeyBinding());
+    }
+
+    /// [KeyBindingRepository#mapToKeyBinding] returns the first matching binding, so a macOS editor default that
+    /// equals another default would shadow that action (e.g., Option+Left would no longer trigger "Back").
+    @Test
+    void macEditorDefaultsDoNotConflictWithOtherMacDefaults() {
+        List<KeyBinding> conflicting = Arrays.stream(KeyBinding.values())
+                                             .filter(binding -> binding.getCategory() == KeyBindingCategory.EDITOR)
+                                             .filter(binding -> !binding.getDefaultMacKeyBinding().isEmpty())
+                                             .filter(editorBinding -> Arrays.stream(KeyBinding.values())
+                                                                            .filter(other -> other != editorBinding)
+                                                                            .anyMatch(other -> other.getDefaultMacKeyBinding().equalsIgnoreCase(editorBinding.getDefaultMacKeyBinding())))
+                                             .toList();
+
+        assertEquals(List.of(), conflicting);
     }
 }

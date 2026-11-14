@@ -2,28 +2,39 @@ package org.jabref.gui.keyboard;
 
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -34,6 +45,234 @@ import static org.mockito.Mockito.when;
 class TextInputKeyBindingsTest {
 
     private static final String MULTILINE_TEXT = "First line\nSecond line\nThird line";
+
+    private static TextArea layoutTextAreaWithCaretAt(String text, int caretPosition) {
+        TextArea area = new TextArea(text);
+        StackPane root = new StackPane(area);
+        new Scene(root, 400, 200);
+        root.applyCss();
+        root.layout();
+        area.positionCaret(caretPosition);
+        root.layout();
+        return area;
+    }
+
+    private static String numberedLines(int count) {
+        return IntStream.rangeClosed(1, count).mapToObj(i -> "Line " + i).collect(Collectors.joining("\n"));
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void centerCaretScrollsCaretLineToVerticalCenter() {
+        JavaFxExtension.invokeAndWait(() -> {
+            String text = numberedLines(60);
+            TextArea area = layoutTextAreaWithCaretAt(text, text.indexOf("Line 30"));
+            TextAreaSkin skin = (TextAreaSkin) area.getSkin();
+            double lineHeight = skin.getCaretBounds().getHeight();
+
+            assertTrue(TextInputKeyBindings.centerCaret(area));
+            area.getParent().layout();
+
+            assertEquals(area.getHeight() / 2, skin.getCaretBounds().getCenterY(), lineHeight);
+            assertEquals(text.indexOf("Line 30"), area.getCaretPosition());
+        });
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void centerCaretDoesNotScrollAboveTextStart() {
+        JavaFxExtension.invokeAndWait(() -> {
+            TextArea area = layoutTextAreaWithCaretAt(numberedLines(60), 0);
+
+            assertTrue(TextInputKeyBindings.centerCaret(area));
+
+            assertEquals(0, area.getScrollTop());
+        });
+    }
+
+    @Test
+    void centerCaretUsesViewportWhenHorizontalScrollbarIsVisible() {
+        JavaFxExtension.invokeAndWait(() -> {
+            String text = IntStream.rangeClosed(1, 60)
+                                   .mapToObj(i -> "Line " + i + " " + "wide text ".repeat(30))
+                                   .collect(Collectors.joining("\n"));
+            TextArea area = layoutTextAreaWithCaretAt(text, text.indexOf("Line 30 "));
+            Node viewport = area.lookup(".scroll-pane .viewport");
+            double viewportCenter = area.sceneToLocal(viewport.localToScene(viewport.getBoundsInLocal())).getCenterY();
+            TextAreaSkin skin = (TextAreaSkin) area.getSkin();
+            assertTrue(viewport.getBoundsInLocal().getHeight() < area.getHeight() - 5);
+
+            assertTrue(TextInputKeyBindings.centerCaret(area));
+            area.getParent().layout();
+
+            assertEquals(viewportCenter, skin.getCaretBounds().getCenterY(), 1.0);
+        });
+    }
+
+    @Test
+    void centerCaretIgnoresSingleLineTextField() {
+        TextField textField = new TextField("abc");
+
+        assertFalse(TextInputKeyBindings.centerCaret(textField));
+    }
+
+    @Test
+    @EnabledOnOs(OS.MAC)
+    void optionBackspaceDeletesPreviousWordInTextArea() {
+        JavaFxExtension.invokeAndWait(() -> {
+            TextArea area = new TextArea("hello world");
+            Stage stage = new Stage();
+            stage.setScene(new Scene(area));
+            stage.show();
+            area.requestFocus();
+            area.positionCaret(11);
+            Event.fireEvent(area, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.BACK_SPACE, false, false, true, false));
+            assertEquals("hello ", area.getText());
+            stage.hide();
+        });
+    }
+
+    @Test
+    void transposeShortcutWorksInReopenedInputDialog() {
+        JavaFxExtension.invokeAndWait(() -> {
+            Stage mainWindow = new Stage();
+            KeyBindingRepository repository = new KeyBindingRepository();
+            repository.put(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, "ctrl+T");
+            ListChangeListener<Window> listener = TextInputKeyBindings.registerSecondaryWindows(mainWindow, repository);
+            TextInputDialog dialog = new TextInputDialog("abcd");
+            try {
+                dialog.show();
+                dialog.hide();
+                dialog.show();
+                TextField editor = dialog.getEditor();
+                editor.requestFocus();
+                editor.positionCaret(2);
+                Event.fireEvent(editor, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.T, false, true, false, false));
+                assertEquals("acbd", editor.getText());
+                assertEquals(3, editor.getCaretPosition());
+            } finally {
+                dialog.hide();
+                Window.getWindows().removeListener(listener);
+            }
+        });
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void transposeCharactersAroundCaret() {
+        TextField textField = new TextField("abcd");
+        textField.positionCaret(2);
+
+        TextInputKeyBindings.transposeCharacters(textField);
+
+        assertEquals("acbd", textField.getText());
+        assertEquals(3, textField.getCaretPosition());
+    }
+
+    @ParameterizedTest
+    @MethodSource("transposeBoundaryData")
+    void transposeMatchesMacOsAtLineBoundaries(String text, int caret, String expected, int expectedCaret) {
+        TextArea area = new TextArea(text);
+        area.positionCaret(caret);
+        TextInputKeyBindings.transposeCharacters(area);
+        assertEquals(expected, area.getText());
+        assertEquals(expectedCaret, area.getCaretPosition());
+    }
+
+    private static Stream<Arguments> transposeBoundaryData() {
+        return Stream.of(
+                Arguments.of("teh", 3, "the", 3), // spellchecker:disable-line
+                Arguments.of("a\u0301b", 2, "ba\u0301", 3),
+                Arguments.of("a\u0301b", 3, "ba\u0301", 3),
+                Arguments.of("ab\n\ncd", 3, "a\nb\ncd", 3),
+                Arguments.of("ab\ncd", 2, "ba\ncd", 2),
+                Arguments.of("a\nb", 1, "a\nb", 1),
+                Arguments.of("ab\ncd", 3, "abc\nd", 4));
+    }
+
+    @Test
+    void readOnlyTextAreaIgnoresEditingShortcuts() {
+        TextArea area = new TextArea("abcd");
+        area.setEditable(false);
+        area.positionCaret(2);
+        Scene scene = mock(Scene.class);
+        KeyBindingRepository repository = mock(KeyBindingRepository.class);
+        when(scene.focusOwnerProperty()).thenReturn(new ReadOnlyObjectWrapper<Node>(area).getReadOnlyProperty());
+        for (KeyBinding binding : new KeyBinding[] {KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, KeyBinding.EDITOR_KILL_LINE, KeyBinding.EDITOR_CAPITALIZE}) {
+            when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(binding));
+            KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.T, false, true, false, false);
+            TextInputKeyBindings.call(scene, event, repository);
+            assertFalse(event.isConsumed());
+            assertEquals("abcd", area.getText());
+            assertEquals(2, area.getCaretPosition());
+        }
+    }
+
+    @Test
+    void transposeCharactersDoesNothingAtDocumentStart() {
+        TextField textField = new TextField("abcd");
+        textField.positionCaret(0);
+
+        TextInputKeyBindings.transposeCharacters(textField);
+
+        assertEquals("abcd", textField.getText());
+        assertEquals(0, textField.getCaretPosition());
+    }
+
+    @Test
+    void transposeCharactersKeepsSupplementaryCharactersIntact() {
+        TextField textField = new TextField("acb");
+        textField.positionCaret(1);
+
+        TextInputKeyBindings.transposeCharacters(textField);
+
+        assertEquals("cab", textField.getText());
+        assertEquals(2, textField.getCaretPosition());
+    }
+
+    @Test
+    void insertLineAfterCaretSplitsTextAndKeepsCaret() {
+        TextArea textArea = new TextArea("abcdef");
+        textArea.positionCaret(3);
+
+        assertTrue(TextInputKeyBindings.insertLineAfterCaret(textArea));
+
+        assertEquals("abc\ndef", textArea.getText());
+        assertEquals(3, textArea.getCaretPosition());
+    }
+
+    @Test
+    void insertLineAfterCaretAtEndOfTextKeepsCaret() {
+        TextArea textArea = new TextArea("abc");
+        textArea.positionCaret(3);
+
+        assertTrue(TextInputKeyBindings.insertLineAfterCaret(textArea));
+
+        assertEquals("abc\n", textArea.getText());
+        assertEquals(3, textArea.getCaretPosition());
+    }
+
+    @Test
+    void insertLineAfterCaretIgnoresSingleLineTextField() {
+        TextField textField = new TextField("abc");
+        textField.positionCaret(1);
+
+        assertFalse(TextInputKeyBindings.insertLineAfterCaret(textField));
+
+        assertEquals("abc", textField.getText());
+        assertEquals(1, textField.getCaretPosition());
+    }
+
+    @Test
+    void insertLineAfterCaretIgnoresReadOnlyTextArea() {
+        TextArea textArea = new TextArea("abc");
+        textArea.setEditable(false);
+        textArea.positionCaret(1);
+
+        assertFalse(TextInputKeyBindings.insertLineAfterCaret(textArea));
+
+        assertEquals("abc", textArea.getText());
+    }
 
     @ParameterizedTest
     @MethodSource("verticalNavigationBoundaryData")
