@@ -2365,6 +2365,216 @@ class BibtexParserTest {
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
 
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresAtSignInsidePercentComment() throws IOException {
+        String bibtex = """
+                % Type of BibLaTeX entries    : @online
+                @online{test,
+                  author = {Foo Bar}
+                }
+                """;
+
+        BibEntry expected = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Foo Bar")
+                .withUserComments("% Type of BibLaTeX entries    : @online\n");
+        BibDatabase expectedDatabase = new BibDatabase(List.of(expected), "\n");
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(expectedDatabase, result.getDatabase());
+        assertEquals(bibtex, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+    }
+
+    /// The line breaks are written with Java escape sequences (e.g., `\n`), so that the CSV parser cannot normalize them.
+    /// A file using classic Mac line endings (`\r`) gets `\r\n` as its line separator, because the parser only looks at the first line-break character.
+    // [utest->req~import.bibtex.percent-comments~1]
+    @ParameterizedTest
+    @CsvSource({
+            "'\\n', '\\n'",
+            "'\\r\\n', '\\r\\n'",
+            "'\\r', '\\r\\n'"
+    })
+    void parseIgnoresAtSignInsidePercentCommentBetweenEntries(String escapedNewline, String escapedLineSeparator) throws IOException {
+        String newline = escapedNewline.translateEscapes();
+        String bibtex = """
+                @article{first,
+                  author = {First Author}
+                }
+                % Type of BibLaTeX entries    : @online
+                @article{second,
+                  author = {Second Author}
+                }
+                """.replace("\n", newline);
+        BibEntry first = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("first")
+                .withField(StandardField.AUTHOR, "First Author");
+        BibEntry second = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("second")
+                .withField(StandardField.AUTHOR, "Second Author")
+                .withUserComments("% Type of BibLaTeX entries    : @online" + newline);
+        BibDatabase expectedDatabase = new BibDatabase(List.of(first, second), escapedLineSeparator.translateEscapes());
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(expectedDatabase, result.getDatabase());
+    }
+
+    /// Parsing a `@preamble`, `@string`, or `@comment` block also consumes the line break ending it.
+    /// The next line must nevertheless be recognized as an (indented) percent comment, so that the entry marker inside it is ignored.
+    // [utest->req~import.bibtex.percent-comments~1]
+    @ParameterizedTest
+    @MethodSource
+    void parseIgnoresIndentedPercentCommentAfterBlock(String block, BibDatabase expectedDatabase) throws IOException {
+        String bibtex = block + "\n" + """
+                  % Comment containing @article{fake}
+                @article{real, author = {Real Author}}
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(expectedDatabase, result.getDatabase());
+    }
+
+    private static Stream<Arguments> parseIgnoresIndentedPercentCommentAfterBlock() {
+        // After a preamble, the parser skips the spaces following its line break, therefore the indentation of the comment is not kept
+        BibEntry entryAfterPreamble = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("real")
+                .withField(StandardField.AUTHOR, "Real Author")
+                .withUserComments("% Comment containing @article{fake}\n");
+        BibDatabase withPreamble = new BibDatabase(List.of(entryAfterPreamble), "\n");
+        withPreamble.setPreamble("\"text\"");
+
+        // A `@comment` block without JabRef metadata is kept as a comment of the following entry
+        BibEntry entryAfterComment = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("real")
+                .withField(StandardField.AUTHOR, "Real Author")
+                .withUserComments("@comment{comment}\n  % Comment containing @article{fake}\n");
+        BibDatabase withComment = new BibDatabase(List.of(entryAfterComment), "\n");
+
+        return Stream.of(
+                Arguments.of("@preamble{\"text\"}", withPreamble),
+                Arguments.of("@comment{comment}", withComment));
+    }
+
+    /// Same as [#parseIgnoresIndentedPercentCommentAfterBlock(String, BibDatabase)] for a `@string` block.
+    /// The libraries are not compared as a whole, because [BibDatabase#equals(Object)] also compares the generated ids of the strings.
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresIndentedPercentCommentAfterString() throws IOException {
+        String bibtex = """
+                @string{journal = {Journal}}
+                  % Comment containing @article{fake}
+                @article{real, author = {Real Author}}
+                """;
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("real")
+                .withField(StandardField.AUTHOR, "Real Author")
+                .withUserComments("  % Comment containing @article{fake}\n");
+        BibtexString expectedString = new BibtexString("journal", "Journal", "@string{journal = {Journal}}\n");
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        BibDatabase database = result.getDatabase();
+        assertEquals(List.of(expected), database.getEntries());
+        assertEquals(List.of(expectedString), List.copyOf(database.getStringValues()));
+        assertEquals(Optional.empty(), database.getPreamble());
+        assertEquals("", database.getEpilog());
+        assertEquals("\n", database.getNewLineSeparator());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parsePreservesEntriesAfterPercentInOrdinaryText() throws IOException {
+        String bibtex = """
+                Some text 100% of entries @article{first, author = {First Author}}
+                  % Comment containing @article{fake}
+                More text 50% of entries @article{second, author = {Second Author}}
+                """;
+        BibEntry first = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("first")
+                .withField(StandardField.AUTHOR, "First Author")
+                .withUserComments("Some text 100% of entries ");
+        BibEntry second = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("second")
+                .withField(StandardField.AUTHOR, "Second Author")
+                .withUserComments("  % Comment containing @article{fake}\nMore text 50% of entries ");
+        BibDatabase expectedDatabase = new BibDatabase(List.of(first, second), "\n");
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(expectedDatabase, result.getDatabase());
+    }
+
+    /// Old JabRef versions wrote no line break after the encoding header (fixed in https://github.com/JabRef/jabref/pull/718).
+    /// The encoding header is not kept as a comment, because JabRef writes it anew when saving.
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseKeepsEntryAfterLegacyEncodingHeaderWithoutLineBreak() throws IOException {
+        String bibtex = "% Encoding: UTF-8@article{first, author = {First Author}}";
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("first")
+                .withField(StandardField.AUTHOR, "First Author");
+        BibDatabase expectedDatabase = new BibDatabase(List.of(expected), OS.NEWLINE);
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(expectedDatabase, result.getDatabase());
+    }
+
+    /// A percent comment without content must end at its line break, so that the entry on the next line is still read.
+    ///
+    /// The comments are written with Java escape sequences (e.g., `\n`), so that the CSV parser cannot normalize their line breaks.
+    // [utest->req~import.bibtex.percent-comments~1]
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            # Empty comment
+            '%\\n'
+            # Indented empty comment
+            '  %\\n'
+            # Comment consisting of trailing spaces only
+            '%   \\n'
+            # Comment consisting of a tab only
+            '%\\t\\n'
+            # Windows line ending
+            '%\\r\\n'
+            # Trailing spaces before a Windows line ending
+            '%   \\r\\n'
+            # Classic Mac line ending
+            '%\\r'
+            # Two consecutive empty comments
+            '%\\n%\\t\\n'
+            # Encoding declaration without an encoding name
+            '% Encoding:\\n'
+            # Encoding declaration followed by whitespace only
+            '% Encoding: \\t\\r\\n'
+            # Shared database ID declaration without an ID
+            '% DBID:\\n'
+            # Shared database ID declaration followed by whitespace only
+            '% DBID: \\t\\r\\n'
+            """)
+    void parsePreservesEntryAfterBlankPercentComment(String escapedComment) throws IOException {
+        String comment = escapedComment.translateEscapes();
+        String entry = "@article{real, author = {Real Author}}";
+        boolean isLibraryHeader = comment.contains(SaveConfiguration.ENCODING_PREFIX) || comment.contains(BibDatabaseWriter.DATABASE_ID_PREFIX);
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("real")
+                .withField(StandardField.AUTHOR, "Real Author")
+                .withUserComments(isLibraryHeader ? "" : comment);
+
+        ParserResult result = parser.parse(Reader.of(comment + entry));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
     @Test
     void preserveEncodingPrefixInsideEntry() throws ParseException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
