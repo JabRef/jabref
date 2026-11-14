@@ -57,6 +57,7 @@ class MarkdownPublicationExporterFilesTest {
                         mock(JournalAbbreviationRepository.class));
 
         Path expectedFile = Path.of(MarkdownPublicationExporterFilesTest.class.getResource(bibFileName.replace(".bib", ".md")).toURI());
-        assertEquals(Files.readString(expectedFile), Files.readString(exportFile));
+        assertEquals(Files.readString(expectedFile).replace("\r\n", "\n"),
+                Files.readString(exportFile).replace("\r\n", "\n"));
     }
 }
