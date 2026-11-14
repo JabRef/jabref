@@ -75,7 +75,6 @@ class GeneralPropertiesViewModelTest {
         assertFalse(undoManager.canUndo(), "the group and the separator are the metadata snapshot's business");
     }
 
-
     @Test
     void storesLibraryNameAndDescription() {
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
@@ -262,6 +261,5 @@ class GeneralPropertiesViewModelTest {
         CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         return new GeneralPropertiesViewModel(databaseContext, mock(DialogService.class), preferences, mock(UndoManager.class));
-
     }
 }

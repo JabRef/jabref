@@ -291,7 +291,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
                               .map(path -> path.toAbsolutePath().normalize());
     }
 
-
     private Path getBrowseDirectory(String configuredDir) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
         Path workingDir = preferences.getFilePreferences().getWorkingDirectory();
