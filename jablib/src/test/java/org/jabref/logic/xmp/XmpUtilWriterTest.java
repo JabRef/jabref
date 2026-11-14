@@ -9,9 +9,12 @@ import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -19,11 +22,16 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_COVERAGE;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_RIGHTS;
@@ -238,6 +246,79 @@ class XmpUtilWriterTest {
         assertArrayEquals(originalBytes, Files.readAllBytes(pdfFile));
         try (Stream<Path> files = Files.list(tempDir)) {
             assertEquals(List.of(pdfFile), files.toList());
+        }
+    }
+
+    private static Stream<Arguments> latexTextFields() {
+        return Stream.of("title", "author", "editor", "abstract", "keywords", "publisher", "coverage", "rights", "source")
+                     .flatMap(field -> Stream.of(
+                             Arguments.of(FieldFactory.parseField(field), "M\\\"uller", "Müller"),
+                             Arguments.of(FieldFactory.parseField(field), "Research \\& Development", "Research & Development")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("latexTextFields")
+    void exportsLatexAsPlainTextInDublinCore(Field field, String original, String plainText) throws IOException, TransformerException {
+        Path pdf = createDefaultFile("latex.pdf", tempDir);
+        BibEntry entry = new BibEntry().withField(field, original);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, entry, new BibDatabase());
+
+        try (PDDocument document = Loader.loadPDF(pdf.toFile());
+             var stream = document.getDocumentCatalog().getMetadata().createInputStream()) {
+            DublinCoreSchema schema = new XmpUtilShared().parseXmpMetadata(stream).getDublinCoreSchema();
+            BibEntry exported = new DublinCoreExtractor(schema, xmpPreferences, new BibEntry()).extractBibtexEntry().orElseThrow();
+
+            assertEquals(plainText, exported.getField(field).orElseThrow());
+            assertEquals(original, entry.getField(field).orElseThrow());
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({"1\\textsuperscript{st}, 1st", "2\\textsuperscript{nd}, 2nd", "3\\textsuperscript{rd}, 3rd", "10\\textsuperscript{th}, 10th"})
+    void exportsOrdinalSuffixesAsPlainText(String original, String plainText) throws IOException, TransformerException {
+        exportsLatexAsPlainTextInDublinCore(StandardField.TITLE, original, plainText);
+    }
+
+    @Test
+    void exportsIssueExampleAsPlainTextInStandardTitle() throws IOException, TransformerException {
+        exportsLatexAsPlainTextInDublinCore(StandardField.TITLE,
+                "Proceedings of the 10\\textsuperscript{th} Central European Workshop on Services and their Composition ({ZEUS} 2018)",
+                "Proceedings of the 10th Central European Workshop on Services and their Composition (ZEUS 2018)");
+    }
+
+    @Test
+    void standardPdfMetadataContainsPlainText() throws IOException, TransformerException {
+        Path pdf = createDefaultFile("plain-text.pdf", tempDir);
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.TITLE, "The 10\\textsuperscript{th} {CEUR} Workshop")
+                .withField(StandardField.AUTHOR, "M{\\\"u}ller")
+                .withField(StandardField.ABSTRACT, "Research \\& Development")
+                .withField(StandardField.KEYWORDS, "{CEUR}, M{\\\"u}ller");
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, entry, new BibDatabase());
+
+        try (PDDocument document = Loader.loadPDF(pdf.toFile())) {
+            assertEquals(List.of("The 10th CEUR Workshop", "Müller", "Research & Development", "CEUR, Müller"),
+                    List.of(document.getDocumentInformation().getTitle(), document.getDocumentInformation().getAuthor(),
+                            document.getDocumentInformation().getSubject(), document.getDocumentInformation().getKeywords()));
+        }
+    }
+
+    @Test
+    void issueExampleKeepsLatexInBibtexFields() throws IOException, TransformerException {
+        String booktitle = "Proceedings of the 10\\textsuperscript{th} Central European Workshop on Services and their Composition ({ZEUS} 2018)";
+        String series = "{CEUR} Workshop Proceedings";
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.BOOKTITLE, booktitle)
+                .withField(StandardField.SERIES, series);
+        Path pdf = createDefaultFile("bibtex.pdf", tempDir);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, entry, new BibDatabase());
+
+        try (PDDocument document = Loader.loadPDF(pdf.toFile());
+             var stream = document.getDocumentCatalog().getMetadata().createInputStream()) {
+            DublinCoreSchema schema = new XmpUtilShared().parseXmpMetadata(stream).getDublinCoreSchema();
+            assertEquals(List.of("bibtex/booktitle/" + booktitle, "bibtex/series/" + series), schema.getRelations());
+            assertEquals(booktitle, document.getDocumentInformation().getCustomMetadataValue("bibtex/booktitle"));
+            assertEquals(series, document.getDocumentInformation().getCustomMetadataValue("bibtex/series"));
         }
     }
 

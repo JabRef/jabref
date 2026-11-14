@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.xml.DomXmpParser;
 import org.apache.xmpbox.xml.XmpParsingException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +20,8 @@ import org.slf4j.LoggerFactory;
 public class XmpUtilShared {
 
     public static final String BIBTEX_DI_FIELD_NAME_PREFIX = "bibtex/";
+
+    private static final Pattern ORDINAL_IN_SUPERSCRIPT = Pattern.compile("(?<=\\d)\\\\textsuperscript\\{(st|nd|rd|th)\\}");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilShared.class);
 
@@ -28,6 +34,11 @@ public class XmpUtilShared {
             LOGGER.error("Could not initialize DomXmpParser", e);
             DOM_XMP_PARSER = null;
         }
+    }
+
+    static @NonNull String toPlainText(@NonNull String value) {
+        String plainOrdinals = ORDINAL_IN_SUPERSCRIPT.matcher(value).replaceAll("$1");
+        return LatexToUnicodeAdapter.format(plainOrdinals);
     }
 
     public XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
