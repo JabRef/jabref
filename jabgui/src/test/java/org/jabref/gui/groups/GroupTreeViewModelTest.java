@@ -54,6 +54,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -110,6 +111,24 @@ class GroupTreeViewModelTest {
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
         groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+    }
+
+    @Test
+    void addSubgroupFromPreviousRootPersistsInCurrentTree() {
+        JavaFxExtension.invokeAndWait(() -> {
+            GroupNodeViewModel previousRoot = groupTree.rootGroupProperty().get();
+            databaseContext.getDatabase().insertEntry(new BibEntry());
+            activeDatabase.setValue(Optional.empty());
+            activeDatabase.setValue(Optional.of(databaseContext));
+
+            try (var ignored = mockConstruction(GroupDialogView.class)) {
+                when(dialogService.showCustomDialogAndWait(any(GroupDialogView.class)))
+                        .thenReturn(Optional.of(new ExplicitGroup("a", GroupHierarchyType.INDEPENDENT, ',')));
+                groupTree.addNewSubgroup(previousRoot, GroupDialogHeader.SUBGROUP);
+            }
+        });
+
+        assertEquals(List.of("a"), childNames());
     }
 
     @Test
