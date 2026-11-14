@@ -101,6 +101,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed HTML export displaying uppercase named entities as text. [#17776](https://github.com/JabRef/jabref/issues/17776)
 - We fixed an issue where the "Simple HTML" export separated author initials with spaces. [#17306](https://github.com/JabRef/jabref/pull/17306)
 - We fixed an issue where the Hayagriva YAML export wrote braced author names, such as company names, as invalid YAML. [#17316](https://github.com/JabRef/jabref/issues/17316)
+- We fixed an issue where the Hayagriva YAML export failed for libraries containing performance or custom entry types. [#17620](https://github.com/JabRef/jabref/issues/17620)
 - We fixed an issue where "Community forum" in the Help menu opened the donation page instead of the forum. [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We fixed an issue where "Regenerate (custom)" in the AI summary ignored the chosen summarization algorithm. [#17216](https://github.com/JabRef/jabref/issues/17216)
 - We fixed AI summary regeneration restoring an outdated summary after a new generation started. [#17236](https://github.com/JabRef/jabref/pull/17236)
