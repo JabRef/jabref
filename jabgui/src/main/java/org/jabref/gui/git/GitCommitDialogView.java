@@ -18,6 +18,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -38,6 +39,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private GitHandlerRegistry gitHandlerRegistry;
     @Inject private GuiPreferences preferences;
+    @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -58,6 +60,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
                 taskExecutor,
                 gitHandlerRegistry,
                 preferences.getImportFormatPreferences(),
+                entryTypesManager,
                 fileUpdateMonitor);
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
@@ -99,6 +102,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(
                 diffDatabases.headDatabase(),
                 diffDatabases.workingTreeDatabase(),
+                entryTypesManager,
                 null);
 
         dialogService.showCustomDialogAndWait(

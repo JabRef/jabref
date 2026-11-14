@@ -10,6 +10,7 @@ import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -33,8 +34,8 @@ public final class GitCommitMessageGenerator {
     /// If there is exactly one difference, try the specific bonus message
     /// Otherwise, do the count of added, deleted, modified entries
     /// If nothing changed, return empty.
-    public static Optional<String> generate(BibDatabaseContext headDatabase, BibDatabaseContext workingTreeDatabase) {
-        List<BibEntryDiff> entryDiffs = BibDatabaseDiff.compare(headDatabase, workingTreeDatabase).getEntryDifferences();
+    public static Optional<String> generate(BibDatabaseContext headDatabase, BibDatabaseContext workingTreeDatabase, BibEntryTypesManager entryTypesManager) {
+        List<BibEntryDiff> entryDiffs = BibDatabaseDiff.compare(headDatabase, workingTreeDatabase, entryTypesManager).getEntryDifferences();
         Optional<String> singleFieldMessage = entryDiffs.size() == 1
                                               ? singleFieldMessage(entryDiffs.getFirst())
                                               : Optional.empty();
