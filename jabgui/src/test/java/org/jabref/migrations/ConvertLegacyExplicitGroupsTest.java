@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConvertLegacyExplicitGroupsTest {
 
@@ -36,7 +38,11 @@ class ConvertLegacyExplicitGroupsTest {
     void performActionWritesGroupMembershipInEntry() {
         ParserResult parserResult = generateParserResult(GroupTreeNode.fromGroup(group));
 
+        assertTrue(action.isMigrationNecessary(parserResult));
+
         action.performMigration(parserResult);
+
+        assertFalse(action.isMigrationNecessary(parserResult));
 
         assertEquals(Optional.of("TestGroup"), entry.getField(StandardField.GROUPS));
     }

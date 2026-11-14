@@ -63,9 +63,8 @@ The fixture contains large and overlapping explicit groups, nested hierarchy mod
 It also includes keyword, regular-expression, search, automatic, and legacy smart groups.
 
 Measure parsing separately from `PerformLoadDatabaseMigrations` with a JVM flight recording.
-Migration runs before GUI attachment: only conversions with remaining legacy content run, using temporarily detached entries and a single citation-key index.
+Migration runs before GUI attachment, after the user confirmed the migration dialog: only conversions with remaining legacy content run, using temporarily detached entries and a single citation-key index.
 Entries are reinserted in a batch to restore observation and database indices, and the library is marked modified so the converted representation can be saved.
-A localized notification announces migration when legacy content is found.
 Save and reopen the fixture to verify that no conversion runs again; the content checks still run to detect legacy data in mixed-format libraries.
 
 ## Coverage

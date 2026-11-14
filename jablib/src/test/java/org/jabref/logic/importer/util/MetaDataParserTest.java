@@ -28,6 +28,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MetaDataParserTest {
 
@@ -104,6 +106,30 @@ public class MetaDataParserTest {
         MetaData parsed = parser.parse(Map.of(MetaData.AI_LIBRARY_ID, "test-ai-library-id;"), ',', "userAndHost");
 
         assertEquals(Optional.of("test-ai-library-id"), parsed.getAiLibraryId());
+    }
+
+    @Test
+    void groupsUnderLegacyKeyAreFlagged() throws ParseException {
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(MetaData.GROUPSTREE_LEGACY, "0 AllEntriesGroup:;"), ',', "userAndHost");
+
+        assertTrue(parsed.isGroupsInLegacyFormat());
+    }
+
+    @Test
+    void groupsUnderCurrentKeyAreNotFlagged() throws ParseException {
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(MetaData.GROUPSTREE, "0 AllEntriesGroup:;"), ',', "userAndHost");
+
+        assertFalse(parsed.isGroupsInLegacyFormat());
+    }
+
+    @Test
+    void parsesSkippedMigrations() throws ParseException {
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(MetaData.SKIPPED_MIGRATIONS, "markings;specialFieldsInKeywords;"), ',', "userAndHost");
+
+        assertEquals(List.of("markings", "specialFieldsInKeywords"), parsed.getSkippedMigrations());
     }
 
     @Test

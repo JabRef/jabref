@@ -64,6 +64,13 @@ public class MetaDataSerializerTest {
     }
 
     @Test
+    void serializeSkippedMigrations() {
+        metaData.setSkippedMigrations(List.of("markings", "specialFieldsInKeywords"));
+
+        assertEquals(Map.of("skippedMigrations", "markings;specialFieldsInKeywords;"), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
     void serializeKeywordSeparator() {
         metaData.setKeywordSeparator(';');
 
