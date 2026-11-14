@@ -6,7 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
-import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 
@@ -38,7 +38,7 @@ class EntryEditorTabViewModelTest {
                 dialogService,
                 entryEditorPreferences,
                 MrDlibPreferences.getDefault(),
-                AbbreviationPreferences.getDefault(),
+                JournalAbbreviationPreferences.getDefault(),
                 mock(TaskExecutor.class));
     }
 

@@ -1,12 +1,8 @@
 package org.jabref.logic.journals;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,73 +15,34 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-///
-/// This class loads abbreviations from a CSV file and stores them into a MV file ([#readAbbreviationsFromCsvFile(Path)]).
-/// It can also create an [JournalAbbreviationRepository] based on an MV file ([#loadRepository(AbbreviationPreferences)]).
-///
-///
-/// Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
-///
-public class JournalAbbreviationLoader {
-
+@NullMarked
+public class JournalAbbreviationLoader extends AbbreviationLoader<JournalAbbreviationRepository> {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
-    public static Collection<Abbreviation> readAbbreviationsFromCsvFile(Path file) throws IOException {
-        LOGGER.debug("Reading journal list from file {}", file);
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromFile(file);
-        return parser.getAbbreviations();
+    public JournalAbbreviationLoader() {
+        super("journals", "journal-list.mv");
     }
 
-    public static JournalAbbreviationRepository loadRepository(AbbreviationPreferences abbreviationPreferences) {
-        return loadRepositorySynchronously(abbreviationPreferences);
+    public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences abbreviationPreferences) {
+        return new JournalAbbreviationLoader().loadRepositorySynchronously(abbreviationPreferences);
     }
 
-    public static JournalAbbreviationRepository loadRepositoryInBackground(AbbreviationPreferences abbreviationPreferences, TaskExecutor taskExecutor) {
+    public static JournalAbbreviationRepository loadRepositoryInBackground(JournalAbbreviationPreferences abbreviationPreferences, TaskExecutor taskExecutor) {
         return new AsyncJournalAbbreviationRepository(abbreviationPreferences, taskExecutor);
     }
 
-    private static JournalAbbreviationRepository loadRepositorySynchronously(AbbreviationPreferences abbreviationPreferences) {
-        JournalAbbreviationRepository repository;
+    @Override
+    protected JournalAbbreviationRepository createRepository(Path file) throws IOException {
+        return new JournalAbbreviationRepository(file, loadLtwaRepository());
+    }
 
-        // Initialize with built-in list
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
-            if (resourceAsStream == null) {
-                LOGGER.warn("There is no journal-list.mv. We use a default journal list.");
-                repository = new JournalAbbreviationRepository();
-            } else {
-                Path tempDir = Files.createTempDirectory("jabref-journal");
-                Path tempJournalList = tempDir.resolve("journal-list.mv");
-                Files.copy(resourceAsStream, tempJournalList);
-                repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());
-                tempDir.toFile().deleteOnExit();
-                tempJournalList.toFile().deleteOnExit();
-                LOGGER.debug("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
-            }
-        } catch (IOException e) {
-            LOGGER.error("Error while loading journal abbreviation repository", e);
-            return getFallbackRepository();
-        }
-
-        // Read external lists
-        List<String> lists = abbreviationPreferences.getExternalJournalLists();
-        // might produce NPE in tests
-        if (lists != null && !lists.isEmpty()) {
-            // reversing ensures that the latest lists overwrites the former one
-            Collections.reverse(lists);
-            for (String filename : lists) {
-                try {
-                    repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(Path.of(filename)));
-                } catch (IOException | InvalidPathException e) {
-                    // invalid path might come from unix/windows mixup of prefs
-                    LOGGER.error("Cannot read external journal list file {}", filename, e);
-                }
-            }
-        }
-        return repository;
+    @Override
+    protected JournalAbbreviationRepository createFallbackRepository() {
+        return getFallbackRepository();
     }
 
     private static JournalAbbreviationRepository getFallbackRepository() {
@@ -94,35 +51,25 @@ public class JournalAbbreviationLoader {
     }
 
     private static LtwaRepository loadLtwaRepository() throws IOException {
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/ltwa-list.mv")) {
-            if (resourceAsStream == null) {
-                LOGGER.warn("There is no ltwa-list.mv. We cannot load the LTWA repository.");
-                throw new IOException("LTWA repository not found");
-            } else {
-                Path tempDir = Files.createTempDirectory("jabref-ltwa");
-                Path tempLtwaList = tempDir.resolve("ltwa-list.mv");
-                Files.copy(resourceAsStream, tempLtwaList);
-                LtwaRepository ltwaRepository = new LtwaRepository(tempLtwaList);
-                tempDir.toFile().deleteOnExit();
-                tempLtwaList.toFile().deleteOnExit();
-                return ltwaRepository;
-            }
-        }
+        Path file = extractResource("/journals/ltwa-list.mv")
+                .orElseThrow(() -> new IOException("LTWA repository not found"));
+        return new LtwaRepository(file);
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new AbbreviationPreferences(List.of(), true, false));
+        return loadRepository(JournalAbbreviationPreferences.getDefault());
     }
 
+    @NullMarked
     private static class AsyncJournalAbbreviationRepository extends JournalAbbreviationRepository {
-        private final AbbreviationPreferences abbreviationPreferences;
+        private final JournalAbbreviationPreferences abbreviationPreferences;
         private final TaskExecutor taskExecutor;
         private final AtomicBoolean loadingStarted = new AtomicBoolean(false);
         private final AtomicBoolean loaded = new AtomicBoolean(false);
         private final AtomicReference<JournalAbbreviationRepository> currentRepository = new AtomicReference<>();
         private final Set<Abbreviation> pendingCustomAbbreviations = new TreeSet<>();
 
-        private AsyncJournalAbbreviationRepository(AbbreviationPreferences abbreviationPreferences, TaskExecutor taskExecutor) {
+        private AsyncJournalAbbreviationRepository(JournalAbbreviationPreferences abbreviationPreferences, TaskExecutor taskExecutor) {
             this.abbreviationPreferences = abbreviationPreferences;
             this.taskExecutor = taskExecutor;
         }
@@ -230,7 +177,7 @@ public class JournalAbbreviationLoader {
                 return;
             }
 
-            BackgroundTask.wrap(() -> loadRepositorySynchronously(abbreviationPreferences))
+            BackgroundTask.wrap(() -> loadRepository(abbreviationPreferences))
                           .onSuccess(this::setLoadedRepository)
                           .onFailure(e -> {
                               LOGGER.error("Error while loading journal abbreviation repository in background", e);

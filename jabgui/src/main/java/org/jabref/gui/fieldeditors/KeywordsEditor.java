@@ -75,7 +75,7 @@ public class KeywordsEditor extends TagsEditor {
 
     @Override
     protected void customizeTag(Label tagLabel, Keyword keyword) {
-        if (!preferences.getAbbreviationPreferences().shouldEnableMscKeywordDescriptions()) {
+        if (!preferences.getJournalAbbreviationPreferences().shouldEnableMscKeywordDescriptions()) {
             return;
         }
 

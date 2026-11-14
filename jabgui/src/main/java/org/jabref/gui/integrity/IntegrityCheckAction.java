@@ -13,6 +13,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.conferences.ConferenceAbbreviationLoader;
+import org.jabref.logic.conferences.ConferenceAbbreviationPreferences;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -49,15 +51,18 @@ public class IntegrityCheckAction extends SimpleCommand {
     @Override
     public void execute() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        IntegrityCheck check = new IntegrityCheck(database,
-                preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                abbreviationRepository,
-                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
+        ConferenceAbbreviationPreferences conferencePreferences = new ConferenceAbbreviationPreferences(
+                List.copyOf(preferences.getConferenceAbbreviationPreferences().getExternalLists()));
 
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
             protected List<IntegrityMessage> call() {
+                IntegrityCheck check = new IntegrityCheck(database,
+                        preferences.getFilePreferences(),
+                        preferences.getCitationKeyPatternPreferences(),
+                        abbreviationRepository,
+                        ConferenceAbbreviationLoader.loadRepository(conferencePreferences),
+                        preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
                 List<IntegrityMessage> result = new ArrayList<>(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
