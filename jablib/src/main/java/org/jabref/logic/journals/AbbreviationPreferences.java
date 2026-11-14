@@ -12,6 +12,7 @@ public class AbbreviationPreferences {
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
+    private final BooleanProperty useBuiltInJournalList = new SimpleBooleanProperty(true);
 
     public AbbreviationPreferences(List<String> externalJournalLists,
                                    boolean useFJournalField,
@@ -31,6 +32,18 @@ public class AbbreviationPreferences {
 
     public static AbbreviationPreferences getDefault() {
         return new AbbreviationPreferences();
+    }
+
+    public BooleanProperty useBuiltInJournalListProperty() {
+        return useBuiltInJournalList;
+    }
+
+    public boolean shouldUseBuiltInJournalList() {
+        return useBuiltInJournalList.get();
+    }
+
+    public void setUseBuiltInJournalList(boolean value) {
+        useBuiltInJournalList.set(value);
     }
 
     public ObservableList<String> getExternalJournalLists() {

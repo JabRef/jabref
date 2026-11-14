@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,6 +20,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -174,7 +178,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws IOException {
-        AbbreviationPreferences abbreviationPreferences = mock(AbbreviationPreferences.class);
+        AbbreviationPreferences abbreviationPreferences = org.mockito.Mockito.spy(AbbreviationPreferences.getDefault());
 
         dialogService = mock(DialogService.class);
         this.tempFolder = tempFolder;
@@ -183,6 +187,98 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel = new JournalAbbreviationsTabViewModel(abbreviationPreferences, dialogService, taskExecutor, repository);
 
         emptyTestFile = createTestFile(new CsvFileNameAndContent("emptyTestFile.csv", ""));
+    }
+
+    @Test
+    void builtInChoiceIsLocalUntilSavedAndRefreshesRetainedRepository() {
+        AbbreviationPreferences preferences = AbbreviationPreferences.getDefault();
+        JournalAbbreviationRepository retained = JournalAbbreviationLoader.loadRepository(preferences);
+        JournalAbbreviationsTabViewModel model = new JournalAbbreviationsTabViewModel(
+                preferences, dialogService, new CurrentThreadTaskExecutor(), retained);
+        model.setValues();
+        model.useBuiltInJournalListProperty().set(false);
+        assertTrue(preferences.shouldUseBuiltInJournalList());
+        assertEquals(Optional.of("2D Mater."), retained.getDefaultAbbreviation("2D Materials"));
+
+        model.setValues();
+        assertTrue(model.useBuiltInJournalListProperty().get());
+        model.useBuiltInJournalListProperty().set(false);
+        model.storeSettings();
+        assertFalse(preferences.shouldUseBuiltInJournalList());
+        assertEquals(Optional.empty(), retained.getDefaultAbbreviation("2D Materials"));
+        model.setValues();
+        assertFalse(model.useBuiltInJournalListProperty().get());
+        assertEquals(List.of("2D Materials"), model.abbreviationsProperty().stream()
+                                                   .map(AbbreviationViewModel::getName)
+                                                   .filter("2D Materials"::equals)
+                                                   .toList());
+    }
+
+    @Test
+    void overlappingSavesKeepLatestExternalEditsAndToggle() throws IOException {
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(emptyTestFile.toString()), true, false);
+        List<Runnable> queued = new ArrayList<>();
+        TaskExecutor executor = mock(TaskExecutor.class);
+        when(executor.execute(any())).thenAnswer(invocation -> {
+            BackgroundTask<?> task = invocation.getArgument(0);
+            queued.add(() -> new CurrentThreadTaskExecutor().execute(task));
+            return CompletableFuture.completedFuture(null);
+        });
+        JournalAbbreviationRepository retained = JournalAbbreviationLoader.loadRepository(preferences);
+        JournalAbbreviationsTabViewModel model = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, retained);
+        model.setValues();
+        queued.getFirst().run();
+        model.currentFileProperty().set(model.journalFilesProperty().getFirst());
+        model.addAbbreviation(ABBREVIATION_0);
+        model.useBuiltInJournalListProperty().set(false);
+        model.storeSettings();
+        model.addAbbreviation(ABBREVIATION_1);
+        model.useBuiltInJournalListProperty().set(true);
+        model.storeSettings();
+
+        queued.get(2).run();
+        queued.get(1).run();
+        queued.getLast().run();
+        assertTrue(preferences.shouldUseBuiltInJournalList());
+        assertEquals(Optional.of("2D Mater."), retained.getDefaultAbbreviation("2D Materials"));
+        assertEquals(Optional.of("Abb0"), retained.getDefaultAbbreviation("Full0"));
+        assertEquals(Optional.of("Abb1"), retained.getDefaultAbbreviation("Full1"));
+        assertEquals(2, JournalAbbreviationLoader.readAbbreviationsFromCsvFile(emptyTestFile).size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void newerSaveFromReopenedPreferencesIsNotOverwrittenByOlderSave(boolean editReopenedList) throws IOException {
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(emptyTestFile.toString()), true, false);
+        List<Runnable> queued = new ArrayList<>();
+        TaskExecutor executor = mock(TaskExecutor.class);
+        when(executor.execute(any())).thenAnswer(invocation -> {
+            BackgroundTask<?> task = invocation.getArgument(0);
+            queued.add(() -> new CurrentThreadTaskExecutor().execute(task));
+            return CompletableFuture.completedFuture(null);
+        });
+        JournalAbbreviationsTabViewModel first = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, repository);
+        first.setValues();
+        queued.removeFirst().run();
+        first.currentFileProperty().set(first.journalFilesProperty().getFirst());
+        first.addAbbreviation(ABBREVIATION_0);
+        first.storeSettings();
+        Runnable olderSave = queued.removeFirst();
+
+        JournalAbbreviationsTabViewModel reopened = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, repository);
+        reopened.setValues();
+        queued.removeFirst().run();
+        reopened.currentFileProperty().set(reopened.journalFilesProperty().getFirst());
+        if (editReopenedList) {
+            reopened.addAbbreviation(ABBREVIATION_1);
+        }
+        reopened.storeSettings();
+        queued.removeFirst().run();
+        olderSave.run();
+
+        assertEquals(editReopenedList ? List.of("Full0", "Full1") : List.of("Full0"), JournalAbbreviationLoader.readAbbreviationsFromCsvFile(emptyTestFile).stream()
+                                                                                                               .map(Abbreviation::getName)
+                                                                                                               .toList());
     }
 
     @Test
