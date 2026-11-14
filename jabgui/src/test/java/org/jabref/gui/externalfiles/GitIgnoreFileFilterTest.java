@@ -141,6 +141,21 @@ class GitIgnoreFileFilterTest {
         assertFalse(secondFilter.accept(second.resolve("keep.pdf")));
     }
 
+    @Test
+    void normalizesSearchAndCandidatePathsBeforeApplyingAncestorRules(@TempDir Path dir) throws IOException {
+        Path other = Files.createDirectory(dir.resolve("other"));
+        Files.writeString(other.resolve(".gitignore"), "*.pdf\n");
+        Path target = Files.createDirectory(dir.resolve("target"));
+        Files.writeString(target.resolve(".gitignore"), "/ignored.pdf\n");
+        Path searchPath = other.resolve("..").resolve("target");
+
+        GitIgnoreFileFilter filter = new GitIgnoreFileFilter(searchPath);
+
+        assertTrue(filter.accept(searchPath.resolve("allowed.pdf")));
+        assertFalse(filter.accept(searchPath.resolve("ignored.pdf")));
+        assertFalse(filter.accept(target.resolve("ignored.pdf")));
+    }
+
     // [utest->req~jabgui.externalfiles.unlinked-files.search.gitignore-windows-case~1]
     @Test
     @EnabledOnOs(OS.WINDOWS)

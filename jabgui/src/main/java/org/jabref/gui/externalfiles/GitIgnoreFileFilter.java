@@ -51,9 +51,10 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
             LOGGER.info("Could not add default ignores", e);
         }
 
-        ignoreNodes.add(Map.entry(path.toAbsolutePath(), ignoreNode));
+        Path directory = path.toAbsolutePath().normalize();
+        ignoreNodes.add(Map.entry(directory, ignoreNode));
         List<Path> ancestors = new ArrayList<>();
-        for (Path current = path.toAbsolutePath(); current != null; current = current.getParent()) {
+        for (Path current = directory; current != null; current = current.getParent()) {
             ancestors.add(current);
         }
         for (Path ancestor : ancestors.reversed()) {
@@ -62,9 +63,10 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     }
 
     private GitIgnoreFileFilter(Path path, GitIgnoreFileFilter parent) {
-        ignoreNodes.add(Map.entry(path.toAbsolutePath(), parent.ignoreNodes.getFirst().getValue()));
+        Path directory = path.toAbsolutePath().normalize();
+        ignoreNodes.add(Map.entry(directory, parent.ignoreNodes.getFirst().getValue()));
         ignoreNodes.addAll(parent.ignoreNodes.subList(1, parent.ignoreNodes.size()));
-        addIgnoreFile(path.toAbsolutePath());
+        addIgnoreFile(directory);
     }
 
     GitIgnoreFileFilter forSubdirectory(Path path) {
@@ -97,8 +99,9 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
     boolean accept(Path path, boolean isDirectory) {
         boolean ignored = false;
+        Path absolutePath = path.toAbsolutePath().normalize();
         for (Map.Entry<Path, IgnoreNode> entry : ignoreNodes) {
-            Path relative = safeRelativize(entry.getKey(), path.toAbsolutePath());
+            Path relative = safeRelativize(entry.getKey(), absolutePath);
             String relativeStr = StreamSupport.stream(relative.spliterator(), false).map(Path::toString).collect(Collectors.joining("/"));
             if (relativeStr.isEmpty()) {
                 continue;
