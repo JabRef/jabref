@@ -1,10 +1,13 @@
 package org.jabref.logic.shared;
 
+import java.nio.file.Path;
 import java.sql.Statement;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 
 import javafx.collections.FXCollections;
@@ -32,6 +35,7 @@ import org.jabref.support.DatabaseTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
@@ -47,11 +51,15 @@ import static org.mockito.Mockito.when;
 @Execution(ExecutionMode.SAME_THREAD)
 class SynchronizationSimulatorTest {
 
+    @TempDir
+    Path offlineChangesDirectory;
+
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
     private SynchronizationEventListenerTest eventListenerB; // used to monitor occurring events
     private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
     private ConnectorTest connectorTest;
+    private final ConcurrentLinkedQueue<Runnable> remoteUpdates = new ConcurrentLinkedQueue<>();
 
     private BibEntry getBibEntryExample(int index) {
         return new BibEntry(StandardEntryType.InProceedings)
@@ -62,11 +70,17 @@ class SynchronizationSimulatorTest {
                 .withCitationKey("nanoproc199" + index);
     }
 
-    /// Awaits an asynchronously arriving state change (listener-thread work) with a bounded deadline.
+    /// Applies queued remote updates on the model thread while awaiting a state change with a bounded deadline.
     /// The assertion afterwards reports the actual state if the deadline was missed.
-    private static void waitUntil(BooleanSupplier condition) throws InterruptedException {
+    private void waitUntil(BooleanSupplier condition) throws InterruptedException {
         long deadline = System.currentTimeMillis() + Duration.ofSeconds(10).toMillis();
-        while (!condition.getAsBoolean() && (System.currentTimeMillis() < deadline)) {
+        while (System.currentTimeMillis() < deadline) {
+            while (!remoteUpdates.isEmpty()) {
+                remoteUpdates.remove().run();
+            }
+            if (condition.getAsBoolean()) {
+                return;
+            }
             Thread.sleep(50);
         }
     }
@@ -80,13 +94,23 @@ class SynchronizationSimulatorTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
+        // Like the JavaFX application thread, the test thread owns all model mutations.
+        Thread modelThread = Thread.currentThread();
+        Executor remoteUpdateExecutor = update -> {
+            if (Thread.currentThread() == modelThread) {
+                update.run();
+            } else {
+                remoteUpdates.add(update);
+            }
+        };
+
         clientContextA = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor());
+        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor(), remoteUpdateExecutor, Runnable::run, offlineChangesDirectory.resolve("clientA"));
         clientContextA.convertToSharedDatabase(synchronizerA);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
         clientContextB = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor());
+        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor(), remoteUpdateExecutor, Runnable::run, offlineChangesDirectory.resolve("clientB"));
         clientContextB.convertToSharedDatabase(synchronizerB);
         // use a second connection, because this is another client (typically on another machine)
         clientContextB.getDBMSSynchronizer().openSharedDatabase(connectorTest.getTestDBMSConnection());

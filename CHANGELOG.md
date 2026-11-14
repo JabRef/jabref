@@ -149,6 +149,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed citation key generation to ignore "as" as a function word. [#17523](https://github.com/JabRef/jabref/issues/17523)
 - We fixed missing PDF links and DOI persistence during full-text downloads. [#12947](https://github.com/JabRef/jabref/issues/12947)
 - We fixed dollar signs and backslashes being mishandled in HTML paragraph formatting. [#17778](https://github.com/JabRef/jabref/issues/17778)
+- We fixed an issue where searching for unlinked files failed when `.gitignore` contained a literal opening brace. [#17546](https://github.com/JabRef/jabref/issues/17546)
 
 ### Removed
 

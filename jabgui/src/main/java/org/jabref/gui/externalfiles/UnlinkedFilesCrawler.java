@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
@@ -140,17 +140,21 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
         // Filters:
         //   1. UnlinkedPDFFileFilter
         //   2. GitIgnoreFilter
-        ChainedFilters filters = new ChainedFilters(List.of(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory)));
-        Map<Boolean, List<Path>> directoryAndFilePartition;
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory, filters);
-             Stream<Path> filesStream = StreamSupport.stream(dirStream.spliterator(), false)) {
-            directoryAndFilePartition = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
+        GitIgnoreFileFilter gitIgnoreFilter = new GitIgnoreFileFilter(directory);
+        List<Path> subDirectories = new ArrayList<>();
+        List<Path> files = new ArrayList<>();
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
+            for (Path path : dirStream) {
+                BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                boolean isDirectory = attributes.isDirectory() || (attributes.isSymbolicLink() && Files.isDirectory(path));
+                if (unlinkedPDFFileFilter.accept(path, isDirectory) && gitIgnoreFilter.accept(path, attributes.isDirectory())) {
+                    (isDirectory ? subDirectories : files).add(path);
+                }
+            }
         } catch (IOException e) {
             LOGGER.error("Error while searching files", e);
             return fileNodeViewModelForCurrentDirectory;
         }
-        List<Path> subDirectories = directoryAndFilePartition.get(true);
-        List<Path> files = directoryAndFilePartition.get(false);
 
         // at this point, only unlinked PDFs AND unignored files are contained
 
