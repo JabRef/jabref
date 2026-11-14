@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Delete" and "Retry" to the context menu of AI chat messages and made user messages retryable. [#17151](https://github.com/JabRef/jabref/pull/17151)
 - We added a list of saved connections to the "Connect to shared database" dialog. [#12948](https://github.com/JabRef/jabref/issues/12948)
 - We added <kbd>Ctrl</kbd> + <kbd>C</kbd> copy support for selected entries in the global search results window. [#17310](https://github.com/JabRef/jabref/issues/17310)
+- We added an optional library name and description, shown in the library tab title and tooltip. [#17473](https://github.com/JabRef/jabref/issues/17473)
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
 

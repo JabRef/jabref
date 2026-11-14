@@ -422,6 +422,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         text.append(modeInfo);
     }
 
+    /// Appends the custom library name and description (if set) as additional tooltip lines.
+    private static void addLibraryNameAndDescription(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+        bibDatabaseContext.getMetaData().getLibraryName().ifPresent(name ->
+                text.append('\n').append(Localization.lang("Library name: %0", name)));
+        bibDatabaseContext.getMetaData().getLibraryDescription().ifPresent(description ->
+                text.append('\n').append(Localization.lang("Library description: %0", description)));
+    }
+
     /// Returns an index for a new untitled library to generate names like "untitled (1)", "untitled (2)", etc.
     private int getUntitledLibraryNumber() {
         // Relies on a fact that a fresh "untitled" library doesn't have a path and that new libraries are added at the end of the list.
@@ -596,6 +604,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
     ///
     /// Example: *jabref-authors.bib – testbib
+    // [impl->req~ux.library-name.tab-label~1]
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();
 
@@ -612,12 +621,30 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
 
             Path databasePath = file.get();
-            tabTitle.append(databasePath.getFileName().toString());
+            // A custom library name replaces the file name as the tab label; the file itself is never renamed
+            String displayName = bibDatabaseContext.getMetaData().getLibraryName()
+                                                   .filter(name -> !name.isBlank())
+                                                   .orElse(databasePath.getFileName().toString());
+            tabTitle.append(displayName);
+
+            boolean displayNameIsDuplicated = stateManager.getOpenDatabases().stream()
+                                                          .filter(context -> context != bibDatabaseContext)
+                                                          .map(context -> context.getMetaData().getLibraryName()
+                                                                                 .orElseGet(() -> context.getDatabasePath()
+                                                                                                         .map(path -> path.getFileName().toString())
+                                                                                                         .orElse("")))
+                                                          .anyMatch(displayName::equals);
+
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
             // Unicode codepoint deliberately chosen to avoid semantical confusion
-            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
-            toolTipText.append(databasePath.toAbsolutePath());
+            if (displayNameIsDuplicated && uniquePathPart.isEmpty()) {
+                tabTitle.append(" \u2013 ").append(databasePath.getFileName());
+            } else {
+                uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
+            }
 
+            toolTipText.append(databasePath.toAbsolutePath());
+            addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
             if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
@@ -636,15 +663,18 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append('*');
                 int untitledNumber = getUntitledLibraryNumber();
-                if (untitledNumber > 0) {
-                    tabTitle.append(Localization.lang("untitled (%0)", Integer.toString(untitledNumber)));
-                } else {
-                    tabTitle.append(Localization.lang("untitled"));
-                }
+                String untitledName = untitledNumber > 0
+                                      ? Localization.lang("untitled (%0)", Integer.toString(untitledNumber))
+                                      : Localization.lang("untitled");
+                String displayName = bibDatabaseContext.getMetaData().getLibraryName()
+                                                       .orElse(untitledName);
+                tabTitle.append(displayName);
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
+
+            addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
             addModeInfo(toolTipText, bibDatabaseContext);
             if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText);

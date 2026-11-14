@@ -17,6 +17,29 @@
         <columnConstraints>
             <ColumnConstraints/>
             <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints/>
+            <RowConstraints/>
+            <RowConstraints/>
+        </rowConstraints>
+
+        <Label styleClass="h4,padding-top-12" text="%Library"
+               GridPane.columnSpan="2" GridPane.rowIndex="0"/>
+        <Label text="%Library name"
+               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="libraryName"
+                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Label text="%Library description"
+               GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <TextField fx:id="libraryDescription"
+                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+    </GridPane>
+
+    <GridPane hgap="10.0" vgap="4.0">
+        <columnConstraints>
+            <ColumnConstraints/>
+            <ColumnConstraints hgrow="ALWAYS"/>
             <ColumnConstraints/>
         </columnConstraints>
         <rowConstraints>
