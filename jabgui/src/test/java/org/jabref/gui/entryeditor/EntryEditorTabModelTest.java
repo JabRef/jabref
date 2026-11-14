@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.List;
 import java.util.Set;
 
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -11,6 +12,8 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,6 +39,25 @@ class EntryEditorTabModelTest {
     @Test
     void unknownPlainFieldNameResolvesToUnknownField() {
         assertEquals(List.of(new UnknownField("myfield")), resolve(entry, "myfield"));
+    }
+
+    @Test
+    void customFieldKeepsItsCasingOnTheEntryEditorLabel() {
+        Field halId = resolve(entry, "HALid").getFirst();
+
+        assertEquals("HALid", FieldsUtil.getDisplayName(halId));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "url, URL",
+            "doi, DOI",
+            "author, Author",
+            "HALid, HALid",
+            "comment-.*, comment-.*"
+    })
+    void fieldDisplayNameMatchesEntryEditorLabel(String fieldPattern, String expectedDisplayName) {
+        assertEquals(expectedDisplayName, EntryEditorTabModel.CustomizedFieldsTab.fieldDisplayName(fieldPattern));
     }
 
     @Test
