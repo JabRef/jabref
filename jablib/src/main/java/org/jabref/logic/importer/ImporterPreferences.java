@@ -203,10 +203,10 @@ public class ImporterPreferences {
     /// @implNote See `fetchers.md` for general information on fetchers.
     public Optional<String> getApiKey(String name) {
         return apiKeys.stream()
-                      .filter(key -> key.getName().equalsIgnoreCase(name))
+                      .filter(key -> key.name().equalsIgnoreCase(name))
                       .filter(FetcherApiKey::shouldUse)
                       .findFirst()
-                      .map(FetcherApiKey::getKey)
+                      .map(FetcherApiKey::key)
                       .or(() -> Optional.ofNullable(getDefaultFetcherKeys().get(name)))
                       .filter(StringUtil::isNotBlank);
     }

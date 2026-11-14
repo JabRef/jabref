@@ -24,7 +24,7 @@
                         <Label minWidth="-Infinity" text="%File"/>
                         <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
                     </HBox>
-                    <ListView fx:id="annotationList" VBox.vgrow="ALWAYS"/>
+                    <ListView fx:id="annotationList" styleClass="variable-cell-size" VBox.vgrow="ALWAYS"/>
                 </children>
             </VBox>
         </masterNode>
