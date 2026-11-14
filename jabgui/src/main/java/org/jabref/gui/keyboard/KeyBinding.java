@@ -129,6 +129,7 @@ public enum KeyBinding {
     READ("Set read status to read", Localization.lang("Mark as read"), "", KeyBindingCategory.EDIT),
     SKIMMED("Set read status to skimmed", Localization.lang("Mark as skimmed"), "", KeyBindingCategory.EDIT),
     GROUP_RENAME("Rename group", Localization.lang("Rename group"), "F2", KeyBindingCategory.EDIT),
+    ASSIGN_ENTRIES_TO_GROUP("Assign entries to group", Localization.lang("Assign entries to group"), "shortcut+shift+G", KeyBindingCategory.EDIT),
     MERGE_WITH_FETCHED_ENTRY("Get bibliographic data from %0, \"DOI/ISBN/...\"", Localization.lang("Get bibliographic data from %0", "DOI/ISBN/..."), "F5", KeyBindingCategory.EDIT),
     LOOKUP_DOC_IDENTIFIER("Search document identifier online", Localization.lang("Search document identifier online"), "alt+F", "shortcut+alt+F", KeyBindingCategory.EDIT),
     RENAME_FILE_TO_NAME("Rename file(s) to configured filename format pattern", Localization.lang("Rename file(s) to configured filename format pattern"), "shortcut+P", KeyBindingCategory.EDIT);

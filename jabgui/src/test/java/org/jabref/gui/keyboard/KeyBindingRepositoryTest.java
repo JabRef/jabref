@@ -1,6 +1,7 @@
 package org.jabref.gui.keyboard;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -42,6 +43,20 @@ class KeyBindingRepositoryTest {
 
         assertEquals(keyBindingRepository.get(bindNames.getFirst()), bindings.getFirst());
         assertEquals(keyBindingRepository.get(bindNames.get(1)), bindings.get(1));
+    }
+
+    @Test
+    void addsDefaultForBindingMissingFromSavedLists() {
+        KeyBindingRepository repository = new KeyBindingRepository(List.of(KeyBinding.PASTE.getConstant()), List.of("shift+B"));
+
+        assertEquals(Optional.of(KeyBinding.ASSIGN_ENTRIES_TO_GROUP.getDefaultKeyBinding()), repository.get(KeyBinding.ASSIGN_ENTRIES_TO_GROUP));
+    }
+
+    @Test
+    void keepsSavedBindingInsteadOfDefault() {
+        KeyBindingRepository repository = new KeyBindingRepository(List.of(KeyBinding.PASTE.getConstant()), List.of("shift+B"));
+
+        assertEquals(Optional.of("shift+B"), repository.get(KeyBinding.PASTE));
     }
 
     // [utest->req~ux.keybindings.duplicate-warning~1]
