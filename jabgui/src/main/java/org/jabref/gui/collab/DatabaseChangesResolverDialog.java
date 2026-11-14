@@ -47,9 +47,6 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     private ExternalChangesResolverViewModel viewModel;
 
-    private boolean areAllChangesAccepted;
-    private boolean areAllChangesDenied;
-
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private BibEntryTypesManager entryTypesManager;
@@ -80,12 +77,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         });
     }
 
-    public boolean areAllChangesAccepted() {
-        return areAllChangesAccepted;
-    }
-
     public boolean areAllChangesDenied() {
-        return areAllChangesDenied;
+        return viewModel.areAllChangesDenied();
     }
 
     public boolean resolvedChangesMatchDisk() {
@@ -122,8 +115,6 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
         EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -> {
             if (isResolved) {
-                areAllChangesAccepted = viewModel.areAllChangesAccepted();
-                areAllChangesDenied = viewModel.areAllChangesDenied();
                 close();
             }
         });
