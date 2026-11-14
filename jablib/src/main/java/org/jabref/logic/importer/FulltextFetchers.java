@@ -115,12 +115,14 @@ public class FulltextFetchers {
     }
 
     public Optional<FetcherResult> findFullTextPDF(BibEntry entry) {
-        // for accuracy, fetch DOI first but do not modify entry
-        BibEntry clonedEntry = new BibEntry(entry);
-        Optional<DOI> doi = clonedEntry.getField(StandardField.DOI).flatMap(DOI::parse);
+        return findFullTextPDFAndUpdateDoi(new BibEntry(entry));
+    }
 
-        if (doi.isEmpty()) {
-            findDoiForEntry(clonedEntry);
+    /// Finds full text and writes a discovered DOI to the supplied entry.
+    /// Callers performing background lookups should supply an entry snapshot.
+    public Optional<FetcherResult> findFullTextPDFAndUpdateDoi(BibEntry entry) {
+        if (entry.getField(StandardField.DOI).flatMap(DOI::parse).isEmpty()) {
+            findDoiForEntry(entry);
         }
 
         // Split direct fetchers from fallback fetchers. Direct (HTTP) fetchers are cheap;
@@ -139,9 +141,9 @@ public class FulltextFetchers {
 
         if (fallbackFetchers.isEmpty()) {
             // Common case (no browser-extension provider registered): race the direct fetchers.
-            return race(clonedEntry, primaryFetchers, FETCHER_TIMEOUT);
+            return race(entry, primaryFetchers, FETCHER_TIMEOUT);
         }
-        return raceWithHeadStart(clonedEntry, primaryFetchers, fallbackFetchers);
+        return raceWithHeadStart(entry, primaryFetchers, fallbackFetchers);
     }
 
     /// Runs the given fetchers in parallel and returns the result of the most trusted fetcher, if any.
