@@ -2,13 +2,15 @@ package org.jabref.gui.externalfiles;
 
 import java.util.Optional;
 
-import javafx.application.Platform;
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -18,11 +20,16 @@ import jakarta.inject.Inject;
 import org.controlsfx.dialog.Wizard;
 
 public class UnlinkedFilesWizard {
+    // Preferred size of every wizard page; this also determines the initial dialog size
+    private static final double PAGE_WIDTH = 650;
+    private static final double PAGE_HEIGHT = 550;
+
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private ThemeManager themeManager;
 
     private UnlinkedFilesDialogViewModel viewModel;
     private BibDatabaseContext bibDatabaseContext;
@@ -40,14 +47,7 @@ public class UnlinkedFilesWizard {
             return;
         }
 
-        Platform.runLater(() -> {
-            if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
-                stage.setResizable(true);
-                stage.setWidth(650);
-                stage.setHeight(550);
-                IconTheme.applyLogo(stage);
-            }
-        });
+        applyThemeAndStageSettings(wizard.getDialog().getDialogPane().getScene());
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(wizard.getDialog());
         page2.shutdown();
@@ -79,9 +79,9 @@ public class UnlinkedFilesWizard {
         page2 = new FileSelectionPage(stateManager, viewModel, preferences.getImportFormatPreferences(), taskExecutor);
         page3 = new ImportResultsPage(viewModel);
 
-        page1.setPrefSize(650, 550);
-        page2.setPrefSize(650, 550);
-        page3.setPrefSize(650, 550);
+        page1.setPrefSize(PAGE_WIDTH, PAGE_HEIGHT);
+        page2.setPrefSize(PAGE_WIDTH, PAGE_HEIGHT);
+        page3.setPrefSize(PAGE_WIDTH, PAGE_HEIGHT);
 
         page1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         page2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -104,5 +104,14 @@ public class UnlinkedFilesWizard {
         if (viewModel.selectedSortProperty().get() != null) {
             preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(viewModel.selectedSortProperty().get());
         }
+    }
+
+    private void applyThemeAndStageSettings(Scene scene) {
+        if (!(scene.getWindow() instanceof Stage stage)) {
+            return;
+        }
+        stage.setResizable(true);
+        IconTheme.applyLogo(stage);
+        themeManager.updateCssOnScene(scene);
     }
 }
