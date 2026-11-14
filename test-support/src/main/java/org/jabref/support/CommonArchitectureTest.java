@@ -19,7 +19,11 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import com.tngtech.archunit.library.GeneralCodingRules;
 
 import static com.tngtech.archunit.base.DescribedPredicate.not;
+import static com.tngtech.archunit.core.domain.JavaCall.Predicates.target;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.assignableTo;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
+import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.name;
+import static com.tngtech.archunit.core.domain.properties.HasOwner.Predicates.With.owner;
 
 /// This class checks JabRef's shipped classes for architecture quality.
 /// Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
@@ -78,6 +82,18 @@ public class CommonArchitectureTest {
         ArchRuleDefinition.noClasses()
                           .should().dependOnClassesThat().resideInAPackage("javafx.scene.web..")
                           .because("html-to-node (plain JavaFX nodes) should be used instead of javafx.web")
+                          .check(classes);
+    }
+
+    @ArchTest
+    public void doNotParseEntryTypesWithEnumValueOf(JavaClasses classes) {
+        ArchRuleDefinition.noClasses()
+                          .that().resideOutsideOfPackage("org.jabref.model.entry.types")
+                          // TODO: remove once https://github.com/JabRef/jabref/pull/17815 is merged
+                          .and().doNotHaveFullyQualifiedName("org.jabref.logic.layout.format.HayagrivaType")
+                          .should().callMethodWhere(target(name("valueOf"))
+                                  .and(target(owner(assignableTo("org.jabref.model.entry.types.EntryType")))))
+                          .because("valueOf throws for custom and non-standard entry types; use EntryTypeFactory.parse(...) instead")
                           .check(classes);
     }
 

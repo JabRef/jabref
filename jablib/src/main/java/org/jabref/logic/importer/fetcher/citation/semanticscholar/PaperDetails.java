@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -146,7 +146,7 @@ public class PaperDetails {
                                      .collect(Collectors.joining(" and "));
         bibEntry.setField(StandardField.AUTHOR, authors);
 
-        bibEntry.setType(StandardEntryType.valueOf(getPublicationType()));
+        bibEntry.setType(EntryTypeFactory.parse(getPublicationType()));
 
         if (getDOI() != null) {
             bibEntry.setField(StandardField.DOI, getDOI());
