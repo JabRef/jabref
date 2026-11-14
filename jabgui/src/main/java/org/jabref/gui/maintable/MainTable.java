@@ -7,8 +7,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -34,6 +36,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Subscription;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
@@ -73,10 +76,12 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +96,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final LibraryTab libraryTab;
     private final StateManager stateManager;
+    private final AtomicReference<BibEntry> entryEditedSinceLastSort = new AtomicReference<>();
+    private final Subscription editorShowingSubscription;
     private final BibDatabaseContext database;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
@@ -227,6 +234,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         libraryTab.getLoading().addListener((_, _, _) -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
         model.searchResultsVersionProperty().addListener(_ -> showSearchMatchesIfNoneVisible());
+
+        // Editing is finished when the user goes back to the table or closes the entry editor.
+        // The click that moves the focus may also change the selection, so sort only after it is handled.
+        focusedProperty().addListener((_, _, focused) -> {
+            if (focused) {
+                Platform.runLater(this::sortAndRevealEditedEntry);
+            }
+        });
+        editorShowingSubscription = stateManager.getEditorShowing().subscribe(showing -> {
+            if (!showing) {
+                sortAndRevealEditedEntry();
+            }
+        });
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -376,6 +396,30 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                        .map(cell -> Math.max(1, cell.getIndex() - firstVisible))
                                        .orElse(1);
         flow.scrollToTop(Math.max(0, lastMatch - fullyVisibleRows + 1));
+    }
+
+    @Subscribe
+    public void listen(FieldChangedEvent event) {
+        // Sorting a large library on every keystroke is too slow, so only remember the entry and sort once the editing is finished
+        entryEditedSinceLastSort.set(event.getBibEntry());
+    }
+
+    private void sortAndRevealEditedEntry() {
+        BibEntry editedEntry = entryEditedSinceLastSort.getAndSet(null);
+        if (editedEntry == null) {
+            return;
+        }
+        // The sorted list re-sorts as soon as the field changes, before the cached cell values of the entry are updated.
+        // It then sorts with the old value. Sorting again here uses the current value.
+        sort();
+        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
+        if (selectedEntry == null || selectedEntry.getEntry() != editedEntry) {
+            return;
+        }
+        int selectedIndex = getSelectionModel().getSelectedIndex();
+        // Unlike TableView#scrollTo, this scrolls only as far as needed and does nothing if the row is already fully visible
+        Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
+                .ifPresent(flow -> flow.scrollTo(selectedIndex));
     }
 
     private void scrollToNextMatchCategory() {
@@ -588,6 +632,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void dispose() {
         columnPreferencesApplier.unbind();
         columnPreferencesRecorder.unbind();
+        editorShowingSubscription.unsubscribe();
         database.getDatabase().unregisterListener(this);
     }
 
