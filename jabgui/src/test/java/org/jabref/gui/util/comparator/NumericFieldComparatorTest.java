@@ -1,5 +1,7 @@
 package org.jabref.gui.util.comparator;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +43,13 @@ class NumericFieldComparatorTest {
     @Test
     void compareIntegerWithString() {
         assertEquals(1, comparator.compare("4", "hi"));
+    }
+
+    @Test
+    void sortMixedTextAndNumericValues() {
+        List<String> values = List.of("Wednesday", "10", "Tuesday", "2");
+
+        assertEquals(List.of("Tuesday", "Wednesday", "2", "10"), values.stream().sorted(comparator).toList());
     }
 
     @Test

@@ -73,6 +73,13 @@ Connecting to a database created by an earlier JabRef version copies its content
 
 Needs: impl
 
+## Shared database client must load entries with missing entry types
+`req~shared-database.missing-entry-type~1`
+
+When a shared database entry has a null or blank type, JabRef loads it as `Misc` instead of failing to load the shared database.
+
+Needs: impl, utest
+
 ## Shared database login dialog must accept connection URLs
 `req~shared-database.connection-url~1`
 
@@ -86,6 +93,30 @@ Needs: impl
 A shared database that is still connected when JabRef closes is reconnected on the next start, like the last opened local libraries. This also covers connections that are not backed by a local file.
 
 Needs: impl
+
+## Connected shared databases must be offered in the login dialog
+`req~shared-database.saved-connections-offered~1`
+
+Every shared database that was connected to is stored, so it can be connected to again without retyping the connection details.
+See <https://github.com/JabRef/jabref/issues/12948>.
+
+Needs: impl, utest
+
+## Reconnecting to a stored shared database must not store it a second time
+`req~shared-database.saved-connections-unique~1`
+
+Connecting to a database that is already stored updates that entry instead of adding a second, indistinguishable one.
+Duplicates stored by earlier versions are listed once.
+
+Needs: impl, utest
+
+## A stored shared database connection must be deletable
+`req~shared-database.saved-connections-deletable~1`
+
+Deleting also removes the stored password and stops the database from being reopened on startup.
+A connection whose library is open cannot be deleted, because quitting would store it again.
+
+Needs: impl, utest
 
 ## A failed connection can be retried
 `req~shared-database.reconnect-retry~1`

@@ -466,8 +466,7 @@ public class GroupTreeView extends BorderPane {
             }
 
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
-            importHandler.importFilesInBackground(files, event.getTransferMode())
-                         .executeWith(taskExecutor);
+            importHandler.importDroppedFiles(files, event.getTransferMode());
             success = true;
         } else if (localDragboard.hasBibEntries()) {
             List<BibEntry> entries = localDragboard.getBibEntries();

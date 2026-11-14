@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.util.Pair;
 
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
@@ -98,6 +99,8 @@ public interface StateManager extends SrvStateManager {
     ObservableList<Task<?>> getRunningBackgroundTasks();
 
     void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task);
+
+    ObservableList<Pair<BackgroundTask<?>, Task<?>>> getRunningBackgroundTasksPairs();
 
     EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning();
 
