@@ -4,9 +4,11 @@ import java.util.StringJoiner;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.Nullable;
+
 public record BibEntryDiff(
-        BibEntry originalEntry,
-        BibEntry newEntry) {
+        @Nullable BibEntry originalEntry,
+        @Nullable BibEntry newEntry) {
 
     @Override
     public String toString() {

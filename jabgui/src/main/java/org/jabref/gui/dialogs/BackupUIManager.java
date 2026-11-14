@@ -1,6 +1,7 @@
 package org.jabref.gui.dialogs;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -25,6 +26,8 @@ import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.bibtex.comparator.BackupComparator;
+import org.jabref.logic.bibtex.comparator.BackupComparison;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -50,19 +53,36 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
+    // [impl->req~jabgui.backup.restore-dialog-non-blocking~2]
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  LibraryTabContainer tabContainer,
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  StateManager stateManager) {
+        Optional<Path> latestBackupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory());
+        Optional<BackupComparison> comparison = Optional.empty();
+        try {
+            // Runs on the loading thread, so a cancelled load interrupts the comparison.
+            if (latestBackupPath.isPresent()) {
+                comparison = Optional.of(BackupComparator.compare(originalPath, latestBackupPath.orElseThrow(), preferences.getImportFormatPreferences()));
+            }
+        } catch (InterruptedIOException e) {
+            LOGGER.debug("Comparison of {} with its backup was cancelled", originalPath, e);
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        } catch (IOException e) {
+            LOGGER.warn("Could not compare library with backup", e);
+        }
+
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
                 tabContainer,
                 stateManager,
                 preferences.getExternalApplicationsPreferences(),
                 originalPath,
-                preferences.getFilePreferences().getBackupDirectory());
+                latestBackupPath,
+                comparison);
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
@@ -103,9 +123,10 @@ public class BackupUIManager {
                                                                  StateManager stateManager,
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                                                  Path originalPath,
-                                                                 Path backupDir) {
+                                                                 Optional<Path> backupPath,
+                                                                 Optional<BackupComparison> comparison) {
         return UiTaskExecutor.runInJavaFXThread(() -> showForLibrary(tabContainer, stateManager, originalPath,
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences))));
+                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupPath, comparison, externalApplicationsPreferences))));
     }
 
     private static <T> T showForLibrary(LibraryTabContainer tabContainer, StateManager stateManager, Path path, Supplier<T> showDialog) {
