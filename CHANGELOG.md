@@ -58,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed "OK" to "Remove" button in Remove subgroups, Remove field name and Remove keyword. [#12706](https://github.com/JabRef/jabref/issues/12706)
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We shortened read-status and priority menu labels and made read and low-priority icons easier to distinguish. [#17691](https://github.com/JabRef/jabref/pull/17691)
+- We changed the main table to keep the entry shown in the entry editor visible when enlarging the entry editor. [#17167](https://github.com/JabRef/jabref/pull/17167)
 
 ### Fixed
 
