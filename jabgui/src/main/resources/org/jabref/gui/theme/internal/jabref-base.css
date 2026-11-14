@@ -215,6 +215,11 @@
     -fx-text-fill: -color-fg-default;
 }
 
+.menu-item .glyph-icon,
+.menu-item .ikonli-font-icon {
+    -fx-font-size: 1em;
+}
+
 .column-header .glyph-icon {
     -fx-alignment: baseline-center;
     -fx-text-fill: -fx-text-inner-color;
@@ -526,6 +531,13 @@
 
 .global-search-bar .toggle-button:selected .glyph-icon {
     -fx-opacity: 1;
+}
+
+.global-search-bar .toggle-button {
+    -fx-padding: 0.25em;
+    -fx-min-width: 2em;
+    -fx-pref-width: 2em;
+    -fx-min-height: 2em;
 }
 
 /* search text */
