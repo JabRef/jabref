@@ -81,11 +81,21 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void updateOnStart(BackgroundTask<?> task) {
-        indexedFiles = getLinkedFilesFromIndex();
-        Map<String, Pair<Long, Path>> currentFiles = getLinkedFilesFromEntries(databaseContext.getEntries());
+        Map<String, Long> filesFromIndex = getLinkedFilesFromIndex(task);
+        if (task.isCancelled()) {
+            return;
+        }
+        indexedFiles = filesFromIndex;
+        Map<String, Pair<Long, Path>> currentFiles = getLinkedFilesFromEntries(databaseContext.getEntries(), task);
+        if (task.isCancelled()) {
+            return;
+        }
 
         Set<String> filesToRemove = new HashSet<>();
         for (Map.Entry<String, Long> entry : indexedFiles.entrySet()) {
+            if (task.isCancelled()) {
+                return;
+            }
             String fileLink = entry.getKey();
             long modification = entry.getValue();
             if (!currentFiles.containsKey(fileLink)) {
@@ -100,6 +110,9 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
         Map<String, Pair<Long, Path>> filesToAdd = new HashMap<>();
         for (Map.Entry<String, Pair<Long, Path>> entry : currentFiles.entrySet()) {
+            if (task.isCancelled()) {
+                return;
+            }
             String fileLink = entry.getKey();
             if (!indexedFiles.containsKey(fileLink)) {
                 LOGGER.debug("File {} has been added to the library. Will be added to the index.", fileLink);
@@ -111,12 +124,15 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
-        addToIndex(getLinkedFilesFromEntries(entries), task);
+        addToIndex(getLinkedFilesFromEntries(entries, task), task);
     }
 
     private void addToIndex(Set<LinkedFile> linkedFiles, BackgroundTask<?> task) {
         Map<String, Pair<Long, Path>> filesToAdd = new HashMap<>();
         for (LinkedFile linkedFile : linkedFiles) {
+            if (task.isCancelled()) {
+                return;
+            }
             Pair<Long, Path> fileInfo = getLinkedFileInfo(linkedFile);
             if (fileInfo != null) {
                 filesToAdd.put(linkedFile.getLink(), fileInfo);
@@ -166,7 +182,10 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void removeFromIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
-        Map<String, Pair<Long, Path>> linkedFiles = getLinkedFilesFromEntries(entries);
+        Map<String, Pair<Long, Path>> linkedFiles = getLinkedFilesFromEntries(entries, task);
+        if (task.isCancelled()) {
+            return;
+        }
         removeUnlinkedFiles(entries, linkedFiles.keySet());
     }
 
@@ -232,12 +251,15 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     @Override
     public void rebuildIndex(BackgroundTask<?> task) {
         removeAllFromIndex();
-        addToIndex(getLinkedFilesFromEntries(databaseContext.getEntries()), task);
+        addToIndex(getLinkedFilesFromEntries(databaseContext.getEntries(), task), task);
     }
 
-    private Map<String, Long> getLinkedFilesFromIndex() {
+    private Map<String, Long> getLinkedFilesFromIndex(BackgroundTask<?> task) {
         LOGGER.debug("Getting all linked files from index.");
         Map<String, Long> linkedFiles = new HashMap<>();
+        if (task.isCancelled()) {
+            return linkedFiles;
+        }
         try {
             TermQuery query = new TermQuery(new Term(LinkedFilesConstants.PAGE_NUMBER.toString(), "1"));
             searcherManager.maybeRefresh();
@@ -245,6 +267,9 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             StoredFields storedFields = searcher.storedFields();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
+                if (task.isCancelled()) {
+                    break;
+                }
                 Document doc = storedFields.document(scoreDoc.doc);
                 IndexableField pathField = doc.getField(LinkedFilesConstants.PATH.toString());
                 IndexableField modifiedField = doc.getField(LinkedFilesConstants.MODIFIED.toString());
@@ -259,10 +284,16 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         return linkedFiles;
     }
 
-    private Map<String, Pair<Long, Path>> getLinkedFilesFromEntries(Collection<BibEntry> entries) {
+    private Map<String, Pair<Long, Path>> getLinkedFilesFromEntries(Collection<BibEntry> entries, BackgroundTask<?> task) {
         Map<String, Pair<Long, Path>> linkedFiles = new HashMap<>();
         for (BibEntry entry : entries) {
+            if (task.isCancelled()) {
+                return Map.of();
+            }
             for (LinkedFile linkedFile : entry.getFiles()) {
+                if (task.isCancelled()) {
+                    return Map.of();
+                }
                 Pair<Long, Path> fileInfo = getLinkedFileInfo(linkedFile);
                 if (fileInfo != null) {
                     linkedFiles.put(linkedFile.getLink(), fileInfo);

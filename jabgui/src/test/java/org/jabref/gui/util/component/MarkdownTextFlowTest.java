@@ -1,10 +1,13 @@
 package org.jabref.gui.util.component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.collections.ListChangeListener;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -15,16 +18,20 @@ import javafx.scene.control.Separator;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.robot.Robot;
+import javafx.scene.shape.Path;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chat.JsonCodeBlockFormatter;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.logic.ai.chatting.util.JsonAnswerFormatter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +42,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -68,6 +76,10 @@ class MarkdownTextFlowTest extends JavaFxTest {
             textFlowReference.set(textFlow);
         });
         return textFlowReference.get();
+    }
+
+    private static void setJsonMarkdown(MarkdownTextFlow textFlow, String text) {
+        textFlow.setMarkdown(JsonAnswerFormatter.fenceJson(text), new JsonCodeBlockFormatter());
     }
 
     /// Text content with tab-separated table cells.
@@ -197,6 +209,167 @@ class MarkdownTextFlowTest extends JavaFxTest {
         });
 
         assertEquals("**bold**", clipBoardManager.stringContent.get());
+    }
+
+    @Test
+    void copySelectedTextFromHighlightedJsonBlockKeepsFences() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            setJsonMarkdown(textFlow, "```json\n{\"a\": 1}\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("""
+                ```json
+                {
+                  "a": 1
+                }
+                ```""", clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("<code"));
+    }
+
+    @Test
+    void jsonAnswerIsHighlighted() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> setJsonMarkdown(textFlow, "{\"a\": 1}"));
+
+        assertTrue(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @Test
+    void copiedJsonAnswerKeepsMarkdownInsideStringsLiteral() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            setJsonMarkdown(textFlow, "{\"a\": \"**not bold**\"}");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```json\n{\n  \"a\": \"**not bold**\"\n}\n```", clipBoardManager.stringContent.get());
+        assertFalse(clipBoardManager.htmlContent.get().contains("<strong>"));
+    }
+
+    @Test
+    void copiedJsonAnswerKeepsBackticksLiteral() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            setJsonMarkdown(textFlow, "{\"a\": \"```\"}");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```json\n{\n  \"a\": \"```\"\n}\n```", clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("```"));
+    }
+
+    @Test
+    void jsonIsLeftAloneWithoutHighlighting() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown("{\"a\": 1}"));
+
+        assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"replacement", "replacement\n"})
+    void codeBlockFormatterIsScopedToOneMarkdownUpdate(String replacement) {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```\noriginal\n```", _ -> Optional.of(List.of(
+                    new MarkdownTextFlow.CodeBlockSegment(replacement, "custom-code"))));
+            assertEquals(replacement, renderedText(textFlow));
+            assertTrue(hasChildWithStyleClass(textFlow, "custom-code"));
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+            assertEquals("```\nreplacement\n```", clipBoardManager.stringContent.get());
+
+            textFlow.setMarkdown("```\noriginal\n```");
+            assertEquals("original\n", renderedText(textFlow));
+            assertFalse(hasChildWithStyleClass(textFlow, "custom-code"));
+        });
+    }
+
+    @Test
+    void tokenDenseJsonIsNotHighlighted() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        // Short enough to be formatted, but far too many tokens to give each one its own node.
+        String hugeJson = "{\"a\": [" + "1, ".repeat(5_000) + "1]}";
+
+        interact(() -> setJsonMarkdown(textFlow, hugeJson));
+
+        assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @Test
+    void copySelectedTextFromCodeBlockKeepsBlankLines() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```java\nint a;\n\nint b;\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```java\nint a;\n\nint b;\n```", clipBoardManager.stringContent.get());
+    }
+
+    @Test
+    void copySelectedTextFromCodeBlockKeepsATrailingBlankLine() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```java\nint a;\n\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```java\nint a;\n\n```", clipBoardManager.stringContent.get());
     }
 
     @Test
@@ -708,6 +881,115 @@ class MarkdownTextFlowTest extends JavaFxTest {
             }
         });
         return boundsReference.get() == null ? new BoundingBox(0, 0, 0, 0) : boundsReference.get();
+    }
+
+    // [utest->req~ai.chat.find.matches~1]
+    @Test
+    void highlightOccurrencesFindsAllCaseInsensitive() {
+        MarkdownTextFlow flow = markdownTextFlow();
+        AtomicReference<Integer> count = new AtomicReference<>();
+        interact(() -> flow.setMarkdown("Chocolate is **chocolate**, CHOCOLATE!"));
+        awaitEvents();
+        interact(() -> count.set(flow.highlightOccurrences("chocolate", 1)));
+
+        assertEquals(3, count.get());
+        assertTrue(flow.getCurrentOccurrence().isPresent());
+    }
+
+    // [utest->req~ai.chat.find.matches~1]
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "[Chocolate](https://example.org)",
+            "Hot [choco](https://example.org)**late**",
+            """
+                    | Flavor |
+                    | --- |
+                    | Chocolate |
+                    """,
+            """
+                    | Flavor |
+                    | --- |
+                    | [Chocolate](https://example.org) |
+                    """
+    })
+    void highlightOccurrencesIncludesEmbeddedMarkdown(String markdown) {
+        MarkdownTextFlow flow = markdownTextFlow();
+        interact(() -> {
+            flow.setMarkdown(markdown);
+            rootPane.applyCss();
+            rootPane.layout();
+
+            assertEquals(1, flow.highlightOccurrences("chocolate", 0));
+            assertTrue(flow.getCurrentOccurrence().isPresent());
+            assertEquals(0, flow.highlightOccurrences("", 0));
+            assertEquals(Optional.empty(), flow.getCurrentOccurrence());
+        });
+    }
+
+    // [utest->req~ai.chat.find.matches~1]
+    @Test
+    void highlightOccurrencesFollowsReadingOrderAcrossTables() {
+        MarkdownTextFlow flow = markdownTextFlow();
+        interact(() -> {
+            flow.setMarkdown("""
+                    Chocolate before
+
+                    | Flavor |
+                    | --- |
+                    | Chocolate inside |
+
+                    Chocolate after
+                    """);
+            rootPane.applyCss();
+            rootPane.layout();
+
+            assertEquals(3, flow.highlightOccurrences("chocolate", 1));
+            Node current = flow.getCurrentOccurrence().orElseThrow();
+            assertInstanceOf(GridPane.class, current.getParent().getParent());
+            assertEquals(3, flow.highlightOccurrences("chocolate", 2));
+            assertEquals(flow.getParent(), flow.getCurrentOccurrence().orElseThrow().getParent());
+        });
+    }
+
+    @Test
+    void changingQueryWhileTextRewrapsDoesNotDuplicateHighlights() {
+        MarkdownTextFlow flow = markdownTextFlow();
+        interact(() -> {
+            flow.setMarkdown("""
+                    Chocolate appears in plain text and **CHOCOLATE** in bold.
+
+                    Here is a [Chocolate citation](https://example.org/chocolate).
+
+                    | Flavor | Note |
+                    | --- | --- |
+                    | Chocolate | Table match |
+                    | [Chocolate source](https://example.org/source) | Link in table |
+
+                    The final chocolate occurrence is below the table.
+                    """);
+            rootPane.applyCss();
+            rootPane.layout();
+            flow.highlightOccurrences("c", 0);
+            flow.getBoundsInParent();
+            Pane content = (Pane) flow.getParent();
+            AtomicBoolean moveOnRemoval = new AtomicBoolean(true);
+            content.getChildren().addListener((ListChangeListener<Node>) change -> {
+                while (change.next()) {
+                    if (change.wasRemoved() && moveOnRemoval.compareAndSet(true, false)) {
+                        flow.setTranslateX(1);
+                    }
+                }
+            });
+            for (int length = 1; length <= "chocolate".length(); length++) {
+                rootPane.resize(240 + (length % 2) * 100, 300);
+                flow.highlightOccurrences("chocolate".substring(0, length), 0);
+                rootPane.applyCss();
+                rootPane.layout();
+            }
+            assertEquals(6, flow.highlightOccurrences("chocolate", 0));
+            assertEquals(4L, content.getChildren().stream().filter(Path.class::isInstance).count());
+        });
+        awaitEvents();
     }
 
     private static class RecordingClipBoardManager extends ClipBoardManager {

@@ -57,6 +57,7 @@ public abstract class BackgroundTask<V> {
     private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
     private final BooleanProperty showToUser = new SimpleBooleanProperty(false);
     private final BooleanProperty willBeRecoveredAutomatically = new SimpleBooleanProperty(false);
+    private boolean failureShownByCaller;
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
@@ -166,6 +167,29 @@ public abstract class BackgroundTask<V> {
 
     public BackgroundTask<V> willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
         this.willBeRecoveredAutomatically.set(willBeRecoveredAutomatically);
+        return this;
+    }
+
+    /// Tells whether the caller shows a failure of this task to the user itself.
+    ///
+    /// The notification center uses this for visible tasks (see [#showToUser(boolean)]):
+    /// if `true`, the notification of a failed task is removed, because the error already reaches the user through the [#onFailure(Consumer)] consumer;
+    /// if `false`, the notification turns into an error notification, so the failure is not lost.
+    ///
+    /// @return `true` if the [#onFailure(Consumer)] consumer shows the error to the user
+    public boolean failureShownByCaller() {
+        return failureShownByCaller;
+    }
+
+    /// Declares whether the [#onFailure(Consumer)] consumer shows the error to the user, for example in a dialog.
+    ///
+    /// Set it to `true` only if the consumer really shows the error.
+    /// Otherwise, keep the default `false`, so that a failed visible task shows an error notification instead of failing silently.
+    ///
+    /// @param failureShownByCaller `true` if the [#onFailure(Consumer)] consumer shows the error to the user
+    /// @see #failureShownByCaller()
+    public BackgroundTask<V> failureShownByCaller(boolean failureShownByCaller) {
+        this.failureShownByCaller = failureShownByCaller;
         return this;
     }
 

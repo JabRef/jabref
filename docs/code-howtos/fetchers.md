@@ -7,6 +7,7 @@ Fetchers are the implementation of the [search using online services](https://do
 
 | Service                                                                                                                                           | Key Source                                                                                                     | Environment Variable           | Rate Limit                                                                            |
 |:--------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------|---------------------------------------------------------------------------------------|
+| [BibSonomy](https://www.bibsonomy.org/)                                                                                                           | [BibSonomy settings](https://www.bibsonomy.org/settings?selTab=1) (username: `BibSonomyUsername`)              | `BibSonomyApiKey`              | -                                                                                     |
 | [Biodiversity Heritage Library](https://www.biodiversitylibrary.org/)                                                                             | [Biodiversitylibrary](https://about.biodiversitylibrary.org/tools-and-services/developer-and-data-tools/#APIs) | `BiodiversityHeritageApiKey`   | -                                                                                     |
 | [arXiv](https://info.arxiv.org/help/api/index.html)                                                                                               | (none)                                                                                                         | (none)                         | [One request per three seconds](https://info.arxiv.org/help/api/tou.html)             |
 | [DOAJ](https://doaj.org/)                                                                                                                         | (none)                                                                                                         | (none)                         | [2 requests/second](https://doaj.org/api/docs)                                        |
@@ -38,11 +39,17 @@ JabRef supports more fetchers. Investigate the package `org.jabref.logic.importe
 
 Fetchers with a documented request limit use `FetcherRateLimiter`. Express limits with `ofRequestsPerInterval` when a provider specifies requests per time window; use `ofRequestsPerSecond` for limits returned dynamically by an API. A limiter is shared across all instances of a fetcher so parallel searches respect the provider-wide request rate.
 
+Fetcher comparisons and protocol field names should use locale-independent case conversion. The arXiv title-search fallback compares titles after removing accents, normalizing punctuation and whitespace, and converting to lowercase with `Locale.ROOT`. This keeps title matching independent of the system language. Queries sent to arXiv retain their accented characters.
+
 ## Fulltext Fetchers
 
 * all fulltext fetchers run in parallel
 * the result with the highest priority wins
 * `InterruptedException` | `ExecutionException` | `CancellationException` are ignored
+
+`FulltextFetchers.findFullTextPDF` leaves the supplied entry unchanged. The download action instead calls `findFullTextPDFAndUpdateDoi` on a separate snapshot and applies the discovered DOI through undo history on the JavaFX thread. Lookup results are discarded when the original entry changes or its library closes.
+
+File existence checks run in the background lookup. A missing PDF is replaced only when it is the sole undescribed PDF or uniquely matches the fetched source URL. Ambiguous attachments, including supplements, are preserved. When lookup finds neither a DOI nor a document, the sole undescribed missing PDF link is removed through undo history. Duplicate replacement downloads link the surviving local file.
 
 ### Trust Levels
 
