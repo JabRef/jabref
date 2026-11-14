@@ -156,7 +156,7 @@ Needs: impl
 Pressing the "Close dialog" key binding in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
 Its default is <kbd>Esc</kbd>; users can change it in the key binding preferences.
 Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
-Currently, this is only the PDF viewer ("Document viewer").
+Currently, this is only the PDF viewer ("Document viewer") and the Citation Entry Review.
 
 Needs: impl, utest
 
@@ -316,6 +316,18 @@ Needs: impl, utest
 
 When a user assigns a keyboard shortcut that is already used by other actions, JabRef warns the user, names these actions and lets the user cancel,
 keep both or replace the existing assignments ([#17240](https://github.com/JabRef/jabref/issues/17240)).
+
+Needs: impl, utest
+
+## Finished tasks do not look like they are still running
+`req~ux.notifications.finished-task~1`
+
+A task notification never keeps a running progress bar after its task ended:
+
+- A successful task keeps its notification with full progress until the user dismisses it.
+- A failed task whose own error message is already shown to the user loses its notification.
+- Any other failed task turns into an error notification, without the exception text.
+- A cancelled task, and a finished task without a title, loses its notification.
 
 Needs: impl, utest
 
