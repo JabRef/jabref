@@ -16,7 +16,8 @@ class JabRefGuiPreferencesTest {
                 Arguments.of(List.of("A", "B", "C", "D"), "A;B;C;D"),
                 Arguments.of(List.of("A", "B", "C", ""), "A;B;C;"),
                 Arguments.of(List.of("a;b", "C:\\Tools\\app.exe"), "a\\;b;C:\\\\Tools\\\\app.exe"),
-                Arguments.of(List.of("a\\", "b"), "a\\\\;b")
+                Arguments.of(List.of("a\\", "b"), "a\\\\;b"),
+                Arguments.of(List.of("Key;WithDelimiter", "", "C:\\Users\\x.bib"), "Key\\;WithDelimiter;;C:\\\\Users\\\\x.bib")
         );
     }
 

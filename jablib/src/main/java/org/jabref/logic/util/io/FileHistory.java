@@ -48,11 +48,19 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     }
 
     /// Adds the file to the top of the list. If it already is in the list, it is merely moved to the top.
+    ///
+    /// Moving a file to the top removes and re-inserts it. The steps are wrapped into a single change, so that
+    /// listeners see one update of the finished history instead of one per step.
     public void newFile(Path file) {
-        removeItem(file);
-        this.addFirst(file);
-        while (size() > HISTORY_SIZE) {
-            history.remove(HISTORY_SIZE);
+        beginChange();
+        try {
+            removeItem(file);
+            this.addFirst(file);
+            while (size() > HISTORY_SIZE) {
+                this.remove(HISTORY_SIZE);
+            }
+        } finally {
+            endChange();
         }
     }
 
