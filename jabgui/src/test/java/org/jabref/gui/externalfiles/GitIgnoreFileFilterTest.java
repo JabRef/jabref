@@ -124,6 +124,23 @@ class GitIgnoreFileFilterTest {
         assertFalse(filter.accept(nested.resolve("other.pdf")));
     }
 
+    @Test
+    void subdirectoriesReuseParentRulesWithoutSharingTheirOwnRules(@TempDir Path dir) throws IOException {
+        Path parentIgnore = dir.resolve(".gitignore");
+        Files.writeString(parentIgnore, "*.pdf\n");
+        GitIgnoreFileFilter parent = new GitIgnoreFileFilter(dir);
+        Files.delete(parentIgnore);
+        Path first = Files.createDirectory(dir.resolve("first"));
+        Files.writeString(first.resolve(".gitignore"), "!keep.pdf\n");
+        Path second = Files.createDirectory(dir.resolve("second"));
+
+        GitIgnoreFileFilter firstFilter = parent.forSubdirectory(first);
+        GitIgnoreFileFilter secondFilter = parent.forSubdirectory(second);
+        assertTrue(firstFilter.accept(first.resolve("keep.pdf")));
+        assertFalse(firstFilter.accept(first.resolve("other.pdf")));
+        assertFalse(secondFilter.accept(second.resolve("keep.pdf")));
+    }
+
     // [utest->req~jabgui.externalfiles.unlinked-files.search.gitignore-windows-case~1]
     @Test
     @EnabledOnOs(OS.WINDOWS)

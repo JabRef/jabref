@@ -42,7 +42,7 @@ Needs: impl, utest
 ## Unlinked-files search must apply applicable ignore rules in precedence order
 `req~jabgui.externalfiles.unlinked-files.search.gitignore-precedence~1`
 
-Apply built-in ignore rules first, followed by `.gitignore` rules from ancestor directories to the current directory. A later matching rule may override an earlier rule, including a built-in rule. Interpret literal braces in patterns as filename characters.
+Apply built-in ignore rules first, followed by `.gitignore` rules from ancestor directories to the current directory. Ancestor rules remain applicable across nested Git repository boundaries. A later matching rule may override an earlier rule, including a built-in rule. Interpret literal braces in patterns as filename characters.
 
 Related issue: [JabRef/jabref#17546](https://github.com/JabRef/jabref/issues/17546)
 

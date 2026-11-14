@@ -57,21 +57,35 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
             ancestors.add(current);
         }
         for (Path ancestor : ancestors.reversed()) {
-            Path gitIgnore = ancestor.resolve(".gitignore");
-            if (Files.isRegularFile(gitIgnore)) {
-                IgnoreNode node = new IgnoreNode();
-                try {
-                    String rules = Files.readString(gitIgnore);
-                    if (OS.WINDOWS) {
-                        rules = rules.toLowerCase(Locale.ROOT);
-                    }
-                    try (InputStream input = new ByteArrayInputStream(rules.getBytes(StandardCharsets.UTF_8))) {
-                        node.parse(input);
-                    }
-                    ignoreNodes.add(Map.entry(ancestor, node));
-                } catch (IOException e) {
-                    LOGGER.info("Could not read .gitignore from {}", gitIgnore, e);
+            addIgnoreFile(ancestor);
+        }
+    }
+
+    private GitIgnoreFileFilter(Path path, GitIgnoreFileFilter parent) {
+        ignoreNodes.add(Map.entry(path.toAbsolutePath(), parent.ignoreNodes.getFirst().getValue()));
+        ignoreNodes.addAll(parent.ignoreNodes.subList(1, parent.ignoreNodes.size()));
+        addIgnoreFile(path.toAbsolutePath());
+    }
+
+    GitIgnoreFileFilter forSubdirectory(Path path) {
+        return new GitIgnoreFileFilter(path, this);
+    }
+
+    private void addIgnoreFile(Path ancestor) {
+        Path gitIgnore = ancestor.resolve(".gitignore");
+        if (Files.isRegularFile(gitIgnore)) {
+            IgnoreNode node = new IgnoreNode();
+            try {
+                String rules = Files.readString(gitIgnore);
+                if (OS.WINDOWS) {
+                    rules = rules.toLowerCase(Locale.ROOT);
                 }
+                try (InputStream input = new ByteArrayInputStream(rules.getBytes(StandardCharsets.UTF_8))) {
+                    node.parse(input);
+                }
+                ignoreNodes.add(Map.entry(ancestor, node));
+            } catch (IOException e) {
+                LOGGER.info("Could not read .gitignore from {}", gitIgnore, e);
             }
         }
     }

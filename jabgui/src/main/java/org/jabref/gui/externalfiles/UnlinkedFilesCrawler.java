@@ -128,6 +128,13 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
     /// @return FileNodeViewModel containing the data of the current directory and all subdirectories
     /// @throws IOException if directory is not a directory or empty
     FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter) throws IOException {
+        if ((directory == null) || !Files.isDirectory(directory)) {
+            throw new IOException("Invalid directory for searching: %s".formatted(directory));
+        }
+        return searchDirectory(directory, unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory));
+    }
+
+    private FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter, GitIgnoreFileFilter gitIgnoreFilter) throws IOException {
         // Return null if the directory is not valid.
         if ((directory == null) || !Files.isDirectory(directory)) {
             throw new IOException("Invalid directory for searching: %s".formatted(directory));
@@ -140,7 +147,6 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
         // Filters:
         //   1. UnlinkedPDFFileFilter
         //   2. GitIgnoreFilter
-        GitIgnoreFileFilter gitIgnoreFilter = new GitIgnoreFileFilter(directory);
         List<Path> subDirectories = new ArrayList<>();
         List<Path> files = new ArrayList<>();
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
@@ -163,7 +169,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
 
         // now we crawl into the found subdirectories first (!)
         for (Path subDirectory : subDirectories) {
-            FileNodeViewModel subRoot = searchDirectory(subDirectory, unlinkedPDFFileFilter);
+            FileNodeViewModel subRoot = searchDirectory(subDirectory, unlinkedPDFFileFilter, gitIgnoreFilter.forSubdirectory(subDirectory));
             if (!subRoot.getChildren().isEmpty()) {
                 fileCountOfSubdirectories += subRoot.getFileCount();
                 fileNodeViewModelForCurrentDirectory.getChildren().add(subRoot);
