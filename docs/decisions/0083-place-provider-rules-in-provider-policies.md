@@ -28,7 +28,6 @@ Where should these provider rules live?
 * Identification and the limit it selects are decided in one place.
 * Writing a fetcher does not require knowledge of limits, retries or identification.
 * Every attempt takes a new permit, and a status code is retried on one level only.
-* Little hidden or global state.
 
 ## Considered Options
 
@@ -40,7 +39,6 @@ Where should these provider rules live?
 
 To be decided in the maintainer call. "Per fetcher" leaves every rule to each fetcher author, which is how the current inconsistencies arose. Between the other two options, the assessment depends on:
 
-* **Is global state configured at startup acceptable?** The lookup by URL needs access to the API keys: registered once at startup (like `ProxyRegisterer`), or an injected factory for all 61 places that create a `URLDownload`. Choosing the policy at the call site needs neither.
 * **Should requests be covered without the caller doing anything?** Only the lookup by URL covers requests that a fetcher author forgets to configure. Example: `CrossRefCitationFetcher` sends no `mailto` today and therefore uses Crossref's public pool. For redirects to another provider (e.g. `doi.org` to `data.crossref.org`), this only holds if `URLDownload` follows redirects itself (see Details).
 * **Is visibility at the call site important?** The chosen policy is visible in the fetcher; the lookup by URL is not.
 
@@ -96,7 +94,6 @@ Typically set once in a fetcher's `getUrlDownload(URL)`.
 
 * Good, because the rules are applied correctly on every attempt, without the fetcher author implementing them.
 * Good, because the policy is visible at the call site.
-* Good, because no global registry is needed. The policy gets the preferences from the fetcher.
 * Bad, because a caller can forget to set the policy.
 * Bad, because a policy is chosen before the request, so a redirect to another provider keeps the policy of the first one.
 
@@ -110,7 +107,7 @@ The registry matches the provider's API host and, where needed, a path (Crossref
 
 * Good, because every request through `URLDownload` gets its provider's rules, without any action by the caller.
 * Good, because a redirect can use the policy of its target. This needs `URLDownload` to follow redirects itself: today `HttpURLConnection` follows redirects within the same protocol internally (`setInstanceFollowRedirects(true)`), so `URLDownload` only sees redirects that change the protocol.
-* Bad, because the API keys are global state, registered at startup. Without registration (tests, use as a library), the default keys of the build apply.
+* Neutral, because the policies read the API keys from the same `ImporterPreferences` instance the fetchers use today. It is registered once (like `ProxyRegisterer`) instead of passed to each fetcher.
 * Bad, because the applied rules are not visible at the call site. A debug log has to show which policy was applied.
 * Neutral, because a caller that needs different rules for the same endpoint needs an override (`withPolicy`, `withoutPolicy`).
 
