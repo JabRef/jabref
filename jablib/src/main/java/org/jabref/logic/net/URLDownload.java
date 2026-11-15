@@ -39,6 +39,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
+import org.jabref.logic.net.provider.ProviderPolicies;
+import org.jabref.logic.net.provider.ProviderPolicy;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
@@ -338,13 +340,25 @@ public class URLDownload {
 
     /// Open a connection to this object's URL (with specified settings).
     ///
+    /// If a [ProviderPolicy] applies to the URL, it adds the provider's identification, and its rate limit, parallel request limit and retries apply to opening the connection.
     /// If accessing an HTTP URL, remember to close the resulting connection after usage.
     ///
     /// @return an open connection
     public URLConnection openConnection() throws FetcherException {
+        Optional<ProviderPolicy> policy = ProviderPolicies.forUrl(source);
+        if (policy.isEmpty()) {
+            return connect(source);
+        }
+        ProviderPolicy.Request request = policy.get().identify(source);
+        request.headers().forEach(this::addHeader);
+        LOGGER.debug("Applying the {} policy to {}", policy.get().getProviderName(), FetcherException.getRedactedUrl(request.url().toString()));
+        return policy.get().execute(request.url(), () -> connect(request.url()));
+    }
+
+    private URLConnection connect(URL target) throws FetcherException {
         URLConnection connection;
         try {
-            connection = getUrlConnection();
+            connection = getUrlConnection(target);
         } catch (IOException e) {
             throw new FetcherException("Error opening connection", e);
         }
@@ -404,8 +418,8 @@ public class URLDownload {
         return logResponseBody ? response : new SimpleHttpResponse(response.statusCode(), response.responseMessage(), "");
     }
 
-    private URLConnection getUrlConnection() throws IOException {
-        URLConnection connection = this.source.openConnection();
+    private URLConnection getUrlConnection(URL target) throws IOException {
+        URLConnection connection = target.openConnection();
 
         if (connection instanceof HttpURLConnection httpConnection) {
             httpConnection.setInstanceFollowRedirects(true);

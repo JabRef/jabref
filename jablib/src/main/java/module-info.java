@@ -33,6 +33,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.journals;
     exports org.jabref.logic.l10n;
     exports org.jabref.logic.net;
+    exports org.jabref.logic.net.provider;
     exports org.jabref.logic.os;
     exports org.jabref.logic.quality.consistency;
     exports org.jabref.logic.shared.prefs;
@@ -259,6 +260,13 @@ open module org.jabref.jablib {
     // endregion
 
     requires dev.failsafe.core;
+
+    // region: resilience4j
+    requires io.github.resilience4j.bulkhead;
+    requires io.github.resilience4j.core;
+    requires io.github.resilience4j.ratelimiter;
+    requires io.github.resilience4j.retry;
+    // endregion
 
     requires org.jabref.latexconv;
 

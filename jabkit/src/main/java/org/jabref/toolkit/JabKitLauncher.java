@@ -22,6 +22,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.provider.ProviderPolicies;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
@@ -104,6 +105,7 @@ public class JabKitLauncher {
 
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
+            ProviderPolicies.useApiKeys(preferences.getImporterPreferences()::getApiKey);
 
             Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 

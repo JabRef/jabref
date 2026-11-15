@@ -18,6 +18,7 @@ import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.provider.ProviderPolicies;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
@@ -83,6 +84,7 @@ public class Launcher {
 
                 configureProxy(preferences.getProxyPreferences());
                 configureSSL(preferences.getSSLPreferences());
+                ProviderPolicies.useApiKeys(preferences.getImporterPreferences()::getApiKey);
             }
 
             List<UiCommand> uiCommands = argumentProcessor.processArguments();

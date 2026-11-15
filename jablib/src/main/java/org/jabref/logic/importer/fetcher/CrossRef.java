@@ -57,21 +57,14 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     private static final String API_URL = "https://api.crossref.org/works";
     private static final String MAILTO_PARAMETER = "mailto";
 
-    /// Rate limit for the CrossRef REST API public pool.
-    /// CrossRef's public pool defaults to 50 req/s, as measured via X-Rate-Limit-Interval/X-Rate-Limit-Limit
-    /// response headers - consistent with [DoiFetcher]'s existing CROSSREF_DCN_RATE_LIMITER.
-    private static final FetcherRateLimiter RATE_LIMITER = FetcherRateLimiter.ofRequestsPerSecond("Crossref", 50.0);
-
     private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
-
-    private final ImporterPreferences importerPreferences;
 
     public CrossRef() {
         this(ImporterPreferences.getDefault());
     }
 
+    /// The contact email for Crossref's polite pool is added by the Crossref provider policy in `URLDownload`.
     public CrossRef(ImporterPreferences importerPreferences) {
-        this.importerPreferences = importerPreferences;
     }
 
     @Override
@@ -101,29 +94,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
-    public Optional<DOI> findIdentifier(@NonNull BibEntry entry) throws FetcherException {
-        RATE_LIMITER.acquire(entry.getCitationKey().orElse(""));
-        return IdParserFetcher.super.findIdentifier(entry);
-    }
-
-    @Override
-    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
-        RATE_LIMITER.acquire(entry.getCitationKey().orElse(""));
-        return EntryBasedParserFetcher.super.performSearch(entry);
-    }
-
-    @Override
-    public List<BibEntry> performSearch(@NonNull BaseQueryNode queryNode) throws FetcherException {
-        RATE_LIMITER.acquire(queryNode.toString());
-        return SearchBasedParserFetcher.super.performSearch(queryNode);
-    }
-
-    @Override
     public Optional<BibEntry> performSearchById(@NonNull String identifier) throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
-        RATE_LIMITER.acquire(identifier);
         return IdBasedParserFetcher.super.performSearchById(identifier);
     }
 
@@ -137,7 +111,6 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         );
         uriBuilder.addParameter("rows", "20");  // = API default
         uriBuilder.addParameter("offset", "0"); // start at the beginning
-        addMailtoParameter(uriBuilder);
         return uriBuilder.build().toURL();
     }
 
@@ -145,14 +118,12 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("query", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
-        addMailtoParameter(uriBuilder);
         return uriBuilder.build().toURL();
     }
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + URLEncoder.encode(identifier, StandardCharsets.UTF_8));
-        addMailtoParameter(uriBuilder);
         return uriBuilder.build().toURL();
     }
 
@@ -275,11 +246,6 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public String getIdentifierName() {
         return "DOI";
-    }
-
-    // [impl->req~fetchers.crossref-polite-pool~1]
-    private void addMailtoParameter(URIBuilder uriBuilder) {
-        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(email -> uriBuilder.addParameter(MAILTO_PARAMETER, email));
     }
 
     private String getKeywords(JSONArray jsonArray) {

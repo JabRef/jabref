@@ -180,6 +180,25 @@ extraJavaModuleInfo {
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
     module("com.knuddels:jtokkit", "jtokkit")
+    // region resilience4j: jars only have an Automatic-Module-Name
+    module("io.github.resilience4j:resilience4j-bulkhead", "io.github.resilience4j.bulkhead") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("io.github.resilience4j:resilience4j-core", "io.github.resilience4j.core") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("io.github.resilience4j:resilience4j-ratelimiter", "io.github.resilience4j.ratelimiter") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("io.github.resilience4j:resilience4j-retry", "io.github.resilience4j.retry") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    // endregion
+
     module("com.konghq:unirest-java-core", "unirest.java.core") {
         exportAllPackages()
         requires("java.net.http")
