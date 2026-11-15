@@ -954,7 +954,6 @@ class AutoSetFileLinksUtilTest {
         }
 
         @Nested
-        @DisplayName("withoutConfiguredExternalFileTypes")
         class withoutConfiguredExternalFileTypes {
 
             @BeforeEach
