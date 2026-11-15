@@ -137,6 +137,9 @@ class HTMLCharsTest {
         return Stream.of(
                 Arguments.of("&amp;", "&"),
                 Arguments.of("&gt;", "&gt;"),
+                Arguments.of("&Omega;", "&Omega;"),
+                Arguments.of("&Alpha;", "&Alpha;"),
+                Arguments.of("&alpha;", "&alpha;"),
                 Arguments.of("&amp;HelloWorld", "&HelloWorld"),
                 Arguments.of("&amp;amp;", "\\\\&"),
                 Arguments.of("&lt;", "&lt;"),
