@@ -39,13 +39,13 @@ public final class ChatHistoryUtils {
 
         if (message.role() != ChatMessage.Role.USER) {
             int index = chatHistory.indexOf(message);
-            if (index > 0) {
-                ChatMessage prev = chatHistory.get(index - 1);
-                if (prev.role() == ChatMessage.Role.USER) {
-                    contentToRegenerate = prev.content();
-                    cutoffTime = prev.timestamp();
-                }
+            if (index == 0 || chatHistory.get(index - 1).role() != ChatMessage.Role.USER) {
+                return Optional.empty();
             }
+
+            ChatMessage prev = chatHistory.get(index - 1);
+            contentToRegenerate = prev.content();
+            cutoffTime = prev.timestamp();
         }
 
         final Instant finalCutoffTime = cutoffTime;

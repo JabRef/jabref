@@ -3,11 +3,13 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -142,23 +144,71 @@ class MainTableDataModelTest {
         BibEntryTableViewModel vmA = model.getViewModelByCitationKey("A").orElseThrow();
         BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
 
-        // First search matches Alice only.
+        JavaFxExtension.invokeAndWait(() -> {
+            // First search matches Alice only.
+            searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
+
+            assertEquals(Set.of(bibEntryA.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
+            assertTrue(vmA.isMatchedBySearch());
+            assertFalse(vmB.isMatchedBySearch());
+            assertTrue(vmA.isVisibleBySearch());
+            assertFalse(vmB.isVisibleBySearch());
+            assertEquals(1, resultSize.get());
+
+            // Second search matches no entries. The old Alice result should not remain visible.
+            searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Charlie")));
+
+            assertFalse(vmA.isMatchedBySearch());
+            assertFalse(vmB.isMatchedBySearch());
+            assertFalse(vmA.isVisibleBySearch());
+            assertFalse(vmB.isVisibleBySearch());
+            assertEquals(0, resultSize.get());
+        });
+    }
+
+    @Test
+    void searchResultsVersionBumpsOncePerAppliedQueryAndNotAfterUnbind() throws Exception {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.getDatabase().insertEntries(List.of(new BibEntry().withCitationKey("A").withField(StandardField.AUTHOR, "Alice")));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FLOAT, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        SearchContext searchContext = new SearchContext(
+                new SimpleBooleanProperty(false),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')));
+
+        // Tasks are collected instead of run, so that a search can be completed after the model was unbound
+        List<BackgroundTask<?>> pendingTasks = new ArrayList<>();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        when(taskExecutor.execute(any())).thenAnswer(invocation -> {
+            pendingTasks.add(invocation.getArgument(0));
+            return null;
+        });
+
+        OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                searchContext,
+                new SimpleListProperty<>(FXCollections.observableArrayList()),
+                searchQueryProperty,
+                new SimpleIntegerProperty());
+        int initialVersion = model.searchResultsVersionProperty().get();
+
         searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
+        executeTask(pendingTasks.removeLast());
+        assertEquals(initialVersion + 1, model.searchResultsVersionProperty().get());
 
-        assertTrue(vmA.isMatchedBySearch());
-        assertFalse(vmB.isMatchedBySearch());
-        assertTrue(vmA.isVisibleBySearch());
-        assertFalse(vmB.isVisibleBySearch());
-        assertEquals(1, resultSize.get());
-
-        // Second search matches no entries. The old Alice result should not remain visible.
-        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Charlie")));
-
-        assertFalse(vmA.isMatchedBySearch());
-        assertFalse(vmB.isMatchedBySearch());
-        assertFalse(vmA.isVisibleBySearch());
-        assertFalse(vmB.isVisibleBySearch());
-        assertEquals(0, resultSize.get());
+        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Bob")));
+        model.unbind();
+        executeTask(pendingTasks.removeLast());
+        assertEquals(initialVersion + 1, model.searchResultsVersionProperty().get());
     }
 
     @Test
@@ -273,6 +323,7 @@ class MainTableDataModelTest {
             assertFalse(quantumViewModel.isMatchedBySearch());
             assertTrue(organicViewModel.isMatchedBySearch());
             assertEquals(1, resultSize.get());
+            assertEquals(Set.of(organicEntry.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
 
             allowFirstSearchToFinish.complete(null);
             submittedTasks.getFirst().get(5, TimeUnit.SECONDS);
@@ -280,6 +331,7 @@ class MainTableDataModelTest {
             assertFalse(quantumViewModel.isMatchedBySearch());
             assertTrue(organicViewModel.isMatchedBySearch());
             assertEquals(1, resultSize.get());
+            assertEquals(Set.of(organicEntry.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
         } finally {
             allowFirstSearchToFinish.complete(null);
             executorService.shutdownNow();
@@ -488,8 +540,10 @@ class MainTableDataModelTest {
     private static <V> void executeTask(BackgroundTask<V> task) throws Exception {
         V result = task.call();
 
-        if (task.getOnSuccess() != null) {
-            task.getOnSuccess().accept(result);
+        Consumer<V> onSuccess = task.getOnSuccess();
+        if (onSuccess != null) {
+            // BackgroundTask invokes completion callbacks on the JavaFX thread in production.
+            JavaFxExtension.invokeAndWait(() -> onSuccess.accept(result));
         }
     }
 }

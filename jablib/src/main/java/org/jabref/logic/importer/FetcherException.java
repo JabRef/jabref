@@ -9,10 +9,12 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class FetcherException extends JabRefException {
     private static final Logger LOGGER = LoggerFactory.getLogger(FetcherException.class);
     private static final String SENSITIVE_PARAM_NAME = "sensitiveParamName";
@@ -49,7 +51,7 @@ public class FetcherException extends JabRefException {
         this.url = url.toString();
     }
 
-    public FetcherException(String errorMessage, Throwable cause) {
+    public FetcherException(String errorMessage, @Nullable Throwable cause) {
         // TODO: Convert IOException e to FetcherClientException
         //       Same TODO as in org.jabref.logic.importer.EntryBasedParserFetcher.performSearch.
         //       Maybe do this in org.jabref.logic.importer.FetcherException.getLocalizedMessage
@@ -70,14 +72,14 @@ public class FetcherException extends JabRefException {
         url = null;
     }
 
-    public FetcherException(String errorMessage, String localizedMessage, Throwable cause) {
+    public FetcherException(String errorMessage, String localizedMessage, @Nullable Throwable cause) {
         super(errorMessage, localizedMessage, cause);
         httpResponse = null;
         url = null;
     }
 
     @Override
-    public String getLocalizedMessage() {
+    public @Nullable String getLocalizedMessage() {
         // TODO: This should be moved to a separate class converting "any" exception object to a localized message
         // TODO: 5% of the "new-ers" pass a "real" localized message. See org.jabref.logic.importer.fetcher.GoogleScholar.addHitsFromQuery. We should maybe make use of this (and rewrite the whole message handling)
         // TODO: Try to convert IOException to some more meaningful information here (or at org.jabref.gui.DialogService.showErrorDialogAndWait(org.jabref.logic.importer.FetcherException)). See also org.jabref.logic.net.URLDownload.openConnection
@@ -91,7 +93,7 @@ public class FetcherException extends JabRefException {
         }
     }
 
-    String getRedactedUrl() {
+    private String getRedactedUrl() {
         return getRedactedUrl(url == null ? "" : url);
     }
 

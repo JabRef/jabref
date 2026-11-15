@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "write-good": {
+      "passive": false,
+      "adverb": false,
+      "tooWordy": false,
+      "weasel": false,
+      "whitelist": [
+        "only"
+      ]
+    }
+  }
+}
