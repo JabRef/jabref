@@ -107,6 +107,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     @Override
     public void setValues() {
+        journalFiles.stream()
+                    .filter(file -> file.isBuiltInListProperty().get())
+                    .forEach(file -> file.enabledProperty().unbindBidirectional(useBuiltInJournalList));
         journalFiles.clear();
 
         createFileObjects();
@@ -121,6 +124,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     public void createFileObjects() {
         List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
         externalFiles.forEach(name -> openFile(Path.of(name)));
+        journalFiles.forEach(file -> file.getAbsolutePath().ifPresent(path ->
+                file.enabledProperty().set(!abbreviationsPreferences.getDisabledExternalJournalLists().contains(path.toAbsolutePath().toString()))));
     }
 
     /// This will set the `currentFile` property to the [AbbreviationsFileViewModel] object that was added to
@@ -135,14 +140,15 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     /// This will load the built in abbreviation files and add it to the list of journal abbreviation files.
     public void addBuiltInList() {
         BackgroundTask
-                .wrap(() -> JournalAbbreviationLoader.loadBuiltInRepository().getAllLoaded())
+                .wrap(() -> JournalAbbreviationLoader.loadBuiltInRepository().getAllLoaded().stream()
+                                                     .map(AbbreviationViewModel::new)
+                                                     .toList())
                 .onRunning(() -> isLoading.setValue(true))
-                .onSuccess(result -> {
+                .onSuccess(builtInViewModels -> {
                     isLoading.setValue(false);
-                    List<AbbreviationViewModel> builtInViewModels = result.stream()
-                                                                          .map(AbbreviationViewModel::new)
-                                                                          .collect(Collectors.toList());
-                    journalFiles.add(new AbbreviationsFileViewModel(builtInViewModels, Localization.lang("JabRef built in list")));
+                    AbbreviationsFileViewModel builtInList = new AbbreviationsFileViewModel(builtInViewModels, Localization.lang("JabRef built in list"));
+                    builtInList.enabledProperty().bindBidirectional(useBuiltInJournalList);
+                    journalFiles.add(builtInList);
                     selectLastJournalFile();
                 })
                 .onFailure(dialogService::showErrorDialogAndWait)
@@ -199,9 +205,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     /// except if there are no more files than the `activeFile` property will be set to `null`.
     public void removeCurrentFile() {
         if (isFileRemovable.get()) {
+            int removedIndex = journalFiles.indexOf(currentFile.get());
             journalFiles.remove(currentFile.get());
             if (journalFiles.isEmpty()) {
                 currentFile.set(null);
+            } else {
+                currentFile.set(journalFiles.get(Math.max(0, removedIndex - 1)));
             }
         }
     }
@@ -319,6 +328,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                                                      .map(path -> path.toAbsolutePath().toString())
                                                      .toList();
         abbreviationsPreferences.setExternalJournalLists(journalStringList);
+        // [impl->req~journals.disable-external~1]
+        abbreviationsPreferences.setDisabledExternalJournalLists(journalFiles.stream()
+                                                                             .filter(file -> !file.enabledProperty().get())
+                                                                             .flatMap(file -> file.getAbsolutePath().stream())
+                                                                             .map(path -> path.toAbsolutePath().toString())
+                                                                             .toList());
         abbreviationsPreferences.setUseFJournalField(useFJournal.get());
         abbreviationsPreferences.setUseBuiltInJournalList(useBuiltInJournalList.get());
         Map<Path, List<Abbreviation>> filesToWrite = snapshotFilesToWrite();

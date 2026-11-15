@@ -9,15 +9,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -25,6 +24,7 @@ import javafx.util.Duration;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.StyleClasses;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -65,7 +65,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     private void buildView() {
         setContent(form()
-                .checkbox(Localization.lang("Use the built-in journal abbreviation list"), viewModel.useBuiltInJournalListProperty())
                 .custom(buildFileChooserRow())
                 .custom(buildAbbreviationsEditor())
                 .custom(buildAddAbbreviationRow())
@@ -74,22 +73,46 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private Node buildFileChooserRow() {
-        ComboBox<AbbreviationsFileViewModel> journalFilesBox = new ComboBox<>();
-        journalFilesBox.setPromptText(Localization.lang("No abbreviation files loaded"));
-        journalFilesBox.setMinWidth(200.0);
-        journalFilesBox.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(journalFilesBox, Priority.ALWAYS);
-        journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
-        journalFilesBox.valueProperty().bindBidirectional(viewModel.currentFileProperty());
+        TableView<AbbreviationsFileViewModel> journalFilesTable = new TableView<>();
+        journalFilesTable.setEditable(true);
+        journalFilesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        journalFilesTable.setPrefHeight(150.0);
+        journalFilesTable.setMinHeight(100.0);
+        journalFilesTable.setMaxHeight(200.0);
+        journalFilesTable.setPlaceholder(new Label(Localization.lang("No abbreviation files loaded")));
+        journalFilesTable.itemsProperty().bind(viewModel.journalFilesProperty());
+
+        TableColumn<AbbreviationsFileViewModel, Boolean> enabledColumn = new TableColumn<>(Localization.lang("Enabled"));
+        enabledColumn.setCellValueFactory(cellData -> cellData.getValue().enabledProperty());
+        enabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(enabledColumn));
+        enabledColumn.setMinWidth(90.0);
+        enabledColumn.setMaxWidth(90.0);
+        enabledColumn.setSortable(false);
+        enabledColumn.setReorderable(false);
+
+        TableColumn<AbbreviationsFileViewModel, String> listColumn = new TableColumn<>(Localization.lang("Journal lists"));
+        listColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue().getDisplayName()));
+        new ValueTableCellFactory<AbbreviationsFileViewModel, String>()
+                .withText(name -> name)
+                .withTooltip((file, _) -> file.toString())
+                .install(listColumn);
+        listColumn.setEditable(false);
+        listColumn.setSortable(false);
+        listColumn.setReorderable(false);
+        journalFilesTable.getColumns().add(enabledColumn);
+        journalFilesTable.getColumns().add(listColumn);
+
+        BindingsHelper.bindBidirectional(viewModel.currentFileProperty(), journalFilesTable.getSelectionModel().selectedItemProperty(),
+                journalFilesTable.getSelectionModel()::select);
 
         Button addList = toolButton(IconTheme.JabRefIcons.ADD_ABBREVIATION_LIST, Localization.lang("Add new list"), viewModel::addNewFile);
         Button openList = toolButton(IconTheme.JabRefIcons.OPEN_ABBREVIATION_LIST, Localization.lang("Open existing list"), viewModel::openFile);
         Button removeList = toolButton(IconTheme.JabRefIcons.REMOVE_ABBREVIATION_LIST, Localization.lang("Remove list"), viewModel::removeCurrentFile);
         removeList.disableProperty().bind(viewModel.isFileRemovableProperty().not());
 
-        HBox row = new HBox(4.0, new Label(Localization.lang("Journal lists:")), journalFilesBox, addList, openList, removeList);
-        row.setAlignment(Pos.CENTER_LEFT);
-        return row;
+        HBox actions = new HBox(4.0, addList, openList, removeList);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        return new VBox(GAP, journalFilesTable, actions);
     }
 
     private Button toolButton(IconTheme.JabRefIcons icon, String tooltip, Runnable action) {

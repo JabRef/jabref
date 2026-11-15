@@ -102,6 +102,7 @@ public class JournalAbbreviationRepository {
         AbbreviationPreferences snapshot = new AbbreviationPreferences(
                 List.copyOf(preferences.getExternalJournalLists()), preferences.shouldUseFJournalField(), preferences.shouldEnableMscKeywordDescriptions());
         snapshot.setUseBuiltInJournalList(preferences.shouldUseBuiltInJournalList());
+        snapshot.setDisabledExternalJournalLists(List.copyOf(preferences.getDisabledExternalJournalLists()));
         BackgroundTask.wrap(() -> JournalAbbreviationLoader.loadRepository(snapshot))
                       .onSuccess(repository -> finishReload(generation, repository))
                       .onFailure(exception -> {

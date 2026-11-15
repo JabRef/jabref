@@ -28,10 +28,25 @@ The generator uses all `.csv` files from <https://github.com/JabRef/abbrv.jabref
 When disabled, repository loading skips the built-in aggregate but still loads external CSV lists and LTWA.
 `loadBuiltInRepository()` always loads the built-in aggregate, including for the preferences list display.
 
+External list paths retain their order in `AbbreviationPreferences.getExternalJournalLists()`.
+`getDisabledExternalJournalLists()` stores disabled paths separately; the loader skips them without changing the precedence of enabled lists.
+The preferences table keeps disabled lists selectable and editable, and applies checkbox changes only on Save.
+Built-in abbreviation row models are constructed in the background before they are attached to the preferences table.
+
 The GUI retains its injected repository when saving preferences and calls `reload` with the saved values.
 Reloading captures the preference values before scheduling background work, then publishes the completed data in one update.
+The snapshot includes disabled external paths, so later preference edits cannot change a scheduled reload.
 Each request has a generation number: a result from an older request cannot overwrite a newer request.
 Existing consumers see the refreshed data on their next lookup; while loading, they continue using the previous data.
+
+## Preferences table
+
+Each list has an enabled checkbox, while selecting its row displays its abbreviations for inspection or editing.
+These cropped previews show the preferences tab with temporary example lists.
+
+![Journal abbreviation lists in light mode](../images/journal-abbreviation-lists-light.png)
+
+![Journal abbreviation lists in dark mode](../images/journal-abbreviation-lists-dark.png)
 
 ## Future work
 

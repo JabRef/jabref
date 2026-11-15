@@ -134,6 +134,62 @@ class AbbreviationsTest {
     }
 
     @Test
+    void disabledExternalListIsExcludedWithoutChangingPrecedence(@TempDir Path directory) throws IOException {
+        // [utest->req~journals.disable-external~1]
+        Path first = directory.resolve("first.csv");
+        Path second = directory.resolve("second.csv");
+        Files.writeString(first, "External Journal;First abbreviation;First abbreviation");
+        Files.writeString(second, "External Journal;Second abbreviation;Second abbreviation");
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(first.toString(), second.toString()), true, false);
+        TaskExecutor executor = new CurrentThreadTaskExecutor();
+
+        repository.reload(preferences, executor);
+        assertEquals(Optional.of("First abbreviation"), repository.getDefaultAbbreviation("External Journal"));
+
+        preferences.setDisabledExternalJournalLists(List.of(first.toString()));
+        repository.reload(preferences, executor);
+        assertEquals(Optional.of("Second abbreviation"), repository.getDefaultAbbreviation("External Journal"));
+        assertEquals(Optional.empty(), repository.get("First abbreviation"));
+        assertEquals(Optional.of("External Journal"), repository.get("Second abbreviation").map(Abbreviation::getName));
+        assertEquals(Optional.of("2D Mater."), repository.getDefaultAbbreviation("2D Materials"));
+
+        preferences.setDisabledExternalJournalLists(List.of(first.toString(), second.toString()));
+        preferences.setUseBuiltInJournalList(false);
+        repository.reload(preferences, executor);
+        assertEquals(Optional.empty(), repository.getDefaultAbbreviation("External Journal"));
+        assertEquals(Optional.empty(), repository.getDefaultAbbreviation("2D Materials"));
+
+        preferences.setDisabledExternalJournalLists(List.of());
+        repository.reload(preferences, executor);
+        assertEquals(Optional.of("First abbreviation"), repository.getDefaultAbbreviation("External Journal"));
+        assertEquals(List.of(first.toString(), second.toString()), preferences.getExternalJournalLists());
+    }
+
+    @Test
+    void externalListReloadCapturesDisabledStateBeforeBackgroundExecution(@TempDir Path directory) throws IOException {
+        Path external = directory.resolve("external.csv");
+        Files.writeString(external, "External Journal;Ext. J.;Ext. J.");
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(external.toString()), true, false);
+        preferences.setDisabledExternalJournalLists(List.of(external.toString()));
+        List<Runnable> queued = new ArrayList<>();
+        TaskExecutor executor = mock(TaskExecutor.class);
+        when(executor.execute(any())).thenAnswer(invocation -> {
+            BackgroundTask<?> task = invocation.getArgument(0);
+            queued.add(() -> new CurrentThreadTaskExecutor().execute(task));
+            return CompletableFuture.completedFuture(null);
+        });
+
+        repository.reload(preferences, executor);
+        preferences.setDisabledExternalJournalLists(List.of());
+        queued.removeFirst().run();
+        assertEquals(List.of(), repository.getFullNames().stream().filter("External Journal"::equals).toList());
+
+        repository.reload(preferences, executor);
+        queued.removeFirst().run();
+        assertEquals(Optional.of("Ext. J."), repository.getDefaultAbbreviation("External Journal"));
+    }
+
+    @Test
     void backgroundLoadedRepositoryReturnsBuiltInAbbreviations() {
         JournalAbbreviationRepository backgroundLoadedRepository = JournalAbbreviationLoader.loadRepositoryInBackground(
                 new AbbreviationPreferences(java.util.List.of(), true, false),
