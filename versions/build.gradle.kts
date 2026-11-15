@@ -28,7 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
-    api(platform("com.konghq:unirest-java-bom:4.11.4"))
+    api(platform("com.konghq:unirest-java-bom:4.11.5"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.23.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
@@ -115,7 +115,7 @@ dependencies.constraints {
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.1")
-    api("org.apache.commons:commons-lang3:3.21.0")
+    api("org.apache.commons:commons-lang3:3.22.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.4")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.5")
