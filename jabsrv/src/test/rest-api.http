@@ -48,9 +48,9 @@ Accept: application/json
 GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex
 
-### Get list of files in Chocolate.bib
+### Get local PDF files linked to an entry of Chocolate.bib
 
-GET http://localhost:23119/libraries/demo/entries/pdffiles
+GET http://localhost:23119/libraries/demo/entries/Tan_2021/files
 Accept: application/json
 
 ### Get CSL JSON of Chocolate.bib

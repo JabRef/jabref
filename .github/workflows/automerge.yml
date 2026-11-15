@@ -8,7 +8,12 @@ permissions:
 jobs:
   automerge:
     runs-on: ubuntu-slim
-    if: github.repository == 'JabRef/jabref'
+    # In JabRef/jabref, on-pr-opened-updated.yml removes "automerge" when a human pushes; the black-forest
+    # repository has no such cleanup, so a human push there must not be acted on with a stale label.
+    if: >
+      github.repository == 'JabRef/jabref' ||
+      (github.repository == 'JabRef/jabref-black-forest' &&
+       !(github.event.action == 'synchronize' && !contains(fromJSON('["dependabot[bot]", "renovate-bot", "jabref-machine"]'), github.event.sender.login)))
     # Serialize with on-pr-labeled.yml's automerge job (same group) so the
     # approve guard never races: the second run starts only after the first
     # finished and its approval is visible.
@@ -42,8 +47,8 @@ jobs:
             exit 0
           fi
 
-          if [[ "$HEAD_REPO" != "JabRef/jabref" ]]; then
-            echo "🚫 not from JabRef/jabref"
+          if [[ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]]; then
+            echo "🚫 not from $GITHUB_REPOSITORY"
             echo "shouldrun=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -71,7 +76,7 @@ jobs:
         env:
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
       - name: Approve PR
-        # jabref-machine cannot approve its own PRs (ports); port-to-other-branch.yml approves those
+        # jabref-machine cannot approve its own PRs (ports); on-pr-labeled.yml approves those
         if: steps.shouldrun.outputs.shouldrun == 'true' && github.event.pull_request.user.login != 'jabref-machine'
         # Guard: a push directly followed by adding the "automerge" label makes both this
         # workflow (live label query) and on-pr-labeled.yml approve — skip if an

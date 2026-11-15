@@ -3,12 +3,10 @@ package org.jabref.logic.quality.consistency;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
-import java.util.Set;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.Field;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -36,8 +34,8 @@ public class BibliographyConsistencyCheckResultCsvWriter extends BibliographyCon
     }
 
     @Override
-    protected void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
-        List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
+    protected void writeBibEntry(BibEntry bibEntry, EntryTypeReport entryTypeReport) throws IOException {
+        List<String> theRecord = getFindingsAsList(bibEntry, entryTypeReport);
         csvPrinter.printRecord(theRecord);
     }
 

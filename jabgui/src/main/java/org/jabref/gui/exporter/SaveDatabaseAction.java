@@ -43,7 +43,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileSnapshot;
@@ -196,8 +195,12 @@ public class SaveDatabaseAction {
         // Set new location
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+            // An ID the database already has is kept: generating a new one here would orphan the settings
+            // stored under the old ID and leave them behind as a second saved connection.
+            String sharedDatabaseId = context.getDatabase().getSharedDatabaseID()
+                                             .orElseGet(() -> context.getDatabase().generateSharedDatabaseID());
+            preferences.getSharedDatabasePreferences().forConnection(sharedDatabaseId)
+                       .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
         SaveResult saveResult = save(file, mode, mayAutoCommit);

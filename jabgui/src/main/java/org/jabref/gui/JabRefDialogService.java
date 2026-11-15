@@ -36,7 +36,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -100,12 +99,17 @@ public class JabRefDialogService implements DialogService {
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
+        return createDialog(type, title, content, true);
+    }
+
+    private FXDialog createDialog(AlertType type, String title, String content, boolean editable) {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
 
         TextArea area = new TextArea(content);
+        area.setEditable(editable);
         area.setWrapText(true);
 
         alert.getDialogPane().setContent(area);
@@ -154,7 +158,7 @@ public class JabRefDialogService implements DialogService {
 
     private <T> ChoiceDialog<T> createChoiceDialog(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
         ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
-        ((Stage) choiceDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefIcon());
+        IconTheme.applyLogo(choiceDialog);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         choiceDialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         choiceDialog.setHeaderText(title);
@@ -215,7 +219,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void showWarningDialogAndWait(String title, String content) {
-        FXDialog alert = createDialog(AlertType.WARNING, title, content);
+        FXDialog alert = createDialog(AlertType.WARNING, title, content, false);
         alert.showAndWait();
     }
 
@@ -403,7 +407,7 @@ public class JabRefDialogService implements DialogService {
         progressDialog.setTitle(title);
         progressDialog.setContentText(content);
         progressDialog.setGraphic(null);
-        ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefIcon());
+        IconTheme.applyLogo(progressDialog);
         progressDialog.setOnCloseRequest(_ -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);
