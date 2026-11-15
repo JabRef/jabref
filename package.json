@@ -3,9 +3,12 @@
   "private": true,
   "devDependencies": {
     "textlint": "^15.7.1",
-    "textlint-rule-common-misspellings": "^1.0.1"
+    "textlint-rule-common-misspellings": "^1.0.1",
+    "textlint-rule-terminology": "^5.2.16",
+    "textlint-rule-write-good": "^2.0.0"
   },
   "scripts": {
-    "textlint": "textlint -f github \"*.md\" \"docs/**/*.md\""
+    "textlint": "textlint -f github \"*.md\" \"docs/**/*.md\"",
+    "textlint:write-good": "textlint -f github --config .textlintrc.write-good.json"
   }
 }

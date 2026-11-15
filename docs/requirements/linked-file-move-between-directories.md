@@ -14,9 +14,7 @@ JabRef supports up to four directory types for storing linked files (see [Direct
 
 Issue: [#12287](https://github.com/JabRef/jabref/issues/12287)
 
-<!-- oft:off -->
-
-## Context menu shows all configured directories as move targets
+## Linked file context menu must display all configured directories as move targets
 `req~jabgui.linked-files.move.context-menu-all-directories~1`
 
 The right-click context menu for a linked file must display one menu item per configured directory type (MD, LSD, USD, LD).
@@ -31,46 +29,58 @@ Each item is labelled as follows:
 
 Only directories that are actually configured appear in the menu.
 
-TODO Needs: impl, utest
+Needs: impl, utest
 
-## Context menu disables the item for the file's current directory
+Status: draft
+
+## Linked file context menu must disable move target for file current directory
 `req~jabgui.linked-files.move.context-menu-disable-current~1`
 
 The menu item whose directory contains the linked file must be shown but disabled.
 It must not be hidden, so that the user can see which directory the file currently resides in.
 
-TODO Needs: impl, utest
+Needs: impl, utest
 
-## Context menu is fully disabled when no directory is configured
+Status: draft
+
+## Linked file context menu must disable move items when no directory is configured
 `req~jabgui.linked-files.move.context-menu-disable-no-config~1`
 
 When no file directory of any type is configured (e.g. an unsaved new library with no preferences set), all move menu items must be disabled.
 
-TODO Needs: impl, utest
+Needs: impl, utest
 
-## LD is disabled when the library has not been saved to disk
+Status: draft
+
+## Linked file context menu must disable move next to library when library is unsaved
 `req~jabgui.linked-files.move.ld-requires-saved-library~1`
 
 The "Move file next to library" item (LD) must be disabled whenever the current library has no file path on disk (i.e. it has never been saved).
 
-TODO Needs: impl, utest
+Needs: impl, utest
 
-## All selected files move to the same chosen target directory
+Status: draft
+
+## File move action must move all selected files to chosen target directory
 `req~jabgui.linked-files.move.multi-file-single-target~1`
 
 When multiple linked files are selected and the user invokes a move action, every selected file must be moved to the single target directory the user chose.
 The source directory of each individual file is irrelevant to the choice of target.
 
-TODO Needs: impl, utest
+Needs: impl, utest
 
-## Files already in the target directory are skipped silently
+Status: draft
+
+## File move action must silently skip files already present in target directory
 `req~jabgui.linked-files.move.multi-file-skip-existing~1`
 
 If a selected file already resides in the chosen target directory, the system must skip that file without raising an error or displaying a warning.
 
-TODO Needs: impl, utest
+Needs: impl, utest
 
-## Subdirectory structure is preserved when moving a file
+Status: draft
+
+## File move action must preserve subdirectory structure under target directory
 `req~logic.linked-files.move.preserve-subdirectory-structure~1`
 
 When a file is moved between directories, its path relative to the source directory must be reconstructed under the target directory.
@@ -84,9 +94,9 @@ Example:
 | Original file path            | `E:\lib\a\b\c\paper.pdf`    |
 | Expected file path after move | `U:\papers\a\b\c\paper.pdf` |
 
-TODO Needs: impl, utest
+Needs: impl, utest
 
-<!-- oft:on -->
+Status: draft
 
 ## Alternatives considered for the context menu
 

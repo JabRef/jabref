@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -24,6 +25,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.LocaleUtil;
 import org.jabref.gui.util.component.MarkdownTextFlow;
+import org.jabref.logic.ai.chatting.util.JsonAnswerFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 
@@ -40,6 +42,8 @@ public class AiChatMessageView extends HBox {
     @FXML private Label sourceLabel;
     @FXML private StackPane markdownContentPane;
     @FXML private ContextMenu contextMenu;
+    @FXML private MenuItem deleteMenuItem;
+    @FXML private MenuItem regenerateMenuItem;
 
     @FXML private VBox buttons;
     // [impl->feat~ai.chat.regenerate-response~1]
@@ -53,7 +57,7 @@ public class AiChatMessageView extends HBox {
     @Inject private GuiPreferences preferences;
 
     // Tooltip for the whole component.
-    private Tooltip tooltip = new Tooltip();
+    private final Tooltip tooltip = new Tooltip();
     private MarkdownTextFlow markdownTextFlow;
 
     private AiChatMessageViewModel viewModel;
@@ -93,6 +97,8 @@ public class AiChatMessageView extends HBox {
 
         regenerateButton.visibleProperty().bind(viewModel.showRegenerateProperty());
         deleteButton.visibleProperty().bind(viewModel.showDeleteProperty());
+        regenerateMenuItem.visibleProperty().bind(viewModel.showRegenerateProperty());
+        deleteMenuItem.visibleProperty().bind(viewModel.showDeleteProperty());
 
         setupPseudoClasses();
     }
@@ -134,7 +140,14 @@ public class AiChatMessageView extends HBox {
             return;
         }
 
-        markdownTextFlow.setMarkdown(StringUtil.makeSafe(chatMessage.content()));
+        String content = StringUtil.makeSafe(chatMessage.content());
+
+        // Only the AI answers with JSON; a user message is shown the way it was typed.
+        if (chatMessage.role() == ChatMessage.Role.AI) {
+            markdownTextFlow.setMarkdown(JsonAnswerFormatter.fenceJson(content), new JsonCodeBlockFormatter());
+        } else {
+            markdownTextFlow.setMarkdown(content);
+        }
     }
 
     private static Pos determineAlignment(ChatMessage chatMessage) {

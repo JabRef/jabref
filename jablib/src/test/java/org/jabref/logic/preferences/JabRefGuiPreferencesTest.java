@@ -3,6 +3,7 @@ package org.jabref.logic.preferences;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,7 +14,9 @@ class JabRefGuiPreferencesTest {
     private static Stream<Arguments> provideTestData() {
         return Stream.of(
                 Arguments.of(List.of("A", "B", "C", "D"), "A;B;C;D"),
-                Arguments.of(List.of("A", "B", "C", ""), "A;B;C;")
+                Arguments.of(List.of("A", "B", "C", ""), "A;B;C;"),
+                Arguments.of(List.of("a;b", "C:\\Tools\\app.exe"), "a\\;b;C:\\\\Tools\\\\app.exe"),
+                Arguments.of(List.of("a\\", "b"), "a\\\\;b")
         );
     }
 
@@ -27,5 +30,10 @@ class JabRefGuiPreferencesTest {
     @MethodSource("provideTestData")
     void convertListToString(List<String> sampleList, String sampleString) {
         assertEquals(sampleString, JabRefCliPreferences.convertListToString(sampleList));
+    }
+
+    @Test
+    void convertStringToListPreservesUnescapedBackslashes() {
+        assertEquals(List.of("C:\\Tools\\app.exe"), JabRefCliPreferences.convertStringToList("C:\\Tools\\app.exe"));
     }
 }
