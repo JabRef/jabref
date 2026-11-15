@@ -84,8 +84,8 @@ public class JournalAbbreviationLoader {
         // Read external lists
         // [impl->req~journals.disable-external~1]
         List<String> lists = new ArrayList<>(abbreviationPreferences.getExternalJournalLists().stream()
-                                                                 .filter(path -> !abbreviationPreferences.getDisabledExternalJournalLists().contains(path))
-                                                                 .toList());
+                                                                    .filter(path -> !abbreviationPreferences.getDisabledExternalJournalLists().contains(path))
+                                                                    .toList());
         if (!lists.isEmpty()) {
             // reversing ensures that the latest lists overwrites the former one
             Collections.reverse(lists);
