@@ -38,6 +38,8 @@ public final class BuildInfo {
     public final String year;
 
     public final String astrophysicsDataSystemAPIKey;
+    public final String bibSonomyApiKey;
+    public final String bibSonomyUsername;
     public final String biodiversityHeritageApiKey;
     public final String crossRefEmail;
     public final String ieeeAPIKey;
@@ -72,6 +74,8 @@ public final class BuildInfo {
         maintainers = properties.getProperty("maintainers", "");
 
         astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
+        bibSonomyApiKey = BuildInfo.getValue(properties, "bibSonomyApiKey", "");
+        bibSonomyUsername = BuildInfo.getValue(properties, "bibSonomyUsername", "");
         biodiversityHeritageApiKey = BuildInfo.getValue(properties, "biodiversityHeritageApiKey", "36b910b6-2eb3-46f2-b64c-9abc149925ba");
         crossRefEmail = BuildInfo.getValue(properties, "crossRefEmail", "");
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");

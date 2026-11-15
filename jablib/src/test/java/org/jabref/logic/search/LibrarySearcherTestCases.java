@@ -1,11 +1,13 @@
 package org.jabref.logic.search;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,6 +40,10 @@ public final class LibrarySearcherTestCases {
     public static final BibEntry TITLE_UPPER_CASED = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-upper-cased")
             .withField(StandardField.TITLE, "TITLE UPPER CASED");
+
+    public static final BibEntry ENTRY_WITH_DOI = new BibEntry(StandardEntryType.Article)
+            .withCitationKey("doi-entry")
+            .withField(StandardField.DOI, "10.1000/182");
 
     private LibrarySearcherTestCases() {
     }
@@ -85,7 +91,38 @@ public final class LibrarySearcherTestCases {
                 // regex on any field
                 Arguments.of(List.of(),
                         new SearchQuery("any =~ [Y]"),
-                        List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED))
+                        List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED)),
+
+                regexWithLiteralBackslash(),
+
+                // DOI matching (full URLs should find entry by DOI)
+                Arguments.of(List.of(ENTRY_WITH_DOI),
+                        new SearchQuery("https://doi.org/10.1000/182"),
+                        List.of(ENTRY_WITH_DOI, TITLE_SENTENCE_CASED)),
+                doiSearchCase("https://doi.org/10.1016/j.jss.2006.05.024", "10.1016/j.jss.2006.05.024"),
+                doiSearchCase("https://doi.org/bfrhmx", "https://doi.org/bfrhmx"),
+                doiSearchCase("https://doi.org/bfrhmx", "10/bfrhmx"),
+                doiSearchCase("https://doi.org/bfr%68mx", "10/bfrhmx"),
+                doiSearchCase("https://doi.org/bfr%68mx", "https://doi.org/bfr%68mx"),
+                doiSearchCase("https://doi.org/10.1000/foo%5C", "10.1000/foo\\"),
+                doiSearchCase("https://doi.org/10.1000/foo%5C", "https://doi.org/10.1000/foo%5C"),
+                doiSearchCase("https://doi.org/10.1000/foo(bar)=baz", "10.1000/foo(bar)=baz"),
+                doiSearchCase("https://doi.org/10.1000/foo+bar", "10.1000/foo+bar"),
+                doiSearchCase("https://doi.org/10.1000/foo%2Bbar", "10.1000/foo+bar"),
+                doiSearchCase("https://doi.org/10.1000/foo%2Bbar", "http://dx.doi.org/10.1000/foo%2Bbar"),
+                doiSearchCase("https://doi.org/10.1000%2F182", "http://doi.org/10.1000%2F182"),
+                doiSearchCase("https://example.org/article/10.1000/182", "https://example.org/article/10.1000/182"),
+                Arguments.of(List.of(), new SearchQuery("https://example.org/article/10.1000/182"), List.of(ENTRY_WITH_DOI))
         );
+    }
+
+    private static Arguments regexWithLiteralBackslash() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "foo\\bar");
+        return Arguments.of(List.of(entry), new SearchQuery("\"foo\\\\bar\"", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)), List.of(entry));
+    }
+
+    private static Arguments doiSearchCase(String query, String value) {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.DOI, value);
+        return Arguments.of(List.of(entry), new SearchQuery(query), List.of(TITLE_SENTENCE_CASED, entry));
     }
 }

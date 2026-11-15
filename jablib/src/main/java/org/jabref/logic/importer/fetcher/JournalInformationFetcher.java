@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Fetches journal information from Crossref and OpenAlex.
-// [impl->req~fetchers.journal-information~1]
+// [impl->feat~fetchers.journal-information~1]
 public class JournalInformationFetcher implements WebFetcher {
     public static final String NAME = "Journal Information";
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);

@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.util.Pair;
 
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
@@ -72,6 +73,11 @@ public interface StateManager extends SrvStateManager {
 
     void setSearchContext(BibDatabaseContext database, SearchContext searchContext);
 
+    /// Drops the [SearchContext] of a library that is closing. It holds the search backends and the
+    /// factories that build them, and those capture the tab that created it, so leaving the
+    /// registration behind keeps the whole closed library alive.
+    void removeSearchContext(BibDatabaseContext database);
+
     void setSelectedEntries(List<BibEntry> newSelectedEntries);
 
     void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups);
@@ -94,6 +100,8 @@ public interface StateManager extends SrvStateManager {
 
     void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task);
 
+    ObservableList<Pair<BackgroundTask<?>, Task<?>>> getRunningBackgroundTasksPairs();
+
     EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning();
 
     DialogWindowState getDialogWindowState(String className);
@@ -113,6 +121,9 @@ public interface StateManager extends SrvStateManager {
     void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow);
 
     void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName);
+
+    /// Closes the group chat windows of a library that is closing and releases their registrations.
+    void closeAiChatWindows(BibDatabaseContext context);
 
     BooleanProperty getEditorShowing();
 

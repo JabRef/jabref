@@ -8,6 +8,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
@@ -16,11 +17,14 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -262,23 +266,69 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void moveApiKeysToKeyRing() throws PasswordAccessException {
-        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
-        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final String fetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String fetcherCustomKeys = "fetcherCustomKeys";
         final Keyring keyring = mock(Keyring.class);
 
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
-        when(preferences.getInternalPreferences().getUserHostInfo().getUserHostString()).thenReturn("user-host");
+        when(preferences.getStringList(fetcherCustomKeyNames)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
+        when(preferences.getStringList(fetcherCustomKeys)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
+
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenThrow(new PasswordAccessException("No entry stored"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherC")).thenThrow(new PasswordAccessException("No entry stored"));
 
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
             keyringFactory.when(Keyring::create).thenReturn(keyring);
 
             PreferencesMigrations.moveApiKeysToKeyring(preferences);
 
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherA"), any());
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherB"), any());
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
-            verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherA"), eq("KeyA"));
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherB"), eq("KeyB"));
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherC"), eq("KeyC"));
+            verify(preferences).deleteKey(fetcherCustomKeys);
+        }
+    }
+
+    @Test
+    void moveApiKeysToKeyRingKeepsExistingKey() throws PasswordAccessException {
+        final String fetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String fetcherCustomKeys = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(preferences.getStringList(fetcherCustomKeyNames)).thenReturn(List.of("FetcherA", "FetcherB"));
+        when(preferences.getStringList(fetcherCustomKeys)).thenReturn(List.of("StaleA", "KeyB"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenReturn("CurrentA");
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+            PreferencesMigrations.moveApiKeysToKeyring(preferences);
+
+            verify(keyring, never()).setPassword(eq("org.jabref.apikeys"), eq("FetcherA"), any());
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherB"), eq("KeyB"));
+            verify(keyring).deletePassword(eq("org.jabref.customapikeys"), eq("FetcherA"));
+            verify(keyring).deletePassword(eq("org.jabref.customapikeys"), eq("FetcherB"));
+            verify(preferences).deleteKey(fetcherCustomKeys);
+        }
+    }
+
+    @Test
+    void moveApiKeysToKeyRingKeepsLegacyEntryWithoutNewValue() throws PasswordAccessException {
+        final String fetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String fetcherCustomKeys = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(preferences.getStringList(fetcherCustomKeyNames)).thenReturn(List.of("FetcherA"));
+        when(preferences.getStringList(fetcherCustomKeys)).thenReturn(List.of(""));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenThrow(new PasswordAccessException("No entry stored"));
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+            PreferencesMigrations.moveApiKeysToKeyring(preferences);
+
+            verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+            verify(keyring, never()).deletePassword(anyString(), anyString());
+            verify(preferences).deleteKey(fetcherCustomKeys);
         }
     }
 
@@ -478,5 +528,48 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
 
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+A"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void upgradeImportDialogDownloadLinkedFilesCopiesWebSearchChoice(boolean webSearchChoice) {
+        // [utest->req~import.dialog.download-linked-files~1]
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(false);
+        when(preferences.hasKey("downloadLinkedFiles")).thenReturn(true);
+        when(preferences.getBoolean(eq("downloadLinkedFiles"), anyBoolean())).thenReturn(webSearchChoice);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences).setImportDialogDownloadLinkedFiles(webSearchChoice);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", webSearchChoice);
+        verify(filePreferences, never()).setDownloadLinkedFiles(anyBoolean());
+    }
+
+    @Test
+    void upgradeImportDialogDownloadLinkedFilesKeepsStoredDialogChoice() {
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(true);
+        when(preferences.hasKey("downloadLinkedFiles")).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences, never()).setImportDialogDownloadLinkedFiles(anyBoolean());
+        verify(preferences, never()).putBoolean(eq("importDialogDownloadLinkedFiles"), anyBoolean());
+    }
+
+    @Test
+    void upgradeImportDialogDownloadLinkedFilesKeepsDefaultForNewUsers() {
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(false);
+        when(preferences.getBoolean("downloadLinkedFiles", true)).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences).setImportDialogDownloadLinkedFiles(true);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", true);
     }
 }
