@@ -21,7 +21,7 @@ frontmatter are skipped; the library's own sidecars and PDFs are never hidden by
 scratch PDF folder ignored by a catch-all `*` still opens). Unparseable Hayagriva files are
 reported as warnings without aborting the scan.
 Scanning must not write or modify any file in the directory.
-See [ADR 75](../decisions/0075-directory-as-library-with-hayagriva-sidecars.md) for more details.
+See [ADR 82](../decisions/0082-directory-as-library-with-hayagriva-sidecars.md) for more details.
 
 Needs: impl
 
