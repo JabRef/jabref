@@ -2,7 +2,7 @@ package org.jabref.gui.ai.summary;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.ai.summarization.logic.summarizationalgorithms.Summarizator;
@@ -19,7 +19,7 @@ public class AiSummaryParametersDialog extends BaseDialog<Boolean> {
 
         this.setTitle(Localization.lang("Summarization parameters"));
 
-        this.setResultConverter(button -> button == ButtonType.OK);
+        this.setResultConverter(button -> button != null && button.getButtonData() == ButtonBar.ButtonData.OK_DONE);
 
         ViewLoader.view(this)
                   .load()

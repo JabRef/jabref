@@ -111,7 +111,7 @@ Apache Tika is a content extraction toolkit it can invoke Tesseract under the ho
 * Bad, because Tika's OCR output is raw extracted text without bounding box coordinates. A separate text layer embedding step is still required, with the same multi-page complexity as the direct Tess4J approach.
 * Bad, because Tika abstracts away fine-grained OCR settings, making expert user configuration harder than with direct Tess4J or OCRmyPDF.
 * Bad, because Tika internally still calls a system-installed Tesseract binary no installation advantage over direct Tess4J use.
-* Bad, because it is not extendable. There is no common OCR interface.
+* Bad, because it is not extendable. No common OCR interface exists.
 
 ### Docling
 

@@ -84,7 +84,8 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasksPairs = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final ObservableList<Task<?>> backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);
-    private final FilteredList<Task<?>> runningBackgroundTasks = new FilteredList<>(backgroundTasks, Task::isRunning);
+    private final FilteredList<Pair<BackgroundTask<?>, Task<?>>> runningBackgroundTasksPairs = new FilteredList<>(backgroundTasksPairs, pair -> pair.getValue().isRunning());
+    private final ObservableList<Task<?>> runningBackgroundTasks = EasyBind.map(runningBackgroundTasksPairs, Pair::getValue);
     private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
@@ -230,6 +231,11 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     }
 
     @Override
+    public ObservableList<Pair<BackgroundTask<?>, Task<?>>> getRunningBackgroundTasksPairs() {
+        return runningBackgroundTasksPairs;
+    }
+
+    @Override
     public EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning() {
         return anyTasksThatWillNotBeRecoveredRunning;
     }
@@ -311,6 +317,12 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
                 groupAiChatWindows.remove(context.getUid());
             }
         }
+    }
+
+    @Override
+    public void closeAiChatWindows(BibDatabaseContext context) {
+        Optional.ofNullable(groupAiChatWindows.remove(context.getUid()))
+                .ifPresent(windows -> List.copyOf(windows.values()).forEach(AiGroupChatWindow::close));
     }
 
     @Override

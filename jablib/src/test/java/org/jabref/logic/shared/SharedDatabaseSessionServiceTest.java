@@ -5,12 +5,14 @@ import java.util.List;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 class SharedDatabaseSessionServiceTest {
 
@@ -24,7 +26,7 @@ class SharedDatabaseSessionServiceTest {
                 .setUser("jabref")
                 .setPassword("")
                 .createDBMSConnectionProperties();
-        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService(_ -> connectionProperties);
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService(mock(SharedDatabasePreferences.class), _ -> connectionProperties);
         LastFilesOpenedPreferences lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
                 List.of(),
                 null,
@@ -38,7 +40,7 @@ class SharedDatabaseSessionServiceTest {
 
     @Test
     void restoresSharedDatabaseId() {
-        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService(mock(SharedDatabasePreferences.class));
         BibDatabaseContext databaseContext = new BibDatabaseContext();
 
         sessionService.restoreSharedDatabaseId(databaseContext, "shared-database-id");

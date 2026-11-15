@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -22,6 +23,9 @@ public class MainTableTooltip extends Tooltip {
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, taskExecutor);
+
+        // Keep the tooltip open while the cursor stays on the cell, so that long abstracts can be read
+        setShowDuration(Duration.INDEFINITE);
 
         preview.resizeForTooltipContent();
 
@@ -44,6 +48,7 @@ public class MainTableTooltip extends Tooltip {
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
+        updateShowDuration();
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
@@ -56,11 +61,17 @@ public class MainTableTooltip extends Tooltip {
         return this;
     }
 
+    private void updateShowDuration() {
+        int seconds = preferences.getPreviewPreferences().getTooltipDuration();
+        setShowDuration(seconds == 0 ? Duration.INDEFINITE : Duration.seconds(seconds));
+    }
+
     public boolean shouldAlwaysShowTooltip() {
         return preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip();
     }
 
     public Tooltip createPreviewTooltip(BibDatabaseContext databaseContext, BibEntry entry) {
+        updateShowDuration();
         preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         preview.setDatabaseContext(databaseContext);
         preview.setEntry(entry);

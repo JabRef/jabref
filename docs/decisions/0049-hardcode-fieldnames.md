@@ -15,7 +15,7 @@ Needs: impl, utest
 
 JabRef allows users to define custom fields and customizing `StandardField`s with arbitrary names and arbitrary casing. Users reported inconsistent casing of field names across the tabs in the details panes of the entry editor (Required/Optional/Other fields), within saved BibTeX files and preferences.
 Fields were partially forced to show in UI with a capital first letter by a UI method inside the `Field` model.
-A argument was made in issue [#116](https://github.com/JabRef/jabref/issues/116) about how to case the field names in the `.bib` file. It was then decided to always lowercase the field names, as BibTeX itself is case-insensitive in that matter, but convention in bibtex style is to lowercase it.
+A argument was made in issue [#116](https://github.com/JabRef/jabref/issues/116) about how to case the field names in the `.bib` file. It was then decided to always lowercase the field names, as BibTeX itself is case-insensitive in that matter, but convention in BibTeX style is to lowercase it.
 There were complains, that this inconsistency [confuses users](https://github.com/JabRef/jabref/issues/10590) and makes it impossible to achieve a predictable, uniform presentation between UI and persisted data, especially when dealing with customized fields.
 
 How should JabRef consistently determine the casing for field names in UI and persistence for both built‑in and custom fields?

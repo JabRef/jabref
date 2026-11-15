@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserFetcher, EntryBasedFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "SemanticScholar";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticScholar.class);
 
@@ -226,7 +227,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     @Override
     public String getName() {
-        return "SemanticScholar";
+        return FETCHER_NAME;
     }
 
     /// Looks for hits which are matched by the given [BibEntry].
