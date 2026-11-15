@@ -274,7 +274,7 @@
 }
 
 .rating > .container > .button {
-    -fx-icon-color: derive(-fx-text-base-color, 85%);
+    -fx-icon-color: derive(-fx-text-base-color, 65%);
 }
 
 .rating > .container > .button.strong {

@@ -76,6 +76,49 @@ class KeyBindingDispatcherTest {
         assertEquals(List.of(KeyBinding.CLOSE), executedBindings);
     }
 
+    @Test
+    void actionWithoutConsumingRuns() {
+        dispatcher.onWithoutConsuming(KeyBinding.CLOSE, () -> executedBindings.add(KeyBinding.CLOSE));
+
+        dispatcher.handle(createKeyPressedEvent(KeyCode.ESCAPE));
+
+        assertEquals(List.of(KeyBinding.CLOSE), executedBindings);
+    }
+
+    @Test
+    void actionWithoutConsumingLeavesEventForParent() {
+        dispatcher.onWithoutConsuming(KeyBinding.CLOSE, () -> executedBindings.add(KeyBinding.CLOSE));
+        KeyEvent event = createKeyPressedEvent(KeyCode.ESCAPE);
+
+        dispatcher.handle(event);
+
+        assertFalse(event.isConsumed());
+    }
+
+    @Test
+    void conditionalActionThatHandledEventConsumesIt() {
+        dispatcher.onConditionally(KeyBinding.CLOSE, () -> true);
+        KeyEvent event = createKeyPressedEvent(KeyCode.ESCAPE);
+
+        dispatcher.handle(event);
+
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void conditionalActionThatDidNotHandleEventLeavesItForParent() {
+        dispatcher.onConditionally(KeyBinding.CLOSE, () -> {
+            executedBindings.add(KeyBinding.CLOSE);
+            return false;
+        });
+        KeyEvent event = createKeyPressedEvent(KeyCode.ESCAPE);
+
+        dispatcher.handle(event);
+
+        assertEquals(List.of(KeyBinding.CLOSE), executedBindings);
+        assertFalse(event.isConsumed());
+    }
+
     private static KeyEvent createKeyPressedEvent(KeyCode keyCode) {
         return new KeyEvent(KeyEvent.KEY_PRESSED, "", keyCode.getName(), keyCode, false, false, false, false);
     }
