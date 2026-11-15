@@ -2,12 +2,6 @@
 nav_order: 82
 parent: Decision Records
 ---
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 # Share bundled LTWA data
 `adr~share-bundled-ltwa~1`
