@@ -45,6 +45,7 @@ public class ExporterFactory {
         exporters.add(new TemplateExporter(Localization.lang("HTML list"), "listrefs", "listrefs", "listrefs", StandardFileType.HTML, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter(Localization.lang("HTML table (with Abstract & BibTeX)"), "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", StandardFileType.HTML, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter(Localization.lang("Markdown titles"), "title-md", "title-md", "title-markdown", StandardFileType.MARKDOWN, layoutPreferences, saveOrder));
+        exporters.add(new MarkdownPublicationExporter(layoutPreferences, preferences.getFilePreferences()));
         exporters.add(new TemplateExporter("Harvard RTF", "harvard", "harvard", "harvard", StandardFileType.RTF, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("ISO 690 RTF", "iso690rtf", "iso690RTF", "iso690rtf", StandardFileType.RTF, layoutPreferences, saveOrder));
         exporters.add(new TemplateExporter("ISO 690", "iso690txt", "iso690", "iso690txt", StandardFileType.TXT, layoutPreferences, saveOrder));
@@ -63,6 +64,7 @@ public class ExporterFactory {
         exporters.add(new XmpPdfExporter(xmpPreferences));
         exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(), fieldPreferences));
         exporters.add(new CffExporter());
+        exporters.add(new BibframeExporter());
         exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));
         exporters.add(new AcademicPagesExporter(layoutPreferences, fieldPreferences, preferences.getCustomEntryTypesRepository()));
 

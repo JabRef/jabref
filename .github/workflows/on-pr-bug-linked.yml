@@ -2,7 +2,7 @@ name: Inherit label and milestone from linked issue
 
 # [impl->req~ci.port-to-other-branch.label-driven-ports~1]
 # [impl->adr~single-stable-branch-with-automatic-ports~1]
-# Adds "dev: into-stable" when a PR into main links an issue of type "bug" for the
+# Adds "dev: send-to-black-forest" when a PR into main links an issue of type "bug" for the
 # first time: at creation, or when an edit of the body adds a new issue link. A push never
 # triggers this, and a link that was already there never counts again - so a maintainer's
 # decision to remove (or add) the label by hand sticks.
@@ -28,7 +28,7 @@ jobs:
       (github.event.action == 'opened' || github.event.changes.body)
     runs-on: ubuntu-slim
     steps:
-      - name: 'Add "dev: into-stable" for a newly linked bug'
+      - name: 'Add "dev: send-to-black-forest" for a newly linked bug'
         env:
           # PAT: a label added with GITHUB_TOKEN would not trigger the "Would merge into the other branch" check
           GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
@@ -68,8 +68,8 @@ jobs:
             # GitHub stores the type name in lower case ("bug") while the issue template writes "Bug"
             if [ "$labeled" = false ] && [ "${type,,}" = "bug" ]; then
               # `gh pr edit` queries fields that need the read:org scope, which the token lacks
-              gh api "repos/JabRef/jabref/issues/$PR_NUMBER/labels" -f "labels[]=dev: into-stable" > /dev/null
-              echo "Added \`dev: into-stable\`" >> "$GITHUB_STEP_SUMMARY"
+              gh api "repos/JabRef/jabref/issues/$PR_NUMBER/labels" -f "labels[]=dev: send-to-black-forest" > /dev/null
+              echo "Added \`dev: send-to-black-forest\`" >> "$GITHUB_STEP_SUMMARY"
               labeled=true
             fi
           done
