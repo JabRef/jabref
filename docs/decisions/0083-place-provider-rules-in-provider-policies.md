@@ -27,7 +27,7 @@ Where should these provider rules live?
 * A provider's rules hold for every request to that provider, regardless of which fetcher sends it.
 * Identification and the limit it selects are decided in one place.
 * Writing a fetcher does not require knowledge of limits, retries or identification.
-* Every attempt takes a new permit, the parallel request limit covers the whole transfer, and a status code is retried on one level only.
+* Every attempt takes a new permit, and a status code is retried on one level only.
 * Little hidden or global state.
 
 ## Considered Options
@@ -40,8 +40,8 @@ Where should these provider rules live?
 
 To be decided in the maintainer call. "Per fetcher" leaves every rule to each fetcher author, which is how the current inconsistencies arose. Between the other two options, the assessment depends on:
 
-* **Is global state configured at startup acceptable?** The lookup by URL needs the preferences in a registry (like `TrustStoreManager` configures the SSL context), or an injected factory for all 61 places that create a `URLDownload`. Choosing the policy at the call site needs neither.
-* **Should requests be covered without the caller doing anything?** Only the lookup by URL covers requests that a fetcher author forgets to configure. For redirects to another provider (e.g. `doi.org` to `data.crossref.org`), this only holds if `URLDownload` follows redirects itself (see Details).
+* **Is global state configured at startup acceptable?** The lookup by URL needs access to the API keys: registered once at startup (like `ProxyRegisterer`), or an injected factory for all 61 places that create a `URLDownload`. Choosing the policy at the call site needs neither.
+* **Should requests be covered without the caller doing anything?** Only the lookup by URL covers requests that a fetcher author forgets to configure. Example: `CrossRefCitationFetcher` sends no `mailto` today and therefore uses Crossref's public pool. For redirects to another provider (e.g. `doi.org` to `data.crossref.org`), this only holds if `URLDownload` follows redirects itself (see Details).
 * **Is visibility at the call site important?** The chosen policy is visible in the fetcher; the lookup by URL is not.
 
 ### Details
@@ -55,7 +55,7 @@ Identification belongs into the policy, because for Crossref it selects the limi
 
 * Retries wrap opening the connection. HTTP 429 is known before the body is read, so parsing never has to be retried.
 * The rate limit is taken on every attempt.
-* The parallel request permit is held until the returned stream is closed, because providers count the whole transfer.
+* The parallel request permit is held while the connection is opened, i.e. until the response headers arrive. Providers count the whole transfer, but for small API responses most of the time passes before the headers, and a remaining 429 is retried. Holding the permit until the body is read would need a hook in every method of `URLDownload` that reads the body.
 * Policies that adapt to responses (like `DoiFetcher` adapting to `X-Rate-Limit-*` headers) see the response.
 * Identification added to the URL is redacted in log messages and exceptions.
 * Requests without a policy behave as today.
@@ -94,7 +94,7 @@ new URLDownload(url).withPolicy(ProviderPolicies.CROSSREF)
 
 Typically set once in a fetcher's `getUrlDownload(URL)`.
 
-* Good, because the rules are applied correctly on every attempt and for the whole transfer, without the fetcher author implementing them.
+* Good, because the rules are applied correctly on every attempt, without the fetcher author implementing them.
 * Good, because the policy is visible at the call site.
 * Good, because no global registry is needed. The policy gets the preferences from the fetcher.
 * Bad, because a caller can forget to set the policy.
@@ -110,6 +110,10 @@ The registry matches the provider's API host and, where needed, a path (Crossref
 
 * Good, because every request through `URLDownload` gets its provider's rules, without any action by the caller.
 * Good, because a redirect can use the policy of its target. This needs `URLDownload` to follow redirects itself: today `HttpURLConnection` follows redirects within the same protocol internally (`setInstanceFollowRedirects(true)`), so `URLDownload` only sees redirects that change the protocol.
-* Bad, because the registry is global state that depends on the preferences. Tests have to configure and reset it.
+* Bad, because the API keys are global state, registered at startup. Without registration (tests, use as a library), the default keys of the build apply.
 * Bad, because the applied rules are not visible at the call site. A debug log has to show which policy was applied.
 * Neutral, because a caller that needs different rules for the same endpoint needs an override (`withPolicy`, `withoutPolicy`).
+
+## More Information
+
+The draft PR contains a proof of concept of the lookup option with Resilience4j for Crossref: one hook in `URLDownload.openConnection()`, a Crossref policy that adds `mailto` and selects the limits from the resulting URL, and the API keys registered in `Launcher` and `JabKitLauncher`.
