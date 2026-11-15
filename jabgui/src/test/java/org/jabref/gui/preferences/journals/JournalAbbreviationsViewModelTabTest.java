@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,6 +25,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -67,6 +69,22 @@ class JournalAbbreviationsViewModelTabTest {
     private Path tempFolder;
     private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
+
+    /// Keeps queued repository tasks outside Mockito's invocation history so completed fixtures can be collected.
+    @NullMarked
+    private static class QueuedTaskExecutor extends CurrentThreadTaskExecutor {
+        private final List<Runnable> queued;
+
+        private QueuedTaskExecutor(List<Runnable> queued) {
+            this.queued = queued;
+        }
+
+        @Override
+        public <V> Future<V> execute(BackgroundTask<V> task) {
+            queued.add(() -> super.execute(task));
+            return CompletableFuture.completedFuture(null);
+        }
+    }
 
     static class TestAbbreviation extends Abbreviation {
 
@@ -278,12 +296,7 @@ class JournalAbbreviationsViewModelTabTest {
     void overlappingSavesKeepLatestExternalEditsAndToggle() throws IOException {
         AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(emptyTestFile.toString()), true, false);
         List<Runnable> queued = new ArrayList<>();
-        TaskExecutor executor = mock(TaskExecutor.class);
-        when(executor.execute(any())).thenAnswer(invocation -> {
-            BackgroundTask<?> task = invocation.getArgument(0);
-            queued.add(() -> new CurrentThreadTaskExecutor().execute(task));
-            return CompletableFuture.completedFuture(null);
-        });
+        TaskExecutor executor = new QueuedTaskExecutor(queued);
         JournalAbbreviationRepository retained = JournalAbbreviationLoader.loadRepository(preferences);
         JournalAbbreviationsTabViewModel model = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, retained);
         model.setValues();
@@ -311,12 +324,7 @@ class JournalAbbreviationsViewModelTabTest {
     void newerSaveFromReopenedPreferencesIsNotOverwrittenByOlderSave(boolean editReopenedList) throws IOException {
         AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(emptyTestFile.toString()), true, false);
         List<Runnable> queued = new ArrayList<>();
-        TaskExecutor executor = mock(TaskExecutor.class);
-        when(executor.execute(any())).thenAnswer(invocation -> {
-            BackgroundTask<?> task = invocation.getArgument(0);
-            queued.add(() -> new CurrentThreadTaskExecutor().execute(task));
-            return CompletableFuture.completedFuture(null);
-        });
+        TaskExecutor executor = new QueuedTaskExecutor(queued);
         JournalAbbreviationsTabViewModel first = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, repository);
         first.setValues();
         queued.removeFirst().run();
@@ -345,12 +353,7 @@ class JournalAbbreviationsViewModelTabTest {
     void editAfterSaveSnapshotIsWrittenByNextSave() throws IOException {
         AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(emptyTestFile.toString()), true, false);
         List<Runnable> queued = new ArrayList<>();
-        TaskExecutor executor = mock(TaskExecutor.class);
-        when(executor.execute(any())).thenAnswer(invocation -> {
-            BackgroundTask<?> task = invocation.getArgument(0);
-            queued.add(() -> new CurrentThreadTaskExecutor().execute(task));
-            return CompletableFuture.completedFuture(null);
-        });
+        TaskExecutor executor = new QueuedTaskExecutor(queued);
         JournalAbbreviationsTabViewModel model = new JournalAbbreviationsTabViewModel(preferences, dialogService, executor, repository);
         model.setValues();
         queued.removeFirst().run();
