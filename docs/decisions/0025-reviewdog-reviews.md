@@ -8,7 +8,7 @@ nav_order: 25
 
 JabRef offers [guidelines to setup the local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 There is also a section on [JabRef's code style](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace#using-jabrefs-code-style).
-There are pull requests by newcomers, which do not follow that style guide.
+Some pull requests by newcomers do not follow that style guide.
 
 How to quickly provide feedback to contributors that checkstyle was not matched?
 

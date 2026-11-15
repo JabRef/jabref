@@ -33,6 +33,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,6 +72,78 @@ class DownloadLinkedFileActionTest {
             cookieManager = (CookieManager) CookieHandler.getDefault();
         }
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+    }
+
+    // [utest->req~fetchers.fulltext-duplicate-replacement~1]
+    @Test
+    void duplicateDownloadReplacesMissingLinkWithSurvivingFile() throws IOException {
+        Path original = tempFolder.resolve("article.pdf");
+        Path duplicate = tempFolder.resolve("article (1).pdf");
+        Files.writeString(original, "%PDF-1.4\narticle");
+        Files.copy(original, duplicate);
+        entry.withFiles(List.of(new LinkedFile("Article", Path.of("missing.pdf"), "PDF")));
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(tempFolder));
+        JabRefUndoManager undoManager = new JabRefUndoManager();
+
+        replacementAction(undoManager).onSuccess(tempFolder, duplicate);
+
+        assertEquals(List.of(new LinkedFile("Article", Path.of("article.pdf"), "PDF")), entry.getFiles());
+        assertFalse(Files.exists(duplicate));
+        assertEquals("%PDF-1.4\narticle", Files.readString(original));
+        undoManager.undo();
+        assertEquals(List.of(new LinkedFile("Article", Path.of("missing.pdf"), "PDF")), entry.getFiles());
+    }
+
+    @Test
+    void duplicateHtmlReplacementPreservesExistingFileAndLinks() throws IOException {
+        Path original = tempFolder.resolve("paywall.html");
+        Path duplicate = tempFolder.resolve("paywall (1).html");
+        String html = "<html><body>Sign in to read this article</body></html>";
+        Files.writeString(original, html);
+        Files.copy(original, duplicate);
+        List<LinkedFile> originalLinks = List.of(new LinkedFile("Article", Path.of("missing.pdf"), "PDF"),
+                new LinkedFile("Paywall", Path.of("paywall.html"), "URL"));
+        entry.withFiles(originalLinks);
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(tempFolder));
+
+        replacementAction(new JabRefUndoManager()).onSuccess(tempFolder, duplicate);
+
+        assertEquals(html, Files.readString(original));
+        assertFalse(Files.exists(duplicate));
+        assertEquals(originalLinks, entry.getFiles());
+    }
+
+    @Test
+    void replacementPreservesDescriptionAndCanBeUndone() {
+        LinkedFile missing = new LinkedFile("Article", Path.of("missing.pdf"), "PDF");
+        entry.withFiles(List.of(missing));
+        JabRefUndoManager undoManager = new JabRefUndoManager();
+        DownloadLinkedFileAction action = replacementAction(undoManager);
+
+        action.attachDownloadedFile(new LinkedFile(Path.of("downloaded.pdf")));
+
+        assertEquals(List.of(new LinkedFile("Article", Path.of("downloaded.pdf"), "")), entry.getFiles());
+        undoManager.undo();
+        assertEquals(List.of(new LinkedFile("Article", Path.of("missing.pdf"), "PDF")), entry.getFiles());
+    }
+
+    @Test
+    void replacementPreservesAttachmentEditedDuringDownload() {
+        entry.withFiles(List.of(new LinkedFile("Article", Path.of("missing.pdf"), "PDF")));
+        DownloadLinkedFileAction action = replacementAction(new JabRefUndoManager());
+        entry.withFiles(List.of(new LinkedFile("Edited description", Path.of("missing.pdf"), "PDF")));
+
+        action.attachDownloadedFile(new LinkedFile(Path.of("downloaded.pdf")));
+
+        assertEquals(List.of(new LinkedFile(Path.of("downloaded.pdf")),
+                new LinkedFile("Edited description", Path.of("missing.pdf"), "PDF")), entry.getFiles());
+    }
+
+    private DownloadLinkedFileAction replacementAction(JabRefUndoManager undoManager) {
+        LinkedFile online = new LinkedFile("", "https://example.org/article.pdf", "PDF");
+        return new DownloadLinkedFileAction(databaseContext, entry, online, online.getLink(), dialogService,
+                externalApplicationsPreferences, filePreferences, new CurrentThreadTaskExecutor(), "", false,
+                undoManager, "missing.pdf");
     }
 
     @Test

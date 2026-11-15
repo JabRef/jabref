@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.external;
 
+import java.util.List;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -26,6 +28,7 @@ import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 
+import com.google.common.base.Splitter;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -33,6 +36,8 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class ExternalTabViewModel implements PreferenceTabViewModel {
+
+    private static final Splitter ARGUMENT_LINES = Splitter.on('\n');
 
     private final StringProperty eMailReferenceSubjectProperty = new SimpleStringProperty("");
     private final BooleanProperty autoOpenAttachedFoldersProperty = new SimpleBooleanProperty();
@@ -71,7 +76,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
+                input -> hasExecutable(input),
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("External programs"),
                         Localization.lang("Custom applications"),
@@ -79,7 +84,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
         fileBrowserCommandValidator = new FunctionBasedValidator<>(
                 customFileBrowserCommandProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
+                input -> hasExecutable(input),
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("External programs"),
                         Localization.lang("Custom applications"),
@@ -111,9 +116,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         citeCommandProperty.setValue(initialPushToApplicationPreferences.getCiteCommand().toString());
 
         useCustomTerminalProperty.setValue(initialExternalApplicationPreferences.useCustomTerminal());
-        customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
+        customTerminalCommandProperty.setValue(String.join("\n", initialExternalApplicationPreferences.getCustomTerminalCommand()));
         useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
-        customFileBrowserCommandProperty.setValue(initialExternalApplicationPreferences.getCustomFileBrowserCommand());
+        customFileBrowserCommandProperty.setValue(String.join("\n", initialExternalApplicationPreferences.getCustomFileBrowserCommand()));
         kindleEmailProperty.setValue(initialExternalApplicationPreferences.getKindleEmail());
     }
 
@@ -122,9 +127,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         initialExternalApplicationPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
         initialExternalApplicationPreferences.setAutoOpenEmailAttachmentsFolder(autoOpenAttachedFoldersProperty.getValue());
         initialExternalApplicationPreferences.setUseCustomTerminal(useCustomTerminalProperty.getValue());
-        initialExternalApplicationPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
+        initialExternalApplicationPreferences.setCustomTerminalCommand(toCommandArguments(customTerminalCommandProperty.getValue()));
         initialExternalApplicationPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
-        initialExternalApplicationPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
+        initialExternalApplicationPreferences.setCustomFileBrowserCommand(toCommandArguments(customFileBrowserCommandProperty.getValue()));
         initialExternalApplicationPreferences.setKindleEmail(kindleEmailProperty.getValue());
 
         initialPushToApplicationPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
@@ -141,6 +146,14 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         target.setEmacsArguments(source.getEmacsArguments());
         target.setVimServer(source.getVimServer());
         target.setCiteCommand(source.getCiteCommand());
+    }
+
+    private static boolean hasExecutable(String command) {
+        return StringUtil.isNotBlank(command.lines().findFirst().orElse(""));
+    }
+
+    static List<String> toCommandArguments(String command) {
+        return StringUtil.isBlank(command) ? List.of() : ARGUMENT_LINES.splitToList(command.replace("\r\n", "\n").replace('\r', '\n'));
     }
 
     public ValidationStatus terminalCommandValidationStatus() {
@@ -203,12 +216,17 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public void customTerminalBrowse() {
         dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(file -> customTerminalCommandProperty.setValue(file.toAbsolutePath().toString()));
+                     .ifPresent(file -> customTerminalCommandProperty.setValue(replaceExecutable(customTerminalCommandProperty.getValue(), file.toAbsolutePath().toString())));
     }
 
     public void customFileBrowserBrowse() {
         dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(file -> customFileBrowserCommandProperty.setValue(file.toAbsolutePath().toString()));
+                     .ifPresent(file -> customFileBrowserCommandProperty.setValue(replaceExecutable(customFileBrowserCommandProperty.getValue(), file.toAbsolutePath().toString())));
+    }
+
+    static String replaceExecutable(String command, String executable) {
+        int endOfExecutable = command.indexOf('\n');
+        return endOfExecutable < 0 ? executable : executable + command.substring(endOfExecutable);
     }
 
     // EMail
