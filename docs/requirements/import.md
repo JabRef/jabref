@@ -3,6 +3,15 @@ parent: Requirements
 ---
 # Import
 
+## JabRef must report warnings when dropped files cannot be imported
+`req~import.dropped-file-diagnostics~1`
+
+The warning identifies affected files and directs the user to the event log for import diagnostics.
+
+Origin: <https://github.com/JabRef/jabref/issues/8625>
+
+Needs: impl, utest
+
 ## JabRef must import MARC21-XML bibliographic records
 `req~import.marc21-xml~1`
 

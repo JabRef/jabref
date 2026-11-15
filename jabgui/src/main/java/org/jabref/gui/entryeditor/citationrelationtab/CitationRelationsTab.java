@@ -467,18 +467,24 @@ public class CitationRelationsTab extends EntryEditorTab {
         ProgressIndicator citedByProgress = new ProgressIndicator();
         citedByProgress.setMaxSize(25, 25);
 
-        // Create import buttons for both sides
+        // Create import and review buttons for both sides
         Button importCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
         importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
+        Button reviewCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
+        reviewCitingButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
+
         Button importCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
         importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
-        hideNodes(importCitingButton, importCitedByButton);
+        Button reviewCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
+        reviewCitedByButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
 
-        HBox citingActions = new HBox(8, importCitingButton, citingProgress, abortCitingButton, refreshCitingButton);
+        hideNodes(importCitingButton, reviewCitingButton, importCitedByButton, reviewCitedByButton);
+
+        HBox citingActions = new HBox(8, importCitingButton, reviewCitingButton, citingProgress, abortCitingButton, refreshCitingButton);
         citingActions.setAlignment(Pos.CENTER_RIGHT);
         citingHeader.setRight(citingActions);
 
-        HBox citedByActions = new HBox(8, importCitedByButton, citedByProgress, abortCitedButton, refreshCitedByButton);
+        HBox citedByActions = new HBox(8, importCitedByButton, reviewCitedByButton, citedByProgress, abortCitedButton, refreshCitedByButton);
         citedByActions.setAlignment(Pos.CENTER_RIGHT);
         citedByHeader.setRight(citedByActions);
 
@@ -494,6 +500,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 refreshCitingButton,
                 CitationFetcher.SearchType.CITES,
                 importCitingButton,
+                reviewCitingButton,
                 citingProgress);
 
         CitationComponents citedByComponents = new CitationComponents(
@@ -503,6 +510,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 refreshCitedByButton,
                 CitationFetcher.SearchType.CITED_BY,
                 importCitedByButton,
+                reviewCitedByButton,
                 citedByProgress);
 
         this.currentCitingComponents = citingComponents;
@@ -886,10 +894,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationsRelationsTabViewModel.trackCitationSearch(citationComponents.searchType(), task);
 
         showNodes(citationComponents.abortButton(), citationComponents.progress());
-        hideNodes(citationComponents.refreshButton(), citationComponents.importButton());
+        hideNodes(citationComponents.refreshButton(), citationComponents.importButton(), citationComponents.reviewButton());
 
         citationComponents.abortButton().setOnAction(_ -> {
-            hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
+            hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton(), citationComponents.reviewButton());
             showNodes(citationComponents.refreshButton());
             task.cancel(false);
             citationsRelationsTabViewModel.clearTrackedCitationSearch(citationComponents.searchType(), task);
@@ -912,7 +920,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     return;
                 }
                 LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
-                hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
+                hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton(), citationComponents.reviewButton());
                 boolean isCites = citationComponents.searchType() == CitationFetcher.SearchType.CITES;
                 // The tab has room for details; the notification stays short and free of exception internals.
                 String labelText = isCites
@@ -997,7 +1005,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         BooleanBinding booleanBind = Bindings.isEmpty(citationComponents.listView().getCheckModel().getCheckedItems());
         citationComponents.importButton().disableProperty().bind(booleanBind);
         citationComponents.importButton().setOnMouseClicked(_ -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
-        showNodes(citationComponents.refreshButton(), citationComponents.importButton());
+        citationComponents.reviewButton().disableProperty().bind(booleanBind);
+        citationComponents.reviewButton().setOnMouseClicked(_ -> reviewAndImportEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
+        showNodes(citationComponents.refreshButton(), citationComponents.importButton(), citationComponents.reviewButton());
     }
 
     private void hideNodes(Node... nodes) {
@@ -1015,6 +1025,47 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationsRelationsTabViewModel.cancelCitationSearches();
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
         dialogService.notify(Localization.lang("%0 entry(s) imported", entriesToImport.size()));
+    }
+
+    /// @param entriesToReview checked entries to walk through
+    /// @param searchType      whether the entries cite the inspected entry or are cited by it
+    /// @param existingEntry   entry the citation relations tab is showing
+    private void reviewAndImportEntries(List<CitationRelationItem> entriesToReview,
+                                        CitationFetcher.SearchType searchType,
+                                        BibEntry existingEntry) {
+        // [impl->feat~entry-editor.citations.review-before-import~1]
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+        if (activeDatabase.isEmpty()) {
+            dialogService.notify(Localization.lang("No library open"));
+            return;
+        }
+        BibDatabaseContext databaseContext = activeDatabase.get();
+
+        CitationEntryReview review = new CitationEntryReview(entriesToReview);
+        while (!review.isFinished()) {
+            CitationEntryReviewDialog reviewDialog = new CitationEntryReviewDialog(
+                    review.getCurrentEntry(),
+                    review.getCurrentNumber(),
+                    review.getTotal(),
+                    databaseContext,
+                    entryTypesManager,
+                    preferences,
+                    stateManager,
+                    dialogService,
+                    taskExecutor);
+
+            // Closing the window without choosing a button discards the review like "End review without imports" does.
+            review.applyDecision(dialogService.showCustomDialogAndWait(reviewDialog)
+                                              .orElse(CitationEntryReviewDialog.Decision.CANCEL));
+        }
+
+        List<CitationRelationItem> acceptedItems = review.getAcceptedItems();
+        if (acceptedItems.isEmpty()) {
+            dialogService.notify(Localization.lang("No entries added"));
+            return;
+        }
+        citationsRelationsTabViewModel.cancelCitationSearches();
+        citationsRelationsTabViewModel.importReviewedEntries(acceptedItems, searchType, existingEntry);
     }
 
     /// Function to open possible duplicate entries window to compare duplicate entries

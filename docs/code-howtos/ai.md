@@ -55,7 +55,23 @@ As every JabRef feature, AI is divided into 3 layers: GUI, logic, and model. Ins
 The GUI code strongly follows [MVVM pattern](./javafx.md). Though, the GUI code is a bit complicated as:
 
 1. Most of the core GUI components (chat and summary components) are designed as a state machine. Typical states include: loading, presenting the result, error, etc.
-2. These core GUI components are also made that way so it would be possible to rebind them to another `BibEntry`. For the details, take a look at the section [How to add a new AI feature](## How to add a new AI feature).
+2. These core GUI components are also made that way so it would be possible to rebind them to another `BibEntry`. For the details, take a look at the section [How to add a new AI feature](#how-to-add-a-new-ai-feature).
+
+### Example: Layering in Summarization
+
+The following table illustrates how layers and responsibilities are organized across the architecture, using summarization as an example:
+
+| JabRef layer name | AI layer name | Class name | Purpose | Notes |
+| --- | --- | --- | --- | --- |
+| GUI | JavaFX representation | `AiSummary.fxml` | The UI of the feature | Written in FXML |
+| | JavaFX controller | `AiSummaryView.java` | Connects UI components in the FXML and ViewModel | Links JavaFX components with ViewModel data and is responsible for the display |
+| | JavaFX ViewModel | `AiSummaryViewModel.java` | Handles the user experience | Specific for the GUI |
+| Logic | Summarizer on the BibEntry level | `BibEntrySummarizator.java` | Analyzes a `BibEntry`, extracts linked files, resolves file paths down to text, and delegates to the summarization algorithm | Logic entry point for entry summarization |
+| | The AI Summarizer | `Summarizator.java` | Interface for raw and specific summarization algorithms (e.g., `ChunkedSummarizator`, `FullDocumentSummarizator`) | Raw algorithm |
+| Model | Type of the AI summarizer | `SummarizatorKind.java` | Enum to select different kinds of summarizators | Enum |
+
+> [!NOTE]
+> One can also employ the Chain of Responsibility pattern to break down processing across representation levels. For example, in summarization, responsibilities can be decomposed along: `BibEntry` &rarr; `LinkedFile` &rarr; `File` (path) &rarr; `Text` &rarr; raw summarization algorithm.
 
 ## Internal model (v2)
 

@@ -5,12 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrFailureReason;
-import org.jabref.logic.ocr.OcrLanguage;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.ocr.OcrUtils;
@@ -62,14 +60,6 @@ public class DoclingEngine implements OcrEngine {
         command.add("--no-tables");
         command.add("--image-export-mode");
         command.add("placeholder");
-
-        List<String> languages = ocrPreferences.getOcrLanguages().stream()
-                                               .map(OcrLanguage::getCode)
-                                               .toList();
-        if (!languages.isEmpty()) {
-            command.add("--ocr-lang");
-            command.add(String.join(",", languages));
-        }
 
         command.add("--output");
         command.add(outputDir.toString());

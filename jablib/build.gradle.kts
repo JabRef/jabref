@@ -221,6 +221,9 @@ val year = Calendar.getInstance().get(Calendar.YEAR).toString()
 
 val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
 val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDataSystemAPIKey").orElse("")
+// BibSonomy credentials are a full account login, used only by the fetcher tests. Never set them in binaries.yml.
+val bibSonomyApiKey = providers.environmentVariable("BibSonomyApiKey").orElse("")
+val bibSonomyUsername = providers.environmentVariable("BibSonomyUsername").orElse("")
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
@@ -246,6 +249,8 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("azureInstrumentationKey", azureInstrumentationKey)
 
     inputs.property("astrophysicsDataSystemAPIKey", astrophysicsDataSystemAPIKey)
+    inputs.property("bibSonomyApiKey", bibSonomyApiKey)
+    inputs.property("bibSonomyUsername", bibSonomyUsername)
     inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
     inputs.property("ieeeAPIKey", ieeeAPIKey)
     inputs.property("medlineApiKey", medlineApiKey)
@@ -267,6 +272,8 @@ tasks.named<ProcessResources>("processResources") {
                 "azureInstrumentationKey" to inputs.properties["azureInstrumentationKey"],
 
                 "astrophysicsDataSystemAPIKey" to inputs.properties["astrophysicsDataSystemAPIKey"],
+                "bibSonomyApiKey" to inputs.properties["bibSonomyApiKey"],
+                "bibSonomyUsername" to inputs.properties["bibSonomyUsername"],
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "medlineApiKey" to inputs.properties["medlineApiKey"],

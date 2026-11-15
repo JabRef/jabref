@@ -3,9 +3,13 @@ package org.jabref.logic.auxparser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -16,10 +20,12 @@ import org.jabref.model.entry.BibEntry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -155,6 +161,52 @@ class AuxParserTest {
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(1, auxResult.getCrossRefEntriesCount());
         }
+    }
+
+    @Test
+    void strictParsingFailsWhenSelectedFileIsMissing(@TempDir Path directory) {
+        DefaultAuxParser parser = new DefaultAuxParser(new BibDatabase());
+
+        assertThrows(IOException.class, () -> parser.parseStrict(directory.resolve("missing.aux")));
+    }
+
+    @Test
+    void strictParsingFailsWhenIncludedFileIsMissing(@TempDir Path directory) throws IOException {
+        Path main = Files.writeString(directory.resolve("main.aux"), """
+                \\citation{first}
+                \\@input{missing.aux}
+                """);
+        DefaultAuxParser parser = new DefaultAuxParser(new BibDatabase());
+
+        assertThrows(IOException.class, () -> parser.parseStrict(main));
+        assertEquals(Set.of("first"), parser.parse(main).getUniqueKeys());
+    }
+
+    @Test
+    void strictParsingReadsNestedCitationsAndStopsAtCycles(@TempDir Path directory) throws IOException {
+        Path main = Files.writeString(directory.resolve("main.aux"), """
+                \\citation{first,*}
+                \\@input{nested.aux}
+                """);
+        Files.writeString(directory.resolve("nested.aux"), """
+                \\abx@aux@cite{0}{second}
+                \\@input{./main.aux}
+                """);
+        DefaultAuxParser parser = new DefaultAuxParser(new BibDatabase());
+
+        AuxParserResult result = parser.parseStrict(main);
+
+        assertEquals(Set.of("first", "second", "*"), result.getUniqueKeys());
+        assertEquals(1, result.getNestedAuxCount());
+    }
+
+    @Test
+    void strictParsingStopsWhenCancelledDuringReading(@TempDir Path directory) throws IOException {
+        Path aux = Files.writeString(directory.resolve("main.aux"), "\\citation{first}\n".repeat(100));
+        AtomicInteger checkpoints = new AtomicInteger();
+        DefaultAuxParser parser = new DefaultAuxParser(new BibDatabase());
+        assertThrows(CancellationException.class, () -> parser.parseStrict(aux, () -> checkpoints.incrementAndGet() >= 5));
+        assertEquals(5, checkpoints.get());
     }
 
     @Test

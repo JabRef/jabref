@@ -8,7 +8,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.strings.StringUtil;
 
@@ -101,7 +100,6 @@ public class ArgumentProcessor {
         try {
             System.out.println(Localization.lang("Setting all preferences to default values."));
             preferences.clear();
-            new SharedDatabasePreferences().clear();
         } catch (BackingStoreException e) {
             System.err.println(Localization.lang("Unable to clear preferences."));
             LOGGER.error("Unable to clear preferences", e);
