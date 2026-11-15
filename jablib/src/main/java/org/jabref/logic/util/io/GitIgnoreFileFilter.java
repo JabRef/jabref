@@ -69,7 +69,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
         addIgnoreFile(directory);
     }
 
-    GitIgnoreFileFilter forSubdirectory(Path path) {
+    public GitIgnoreFileFilter forSubdirectory(Path path) {
         return new GitIgnoreFileFilter(path, this);
     }
 
@@ -97,7 +97,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
         return accept(path, Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS));
     }
 
-    boolean accept(Path path, boolean isDirectory) {
+    public boolean accept(Path path, boolean isDirectory) {
         boolean ignored = false;
         Path absolutePath = path.toAbsolutePath().normalize();
         for (Map.Entry<Path, IgnoreNode> entry : ignoreNodes) {
