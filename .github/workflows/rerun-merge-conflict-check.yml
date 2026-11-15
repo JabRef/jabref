@@ -1,12 +1,21 @@
 name: Rerun PR merge conflicts check
 
 on:
+  # A push to main can make any open PR conflict, without an event on that PR
+  push:
+    branches:
+      - main
+  # Ensure updates for stacked PRs
   schedule:
     - cron: "0 3 * * *"
   pull_request:
     paths:
       - '.github/workflows/rerun-merge-conflict-check.yml'
   workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
 
 jobs:
   rerun:
@@ -22,7 +31,7 @@ jobs:
         with:
           packages: jq
           version: 1.0
-      - name: Trigger "On PR opened/updated" for all open PRs
+      - name: Trigger "On PR opened/updated" for open PRs not known to be mergeable
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -30,7 +39,8 @@ jobs:
           set -x
           workflow_name="On PR opened/updated"
 
-          gh pr list --state open --json number --jq '.[] | "\(.number)"' |
+          # Each push to main would otherwise queue one run per open PR; UNKNOWN (not computed yet) is checked too
+          gh pr list --state open --limit 1000 --json number,mergeable --jq '.[] | select(.mergeable != "MERGEABLE") | "\(.number)"' |
           while read pr; do
             echo "Triggering '$workflow_name' for PR #$pr"
             gh workflow run "$workflow_name" --ref main --field pr_number="$pr"

@@ -23,7 +23,7 @@ public record ChatMessage(String id, Instant timestamp, Role role, String conten
         ERROR;
 
         public boolean canRegenerate() {
-            return this == AI || this == ERROR;
+            return this == USER || this == AI || this == ERROR;
         }
     }
 

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -246,6 +247,24 @@ class BibEntryTypesManagerTest {
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
 
         assertEquals(overwrittenStandardType.getOptionalFields(), type.get().getOptionalFields());
+    }
+
+    /// The entry types stored in the preferences are serialized and parsed back at every start. If that round trip
+    /// were lossy, JabRef would keep offering to import the very same customizations - see
+    /// <https://github.com/JabRef/jabref/issues/9930>. The types are the ones of the library attached to that issue.
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "jabref-entrytype: audio: req[author;date;editor;editortype;number;publisher;series;title;type] opt[url;urldate]",
+            "jabref-entrytype: manuscript: req[collection;library;location;shelfmark;shortcollection;shorthand;shortlibrary] opt[annotation;bookpagination;catalog;columns;contents;dating;keywords;layer;origin;owner;pages;pagetotal;pagination;scribe;support]",
+            "jabref-entrytype: review: req[author;date;journal;journaltitle;number;pages;related;relatedtype;volume;citationkey] opt[doi;url;urldate;eprint;eprinttype]"
+    })
+    void customEntryTypeSurvivesSerializationRoundTrip(String entryTypeComment) {
+        BibEntryType entryType = MetaDataParser.parseCustomEntryType(entryTypeComment).orElseThrow();
+
+        assertEquals(Optional.of(entryType),
+                MetaDataParser.parseCustomEntryType(MetaDataSerializer.serializeCustomEntryTypes(entryType)));
+        assertEquals(Optional.of(entryType),
+                MetaDataParser.parseCustomEntryType(MetaDataSerializer.serializeCustomEntryTypesV2(entryType)));
     }
 
     @Test

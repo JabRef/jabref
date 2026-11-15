@@ -51,6 +51,23 @@ class ConvertLegacyExplicitGroupsTest {
     }
 
     @Test
+    void migrationPreservesDuplicateCitationKeysAndIgnoresMissingKeys() {
+        BibEntry duplicate = new BibEntry().withCitationKey("Entry1").withField(StandardField.TITLE, "Duplicate key");
+        BibEntry unkeyed = new BibEntry().withField(StandardField.TITLE, "No key");
+        group.addLegacyEntryKey("Missing");
+        group.addLegacyEntryKey("Entry1");
+        ParserResult result = new ParserResult(List.of(entry, duplicate, unkeyed));
+        result.getMetaData().setGroups(GroupTreeNode.fromGroup(group));
+
+        action.performMigration(result);
+
+        assertEquals(Optional.of("TestGroup"), entry.getField(StandardField.GROUPS));
+        assertEquals(Optional.of("TestGroup"), duplicate.getField(StandardField.GROUPS));
+        assertEquals(Optional.empty(), unkeyed.getField(StandardField.GROUPS));
+        assertEquals(List.of(), group.getLegacyEntryKeys());
+    }
+
+    @Test
     void performActionWritesGroupMembershipInEntryForComplexGroupTree() {
         GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING, ','));

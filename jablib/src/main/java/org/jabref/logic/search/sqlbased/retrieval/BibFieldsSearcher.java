@@ -34,7 +34,7 @@ public class BibFieldsSearcher {
     }
 
     private static SearchQuery createBooleanQueryForEntry(BibEntry entry, SearchQuery oldSearchQuery) {
-        String newSearchExpression = "( " + ENTRY_ID + "= " + entry.getId() + ") AND (" + oldSearchQuery.getSearchExpression() + " )";
+        String newSearchExpression = "( " + ENTRY_ID + "= " + entry.getId() + ") AND (" + oldSearchQuery.getNormalizedSearchExpression() + " )";
         return new SearchQuery(newSearchExpression, oldSearchQuery.getSearchFlags());
     }
 
