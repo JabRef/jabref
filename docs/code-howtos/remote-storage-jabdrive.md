@@ -25,7 +25,7 @@ We call this the "pull-merge-push cycle".
 ## Data structures
 
 We start by providing information on data structures.
-There are some explanations of data structures included if they are short.
+Short explanations of data structures are included.
 Longer explanations are put below at "The 'pull-merge-push cycle'".
 
 ### Metadata for each item
@@ -106,7 +106,7 @@ The client pulls on first connect or when requested to pull.
 The client asks the server for a list of documents that changed since the last checkpoint. (Creating a checkpoint is explained further below.)
 The server responses with a batched list of these entries together with their `Version` information.
 These entries could also be tombstones.
-Each batch includes also a checkpoint `To` that has the meaning "all changes to this point in time are included in the current batch".
+Each batch includes also a checkpoint `To` that has the meaning "all changes up to this time are included in the current batch".
 
 {: .note }
 Once the pull does not give any further changes, the client switches to an event-based strategy and observes new changes by subscribing to the event bus provided by the server.
@@ -130,7 +130,7 @@ If the entry returned by the server is a tombstone, then:
 
 - If the client's entry is also a tombstone, then we do not have to do anything.
 - If the client's entry is dirty, then the user is shown a message to resolve the conflict (see "Conflict Handling") below.
-- Otherwise, the client's entry is deleted. There is no need to keep track of this as a local tombstone.
+- Otherwise, the client's entry is deleted. No local tombstone needs to be kept for this.
 
 #### Conflict Handling
 
@@ -159,7 +159,7 @@ Entries rejected by the server remain dirty, and their `Version` remains unchang
 ### Start the "pull-merge-push cycle" again
 
 It is important to note that sync replicates the library only as it was at the point in time when the sync was started.
-So, any additions, modifications, or deletions on the server-side after the start of sync will not be replicated.
+Any additions, modifications, or deletions on the server-side after the start of sync will not be replicated.
 For this reason, a new cycle is started.
 
 ## Scenarios

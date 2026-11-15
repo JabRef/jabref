@@ -16,6 +16,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -38,6 +39,7 @@ public final class HayagrivaMapping {
             Map.entry("chapter", StandardEntryType.InBook),
             Map.entry("conference", StandardEntryType.InProceedings),
             Map.entry("misc", StandardEntryType.Misc),
+            Map.entry("performance", BiblatexNonStandardEntryType.Performance),
             Map.entry("proceedings", StandardEntryType.Proceedings),
             Map.entry("reference", StandardEntryType.Reference),
             Map.entry("report", StandardEntryType.Report),

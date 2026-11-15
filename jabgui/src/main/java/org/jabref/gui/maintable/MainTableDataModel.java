@@ -11,6 +11,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -22,6 +26,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -55,6 +60,7 @@ public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>();
+    private final ReadOnlyObjectWrapper<Optional<SearchResults>> searchResults = new ReadOnlyObjectWrapper<>(Optional.empty());
     private final GroupsPreferences groupsPreferences;
     private final SearchPreferences searchPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
@@ -68,6 +74,9 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    /// Bumped after each search result has been applied to the table rows, so that listeners see the final match categories.
+    /// Deliberately not bumped by the incremental index updates on entry edits: the table must not move while the user is editing an entry
+    private final IntegerProperty searchResultsVersion = new SimpleIntegerProperty();
     @Nullable private final SearchContext searchContext;
 
     private Optional<MatcherSet> groupsMatcher;
@@ -106,8 +115,15 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
+    // [impl->req~jabgui.search.fulltext.entry-editor-results~1]
     private void updateSearchMatches(Optional<SearchQuery> query) {
         long updateSequence = searchUpdateSequence.incrementAndGet();
+        // Index updates may start a search off the FX thread; an older queued clear must not erase newer results.
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            if (updateSequence == searchUpdateSequence.get()) {
+                searchResults.set(Optional.empty());
+            }
+        });
         Optional<SearchQuery> querySnapshot = query.map(searchQuery -> new SearchQuery(
                 searchQuery.getSearchExpression(),
                 EnumSet.copyOf(searchQuery.getSearchFlags())));
@@ -118,12 +134,16 @@ public class MainTableDataModel {
                           if (updateSequence != searchUpdateSequence.get()) {
                               return;
                           }
-                          results.ifPresentOrElse(
-                                  this::setSearchMatches,
-                                  this::clearSearchMatches
-                          );
+                          // The editor consumes detailed hits, while the table needs derived match flags on each row.
+                          searchResults.set(results);
+                          results.ifPresentOrElse(this::setSearchMatches, this::clearSearchMatches);
                           FilteredListProxy.refilterListReflection(entriesFiltered);
+                          searchResultsVersion.set(searchResultsVersion.get() + 1);
                       }).executeWith(taskExecutor);
+    }
+
+    public ReadOnlyObjectProperty<Optional<SearchResults>> searchResultsProperty() {
+        return searchResults.getReadOnlyProperty();
     }
 
     /// Refresh the current search
@@ -250,12 +270,18 @@ public class MainTableDataModel {
     }
 
     public void unbind() {
+        // A search still running for this model must not apply its result (and notify the table) after the model is replaced
+        searchUpdateSequence.incrementAndGet();
         searchQuerySubscription.unsubscribe();
         searchDisplayModeSubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();
         groupViewModeSubscription.unsubscribe();
 
         bibDatabaseContext.getDatabase().unregisterListener(indexUpdatedListener);
+    }
+
+    public ReadOnlyIntegerProperty searchResultsVersionProperty() {
+        return searchResultsVersion;
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
@@ -308,7 +334,7 @@ public class MainTableDataModel {
         }
 
         SearchQuery searchQuery = query.get();
-        String expression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getSearchExpression() + ")";
+        String expression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getNormalizedSearchExpression() + ")";
         SearchQuery entryQuery = new SearchQuery(expression, searchQuery.getSearchFlags());
         SearchResults results = searchContext.search(entryQuery);
         return new IndexedEntrySearchMatch(

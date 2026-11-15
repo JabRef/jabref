@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
@@ -29,8 +30,8 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
 
     // Kept as fields so validation can be attached after the grids are assembled.
     private TextField citeCommand;
-    private TextField customTerminalCommand;
-    private TextField customFileBrowserCommand;
+    private TextArea customTerminalCommand;
+    private TextArea customFileBrowserCommand;
 
     public ExternalTab() {
         this.viewModel = new ExternalTabViewModel(
@@ -106,7 +107,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     private Node buildCustomApplicationsGrid() {
-        String dirPlaceholderHint = Localization.lang("Note: Use the placeholder %DIR% for the location of the opened library file.");
+        String dirPlaceholderHint = Localization.lang("Enter the application on the first line and one argument per following line. Use %DIR% for the library directory.");
 
         CheckBox useCustomTerminal = new CheckBox(Localization.lang("Use custom terminal emulator"));
         useCustomTerminal.selectedProperty().bindBidirectional(viewModel.useCustomTerminalProperty());
@@ -138,8 +139,9 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         return grid;
     }
 
-    private TextField commandField(String tooltip, javafx.beans.property.StringProperty value, CheckBox enabler) {
-        TextField field = new TextField();
+    private TextArea commandField(String tooltip, javafx.beans.property.StringProperty value, CheckBox enabler) {
+        TextArea field = new TextArea();
+        field.setPrefRowCount(3);
         field.textProperty().bindBidirectional(value);
         field.setTooltip(new Tooltip(tooltip));
         field.disableProperty().bind(enabler.selectedProperty().not());
