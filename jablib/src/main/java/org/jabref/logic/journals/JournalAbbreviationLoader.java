@@ -2,6 +2,7 @@ package org.jabref.logic.journals;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -14,11 +15,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.TaskExecutor;
 
+import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +36,28 @@ import org.slf4j.LoggerFactory;
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
+    private static final LtwaRepositoryCache LTWA_REPOSITORY = new LtwaRepositoryCache(Unchecked.supplier(JournalAbbreviationLoader::readLtwaRepository));
+
+    /// LTWA trees are populated only during construction, and lookups keep parser state local.
+    /// Cache successful initialization so journal-list reloads share this read-only bundled data.
+    @NullMarked
+    static final class LtwaRepositoryCache {
+        private final Supplier<LtwaRepository> loader;
+        private Optional<LtwaRepository> repository = Optional.empty();
+
+        LtwaRepositoryCache(Supplier<LtwaRepository> loader) {
+            this.loader = loader;
+        }
+
+        // [impl->req~journals.reuse-ltwa~1]
+        // [impl->adr~share-bundled-ltwa~1]
+        synchronized LtwaRepository get() {
+            if (repository.isEmpty()) {
+                repository = Optional.of(loader.get());
+            }
+            return repository.orElseThrow();
+        }
+    }
 
     public static Collection<Abbreviation> readAbbreviationsFromCsvFile(Path file) throws IOException {
         LOGGER.debug("Reading journal list from file {}", file);
@@ -54,7 +80,7 @@ public class JournalAbbreviationLoader {
         if (!abbreviationPreferences.shouldUseBuiltInJournalList()) {
             try {
                 repository = new JournalAbbreviationRepository(loadLtwaRepository());
-            } catch (IOException e) {
+            } catch (UncheckedIOException e) {
                 LOGGER.error("Error while loading LTWA repository", e);
                 repository = new JournalAbbreviationRepository(new LtwaRepository());
             }
@@ -75,7 +101,7 @@ public class JournalAbbreviationLoader {
                         Files.deleteIfExists(tempDir);
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | UncheckedIOException e) {
                 LOGGER.error("Error while loading journal abbreviation repository", e);
                 return getFallbackRepository();
             }
@@ -106,7 +132,11 @@ public class JournalAbbreviationLoader {
         return new JournalAbbreviationRepository();
     }
 
-    private static LtwaRepository loadLtwaRepository() throws IOException {
+    static LtwaRepository loadLtwaRepository() {
+        return LTWA_REPOSITORY.get();
+    }
+
+    private static LtwaRepository readLtwaRepository() throws IOException {
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/ltwa-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no ltwa-list.mv. We cannot load the LTWA repository.");

@@ -27,6 +27,11 @@ The generator uses all `.csv` files from <https://github.com/JabRef/abbrv.jabref
 `AbbreviationPreferences.shouldUseBuiltInJournalList()` defaults to `true`.
 When disabled, repository loading skips the built-in aggregate but still loads external CSV lists and LTWA.
 `loadBuiltInRepository()` always loads the built-in aggregate, including for the preferences list display.
+Bundled LTWA data is loaded lazily once per JVM and shared across repositories and reloads.
+Its private prefix and suffix trees are populated only during construction; each lookup uses its own parser and listener state.
+Initialization is synchronized, and failed loads can be retried rather than caching an empty fallback.
+Journal-list contents remain separate for each repository.
+See [Share bundled LTWA data](../decisions/0082-share-bundled-ltwa-data.md) for the lifecycle decision.
 
 External list paths retain their order in `AbbreviationPreferences.getExternalJournalLists()`.
 `getDisabledExternalJournalLists()` stores disabled paths separately; the loader skips them without changing the precedence of enabled lists.
@@ -37,6 +42,9 @@ The GUI retains its injected repository when saving preferences and calls `reloa
 Reloading captures the preference values before scheduling background work, then publishes the completed data in one update.
 The snapshot includes disabled external paths, so later preference edits cannot change a scheduled reload.
 Each request has a generation number: a result from an older request cannot overwrite a newer request.
+Starting a new reload cancels the previous background task.
+Canceled queued requests skip loading; repository construction runs under a separate background lock so a library read that cannot stop immediately does not overlap another reload of the same repository.
+The FX thread never waits on this construction lock.
 Existing consumers see the refreshed data on their next lookup; while loading, they continue using the previous data.
 
 ## Preferences table
