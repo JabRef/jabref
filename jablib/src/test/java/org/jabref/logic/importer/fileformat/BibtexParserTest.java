@@ -2531,48 +2531,68 @@ class BibtexParserTest {
 
     /// A percent comment without content must end at its line break, so that the entry on the next line is still read.
     ///
-    /// The comments are written with Java escape sequences (e.g., `\n`), so that the CSV parser cannot normalize their line breaks.
+    /// The comments and line separators are written with Java escape sequences (e.g., `\n`), so that the CSV parser cannot normalize their line breaks.
+    /// The columns are the comment, the expected comment of the entry, and the expected line separator of the library.
     // [utest->req~import.bibtex.percent-comments~1]
     @ParameterizedTest
     @CsvSource(textBlock = """
             # Empty comment
-            '%\\n'
+            '%\\n',                  '%\\n',           '\\n'
             # Indented empty comment
-            '  %\\n'
+            '  %\\n',                '  %\\n',         '\\n'
             # Comment consisting of trailing spaces only
-            '%   \\n'
+            '%   \\n',               '%   \\n',        '\\n'
             # Comment consisting of a tab only
-            '%\\t\\n'
+            '%\\t\\n',               '%\\t\\n',        '\\n'
             # Windows line ending
-            '%\\r\\n'
+            '%\\r\\n',               '%\\r\\n',        '\\r\\n'
             # Trailing spaces before a Windows line ending
-            '%   \\r\\n'
+            '%   \\r\\n',            '%   \\r\\n',     '\\r\\n'
             # Classic Mac line ending
-            '%\\r'
+            '%\\r',                  '%\\r',           '\\r\\n'
             # Two consecutive empty comments
-            '%\\n%\\t\\n'
+            '%\\n%\\t\\n',           '%\\n%\\t\\n',    '\\n'
             # Encoding declaration without an encoding name
-            '% Encoding:\\n'
-            # Encoding declaration followed by whitespace only
-            '% Encoding: \\t\\r\\n'
-            # Shared database ID declaration without an ID
-            '% DBID:\\n'
-            # Shared database ID declaration followed by whitespace only
-            '% DBID: \\t\\r\\n'
+            '% Encoding:\\n',        '% Encoding:\\n', '\\n'
+            # Encoding declaration followed by whitespace only: the encoding header is not kept as comment
+            '% Encoding: \\t\\r\\n', '',               '\\r\\n'
             """)
-    void parsePreservesEntryAfterBlankPercentComment(String escapedComment) throws IOException {
-        String comment = escapedComment.translateEscapes();
-        String entry = "@article{real, author = {Real Author}}";
-        boolean isLibraryHeader = comment.contains(SaveConfiguration.ENCODING_PREFIX) || comment.contains(BibDatabaseWriter.DATABASE_ID_PREFIX);
+    void parsePreservesEntryAfterBlankPercentComment(String escapedComment, String escapedUserComments, String escapedLineSeparator) throws IOException {
+        String bibtex = escapedComment.translateEscapes() + "@article{real, author = {Real Author}}";
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("real")
                 .withField(StandardField.AUTHOR, "Real Author")
-                .withUserComments(isLibraryHeader ? "" : comment);
+                .withUserComments(escapedUserComments.translateEscapes());
+        BibDatabase expectedDatabase = new BibDatabase(List.of(expected), escapedLineSeparator.translateEscapes());
 
-        ParserResult result = parser.parse(Reader.of(comment + entry));
+        ParserResult result = parser.parse(Reader.of(bibtex));
 
         assertFalse(result.hasWarnings());
-        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(expectedDatabase, result.getDatabase());
+    }
+
+    /// A shared database ID declaration without an ID must end at its line break, too.
+    /// The declaration is not kept as comment, and the shared database ID of the library is empty.
+    // [utest->req~import.bibtex.percent-comments~1]
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            # Shared database ID declaration without an ID
+            '% DBID:\\n',        '\\n'
+            # Shared database ID declaration followed by whitespace only
+            '% DBID: \\t\\r\\n', '\\r\\n'
+            """)
+    void parsePreservesEntryAfterSharedDatabaseIdDeclarationWithoutId(String escapedDeclaration, String escapedLineSeparator) throws IOException {
+        String bibtex = escapedDeclaration.translateEscapes() + "@article{real, author = {Real Author}}";
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("real")
+                .withField(StandardField.AUTHOR, "Real Author");
+        BibDatabase expectedDatabase = new BibDatabase(List.of(expected), escapedLineSeparator.translateEscapes());
+        expectedDatabase.setSharedDatabaseID("");
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(expectedDatabase, result.getDatabase());
     }
 
     @Test
