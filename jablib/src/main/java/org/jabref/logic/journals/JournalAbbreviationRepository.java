@@ -34,10 +34,10 @@ public class JournalAbbreviationRepository {
     private final StringSimilarity similarity = new StringSimilarity();
     private volatile RepositoryData data;
     private final AtomicLong loadGeneration = new AtomicLong();
-    private final Object reloadLock = new Object();
+    // CSV readers must not observe files partway through a rewrite.
+    private final Object journalFileLock = new Object();
     private Optional<BackgroundTask<Optional<JournalAbbreviationRepository>>> pendingReload = Optional.empty();
     private final AtomicLong saveGeneration = new AtomicLong();
-    private final Object saveLock = new Object();
     private final Map<Path, List<Abbreviation>> pendingJournalWrites = new HashMap<>();
     private final Set<Abbreviation> addedCustomAbbreviations = new TreeSet<>();
 
@@ -107,10 +107,11 @@ public class JournalAbbreviationRepository {
                 List.copyOf(preferences.getExternalJournalLists()), preferences.shouldUseFJournalField(), preferences.shouldEnableMscKeywordDescriptions());
         snapshot.setUseBuiltInJournalList(preferences.shouldUseBuiltInJournalList());
         snapshot.setDisabledExternalJournalLists(List.copyOf(preferences.getDisabledExternalJournalLists()));
+        // [impl->req~journals.coordinate-csv-access~1]
         var task = BackgroundTask
                 .wrap(() -> {
                     // A canceled library read may need to finish before another full repository can be loaded.
-                    synchronized (reloadLock) {
+                    synchronized (journalFileLock) {
                         if (generation != loadGeneration.get()) {
                             return Optional.<JournalAbbreviationRepository>empty();
                         }
@@ -143,7 +144,7 @@ public class JournalAbbreviationRepository {
             pendingSnapshot = Map.copyOf(pendingJournalWrites);
         }
         BackgroundTask.wrap(() -> {
-                          synchronized (saveLock) {
+                          synchronized (journalFileLock) {
                               if (generation == saveGeneration.get()) {
                                   Map<Path, List<Abbreviation>> failed = new HashMap<>();
                                   for (Map.Entry<Path, List<Abbreviation>> file : pendingSnapshot.entrySet()) {

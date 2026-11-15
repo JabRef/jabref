@@ -45,4 +45,13 @@ Journal lists and custom abbreviations remain independent between repositories.
 
 Needs: impl, utest
 
+## Journal reloads must not read CSV files while the same repository rewrites them
+`req~journals.coordinate-csv-access~1`
+
+Repository construction and CSV writes share a background-only lock.
+Generation checks still reject superseded requests.
+Save callbacks and repository publication run after releasing the I/O lock, so callbacks can schedule further work without holding it.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

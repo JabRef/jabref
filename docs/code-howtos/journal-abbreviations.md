@@ -45,8 +45,10 @@ Reloading captures the preference values before scheduling background work, then
 The snapshot includes disabled external paths, so later preference edits cannot change a scheduled reload.
 Each request has a generation number: a result from an older request cannot overwrite a newer request.
 Starting a new reload cancels the previous background task.
-Canceled queued requests skip loading; repository construction runs under a separate background lock so a library read that cannot stop immediately does not overlap another reload of the same repository.
-The FX thread never waits on this construction lock.
+Canceled queued requests skip loading; repository construction and CSV writes share a background I/O lock.
+A library read that cannot stop immediately cannot overlap another reload or a CSV rewrite by the same repository.
+Success/failure callbacks and repository publication run after releasing this lock.
+The FX thread never waits on the I/O lock.
 Existing consumers see the refreshed data on their next lookup; while loading, they continue using the previous data.
 
 ## Preferences table

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -17,7 +18,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.BackgroundTask;
@@ -30,6 +33,8 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -103,6 +108,77 @@ class AbbreviationsTest {
         executor.runNext();
         assertFalse(Files.exists(removed));
         assertEquals(Optional.empty(), repository.getPendingJournalList(removed));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void reloadAndSaveDoNotOverlapCsvAccess(boolean saveFirst, @TempDir Path directory) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        // [utest->req~journals.coordinate-csv-access~1]
+        Path external = directory.resolve("external.csv");
+        Files.writeString(external, "External Journal;Old J.;Old J.");
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(external.toString()), true, false);
+        preferences.setUseBuiltInJournalList(false);
+        repository = JournalAbbreviationLoader.loadRepository(preferences);
+        List<Abbreviation> saved = List.of(new Abbreviation("External Journal", "Updated J."), new Abbreviation("Second Journal", "Second J."));
+        CountDownLatch firstStarted = new CountDownLatch(1);
+        CompletableFuture<Boolean> releaseFirst = new CompletableFuture<>();
+        AtomicBoolean callbackCompleted = new AtomicBoolean();
+        AtomicInteger csvAccesses = new AtomicInteger();
+        Runnable holdFirst = () -> {
+            firstStarted.countDown();
+            releaseFirst.join();
+        };
+
+        try (ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            ParallelCsvExecutor executor = new ParallelCsvExecutor(workers,
+                    () -> {
+                        csvAccesses.incrementAndGet();
+                        if (!saveFirst) {
+                            holdFirst.run();
+                        }
+                    },
+                    Unchecked.consumer(path -> {
+                        csvAccesses.incrementAndGet();
+                        if (saveFirst) {
+                            Files.writeString(path, "");
+                            holdFirst.run();
+                        }
+                    }));
+            Runnable save = () -> repository.saveJournalLists(Map.of(external, saved), preferences, executor,
+                    Unchecked.runnable(() -> {
+                        repository.reload(preferences, executor);
+                        executor.submitted.getLast().get(5, TimeUnit.SECONDS);
+                        callbackCompleted.set(true);
+                    }));
+            try {
+                if (saveFirst) {
+                    save.run();
+                } else {
+                    repository.reload(preferences, executor);
+                }
+                assertTrue(firstStarted.await(5, TimeUnit.SECONDS));
+                if (saveFirst) {
+                    repository.reload(preferences, executor);
+                } else {
+                    save.run();
+                }
+                assertTrue(executor.secondWorkerStarted.await(5, TimeUnit.SECONDS));
+                assertThrows(TimeoutException.class, () -> executor.submitted.get(1).get(100, TimeUnit.MILLISECONDS));
+                assertEquals(1, csvAccesses.get());
+                assertEquals(Optional.of("Old J."), repository.getDefaultAbbreviation("External Journal"));
+            } finally {
+                releaseFirst.complete(true);
+            }
+            executor.submitted.getFirst().get(5, TimeUnit.SECONDS);
+            executor.submitted.get(1).get(5, TimeUnit.SECONDS);
+            for (Future<?> task : executor.submitted) {
+                task.get(5, TimeUnit.SECONDS);
+            }
+            assertTrue(callbackCompleted.get());
+            assertEquals(saved, List.copyOf(JournalAbbreviationLoader.readAbbreviationsFromCsvFile(external)));
+            assertEquals(Optional.of("Updated J."), repository.getDefaultAbbreviation("External Journal"));
+            assertEquals(Optional.of("Second J."), repository.getDefaultAbbreviation("Second Journal"));
+        }
     }
 
     @Test
@@ -477,6 +553,46 @@ class AbbreviationsTest {
 
         private void runLast() {
             super.execute(queued.removeLast());
+        }
+    }
+
+    @NullMarked
+    private static class ParallelCsvExecutor extends CurrentThreadTaskExecutor {
+        private final ExecutorService workers;
+        private final Runnable beforeRead;
+        private final Consumer<Path> beforeWrite;
+        private final List<Future<?>> submitted = new CopyOnWriteArrayList<>();
+        private final AtomicInteger executions = new AtomicInteger();
+        private final CountDownLatch secondWorkerStarted = new CountDownLatch(1);
+
+        private ParallelCsvExecutor(ExecutorService workers, Runnable beforeRead, Consumer<Path> beforeWrite) {
+            this.workers = workers;
+            this.beforeRead = beforeRead;
+            this.beforeWrite = beforeWrite;
+        }
+
+        @Override
+        public <V> Future<V> execute(BackgroundTask<V> task) {
+            int index = executions.getAndIncrement();
+            Future<V> future = workers.submit(() -> {
+                try (var loader = mockStatic(JournalAbbreviationLoader.class, CALLS_REAL_METHODS);
+                     var writer = mockStatic(AbbreviationWriter.class, CALLS_REAL_METHODS)) {
+                    loader.when(() -> JournalAbbreviationLoader.readAbbreviationsFromCsvFile(any())).thenAnswer(invocation -> {
+                        beforeRead.run();
+                        return invocation.callRealMethod();
+                    });
+                    writer.when(() -> AbbreviationWriter.writeOrCreate(any(), any())).thenAnswer(invocation -> {
+                        beforeWrite.accept(invocation.getArgument(0));
+                        return invocation.callRealMethod();
+                    });
+                    if (index == 1) {
+                        secondWorkerStarted.countDown();
+                    }
+                    return super.execute(task).get();
+                }
+            });
+            submitted.add(future);
+            return future;
         }
     }
 
