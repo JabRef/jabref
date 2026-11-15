@@ -6,6 +6,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -42,16 +43,19 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     public void lookupIdentifier(BibEntry bibEntry) {
         CrossRef doiFetcher = new CrossRef(preferences.getImporterPreferences());
 
-        BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
-                      .onRunning(() -> identifierLookupInProgress.setValue(true))
-                      .onFinished(() -> identifierLookupInProgress.setValue(false))
-                      .onSuccess(identifier -> {
-                          if (identifier.isPresent()) {
-                              entry.setField(field, identifier.get().asString());
-                          } else {
-                              dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field)));
-                          }
-                      }).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
+        BibEntry lookedUpEntry = entry;
+        BackgroundTask.wrap(() -> doiFetcher.findIdentifier(lookedUpEntry))
+                      .onRunning(() -> EntryLookupsInProgress.DOI.started(lookedUpEntry))
+                      .onFinished(() -> EntryLookupsInProgress.DOI.finished(lookedUpEntry))
+                      .onSuccess(identifier -> identifier.ifPresentOrElse(
+                              doi -> lookedUpEntry.setField(field, doi.asString()),
+                              () -> dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field))))).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
+    }
+
+    @Override
+    public void bindToEntry(BibEntry entry) {
+        super.bindToEntry(entry);
+        identifierLookupInProgress.bind(EntryLookupsInProgress.DOI.inProgress(entry));
     }
 
     @Override

@@ -168,7 +168,7 @@ public class RTFChars implements LayoutFormatter {
         int icount = i;
         StringBuilder part = new StringBuilder();
         loop:
-        while ((count >= 0) && (icount < text.length())) {
+        while ((count >= 0) && (icount < (text.length() - 1))) {
             icount++;
             c = text.charAt(icount);
             switch (c) {

@@ -1,10 +1,13 @@
 package org.jabref.logic.shared;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+
+import org.jspecify.annotations.Nullable;
 
 /// Keeps all essential data for establishing a new connection to a DBMS using [DBMSConnection].
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
@@ -109,6 +112,12 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         return type.getUrl(host, port, database);
     }
 
+    /// Whether both point at the same data: same DBMS, server, and database - regardless of whether the connection
+    /// was entered as form fields or as a JDBC URL, and of password or SSL settings. [#equals(Object)] tells those apart.
+    public static boolean isSameDatabase(DatabaseConnectionProperties first, DatabaseConnectionProperties second) {
+        return SharedDatabaseIdentity.from(first).equals(SharedDatabaseIdentity.from(second));
+    }
+
     /// Returns username, password and ssl as Properties Object
     ///
     /// @return Properties with values for user, password and ssl
@@ -151,7 +160,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
             return false;
         }
         return Objects.equals(type, properties.getType())
-                && this.host.equalsIgnoreCase(properties.getHost())
+                && Objects.equals(canonicalHost(host), canonicalHost(properties.getHost()))
                 && Objects.equals(port, properties.getPort())
                 && Objects.equals(database, properties.getDatabase())
                 && Objects.equals(user, properties.getUser())
@@ -163,7 +172,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
+        return Objects.hash(type, canonicalHost(host), port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
+    }
+
+    /// Host names are case-insensitive; one canonical form serves `equals` and `hashCode` alike. Remembered preferences
+    /// may lack the host, which must not make the comparison throw.
+    private static @Nullable String canonicalHost(@Nullable String host) {
+        return (host == null) ? null : host.toLowerCase(Locale.ROOT);
     }
 
     @Override

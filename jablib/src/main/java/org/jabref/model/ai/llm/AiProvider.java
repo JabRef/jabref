@@ -13,7 +13,9 @@ public enum AiProvider implements Serializable {
     // [impl->req~ai.llms.providers.gemini~1]
     GEMINI("https://generativelanguage.googleapis.com/v1beta/", "https://ai.google.dev/gemini-api/terms"),
     // [impl->req~ai.llms.providers.huggingface~1]
-    HUGGING_FACE("https://router.huggingface.co/v1", "https://huggingface.co/privacy");
+    HUGGING_FACE("https://router.huggingface.co/v1", "https://huggingface.co/privacy"),
+    // [impl->req~ai.llms.providers.debug~1]
+    DEBUG("http://localhost", "");
 
     private final String apiUrl;
     private final String privacyPolicyUrl;

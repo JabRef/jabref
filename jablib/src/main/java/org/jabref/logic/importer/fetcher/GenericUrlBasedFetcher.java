@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /// This is the fallback for any URL that no more specific [UrlBasedFetcher] recognizes — it does not try to
 /// interpret the URL's shape (e.g. a DOI or Semantic Scholar link), it only records the link itself, when it was
 /// added, and (best-effort) the target page's title.
-// [impl->req~fetchers.generic-url~1]
+// [impl->feat~fetchers.generic-url~1]
 @NullMarked
 public class GenericUrlBasedFetcher implements UrlBasedFetcher {
 

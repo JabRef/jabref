@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,12 +14,15 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -45,6 +49,7 @@ import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingDispatcher;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
@@ -221,13 +226,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         libraryTab.getLoading().addListener((_, _, _) -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
-        // Matches float to the top (or are the only rows left), so a table scrolled down before searching would show none of them.
-        // Only scroll when the top is actually out of view, so the table does not jump while typing a query
-        libraryTab.searchQueryProperty().addListener((_, _, query) -> query.ifPresent(_ -> {
-            if (!isFirstRowVisible()) {
-                scrollTo(0);
-            }
-        }));
+        model.searchResultsVersionProperty().addListener(_ -> showSearchMatchesIfNoneVisible());
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -235,23 +234,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // When two entries are equal based on the comparator, the entry that was inserted first should be considered smaller.
         this.setSortPolicy(_ -> true);
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(
-                this.comparatorProperty().map(comparator -> {
-                    if (comparator == null) {
-                        return null;
-                    }
-
-                    return (entry1, entry2) -> {
-                        int result = comparator.compare(entry1, entry2);
-                        if (result != 0) {
-                            return result;
-                        }
-                        // If the entries are equal according to the comparator, compare them by their index in the database.
-                        // The comparison should ideally be based on the database index, but retrieving the index takes log(n). See {@link BibDatabase#indexOf}.
-                        // Using the entry ID is also valid since IDs are monotonically increasing.
-                        return entry1.getEntry().getId().compareTo(entry2.getEntry().getId());
-                    };
-                })
-        );
+                this.comparatorProperty().map(MainTable::thenComparingByInsertionOrder));
 
         UiTaskExecutor.runInJavaFXThread(columnPreferencesApplier::applySortOrder);
 
@@ -354,11 +337,45 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
-    private boolean isFirstRowVisible() {
-        return Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
-                       .map(VirtualFlow::getFirstVisibleCell)
-                       .map(cell -> cell.getIndex() == 0)
-                       .orElse(true);
+    /// If the entries are equal according to the comparator, compare them by their index in the database.
+    /// The comparison should ideally be based on the database index, but retrieving the index takes log(n), see [org.jabref.model.database.BibDatabase#indexOf].
+    /// Using the entry ID is also valid since IDs are monotonically increasing.
+    private static Comparator<BibEntryTableViewModel> thenComparingByInsertionOrder(Comparator<BibEntryTableViewModel> comparator) {
+        return comparator.thenComparing(entry -> entry.getEntry().getId());
+    }
+
+    /// Search matches are sorted to the top (or are the only rows left), so a table scrolled down before searching shows none of them.
+    /// The table stays where it is as long as at least one match is in view, and otherwise moves the minimal distance, to avoid jumping around while a query is typed.
+    private void showSearchMatchesIfNoneVisible() {
+        if (!(getSkin() instanceof MainTableSkin skin)) {
+            return;
+        }
+        VirtualFlow<?> flow = skin.getFlow();
+        Optional.ofNullable(flow.getFirstVisibleCell())
+                .map(IndexedCell::getIndex)
+                // A cell not (yet) bound to a row reports -1
+                .filter(firstVisible -> firstVisible >= 0 && firstVisible < getItems().size())
+                .filter(firstVisible -> !getItems().get(firstVisible).isMatchedBySearch())
+                .ifPresent(firstVisible -> scrollToLastMatchAbove(flow, firstVisible));
+    }
+
+    /// Matches are a prefix of the rows, so with a non-match at the top of the viewport, the last match is above it.
+    ///
+    /// `VirtualFlow.scrollTo` puts a far-away row at the top of the viewport, which would show a single match.
+    /// Instead, the last match goes to the bottom, so that the viewport is filled with matches.
+    private void scrollToLastMatchAbove(VirtualFlow<?> flow, int firstVisible) {
+        int lastMatch = -1;
+        for (int i = 0; i < firstVisible && getItems().get(i).isMatchedBySearch(); i++) {
+            lastMatch = i;
+        }
+        if (lastMatch < 0) {
+            return;
+        }
+        // The last visible cell may be cut off, therefore it is not counted
+        int fullyVisibleRows = Optional.ofNullable(flow.getLastVisibleCell())
+                                       .map(cell -> Math.max(1, cell.getIndex() - firstVisible))
+                                       .orElse(1);
+        flow.scrollToTop(Math.max(0, lastMatch - fullyVisibleRows + 1));
     }
 
     private void scrollToNextMatchCategory() {
@@ -410,6 +427,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
         LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor);
 
+        KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(keyBindings)
+                .on(KeyBinding.SELECT_FIRST_ENTRY, this::clearAndSelectFirst)
+                .on(KeyBinding.SELECT_LAST_ENTRY, this::clearAndSelectLast)
+                .on(KeyBinding.PASTE, pasteAction::execute)
+                .on(KeyBinding.COPY, copyAction::execute)
+                .on(KeyBinding.CUT, cutAction::execute)
+                .on(KeyBinding.DELETE_ENTRY, deleteAction::execute)
+                .on(KeyBinding.SCROLL_TO_NEXT_MATCH_CATEGORY, this::scrollToNextMatchCategory)
+                .on(KeyBinding.SCROLL_TO_PREVIOUS_MATCH_CATEGORY, this::scrollToPreviousMatchCategory)
+                .on(KeyBinding.OPEN_URL_OR_DOI, openUrlAction::execute)
+                .on(KeyBinding.OPEN_FILE, openSelectedEntriesFilesActionFileAction::execute)
+                .on(KeyBinding.MERGE_WITH_FETCHED_ENTRY, mergeWithFetchedEntryAction::execute)
+                .on(KeyBinding.LOOKUP_DOC_IDENTIFIER, lookupIdentifierAction::execute);
+
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
@@ -419,61 +450,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 return;
             }
 
-            Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case SELECT_FIRST_ENTRY:
-                        clearAndSelectFirst();
-                        event.consume();
-                        break;
-                    case SELECT_LAST_ENTRY:
-                        clearAndSelectLast();
-                        event.consume();
-                        break;
-                    case PASTE:
-                        pasteAction.execute();
-                        event.consume();
-                        break;
-                    case COPY:
-                        copyAction.execute();
-                        event.consume();
-                        break;
-                    case CUT:
-                        cutAction.execute();
-                        event.consume();
-                        break;
-                    case DELETE_ENTRY:
-                        deleteAction.execute();
-                        event.consume();
-                        break;
-                    case SCROLL_TO_NEXT_MATCH_CATEGORY:
-                        scrollToNextMatchCategory();
-                        event.consume();
-                        break;
-                    case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
-                        scrollToPreviousMatchCategory();
-                        event.consume();
-                        break;
-                    case OPEN_URL_OR_DOI:
-                        openUrlAction.execute();
-                        event.consume();
-                        break;
-                    case OPEN_FILE:
-                        openSelectedEntriesFilesActionFileAction.execute();
-                        event.consume();
-                        break;
-                    case MERGE_WITH_FETCHED_ENTRY:
-                        mergeWithFetchedEntryAction.execute();
-                        event.consume();
-                        break;
-                    case LOOKUP_DOC_IDENTIFIER:
-                        lookupIdentifierAction.execute();
-                        event.consume();
-                        break;
-                    default:
-                        // Pass other keys to parent
-                }
-            }
+            keyBindingDispatcher.handle(event);
         });
     }
 
@@ -562,7 +539,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // - Bottom + top -> import entries
                 case TOP,
                      BOTTOM ->
-                        importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                        importHandler.importDroppedFiles(files, transferMode);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     Map<Boolean, List<Path>> partitionedFiles = files.stream()
@@ -571,7 +548,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     List<Path> otherFiles = partitionedFiles.get(false);
 
                     if (!importableFiles.isEmpty()) {
-                        importHandler.importFilesInBackground(importableFiles, transferMode).executeWith(taskExecutor);
+                        importHandler.importDroppedFiles(importableFiles, transferMode);
                     }
                     if (!otherFiles.isEmpty()) {
                         BibEntry entry = target.getEntry();
@@ -596,9 +573,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .map(File::toPath)
                                     .map(FileUtil::resolveIfShortcut)
                                     .toList();
-            importHandler
-                    .importFilesInBackground(files, event.getTransferMode())
-                    .executeWith(taskExecutor);
+            importHandler.importDroppedFiles(files, event.getTransferMode());
             success = true;
         }
 
@@ -684,5 +659,21 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(stateManager);
         findUnlinkedFilesAction.execute();
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new MainTableSkin(this);
+    }
+
+    /// Exposes the [VirtualFlow] of the table, which avoids a CSS lookup on each search result
+    private static class MainTableSkin extends TableViewSkin<BibEntryTableViewModel> {
+        MainTableSkin(MainTable table) {
+            super(table);
+        }
+
+        VirtualFlow<?> getFlow() {
+            return getVirtualFlow();
+        }
     }
 }
