@@ -3,13 +3,6 @@ parent: Code Howtos
 ---
 # Profiling Gradle test memory with JFR
 
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
-
 Use this workflow to investigate test-worker heap exhaustion, excessive allocation, or objects retained after tests finish.
 The examples use a POSIX shell, a HotSpot-based JDK 25 or later, and JabRef's Gradle wrapper.
 Replace the task and fully qualified test class to use it in another Gradle project.
