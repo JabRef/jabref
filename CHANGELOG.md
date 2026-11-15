@@ -11,7 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added an option to disable the built-in journal abbreviation list while keeping custom lists available. [#12468](https://github.com/JabRef/jabref/issues/12468)
 - We added native macOS text-editing shortcuts, such as <kbd>Ctrl</kbd> + <kbd>A</kbd>, to text fields and the BibTeX source editor. [#16529](https://github.com/JabRef/jabref/issues/16529)
 - We added an option to enable AI provider debugging in expert settings for testing AI features without external API calls. [#17607](https://github.com/JabRef/jabref/pull/17607)
 - We added ISBN extraction from bibliographic pages in PDF books. [#12874](https://github.com/JabRef/jabref/issues/12874)
@@ -41,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added <kbd>Ctrl</kbd> + <kbd>C</kbd> copy support for selected entries in the global search results window. [#17310](https://github.com/JabRef/jabref/issues/17310)
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
+- We added an option to disable the built-in journal abbreviation list while keeping custom lists available. [#12468](https://github.com/JabRef/jabref/issues/12468)
 
 ### Changed
 
