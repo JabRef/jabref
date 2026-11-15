@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PreferenceMigrationTest {
     private static final String AI_ANSWER_ENGINE_KIND = "aiAnswerEngineKind";
     private static final String AI_RESPONSE_ENGINE_KIND = "aiResponseEngineKind";
+    private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
     private static final String LEGACY_GROBID_URL = "http://grobid.jabref.org:8070";
     private static final String HTTPS_GROBID_URL = "https://grobid.jabref.org";
@@ -26,10 +27,12 @@ class PreferenceMigrationTest {
 
     private boolean hasLegacyResponseEngineKindValue;
     private boolean hasResponseEngineKindValue;
+    private boolean hasCustomizeSettingsValue;
     private boolean hasEmbeddingModelValue;
     private boolean hasGrobidUrlValue;
     private String legacyResponseEngineKindValue;
     private String responseEngineKindValue;
+    private String customizeSettingsValue;
     private String embeddingModelValue;
     private String grobidUrlValue;
 
@@ -39,15 +42,18 @@ class PreferenceMigrationTest {
 
         hasLegacyResponseEngineKindValue = preferences.hasKey(AI_ANSWER_ENGINE_KIND);
         hasResponseEngineKindValue = preferences.hasKey(AI_RESPONSE_ENGINE_KIND);
+        hasCustomizeSettingsValue = preferences.hasKey(AI_CUSTOMIZE_SETTINGS);
         hasEmbeddingModelValue = preferences.hasKey(AI_EMBEDDING_MODEL);
         hasGrobidUrlValue = preferences.hasKey(JabRefCliPreferences.GROBID_URL);
         legacyResponseEngineKindValue = preferences.get(AI_ANSWER_ENGINE_KIND, UNUSED_DEFAULT_VALUE);
         responseEngineKindValue = preferences.get(AI_RESPONSE_ENGINE_KIND, UNUSED_DEFAULT_VALUE);
+        customizeSettingsValue = preferences.get(AI_CUSTOMIZE_SETTINGS, UNUSED_DEFAULT_VALUE);
         embeddingModelValue = preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE);
         grobidUrlValue = preferences.get(JabRefCliPreferences.GROBID_URL, UNUSED_DEFAULT_VALUE);
 
         preferences.remove(AI_ANSWER_ENGINE_KIND);
         preferences.remove(AI_RESPONSE_ENGINE_KIND);
+        preferences.remove(AI_CUSTOMIZE_SETTINGS);
         preferences.remove(AI_EMBEDDING_MODEL);
         preferences.remove(JabRefCliPreferences.GROBID_URL);
     }
@@ -58,6 +64,7 @@ class PreferenceMigrationTest {
 
         restorePreference(preferences, AI_ANSWER_ENGINE_KIND, hasLegacyResponseEngineKindValue, legacyResponseEngineKindValue);
         restorePreference(preferences, AI_RESPONSE_ENGINE_KIND, hasResponseEngineKindValue, responseEngineKindValue);
+        restorePreference(preferences, AI_CUSTOMIZE_SETTINGS, hasCustomizeSettingsValue, customizeSettingsValue);
         restorePreference(preferences, AI_EMBEDDING_MODEL, hasEmbeddingModelValue, embeddingModelValue);
         restorePreference(preferences, JabRefCliPreferences.GROBID_URL, hasGrobidUrlValue, grobidUrlValue);
     }

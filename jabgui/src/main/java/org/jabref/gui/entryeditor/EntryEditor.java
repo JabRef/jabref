@@ -28,6 +28,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingDispatcher;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -226,48 +227,28 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     private void setupKeyBindings() {
-        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case ENTRY_EDITOR_NEXT_PANEL,
-                         ENTRY_EDITOR_NEXT_PANEL_2 -> {
-                        tabbed.getSelectionModel().selectNext();
-                        event.consume();
-                    }
-                    case ENTRY_EDITOR_PREVIOUS_PANEL,
-                         ENTRY_EDITOR_PREVIOUS_PANEL_2 -> {
-                        tabbed.getSelectionModel().selectPrevious();
-                        event.consume();
-                    }
-                    case ENTRY_EDITOR_NEXT_ENTRY -> {
-                        focusUtils.captureFocusedField();
-                        tabSupplier.get().selectNextEntry();
-                        event.consume();
-                    }
-                    case ENTRY_EDITOR_PREVIOUS_ENTRY -> {
-                        focusUtils.captureFocusedField();
-                        tabSupplier.get().selectPreviousEntry();
-                        event.consume();
-                    }
-                    case HELP -> {
-                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
-                        event.consume();
-                    }
-                    case CLOSE ->
-                        // We do not want to close the entry editor as such
-                        // We just want to unfocus the field
-                            tabbed.requestFocus();
-                    case OPEN_CLOSE_ENTRY_EDITOR -> {
-                        close();
-                        event.consume();
-                    }
-                    default -> {
-                        // Pass other keys to parent
-                    }
-                }
-            }
-        });
+        Runnable selectNextPanel = () -> tabbed.getSelectionModel().selectNext();
+        Runnable selectPreviousPanel = () -> tabbed.getSelectionModel().selectPrevious();
+        KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(keyBindingRepository)
+                .on(KeyBinding.ENTRY_EDITOR_NEXT_PANEL, selectNextPanel)
+                .on(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2, selectNextPanel)
+                .on(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL, selectPreviousPanel)
+                .on(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2, selectPreviousPanel)
+                .on(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY, () -> {
+                    focusUtils.captureFocusedField();
+                    tabSupplier.get().selectNextEntry();
+                })
+                .on(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY, () -> {
+                    focusUtils.captureFocusedField();
+                    tabSupplier.get().selectPreviousEntry();
+                })
+                .on(KeyBinding.HELP, () -> new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute())
+                // We do not want to close the entry editor as such
+                // We just want to unfocus the field
+                .onWithoutConsuming(KeyBinding.CLOSE, tabbed::requestFocus)
+                .on(KeyBinding.OPEN_CLOSE_ENTRY_EDITOR, this::close);
+
+        this.addEventHandler(KeyEvent.KEY_PRESSED, keyBindingDispatcher::handle);
     }
 
     @FXML

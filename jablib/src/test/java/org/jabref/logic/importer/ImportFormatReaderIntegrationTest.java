@@ -70,6 +70,9 @@ class ImportFormatReaderIntegrationTest {
         result.add(new Object[] {"fileformat/OvidImporterTest3.txt", "ovid", 1});
         result.add(new Object[] {"fileformat/Endnote.entries.enw", "refer", 5});
         result.add(new Object[] {"fileformat/MsBibImporterTest4.xml", "msbib", 1});
+        result.add(new Object[] {"fileformat/DnbMarcXmlDoiRecord.xml", "marcxml", 1});
+        result.add(new Object[] {"bibframe/book.rdf", "bibframe", 1});
+        result.add(new Object[] {"bibframe/article.rdf", "bibframe", 1});
         result.add(new Object[] {"fileformat/MsBibImporterTest4.bib", "bibtex", 1});
         result.add(new Object[] {"fileformat/refer.bibIX.ref", "refer-bibIX", 4});
         return result.stream();

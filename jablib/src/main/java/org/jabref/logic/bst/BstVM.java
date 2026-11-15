@@ -3,10 +3,18 @@ package org.jabref.logic.bst;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryConverter;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -18,6 +26,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.Trees;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -95,20 +104,36 @@ public class BstVM {
     }
 
     public boolean hasSortCommand() {
-        return containsSortCommand(tree);
+        return Trees.getDescendants(tree).stream().anyMatch(BstParser.SortCommandContext.class::isInstance);
     }
 
-    private boolean containsSortCommand(ParseTree parseTree) {
-        if (parseTree instanceof BstParser.SortCommandContext) {
-            return true;
-        }
+    /// Returns the names of the fields declared in the `ENTRY` command, i.e., the fields the style reads.
+    /// Names are lower-cased, because BibTeX field names are case-insensitive.
+    public Set<String> getEntryFields() {
+        return Trees.getDescendants(tree).stream()
+                    .filter(BstParser.EntryCommandContext.class::isInstance)
+                    .map(BstParser.EntryCommandContext.class::cast)
+                    .flatMap(entryCommand -> entryCommand.idListOpt(0).identifier().stream())
+                    .map(identifier -> identifier.getText().toLowerCase(Locale.ROOT))
+                    .collect(Collectors.toSet());
+    }
 
-        for (int i = 0; i < parseTree.getChildCount(); i++) {
-            if (containsSortCommand(parseTree.getChild(i))) {
+    /// Selects fields that can supply values to this style, including aliases and date parts.
+    public Optional<Predicate<Field>> getFieldSelection() {
+        Set<String> entryFields = getEntryFields();
+        if (entryFields.isEmpty()) {
+            return Optional.empty();
+        }
+        Set<Field> dateFields = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
+        return Optional.of(field -> {
+            if (field == StandardField.CROSSREF) {
                 return true;
             }
-        }
-        return false;
+            Stream<Field> candidates = dateFields.contains(field)
+                                       ? dateFields.stream()
+                                       : Stream.concat(Stream.of(field), Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(field)).stream());
+            return candidates.map(candidate -> candidate.getName().toLowerCase(Locale.ROOT)).anyMatch(entryFields::contains);
+        });
     }
 
     @VisibleForTesting

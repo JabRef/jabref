@@ -62,7 +62,7 @@ public class KeyBindingViewModel {
         return realBinding;
     }
 
-    private void setBinding(String bind) {
+    void setBinding(String bind) {
         this.realBinding = bind;
         if (bind.isEmpty()) {
             this.shownBinding.set("");

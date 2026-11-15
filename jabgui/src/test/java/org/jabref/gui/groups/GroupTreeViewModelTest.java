@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.NoOpSearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -48,7 +50,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // org.jabref.gui.groups.GroupNodeViewModel.refreshGroup is used, which uses "Platform.runlater"
@@ -211,6 +218,47 @@ class GroupTreeViewModelTest {
                 events.stream().map(MetaDataChangedEvent::getSource).distinct().toList());
     }
 
+    @Test
+    void removingSubgroupsIsConfirmedWithTheRemoveLabel() {
+        GroupNodeViewModel root = rootWithTwoSubgroups();
+        when(dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove")))
+                .thenReturn(true);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.removeSubgroups(root));
+
+        assertEquals(List.of(), childNames());
+    }
+
+    @Test
+    void cancellingTheRemoveSubgroupsDialogKeepsTheSubgroups() {
+        GroupNodeViewModel root = rootWithTwoSubgroups();
+        when(dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove")))
+                .thenReturn(false);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.removeSubgroups(root));
+
+        verify(dialogService).showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove"));
+        assertEquals(List.of("A", "B"), childNames());
+    }
+
+    private GroupNodeViewModel rootWithTwoSubgroups() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        return groupTree.rootGroupProperty().getValue();
+    }
+
     private List<String> childNames() {
         return databaseContext.getMetaData().getGroups().orElseThrow().getChildren().stream()
                               .map(node -> node.getGroup().getName())
@@ -355,5 +403,71 @@ class GroupTreeViewModelTest {
         List<GroupNodeViewModel> groups = model.rootGroupProperty().getValue().getChildren();
 
         assertEquals(0, groups.size());
+    }
+
+    @Test
+        // [utest->req~ux.groups.library-switch-preserves-selection~1]
+    void selectionOfNewDatabaseSurvivesSwitch() {
+        BibDatabaseContext secondDatabase = new BibDatabaseContext();
+        secondDatabase.setDatabasePath(Path.of("second.bib"));
+        GroupTreeNode groupA = setUpLibraryWithGroup(databaseContext, "A");
+        GroupTreeNode groupB = setUpLibraryWithGroup(secondDatabase, "B");
+        var storedSelectionA = stateManager.getSelectedGroups(databaseContext);
+
+        assertEquals(List.of(groupA), selectedGroupNodes());
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+
+        clearInvocations(stateManager);
+
+        activeDatabase.setValue(Optional.of(secondDatabase));
+        assertEquals(List.of(groupB), selectedGroupNodes());
+        activeDatabase.setValue(Optional.of(databaseContext));
+        assertEquals(List.of(groupA), selectedGroupNodes());
+        assertEquals(List.of(groupA), storedSelectionA);
+
+        verify(stateManager, never()).clearSelectedGroups(any(BibDatabaseContext.class));
+    }
+
+    @Test
+        // [utest->req~ux.groups.shared-update-preserves-selection~1]
+    void sharedDatabaseGroupUpdatePreservesSelection() {
+        GroupTreeNode selectedGroup = setUpLibraryWithGroup(databaseContext, "A");
+        var storedSelection = stateManager.getSelectedGroups(databaseContext);
+        GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        updatedRoot.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+        clearInvocations(stateManager);
+
+        JavaFxExtension.invokeAndWait(() -> databaseContext.getMetaData().setGroups(updatedRoot));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertEquals(List.of(selectedGroup), storedSelection);
+        assertEquals(List.of("A"), selectedGroupNodes().stream().map(GroupTreeNode::getName).toList());
+        verify(stateManager, never()).clearSelectedGroups(databaseContext);
+    }
+
+    private GroupTreeNode setUpLibraryWithGroup(BibDatabaseContext library, String name) {
+        var root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode group = root.addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, ','));
+        var storedSelection = FXCollections.observableArrayList(group);
+        when(stateManager.getSelectedGroups(library)).thenReturn(storedSelection);
+        doAnswer(_ -> {
+            storedSelection.clear();
+            return null;
+        }).when(stateManager).clearSelectedGroups(library);
+        // the root is attached last otherwise refresh will overlap with stubbing
+        // the second invokeAndWait() waits for the refresh queued by setGroups to finish
+        JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+        return group;
+    }
+
+    private List<GroupTreeNode> selectedGroupNodes() {
+        return groupTree.selectedGroupsProperty().stream().map(GroupNodeViewModel::getGroupNode).toList();
     }
 }
