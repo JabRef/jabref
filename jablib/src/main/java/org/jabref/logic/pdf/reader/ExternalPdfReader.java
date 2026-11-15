@@ -12,7 +12,6 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public record ExternalPdfReader(String displayName, Set<String> executableNames, IntFunction<List<String>> pageArguments) {
-
     public ExternalPdfReader {
         executableNames = Set.copyOf(executableNames);
     }
