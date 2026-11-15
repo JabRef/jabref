@@ -22,8 +22,10 @@ jobs:
       )
     permissions:
       contents: read
+      issues: read
     outputs:
       issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+      needs_triage: ${{ steps.needs_triage.outputs.needs_triage }}
       allow_missing_issue_link: ${{ steps.allow_missing_issue_link.outputs.allowed }}
     steps:
       - name: echo PR data
@@ -74,6 +76,18 @@ jobs:
                 ;;
             esac
           fi
+      - name: Check whether the issue still needs triage
+        id: needs_triage
+        if: steps.get_issue_number.outputs.ticketNumber != '-1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.get_issue_number.outputs.ticketNumber }}
+        run: |
+          set -euo pipefail
+          ISSUE_LABELS=$(gh api "/repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER" --jq '.labels[].name')
+          if grep -qxF 'status: needs-triage' <<< "$ISSUE_LABELS"; then
+            echo "needs_triage=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Issue number present
         if: steps.get_issue_number.outputs.ticketNumber == '-1' && steps.allow_missing_issue_link.outputs.allowed != 'true'
         run: |
@@ -82,7 +96,8 @@ jobs:
 
   move_issue:
     name: Mark issue as in progress
-    if: needs.determine_issue_number.outputs.issue_number != '-1'
+    # An untriaged issue is not in progress: ensure_assignment closes the pull request.
+    if: needs.determine_issue_number.outputs.issue_number != '-1' && needs.determine_issue_number.outputs.needs_triage != 'true'
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-slim
@@ -134,6 +149,7 @@ jobs:
       ISSUE_NUMBER: ${{ needs.determine_issue_number.outputs.issue_number }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
       PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      PR_BODY: ${{ github.event.pull_request.body }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -151,9 +167,11 @@ jobs:
 
           # An untriaged issue may turn out to be invalid or a duplicate: neither assign nor pin it.
           # "edited" also fires on closed pull requests; only an open one is commented on and closed.
+          # "Refs #n" does not claim to fix the issue, so such a pull request stays open.
           ISSUE_LABELS=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '.labels[].name')
           if grep -qxF 'status: needs-triage' <<< "$ISSUE_LABELS"; then
-            if [ "$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state --jq '.state')" = 'OPEN' ]; then
+            if ! grep -Eiq "refs\s+<?(https?://github\.com/JabRef/jabref/issues/)?#?$ISSUE_NUMBER\b" <<< "$PR_BODY" &&
+              [ "$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state --jq '.state')" = 'OPEN' ]; then
               gh pr close "$PR_NUMBER" --repo "$REPO" --comment "The respective issue needs to be triaged first."
             fi
             exit 0
