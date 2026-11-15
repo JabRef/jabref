@@ -13,7 +13,9 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -350,6 +352,51 @@ class HayagrivaYamlExporterTest {
                 "  url: http://example.com",
                 "  serial-number:",
                 "    issn: \"0896-3207\"");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    final void exportsPerformanceEntryWithPerformanceType(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+        BibEntry entry = new BibEntry(BiblatexNonStandardEntryType.Performance)
+                .withCitationKey("Example2024Performance")
+                .withField(StandardField.TITLE, "Example Performance Title")
+                .withField(StandardField.AUTHOR, "Example Author")
+                .withField(StandardField.DATE, "2024-09-12")
+                .withField(StandardField.LOCATION, "Example City")
+                .withField(StandardField.URL, "https://example.org/event");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
+
+        List<String> expected = List.of(
+                "Example2024Performance:",
+                "  type: performance",
+                "  title: \"Example Performance Title\"",
+                "  author:",
+                "    - Author, Example",
+                "  date: 2024-09-12",
+                "  location: Example City",
+                "  url: https://example.org/event");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    final void exportsUnknownEntryTypeAsMisc(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+        BibEntry entry = new BibEntry(new UnknownEntryType("mycustomtype"))
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, "Test Title");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
+
+        List<String> expected = List.of(
+                "test:",
+                "  type: Misc",
+                "  title: \"Test Title\"");
 
         assertEquals(expected, Files.readAllLines(file));
     }
