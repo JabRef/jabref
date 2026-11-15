@@ -149,6 +149,16 @@ jobs:
 
           echo "warned=false" >> "$GITHUB_OUTPUT"
 
+          # An untriaged issue may turn out to be invalid or a duplicate: neither assign nor pin it.
+          # "edited" also fires on closed pull requests; only an open one is commented on and closed.
+          ISSUE_LABELS=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '.labels[].name')
+          if grep -qxF 'status: needs-triage' <<< "$ISSUE_LABELS"; then
+            if [ "$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state --jq '.state')" = 'OPEN' ]; then
+              gh pr close "$PR_NUMBER" --repo "$REPO" --comment "The respective issue needs to be triaged first."
+            fi
+            exit 0
+          fi
+
           # Read and act in one step: assignees can change at any moment, and a decision made in an earlier step
           # would pin or warn based on an assignment that no longer holds.
           ASSIGNEES=$(gh api "/repos/$REPO/issues/$ISSUE_NUMBER" --jq '[.assignees[].login]' | jq -c '.')
