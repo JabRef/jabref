@@ -2,8 +2,11 @@ package org.jabref.gui.preferences.journals;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -122,10 +125,17 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     /// Read all saved file paths and read their abbreviations.
     public void createFileObjects() {
-        List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
-        externalFiles.forEach(name -> openFile(Path.of(name)));
+        abbreviationsPreferences.getExternalJournalLists().stream()
+                                .map(Path::of)
+                                .map(path -> path.toAbsolutePath().normalize())
+                                .distinct()
+                                .forEach(this::openFile);
+        Set<Path> disabledPaths = abbreviationsPreferences.getDisabledExternalJournalLists().stream()
+                                                          .map(Path::of)
+                                                          .map(path -> path.toAbsolutePath().normalize())
+                                                          .collect(Collectors.toSet());
         journalFiles.forEach(file -> file.getAbsolutePath().ifPresent(path ->
-                file.enabledProperty().set(!abbreviationsPreferences.getDisabledExternalJournalLists().contains(path.toAbsolutePath().toString()))));
+                file.enabledProperty().set(!disabledPaths.contains(path.toAbsolutePath().normalize()))));
     }
 
     /// This will set the `currentFile` property to the [AbbreviationsFileViewModel] object that was added to
@@ -171,13 +181,17 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     ///
     /// @param filePath path to the file
     private void openFile(Path filePath) {
-        AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
-        if (journalFiles.contains(abbreviationsFile)) {
+        Path absolutePath = filePath.toAbsolutePath().normalize();
+        if (journalFiles.stream()
+                        .flatMap(file -> file.getAbsolutePath().stream())
+                        .map(path -> path.toAbsolutePath().normalize())
+                        .anyMatch(absolutePath::equals)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal File"),
                     Localization.lang("Journal file %s already added", filePath.toString()));
             return;
         }
-        var pending = journalAbbreviationRepository.getPendingJournalList(filePath);
+        AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(absolutePath);
+        var pending = journalAbbreviationRepository.getPendingJournalList(absolutePath);
         if (pending.isPresent()) {
             pending.orElseThrow().stream().map(AbbreviationViewModel::new)
                    .forEach(abbreviationsFile.abbreviationsProperty()::add);
@@ -322,21 +336,20 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     @Override
     public void storeSettings() {
         // [impl->req~journals.disable-built-in~1]
-        List<String> journalStringList = journalFiles.stream()
-                                                     .filter(path -> !path.isBuiltInListProperty().get())
-                                                     .flatMap(path -> path.getAbsolutePath().stream())
-                                                     .map(path -> path.toAbsolutePath().toString())
-                                                     .toList();
-        abbreviationsPreferences.setExternalJournalLists(journalStringList);
+        SequencedMap<Path, AbbreviationsFileViewModel> externalFiles = new LinkedHashMap<>();
+        journalFiles.stream()
+                    .filter(file -> !file.isBuiltInListProperty().get())
+                    .forEach(file -> file.getAbsolutePath().ifPresent(path ->
+                            externalFiles.putIfAbsent(path.toAbsolutePath().normalize(), file)));
+        Map<Path, List<Abbreviation>> filesToWrite = snapshotFilesToWrite(externalFiles);
+        abbreviationsPreferences.setExternalJournalLists(externalFiles.keySet().stream().map(Path::toString).toList());
         // [impl->req~journals.disable-external~1]
-        abbreviationsPreferences.setDisabledExternalJournalLists(journalFiles.stream()
-                                                                             .filter(file -> !file.enabledProperty().get())
-                                                                             .flatMap(file -> file.getAbsolutePath().stream())
-                                                                             .map(path -> path.toAbsolutePath().toString())
-                                                                             .toList());
+        abbreviationsPreferences.setDisabledExternalJournalLists(externalFiles.entrySet().stream()
+                                                                              .filter(entry -> !entry.getValue().enabledProperty().get())
+                                                                              .map(entry -> entry.getKey().toString())
+                                                                              .toList());
         abbreviationsPreferences.setUseFJournalField(useFJournal.get());
         abbreviationsPreferences.setUseBuiltInJournalList(useBuiltInJournalList.get());
-        Map<Path, List<Abbreviation>> filesToWrite = snapshotFilesToWrite();
         long savedRevision = editRevision;
         journalAbbreviationRepository.saveJournalLists(filesToWrite, abbreviationsPreferences, taskExecutor,
                 () -> {
@@ -347,14 +360,13 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     }
 
     /// Captures external list contents before background saving so later UI edits cannot change the pending write.
-    private Map<Path, List<Abbreviation>> snapshotFilesToWrite() {
+    private Map<Path, List<Abbreviation>> snapshotFilesToWrite(Map<Path, AbbreviationsFileViewModel> externalFiles) {
         if (!shouldWriteLists) {
             return Map.of();
         }
 
-        return journalFiles.stream()
-                           .filter(file -> !file.isBuiltInListProperty().get())
-                           .collect(Collectors.toMap(file -> file.getAbsolutePath().orElseThrow(), this::snapshotAbbreviations));
+        return externalFiles.entrySet().stream()
+                            .collect(Collectors.toMap(Map.Entry::getKey, entry -> snapshotAbbreviations(entry.getValue())));
     }
 
     /// Copies abbreviation values from their view models, excluding placeholder rows that must not be saved.

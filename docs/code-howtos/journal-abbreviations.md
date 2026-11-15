@@ -37,6 +37,8 @@ External list paths retain their order in `AbbreviationPreferences.getExternalJo
 `getDisabledExternalJournalLists()` stores disabled paths separately; the loader skips them without changing the precedence of enabled lists.
 The preferences table keeps disabled lists selectable and editable, and applies checkbox changes only on Save.
 Built-in abbreviation row models are constructed in the background before they are attached to the preferences table.
+External list paths are compared as normalized absolute paths, so opening a list again cannot add a duplicate row.
+Duplicate saved paths are loaded once; saving also deduplicates paths while retaining the first row's contents and enabled state.
 
 The GUI retains its injected repository when saving preferences and calls `reload` with the saved values.
 Reloading captures the preference values before scheduling background work, then publishes the completed data in one update.

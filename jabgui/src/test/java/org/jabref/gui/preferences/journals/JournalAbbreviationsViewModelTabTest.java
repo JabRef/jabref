@@ -40,7 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class JournalAbbreviationsViewModelTabTest {
@@ -417,6 +419,58 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.openFile();
         viewModel.openFile();
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void openingEquivalentPathKeepsOneList(boolean useRelativePath) {
+        Path equivalentPath = useRelativePath
+                              ? Path.of("").toAbsolutePath().relativize(emptyTestFile)
+                              : emptyTestFile.resolveSibling("unused").resolve("..").resolve(emptyTestFile.getFileName());
+        when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(emptyTestFile), Optional.of(equivalentPath));
+
+        viewModel.openFile();
+        viewModel.openFile();
+
+        assertEquals(List.of(Optional.of(emptyTestFile)), viewModel.journalFilesProperty().stream()
+                                                                   .map(AbbreviationsFileViewModel::getAbsolutePath).toList());
+        verify(dialogService, times(1)).showErrorDialogAndWait(anyString(), anyString());
+    }
+
+    @Test
+    void duplicateSavedPathsOpenOnceAndRetainDisabledState() {
+        Path equivalentPath = emptyTestFile.resolveSibling(".").resolve(emptyTestFile.getFileName());
+        AbbreviationPreferences preferences = new AbbreviationPreferences(
+                List.of(emptyTestFile.toString(), emptyTestFile.toString(), equivalentPath.toString()), true, false);
+        preferences.setDisabledExternalJournalLists(List.of(equivalentPath.toString()));
+        JournalAbbreviationsTabViewModel model = new JournalAbbreviationsTabViewModel(
+                preferences, dialogService, new CurrentThreadTaskExecutor(), repository);
+
+        model.createFileObjects();
+
+        assertEquals(1, model.journalFilesProperty().size());
+        assertFalse(model.journalFilesProperty().getFirst().enabledProperty().get());
+        verifyNoInteractions(dialogService);
+    }
+
+    @Test
+    void savingDuplicateRowsUsesFirstListContentsAndEnabledState() throws IOException {
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(emptyTestFile.toString()), true, false);
+        preferences.setUseBuiltInJournalList(false);
+        JournalAbbreviationsTabViewModel model = new JournalAbbreviationsTabViewModel(
+                preferences, dialogService, new CurrentThreadTaskExecutor(), repository);
+        model.createFileObjects();
+        model.addAbbreviation(ABBREVIATION_0);
+        model.journalFilesProperty().getFirst().enabledProperty().set(false);
+        Path equivalentPath = emptyTestFile.resolveSibling(".").resolve(emptyTestFile.getFileName());
+        model.journalFilesProperty().add(new AbbreviationsFileViewModel(equivalentPath));
+
+        model.storeSettings();
+
+        assertEquals(List.of(emptyTestFile.toString()), preferences.getExternalJournalLists());
+        assertEquals(List.of(emptyTestFile.toString()), preferences.getDisabledExternalJournalLists());
+        assertEquals(List.of("Full0"), JournalAbbreviationLoader.readAbbreviationsFromCsvFile(emptyTestFile).stream()
+                                                                .map(Abbreviation::getName).toList());
     }
 
     @ParameterizedTest
