@@ -44,7 +44,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -156,6 +158,25 @@ class CitationRelationsTabTest {
 
         verify(searchService, times(2)).searchCites(any(), eq(false), any());
         verify(searchService, times(2)).searchCitedBy(any(), eq(false), any());
+    }
+
+    @Test
+    void citationSearchesKeepTheirOriginalDoiWhenEntryChanges() throws FetcherException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.DOI, "10.1145/782941.782993");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            tab.currentEntryProperty().set(entry);
+            tab.notifyAboutFocus(entry);
+            entry.setField(StandardField.DOI, "10.1038/35057062");
+        });
+
+        ArgumentCaptor<BibEntry> citingEntry = ArgumentCaptor.forClass(BibEntry.class);
+        ArgumentCaptor<BibEntry> citedEntry = ArgumentCaptor.forClass(BibEntry.class);
+        verify(searchService).searchCites(citingEntry.capture(), eq(false), any());
+        verify(searchService).searchCitedBy(citedEntry.capture(), eq(false), any());
+        assertEquals(Optional.of("10.1145/782941.782993"), citingEntry.getValue().getField(StandardField.DOI));
+        assertEquals(Optional.of("10.1145/782941.782993"), citedEntry.getValue().getField(StandardField.DOI));
     }
 
     @Test

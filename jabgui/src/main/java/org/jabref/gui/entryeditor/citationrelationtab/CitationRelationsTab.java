@@ -903,7 +903,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setLoadingPlaceholder(citationComponents.listView());
 
         BackgroundTask<List<CitationRelationItem>> task = this.createCitationSearchTask(
-                citationComponents.entry(),
+                new BibEntry(citationComponents.entry()),
                 citationComponents.searchType(),
                 bypassCache,
                 librarySnapshot.entries(),
