@@ -9,11 +9,14 @@ import java.util.EnumSet;
 import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxTest;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +27,10 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -37,7 +42,7 @@ import static org.mockito.Mockito.when;
 /// online links through `Path.of`, which collapses `https://` and truncates query strings).
 @NullMarked
 @DisabledOnOs(OS.WINDOWS)
-class NativeDesktopTest {
+class NativeDesktopTest extends JavaFxTest {
 
     private static final String URL_WITH_QUERY = "https://journals.plos.org/plosmedicine/article/file?id=10.1371/journal.pmed.1004085&type=printable";
 
@@ -112,6 +117,28 @@ class NativeDesktopTest {
 
         verify(desktop).openUrlWithSystemHandler("mailto:someone@example.org");
         verifyNoInteractions(hostServices);
+    }
+
+    @Test
+    void openBrowserShowPopupNotifiesWhenTheLaunchCannotBeConfirmed() {
+        DialogService dialogService = mock(DialogService.class);
+        NativeDesktop desktop = NativeDesktop.create(mock(HostServices.class), preferencesWith());
+
+        // The notification closes itself through a JavaFX animation
+        interact(() -> desktop.openBrowserShowPopup(URL_WITH_QUERY, dialogService));
+
+        verify(dialogService).notify(isA(Notifications.UiNotification.class));
+    }
+
+    @Test
+    void openBrowserShowPopupDoesNotNotifyForTheSystemHandler() throws IOException {
+        DialogService dialogService = mock(DialogService.class);
+        NativeDesktop desktop = spy(NativeDesktop.create(mock(HostServices.class), preferencesWith()));
+        doNothing().when(desktop).openUrlWithSystemHandler(anyString());
+
+        desktop.openBrowserShowPopup("mailto:someone@example.org", dialogService);
+
+        verify(dialogService, never()).notify(isA(Notifications.UiNotification.class));
     }
 
     private static GuiPreferences preferencesWith(ExternalFileType... externalFileTypes) {

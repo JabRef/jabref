@@ -12,9 +12,11 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javafx.application.HostServices;
+import javafx.util.Duration;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -36,6 +38,8 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
+import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.LoggerFactory;
 
@@ -271,11 +275,16 @@ public abstract class NativeDesktop {
     ///
     /// @param url the URL to open
     public void openBrowser(String url) throws IOException {
+        launchBrowser(url);
+    }
+
+    /// @return `false` if the browser was started via [HostServices], which does not report whether that succeeded
+    private boolean launchBrowser(String url) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", preferences.getExternalApplicationsPreferences());
         if (fileType.isPresent() && !fileType.get().getOpenWithApplication().isEmpty()) {
             // The user configured a custom browser; hand it the URL string unmodified
             openFileWithApplication(url, fileType.get().getOpenWithApplication());
-            return;
+            return true;
         }
         // A URL must be opened via a URL-aware API: the file-open path runs it through
         // Path.of(...), which collapses "https://" to "https:/" and yields a bogus filesystem path
@@ -286,15 +295,16 @@ public abstract class NativeDesktop {
             // Not URI-parseable (e.g. unencoded spaces); the OS URL handlers accept the raw string
             LoggerFactory.getLogger(NativeDesktop.class).debug("Could not parse {} as URI, falling back to the OS URL handler", url, e);
             openUrlWithSystemHandler(url);
-            return;
+            return true;
         }
         // On Windows, HostServices hands every URI to the web browser, also mailto: and links to other programs.
         // The OS handler dispatches by scheme. createUri also produces relative URIs, which only the OS handler can resolve.
         if ("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme())) {
             showDocument(uri.toASCIIString());
-        } else {
-            openUrlWithSystemHandler(uri.isAbsolute() ? uri.toASCIIString() : url);
+            return false;
         }
+        openUrlWithSystemHandler(uri.isAbsolute() ? uri.toASCIIString() : url);
+        return true;
     }
 
     public void openBrowser(URI url) throws IOException {
@@ -311,9 +321,25 @@ public abstract class NativeDesktop {
     /// @param url the URL to open
     public void openBrowserShowPopup(String url, DialogService dialogService) {
         try {
-            openBrowser(url);
+            if (!launchBrowser(url)) {
+                // A failure would go unnoticed, so the link stays reachable for a while
+                dialogService.notify(new UnconfirmedBrowserLaunchNotification(url, dialogService));
+            }
         } catch (IOException exception) {
             showManualOpenPopup(url, dialogService, exception);
+        }
+    }
+
+    private static final class UnconfirmedBrowserLaunchNotification extends Notifications.UiNotification {
+        UnconfirmedBrowserLaunchNotification(String url, DialogService dialogService) {
+            super(Localization.lang("Opening link in the browser"),
+                    Localization.lang("If no browser opened, copy the link and open it manually."));
+            withAutoClose(Duration.seconds(10));
+            getActions().add(new NotificationAction<>(Localization.lang("Copy link"), _ -> {
+                Injector.instantiateModelOrService(ClipBoardManager.class).setContent(url);
+                dialogService.notify(Localization.lang("The link has been copied to the clipboard."));
+                return OnClickBehaviour.REMOVE;
+            }));
         }
     }
 
