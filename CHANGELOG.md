@@ -63,7 +63,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where filled and empty rating stars were hard to distinguish in dark and colored themes. [#17819](https://github.com/Jabref/jabref/issues/17819)
+- We fixed an issue where filled and empty rating stars were hard to distinguish in dark and colored themes. [#17819](https://github.com/JabRef/jabref/issues/17819)
 - We fixed the `IfPlural` export formatter treating organizations containing “and” as multiple editors. [#17780](https://github.com/JabRef/jabref/issues/17780)
 - We fixed an issue where the DocBook export wrote invalid XML for emoji and some math symbols. [#17747](https://github.com/JabRef/jabref/issues/17747)
 - We fixed an issue where clicking "Generate" in the AUX file import dialog before parsing caused an exception.
