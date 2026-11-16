@@ -29,7 +29,7 @@ public class HTMLParagraphs implements LayoutFormatter {
             String middle = m.group(1).trim();
             if (!middle.isEmpty()) {
                 s.append("<p>\n");
-                m.appendReplacement(s, m.group(1));
+                m.appendReplacement(s, Matcher.quoteReplacement(m.group(1)));
                 s.append("\n</p>\n");
             }
         }

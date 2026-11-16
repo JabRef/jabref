@@ -2,7 +2,9 @@ package org.jabref.gui.preferences.keybindings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -12,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
@@ -21,8 +24,10 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
+import org.jabref.gui.preferences.keybindings.presets.MacOsKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.OptionalObjectProperty;
 
 import org.jspecify.annotations.NonNull;
@@ -48,6 +53,9 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
         keyBindingPresets.add(new BashKeyBindingPreset());
         keyBindingPresets.add(new NewEntryBindingPreset());
+        if (OS.OS_X) {
+            keyBindingPresets.add(new MacOsKeyBindingPreset());
+        }
     }
 
     /// Read all keybindings from the keybinding repository and create table keybinding models for them
@@ -106,9 +114,62 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
+        if (keyBindingRepository.checkKeyCombinationEquality(selectedEntry.getKeyBinding(), event)) {
+            return;
+        }
+
+        String previousBinding = selectedEntry.getBinding();
         if (selectedEntry.setNewBinding(event)) {
+            // [impl->req~ux.keybindings.duplicate-warning~1]
+            List<KeyBinding> conflicts = keyBindingRepository.findConflictingKeyBindings(
+                    selectedEntry.getKeyBinding(), event);
+
+            if (!conflicts.isEmpty()) {
+                ButtonBar.ButtonData choice = askForResolution(selectedEntry.shownBindingProperty().get(), conflicts);
+                if (choice == ButtonBar.ButtonData.OK_DONE) {
+                    conflicts.forEach(this::clearBinding);
+                } else if (choice != ButtonBar.ButtonData.OTHER) {
+                    selectedEntry.setBinding(previousBinding);
+                    return;
+                }
+            }
+
             keyBindingRepository.put(selectedEntry.getKeyBinding(), selectedEntry.getBinding());
         }
+    }
+
+    private ButtonBar.ButtonData askForResolution(String combination, List<KeyBinding> conflictingKeyBindings) {
+        String names = conflictingKeyBindings.stream()
+                                             .map(keyBinding -> "'" + keyBinding.getLocalization() + "'")
+                                             .collect(Collectors.joining(", "));
+        ButtonType replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType keepBoth = new ButtonType(Localization.lang("Keep both"), ButtonBar.ButtonData.OTHER);
+        ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        Map<ButtonType, String> tooltips = Map.of(
+                keepBoth, Localization.lang("Both actions keep the shortcut. This only works if they are used in different places."));
+        return dialogService.showCustomButtonDialogWithTooltipsAndWait(
+                                    Alert.AlertType.WARNING,
+                                    Localization.lang("Shortcut already in use"),
+                                    Localization.lang("The shortcut %0 is already used by %1. Replace it or keep both?",
+                                            combination, names),
+                                    tooltips,
+                                    replace, keepBoth, cancel)
+                            .map(ButtonType::getButtonData)
+                            .orElse(ButtonBar.ButtonData.CANCEL_CLOSE);
+    }
+
+    private void clearBinding(KeyBinding keyBinding) {
+        findRow(keyBinding).ifPresentOrElse(
+                KeyBindingViewModel::clear,
+                () -> keyBindingRepository.put(keyBinding, ""));
+    }
+
+    private Optional<KeyBindingViewModel> findRow(KeyBinding keyBinding) {
+        return Optional.ofNullable(rootKeyBinding.get()).stream()
+                       .flatMap(root -> root.getChildren().stream())
+                       .flatMap(category -> category.getChildren().stream())
+                       .filter(row -> row.getKeyBinding() == keyBinding)
+                       .findFirst();
     }
 
     @Override
@@ -145,7 +206,20 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        preset.getKeyBindings().forEach(keyBindingRepository::put);
+        Map<KeyBinding, String> presetBindings = preset.getKeyBindings();
+        if (preset instanceof MacOsKeyBindingPreset) {
+            presetBindings.keySet().forEach(binding -> keyBindingRepository.put(binding, ""));
+            presetBindings.forEach((binding, value) -> {
+                if (value.isEmpty() || keyBindingRepository.getKeyBindings().keySet().stream()
+                                                           .filter(other -> other != binding)
+                                                           .map(keyBindingRepository::getKeyCombination)
+                                                           .noneMatch(combination -> combination.filter(KeyCombination.valueOf(value)::equals).isPresent())) {
+                    keyBindingRepository.put(binding, value);
+                }
+            });
+        } else {
+            presetBindings.forEach(keyBindingRepository::put);
+        }
         setValues();
     }
 

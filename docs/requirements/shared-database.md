@@ -73,6 +73,13 @@ Connecting to a database created by an earlier JabRef version copies its content
 
 Needs: impl
 
+## Shared database client must load entries with missing entry types
+`req~shared-database.missing-entry-type~1`
+
+When a shared database entry has a null or blank type, JabRef loads it as `Misc` instead of failing to load the shared database.
+
+Needs: impl, utest
+
 ## Shared database login dialog must accept connection URLs
 `req~shared-database.connection-url~1`
 
@@ -87,10 +94,48 @@ A shared database that is still connected when JabRef closes is reconnected on t
 
 Needs: impl
 
+## Connected shared databases must be offered in the login dialog
+`req~shared-database.saved-connections-offered~1`
+
+Every shared database that was connected to is stored, so it can be connected to again without retyping the connection details.
+See <https://github.com/JabRef/jabref/issues/12948>.
+
+Needs: impl, utest
+
+## Reconnecting to a stored shared database must not store it a second time
+`req~shared-database.saved-connections-unique~1`
+
+Connecting to a database that is already stored updates that entry instead of adding a second, indistinguishable one.
+Duplicates stored by earlier versions are listed once.
+
+Needs: impl, utest
+
+## A stored shared database connection must be deletable
+`req~shared-database.saved-connections-deletable~1`
+
+Deleting also removes the stored password and stops the database from being reopened on startup.
+A connection whose library is open cannot be deleted, because quitting would store it again.
+
+Needs: impl, utest
+
+## A failed connection can be retried
+`req~shared-database.reconnect-retry~1`
+
+If connecting fails, on startup or from the connection dialog, the database is shown as a tab carrying the error and a retry button instead of an error dialog. A remembered database stays remembered when JabRef is closed while that tab is open.
+
+Needs: impl
+
 ## A database is open in one tab only
 `req~shared-database.single-tab~1`
 
 A shared database identified by its DBMS type, normalized host, port, and database name is never opened in a second tab, whichever way the connection is entered (form fields, JDBC URL, a library file carrying its id, or a remembered connection at startup). Instead, the tab that is already connected or connecting is shown.
+
+Needs: impl, utest
+
+## Shared database cleanup must not block other library tabs
+`req~shared-database.background-close~1`
+
+Closing a shared library prepares pending model changes on the JavaFX thread and flushes them in the background. Reopening the same database and application shutdown wait for cleanup to finish.
 
 Needs: impl, utest
 

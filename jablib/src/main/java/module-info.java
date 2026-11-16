@@ -56,6 +56,7 @@ open module org.jabref.jablib {
     exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
     exports org.jabref.logic.pdf;
+    exports org.jabref.logic.pdf.reader;
     exports org.jabref.model.database.event;
     exports org.jabref.model.entry.event;
     exports org.jabref.logic.push;
@@ -131,6 +132,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
+    exports org.jabref.logic.citedrive;
     exports org.jabref.logic.ocr;
 
     // region: AI
@@ -230,6 +232,11 @@ open module org.jabref.jablib {
     requires transitive org.jsoup;
     requires transitive unirest.java.core;
     requires /*runtime*/ unirest.modules.gson;
+    // endregion
+
+    // region nimbusds / OAuth2
+    requires json.smart;
+    requires transitive nimbusds.oauth2.oidc.sdk;
     // endregion
 
     // region: SQL databases

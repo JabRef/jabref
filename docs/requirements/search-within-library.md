@@ -59,6 +59,13 @@ When linked-file full-text indexing is enabled, users must be able to search the
 
 Needs: impl, utest
 
+## Disabling linked-file full-text indexing must stop pending and running indexing
+`req~search.fulltext.disable-indexing~1`
+
+When automatic linked-file indexing is disabled, queued work must not start, and running work must stop after its current file. Re-enabling indexing must not overlap with the cancelled work. [#17577](https://github.com/JabRef/jabref/issues/17577)
+
+Needs: impl, utest
+
 ## Full-text search results must reflect the active library in the entry editor
 `req~jabgui.search.fulltext.entry-editor-results~1`
 
@@ -83,6 +90,15 @@ Issue: [#9482](https://github.com/JabRef/jabref/issues/9482)
 
 The search bar validates regular expressions with `java.util.regex`, the full-text index parses them with Lucene's own dialect, where characters such as `"` and `<` are syntax instead of literals.
 A query that only Lucene rejects must leave the metadata results untouched and skip the linked files, instead of aborting the whole search.
+
+Needs: impl, utest
+
+## Search must normalize full DOI links to plain DOI identifiers
+`req~search.doi-link-normalization~1`
+
+Issue: [#17348](https://github.com/JabRef/jabref/issues/17348)
+
+When the entire search expression is a DOI resolver URL, a `doi.org/` link, or a `doi:` identifier, the search must extract the DOI identifier and use it for matching. The search matches entries with decoded DOIs as well as entries storing percent-encoded DOI links. The original URL must be preserved as the visible search expression. Normalization must not apply to regular expression searches (to prevent parsing from altering regex syntax or stripping escape characters) or multi-term queries.
 
 Needs: impl, utest
 

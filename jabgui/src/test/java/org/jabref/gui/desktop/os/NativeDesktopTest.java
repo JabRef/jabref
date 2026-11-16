@@ -69,7 +69,7 @@ class NativeDesktopTest {
         ExternalApplicationsPreferences preferences = mock(ExternalApplicationsPreferences.class);
         when(preferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(htmlType));
 
-        NativeDesktop.openBrowser(URL_WITH_QUERY, preferences);
+        NativeDesktop.openBrowser(URL_WITH_QUERY, preferences, FakeDesktop.NO_FAILURE_EXPECTED, new Windows());
 
         assertEquals(URL_WITH_QUERY, recordedArgument());
     }

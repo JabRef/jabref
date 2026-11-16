@@ -1,34 +1,38 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 
 public class HayagrivaType implements LayoutFormatter {
 
     @Override
     public String format(String value) {
-        return switch (StandardEntryType.valueOf(value)) {
-            case Article,
-                 Conference ->
+        return switch (EntryTypeFactory.parse(value)) {
+            case StandardEntryType.Article,
+                 StandardEntryType.Conference ->
                     "article";
-            case Book ->
+            case StandardEntryType.Book ->
                     "book";
-            case InBook ->
+            case StandardEntryType.InBook ->
                     "chapter";
-            case Report,
-                 TechReport ->
+            case StandardEntryType.Report,
+                 StandardEntryType.TechReport ->
                     "report";
-            case Thesis,
-                 MastersThesis,
-                 PhdThesis ->
+            case StandardEntryType.Thesis,
+                 StandardEntryType.MastersThesis,
+                 StandardEntryType.PhdThesis ->
                     "thesis";
-            case WWW,
-                 Online ->
+            case StandardEntryType.WWW,
+                 StandardEntryType.Online ->
                     "web";
-            case Proceedings ->
+            case StandardEntryType.Proceedings ->
                     "proceedings";
-            case Reference ->
+            case StandardEntryType.Reference ->
                     "reference";
+            case BiblatexNonStandardEntryType.Performance ->
+                    "performance";
 
             default ->
                     "Misc";

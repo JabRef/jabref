@@ -31,6 +31,15 @@ A failed write must leave the original file untouched and must not leave tempora
 
 Needs: impl, utest
 
+## Template export failures must preserve the destination file
+`req~logic.exporter.preserve-output-on-template-failure~1`
+
+If loading or rendering a required layout fails, an existing destination remains unchanged and a new destination is not created, even if output has already been generated.
+
+See [JabRef/jabref#17423](https://github.com/JabRef/jabref/issues/17423).
+
+Needs: impl, utest
+
 ## Backup system must not overwrite valid backups on write failure
 `req~jabgui.autosaveandbackup.complete-backup~1`
 
@@ -55,6 +64,27 @@ Rewriting a keyword field from an accepted import delimiter to the library's key
 It is part of the default save actions and available in the cleanup dialog, so users see it, can disable it per library, and can run it on demand.
 A field that already uses the library's separator is returned unchanged, including its spacing.
 Cleanups that depend on the keyword separator use the separator declared by the library the entry belongs to and fall back to the global preference when the library declares none.
+
+Needs: impl, utest
+
+## User can convert LaTeX character commands to Unicode-aware LaTeX
+`feat~save.cleanup.latex-to-unicode-aware-latex~1`
+
+The field formatter "LaTeX to Unicode-aware LaTeX" replaces commands that encode a single character, such as `\textcopyright{}` or `\"{o}`, by the Unicode character, because current LaTeX engines read Unicode directly.
+It is available in the cleanup dialog and as a save action.
+Unlike "LaTeX to Unicode", it keeps all other LaTeX code: protective braces, math, formatting commands such as `\emph{...}`, and commands without a single-character Unicode equivalent.
+It preserves LaTeX comments and braces protecting uppercase character commands from BibTeX case changes.
+Math preservation recognizes standard math delimiters and a fixed set of common math environments; custom and unlisted environments are not recognized.
+A command whose conversion would introduce a LaTeX special character (such as `\textbackslash{}`) is kept.
+
+See <https://github.com/JabRef/jabref/issues/8715>.
+
+Needs: impl, utest
+
+## LaTeX to Unicode-aware LaTeX formatter must keep escaped special characters
+`req~save.cleanup.latex-to-unicode-aware-latex.keep-escaped-characters~1`
+
+Escaped LaTeX special characters (`\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `\\`) stay escaped, because the unescaped character has a different meaning in LaTeX.
 
 Needs: impl, utest
 

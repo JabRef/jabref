@@ -1,13 +1,14 @@
 package org.jabref.logic.auxparser;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
+import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,37 @@ public class DefaultAuxParser implements AuxParser {
     @Override
     public AuxParserResult parse(Path auxFile) {
         AuxParserResult result = new AuxParserResult(masterDatabase);
+        try {
+            readFiles(auxFile, result, false, () -> false);
+        } catch (IOException e) {
+            LOGGER.warn("Problem opening file", e);
+        }
+        resolveTags(result);
+        return result;
+    }
 
+    /// Parses the complete AUX input, failing if the selected file or any included file cannot be read.
+    public AuxParserResult parseStrict(Path auxFile) throws IOException {
+        return parseStrict(auxFile, () -> false);
+    }
+
+    public AuxParserResult parseStrict(Path auxFile, BooleanSupplier cancelled) throws IOException {
+        checkCancelled(cancelled);
+        AuxParserResult result = new AuxParserResult(masterDatabase);
+        readFiles(auxFile, result, true, cancelled);
+        checkCancelled(cancelled);
+        resolveTags(result);
+        return result;
+    }
+
+    private static void checkCancelled(BooleanSupplier cancelled) {
+        if (cancelled.getAsBoolean() || Thread.currentThread().isInterrupted()) {
+            throw new CancellationException();
+        }
+    }
+
+    private void readFiles(Path auxFile, AuxParserResult result, boolean failOnReadError, BooleanSupplier cancelled) throws IOException {
+        auxFile = auxFile.toAbsolutePath().normalize();
         // nested AUX files
         List<Path> fileList = new ArrayList<>(1);
         fileList.add(auxFile);
@@ -53,26 +84,30 @@ public class DefaultAuxParser implements AuxParser {
         int fileIndex = 0;
 
         while (fileIndex < fileList.size()) {
+            if (failOnReadError) {
+                checkCancelled(cancelled);
+            }
             Path file = fileList.get(fileIndex);
 
             try (BufferedReader br = Files.newBufferedReader(file)) {
                 String line;
 
                 while ((line = br.readLine()) != null) {
+                    if (failOnReadError) {
+                        checkCancelled(cancelled);
+                    }
                     matchCitation(result, line);
                     matchNestedAux(auxFile, result, fileList, line);
                 }
-            } catch (FileNotFoundException e) {
-                LOGGER.warn("Cannot locate input file", e);
             } catch (IOException e) {
+                if (failOnReadError) {
+                    throw e;
+                }
                 LOGGER.warn("Problem opening file", e);
             }
 
             fileIndex++;
         }
-        resolveTags(result);
-
-        return result;
     }
 
     private void matchNestedAux(Path baseAuxFile, AuxParserResult result, List<Path> fileList, String line) {
@@ -89,6 +124,7 @@ public class DefaultAuxParser implements AuxParser {
                 inputFile = Path.of(inputString);
             }
 
+            inputFile = inputFile.toAbsolutePath().normalize();
             if (!fileList.contains(inputFile)) {
                 fileList.add(inputFile);
                 result.increaseNestedAuxFilesCounter();

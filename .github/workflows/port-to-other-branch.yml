@@ -2,8 +2,10 @@ name: Port to other branch
 
 # [impl->req~ci.port-to-other-branch.label-driven-ports~1]
 # [impl->adr~single-stable-branch-with-automatic-ports~1]
-# Keeps "main" and "stable" in sync: a PR into main labeled "dev: into-stable" is
-# ported to stable once merged; a PR into stable is always ported to main once merged.
+# Keeps "main" of JabRef/jabref and "black-forest" of JabRef/jabref-black-forest in sync: a PR into
+# main labeled "dev: send-to-black-forest" is ported to black-forest once merged; a PR into
+# black-forest is always ported to main once merged. The same file lives on both branches; the
+# repository it runs in decides the direction.
 # Before the merge, the port is simulated, so a conflict shows up as a failed check on the PR.
 #
 # pull_request_target: the port needs a push-capable token, and the PR may come from a fork.
@@ -22,11 +24,17 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.event.merge_group.head_ref }}-${{ github.event.action == 'closed' && 'port' || 'check' }}"
   cancel-in-progress: ${{ github.event.action != 'closed' }}
 
+env:
+  # The other side of the port; the owner is always JabRef
+  TARGET_REPO: ${{ github.repository == 'JabRef/jabref' && 'jabref-black-forest' || 'jabref' }}
+  TARGET: ${{ github.repository == 'JabRef/jabref' && 'black-forest' || 'main' }}
+  SOURCE: ${{ github.repository == 'JabRef/jabref' && 'main' || 'black-forest' }}
+
 jobs:
   check:
     # Fixed name: it is listed as a required status check, whichever branch is the target
     name: Would merge into the other branch
-    if: github.repository == 'JabRef/jabref' && github.event.action != 'closed'
+    if: (github.repository == 'JabRef/jabref' || github.repository == 'JabRef/jabref-black-forest') && github.event.action != 'closed'
     runs-on: ubuntu-slim
     permissions:
       contents: read
@@ -49,27 +57,25 @@ jobs:
             PR_NUMBER=$(sed -E 's#.*/pr-([0-9]+)-.*#\1#' <<< "$QUEUE_REF")
           fi
           gh pr view "$PR_NUMBER" --json state,baseRefName,headRefName,headRepositoryOwner,headRepository,labels \
-            --jq '"state=\(.state|@sh)\nbase=\(.baseRefName|@sh)\nhead_repo=\("\(.headRepositoryOwner.login)/\(.headRepository.name)"|@sh)\nhead_ref=\(.headRefName|@sh)\ninto_stable=\(any(.labels[]; .name == "dev: into-stable"))"' > pr.env
+            --jq '"state=\(.state|@sh)\nbase=\(.baseRefName|@sh)\nhead_repo=\("\(.headRepositoryOwner.login)/\(.headRepository.name)"|@sh)\nhead_ref=\(.headRefName|@sh)\nlabeled=\(any(.labels[]; .name == "dev: send-to-black-forest"))"' > pr.env
           # shellcheck disable=SC1091
           source pr.env
           port=false
           # A port PR (head "port-*" in this repository - a fork branch of that name is just a branch)
           # carries a change the other branch already has - never port it back.
-          if [ "$state" = "OPEN" ] && ! { [ "$head_repo" = "JabRef/jabref" ] && [[ "$head_ref" == port-* ]]; }; then
-            if [ "$base" = "stable" ] || { [ "$base" = "main" ] && [ "$into_stable" = "true" ]; }; then
+          if [ "$state" = "OPEN" ] && [ "$base" = "$SOURCE" ] && ! { [ "$head_repo" = "$GH_REPO" ] && [[ "$head_ref" == port-* ]]; }; then
+            # Into main, the label decides; everything merged into black-forest goes back to main
+            if [ "$base" != "main" ] || [ "$labeled" = "true" ]; then
               port=true
             fi
           fi
-          target=main
-          [ "$base" = "main" ] && target=stable
           {
             echo "number=$PR_NUMBER"
             echo "base=$base"
-            echo "target=$target"
             echo "port=$port"
           } >> "$GITHUB_OUTPUT"
           if [ "$port" != "true" ]; then
-            echo "Nothing to check for #$PR_NUMBER: not a port candidate (base \`$base\`, label \`dev: into-stable\` $([ "$into_stable" = true ] && echo present || echo absent))" >> "$GITHUB_STEP_SUMMARY"
+            echo "Nothing to check for #$PR_NUMBER: not a port candidate (base \`$base\`, label \`dev: send-to-black-forest\` $([ "$labeled" = true ] && echo present || echo absent))" >> "$GITHUB_STEP_SUMMARY"
           fi
       # The base branch tip, explicitly: on merge_group the event's ref is the queued commit, which
       # contains the PR - the composite action and the merge driver must come from the trusted base.
@@ -87,7 +93,6 @@ jobs:
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
           BASE_REF: ${{ steps.pr.outputs.base }}
-          TARGET: ${{ steps.pr.outputs.target }}
           HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
           QUEUE_REF: ${{ github.event.merge_group.head_ref }}
           GIT_AUTHOR_NAME: github-actions[bot]
@@ -96,28 +101,31 @@ jobs:
           GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
         run: |
           set -euo pipefail
-          if ! git ls-remote --exit-code --heads origin "$TARGET" > /dev/null; then
-            echo "Branch \`$TARGET\` does not exist yet - nothing to check" >> "$GITHUB_STEP_SUMMARY"
+          target_url="https://github.com/JabRef/$TARGET_REPO.git"
+          if ! git ls-remote --exit-code --heads "$target_url" "$TARGET" > /dev/null; then
+            echo "Branch \`$TARGET\` does not exist yet in JabRef/$TARGET_REPO - nothing to check" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          git fetch --no-tags "$target_url" "$TARGET"
+          target=$(git rev-parse FETCH_HEAD)
           if [ -n "$QUEUE_REF" ]; then
             # The queued commit merges this PR onto the previous queue entry (or the base tip), so its
             # first parent bounds exactly this PR's change even when several PRs are batched.
-            git fetch --no-tags origin "$TARGET" "$QUEUE_REF"
+            git fetch --no-tags origin "$QUEUE_REF"
             parent=$(git rev-parse "$HEAD_SHA^1")
           else
-            git fetch --no-tags origin "$TARGET" "+refs/pull/$PR_NUMBER/head:refs/remotes/pr/$PR_NUMBER"
+            git fetch --no-tags origin "+refs/pull/$PR_NUMBER/head:refs/remotes/pr/$PR_NUMBER"
             parent=$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")
           fi
           # The PR as it lands: one commit carrying the PR's whole change (squash merge)
           squash=$(git commit-tree "$HEAD_SHA^{tree}" -p "$parent" -m "Squash of #$PR_NUMBER")
-          git checkout -q "origin/$TARGET"
+          git checkout -q "$target"
           if git cherry-pick --no-commit "$squash"; then
-            echo "✅ PR #$PR_NUMBER applies cleanly to \`$TARGET\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ PR #$PR_NUMBER applies cleanly to \`$TARGET\` of JabRef/$TARGET_REPO" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           {
-            echo "❌ PR #$PR_NUMBER conflicts with \`$TARGET\` in:"
+            echo "❌ PR #$PR_NUMBER conflicts with \`$TARGET\` of JabRef/$TARGET_REPO in:"
             echo
             git diff --name-only --diff-filter=U | sed 's/^/- `/; s/$/`/'
             echo
@@ -126,38 +134,38 @@ jobs:
           exit 1
 
   port:
-    name: Port to ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
+    name: Port to ${{ github.repository == 'JabRef/jabref' && 'black-forest' || 'main' }}
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     env:
-      TARGET: ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
-      GH_REPO: ${{ github.repository }}
     if: >
-      github.repository == 'JabRef/jabref' &&
+      (github.repository == 'JabRef/jabref' || github.repository == 'JabRef/jabref-black-forest') &&
       github.event.action == 'closed' &&
       github.event.pull_request.merged &&
-      !(github.event.pull_request.head.repo.full_name == 'JabRef/jabref' && startsWith(github.event.pull_request.head.ref, 'port-')) &&
+      !(github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'port-')) &&
       (
-        github.event.pull_request.base.ref == 'stable' ||
-        (github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'dev: into-stable'))
+        (github.repository == 'JabRef/jabref-black-forest' && github.event.pull_request.base.ref == 'black-forest') ||
+        (github.repository == 'JabRef/jabref' && github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'dev: send-to-black-forest'))
       )
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          # The action pushes the port branch with the credential this checkout persists; the
+          # repository's own token cannot push to the other repository, the PAT can
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
       - uses: ./.github/actions/changelog-cherry-pick-driver
-      - name: Check that ${{ env.TARGET }} exists
+      - name: Check that ${{ env.TARGET }} exists in JabRef/${{ env.TARGET_REPO }}
         id: target
         run: |
-          if git ls-remote --exit-code --heads origin "$TARGET" > /dev/null; then
+          if git ls-remote --exit-code --heads "https://github.com/JabRef/$TARGET_REPO.git" "$TARGET" > /dev/null; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Branch \`$TARGET\` does not exist yet - nothing to port" >> "$GITHUB_STEP_SUMMARY"
+            echo "Branch \`$TARGET\` does not exist yet in JabRef/$TARGET_REPO - nothing to port" >> "$GITHUB_STEP_SUMMARY"
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Cherry-pick into a port PR
@@ -165,7 +173,7 @@ jobs:
         id: port
         uses: korthout/backport-action@8560fb503c275d433c56f05a2f64850093baa9f7 # v4.7.0
         with:
-          # A PAT, so that CI runs on the port PR; the PR and its comment are authored by jabref-machine
+          # jabref-machine's PAT: it has to push to the other repository, and CI runs on the port PR
           github_token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           target_branches: ${{ env.TARGET }}
           # The target comes from the base branch and the label above, not from "backport <branch>" labels
@@ -173,35 +181,38 @@ jobs:
           branch_name: port-${pull_number}-to-${target_branch}
           pull_title: "[Port to ${target_branch}] ${pull_title}"
           pull_description: |
-            Port of #${pull_number} to `${target_branch}`, see [Branching strategy](https://devdocs.jabref.org/contributing.html#branching-strategy).
+            Port of ${{ github.repository }}#${pull_number} to `${target_branch}`, see [Branching strategy](https://devdocs.jabref.org/contributing.html#branching-strategy).
 
             If this PR is a draft, the cherry-pick conflicted: the conflicting files are committed with Git's conflict markers left in. Resolve the markers locally, push, and mark the PR ready.
           # A PR branch usually contains merges from main; the squash commit is what gets ported
           merge_commits: skip
           experimental: >
-            {"conflict_resolution": "draft_commit_conflicts"}
-      - name: Auto-merge a clean port
-        if: steps.port.outputs.was_successful == 'true'
+            {"conflict_resolution": "draft_commit_conflicts", "downstream_repo": "${{ env.TARGET_REPO }}"}
+      - name: Label the port PR
+        if: steps.target.outputs.exists == 'true'
         env:
-          # jabref-machine's token: "On PR labeled" only fires for labels added with a PAT
+          # The port PR lives in the other repository, where only the PAT has rights; labels go through
+          # `gh api`, because `gh pr edit` needs the read:org scope the token lacks. The "automerge"
+          # label triggers "On PR labeled" there, which approves the port and enables auto-merge.
           GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
-          APPROVE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_FULL: JabRef/${{ env.TARGET_REPO }}
           CREATED: ${{ steps.port.outputs.created_pull_numbers }}
         run: |
+          set -euo pipefail
+          if [ -z "$CREATED" ]; then
+            echo "❌ No port PR was opened for #$PR_NUMBER" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          # The action also reports a committed conflict as successful; the draft state tells them apart
+          conflict=false
           for pr in $CREATED; do
-            # jabref-machine cannot approve its own PR; github-actions[bot] does it instead
-            GH_TOKEN="$APPROVE_TOKEN" gh pr review --approve "$pr"
-            gh pr edit "$pr" --add-label automerge
-            echo "✅ Port PR #$pr opened with auto-merge" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$(gh api "repos/$TARGET_FULL/pulls/$pr" --jq .draft)" = "true" ]; then
+              gh api "repos/$TARGET_FULL/issues/$pr/labels" -f "labels[]=status: changes-required" > /dev/null
+              echo "❌ Port of #$PR_NUMBER to \`$TARGET\` conflicts - resolve it in the draft port PR $TARGET_FULL#$pr" | tee -a "$GITHUB_STEP_SUMMARY"
+              conflict=true
+            else
+              gh api "repos/$TARGET_FULL/issues/$pr/labels" -f "labels[]=automerge" > /dev/null
+              echo "✅ Port PR $TARGET_FULL#$pr opened with auto-merge" >> "$GITHUB_STEP_SUMMARY"
+            fi
           done
-      - name: Report a conflicting port
-        if: steps.target.outputs.exists == 'true' && steps.port.outputs.was_successful != 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CREATED: ${{ steps.port.outputs.created_pull_numbers }}
-        run: |
-          for pr in $CREATED; do
-            gh pr edit "$pr" --add-label "status: changes-required"
-          done
-          echo "❌ Port of #$PR_NUMBER to \`$TARGET\` conflicts - resolve it in the draft port PR ${CREATED:+#$CREATED}" | tee -a "$GITHUB_STEP_SUMMARY"
-          exit 1
+          [ "$conflict" = false ]

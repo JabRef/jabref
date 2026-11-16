@@ -9,12 +9,16 @@ import java.util.SequencedSet;
 import java.util.stream.Stream;
 
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -24,6 +28,7 @@ import javafx.scene.layout.RowConstraints;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
@@ -161,6 +166,24 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 undoAction,
                 redoAction);
         fieldEditor.bindToEntry(entry);
+        // [impl->req~entry-editor.accept-single-line-value~1]
+        fieldEditor.getNode().addEventHandler(ActionEvent.ACTION, event -> {
+            if (event.getTarget() instanceof EditorTextField) {
+                gridPane.requestFocus();
+                event.consume();
+            }
+        });
+        // Commit before moving focus: the combo box would otherwise commit on key release.
+        fieldEditor.getNode().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER
+                    && event.getTarget() instanceof ComboBox<?> comboBox
+                    && comboBox.isEditable()
+                    && !comboBox.isShowing()) {
+                comboBox.commitValue();
+                gridPane.requestFocus();
+                event.consume();
+            }
+        });
         editors.put(field, fieldEditor);
         return new FieldNameLabel(field);
     }

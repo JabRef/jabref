@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 //JAVA 25+
 //DEPS org.jspecify:jspecify:1.0.1
 
-/// Git merge driver for `CHANGELOG.md` when a change is ported between `main` and `stable`
+/// Git merge driver for `CHANGELOG.md` when a change is ported between `main` and `black-forest`
 /// (see `.github/workflows/port-to-other-branch.yml`).
 ///
 /// [impl->adr~single-stable-branch-with-automatic-ports~1]

@@ -44,18 +44,27 @@ public class ClipBoardManager {
 
     private static Clipboard clipboard;
 
-    private static java.awt.datatransfer.Clipboard primary;
+    private static java.awt.datatransfer.@Nullable Clipboard primary;
 
     private final StateManager stateManager;
 
     public ClipBoardManager(StateManager stateManager) {
-        this(stateManager, Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());
+        this(stateManager, Clipboard.getSystemClipboard(), getPrimarySelection());
     }
 
-    public ClipBoardManager(StateManager stateManager, Clipboard clipboard, java.awt.datatransfer.Clipboard primary) {
+    public ClipBoardManager(StateManager stateManager, Clipboard clipboard, java.awt.datatransfer.@Nullable Clipboard primary) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
         this.stateManager = stateManager;
+    }
+
+    private static java.awt.datatransfer.@Nullable Clipboard getPrimarySelection() {
+        if (!OS.LINUX) {
+            // The primary selection exists only on X11. AWT reports no system selection on the other platforms,
+            // so they do not need to initialize the AWT toolkit at startup for it.
+            return null;
+        }
+        return Toolkit.getDefaultToolkit().getSystemSelection();
     }
 
     /// Add X11 clipboard support to a text input control. It is necessary to call this method in every input where you

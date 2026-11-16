@@ -144,6 +144,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                                                             .validate(viewModel.getRagMinScoreRangeValidationStatus()))
                                                                 .stackedField(Localization.lang("Document splitter - overlap size"), integerField(viewModel.documentSplitterOverlapSizeProperty()),
                                                                         overlapSize -> overlapSize.validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus()))))
+                                                .checkbox(Localization.lang("Enable AI provider debugging"), viewModel.enableAiDebugProviderProperty())
                                                 .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
                                         // Disabling the group covers every expert control above; individual controls
                                         // only add their own extra conditions on top.

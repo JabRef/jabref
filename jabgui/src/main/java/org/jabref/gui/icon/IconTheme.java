@@ -210,7 +210,7 @@ public class IconTheme {
         PRIORITY(MaterialDesignF.FLAG),
         PRIORITY_HIGH(Color.RED, MaterialDesignF.FLAG),
         PRIORITY_MEDIUM(Color.ORANGE, MaterialDesignF.FLAG),
-        PRIORITY_LOW(Color.rgb(111, 204, 117), MaterialDesignF.FLAG),
+        PRIORITY_LOW(Color.rgb(25, 118, 210, 1), MaterialDesignF.FLAG),
         PRINTED(MaterialDesignP.PRINTER),
         RANKING(MaterialDesignS.STAR),
         RANK1(MaterialDesignS.STAR, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE, MaterialDesignS.STAR_OUTLINE),
@@ -244,11 +244,16 @@ public class IconTheme {
         ADD_ROW(MaterialDesignS.SERVER_PLUS),
         REMOVE_ROW(MaterialDesignS.SERVER_MINUS),
         PICTURE(MaterialDesignF.FILE_IMAGE),
-        READ_STATUS_READ(Color.rgb(111, 204, 117, 1), MaterialDesignE.EYE),
+        READ_STATUS_READ(Color.rgb(46, 165, 50, 1), MaterialDesignE.EYE),
         READ_STATUS_SKIMMED(Color.ORANGE, MaterialDesignE.EYE),
         READ_STATUS(MaterialDesignE.EYE),
         RELEVANCE(MaterialDesignS.STAR_CIRCLE),
-        RELEVANT(Color.rgb(255, 179, 0), MaterialDesignS.STAR_CIRCLE),
+        // The golden color is used only to indicate that an entry is marked as relevant in the table;
+        // menus continue to use the neutral icon. This follows the discussion in
+        // https://github.com/JabRef/jabref/pull/17356, aiming for consistency with the colored Priority and Read Status icons.
+        // The amber shade is intended to remain visible in both light and dark themes,
+        // although its contrast against a white background may be limited.
+        RELEVANT_COLORED(Color.rgb(255, 179, 0), MaterialDesignS.STAR_CIRCLE),
         MERGE_ENTRIES(MaterialDesignC.COMPARE),
         CONNECT_OPEN_OFFICE(MaterialDesignO.OPEN_IN_APP),
         PLAIN_TEXT_IMPORT_TODO(MaterialDesignC.CHECKBOX_BLANK_CIRCLE_OUTLINE),

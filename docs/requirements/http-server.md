@@ -38,4 +38,15 @@ TODO: if the named group exists but is not assignable (e.g. a search or automati
 
 Needs: impl
 
+## HTTP server must list the local PDF files of a single entry
+`req~jabsrv.entry.files.list~1`
+
+The HTTP server exposes `GET /libraries/{id}/entries/{citationKey}/files` returning the linked files of that entry as a list of `fileName`, `parentCitationKey` and `path`.
+Only files of type PDF are returned; online links are skipped.
+An unknown citation key yields `404`.
+
+The files are served per entry (and not for the whole library at once), because in [JabMap](https://github.com/JabRef/jabmap), PDF nodes are attached to the BibEntry node they belong to.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
