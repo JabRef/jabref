@@ -11,18 +11,19 @@ import org.jspecify.annotations.NullMarked;
 public class CiteDriveImportAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
-    public CiteDriveImportAction(DialogService dialogService, GuiPreferences preferences) {
+    public CiteDriveImportAction(DialogService dialogService, NativeDesktop nativeDesktop, GuiPreferences preferences) {
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
         this.preferences = preferences;
     }
 
     /// [impl->req~citedrive.import.open-export-page~1]
     @Override
     public void execute() {
-        NativeDesktop.openBrowserShowPopup(
+        nativeDesktop.openBrowserShowPopup(
                 preferences.getCiteDrivePreferences().getExportPage().toASCIIString(),
-                dialogService,
-                preferences.getExternalApplicationsPreferences());
+                dialogService);
     }
 }
