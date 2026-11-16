@@ -47,6 +47,7 @@ import org.mockito.Answers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -136,7 +137,8 @@ class CitationRelationsTabTest {
 
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
 
-        verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
+        verify(searchService, times(1)).searchCites(any(), eq(false), any());
+        verify(searchService, times(1)).searchCitedBy(any(), eq(false), any());
     }
 
     @Test
@@ -152,7 +154,8 @@ class CitationRelationsTabTest {
         entry.setField(StandardField.DOI, "10.1038/35057062");
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
 
-        verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
+        verify(searchService, times(2)).searchCites(any(), eq(false), any());
+        verify(searchService, times(2)).searchCitedBy(any(), eq(false), any());
     }
 
     @Test
@@ -168,11 +171,13 @@ class CitationRelationsTabTest {
         entry.clearField(StandardField.DOI);
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
 
-        verify(searchService, times(1)).searchCites(any(), anyBoolean(), any());
+        verify(searchService, times(1)).searchCites(any(), eq(false), any());
+        verify(searchService, times(1)).searchCitedBy(any(), eq(false), any());
 
         entry.setField(StandardField.DOI, "10.1145/782941.782993");
         JavaFxExtension.invokeAndWait(() -> tab.notifyAboutFocus(entry));
 
-        verify(searchService, times(2)).searchCites(any(), anyBoolean(), any());
+        verify(searchService, times(2)).searchCites(any(), eq(false), any());
+        verify(searchService, times(2)).searchCitedBy(any(), eq(false), any());
     }
 }
