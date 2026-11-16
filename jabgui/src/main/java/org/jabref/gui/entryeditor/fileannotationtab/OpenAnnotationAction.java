@@ -45,19 +45,22 @@ public class OpenAnnotationAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
 
     public OpenAnnotationAction(ObjectExpression<@Nullable Path> currentFile,
                                 ObjectExpression<@Nullable FileAnnotationViewModel> currentAnnotation,
                                 BibEntry entry,
                                 StateManager stateManager,
                                 GuiPreferences preferences,
-                                DialogService dialogService) {
+                                DialogService dialogService,
+                                NativeDesktop nativeDesktop) {
         this.currentFile = currentFile;
         this.currentAnnotation = currentAnnotation;
         this.entry = entry;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
 
         this.executable.bind(currentFile.isNotNull().and(currentAnnotation.isNotNull()));
     }
@@ -129,9 +132,7 @@ public class OpenAnnotationAction extends SimpleCommand {
 
     private void openWithoutPage(Path pdfFile, Path executable) {
         try {
-            NativeDesktop.get().openFile(pdfFile.toString(),
-                    StandardExternalFileType.PDF.getExtension(),
-                    preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openFile(pdfFile.toString(), StandardExternalFileType.PDF.getExtension());
         } catch (IOException e) {
             LOGGER.warn("Could not open '{}' with '{}'", pdfFile, executable, e);
             dialogService.showErrorDialogAndWait(
