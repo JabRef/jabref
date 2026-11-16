@@ -265,8 +265,10 @@ public abstract class NativeDesktop {
     /// Its output is discarded and its stdin is closed, as it never gets input: no pipe stays open until garbage collection,
     /// and no thread reads from a long-running program, which would delay JabRef's shutdown.
     protected static void startProcess(ProcessBuilder processBuilder) throws IOException {
-        // The program's error output is discarded, so the command line is the only trace of a failing launch
-        LoggerFactory.getLogger(NativeDesktop.class).debug("Starting {}", processBuilder.command());
+        // The program's error output is discarded, so this is the only trace of a failing launch.
+        // The arguments are not logged: they may carry mail contents or login URLs.
+        List<String> command = processBuilder.command();
+        LoggerFactory.getLogger(NativeDesktop.class).debug("Starting {} with {} argument(s)", command.getFirst(), command.size() - 1);
         Process process = processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD)
                                         .redirectError(ProcessBuilder.Redirect.DISCARD)
                                         .start();
