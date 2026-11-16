@@ -54,4 +54,13 @@ Save callbacks and repository publication run after releasing the I/O lock, so c
 
 Needs: impl, utest
 
+## Journal preferences must report CSV write failures before unsaved edits can be mistaken for saved data
+`req~journals.report-write-failures~1`
+
+Report the paths that could not be written and warn that unsaved edits will be lost on exit.
+Keep failed contents available for retry while allowing other lists to save and lookup settings to refresh.
+Deliver the failure callback outside the background I/O lock.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

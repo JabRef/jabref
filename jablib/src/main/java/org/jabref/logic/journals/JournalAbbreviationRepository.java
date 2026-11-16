@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,7 +134,7 @@ public class JournalAbbreviationRepository {
     }
 
     public void saveJournalLists(Map<Path, List<Abbreviation>> files, AbbreviationPreferences preferences,
-                                 TaskExecutor executor, Runnable onSuccess) {
+                                 TaskExecutor executor, Runnable onSuccess, Consumer<Set<Path>> onWriteFailure) {
         long generation;
         Map<Path, List<Abbreviation>> pendingSnapshot;
         synchronized (pendingJournalWrites) {
@@ -169,6 +170,9 @@ public class JournalAbbreviationRepository {
                               }
                               if (failed.isEmpty()) {
                                   onSuccess.run();
+                              } else {
+                                  // [impl->req~journals.report-write-failures~1]
+                                  onWriteFailure.accept(Set.copyOf(failed.keySet()));
                               }
                               reload(preferences, executor);
                           }

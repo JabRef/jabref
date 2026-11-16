@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
@@ -85,13 +87,40 @@ class AbbreviationsTest {
         AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(failed.toString(), valid.toString()), true, false);
         preferences.setUseBuiltInJournalList(false);
         Abbreviation abbreviation = new Abbreviation("External Journal", "Ext. J.");
+        AtomicReference<Set<Path>> reportedFailures = new AtomicReference<>(Set.of());
         repository.saveJournalLists(Map.of(failed, List.of(abbreviation), valid, List.of(abbreviation)),
                 preferences, new CurrentThreadTaskExecutor(), () -> {
-                });
+                }, reportedFailures::set);
         assertEquals(List.of(abbreviation), List.copyOf(JournalAbbreviationLoader.readAbbreviationsFromCsvFile(valid)));
+        assertEquals(Set.of(failed), reportedFailures.get());
         assertEquals(Optional.of(List.of(abbreviation)), repository.getPendingJournalList(failed));
         assertEquals(Optional.empty(), repository.getPendingJournalList(valid));
         assertEquals(Optional.empty(), repository.getDefaultAbbreviation("2D Materials"));
+    }
+
+    @Test
+    void writeFailureCallbackCanReloadWithoutHoldingIoLock(@TempDir Path directory) throws Exception {
+        Path failed = directory.resolve("missing").resolve("failed.csv");
+        AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(failed.toString()), true, false);
+        preferences.setUseBuiltInJournalList(false);
+        CompletableFuture<Set<Path>> reported = new CompletableFuture<>();
+        try (ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor()) {
+            ParallelCsvExecutor executor = new ParallelCsvExecutor(workers, () -> {
+            }, _ -> {
+            });
+            repository.saveJournalLists(Map.of(failed, List.of(new Abbreviation("Journal", "J."))), preferences, executor,
+                    () -> org.junit.jupiter.api.Assertions.fail("Failed writes must not report success"),
+                    Unchecked.consumer(paths -> {
+                        repository.reload(preferences, executor);
+                        executor.submitted.getLast().get(5, TimeUnit.SECONDS);
+                        reported.complete(paths);
+                    }));
+            assertEquals(Set.of(failed), reported.get(5, TimeUnit.SECONDS));
+            executor.submitted.getFirst().get(5, TimeUnit.SECONDS);
+            for (Future<?> task : executor.submitted) {
+                task.get(5, TimeUnit.SECONDS);
+            }
+        }
     }
 
     @Test
@@ -100,9 +129,11 @@ class AbbreviationsTest {
         AbbreviationPreferences preferences = new AbbreviationPreferences(List.of(removed.toString()), true, false);
         QueuedTaskExecutor executor = new QueuedTaskExecutor();
         repository.saveJournalLists(Map.of(removed, List.of(new Abbreviation("Journal", "J."))), preferences, executor, () -> {
+        }, _ -> {
         });
         preferences.setExternalJournalLists(List.of());
         repository.saveJournalLists(Map.of(), preferences, executor, () -> {
+        }, _ -> {
         });
         executor.runLast();
         executor.runNext();
@@ -149,7 +180,7 @@ class AbbreviationsTest {
                         repository.reload(preferences, executor);
                         executor.submitted.getLast().get(5, TimeUnit.SECONDS);
                         callbackCompleted.set(true);
-                    }));
+                    }), failures -> org.junit.jupiter.api.Assertions.fail("Unexpected write failures: " + failures));
             try {
                 if (saveFirst) {
                     save.run();

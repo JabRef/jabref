@@ -49,6 +49,8 @@ Canceled queued requests skip loading; repository construction and CSV writes sh
 A library read that cannot stop immediately cannot overlap another reload or a CSV rewrite by the same repository.
 Success/failure callbacks and repository publication run after releasing this lock.
 The FX thread never waits on the I/O lock.
+CSV write failures invoke a failure callback after releasing the lock.
+Preferences show the failed paths and warn that unsaved changes will be lost on exit; failed contents remain pending for a later Save retry.
 Existing consumers see the refreshed data on their next lookup; while loading, they continue using the previous data.
 
 ## Preferences table

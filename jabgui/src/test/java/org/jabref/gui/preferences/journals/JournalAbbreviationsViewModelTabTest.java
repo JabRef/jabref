@@ -21,6 +21,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
@@ -369,6 +370,34 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(List.of("Full0", "Full1"), JournalAbbreviationLoader.readAbbreviationsFromCsvFile(emptyTestFile).stream()
                                                                          .map(Abbreviation::getName)
                                                                          .toList());
+    }
+
+    @Test
+    void failedWritesShowPathsAndRemainRetryable() throws IOException {
+        // [utest->req~journals.report-write-failures~1]
+        Path failedLast = tempFolder.resolve("missing/z.csv");
+        Path failedFirst = tempFolder.resolve("missing/a.csv");
+        AbbreviationPreferences preferences = new AbbreviationPreferences(
+                List.of(failedLast.toString(), failedFirst.toString(), emptyTestFile.toString()), true, false);
+        preferences.setUseBuiltInJournalList(false);
+        JournalAbbreviationsTabViewModel model = new JournalAbbreviationsTabViewModel(
+                preferences, dialogService, new CurrentThreadTaskExecutor(), repository);
+        model.createFileObjects();
+        model.currentFileProperty().set(model.journalFilesProperty().getFirst());
+        model.addAbbreviation(ABBREVIATION_0);
+
+        model.storeSettings();
+
+        verify(dialogService).showErrorDialogAndWait(Localization.lang("Journal abbreviations"),
+                Localization.lang("Could not save the following journal abbreviation lists:\n%0\n\nUnsaved changes will be lost when JabRef closes.",
+                        failedFirst + "\n" + failedLast));
+        assertEquals(Optional.of(List.of(new Abbreviation("Full0", "Abb0"))), repository.getPendingJournalList(failedLast));
+        Files.createDirectory(failedLast.getParent());
+        model.storeSettings();
+
+        assertEquals(List.of("Full0"), JournalAbbreviationLoader.readAbbreviationsFromCsvFile(failedLast).stream().map(Abbreviation::getName).toList());
+        assertEquals(Optional.empty(), repository.getPendingJournalList(failedLast));
+        verify(dialogService, times(1)).showErrorDialogAndWait(anyString(), anyString());
     }
 
     @Test

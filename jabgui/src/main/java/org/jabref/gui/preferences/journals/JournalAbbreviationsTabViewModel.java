@@ -356,7 +356,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     if (savedRevision == editRevision) {
                         shouldWriteLists = false;
                     }
-                });
+                }, failedPaths -> dialogService.showErrorDialogAndWait(Localization.lang("Journal abbreviations"),
+                        Localization.lang("Could not save the following journal abbreviation lists:\n%0\n\nUnsaved changes will be lost when JabRef closes.",
+                                failedPaths.stream().map(Path::toString).sorted().collect(Collectors.joining("\n")))));
     }
 
     /// Captures external list contents before background saving so later UI edits cannot change the pending write.
