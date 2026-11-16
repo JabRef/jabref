@@ -60,6 +60,7 @@ import org.jabref.logic.layout.format.Iso690NamesAuthors;
 import org.jabref.logic.layout.format.JournalAbbreviator;
 import org.jabref.logic.layout.format.LastPage;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.MarkdownEscaper;
 import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
@@ -555,6 +556,8 @@ class LayoutEntry {
                     new WrapFileLinks(fileDirForDatabase, preferences.getMainFileDirectory());
             case "Markdown" ->
                     new MarkdownFormatter();
+            case "MarkdownEscaper" ->
+                    new MarkdownEscaper();
             case "CSLType" ->
                     new CSLType();
             case "ShortMonth" ->

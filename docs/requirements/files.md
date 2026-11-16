@@ -39,6 +39,27 @@ Rendering or scrolling the result tree must not perform file-system searches.
 
 Needs: impl, utest
 
+## Unlinked-files search must apply applicable ignore rules in precedence order
+`req~jabgui.externalfiles.unlinked-files.search.gitignore-precedence~1`
+
+Apply built-in ignore rules first, followed by `.gitignore` rules from ancestor directories to the current directory. Ancestor rules remain applicable across nested Git repository boundaries. A later matching rule may override an earlier rule, including a built-in rule. Interpret literal braces in patterns as filename characters.
+
+Related issue: [JabRef/jabref#17546](https://github.com/JabRef/jabref/issues/17546)
+
+Needs: impl, utest
+
+## Unlinked-files search must match ignore rules without regard to case on Windows
+`req~jabgui.externalfiles.unlinked-files.search.gitignore-windows-case~1`
+
+Needs: impl, utest
+
+## Unlinked-files search must match directory-only ignore rules against the entry itself
+`req~jabgui.externalfiles.unlinked-files.search.gitignore-symlink~1`
+
+A symbolic link to a directory is not itself a directory for matching a directory-only rule.
+
+Needs: impl, utest
+
 ## PDF preview pane in unlinked-files dialog must allow closing and release resources
 `req~jabgui.externalfiles.unlinked-files.preview.close~1`
 
