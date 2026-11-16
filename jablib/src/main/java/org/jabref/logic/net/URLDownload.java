@@ -86,6 +86,7 @@ public class URLDownload {
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     // Can be null if SSL is not supported. If null, then ignore.
     private @Nullable SSLContext sslContext;
+    private boolean logResponseBody = true;
 
     /// @param source the URL to download from
     /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
@@ -193,6 +194,12 @@ public class URLDownload {
         this.parameters.put(key, value);
     }
 
+    /// Keeps the bodies of error responses out of the log, for services which repeat the submitted credentials in them.
+    /// The body stays available to the caller through the thrown [FetcherException].
+    public void omitResponseBodyFromLog() {
+        logResponseBody = false;
+    }
+
     public void setPostData(String postData) {
         if (postData != null) {
             this.postData = postData;
@@ -275,7 +282,7 @@ public class URLDownload {
         LOGGER.debug("Response code: {}", responseCode); // We could check for != 200, != 204
         if (responseCode >= 300) {
             SimpleHttpResponse simpleHttpResponse = new SimpleHttpResponse(urlConnection);
-            LOGGER.error("Failed to read from url: {}", simpleHttpResponse);
+            LOGGER.error("Failed to read from url: {}", toLoggableResponse(simpleHttpResponse));
             throw FetcherException.of(this.source, simpleHttpResponse);
         }
         long fileSize = urlConnection.getContentLengthLong();
@@ -382,7 +389,7 @@ public class URLDownload {
             } else if (status >= 400) {
                 // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
-                LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source.toString()), httpResponse);
+                LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source.toString()), toLoggableResponse(httpResponse));
                 if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
                 } else {
@@ -391,6 +398,10 @@ public class URLDownload {
             }
         }
         return connection;
+    }
+
+    private SimpleHttpResponse toLoggableResponse(SimpleHttpResponse response) {
+        return logResponseBody ? response : new SimpleHttpResponse(response.statusCode(), response.responseMessage(), "");
     }
 
     private URLConnection getUrlConnection() throws IOException {

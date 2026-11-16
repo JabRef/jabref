@@ -45,7 +45,6 @@ import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +63,7 @@ public class ImportFormatReader {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private BibtexImporter bibtexImporter;
+    private final BibtexImporter bibtexImporter;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
@@ -74,6 +73,7 @@ public class ImportFormatReader {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         reset();
     }
 
@@ -110,7 +110,6 @@ public class ImportFormatReader {
         importers.addAll(importerPreferences.getCustomImporters());
 
         // BibTeX as last
-        bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         importers.add(bibtexImporter);
     }
 
@@ -208,7 +207,7 @@ public class ImportFormatReader {
     /// @param data the string to import
     /// @return an UnknownFormatImport with the imported entries and metadata
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public ImportResult importWithAutoDetection(@NonNull String data) throws ImportException {
+    public ImportResult importWithAutoDetection(String data) throws ImportException {
         return importWithAutoDetection(
                 importer -> importer.importDatabase(data),
                 importer -> importer.isRecognizedFormat(data),
@@ -270,7 +269,7 @@ public class ImportFormatReader {
             }
         }
 
-        if (bestResult != null) {
+        if (bestResult != null && bestFormatName != null) {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
             return new ImportResult(bestFormatName, parserResult);
