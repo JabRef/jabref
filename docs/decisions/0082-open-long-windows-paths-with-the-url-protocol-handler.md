@@ -1,8 +1,6 @@
 ---
 nav_order: 82
 parent: Decision Records
-status: accepted
-date: 2026-11-04
 ---
 # Open long Windows paths with the URL protocol handler
 `adr~open-long-windows-paths-with-the-url-protocol-handler~1`
