@@ -570,6 +570,7 @@ public class JabRefCliPreferences implements CliPreferences {
         Localization.setLanguage(getLanguage());
     }
 
+    /// Just for testing with real prefs instances on a different node path
     JabRefCliPreferences(Preferences prefsNode) {
         this.prefsNode = prefsNode;
     }
