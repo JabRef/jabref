@@ -1,5 +1,5 @@
 ---
-nav_order: 81
+nav_order: 82
 parent: Decision Records
 status: accepted
 date: 2026-11-04
@@ -31,7 +31,7 @@ The question is whether JabRef can use it here.
 
 * Hand arguments of `MAX_PATH` characters or more to `rundll32.exe url.dll,FileProtocolHandler`
 * Declare `longPathAware` in the application manifest and require `LongPathsEnabled`
-* Prefix the path with `\?\`
+* Prefix the path with `\\?\`
 * Pass the 8.3 short name of the path to Explorer
 * Open the file through `java.awt.Desktop#open`
 
@@ -44,7 +44,7 @@ Revealing a file has no such substitute — the protocol handler cannot select a
 The manifest option does not apply.
 `longPathAware` governs the process that declares it, and the process that fails here is `explorer.exe`, which JabRef starts and whose manifest is Microsoft's.
 The behaviour was measured on a machine with `LongPathsEnabled` set to 1, where Explorer still truncated at exactly 260 characters.
-JabRef's own file access is not affected either way, because the JDK prefixes long absolute paths with `\?\` in its Win32 calls.
+JabRef's own file access is not affected either way, because the JDK prefixes long absolute paths with `\\?\` in its Win32 calls.
 
 ### Consequences
 
@@ -66,7 +66,7 @@ JabRef's own file access is not affected either way, because the JDK prefixes lo
 * Bad, because `LongPathsEnabled` is machine-wide and off by default, so the fix would not reach most users.
 * Bad, because the launcher's manifest comes from `jpackage` and is not JabRef's to write.
 
-### Prefix the path with `\?\`
+### Prefix the path with `\\?\`
 
 * Good, because it lifts the limit for the Win32 file functions.
 * Bad, because the prefix addresses the file system directly and the shell does not accept it, so Explorer is no better off.
