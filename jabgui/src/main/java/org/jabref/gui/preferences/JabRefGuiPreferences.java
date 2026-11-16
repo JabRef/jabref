@@ -103,6 +103,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String BIND_NAMES = "bindNames";
     public static final String BINDINGS = "bindings";
     public static final String MACOS_KEY_BINDING_DEFAULTS_MIGRATED = "macOSKeyBindingDefaultsMigrated";
+    public static final String MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED = "macOSTextEditingKeyBindingDefaultsMigrated";
     // endregion
 
     // region column names
