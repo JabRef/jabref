@@ -79,7 +79,7 @@ public class BibDatabaseDiff {
         // Create a HashSet where we can put references to entries in the new
         // database that we have matched. This is to avoid matching them twice.
         Set<Integer> matchedEntries = new HashSet<>(newEntries.size());
-        Set<BibEntry> notMatched = new HashSet<>(originalEntries.size());
+        List<BibEntry> notMatched = new ArrayList<>(originalEntries.size());
 
         // Loop through the entries of the original database, looking for exact matches in the new one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
@@ -100,21 +100,26 @@ public class BibDatabaseDiff {
             notMatched.add(originalEntry);
         }
 
-        // We've found all exact matches - and stored the non-matched entries in the notMatched set.
+        // We've found all exact matches - and stored the non-matched entries in the notMatched list.
         // Look through the remaining entries, looking for close matches.
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         for (BibEntry originalEntry : notMatched) {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
             double bestMatch = 0;
-            int bestMatchIndex = 0;
+            int bestMatchIndex = -1;
             for (int i = 0; i < newEntries.size(); i++) {
                 if (!matchedEntries.contains(i)) {
                     double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(i));
-                    if (score > bestMatch) {
+                    if (bestMatchIndex < 0 || score > bestMatch) {
                         bestMatch = score;
                         bestMatchIndex = i;
                     }
                 }
+            }
+
+            if (bestMatchIndex < 0) {
+                differences.add(new BibEntryDiff(originalEntry, null));
+                continue;
             }
 
             BibEntry bestEntry = newEntries.get(bestMatchIndex);

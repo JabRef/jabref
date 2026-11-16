@@ -27,6 +27,41 @@ class BibDatabaseDiffTest {
     }
 
     @Test
+    void compareWithEmptyNewDatabaseReportsAllOriginalEntriesRemoved() {
+        BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Removed");
+        BibDatabaseContext original = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(original, new BibDatabaseContext());
+
+        assertEquals(List.of(new BibEntryDiff(entry, null)), diff.getEntryDifferences());
+    }
+
+    @Test
+    void compareWithOneOfTwoEntriesRemovedReportsOnlyRemoval() {
+        BibEntry kept = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Kept");
+        BibEntry removed = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Removed");
+        BibDatabaseContext original = new BibDatabaseContext(new BibDatabase(List.of(kept, removed)));
+        BibDatabaseContext changed = new BibDatabaseContext(new BibDatabase(List.of(kept)));
+
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(original, changed);
+
+        assertEquals(List.of(new BibEntryDiff(removed, null)), diff.getEntryDifferences());
+    }
+
+    @Test
+    void compareWithDuplicateOriginalEntriesReportsOneRemoval() {
+        BibEntry first = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Same");
+        BibEntry second = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Same");
+        BibEntry remaining = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Same");
+        BibDatabaseContext original = new BibDatabaseContext(new BibDatabase(List.of(first, second)));
+        BibDatabaseContext changed = new BibDatabaseContext(new BibDatabase(List.of(remaining)));
+
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(original, changed);
+
+        assertEquals(List.of(new BibEntryDiff(second, null)), diff.getEntryDifferences());
+    }
+
+    @Test
     void compareOfSameEntryReportsNoDifferences() {
         BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
 

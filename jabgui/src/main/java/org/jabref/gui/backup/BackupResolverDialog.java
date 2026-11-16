@@ -1,22 +1,31 @@
 package org.jabref.gui.backup;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Optional;
+import java.util.OptionalInt;
 
+import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.bibtex.comparator.BackupComparison;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileUtil;
 
-import org.controlsfx.control.HyperlinkLabel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,40 +35,111 @@ public class BackupResolverDialog extends FXDialog {
     public static final ButtonType IGNORE_BACKUP = new ButtonType(Localization.lang("Ignore backup"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupResolverDialog.class);
+    private static final String UNKNOWN = "–";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
 
-    public BackupResolverDialog(Path originalPath, Path backupDir, ExternalApplicationsPreferences externalApplicationsPreferences) {
+    // [impl->req~jabgui.backup.restore-dialog-comparison~1]
+    public BackupResolverDialog(Path originalPath,
+                                Optional<Path> backupPath,
+                                Optional<BackupComparison> comparison,
+                                ExternalApplicationsPreferences externalApplicationsPreferences) {
         super(AlertType.CONFIRMATION, Localization.lang("Backup found"), true);
         setHeaderText(null);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
-        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
-        String backupFilename = backupPathOpt.map(Path::getFileName).map(Path::toString).orElse(Localization.lang("File not found"));
-        String librarySize = FileUtil.getFileSize(originalPath).orElse(Localization.lang("Unknown"));
-        String backupSize = backupPathOpt.flatMap(FileUtil::getFileSize).orElse(Localization.lang("Unknown"));
-        String content = Localization.lang("A backup file for '%0' was found at [%1]", originalPath.getFileName().toString(), backupFilename) + "\n" +
-                Localization.lang("Current library size: %0", librarySize) + "\n" +
-                Localization.lang("Backup size: %0", backupSize) + "\n" +
-                Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used.") + "\n\n" +
-                Localization.lang("Do you want to recover the library from the backup file?");
+        Node backupNameCell = backupPath.<Node>map(path -> backupLink(path, externalApplicationsPreferences))
+                                        .orElseGet(() -> value("backupName", Localization.lang("File not found")));
+        GridPane table = new GridPane();
+        table.setHgap(12);
+        table.setVgap(6);
+        table.addRow(0, header(Localization.lang("Property")), header(Localization.lang("Current file")), header(Localization.lang("Backup file")));
+        table.addRow(1, new Label(Localization.lang("Name")),
+                capped(value("currentName", originalPath.getFileName().toString())),
+                backupNameCell);
+        table.addRow(2, new Label(Localization.lang("Size")),
+                value("currentSize", FileUtil.getFileSize(originalPath).orElse(UNKNOWN)),
+                value("backupSize", backupPath.flatMap(FileUtil::getFileSize).orElse(UNKNOWN)));
+        table.addRow(3, new Label(Localization.lang("Last modified")),
+                value("currentModified", formatModified(originalPath)),
+                value("backupModified", backupPath.map(BackupResolverDialog::formatModified).orElse(UNKNOWN)));
+        table.addRow(4, new Label(Localization.lang("Number of entries")),
+                value("currentEntries", comparison.map(result -> format(result.currentEntryCount())).orElse(UNKNOWN)),
+                value("backupEntries", comparison.map(result -> format(result.backupEntryCount())).orElse(UNKNOWN)));
+        table.addRow(5, new Label(Localization.lang("Changes")),
+                new Label(),
+                value("backupChanges", comparison.flatMap(BackupComparison::changes).map(BackupResolverDialog::describeChanges).orElse(UNKNOWN)));
 
-        HyperlinkLabel contentLabel = new HyperlinkLabel(content);
-        contentLabel.setPrefWidth(360);
-        contentLabel.setPrefHeight(180);
-        contentLabel.setOnAction(e -> {
-            if (backupPathOpt.isPresent()) {
-                if (!(e.getSource() instanceof Hyperlink)) {
-                    return;
-                }
-                String clickedLinkText = ((Hyperlink) (e.getSource())).getText();
-                if (backupFilename.equals(clickedLinkText)) {
-                    try {
-                        NativeDesktop.openFolderAndSelectFile(backupPathOpt.get(), externalApplicationsPreferences, null);
-                    } catch (IOException ex) {
-                        LOGGER.error("Could not open backup folder", ex);
-                    }
-                }
+        VBox content = new VBox(10,
+                wrapped(Localization.lang("A newer backup of this library was found.")),
+                wrapped(Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used.")),
+                table,
+                wrapped(Localization.lang("Restoring overwrites the library file with the backup. Ignoring opens the library file as it is and keeps the backup file.")),
+                wrapped(Localization.lang("Do you want to recover the library from the backup file?")));
+        getDialogPane().setContent(content);
+    }
+
+    private static Label header(String text) {
+        Label headerLabel = new Label(text);
+        headerLabel.getStyleClass().add("bold");
+        return headerLabel;
+    }
+
+    private static Label value(String id, String text) {
+        Label valueLabel = new Label(text);
+        valueLabel.setId(id);
+        return valueLabel;
+    }
+
+    /// Backup file names carry a hash prefix and a timestamp, so name cells are capped and show the full name as a tooltip.
+    private static <T extends Labeled> T capped(T cell) {
+        cell.setMaxWidth(240);
+        cell.setTooltip(new Tooltip(cell.getText()));
+        return cell;
+    }
+
+    private Hyperlink backupLink(Path backupPath, ExternalApplicationsPreferences externalApplicationsPreferences) {
+        Hyperlink link = capped(new Hyperlink(backupPath.getFileName().toString()));
+        link.setId("backupName");
+        link.setOnAction(_ -> {
+            try {
+                NativeDesktop.openFolderAndSelectFile(backupPath, externalApplicationsPreferences, null);
+            } catch (IOException ex) {
+                LOGGER.error("Could not open backup folder", ex);
             }
         });
-        getDialogPane().setContent(new StackPane(contentLabel));
+        return link;
+    }
+
+    private static String formatModified(Path file) {
+        try {
+            return DATE_TIME_FORMATTER.format(Files.getLastModifiedTime(file).toInstant());
+        } catch (IOException ex) {
+            LOGGER.debug("Could not read modification time of {}", file, ex);
+            return UNKNOWN;
+        }
+    }
+
+    private static String describeChanges(BackupComparison.ChangeCounts changes) {
+        boolean noEntryChanges = changes.added() == 0 && changes.removed() == 0 && changes.modified() == 0;
+        if (noEntryChanges) {
+            return changes.otherContentChanged()
+                   ? Localization.lang("No entry changes, but groups, strings or the preamble differ")
+                   : Localization.lang("No changes");
+        }
+        String entryChanges = Localization.lang("removed: %0, added: %1, modified: %2",
+                String.valueOf(changes.removed()), String.valueOf(changes.added()), String.valueOf(changes.modified()));
+        return changes.otherContentChanged()
+               ? Localization.lang("%0; groups, strings or the preamble also differ", entryChanges)
+               : entryChanges;
+    }
+
+    private static String format(OptionalInt count) {
+        return count.isPresent() ? String.valueOf(count.orElseThrow()) : UNKNOWN;
+    }
+
+    private static Label wrapped(String text) {
+        Label wrappedLabel = new Label(text);
+        wrappedLabel.setWrapText(true);
+        return wrappedLabel;
     }
 }

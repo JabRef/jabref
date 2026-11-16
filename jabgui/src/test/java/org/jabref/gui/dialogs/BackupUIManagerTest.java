@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.scene.layout.StackPane;
+import javafx.scene.Node;
+import javafx.scene.control.Labeled;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
@@ -44,9 +46,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.controlsfx.control.HyperlinkLabel;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,6 +63,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -112,6 +113,59 @@ class BackupUIManagerTest extends JavaFxTest {
                 eq(Localization.lang("Restore backup")),
                 eq(Localization.lang("Could not restore the backup file '%0'.", backupFile)),
                 any(DirectoryNotEmptyException.class));
+    }
+
+    @Test
+    void missingBackupRestoreShowsOriginalPath(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.RESTORE_FROM_BACKUP));
+        Path originalFile = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
+
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                tabContainer,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                new JabRefGuiStateManager()));
+
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("Restore backup"),
+                Localization.lang("No backup file was found for '%0'.", originalFile));
+    }
+
+    @Test
+    void emptyBackupRestoreShowsBackupPath(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.RESTORE_FROM_BACKUP));
+        Path originalFile = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(
+                originalFile,
+                BackupFileType.BACKUP,
+                backupDir);
+        Files.writeString(backupFile, "");
+
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                tabContainer,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                new JabRefGuiStateManager()));
+
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("Restore backup"),
+                Localization.lang("The backup file '%0' is empty and was not restored.", backupFile));
     }
 
     /// The review runs while the library is still being opened, so no tab exists for it yet and the active tab may be
@@ -171,6 +225,30 @@ class BackupUIManagerTest extends JavaFxTest {
         BibDatabaseContext restored = result.orElseThrow().getDatabaseContext();
         assertEquals(2, restored.getDatabase().getEntryCount());
         assertEquals(List.of("TODO"), restored.getMetaData().getGroups().orElseThrow().getChildren().stream().map(GroupTreeNode::getName).toList());
+    }
+
+    // [utest->req~jabgui.backup.restore-dialog-non-blocking~2]
+    @Test
+    void cancelledOpeningShowsNoDialog(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        Path originalFile = Files.writeString(tempDir.resolve("library.bib"), "@Article{original}");
+        Files.writeString(BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir), "@Article{backup}");
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+
+        Optional<ParserResult> result;
+        boolean stillInterrupted;
+        Thread.currentThread().interrupt();
+        try {
+            result = BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, originalFile, preferences,
+                    mock(FileUpdateMonitor.class), new JabRefGuiStateManager());
+        } finally {
+            stillInterrupted = Thread.interrupted();
+        }
+
+        assertEquals(Optional.empty(), result);
+        assertTrue(stillInterrupted);
+        verify(dialogService, never()).showCustomDialogAndWait(any(BackupResolverDialog.class));
     }
 
     @Test
@@ -290,21 +368,17 @@ class BackupUIManagerTest extends JavaFxTest {
         Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, tempDir.resolve("backups"));
         Files.write(backupFile, new byte[2048]);
 
-        AtomicReference<@Nullable String> dialogContent = new AtomicReference<>();
+        AtomicReference<List<String>> cells = new AtomicReference<>(List.of());
         interact(() -> {
-            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class));
-            StackPane content = (StackPane) dialog.getDialogPane().getContent();
-            HyperlinkLabel hyperlink = (HyperlinkLabel) content.getChildren().getFirst();
-            dialogContent.set(hyperlink.getText());
+            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, Optional.of(backupFile), Optional.empty(),
+                    mock(ExternalApplicationsPreferences.class));
+            Node content = dialog.getDialogPane().getContent();
+            cells.set(Stream.of("#currentSize", "#backupSize", "#backupName")
+                            .map(id -> ((Labeled) content.lookup(id)).getText())
+                            .toList());
         });
 
-        assertEquals("""
-                A backup file for 'library.bib' was found at [%s]
-                Current library size: 1 KB
-                Backup size: 2 KB
-                This could indicate that JabRef did not shut down cleanly last time the file was used.
-
-                Do you want to recover the library from the backup file?""".formatted(backupFile.getFileName()), dialogContent.get());
+        assertEquals(List.of("1 KB", "2 KB", backupFile.getFileName().toString()), cells.get());
     }
 
     /// A conflict-aborted original produces an invalid, empty result. Reviewing the backup merges content into that

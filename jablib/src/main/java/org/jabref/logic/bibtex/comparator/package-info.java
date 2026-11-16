@@ -3,6 +3,7 @@
 /// - Sorting: comparators implementing `Comparator<BibEntry>`, for example [org.jabref.logic.bibtex.comparator.EntryComparator].
 /// - The class [org.jabref.logic.bibtex.comparator.BibEntryCompare] provides comparison based on the set relation.
 /// - A whole library can be compared using [org.jabref.logic.bibtex.comparator.BibDatabaseDiff].
+/// - Backup files can be summarized and compared using [org.jabref.logic.bibtex.comparator.BackupComparator].
 ///
 /// Fuzzy similarity (duplicate detection) is not here but in [org.jabref.logic.database.DuplicateCheck].
 ///
