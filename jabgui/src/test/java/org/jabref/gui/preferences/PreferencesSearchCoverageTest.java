@@ -83,7 +83,7 @@ class PreferencesSearchCoverageTest {
         // under the interface they were written against.
         Injector.setModelOrService(CliPreferences.class, preferences);
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
-        Injector.setModelOrService(NativeDesktop.class, NativeDesktop.create(mock(HostServices.class), preferences));
+        Injector.setModelOrService(NativeDesktop.class, NativeDesktop.create(mock(HostServices.class), preferences, mock(ClipBoardManager.class)));
         Injector.setModelOrService(TaskExecutor.class, new CurrentThreadTaskExecutor());
         Injector.setModelOrService(StateManager.class, mock(StateManager.class, Answers.RETURNS_DEEP_STUBS));
         Injector.setModelOrService(AiService.class, mock(AiService.class, Answers.RETURNS_DEEP_STUBS));

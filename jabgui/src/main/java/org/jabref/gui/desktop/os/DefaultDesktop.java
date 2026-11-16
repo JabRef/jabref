@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import javafx.application.HostServices;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.Directories;
 
@@ -20,8 +21,8 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class DefaultDesktop extends NativeDesktop {
 
-    public DefaultDesktop(HostServices hostServices, GuiPreferences preferences) {
-        super(hostServices, preferences);
+    public DefaultDesktop(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
+        super(hostServices, preferences, clipBoardManager);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class DefaultDesktop extends NativeDesktop {
     }
 
     @Override
-    public void openUrlWithSystemHandler(String url) {
+    protected void openUrlWithSystemHandler(String url) {
         // No native URL handler known for this platform
         showDocument(url);
     }

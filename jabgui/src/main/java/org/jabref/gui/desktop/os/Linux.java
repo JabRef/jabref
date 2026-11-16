@@ -13,6 +13,7 @@ import javafx.application.HostServices;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
@@ -33,8 +34,8 @@ public class Linux extends NativeDesktop {
 
     private static final String ETC_ALTERNATIVES_X_TERMINAL_EMULATOR = "/etc/alternatives/x-terminal-emulator";
 
-    public Linux(HostServices hostServices, GuiPreferences preferences) {
-        super(hostServices, preferences);
+    public Linux(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
+        super(hostServices, preferences, clipBoardManager);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public void openUrlWithSystemHandler(String url) throws IOException {
+    protected void openUrlWithSystemHandler(String url) throws IOException {
         startProcess(new ProcessBuilder("xdg-open", url));
     }
 

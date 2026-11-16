@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import javafx.application.HostServices;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 
 import org.jspecify.annotations.NullMarked;
@@ -18,8 +19,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class OSX extends NativeDesktop {
 
-    public OSX(HostServices hostServices, GuiPreferences preferences) {
-        super(hostServices, preferences);
+    public OSX(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
+        super(hostServices, preferences, clipBoardManager);
     }
 
     @Override
@@ -28,7 +29,7 @@ public class OSX extends NativeDesktop {
     }
 
     @Override
-    public void openUrlWithSystemHandler(String url) throws IOException {
+    protected void openUrlWithSystemHandler(String url) throws IOException {
         startProcess(new ProcessBuilder("/usr/bin/open", url));
     }
 

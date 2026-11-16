@@ -98,6 +98,7 @@ public class JabRefGUI extends Application {
     private static ThemeManager themeManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static NativeDesktop nativeDesktop;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
 
     private static DialogService dialogService;
@@ -131,8 +132,6 @@ public class JabRefGUI extends Application {
             // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
             setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
-            NativeDesktop nativeDesktop = NativeDesktop.create(getHostServices(), preferences);
-            Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
             initialize();
 
@@ -267,6 +266,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+
+        JabRefGUI.nativeDesktop = NativeDesktop.create(getHostServices(), preferences, clipBoardManager);
+        Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),

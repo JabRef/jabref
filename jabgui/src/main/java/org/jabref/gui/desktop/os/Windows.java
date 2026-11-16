@@ -7,6 +7,7 @@ import java.util.List;
 import javafx.application.HostServices;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.Directories;
 
@@ -26,8 +27,8 @@ public class Windows extends NativeDesktop {
     /// NUL character, leaving 259 usable characters.
     private static final int MAX_PATH = 260;
 
-    public Windows(HostServices hostServices, GuiPreferences preferences) {
-        super(hostServices, preferences);
+    public Windows(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
+        super(hostServices, preferences, clipBoardManager);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class Windows extends NativeDesktop {
     }
 
     @Override
-    public void openUrlWithSystemHandler(String url) throws IOException {
+    protected void openUrlWithSystemHandler(String url) throws IOException {
         startProcess(new ProcessBuilder(shellOpenCommand(url)));
     }
 

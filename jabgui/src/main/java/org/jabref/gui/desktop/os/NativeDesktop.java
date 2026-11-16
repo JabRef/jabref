@@ -69,10 +69,12 @@ public abstract class NativeDesktop {
 
     private final HostServices hostServices;
     private final GuiPreferences preferences;
+    private final ClipBoardManager clipBoardManager;
 
-    protected NativeDesktop(HostServices hostServices, GuiPreferences preferences) {
+    protected NativeDesktop(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
         this.hostServices = hostServices;
         this.preferences = preferences;
+        this.clipBoardManager = clipBoardManager;
     }
 
     /// Open a http/pdf/ps viewer for the given link string.
@@ -280,10 +282,10 @@ public abstract class NativeDesktop {
 
     /// @return `false` if the browser was started via [HostServices], which does not report whether that succeeded
     private boolean launchBrowser(String url) throws IOException {
-        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", preferences.getExternalApplicationsPreferences());
-        if (fileType.isPresent() && !fileType.get().getOpenWithApplication().isEmpty()) {
+        String browser = configuredApplication("html");
+        if (!browser.isEmpty()) {
             // The user configured a custom browser; hand it the URL string unmodified
-            openFileWithApplication(url, fileType.get().getOpenWithApplication());
+            openFileWithApplication(url, browser);
             return true;
         }
         // A URL must be opened via a URL-aware API: the file-open path runs it through
@@ -323,7 +325,7 @@ public abstract class NativeDesktop {
         try {
             if (!launchBrowser(url)) {
                 // A failure would go unnoticed, so the link stays reachable for a while
-                dialogService.notify(new UnconfirmedBrowserLaunchNotification(url, dialogService));
+                dialogService.notify(new UnconfirmedBrowserLaunchNotification(url, dialogService, clipBoardManager));
             }
         } catch (IOException exception) {
             showManualOpenPopup(url, dialogService, exception);
@@ -331,20 +333,19 @@ public abstract class NativeDesktop {
     }
 
     private static final class UnconfirmedBrowserLaunchNotification extends Notifications.UiNotification {
-        UnconfirmedBrowserLaunchNotification(String url, DialogService dialogService) {
+        UnconfirmedBrowserLaunchNotification(String url, DialogService dialogService, ClipBoardManager clipBoardManager) {
             super(Localization.lang("Opening link in the browser"),
                     Localization.lang("If no browser opened, copy the link and open it manually."));
             withAutoClose(Duration.seconds(10));
             getActions().add(new NotificationAction<>(Localization.lang("Copy link"), _ -> {
-                Injector.instantiateModelOrService(ClipBoardManager.class).setContent(url);
+                clipBoardManager.setContent(url);
                 dialogService.notify(Localization.lang("The link has been copied to the clipboard."));
                 return OnClickBehaviour.REMOVE;
             }));
         }
     }
 
-    private static void showManualOpenPopup(String url, DialogService dialogService, IOException exception) {
-        ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
+    private void showManualOpenPopup(String url, DialogService dialogService, IOException exception) {
         clipBoardManager.setContent(url);
         LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser", exception);
         String couldNotOpenBrowser = Localization.lang("Could not open browser.");
@@ -422,22 +423,26 @@ public abstract class NativeDesktop {
 
     // endregion
 
-    public static NativeDesktop create(HostServices hostServices, GuiPreferences preferences) {
+    public static NativeDesktop create(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
         if (OS.WINDOWS) {
-            return new Windows(hostServices, preferences);
+            return new Windows(hostServices, preferences, clipBoardManager);
         } else if (OS.OS_X) {
-            return new OSX(hostServices, preferences);
+            return new OSX(hostServices, preferences, clipBoardManager);
         } else if (OS.LINUX) {
-            return new Linux(hostServices, preferences);
+            return new Linux(hostServices, preferences, clipBoardManager);
         }
-        return new DefaultDesktop(hostServices, preferences);
+        return new DefaultDesktop(hostServices, preferences, clipBoardManager);
     }
 
     public void openFile(String filePath, String fileType) throws IOException {
-        String application = ExternalFileTypes.getExternalFileTypeByExt(fileType, preferences.getExternalApplicationsPreferences())
-                                              .map(ExternalFileType::getOpenWithApplication)
-                                              .orElse("");
-        openFileWithApplication(filePath, application);
+        openFileWithApplication(filePath, configuredApplication(fileType));
+    }
+
+    /// @return the application configured for the file type, or an empty string for the OS default application
+    private String configuredApplication(String extension) {
+        return ExternalFileTypes.getExternalFileTypeByExt(extension, preferences.getExternalApplicationsPreferences())
+                                .map(ExternalFileType::getOpenWithApplication)
+                                .orElse("");
     }
 
     /// Does not report failures, so callers cannot detect that no browser could be started.
@@ -448,13 +453,13 @@ public abstract class NativeDesktop {
 
     /// The OS handler dispatches by scheme, e.g., `mailto:` to the mail client.
     /// The URL must never be run through `Path.of`, which mangles it.
-    public abstract void openUrlWithSystemHandler(String url) throws IOException;
+    protected abstract void openUrlWithSystemHandler(String url) throws IOException;
 
     /// Opens a file on an Operating System, using the given application.
     ///
     /// @param filePath    The filename.
     /// @param application Link to the app that opens the file. If empty, the OS default application is used.
-    public void openFileWithApplication(String filePath, String application) throws IOException {
+    protected void openFileWithApplication(String filePath, String application) throws IOException {
         if (application.isEmpty()) {
             openFileWithDefaultApplication(filePath);
         } else {
