@@ -42,26 +42,35 @@ public class DeleteFileAction extends SimpleCommand {
     private final BibDatabaseContext databaseContext;
     private final @Nullable LinkedFilesEditorViewModel viewModel;
     private final List<LinkedFileViewModel> filesToDelete;
+    private final NativeDesktop nativeDesktop;
     private boolean success = false;
 
     public DeleteFileAction(DialogService dialogService,
                             FilePreferences filePreferences,
                             BibDatabaseContext databaseContext,
                             @Nullable LinkedFilesEditorViewModel viewModel,
-                            List<LinkedFileViewModel> filesToDelete) {
+                            List<LinkedFileViewModel> filesToDelete,
+                            NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.databaseContext = databaseContext;
         this.viewModel = viewModel;
         this.filesToDelete = List.copyOf(filesToDelete);
+        this.nativeDesktop = nativeDesktop;
     }
 
     /// Called when the user wants to delete a complete entry.
     public DeleteFileAction(DialogService dialogService,
                             FilePreferences filePreferences,
                             BibDatabaseContext databaseContext,
-                            List<LinkedFileViewModel> filesToDelete) {
-        this(dialogService, filePreferences, databaseContext, null, filesToDelete);
+                            List<LinkedFileViewModel> filesToDelete,
+                            NativeDesktop nativeDesktop) {
+        this(dialogService, filePreferences, databaseContext, null, filesToDelete, nativeDesktop);
+    }
+
+    /// The preference only states the user's wish; the platform may not offer a trash
+    private boolean shouldMoveToTrash() {
+        return filePreferences.moveToTrash() && nativeDesktop.moveToTrashSupported();
     }
 
     private boolean deletionOfCompleteEntry() {
@@ -116,7 +125,7 @@ public class DeleteFileAction extends SimpleCommand {
         DialogPane dialogPane = createDeleteFilesDialog(dialogDescription);
 
         String label;
-        if (filePreferences.moveToTrash()) {
+        if (shouldMoveToTrash()) {
             label = Localization.lang("Move file(s) to trash");
         } else {
             label = Localization.lang("Delete from disk");
@@ -189,11 +198,9 @@ public class DeleteFileAction extends SimpleCommand {
 
         Path theFile = file.get();
         try {
-            boolean preferencesMoveToTrash = filePreferences.moveToTrash();
-            LOGGER.debug("filePreferences.moveToTrash() = {}", preferencesMoveToTrash);
-            if (preferencesMoveToTrash) {
+            if (shouldMoveToTrash()) {
                 LOGGER.debug("Moving to trash: {}", theFile);
-                NativeDesktop.get().moveToTrash(theFile);
+                nativeDesktop.moveToTrash(theFile);
             } else {
                 LOGGER.debug("Deleting: {}", theFile);
                 Files.delete(theFile);

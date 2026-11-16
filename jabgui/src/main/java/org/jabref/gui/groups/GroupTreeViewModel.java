@@ -497,8 +497,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         keepAssignments,
                         removeAssignments,
                         cancel);
-                boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                        && (group instanceof ExplicitGroup);
+                // [impl->req~groups.edit.remove-obsolete-explicit-assignments~1]
+                boolean removePreviousAssignments = oldGroupDef instanceof ExplicitGroup;
 
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
