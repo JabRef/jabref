@@ -9,8 +9,10 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.os.OS;
 import org.jabref.model.search.LinkedFilesConstants;
 
+import com.google.common.annotations.VisibleForTesting;
 import net.harawata.appdirs.AppDirsFactory;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// This collects all directories based on AppDirs.
 /// OS-dependent directories are handled in the NativeDesktop class.
@@ -28,11 +30,16 @@ public class Directories {
     /// Only checks well-known locations: jablib also runs headless, where native calls or external processes are not wanted.
     public static Path getDocumentsDirectory() {
         // Set only if the desktop session exports it; usually, it is defined in ~/.config/user-dirs.dirs only
-        return Optional.ofNullable(System.getenv("XDG_DOCUMENTS_DIR"))
+        return getDocumentsDirectory(System.getenv("XDG_DOCUMENTS_DIR"), getUserDirectory());
+    }
+
+    @VisibleForTesting
+    static Path getDocumentsDirectory(@Nullable String xdgDocumentsDirectory, Path userDirectory) {
+        return Optional.ofNullable(xdgDocumentsDirectory)
                        .map(Path::of)
                        .filter(Files::isDirectory)
-                       .or(() -> Optional.of(getUserDirectory().resolve("Documents")).filter(Files::isDirectory))
-                       .orElseGet(Directories::getUserDirectory);
+                       .or(() -> Optional.of(userDirectory.resolve("Documents")).filter(Files::isDirectory))
+                       .orElse(userDirectory);
     }
 
     public static Path getLogDirectory(Version version) {

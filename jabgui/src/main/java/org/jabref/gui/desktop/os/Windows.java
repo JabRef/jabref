@@ -11,6 +11,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.Directories;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// This class contains Windows specific implementations for file directories and file/application open handling methods.
 ///
@@ -77,7 +78,7 @@ public class Windows extends NativeDesktop {
     /// selection at least arrives where the file is.
     static List<String> revealCommand(Path filePath) {
         String path = filePath.toString();
-        Path parent = filePath.getParent();
+        @Nullable Path parent = filePath.getParent();
         if (path.length() < MAX_PATH || parent == null) {
             return List.of("explorer.exe", "/select,", path);
         }
