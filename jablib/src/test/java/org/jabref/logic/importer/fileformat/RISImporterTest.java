@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -36,8 +36,8 @@ class RISImporterTest {
                 ER  -
                 """;
 
-        BibEntry entry = importer.importDatabase(new BufferedReader(new StringReader(ris)))
-                                  .getDatabase().getEntries().getFirst();
+        BibEntry entry = importer.importDatabase(new BufferedReader(Reader.of(ris)))
+                                 .getDatabase().getEntries().getFirst();
 
         assertEquals(Optional.of("1"), entry.getField(StandardField.NUMBER));
         assertEquals(Optional.of("26957754"), entry.getField(new UnknownField("accession-number")));
