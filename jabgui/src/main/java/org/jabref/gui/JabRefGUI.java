@@ -392,6 +392,8 @@ public class JabRefGUI extends Application {
         LOGGER.debug("installing CSS");
         themeManager.updateCssOnScene(scene);
 
+        TextInputKeyBindings.registerSecondaryWindows(mainStage, preferences.getKeyBindingRepository());
+
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
