@@ -274,17 +274,19 @@
 }
 
 .rating > .container > .button {
-    -fx-icon-color: -color-fg-subtle;
+    -fx-icon-code: "mdi2s-star-outline";
+    -fx-icon-color: -color-fg-muted;
 }
 
 .rating > .container > .button.strong {
+    -fx-icon-code: "mdi2s-star";
     -fx-icon-color: -color-accent;
 }
 
-/* On a selected row the background is the accent color, so stars need a contrasting color */
+/* Selected rows use the normal text color, which every theme keeps readable on -color-selection.
+   Filled vs. empty stays clear through the solid vs. outline shape. */
 .table-row-cell:selected .rating > .container > .button {
-    -fx-icon-color: -color-fg-emphasis;
-    -fx-opacity: 0.45;
+    -fx-icon-color: -color-fg-default;
 }
 
 .table-row-cell:selected .rating > .container > .button.strong {
