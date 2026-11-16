@@ -81,7 +81,7 @@ public class CiteDrivePushAction extends SimpleCommand {
                                         Localization.lang("Open import page"),
                                         importPage, dialogService, nativeDesktop, clipBoardManager,
                                         Notification.OnClickBehaviour.REMOVE));
-                                nativeDesktop.openBrowserShowPopup(importPage, dialogService);
+                                CiteDriveLoginAction.openPage(nativeDesktop, importPage);
                             });
                         }
                     } catch (IOException e) {

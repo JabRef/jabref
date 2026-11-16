@@ -1,5 +1,6 @@
 package org.jabref.gui.citedrive;
 
+import java.io.IOException;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeoutException;
 
@@ -49,7 +50,7 @@ public class CiteDriveLoginAction extends SimpleCommand {
                     LoginPageNotification notification = new LoginPageNotification(loginPage, dialogService, nativeDesktop, clipBoardManager);
                     dialogService.notify(notification);
                     page.finished().whenComplete((_, _) -> UiTaskExecutor.runInJavaFXThread(notification::remove));
-                    nativeDesktop.openBrowserShowPopup(loginPage, dialogService);
+                    openPage(nativeDesktop, loginPage);
                 }),
                 () -> enableHttpServer(dialogService, preferences.getRemotePreferences()));
     }
@@ -92,6 +93,15 @@ public class CiteDriveLoginAction extends SimpleCommand {
                 });
     }
 
+    /// The page notification already offers to open or copy the page, so a failure is only logged
+    static void openPage(NativeDesktop nativeDesktop, String page) {
+        try {
+            nativeDesktop.openBrowser(page);
+        } catch (IOException e) {
+            LOGGER.warn("Could not open {}", page, e);
+        }
+    }
+
     /// Keeps a CiteDrive page reachable: opening the browser may fail without any notice
     static class PageNotification extends Notifications.UiNotification {
         /// @param afterAction whether the notification stays after one of its actions was used
@@ -100,7 +110,14 @@ public class CiteDriveLoginAction extends SimpleCommand {
             // Clicking the text must not remove the notification, so that the actions remain available
             setOnClick(_ -> OnClickBehaviour.NONE);
             getActions().add(new NotificationAction<>(openPageLabel, _ -> {
-                nativeDesktop.openBrowserShowPopup(page, dialogService);
+                try {
+                    nativeDesktop.openBrowser(page);
+                } catch (IOException e) {
+                    LOGGER.warn("Could not open {}", page, e);
+                    dialogService.notify(Localization.lang("Could not open browser."));
+                    // Keep the notification, so that the link can still be copied
+                    return OnClickBehaviour.NONE;
+                }
                 return afterAction;
             }));
             getActions().add(new NotificationAction<>(Localization.lang("Copy link"), _ -> {

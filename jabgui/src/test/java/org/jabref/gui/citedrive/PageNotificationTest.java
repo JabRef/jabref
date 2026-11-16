@@ -1,5 +1,6 @@
 package org.jabref.gui.citedrive;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -12,6 +13,7 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -32,10 +34,19 @@ class PageNotificationTest {
     }
 
     @Test
-    void openActionOpensThePage() {
+    void openActionOpensThePage() throws IOException {
         notification.getActions().getFirst().getOnAction().call(notification);
 
-        verify(nativeDesktop).openBrowserShowPopup(PAGE, dialogService);
+        verify(nativeDesktop).openBrowser(PAGE);
+    }
+
+    @Test
+    void failedOpenKeepsTheNotificationForCopying() throws IOException {
+        doThrow(new IOException("no browser")).when(nativeDesktop).openBrowser(PAGE);
+        CiteDriveLoginAction.PageNotification removedAfterUse = new CiteDriveLoginAction.PageNotification(
+                "Title", "Description", "Open page", PAGE, dialogService, nativeDesktop, clipBoardManager, Notification.OnClickBehaviour.REMOVE);
+
+        assertEquals(Notification.OnClickBehaviour.NONE, removedAfterUse.getActions().getFirst().getOnAction().call(removedAfterUse));
     }
 
     @Test
