@@ -69,8 +69,10 @@ public class BibDatabaseDiff {
     private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries, BibDatabaseMode mode) {
         List<BibEntryDiff> differences = new ArrayList<>();
 
-        // Prevent IndexOutOfBoundException
+        // Without new entries, every original entry was deleted
+        // Returning immediately also prevent IndexOutOfBoundException
         if (newEntries.isEmpty()) {
+            originalEntries.forEach(originalEntry -> differences.add(new BibEntryDiff(originalEntry, null)));
             return differences;
         }
 

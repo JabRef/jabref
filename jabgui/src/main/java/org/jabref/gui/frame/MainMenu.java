@@ -25,6 +25,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.MergeLibraryAction;
 import org.jabref.gui.consistency.ConsistencyCheckAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.EditAction;
@@ -119,6 +120,7 @@ public class MainMenu extends MenuBar {
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final OAuthSessionRegistry oAuthSessionRegistry;
+    private final NativeDesktop nativeDesktop;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -137,7 +139,8 @@ public class MainMenu extends MenuBar {
                     PreviewControls previewControls,
                     GitHandlerRegistry gitHandlerRegistry,
                     JournalAbbreviationRepository journalAbbreviationRepository,
-                    OAuthSessionRegistry oAuthSessionRegistry
+                    OAuthSessionRegistry oAuthSessionRegistry,
+                    NativeDesktop nativeDesktop
     ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
@@ -157,6 +160,7 @@ public class MainMenu extends MenuBar {
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.oAuthSessionRegistry = oAuthSessionRegistry;
+        this.nativeDesktop = nativeDesktop;
 
         createMenu();
     }
@@ -440,8 +444,8 @@ public class MainMenu extends MenuBar {
                                    GuiPreferences preferences) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor))
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor, nativeDesktop))
         );
 
         return sendMenu;
@@ -451,8 +455,8 @@ public class MainMenu extends MenuBar {
     private Menu citeDriveMenu(ActionFactory factory) {
         Menu citeDrive = factory.createSubMenu(StandardActions.CITE_DRIVE,
                 factory.createMenuItem(StandardActions.CITE_DRIVE_IMPORT, new CiteDriveImportAction(dialogService, preferences)),
-                factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry)),
-                factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry)));
+                factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry, nativeDesktop, clipBoardManager)),
+                factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry, nativeDesktop, clipBoardManager)));
         citeDrive.visibleProperty().bind(preferences.getCiteDrivePreferences().enabledProperty());
         return citeDrive;
     }

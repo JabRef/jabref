@@ -1,5 +1,7 @@
 package org.jabref.gui.maintable.columns;
 
+import java.text.Collator;
+
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
 
@@ -7,6 +9,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.CollationKeyComparator;
 import org.jabref.gui.util.comparator.NumericFieldComparator;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -18,6 +21,10 @@ import com.google.common.collect.MoreCollectors;
 
 /// A column that displays the text-value of the field
 public class FieldColumn extends MainTableColumn<String> {
+
+    /// Shared by all field columns, so that equal values in different columns or tables reuse the cached collation key.
+    /// Uses the collator of the default locale, as JavaFX does for string columns
+    private static final CollationKeyComparator TEXT_COMPARATOR = new CollationKeyComparator(Collator.getInstance());
 
     private final OrFields fields;
     private final MainTableTooltip tooltip;
@@ -36,16 +43,18 @@ public class FieldColumn extends MainTableColumn<String> {
                 .showTooltipRegardlessOfTruncation(tooltip::shouldAlwaysShowTooltip)
                 .install(this);
 
-        if (fields.hasExactlyOne()) {
-            // comparator can't parse more than one value
-            Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
-
-            if ((field instanceof UnknownField) || field.isNumeric()) {
-                this.setComparator(new NumericFieldComparator());
-            }
-        }
+        this.setComparator(isNumeric() ? new NumericFieldComparator() : TEXT_COMPARATOR);
 
         this.setSortable(true);
+    }
+
+    private boolean isNumeric() {
+        if (!fields.hasExactlyOne()) {
+            // comparator can't parse more than one value
+            return false;
+        }
+        Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
+        return (field instanceof UnknownField) || field.isNumeric();
     }
 
     /// Get the table column name to be displayed in the UI

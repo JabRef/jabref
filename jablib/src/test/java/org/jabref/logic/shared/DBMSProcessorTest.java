@@ -3,6 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -123,6 +124,25 @@ class DBMSProcessorTest {
                 assertFalse(fieldResultSet.next());
             }
         }
+    }
+
+    @Test
+        // [utest->req~shared-database.missing-entry-type~1]
+    void nullEntryTypeFallsBackToMiscWhenSharedEntriesAreRead() throws SQLException {
+        try (Statement statement = dbmsConnection.getConnection().createStatement()) {
+            statement.executeUpdate("INSERT INTO jabref.entry (entrytype) VALUES (NULL)");
+        }
+
+        assertEquals(List.of(new BibEntry(StandardEntryType.Misc)), dbmsProcessor.getSharedEntries());
+    }
+
+    @Test
+    void blankEntryTypeFallsBackToMiscWhenSharedEntriesAreRead() throws SQLException {
+        try (Statement statement = dbmsConnection.getConnection().createStatement()) {
+            statement.executeUpdate("INSERT INTO jabref.entry (entrytype) VALUES (' ')");
+        }
+
+        assertEquals(List.of(new BibEntry(StandardEntryType.Misc)), dbmsProcessor.getSharedEntries());
     }
 
     @Test

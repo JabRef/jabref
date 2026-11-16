@@ -22,9 +22,13 @@ import org.jspecify.annotations.Nullable;
 /// `synchronized` so that the counter update, list append, completion check, and `onFinish` execution
 /// happen atomically. This guarantees `onFinish` runs exactly once and only after every imported entry
 /// is visible in `importedEntries`.
+///
+/// An entry resolved by keeping the library's duplicate counts as skipped, because nothing is imported for it and
+/// it is not selected. The kept library entry is available separately for callers that relate the entry to others.
 @NullMarked
 public class EntryImportHandlerTracker {
     private final List<BibEntry> importedEntries;
+    private final List<BibEntry> keptExistingEntries = new ArrayList<>();
 
     private final StateManager stateManager;
     private final BibDatabaseContext targetDatabaseContext;
@@ -61,6 +65,14 @@ public class EntryImportHandlerTracker {
         checkDone();
     }
 
+    /// Marks an entry as skipped because the user kept its duplicate that is already in the library
+    ///
+    /// @param existingEntry the library's entry that stays in place
+    public synchronized void markKeptExisting(BibEntry existingEntry) {
+        keptExistingEntries.add(existingEntry);
+        markSkipped();
+    }
+
     /// Checks if all entries have been processed; if yes, execute the onFinish action exactly once.
     /// Must be called while holding this object's monitor (i.e. from a `synchronized` method).
     private void checkDone() {
@@ -90,6 +102,11 @@ public class EntryImportHandlerTracker {
     /// into the database), not the originals passed to the import call.
     public synchronized List<BibEntry> getImportedEntries() {
         return List.copyOf(importedEntries);
+    }
+
+    /// Returns an immutable snapshot of the library entries reported through [#markKeptExisting(BibEntry)].
+    public synchronized List<BibEntry> getKeptExistingEntries() {
+        return List.copyOf(keptExistingEntries);
     }
 
     public synchronized int getImportedCount() {
