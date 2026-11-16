@@ -274,11 +274,21 @@
 }
 
 .rating > .container > .button {
-    -fx-icon-color: derive(-fx-text-base-color, 85%);
+    -fx-icon-color: -color-fg-subtle;
 }
 
 .rating > .container > .button.strong {
-    -fx-icon-color: -fx-text-base-color;
+    -fx-icon-color: -color-accent;
+}
+
+/* On a selected row the background is the accent color, so stars need a contrasting color */
+.table-row-cell:selected .rating > .container > .button {
+    -fx-icon-color: -color-fg-emphasis;
+    -fx-opacity: 0.45;
+}
+
+.table-row-cell:selected .rating > .container > .button.strong {
+    -fx-opacity: 1;
 }
 
 .file-row-text {
