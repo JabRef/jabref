@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added native macOS text-editing shortcuts, such as <kbd>Ctrl</kbd> + <kbd>A</kbd>, to text fields and the BibTeX source editor. [#16529](https://github.com/JabRef/jabref/issues/16529)
 - We added an option to enable AI provider debugging in expert settings for testing AI features without external API calls. [#17607](https://github.com/JabRef/jabref/pull/17607)
 - We added ISBN extraction from bibliographic pages in PDF books. [#12874](https://github.com/JabRef/jabref/issues/12874)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
@@ -21,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added tooltips with action descriptions to menu items. [#9615](https://github.com/JabRef/jabref/issues/9615)
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
+- We added an action to open a PDF at the selected annotation. [#16585](https://github.com/JabRef/jabref/issues/16585)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
 - We added a way to review and edit entries one by one before adding them from the citations tab. [#13598](https://github.com/JabRef/jabref/issues/13598)
 - We added an automatically generated commit message to the Git commit message box. [#16763](https://github.com/JabRef/jabref/issues/16763)
@@ -119,6 +121,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
 - We fixed an issue where group selections were lost when changing library tabs. [#1104](https://github.com/JabRef/jabref/issues/1104)
+- We fixed obsolete group assignments remaining after changing an explicit group's grouping method. [#8824](https://github.com/JabRef/jabref/issues/8824)
 - We fixed an issue where the AI chat tab still said "Unable to chat" after attaching a file. [#17157](https://github.com/JabRef/jabref/pull/17157)
 - We fixed an issue where importing a PDF could set the exporter's account name as author. [#16247](https://github.com/JabRef/jabref/pull/16247)
 - We fixed an issue where importing a PDF could set an implausible year, such as a postal code. [#16247](https://github.com/JabRef/jabref/pull/16247)
@@ -139,6 +142,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed line navigation and deletion shortcuts in multiline entry fields and the source editor. [#17256](https://github.com/JabRef/jabref/issues/17256)
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
+- We fixed an issue where the side panels were not reachable in small windows. [#17470](https://github.com/JabRef/jabref/issues/17470)
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 - We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
