@@ -7,8 +7,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
@@ -43,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -286,6 +295,80 @@ class BackupManagerTest {
         } finally {
             BackupManager.shutdown(context, backupDir, false);
             filter.shutdown();
+        }
+    }
+
+    @Test
+        // [utest->req~jabgui.autosaveandbackup.serialized-writes~1]
+    void shutdownWaitsForScheduledBackupBeforeWritingNewestEdit(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        Path libraryPath = tempDir.resolve("library.bib");
+        context.setDatabasePath(libraryPath);
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        var fieldPreferences = preferences.getFieldPreferences();
+        CountDownLatch snapshotCaptured = new CountDownLatch(1);
+        CountDownLatch releaseSnapshot = new CountDownLatch(1);
+        AtomicInteger writes = new AtomicInteger();
+        AtomicBoolean overlappingWrites = new AtomicBoolean();
+        when(preferences.getFieldPreferences()).thenAnswer(_ -> {
+            if (writes.incrementAndGet() == 1) {
+                snapshotCaptured.countDown();
+                assertTrue(releaseSnapshot.await(5, TimeUnit.SECONDS));
+            } else {
+                overlappingWrites.set(releaseSnapshot.getCount() > 0);
+            }
+            return fieldPreferences;
+        });
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        try (var scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+             var shutdownExecutor = Executors.newSingleThreadExecutor()) {
+            try {
+                entry.setField(StandardField.EDITOR, "Editor");
+                Path backupPath = manager.determineBackupPathForNewBackup(backupDir).orElseThrow();
+                Future<?> scheduledBackup = scheduledExecutor.schedule(() -> manager.performBackup(backupPath), 0, TimeUnit.SECONDS);
+                assertTrue(snapshotCaptured.await(5, TimeUnit.SECONDS));
+                entry.setField(StandardField.EDITOR, "Editor!");
+                CompletableFuture<Thread> shutdownThread = new CompletableFuture<>();
+                Future<?> shutdownBackup = shutdownExecutor.submit(() -> {
+                    shutdownThread.complete(Thread.currentThread());
+                    BackupManager.shutdown(context, backupDir, true);
+                });
+                awaitShutdownBackupAttempt(shutdownBackup, shutdownThread.get(5, TimeUnit.SECONDS));
+                releaseSnapshot.countDown();
+                scheduledBackup.get(5, TimeUnit.SECONDS);
+                shutdownBackup.get(5, TimeUnit.SECONDS);
+
+                Path latestBackup = BackupManager.getLatestBackupPath(libraryPath, backupDir).orElseThrow();
+                assertEquals(Optional.of("Editor!"), BibtexParser.singleFromString(Files.readString(latestBackup), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS))
+                                                                 .orElseThrow().getField(StandardField.EDITOR));
+                assertFalse(overlappingWrites.get());
+                assertEquals(2, writes.get());
+            } finally {
+                releaseSnapshot.countDown();
+            }
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
+    }
+
+    private void awaitShutdownBackupAttempt(Future<?> shutdownBackup, Thread shutdownThread) {
+        long startedAt = System.nanoTime();
+        // Release the older writer only once shutdown has finished or is waiting at the backup monitor.
+        while (!shutdownBackup.isDone()) {
+            if (shutdownThread.getState() == Thread.State.BLOCKED
+                    && Arrays.stream(shutdownThread.getStackTrace()).findFirst()
+                             .filter(frame -> frame.getClassName().equals(BackupManager.class.getName()) && "performBackup".equals(frame.getMethodName()))
+                             .isPresent()) {
+                return;
+            }
+            if (System.nanoTime() - startedAt >= TimeUnit.SECONDS.toNanos(5)) {
+                fail("Shutdown did not finish or wait for the in-flight backup");
+            }
+            Thread.yield();
         }
     }
 

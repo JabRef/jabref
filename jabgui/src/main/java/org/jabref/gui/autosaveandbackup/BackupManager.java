@@ -222,9 +222,12 @@ public class BackupManager {
     ///
     /// *SIDE EFFECT: Deletes oldest backup file*
     ///
+    /// Scheduled and shutdown backups must not commit snapshots out of order.
+    /// [impl->req~jabgui.autosaveandbackup.serialized-writes~1]
+    ///
     /// @param backupPath the full path to the file where the library should be backed up to
     // [impl->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
-    void performBackup(Path backupPath) {
+    synchronized void performBackup(Path backupPath) {
         long generation = changeGeneration.get();
         if (generation == backedUpGeneration.get()) {
             return;

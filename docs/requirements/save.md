@@ -65,6 +65,14 @@ A failed backup must leave its edits pending for another attempt.
 
 Needs: impl, utest
 
+## Backup writers for a library must execute one at a time
+`req~jabgui.autosaveandbackup.serialized-writes~1`
+
+Scheduled backups and backups requested during shutdown must serialize generation capture, snapshot creation, file commit, and completion acknowledgement.
+A shutdown backup must wait for an in-flight backup before capturing the latest edits, so an older snapshot cannot replace the final backup.
+
+Needs: impl, utest
+
 ## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
