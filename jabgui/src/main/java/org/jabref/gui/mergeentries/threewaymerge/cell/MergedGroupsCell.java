@@ -31,6 +31,8 @@ public class MergedGroupsCell extends ThreeWayMergeCell {
         getChildren().add(groupsEditor);
     }
 
+    /// The editor gets its own undo manager because it is never bound to an entry and thus records no edits.
+    /// The merge itself is recorded in the library's undo history as a single edit when the user confirms the dialog.
     private static GroupsEditor createGroupsEditor(GuiPreferences preferences, StateManager stateManager) {
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElseGet(BibDatabaseContext::new);
         SuggestionProviders suggestionProviders = stateManager.activeTabProperty().get()
