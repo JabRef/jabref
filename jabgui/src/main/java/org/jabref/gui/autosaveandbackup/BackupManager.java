@@ -319,11 +319,11 @@ public class BackupManager {
         }
     }
 
+    /// Minor typing events must also arm the backup; the scheduled task throttles writes.
+    /// [impl->req~jabgui.autosaveandbackup.backup-every-edit~1]
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (!event.isFiltered()) {
-            this.needsBackup = true;
-        }
+        this.needsBackup = true;
     }
 
     private void startBackupTask(Path backupDir) {

@@ -12,6 +12,9 @@ import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -19,7 +22,10 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
@@ -28,6 +34,8 @@ import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -176,6 +184,45 @@ class BackupManagerTest {
         BackupManager.RestoreResult.Failed failure = assertInstanceOf(BackupManager.RestoreResult.Failed.class, result);
         assertEquals(backup, failure.backupPath());
         assertInstanceOf(DirectoryNotEmptyException.class, failure.exception());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "A"})
+        // [utest->req~jabgui.autosaveandbackup.backup-every-edit~1]
+    void typingIntoNewOrExistingFieldIsBackedUp(String initialValue, @TempDir Path tempDir) throws IOException, ParseException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry").withField(StandardField.EDITOR, initialValue);
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        Path originalFile = tempDir.resolve("library.bib");
+        context.setDatabasePath(originalFile);
+        Files.writeString(originalFile, """
+                @Article{entry,
+                  editor = {%s},
+                }
+                """.formatted(initialValue));
+        Files.setLastModifiedTime(originalFile, FileTime.fromMillis(0));
+
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        Path backupPath = manager.determineBackupPathForNewBackup(backupDir).orElseThrow();
+        String editor = initialValue + "Editor";
+        try {
+            for (int length = initialValue.length() + 1; length <= editor.length(); length++) {
+                String value = editor.substring(0, length);
+                entry.setField(StandardField.EDITOR, value);
+                manager.performBackup(backupPath);
+
+                assertEquals(Optional.of(value), BibtexParser.singleFromString(Files.readString(backupPath), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS))
+                                                             .orElseThrow().getField(StandardField.EDITOR));
+            }
+            assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir));
+            assertEquals(new BackupManager.RestoreResult.Restored(), BackupManager.restoreBackup(originalFile, backupDir));
+            assertEquals(Files.readString(backupPath), Files.readString(originalFile));
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
     }
 
     @Test

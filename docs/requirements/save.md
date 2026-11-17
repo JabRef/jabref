@@ -47,6 +47,16 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Backup must batch field edits into scheduled writes
+`req~jabgui.autosaveandbackup.backup-every-edit~1`
+
+Typing into a newly added or existing field must mark the library for backup, including single-character changes.
+Keystrokes must only mark a backup as pending; they must not trigger serialization or disk writes.
+The backup timer must batch pending edits into at most one backup write per interval (currently 19 seconds).
+The next scheduled backup must contain the latest field value so recovery can detect and restore unsaved edits after a crash.
+
+Needs: impl, utest
+
 ## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
