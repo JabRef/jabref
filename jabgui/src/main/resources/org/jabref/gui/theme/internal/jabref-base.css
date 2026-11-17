@@ -274,11 +274,23 @@
 }
 
 .rating > .container > .button {
-    -fx-icon-color: derive(-fx-text-base-color, 65%);
+    -fx-icon-code: "mdi2s-star-outline";
+    -fx-icon-color: -color-accent;
+    -fx-opacity: 0.6;
 }
 
 .rating > .container > .button.strong {
-    -fx-icon-color: -fx-text-base-color;
+    -fx-icon-code: "mdi2s-star";
+    -fx-opacity: 1;
+}
+
+.table-row-cell:selected .rating > .container > .button {
+    -fx-icon-color: -color-fg-default;
+    -fx-opacity: 1;
+}
+
+.table-row-cell:selected .rating > .container > .button.strong {
+    -fx-opacity: 1;
 }
 
 .file-row-text {
