@@ -1,6 +1,6 @@
 TY  - GEN
-\begin{author}\format[FormatChars,RisAuthors(AU)]{\author}\end{author}
-\begin{editor}\format[FormatChars,RisAuthors(A2)]{\editor}\end{editor}
+\begin{author}\format[RisAuthors(AU)]{\author}\end{author}
+\begin{editor}\format[RisAuthors(A2)]{\editor}\end{editor}
 \begin{title}T1  - \format[FormatChars]{\title}\end{title}
 \begin{journal}JO  - \format[FormatChars]{\journal}\end{journal}
 \begin{publisher}PB  - \format[FormatChars]{\publisher}\end{publisher}
