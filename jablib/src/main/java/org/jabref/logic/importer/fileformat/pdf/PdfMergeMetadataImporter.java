@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -187,7 +186,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
             return book;
         }
 
-        Map<ISBN, Optional<BibEntry>> candidates = new LinkedHashMap<>();
+        Map<ISBN, Optional<BibEntry>> candidates = new HashMap<>();
         for (ISBN isbn : book.isbnCandidates()) {
             candidates.put(isbn, fetchIsbn(isbn.asString(), isbnCache));
         }
