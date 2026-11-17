@@ -626,6 +626,7 @@ We want to have a look that matches our icons in the tool-bar */
 .tags-field > .flow-pane > .tag-view:selected {
     -fx-background: -color-button-default;
     -fx-background-color: -color-fg-default, -color-button-default;
+    /* 2px outline at the default 12px root font; em so it scales with the font size */
     -fx-background-insets: 0, 0.166667em;
     -fx-text-fill: -fx-text-background-color;
 }
