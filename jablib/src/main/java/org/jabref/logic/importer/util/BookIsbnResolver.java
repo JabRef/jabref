@@ -17,6 +17,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class BookIsbnResolver {
 
+    // Limit the number of external lookups during ISBN resolution to avoid excessive requests which could delay imports.
     public static final int MAX_CANDIDATES = 4;
     private static final Pattern SEPARATORS = Pattern.compile("[\\p{P}\\p{Z}\\s]+");
     private static final Pattern YEAR = Pattern.compile("[0-9]{4}");
