@@ -186,7 +186,7 @@ Needs: impl, utest
 ## PDF book imports must resolve ISBN ambiguity when several ISBNs were found in the text
 `req~import.pdf.book-isbn-resolution~1`
 
-Equivalent ISBN-10 and ISBN-13 forms count as one candidate. If the multiple valid ISBNs are found, keep any extracted book metadata, leave the ISBN unset, and show a warning. See [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874).
+Equivalent ISBN-10 and ISBN-13 forms count as one candidate. If the multiple valid ISBNs are found, merged PDF import selects one only when lookup results and extracted book metadata identify a unique match and the other options are ruled out. Otherwise, keep any extracted book metadata, leave the ISBN unset, and show a warning.
 
 Needs: impl, utest
 
