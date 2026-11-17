@@ -245,28 +245,32 @@ public class PdfContentImporter extends PdfImporter {
     ParserResult importBook(BookMetadataExtractionResult book) {
         Optional<BibEntry> localBook = book.localBook();
         List<ISBN> isbns = book.isbnCandidates();
-        if (isbns.size() > 1) {
-            ParserResult result;
-            if (localBook.isEmpty()) {
-                result = new ParserResult();
-            } else {
-                result = new ParserResult(List.of(localBook.orElseThrow()));
-            }
 
+        ParserResult result;
+        if (localBook.isPresent() && isbns.size() == 1) {
+            BibEntry bookEntry = new BibEntry(localBook.orElseThrow());
+            bookEntry.withField(StandardField.ISBN, isbns.getFirst().asString());
+            result = new ParserResult(List.of(bookEntry));
+        } else if (localBook.isPresent()) {
+            BibEntry bookEntry = new BibEntry(localBook.orElseThrow());
+            result = new ParserResult(List.of(bookEntry));
+        } else if (isbns.size() == 1) {
+            BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
+            bookEntry.withField(StandardField.ISBN, isbns.getFirst().asString());
+            result = new ParserResult(List.of(bookEntry));
+        } else if (isbns.size() <= 1) {
+            BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
+            result = new ParserResult(List.of(bookEntry));
+        } else {
+            result = new ParserResult();
+        }
+
+        if (isbns.size() > 1) {
             result.addWarning(Localization.lang("More than one ISBN found: %0. No ISBN was selected.",
                     String.join(", ", isbns.stream().map(ISBN::asString).toList())));
-            return result;
         }
-        BibEntry bookEntry;
-        if (localBook.isEmpty()) {
-            bookEntry = new BibEntry(StandardEntryType.Book);
-        } else {
-            bookEntry = new BibEntry(localBook.orElseThrow());
-        }
-        if (isbns.size() == 1) {
-            bookEntry.withField(StandardField.ISBN, isbns.getFirst().asString());
-        }
-        return new ParserResult(List.of(bookEntry));
+
+        return result;
     }
 
     private Optional<BibEntry> extractBookMetadata(String pageText) {
