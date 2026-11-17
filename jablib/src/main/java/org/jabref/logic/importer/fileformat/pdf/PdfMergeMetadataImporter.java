@@ -223,15 +223,16 @@ public class PdfMergeMetadataImporter extends PdfImporter {
             // One should also check if `archivePrefix` is equal to `arXiv`, and handle other cases too.
             fetchData(candidate, StandardField.EPRINT, arXivFetcher, fetchedIds, fetchedCandidates);
 
-            candidate.getField(StandardField.ISBN)
-                     .filter(_ -> unresolvedBookIsbns.isEmpty())
-                     .map(identifier -> ISBN.parse(identifier)
-                                            .flatMap(ISBN::asIsbn13)
-                                            .map(ISBN::asString)
-                                            .orElse(identifier))
-                     .filter(fetchedIds::add)
-                     .flatMap(identifier -> fetchIsbn(identifier, isbnCache))
-                     .ifPresent(fetchedCandidates::add);
+            if (unresolvedBookIsbns.isEmpty()) {
+                candidate.getField(StandardField.ISBN)
+                         .map(identifier -> ISBN.parse(identifier)
+                                                .flatMap(ISBN::asIsbn13)
+                                                .map(ISBN::asString)
+                                                .orElse(identifier))
+                         .filter(fetchedIds::add)
+                         .flatMap(identifier -> fetchIsbn(identifier, isbnCache))
+                         .ifPresent(fetchedCandidates::add);
+            }
 
             // TODO: Handle URLs too.
             // However, it may have problems if URL refers to the same identifier in DOI, ISBN, or arXiv.
