@@ -40,6 +40,6 @@ class RISImporterTest {
                                  .getDatabase().getEntries().getFirst();
 
         assertEquals(Optional.of("1"), entry.getField(StandardField.NUMBER));
-        assertEquals(Optional.of("26957754"), entry.getField(new UnknownField("accession-number")));
+        assertEquals(Optional.of("26957754"), entry.getField(new UnknownField("accession-num")));
     }
 }
