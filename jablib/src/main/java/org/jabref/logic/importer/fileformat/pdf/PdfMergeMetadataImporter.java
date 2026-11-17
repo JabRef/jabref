@@ -195,7 +195,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         if (selectedIsbn.isEmpty()) {
             return book;
         }
-        return new BookMetadataExtractionResult(book.localBook(), List.of(selectedIsbn.orElseThrow()));
+        return new BookMetadataExtractionResult(book.localBook(), List.of(selectedIsbn.get()));
     }
 
     private Optional<BibEntry> fetchIsbn(String identifier, Map<String, Optional<BibEntry>> isbnCache) {

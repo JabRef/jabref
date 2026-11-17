@@ -219,7 +219,7 @@ public class PdfContentImporter extends PdfImporter {
         if (book.isEmpty()) {
             return importPaperContent(document);
         }
-        return importBook(book.orElseThrow());
+        return importBook(book.get());
     }
 
     Optional<BookMetadataExtractionResult> extractBook(PDDocument document) throws IOException {
@@ -228,7 +228,7 @@ public class PdfContentImporter extends PdfImporter {
         if (bibliographicPages.isEmpty()) {
             return Optional.empty();
         }
-        String pageText = bibliographicPages.orElseThrow();
+        String pageText = bibliographicPages.get();
         Optional<BibEntry> localBook = extractBookMetadata(pageText);
 
         List<ISBN> isbns = ISBN.findAllInText(pageText).stream()
@@ -248,11 +248,11 @@ public class PdfContentImporter extends PdfImporter {
 
         ParserResult result;
         if (localBook.isPresent() && isbns.size() == 1) {
-            BibEntry bookEntry = new BibEntry(localBook.orElseThrow());
+            BibEntry bookEntry = new BibEntry(localBook.get());
             bookEntry.withField(StandardField.ISBN, isbns.getFirst().asString());
             result = new ParserResult(List.of(bookEntry));
         } else if (localBook.isPresent()) {
-            BibEntry bookEntry = new BibEntry(localBook.orElseThrow());
+            BibEntry bookEntry = new BibEntry(localBook.get());
             result = new ParserResult(List.of(bookEntry));
         } else if (isbns.size() == 1) {
             BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
