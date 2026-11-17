@@ -57,6 +57,14 @@ The next scheduled backup must contain the latest field value so recovery can de
 
 Needs: impl, utest
 
+## Backup completion must preserve pending edits made after its snapshot
+`req~jabgui.autosaveandbackup.preserve-pending-edits~1`
+
+A field edit received after a backup captures its snapshot must remain pending for the next scheduled backup, even if the older snapshot is written successfully.
+A failed backup must leave its edits pending for another attempt.
+
+Needs: impl, utest
+
 ## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 

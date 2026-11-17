@@ -226,6 +226,70 @@ class BackupManagerTest {
     }
 
     @Test
+        // [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
+    void editAfterSnapshotIsIncludedInNextBackup(@TempDir Path tempDir) throws IOException, ParseException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        context.setDatabasePath(tempDir.resolve("library.bib"));
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        var fieldPreferences = preferences.getFieldPreferences();
+        // Writer preferences are read after cloning, so this edit cannot be in the first snapshot.
+        when(preferences.getFieldPreferences()).thenAnswer(_ -> {
+            entry.setField(StandardField.EDITOR, "Editor!");
+            return fieldPreferences;
+        }).thenReturn(fieldPreferences);
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        ImportFormatPreferences importPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        Path firstBackup = tempDir.resolve("first.bib");
+        Path nextBackup = tempDir.resolve("next.bib");
+        Path unnecessaryBackup = tempDir.resolve("unnecessary.bib");
+        try {
+            entry.setField(StandardField.EDITOR, "Editor");
+            manager.performBackup(firstBackup);
+            assertEquals(Optional.of("Editor"), BibtexParser.singleFromString(Files.readString(firstBackup), importPreferences)
+                                                            .orElseThrow().getField(StandardField.EDITOR));
+
+            manager.performBackup(nextBackup);
+            assertEquals(Optional.of("Editor!"), BibtexParser.singleFromString(Files.readString(nextBackup), importPreferences)
+                                                             .orElseThrow().getField(StandardField.EDITOR));
+
+            manager.performBackup(unnecessaryBackup);
+            assertFalse(Files.exists(unnecessaryBackup));
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
+    }
+
+    @Test
+        // [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
+    void failedBackupCommitLeavesEditsPending(@TempDir Path tempDir) throws IOException, ParseException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        context.setDatabasePath(tempDir.resolve("library.bib"));
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        Path failedBackup = Files.createDirectory(tempDir.resolve("failed.bib"));
+        Files.writeString(failedBackup.resolve("existing"), "Keep this file");
+        Path nextBackup = tempDir.resolve("next.bib");
+        try {
+            entry.setField(StandardField.EDITOR, "Editor");
+            manager.performBackup(failedBackup);
+            manager.performBackup(nextBackup);
+
+            assertEquals(Optional.of("Editor"), BibtexParser.singleFromString(Files.readString(nextBackup), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS))
+                                                            .orElseThrow().getField(StandardField.EDITOR));
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
+    }
+
+    @Test
     void shouldNotCreateABackup(@TempDir Path customDir) throws IOException {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
