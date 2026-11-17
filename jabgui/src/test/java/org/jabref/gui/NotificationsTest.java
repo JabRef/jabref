@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.concurrent.Task;
+import javafx.util.Duration;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -96,6 +97,32 @@ class NotificationsTest {
         runToEnd(BackgroundTask.wrap(SUCCEEDING).setTitle(""));
 
         assertEquals(List.of(), group.getNotifications());
+    }
+
+    @Test
+    void autoCloseRemovesTheNotification() throws InterruptedException {
+        NotificationGroup<Object, Notifications.UiNotification> uiGroup = new NotificationGroup<>("UI");
+        UiTaskExecutor.runAndWaitInJavaFXThread(() ->
+                uiGroup.getNotifications().add(new Notifications.UiNotification("Title", "Description").withAutoClose(Duration.millis(10))));
+
+        waitForAutoClose();
+
+        assertEquals(List.of(), uiGroup.getNotifications());
+    }
+
+    /// The user may remove a notification before it closes itself, or it may never have been shown
+    @Test
+    void autoCloseOfANotificationOutsideAnyGroupDoesNotFail() throws InterruptedException {
+        UiTaskExecutor.runAndWaitInJavaFXThread(() -> new Notifications.UiNotification("Title", "Description").withAutoClose(Duration.millis(10)));
+
+        waitForAutoClose();
+
+        JavaFxExtension.awaitEvents();
+    }
+
+    private static void waitForAutoClose() throws InterruptedException {
+        Thread.sleep(200);
+        flushJavaFXThread();
     }
 
     private Notifications.TaskNotification runToEnd(BackgroundTask<Void> backgroundTask) {

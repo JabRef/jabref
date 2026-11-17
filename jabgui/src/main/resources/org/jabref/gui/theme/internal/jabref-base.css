@@ -274,7 +274,7 @@
 }
 
 .rating > .container > .button {
-    -fx-icon-color: derive(-fx-text-base-color, 85%);
+    -fx-icon-color: derive(-fx-text-base-color, 65%);
 }
 
 .rating > .container > .button.strong {
@@ -1815,4 +1815,12 @@ We want to have a look that matches our icons in the tool-bar */
 
 .flashing-danger {
     -fx-background-color: -color-danger;
+}
+
+.side-pane-scroll {
+    -fx-padding: 0;
+}
+
+.side-pane-scroll > .scroll-bar:vertical {
+    -fx-padding: 0 4 0 4;
 }
