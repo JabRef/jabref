@@ -15,7 +15,7 @@ public class FirstPage implements LayoutFormatter {
         if (s == null) {
             return "";
         }
-        String strippedPages = s.strip();
+        String strippedPages = s.replace('\u00A0', ' ').strip();
         String[] pageParts = strippedPages.split("[ \\-\u2013\u2014]+");
         if (pageParts.length == 2) {
             return pageParts[0];
