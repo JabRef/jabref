@@ -19,9 +19,11 @@ public class OpenOfficeInstallationDetector {
 
     private final OpenOfficePreferences openOfficePreferences;
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
 
-    public OpenOfficeInstallationDetector(OpenOfficePreferences openOfficePreferences, DialogService dialogService) {
+    public OpenOfficeInstallationDetector(OpenOfficePreferences openOfficePreferences, DialogService dialogService, NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
         this.openOfficePreferences = openOfficePreferences;
     }
 
@@ -33,7 +35,7 @@ public class OpenOfficeInstallationDetector {
         dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
                 Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(NativeDesktop.get().getApplicationDirectory())
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
                 .build();
         return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
     }
