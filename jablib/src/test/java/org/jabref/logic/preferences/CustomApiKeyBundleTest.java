@@ -86,7 +86,7 @@ class CustomApiKeyBundleTest {
         assertEquals(expected, preferences.getImporterPreferences().getApiKeys());
         verify(keyring).getPassword("org.jabref.apikeys.bundle", "keys");
         assertEquals(1, Mockito.mockingDetails(keyring).getInvocations().stream()
-                               .filter(invocation -> invocation.getMethod().getName().equals("getPassword")).count());
+                               .filter(invocation -> "getPassword".equals(invocation.getMethod().getName())).count());
     }
 
     @Test
