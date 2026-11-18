@@ -84,7 +84,7 @@ public final class PreviewHtmlProcessor {
                             }
                             target.attr("style", newStyle);
                         }
-                    } catch (SelectorParseException e) {
+                    } catch (SelectorParseException _) {
                         // Ignore unsupported CSS selectors
                     }
                 }
@@ -428,7 +428,7 @@ public final class PreviewHtmlProcessor {
                     yield OptionalDouble.of(raw);
                 }
             };
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return OptionalDouble.empty();
         }
     }
@@ -454,7 +454,7 @@ public final class PreviewHtmlProcessor {
                 default ->
                         OptionalDouble.empty();
             };
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return OptionalDouble.empty();
         }
     }
