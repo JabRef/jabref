@@ -1179,9 +1179,19 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background: -color-bg-sidepane;
 }
 
+.group-tree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell {
+    -fx-padding: 0;
+}
+
+.group-tree .tree-table-row-cell > .numberColumn {
+    -fx-alignment: center-right;
+    -fx-padding: 0 0.2em 0 0;
+}
+
 .group-tree .numberColumn > .hits {
     -fx-background: -color-badge-bg;
     -fx-background-color: -color-badge-bg;
+    -fx-padding: 0.15em 0.35em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
 }
@@ -1205,6 +1215,18 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-color: -color-border-muted;
 }
 
+.group-tree .tree-table-row-cell:root > .tree-table-cell {
+    -fx-padding: 0 0 0 1em;
+}
+
+.group-tree .tree-table-row-cell:root > .numberColumn {
+    -fx-padding: 0 0.2em 0 0;
+}
+
+.group-tree .tree-table-row-cell:root > .expansionNodeColumn {
+    -fx-padding: 0 0.2em 0 0.2em;
+}
+
 .group-tree .tree-table-row-cell:empty {
     -fx-background-color: transparent; /* hide cells which are not bound to a group */
 }
@@ -1218,12 +1240,16 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-fg-muted;
     -fx-max-height: 0.5em;
     -fx-max-width: 0.5em;
-    -fx-padding: 0.333333em; /* 4 */
+    -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
     -fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
 }
 
 .group-tree .tree-table-row-cell:expanded > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-rotate: 90;
+}
+
+.group-tree .tree-table-row-cell > .tree-table-cell > .icon {
+    -fx-translate-x: -0.4em;
 }
 
 .group-tree .numberColumn > .hits:all-selected {

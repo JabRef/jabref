@@ -390,7 +390,7 @@ public class GroupTreeView extends BorderPane {
         text.getStyleClass().setAll("text");
 
         node.getChildren().add(text);
-        node.setMaxHeight(Region.USE_PREF_SIZE);
+        node.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         return node;
     }
 
