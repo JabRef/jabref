@@ -2,6 +2,9 @@ package org.jabref.gui.preferences;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -115,5 +118,21 @@ class JabRefGuiPreferencesTest {
         assertEquals(command, JabRefGuiPreferences.getCommandArguments(
                 preferences, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, List.of()));
         verify(preferences).putStringList(CONSOLE_COMMAND_ARGUMENTS, command);
+    }
+
+    @Test
+    void suppliedPreferencesNodePersistsWorkspaceSettings() throws BackingStoreException {
+        Preferences node = Preferences.userRoot().node("/org/jabref-gui-preferences-test-" + UUID.randomUUID());
+        try {
+            JabRefGuiPreferences preferences = new JabRefGuiPreferences(node);
+            preferences.getWorkspacePreferences().setMainFontSize(17);
+            preferences.getWorkspacePreferences().setWrapMainTableText(false);
+
+            JabRefGuiPreferences reloaded = new JabRefGuiPreferences(node);
+            assertEquals(17, reloaded.getWorkspacePreferences().getMainFontSize());
+            assertEquals(false, reloaded.getWorkspacePreferences().shouldWrapMainTableText());
+        } finally {
+            node.removeNode();
+        }
     }
 }

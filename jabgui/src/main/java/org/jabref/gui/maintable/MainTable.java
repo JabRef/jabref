@@ -79,6 +79,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +107,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final ClipboardContentGenerator clipboardContentGenerator;
     private final ColumnPreferencesApplier columnPreferencesApplier;
     private final ColumnPreferencesRecorder columnPreferencesRecorder;
+    private final Subscription wrapTextSubscription;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
@@ -138,7 +140,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.importHandler = importHandler;
         this.nativeDesktop = nativeDesktop;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
-        BindingsHelper.includePseudoClassWhen(this, WRAP_TEXT, preferences.getWorkspacePreferences().wrapMainTableTextProperty());
+        wrapTextSubscription = BindingsHelper.includePseudoClassWhen(this, WRAP_TEXT, preferences.getWorkspacePreferences().wrapMainTableTextProperty());
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -594,6 +596,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void dispose() {
+        wrapTextSubscription.unsubscribe();
         columnPreferencesApplier.unbind();
         columnPreferencesRecorder.unbind();
         database.getDatabase().unregisterListener(this);

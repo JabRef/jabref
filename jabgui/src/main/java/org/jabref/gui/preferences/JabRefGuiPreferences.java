@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
@@ -309,6 +310,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private DonationPreferences donationPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private MathSciNetPreferences mathSciNetPreferences;
+
+    public JabRefGuiPreferences() {
+        super();
+    }
+
+    public JabRefGuiPreferences(Preferences preferencesNode) {
+        super(preferencesNode);
+    }
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).

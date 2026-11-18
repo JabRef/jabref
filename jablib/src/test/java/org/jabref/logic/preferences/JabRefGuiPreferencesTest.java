@@ -1,6 +1,10 @@
 package org.jabref.logic.preferences;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -35,5 +39,24 @@ class JabRefGuiPreferencesTest {
     @Test
     void convertStringToListPreservesUnescapedBackslashes() {
         assertEquals(List.of("C:\\Tools\\app.exe"), JabRefCliPreferences.convertStringToList("C:\\Tools\\app.exe"));
+    }
+
+    @Test
+    void suppliedPreferencesNodesKeepValuesAndChildNodesSeparate() throws BackingStoreException {
+        Preferences root = Preferences.userRoot().node("/org/jabref-preferences-test-" + UUID.randomUUID());
+        try {
+            JabRefCliPreferences first = new JabRefCliPreferences(root.node("first"));
+            JabRefCliPreferences second = new JabRefCliPreferences(root.node("second"));
+            first.put("isolatedValue", "first");
+            second.put("isolatedValue", "second");
+            first.addDeclinedCustomEntryTypes(Set.of("article"));
+
+            assertEquals("first", new JabRefCliPreferences(root.node("first")).get("isolatedValue", ""));
+            assertEquals("second", second.get("isolatedValue", ""));
+            assertEquals(Set.of("article"), first.getDeclinedCustomEntryTypes());
+            assertEquals(Set.of(), second.getDeclinedCustomEntryTypes());
+        } finally {
+            root.removeNode();
+        }
     }
 }
