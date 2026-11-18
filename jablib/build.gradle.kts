@@ -115,6 +115,7 @@ tasks.withType<JBangTask>().configureEach {
 
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
+val generatedConferenceFile = layout.buildDirectory.file("generated/resources/conferences/conference-list.mv")
 
 // JBang compiles the files listed in `//SOURCES` into the script, so they must be task inputs
 // as well - otherwise a change there leaves the generated output stale.
@@ -134,15 +135,16 @@ fun jbangSources(script: RegularFile): FileCollection {
 
 var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
     group = "JabRef"
-    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    description = "Converts journal and conference abbreviation CSV files to separate H2 MVStores"
     dependsOn(tasks.named("generateGrammarSource"))
-    val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java")
+    val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/AbbreviationListMvGenerator.java")
     script = '"' + generatorScript.asFile.absolutePath + '"'
 
     inputs.dir(abbrvJabRefOrgDir)
     inputs.file(generatorScript)
     inputs.files(jbangSources(generatorScript))
     outputs.file(generatedJournalFile)
+    outputs.file(generatedConferenceFile)
 }
 
 var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {

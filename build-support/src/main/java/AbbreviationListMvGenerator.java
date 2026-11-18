@@ -16,8 +16,11 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationLoader.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/LtwaEntry.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/LtwaRepository.java
@@ -33,7 +36,6 @@
 //SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -42,29 +44,22 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.AbbreviationLoader;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
-import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
-public class JournalListMvGenerator {
+@NullMarked
+public class AbbreviationListMvGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JournalListMvGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviationListMvGenerator.class);
 
     static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
-
-        Path abbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", "journals");
-        if (!Files.exists(abbreviationsDirectory)) {
-            System.out.println("Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist");
-            System.exit(0);
-        }
-        // Directory layout aligns to other plugins (e.g., XJF plugin (https://github.com/bjornvester/xjc-gradle-plugin))
-        Path journalListMvFile = Path.of("jablib", "build", "generated", "resources", "journals", "journal-list.mv");
 
         Set<String> ignoredNames = Set.of(
                 // remove all lists without dot in them:
@@ -77,39 +72,54 @@ public class JournalListMvGenerator {
                 "journal_abbreviations_ieee_strings.csv"
         );
 
-        Files.createDirectories(journalListMvFile.getParent());
+        generate("journals", "journal-list.mv", ignoredNames, verbose);
+        // [impl->req~abbreviations.conference-store~1]
+        generate("conferences", "conference-list.mv", Set.of(), verbose);
+    }
 
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(abbreviationsDirectory, "*.csv");
-             MVStore store = new MVStore.Builder().
-                     fileName(journalListMvFile.toString()).
-                     compressHigh().
-                     open()) {
+    private static void generate(String directory, String fileName, Set<String> ignoredNames, boolean verbose) throws IOException {
+        Path abbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", directory);
+        Path abbreviationListMvFile = Path.of("jablib", "build", "generated", "resources", directory, fileName);
+
+        Files.createDirectories(abbreviationListMvFile.getParent());
+
+        try (MVStore store = new MVStore.Builder().
+                fileName(abbreviationListMvFile.toString()).
+                compressHigh().
+                open()) {
             MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
-            stream.forEach(Unchecked.consumer(path -> {
-                String fileName = path.getFileName().toString();
-                System.out.print("Checking ");
-                System.out.print(fileName);
-                if (ignoredNames.contains(fileName)) {
-                    System.out.println(" ignored");
-                } else {
-                    System.out.println("...");
-                    Collection<Abbreviation> abbreviations = JournalAbbreviationLoader.readAbbreviationsFromCsvFile(path);
-                    Map<String, Abbreviation> abbreviationMap = abbreviations
-                            .stream()
-                            .collect(Collectors.toMap(
-                                    Abbreviation::getName,
-                                    abbreviation -> abbreviation,
-                                    (abbreviation1, abbreviation2) -> {
-                                        if (verbose) {
-                                            System.out.println("Double entry " + abbreviation1.getName());
-                                        }
-                                        return abbreviation2;
-                                    }));
-                    fullToAbbreviation.putAll(abbreviationMap);
+            fullToAbbreviation.clear();
+            if (!Files.isDirectory(abbreviationsDirectory)) {
+                LOGGER.info("No abbreviation lists available at {}", abbreviationsDirectory);
+                return;
+            }
+            try (var stream = Files.list(abbreviationsDirectory)) {
+                for (Path path : stream.filter(path -> path.toString().endsWith(".csv")).toList()) {
+                    String csvFileName = path.getFileName().toString();
+                    System.out.print("Checking ");
+                    System.out.print(csvFileName);
+                    if (ignoredNames.contains(csvFileName)) {
+                        System.out.println(" ignored");
+                    } else {
+                        System.out.println("...");
+                        Collection<Abbreviation> abbreviations = AbbreviationLoader.readAbbreviationsFromCsvFile(path);
+                        Map<String, Abbreviation> abbreviationMap = abbreviations
+                                .stream()
+                                .collect(Collectors.toMap(
+                                        Abbreviation::getName,
+                                        abbreviation -> abbreviation,
+                                        (abbreviation1, abbreviation2) -> {
+                                            if (verbose) {
+                                                System.out.println("Double entry " + abbreviation1.getName());
+                                            }
+                                            return abbreviation2;
+                                        }));
+                        fullToAbbreviation.putAll(abbreviationMap);
+                    }
                 }
-            }));
+            }
         }
 
-        LOGGER.info("Generated journal list at {}", journalListMvFile.toAbsolutePath());
+        LOGGER.info("Generated abbreviation list at {}", abbreviationListMvFile.toAbsolutePath());
     }
 }

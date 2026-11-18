@@ -89,7 +89,7 @@ public class CleanupDialog extends BaseDialog<Void> {
                 new Tab(Localization.lang("Single field"), singleFieldPanel),
                 new Tab(Localization.lang("File-related"), fileRelatedPanel),
                 new Tab(Localization.lang("Multi-field"), multiFieldPanel),
-                new Tab(Localization.lang("Journal-related"), journalRelatedPanel)
+                new Tab(Localization.lang("Journals and book titles"), journalRelatedPanel)
         );
 
         Button btn = (Button) getDialogPane().lookupButton(cleanUpButton);

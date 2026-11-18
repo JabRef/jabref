@@ -16,8 +16,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.AbbreviationLoader;
 import org.jabref.logic.journals.AbbreviationWriter;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 /// This class provides a model for abbreviation files. It actually doesn't save the files as objects but rather saves
 /// their paths. This also allows to specify pseudo files as placeholder objects.
@@ -47,7 +47,7 @@ public class AbbreviationsFileViewModel {
 
     public void readAbbreviations() throws IOException {
         if (path.isPresent()) {
-            Collection<Abbreviation> abbreviationList = JournalAbbreviationLoader.readAbbreviationsFromCsvFile(path.get());
+            Collection<Abbreviation> abbreviationList = AbbreviationLoader.readAbbreviationsFromCsvFile(path.get());
             abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
         } else {
             throw new FileNotFoundException();

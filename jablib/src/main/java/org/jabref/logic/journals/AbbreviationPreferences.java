@@ -2,67 +2,24 @@ package org.jabref.logic.journals;
 
 import java.util.List;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class AbbreviationPreferences {
+import org.jspecify.annotations.NullMarked;
 
-    private final ObservableList<String> externalJournalLists;
-    private final BooleanProperty useFJournalField;
-    private final BooleanProperty shouldEnableMscKeywordDescriptions;
+@NullMarked
+public abstract class AbbreviationPreferences {
+    private final ObservableList<String> externalLists;
 
-    public AbbreviationPreferences(List<String> externalJournalLists,
-                                   boolean useFJournalField,
-                                   boolean shouldEnableMscKeywordDescriptions) {
-        this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
-        this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
-        this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
+    protected AbbreviationPreferences(List<String> externalLists) {
+        this.externalLists = FXCollections.observableArrayList(externalLists);
     }
 
-    private AbbreviationPreferences() {
-        this(
-                List.of(), // externalJournalLists
-                true,      // useFJournalField
-                false      // Enable MSC codes as Keyword
-        );
+    public ObservableList<String> getExternalLists() {
+        return externalLists;
     }
 
-    public static AbbreviationPreferences getDefault() {
-        return new AbbreviationPreferences();
-    }
-
-    public ObservableList<String> getExternalJournalLists() {
-        return externalJournalLists;
-    }
-
-    public void setExternalJournalLists(List<String> list) {
-        externalJournalLists.clear();
-        externalJournalLists.addAll(list);
-    }
-
-    public boolean shouldUseFJournalField() {
-        return useFJournalField.get();
-    }
-
-    public BooleanProperty useFJournalFieldProperty() {
-        return useFJournalField;
-    }
-
-    public void setUseFJournalField(boolean useFJournalField) {
-        this.useFJournalField.set(useFJournalField);
-    }
-
-    public boolean shouldEnableMscKeywordDescriptions() {
-        return shouldEnableMscKeywordDescriptions.get();
-    }
-
-    public void setShouldEnableMscKeywordDescriptions(boolean value) {
-        this.shouldEnableMscKeywordDescriptions.set(value);
-    }
-
-    public BooleanProperty shouldEnableMscKeywordDescriptionsProperty() {
-        return shouldEnableMscKeywordDescriptions;
+    public void setExternalLists(List<String> externalLists) {
+        this.externalLists.setAll(externalLists);
     }
 }

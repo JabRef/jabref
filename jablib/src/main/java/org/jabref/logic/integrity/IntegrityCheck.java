@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -22,6 +23,15 @@ public class IntegrityCheck {
                           FilePreferences filePreferences,
                           CitationKeyPatternPreferences citationKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
+                          boolean allowIntegerEdition) {
+        this(bibDatabaseContext, filePreferences, citationKeyPatternPreferences, journalAbbreviationRepository, new ConferenceAbbreviationRepository(), allowIntegerEdition);
+    }
+
+    public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
+                          FilePreferences filePreferences,
+                          CitationKeyPatternPreferences citationKeyPatternPreferences,
+                          JournalAbbreviationRepository journalAbbreviationRepository,
+                          ConferenceAbbreviationRepository conferenceAbbreviationRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -40,6 +50,7 @@ public class IntegrityCheck {
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
                 new AmpersandChecker(),
+                new AbbreviationChecker(conferenceAbbreviationRepository),
                 new LatexIntegrityChecker(),
                 new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository)));
 

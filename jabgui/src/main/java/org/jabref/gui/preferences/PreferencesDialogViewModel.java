@@ -29,6 +29,7 @@ import org.jabref.gui.preferences.externalstorages.ExternalStoragesTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.git.GitTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
+import org.jabref.gui.preferences.journals.ConferenceAbbreviationsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
@@ -94,6 +95,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExternalTab(),
                 new ExternalFileTypesTab(),
                 new JournalAbbreviationsTab(),
+                new ConferenceAbbreviationsTab(),
                 new NameFormatterTab(),
                 new XmpPrivacyTab(),
                 new CustomImporterTab(),

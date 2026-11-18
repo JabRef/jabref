@@ -21,7 +21,7 @@ import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
-import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.msc.MscCodeLoader;
 import org.jabref.logic.util.BackgroundTask;
@@ -57,14 +57,14 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final EntryEditorPreferences entryEditorPreferences;
     private final MrDlibPreferences mrDlibPreferences;
-    private final AbbreviationPreferences abbreviationPreferences;
+    private final JournalAbbreviationPreferences abbreviationPreferences;
     private final TaskExecutor taskExecutor;
     private boolean mscKeywordDescriptionsInitialized;
 
     public EntryEditorTabViewModel(DialogService dialogService,
                                    EntryEditorPreferences entryEditorPreferences,
                                    MrDlibPreferences mrDlibPreferences,
-                                   AbbreviationPreferences abbreviationPreferences,
+                                   JournalAbbreviationPreferences abbreviationPreferences,
                                    TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.entryEditorPreferences = entryEditorPreferences;
