@@ -45,6 +45,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
@@ -141,6 +142,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final NativeDesktop nativeDesktop;
 
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final NavigationHistory navigationHistory = new NavigationHistory();
@@ -251,9 +253,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                     return;
                 }
             }
-            tab.loading.set(false);
-            tab.dataLoadingTask = null;
-            tab.tabContainer.closeTab(tab);
+            tab.closeWhileLoading();
             onFailure.accept(exception);
         }
 
@@ -333,6 +333,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.aiService = aiService;
 
         this.journalAbbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+        this.nativeDesktop = Injector.instantiateModelOrService(NativeDesktop.class);
         initializeComponentsAndListeners(isDummyContext);
 
         // set LibraryTab ID for drag'n'drop
@@ -731,7 +732,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 clipBoardManager,
                 entryTypesManager,
                 taskExecutor,
-                importHandler);
+                importHandler,
+                nativeDesktop);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
@@ -1071,12 +1073,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         alreadyOpen.ifPresent(other -> {
             LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", loadedContext.getDBMSSynchronizer().getDBName());
             BackgroundTask.wrap(() -> closeSharedDatabase(loadedContext)).executeWith(taskExecutor);
-            loading.set(false);
-            dataLoadingTask = null;
-            tabContainer.closeTab(this);
+            closeWhileLoading();
             tabContainer.showLibraryTab(other);
         });
         return alreadyOpen.isPresent();
+    }
+
+    /// Closes this tab before its loading task is dropped: until loading succeeded, the tab holds the placeholder
+    /// context of a connection that was never opened, and only a loading tab gets the cleanup suited to it in
+    /// [#onClosed(Event)].
+    void closeWhileLoading() {
+        loading.set(false);
+        tabContainer.closeTab(this);
+        dataLoadingTask = null;
     }
 
     private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
@@ -1350,7 +1359,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                                                      .map(linkedFile -> LinkedFileViewModel.fromLinkedFile(linkedFile, null, bibDatabaseContext, null, null, preferences))
                                                                      .collect(Collectors.toList());
 
-                new DeleteFileAction(dialogService, preferences.getFilePreferences(), bibDatabaseContext, viewModels).execute();
+                new DeleteFileAction(dialogService, preferences.getFilePreferences(), bibDatabaseContext, viewModels, nativeDesktop).execute();
             }
         }
 

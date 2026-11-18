@@ -15,8 +15,10 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.KeyCombination;
 
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -30,7 +32,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.GrobidUrlMigration;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
-import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -38,6 +39,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
@@ -87,6 +89,7 @@ public class PreferencesMigrations {
         upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
         upgradeKeyBindingsToJavaFX(preferences);
         upgradeMacKeyBindingDefaults(preferences, OS.OS_X);
+        upgradeMacTextEditingKeyBindingDefaults(preferences, OS.OS_X);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         upgradeBuiltinPreviewName(preferences);
@@ -427,7 +430,8 @@ public class PreferencesMigrations {
             String bindingName = bindNames.get(i);
             String persistedBinding = bindings.get(i);
             for (KeyBinding keyBinding : KeyBinding.values()) {
-                if (keyBinding.getConstant().equals(bindingName)) {
+                // Editor bindings are migrated by upgradeMacTextEditingKeyBindingDefaults, which also checks for conflicts
+                if (keyBinding.getConstant().equals(bindingName) && keyBinding.getCategory() != KeyBindingCategory.EDITOR) {
                     int index = i;
                     keyBinding.getMacDefaultReplacement(persistedBinding)
                               .ifPresent(replacement -> migratedBindings.set(index, replacement));
@@ -438,6 +442,70 @@ public class PreferencesMigrations {
 
         prefs.putStringList(JabRefGuiPreferences.BINDINGS, migratedBindings);
         prefs.putBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    /// Assigns the macOS text-editing defaults (e.g., <kbd>Control</kbd> + <kbd>A</kbd>) to editor key bindings
+    /// persisted while these bindings had no default yet.
+    ///
+    /// - An empty persisted editor binding is treated as the former default, because it cannot be distinguished from
+    ///   a binding the user cleared. The migration runs only once (also if no key bindings are persisted yet),
+    ///   so a binding the user clears afterwards stays cleared.
+    /// - A default is not assigned if another action already uses its key combination, so custom shortcuts keep working.
+    ///   An editor binding missing from the persisted snapshot is then stored as unassigned for the same reason.
+    ///
+    /// See <https://github.com/JabRef/jabref/issues/16529>.
+    static void upgradeMacTextEditingKeyBindingDefaults(JabRefCliPreferences prefs, boolean isMacOs) {
+        if (!isMacOs || prefs.getBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, false)) {
+            return;
+        }
+
+        List<String> bindNames = prefs.getStringList(JabRefGuiPreferences.BIND_NAMES);
+        List<String> bindings = prefs.getStringList(JabRefGuiPreferences.BINDINGS);
+        if (!bindNames.isEmpty() && (bindNames.size() == bindings.size())) {
+            List<String> migratedBindNames = new ArrayList<>(bindNames);
+            List<String> migratedBindings = new ArrayList<>(bindings);
+            for (KeyBinding keyBinding : KeyBinding.values()) {
+                if (keyBinding.getCategory() == KeyBindingCategory.EDITOR) {
+                    migrateMacTextEditingKeyBinding(keyBinding, migratedBindNames, migratedBindings);
+                }
+            }
+            prefs.putStringList(JabRefGuiPreferences.BIND_NAMES, migratedBindNames);
+            prefs.putStringList(JabRefGuiPreferences.BINDINGS, migratedBindings);
+        }
+        prefs.putBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    private static void migrateMacTextEditingKeyBinding(KeyBinding keyBinding, List<String> bindNames, List<String> bindings) {
+        int index = bindNames.indexOf(keyBinding.getConstant());
+        String macDefault = keyBinding.getDefaultMacKeyBinding();
+        if (index == -1) {
+            bindNames.add(keyBinding.getConstant());
+            bindings.add(isKeyCombinationInUse(macDefault, bindings) ? "" : macDefault);
+            return;
+        }
+        keyBinding.getMacDefaultReplacement(bindings.get(index))
+                  .filter(replacement -> !isKeyCombinationInUse(replacement, bindings))
+                  .ifPresent(replacement -> bindings.set(index, replacement));
+    }
+
+    private static boolean isKeyCombinationInUse(String keyCombination, List<String> bindings) {
+        return parseKeyCombination(keyCombination)
+                .map(combination -> bindings.stream()
+                                            .map(PreferencesMigrations::parseKeyCombination)
+                                            .anyMatch(binding -> binding.filter(combination::equals).isPresent()))
+                .orElse(false);
+    }
+
+    private static Optional<KeyCombination> parseKeyCombination(String keyCombination) {
+        if (keyCombination.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(KeyCombination.valueOf(keyCombination));
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Ignoring invalid key binding {} during migration", keyCombination, e);
+            return Optional.empty();
+        }
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {
@@ -710,10 +778,25 @@ public class PreferencesMigrations {
         if (!keys.isEmpty() && names.size() == keys.size()) {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
-                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
-                            keys.get(i),
-                            preferences.getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
+                    boolean hasNewEntry;
+                    try {
+                        keyring.getPassword("org.jabref.apikeys", names.get(i));
+                        hasNewEntry = true;
+                    } catch (PasswordAccessException _) {
+                        hasNewEntry = false;
+                    }
+                    if (!hasNewEntry && StringUtil.isNotBlank(keys.get(i))) {
+                        keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
+                        hasNewEntry = true;
+                    }
+                    // Without an entry at the new location, the legacy entry is kept, so that it is migrated when it is read
+                    if (hasNewEntry) {
+                        try {
+                            keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                        } catch (PasswordAccessException _) {
+                            // Already absent, nothing to clear
+                        }
+                    }
                 }
                 preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
             } catch (Exception ex) {

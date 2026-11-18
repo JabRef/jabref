@@ -274,11 +274,23 @@
 }
 
 .rating > .container > .button {
-    -fx-icon-color: derive(-fx-text-base-color, 85%);
+    -fx-icon-code: "mdi2s-star-outline";
+    -fx-icon-color: -color-accent;
+    -fx-opacity: 0.6;
 }
 
 .rating > .container > .button.strong {
-    -fx-icon-color: -fx-text-base-color;
+    -fx-icon-code: "mdi2s-star";
+    -fx-opacity: 1;
+}
+
+.table-row-cell:selected .rating > .container > .button {
+    -fx-icon-color: -color-fg-default;
+    -fx-opacity: 1;
+}
+
+.table-row-cell:selected .rating > .container > .button.strong {
+    -fx-opacity: 1;
 }
 
 .file-row-text {
@@ -1815,4 +1827,12 @@ We want to have a look that matches our icons in the tool-bar */
 
 .flashing-danger {
     -fx-background-color: -color-danger;
+}
+
+.side-pane-scroll {
+    -fx-padding: 0;
+}
+
+.side-pane-scroll > .scroll-bar:vertical {
+    -fx-padding: 0 4 0 4;
 }
