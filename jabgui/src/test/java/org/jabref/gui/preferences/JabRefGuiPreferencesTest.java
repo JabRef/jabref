@@ -12,6 +12,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -130,7 +131,7 @@ class JabRefGuiPreferencesTest {
 
             JabRefGuiPreferences reloaded = new JabRefGuiPreferences(node);
             assertEquals(17, reloaded.getWorkspacePreferences().getMainFontSize());
-            assertEquals(false, reloaded.getWorkspacePreferences().shouldWrapMainTableText());
+            assertFalse(reloaded.getWorkspacePreferences().shouldWrapMainTableText());
         } finally {
             node.removeNode();
         }
