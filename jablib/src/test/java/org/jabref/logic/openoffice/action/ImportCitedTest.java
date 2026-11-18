@@ -249,8 +249,22 @@ class ImportCitedTest {
         String referenceMark = ZoteroReferenceMark.PREFIX + """
                 {
                   "citationItems": [
-                    {"id": 587, "itemData": {"id": 587, "type": "article-journal", "title": "Original title"}},
-                    {"id": "Zotero-587", "itemData": {"id": "Zotero-587", "type": "article-journal", "title": "Updated title"}}
+                    {
+                      "id": 587,
+                      "itemData": {
+                        "id": 587,
+                        "type": "article-journal",
+                        "title": "Original title"
+                      }
+                    },
+                    {
+                      "id": "Zotero-587",
+                      "itemData": {
+                        "id": "Zotero-587",
+                        "type": "article-journal",
+                        "title": "Updated title"
+                      }
+                    }
                   ]
                 }
                 """ + " RNDabcdefghij";
@@ -266,8 +280,20 @@ class ImportCitedTest {
         String referenceMark = ZoteroReferenceMark.PREFIX + """
                 {
                   "citationItems": [
-                    {"itemData": {"type": "article-journal", "citation-key": "Smith2024", "title": "Original title"}},
-                    {"itemData": {"type": "article-journal", "citation-key": "Smith2024", "title": "Updated title"}}
+                    {
+                      "itemData": {
+                        "type": "article-journal",
+                        "citation-key": "Smith2024",
+                        "title": "Original title"
+                      }
+                    },
+                    {
+                      "itemData": {
+                        "type": "article-journal",
+                        "citation-key": "Smith2024",
+                        "title": "Updated title"
+                      }
+                    }
                   ]
                 }
                 """ + " RNDabcdefghij";
@@ -283,8 +309,18 @@ class ImportCitedTest {
         String referenceMark = ZoteroReferenceMark.PREFIX + """
                 {
                   "citationItems": [
-                    {"itemData": {"type": "article-journal", "title": "Same title"}},
-                    {"itemData": {"type": "article-journal", "title": "Same title"}}
+                    {
+                      "itemData": {
+                        "type": "article-journal",
+                        "title": "Same title"
+                      }
+                    },
+                    {
+                      "itemData": {
+                        "type": "article-journal",
+                        "title": "Same title"
+                      }
+                    }
                   ]
                 }
                 """ + " RNDabcdefghij";
