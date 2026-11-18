@@ -229,7 +229,7 @@ class WriterIntegrationTest {
 
     @ParameterizedTest
     @CsvSource({"AUTHOR_ONLY, Alpha", "YEAR_ONLY, 2020"})
-    // [utest->req~openoffice.csl-partial-citations~1]
+        // [utest->req~openoffice.csl-partial-citations~1]
     void canonicalCslPartialCitationsKeepTheirTypeAndTextAcrossRefreshAndReopen(CitationType type, String expectedText) throws Exception {
         XTextDocument document = office.newDocument();
         document.getText().setString("Citations: .\nBibliography below.");

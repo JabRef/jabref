@@ -235,8 +235,8 @@ class CslRendererTest {
     @Test
     void nativeRenderingApproximatesPartialModesWithNormalCitations() throws RenderException {
         RenderRequest request = request(List.of(group("author", CitationType.AUTHOR_ONLY, "a"), group("year", CitationType.YEAR_ONLY, "b"),
-                group("nopar", CitationType.AUTHORYEAR_NOPAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "b"),
-                group("invisible", CitationType.INVISIBLE_CIT, "c"), group("normal", CitationType.AUTHORYEAR_PAR, "c")),
+                        group("nopar", CitationType.AUTHORYEAR_NOPAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "b"),
+                        group("invisible", CitationType.INVISIBLE_CIT, "c"), group("normal", CitationType.AUTHORYEAR_PAR, "c")),
                 List.of(entry("a", "A"), entry("b", "B"), entry("c", "C")));
 
         assertEquals(List.of("[1]", "[2]", "[1]", "Smith [2]", "", "[3]"), markers(request, renderer(false, false).renderNative(request)));
