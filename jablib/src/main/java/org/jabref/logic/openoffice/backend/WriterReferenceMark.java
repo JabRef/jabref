@@ -89,7 +89,7 @@ public final class WriterReferenceMark {
 
     private static Optional<XComponentContext> findComponentContext(XTextDocument doc) {
         Optional<XPropertySet> properties = UnoInterfaces.query(XMultiServiceFactory.class, doc)
-                                                   .flatMap(factory -> UnoInterfaces.query(XPropertySet.class, factory));
+                                                         .flatMap(factory -> UnoInterfaces.query(XPropertySet.class, factory));
         if (properties.isEmpty()) {
             return Optional.empty();
         }
