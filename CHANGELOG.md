@@ -42,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
 - We added switching between JStyle, CSL, and BST in Writer, plus CSL author-only and year-only citations. [#14962](https://github.com/JabRef/jabref/issues/14962)
+- We added a shortcut from the Writer panel to OpenOffice/LibreOffice preferences. [#17673](https://github.com/JabRef/jabref/pull/17673)
 
 ### Changed
 

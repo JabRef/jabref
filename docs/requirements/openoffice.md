@@ -86,6 +86,14 @@ Unsupported dialog choices and page information are disabled; JStyle and native 
 
 Needs: impl, utest
 
+## Writer panel must open OpenOffice/LibreOffice preferences from More settings
+`req~openoffice.preferences-shortcut~1`
+
+The Settings menu offers a localized More settings item that opens JabRef preferences with the OpenOffice/LibreOffice tab selected.
+This item remains available without a Writer connection.
+
+Needs: impl, utest
+
 ## Successful citation insertion must warn about unresolved existing citation keys
 `req~openoffice.insertion-unresolved-warning~1`
 

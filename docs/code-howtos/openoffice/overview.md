@@ -177,6 +177,8 @@ Shared ordering is not a guarantee of correct reading order for every layout.
 
 ## Style selection and external styles
 
+The panel's Settings menu provides More settings, which opens JabRef preferences with the OpenOffice/LibreOffice tab selected, even without a connected Writer document.
+
 Style registries have explicit family-specific sources.
 The CSL registry uses `CSLStyleLoader::getStyles`, including configured external CSL styles; it does not accidentally restrict the catalog to bundled styles.
 JStyle and BST retain their bundled defaults alongside their configured external styles.

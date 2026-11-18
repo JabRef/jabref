@@ -13,11 +13,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.PreferencesDialogView;
+import org.jabref.gui.preferences.openoffice.OpenOfficeTab;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -134,6 +138,7 @@ class OpenOfficePanelTest {
 
         private final OpenOfficePanel panel = mock(OpenOfficePanel.class, CALLS_REAL_METHODS);
         private final DialogService dialogs = mock(DialogService.class);
+        private final LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
         private final OpenOfficePreferences preferences = mock(OpenOfficePreferences.class);
         private final OpenOfficeStyleCatalog styles = mock(OpenOfficeStyleCatalog.class);
         private final OpenOfficeCitationController citationController = mock(OpenOfficeCitationController.class);
@@ -161,6 +166,7 @@ class OpenOfficePanelTest {
                 }
             }
             setField("dialogService", dialogs);
+            setField("tabContainer", tabContainer);
             setField("openOfficePreferences", preferences);
             setField("styleCatalog", styles);
             setField("citationController", citationController);
@@ -173,6 +179,32 @@ class OpenOfficePanelTest {
             setField("bstStyleLoader", mock(BstStyleLoader.class));
             setField("journalAbbreviationRepository", mock(JournalAbbreviationRepository.class));
             JavaFxExtension.invokeAndWait(() -> assertDoesNotThrow(this::initializePanel));
+        }
+
+        @Test
+        // [utest->req~openoffice.preferences-shortcut~1]
+        void settingsMenuOpensLibreOfficePreferencesWithoutAWriterConnection() throws ReflectiveOperationException {
+            when(citationController.isDocumentConnectionMissing()).thenReturn(true);
+            Button settings = button("settingsB");
+            Method updateAvailability = OpenOfficePanel.class.getDeclaredMethod("updateButtonAvailability");
+            updateAvailability.setAccessible(true);
+
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(() -> updateAvailability.invoke(panel));
+                assertFalse(settings.isDisabled());
+                try (MockedConstruction<PreferencesDialogView> views = mockConstruction(PreferencesDialogView.class, (view, context) ->
+                        assertEquals(List.of(OpenOfficeTab.class), context.arguments()))) {
+                    MenuItem moreSettings = settings.getContextMenu().getItems().stream()
+                                                    .filter(item -> lang("More settings").equals(item.getText())).findFirst().orElseThrow();
+                    assertFalse(moreSettings.isDisable());
+
+                    moreSettings.fire();
+
+                    assertEquals(1, views.constructed().size());
+                    verify(dialogs).showCustomDialogAndWait(views.constructed().getFirst());
+                }
+            });
+            verify(tabContainer).refresh();
         }
 
         @Test

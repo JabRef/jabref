@@ -36,6 +36,8 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.ShowPreferencesAction;
+import org.jabref.gui.preferences.openoffice.OpenOfficeTab;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -650,6 +652,10 @@ public class OpenOfficePanel {
         onlyUseActiveTab.setSelected(!openOfficePreferences.getUseAllDatabases());
 
         MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
+        // [impl->req~openoffice.preferences-shortcut~1]
+        MenuItem moreSettings = new ActionFactory().createMenuItem(
+                StandardActions.SHOW_PREFS.withText(Localization.lang("More settings")),
+                new ShowPreferencesAction(tabContainer, OpenOfficeTab.class, dialogService));
 
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
         onlyUseActiveTab.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!onlyUseActiveTab.isSelected()));
@@ -666,7 +672,9 @@ public class OpenOfficePanel {
                 new SeparatorMenuItem(),
                 onlyUseActiveTab,
                 new SeparatorMenuItem(),
-                clearConnectionSettings);
+                clearConnectionSettings,
+                new SeparatorMenuItem(),
+                moreSettings);
 
         return contextMenu;
     }
