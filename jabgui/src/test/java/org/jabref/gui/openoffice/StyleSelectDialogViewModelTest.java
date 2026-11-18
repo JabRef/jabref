@@ -73,12 +73,15 @@ class StyleSelectDialogViewModelTest {
     private final OpenOfficePreferences openOfficePreferences = OpenOfficePreferences.getDefault();
 
     @Test
-    void storeJStyleSelectionInCurrentStylePreference() {
+    void storeJStyleSelectionWithoutRebuildingExternalStylePreferences() {
         JStyle currentStyle = mock(JStyle.class);
         JStyle selectedStyle = mock(JStyle.class);
         when(currentStyle.getPath()).thenReturn("current.jstyle");
         when(selectedStyle.getPath()).thenReturn("selected.jstyle");
         when(jStyleLoader.getStyles()).thenReturn(List.of(currentStyle, selectedStyle));
+        openOfficePreferences.setExternalJStyles(List.of("registered.jstyle"));
+        openOfficePreferences.setExternalBstStyles(List.of("registered.bst"));
+        openOfficePreferences.setExternalCslStyles(List.of("registered.csl"));
         StyleSelectDialogViewModel viewModel = viewModel(currentStyle);
         viewModel.setSelectedTab(new Tab("JStyles"));
         viewModel.selectedJStyleProperty().set(viewModel.jStylesProperty().getLast());
@@ -86,7 +89,9 @@ class StyleSelectDialogViewModelTest {
         viewModel.storeStylePreferences();
 
         assertEquals(selectedStyle, openOfficePreferences.getCurrentStyle());
-        assertEquals(List.of("current.jstyle", "selected.jstyle"), openOfficePreferences.getExternalJStyles());
+        assertEquals(List.of("registered.jstyle"), openOfficePreferences.getExternalJStyles());
+        assertEquals(List.of("registered.bst"), openOfficePreferences.getExternalBstStyles());
+        assertEquals(List.of("registered.csl"), openOfficePreferences.getExternalCslStyles());
     }
 
     @Test
@@ -271,6 +276,42 @@ class StyleSelectDialogViewModelTest {
             viewModel.storeStylePreferences();
             assertEquals(imported, openOfficePreferences.getCurrentStyle());
             verify(dialogService, never()).showErrorDialogAndWait(anyString(), anyString());
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = StandardFileType.class, names = {"CITATION_STYLE", "JSTYLE", "BST"})
+        void acceptingStaleDialogDoesNotDiscardAStyleRegisteredByAnotherDialog(StandardFileType fileType) throws IOException {
+            StyleSelectDialogViewModel staleDialog = viewModel;
+            viewModel = createViewModel(cslStyleLoader);
+            OOStyle imported = addExternalStyle(fileType);
+            List<? extends OOStyle> registeredStyles = styles(fileType);
+
+            staleDialog.storeStylePreferences();
+
+            assertEquals(List.of(imported.getPath()), externalPaths(fileType));
+            assertEquals(registeredStyles, styles(fileType));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = StandardFileType.class, names = {"CITATION_STYLE", "JSTYLE", "BST"})
+        void acceptingStaleDialogDoesNotRegisterAStyleRemovedFromItsLoader(StandardFileType fileType) throws IOException {
+            OOStyle imported = addExternalStyle(fileType);
+            boolean removed = switch (imported) {
+                case CitationStyle cslStyle ->
+                        cslStyleLoader.removeStyle(cslStyle);
+                case JStyle jStyle ->
+                        realJStyleLoader.removeStyle(jStyle);
+                case BstStyle bstStyle ->
+                        bstStyleLoader.removeStyle(bstStyle);
+            };
+            assertTrue(removed);
+            List<? extends OOStyle> remainingStyles = styles(fileType);
+            selectStyle(remainingStyles.getFirst());
+
+            viewModel.storeStylePreferences();
+
+            assertEquals(List.of(), externalPaths(fileType));
+            assertEquals(remainingStyles, styles(fileType));
         }
 
         @ParameterizedTest
@@ -636,6 +677,19 @@ class StyleSelectDialogViewModelTest {
                         Optional.ofNullable(viewModel.selectedJStyleProperty().get()).map(JStyleSelectViewModel::getJStyle);
                 case BST ->
                         Optional.ofNullable(viewModel.selectedBstStyleProperty().get()).map(BstStyleSelectViewModel::getBstStyle);
+                default ->
+                        throw new AssertionError("Not a style file type: " + fileType);
+            };
+        }
+
+        private List<String> externalPaths(StandardFileType fileType) {
+            return switch (fileType) {
+                case CITATION_STYLE ->
+                        List.copyOf(openOfficePreferences.getExternalCslStyles());
+                case JSTYLE ->
+                        List.copyOf(openOfficePreferences.getExternalJStyles());
+                case BST ->
+                        List.copyOf(openOfficePreferences.getExternalBstStyles());
                 default ->
                         throw new AssertionError("Not a style file type: " + fileType);
             };

@@ -1,7 +1,6 @@
 package org.jabref.gui.openoffice;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -161,26 +160,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storeStylePreferences() {
-        // save external jstyles
-        List<String> externalJStyles = jStyles.stream()
-                                              .map(this::toJStyle)
-                                              .filter(style -> !style.isInternalStyle())
-                                              .map(JStyle::getPath)
-                                              .toList();
-
-        openOfficePreferences.setExternalJStyles(externalJStyles);
-
-        // save external bst styles
-        List<String> externalBstStyles = bstStyles.stream()
-                                                  .map(vm -> vm.getBstStyle())
-                                                  .filter(style -> !style.isInternalStyle())
-                                                  .map(BstStyle::getPath)
-                                                  .toList();
-        openOfficePreferences.setExternalBstStyles(externalBstStyles);
-
-        // save bst citation format
         openOfficePreferences.setBstCitationFormat(bstCitationFormat.get());
-
         openOfficePreferences.setCurrentStyle(getSelectedStyle());
     }
 
@@ -279,17 +259,13 @@ public class StyleSelectDialogViewModel {
 
             CitationStyle citationStyleToAdd = citationStyleToAddOptional.get();
 
-            // Check if citation style is duplicate in the list
-            if (isDuplicate(citationStyleToAdd)) {
+            if (!cslStyleLoader.addExternalStyle(citationStyleToAdd)) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Style already available"),
                         Localization.lang("The selected CSL style is already available in the list.")
                 );
                 return;
             }
-
-            // Citation style is good to add
-            cslStyleLoader.addExternalStyle(citationStyleToAdd);
 
             List<CitationStyle> allStyles = CSLStyleLoader.getStyles();
             List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
@@ -325,15 +301,6 @@ public class StyleSelectDialogViewModel {
                 selectedCslLayoutProperty, CitationStylePreviewLayout::citationStyle);
     }
 
-    private boolean isDuplicate(CitationStyle styleToAdd) {
-        return CSLStyleLoader.getStyles().stream()
-                             .anyMatch(existingStyle -> hasSameStyleName(existingStyle, styleToAdd));
-    }
-
-    private boolean hasSameStyleName(CitationStyle existingStyle, CitationStyle styleToAdd) {
-        return existingStyle.getTitle().equals(styleToAdd.getTitle())
-                || (!styleToAdd.getShortTitle().isBlank() && existingStyle.getShortTitle().equals(styleToAdd.getShortTitle()));
-    }
     // endregion
 
     // region - bst-specific methods
@@ -358,7 +325,8 @@ public class StyleSelectDialogViewModel {
 
     public void addBstStyleFile() {
         selectStyleFile(StandardFileType.BST).ifPresent(stylePath -> {
-            if (!stylePath.getFileName().toString().toLowerCase().endsWith(".bst") || !Files.exists(stylePath)) {
+            Optional<BstStyle> loadedStyle = bstStyleLoader.loadExternalStyle(stylePath);
+            if (loadedStyle.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Invalid style selected"),
                         Localization.lang("You must select a valid .bst style file.")
@@ -366,18 +334,8 @@ public class StyleSelectDialogViewModel {
                 return;
             }
 
-            BstStyle bstStyleToAdd;
-            try {
-                bstStyleToAdd = BstStyle.loadExternal(stylePath);
-            } catch (IOException _) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Invalid style selected"),
-                        Localization.lang("You must select a valid .bst style file.")
-                );
-                return;
-            }
-
-            if (isDuplicate(bstStyleToAdd)) {
+            BstStyle bstStyleToAdd = loadedStyle.orElseThrow();
+            if (!bstStyleLoader.addExternalStyle(bstStyleToAdd)) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Style already available"),
                         Localization.lang("A style with the same filename already exists. If it is a different style, please rename and import.")
@@ -385,7 +343,6 @@ public class StyleSelectDialogViewModel {
                 return;
             }
 
-            bstStyleLoader.addExternalStyle(bstStyleToAdd);
             BstStyleSelectViewModel vm = new BstStyleSelectViewModel(bstStyleToAdd);
             bstStyles.add(vm);
             selectedBstStyle.setValue(vm);
@@ -398,25 +355,12 @@ public class StyleSelectDialogViewModel {
                 selectedBstStyle, BstStyleSelectViewModel::getBstStyle);
     }
 
-    private boolean isDuplicate(BstStyle fileToAdd) {
-        return bstStyleLoader.getStyles().stream()
-                             .anyMatch(existingStyle -> hasSameStyleName(existingStyle, fileToAdd));
-    }
-
-    private boolean hasSameStyleName(BstStyle existingStyle, BstStyle styleToAdd) {
-        return existingStyle.getName().equals(styleToAdd.getName());
-    }
-
     // endregion
 
     // region - jstyle-specific methods
 
     public JStyleSelectViewModel fromJStyle(JStyle style) {
         return new JStyleSelectViewModel(style);
-    }
-
-    public JStyle toJStyle(JStyleSelectViewModel item) {
-        return item.getJStyle();
     }
 
     public ListProperty<JStyleSelectViewModel> jStylesProperty() {

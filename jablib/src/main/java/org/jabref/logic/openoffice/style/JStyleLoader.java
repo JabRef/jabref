@@ -46,7 +46,24 @@ public class JStyleLoader {
     public List<JStyle> getStyles() {
         List<JStyle> result = new ArrayList<>(internalStyles);
         result.addAll(externalStyles);
-        return result;
+        return List.copyOf(result);
+    }
+
+    public boolean addExternalStyle(@NonNull JStyle style) {
+        if (style.isInternalStyle()) {
+            return false;
+        }
+        if (externalStyles.contains(style)) {
+            LOGGER.info("External style file {} already existing.", style.getPath());
+            return false;
+        }
+        if (!style.isValid()) {
+            LOGGER.error("Style with filename {} is invalid", style.getPath());
+            return false;
+        }
+        externalStyles.add(style);
+        storeExternalStyles();
+        return true;
     }
 
     /// Adds the given style to the list of styles
@@ -56,15 +73,7 @@ public class JStyleLoader {
     public boolean addStyleIfValid(@NonNull Path filename) {
         try {
             JStyle newStyle = new JStyle(filename, layoutFormatterPreferences, abbreviationRepository);
-            if (externalStyles.contains(newStyle)) {
-                LOGGER.info("External style file {} already existing.", filename);
-            } else if (newStyle.isValid()) {
-                externalStyles.add(newStyle);
-                storeExternalStyles();
-                return true;
-            } else {
-                LOGGER.error("Style with filename {} is invalid", filename);
-            }
+            return addExternalStyle(newStyle);
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
             LOGGER.info("Cannot find external style file {}", filename, e);
@@ -115,11 +124,13 @@ public class JStyleLoader {
     }
 
     public boolean removeStyle(@NonNull JStyle style) {
-        if (!style.isInternalStyle()) {
-            boolean result = externalStyles.remove(style);
-            storeExternalStyles();
-            return result;
+        if (style.isInternalStyle()) {
+            return false;
         }
-        return false;
+        boolean removed = externalStyles.remove(style);
+        if (removed) {
+            storeExternalStyles();
+        }
+        return removed;
     }
 }

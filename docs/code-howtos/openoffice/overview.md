@@ -185,6 +185,21 @@ The panel's Settings menu provides More settings, which opens JabRef preferences
 Style registries have explicit family-specific sources.
 The CSL registry uses `CSLStyleLoader::getStyles`, including configured external CSL styles; it does not accidentally restrict the catalog to bundled styles.
 JStyle and BST retain their bundled defaults alongside their configured external styles.
+Each loader's `getStyles()` returns a detached, unmodifiable list snapshot with internal styles first.
+CSL retains its static shared style lists and generated metadata catalog, with lazy loading of built-in style sources.
+
+Each loader owns its guarded boolean `addExternalStyle(...)` and `removeStyle(...)` operations and persists its family's external paths only after an accepted addition or actual removal.
+Internal styles cannot be added as external styles or removed; rejected and no-op mutations do not write preferences.
+Duplicate checks preserve each family's policy:
+
+- CSL compares full titles or matching nonblank short titles against external styles and built-in metadata, without loading built-in sources.
+- BST compares case-sensitive, extension-stripped names against external and built-in styles.
+- JStyle checks parsed-style equality against its external list.
+
+`StyleSelectDialogViewModel.storeStylePreferences()` saves only the selected style and BST citation notation, never reconstructing external-path lists from dialog rows.
+Keeping one writer per family's external-path list prevents a stale dialog snapshot from overwriting registry changes.
+Adding CSL or BST styles still applies the added style immediately; adding a JStyle selects its row but defers applying it until the dialog is confirmed.
+
 For style preparation, `OpenOfficePanel` calls `JStyle.ensureUpToDate()` directly on the actual selected JStyle; CSL and BST instances are left untouched.
 The panel retains the last selected style from global preferences at startup and when connecting to or selecting a Writer document.
 No style family is inferred or restored automatically from document metadata.

@@ -1,7 +1,9 @@
 /// JavaFX controls and dialogs for the Writer integration.
 /// [OpenOfficePanel] presents document actions, prepares the selected JStyle, and controls capability-based availability;
 /// [OpenOfficeCitationController] connects those actions to [org.jabref.logic.openoffice.engine.CitationEngine].
-/// [StyleSelectDialogViewModel] manages style selection; [CslStyleResolver] resolves document metadata for manual CSL inference.
+/// [StyleSelectDialogViewModel] manages style selection and delegates external-style mutations to the family loaders.
+/// The loaders alone persist external paths, so stale dialog snapshots cannot overwrite registry membership.
+/// [CslStyleResolver] resolves document metadata for manual CSL inference.
 /// [CiteSpecialDialogView] limits citation choices and page information to the selected backend's capabilities.
 /// Rendering, document storage, and Zotero strategy selection belong to the logic layer, not this package.
 ///

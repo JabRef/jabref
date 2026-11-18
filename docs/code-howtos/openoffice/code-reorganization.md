@@ -47,7 +47,9 @@ Document mutation, renderer dispatch, write-session handling, and Zotero strateg
 Its static `disposeAllBridges()` operation globally disposes client-side UNO bridges without closing Writer documents or the office application.
 `OpenOfficeInstallationDetector` handles installation-path selection and validation.
 
-`StyleSelectDialogViewModel` manages style selection and the external-style lifecycle through `JStyleLoader`, `CSLStyleLoader`, and `BstStyleLoader`.
+`StyleSelectDialogViewModel` manages style selection and delegates guarded external-style mutations to `JStyleLoader`, `CSLStyleLoader`, and `BstStyleLoader`.
+Each loader alone persists its family's external paths; `storeStylePreferences()` saves selection and BST citation notation, not registry membership reconstructed from dialog snapshots.
+`BstStyleLoader.loadExternalStyle(Path)` returns an `Optional<BstStyle>` and centralizes BST import validation, parsing, and I/O-failure logging before registration through `addExternalStyle(...)`.
 The package-private `CslStyleResolver.resolve(XTextDocument)` resolves document metadata only for manual CSL inference using a live `Supplier<List<CitationStyle>>`.
 `OpenOfficePanel` prepares the actual selected JStyle by calling `JStyle.ensureUpToDate()` directly; it leaves CSL and BST styles untouched.
 Connecting to or selecting a Writer document retains the last selected style from global preferences, without automatic style inference or restoration.
