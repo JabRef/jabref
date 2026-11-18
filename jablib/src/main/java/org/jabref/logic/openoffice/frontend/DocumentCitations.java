@@ -261,7 +261,7 @@ public class DocumentCitations {
                 return OOVoidResult.ok();
             }
             return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
-                    rangeOverlapsToMessage(overlaps)));
+                    Localization.lang("The cursor is in a protected area.") + "\n" + rangeOverlapsToMessage(overlaps)));
         } catch (WriterDocumentAccessException | WrappedTargetException e) {
             return OOVoidResult.error(new JabRefException(e.getMessage(), e));
         }

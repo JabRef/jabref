@@ -248,7 +248,8 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             protectedRanges.addAll(unmanaged);
             for (RangeForOverlapCheck<String> range : protectedRanges) {
                 if (overlaps(cursor, range.range, range.kind == RangeForOverlapCheck.BIBLIOGRAPHY_MARK_KIND)) {
-                    throw new StrategyException(Reason.PROTECTED_RANGE, "Zotero insertion intersects protected document content", Localization.lang("Found overlapping ranges"));
+                    throw new StrategyException(Reason.PROTECTED_RANGE, "Zotero insertion intersects protected document content",
+                            Localization.lang("The cursor is in a protected area.") + "\n" + Localization.lang("Found overlapping ranges"));
                 }
             }
         }

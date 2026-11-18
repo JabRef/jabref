@@ -426,7 +426,9 @@ class ZoteroCitationStrategyTest {
              MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class)) {
             OOResult<List<String>, JabRefException> result = strategy().insert(List.of(entry("a", "A")), List.of(), style(), CitationType.AUTHORYEAR_PAR, "", cursor, false);
 
-            assertEquals(Reason.PROTECTED_RANGE, assertInstanceOf(StrategyException.class, result.getError()).reason());
+            StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+            assertEquals(Reason.PROTECTED_RANGE, error.reason());
+            assertEquals(Localization.lang("The cursor is in a protected area.") + "\n" + Localization.lang("Found overlapping ranges"), error.getLocalizedMessage());
             linker.verifyNoInteractions();
             writer.verifyNoInteractions();
         }
@@ -444,7 +446,9 @@ class ZoteroCitationStrategyTest {
         try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class, CALLS_REAL_METHODS)) {
             OOResult<List<String>, JabRefException> result = strategy().refresh(List.of(new BibDatabase(List.of(entry("a", "A")))), style());
 
-            assertEquals(Reason.OVERLAPPING_RANGES, assertInstanceOf(StrategyException.class, result.getError()).reason());
+            StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+            assertEquals(Reason.OVERLAPPING_RANGES, error.reason());
+            assertEquals(Localization.lang("Found overlapping ranges"), error.getLocalizedMessage());
             linker.verifyNoInteractions();
         }
     }
