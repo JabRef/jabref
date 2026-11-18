@@ -55,6 +55,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @NullMarked
@@ -421,25 +422,31 @@ class OpenOfficeCitationControllerTest {
 
     @ParameterizedTest
     @ValueSource(classes = {CitationStyle.class, JStyle.class, BstStyle.class})
-    void documentSelectionRestoresTheStoredStyleInsteadOfTheGlobalPreference(Class<? extends OOStyle> styleClass) throws WrappedTargetException {
-        OOStyle storedStyle = mock(styleClass);
-        OpenOfficeStyleCatalog catalog = mock(OpenOfficeStyleCatalog.class);
-        when(catalog.restore(document, false)).thenReturn(Optional.of(storedStyle));
+    void documentSelectionRetainsThePreferredStyleWithoutSettingAStyle(Class<? extends OOStyle> styleClass) throws Exception {
+        OOStyle preferredStyle = mock(styleClass);
+        when(preferences.getCurrentStyle()).thenReturn(preferredStyle);
 
-        assertEquals(Optional.of(storedStyle), controller().restoreStyleFromDocument(catalog).get());
-        verify(preferences).setCurrentStyle(storedStyle);
-        verify(preferences, never()).setCurrentStyle(style);
+        controller().selectDocument(true);
+
+        assertEquals(preferredStyle, preferences.getCurrentStyle());
+        verify(preferences, never()).setCurrentStyle(any());
+        verifyNoInteractions(document);
     }
 
-    @Test
-    void zoteroDocumentSelectionRestoresTheNativeStyle() throws WrappedTargetException {
-        when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
-        CitationStyle storedStyle = mock(CitationStyle.class);
-        OpenOfficeStyleCatalog catalog = mock(OpenOfficeStyleCatalog.class);
-        when(catalog.restore(document, true)).thenReturn(Optional.of(storedStyle));
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void switchingDocumentsRetainsThePreferredStyleWithoutSettingAStyle(boolean zoteroMode) throws Exception {
+        when(preferences.getZoteroCompatibilityMode()).thenReturn(zoteroMode);
+        XTextDocument nextDocument = mock(XTextDocument.class);
+        OpenOfficeCitationController citationController = controller();
+        citationController.selectDocument(true);
+        when(connection.getXTextDocument()).thenReturn(OOResult.ok(nextDocument));
 
-        assertEquals(Optional.of(storedStyle), controller().restoreStyleFromDocument(catalog).get());
-        verify(preferences).setCurrentStyle(storedStyle);
+        citationController.selectDocument(true);
+
+        assertEquals(style, preferences.getCurrentStyle());
+        verify(preferences, never()).setCurrentStyle(any());
+        verifyNoInteractions(document, nextDocument);
     }
 
     @Test
@@ -450,7 +457,8 @@ class OpenOfficeCitationControllerTest {
 
         assertEquals(Optional.of(inferred), controller().inferCslStyleFromDocument(catalog).get());
         verify(preferences).setCurrentStyle(inferred);
-        verify(catalog, never()).restore(any(), anyBoolean());
+        verify(catalog).inferCslStyle(document);
+        verifyNoMoreInteractions(catalog);
     }
 
     @Test
@@ -472,7 +480,7 @@ class OpenOfficeCitationControllerTest {
     }
 
     @Test
-    void documentSelectionDoesNotConstructEngineBeforeDocumentStyleRestoration() throws Exception {
+    void documentSelectionDoesNotConstructEngine() throws Exception {
         try (MockedConstruction<CitationEngine> engines = mockEngines()) {
             controller().selectDocument(true);
 

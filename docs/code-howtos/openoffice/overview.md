@@ -144,6 +144,7 @@ Document custom properties do not travel with citation text copied to another do
 
 `JabRef_document_style` stores the applied family and identifier: a path for JStyle/BST or a CSL style identifier.
 Selecting a style does not change the last-applied document property; a successful write does.
+This metadata remains available for manual CSL inference and citation-format conversion, not automatic style selection.
 CSL operations also maintain Zotero preferences such as `ZOTERO_PREF`.
 Ordinary `DocumentStyleStore` and Zotero preference writes use raw property setters, so Undo can restore presentation without restoring their recorded style identity.
 Conversion separately prepares those style-property deltas and makes its own writes undoable alongside citation edits.
@@ -184,7 +185,9 @@ The panel's Settings menu provides More settings, which opens JabRef preferences
 Style registries have explicit family-specific sources.
 The CSL registry uses `CSLStyleLoader::getStyles`, including configured external CSL styles; it does not accidentally restrict the catalog to bundled styles.
 JStyle and BST retain their bundled defaults alongside their configured external styles.
-Manual style inference is available only with a CSL style selected and a connected Writer document; automatic restoration of stored JStyle, CSL, and BST styles is a separate operation.
+The panel retains the last selected style from global preferences at startup and when connecting to or selecting a Writer document.
+No style family is inferred or restored automatically from document metadata.
+Manual **Infer style** is available only with a CSL style selected and a connected Writer document.
 Choosing another family does not turn manual CSL inference into a JStyle/BST heuristic.
 
 The style dialogs share the external-file picker and narrow private removal helpers, not a new generic style-management framework.

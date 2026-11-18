@@ -48,7 +48,8 @@ Its static `disposeAllBridges()` operation globally disposes client-side UNO bri
 `OpenOfficeInstallationDetector` handles installation-path selection and validation.
 
 `StyleSelectDialogViewModel` manages style selection and the external-style lifecycle.
-`OpenOfficeStyleCatalog` resolves available JStyle, CSL, and BST styles from stored document identities; manual CSL inference is a separate operation.
+`OpenOfficeStyleCatalog` provides manual CSL inference from document metadata and reloads the selected JStyle when needed.
+Connecting to or selecting a Writer document retains the last selected style from global preferences, without automatic style inference or restoration.
 This runtime catalog is distinct from the generated CSL catalog produced by `CitationStyleCatalogGenerator` in `build-support`.
 `ManageCitationsDialogViewModel.applyCitationEdits()` applies edited citation rows through the controller; it does not store dialog preferences.
 `OOError` carries localized dialog messages and titles at the GUI boundary.

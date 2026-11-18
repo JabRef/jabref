@@ -47,7 +47,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -57,15 +56,18 @@ import static org.jabref.logic.l10n.Localization.lang;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @NullMarked
@@ -158,7 +160,6 @@ class OpenOfficePanelTest {
             when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
             when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entry));
             when(citationController.capabilities(any())).thenReturn(new StyleCapabilities(EnumSet.allOf(CitationType.class), true, true, true));
-            when(citationController.restoreStyleFromDocument(styles)).thenReturn(OOResult.ok(Optional.empty()));
 
             for (Field field : OpenOfficePanel.class.getDeclaredFields()) {
                 if (field.getType() == Button.class) {
@@ -396,7 +397,6 @@ class OpenOfficePanelTest {
             assertEquals(lang("Infer CSL style from document"), infer.getTooltip().getText());
             assertEquals(inferred, field("currentStyle"));
             verify(citationController).inferCslStyleFromDocument(styles);
-            verify(citationController, never()).restoreStyleFromDocument(any());
             verify(dialogs).notify(lang("Inferred CSL style: '%0'", "External CSL style"));
         }
 
@@ -418,20 +418,42 @@ class OpenOfficePanelTest {
         }
 
         @ParameterizedTest
-        @CsvSource({"false, false, true", "false, true, true", "true, false, false", "true, true, true"})
-        void documentSelectionRestoresStyleSeparatelyAndRespectsNativeInferencePreference(boolean zoteroMode, boolean inferOnConnect, boolean restores) throws ReflectiveOperationException {
-            when(preferences.getZoteroCompatibilityMode()).thenReturn(zoteroMode);
-            when(preferences.shouldInferCslStyleFromDocument()).thenReturn(inferOnConnect);
+        @ValueSource(classes = {CitationStyle.class, JStyle.class, BstStyle.class})
+        void documentSelectionKeepsTheLastSelectedStyleWithoutReadingDocumentStyle(Class<? extends OOStyle> styleClass) throws ReflectiveOperationException {
+            OOStyle selected = mock(styleClass);
+            when(preferences.getCurrentStyle()).thenReturn(selected);
             Button selectDocument = button("selectDocument");
 
-            JavaFxExtension.invokeAndWait(selectDocument::fire);
+            JavaFxExtension.invokeAndWait(() -> {
+                selectDocument.fire();
+                selectDocument.fire();
+            });
 
-            if (restores) {
-                verify(citationController).restoreStyleFromDocument(styles);
-            } else {
-                verify(citationController, never()).restoreStyleFromDocument(any());
-            }
+            assertEquals(selected, field("currentStyle"));
+            verify(preferences, never()).setCurrentStyle(any());
             verify(citationController, never()).inferCslStyleFromDocument(any());
+            verifyNoInteractions(styles);
+        }
+
+        @Test
+        void documentSelectionWithoutAStyleRemainsSafeAndAllowsSelectingOne() throws ReflectiveOperationException {
+            Button selectDocument = button("selectDocument");
+            Button selectStyle = button("setStyleFile");
+            List<Button> styleActions = List.of(button("cite"), button("citeInText"), button("citeEmpty"), button("citeSpecial"),
+                    button("updateBibliography"), button("merge"), button("unmerge"), button("manageCitations"), button("modifyBibliographyProperties"));
+            clearInvocations(citationController);
+
+            JavaFxExtension.invokeAndWait(() -> {
+                selectDocument.fire();
+                assertFalse(selectStyle.isDisabled());
+                styleActions.forEach(action -> assertTrue(action.isDisabled()));
+            });
+
+            assertNull(field("currentStyle"));
+            verify(preferences, never()).setCurrentStyle(any());
+            verify(citationController, never()).capabilities(any());
+            verify(citationController, never()).inferCslStyleFromDocument(any());
+            verifyNoInteractions(styles);
         }
 
         private void prepareScenario(String scenario) throws IOException {

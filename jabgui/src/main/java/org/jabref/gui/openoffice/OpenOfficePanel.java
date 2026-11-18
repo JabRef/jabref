@@ -154,7 +154,7 @@ public class OpenOfficePanel {
 
         cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
         bstStyleLoader = new BstStyleLoader(openOfficePreferences);
-        styleCatalog = new OpenOfficeStyleCatalog(jStyleLoader, CSLStyleLoader::getStyles, bstStyleLoader);
+        styleCatalog = new OpenOfficeStyleCatalog(jStyleLoader, CSLStyleLoader::getStyles);
 
         ActionFactory factory = new ActionFactory();
 
@@ -219,7 +219,6 @@ public class OpenOfficePanel {
         selectDocument.setOnAction(_ -> {
             try {
                 citationController.selectDocument(false);
-                restoreDocumentStyle();
                 currentStyle = openOfficePreferences.getCurrentStyle();
                 updateButtonAvailability();
             } catch (WrappedTargetException
@@ -465,7 +464,6 @@ public class OpenOfficePanel {
 
             try {
                 citationController.selectDocument(true);
-                restoreDocumentStyle();
             } catch (WrappedTargetException
                      | NoSuchElementException e) {
                 LOGGER.warn("Unable to connect to document", e);
@@ -563,14 +561,6 @@ public class OpenOfficePanel {
         }
 
         citationController.insertCitation(entries, getDatabaseList(), currentStyle, citationType, pageInfo);
-    }
-
-    private void restoreDocumentStyle() {
-        if (openOfficePreferences.getZoteroCompatibilityMode() && !openOfficePreferences.shouldInferCslStyleFromDocument()) {
-            return;
-        }
-        citationController.restoreStyleFromDocument(styleCatalog)
-                          .ifError(error -> citationController.showDialog(error.setTitle(Localization.lang("Could not restore style from document"))));
     }
 
     private void inferCslStyleFromDocument() {

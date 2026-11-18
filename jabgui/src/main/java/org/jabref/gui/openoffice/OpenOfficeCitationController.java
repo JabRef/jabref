@@ -129,21 +129,6 @@ public class OpenOfficeCitationController {
         return getEngine().map(current -> current.capabilities(style)).getOptional().orElse(NO_CAPABILITIES);
     }
 
-    OOResult<Optional<OOStyle>, OOError> restoreStyleFromDocument(OpenOfficeStyleCatalog styles) {
-        OOResult<XTextDocument, OOError> document = getXTextDocument();
-        if (document.isError()) {
-            return OOResult.error(document.getError());
-        }
-        try {
-            Optional<OOStyle> restored = styles.restore(document.get(), openOfficePreferences.getZoteroCompatibilityMode());
-            restored.ifPresent(openOfficePreferences::setCurrentStyle);
-            return OOResult.ok(restored);
-        } catch (WrappedTargetException exception) {
-            LOGGER.warn("Could not read the citation style stored in the Writer document", exception);
-            return OOResult.error(OOError.fromMisc(exception));
-        }
-    }
-
     OOResult<Optional<CitationStyle>, OOError> inferCslStyleFromDocument(OpenOfficeStyleCatalog styles) {
         OOResult<XTextDocument, OOError> document = getXTextDocument();
         if (document.isError()) {
