@@ -35,7 +35,7 @@ import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.uno.DocumentAnnotation;
+import org.jabref.logic.openoffice.uno.NamedTextContentPlacement;
 import org.jabref.logic.openoffice.uno.UnoRedlines;
 import org.jabref.logic.openoffice.uno.UnoTextSection;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
@@ -138,7 +138,7 @@ class ZoteroWriterTest {
         XTextCursor position = document.getText().createTextCursor();
         position.goRight((short) 7, false);
         position.goRight((short) initial.length(), true);
-        WriterReferenceMarks.create(new DocumentAnnotation(document, name, position, true));
+        WriterReferenceMarks.create(new NamedTextContentPlacement(document, name, position, true));
         WriterReferenceMarks marks = new WriterReferenceMarks();
         for (String rendered : List.of("", "X", "updated", "")) {
             WriterReferenceMark mark = marks.find(document, name, policy).orElseThrow();
@@ -277,7 +277,7 @@ class ZoteroWriterTest {
         bibliography.setString("\n");
         bibliography.collapseToEnd();
         bibliography.setString("Existing native bibliography");
-        UnoTextSection.create(new DocumentAnnotation(document, "ZOTERO_BIBL unchanged", bibliography, true));
+        UnoTextSection.create(new NamedTextContentPlacement(document, "ZOTERO_BIBL unchanged", bibliography, true));
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_citation_conversion:unrelated", "not JSON");
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_document_style", "CSL\nuntouched");
         UnoRedlines.setRecordChanges(document, true);
@@ -404,7 +404,7 @@ class ZoteroWriterTest {
         cursor.setString("\n");
         cursor.collapseToEnd();
         cursor.setString("Existing JabRef bibliography");
-        UnoTextSection.create(new DocumentAnnotation(document, "JR_bib", cursor, true));
+        UnoTextSection.create(new NamedTextContentPlacement(document, "JR_bib", cursor, true));
         Map<String, String> ignored = marks(document);
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_document_style", "JSTYLE\nuntouched");
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_page_info:stableIgnored:0", "p. 99");
@@ -481,7 +481,7 @@ class ZoteroWriterTest {
         cursor.setString("\n");
         cursor.collapseToEnd();
         cursor.setString("Existing JabRef bibliography");
-        UnoTextSection.create(new DocumentAnnotation(document, "JR_bib", cursor, true));
+        UnoTextSection.create(new NamedTextContentPlacement(document, "JR_bib", cursor, true));
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_document_style", "JSTYLE\nuntouched");
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_page_info:stableIgnored:0", "p. 99");
         Map<String, String> ignored = marks(document);
@@ -500,7 +500,7 @@ class ZoteroWriterTest {
         XTextDocument document = office.newDocument();
         appendMark(document, nativeMarkName(), "[native]");
         DocumentSnapshot before = snapshot(document);
-        OOStyle unsupported = "bst".equals(family) ? BstStyle.loadExternal(resource("golden.bst"))
+        OOStyle unsupported = "bst".equals(family) ? BstStyle.loadExternal(resource("title-only.bst"))
                                                    : new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
         try (CitationEngine engine = engine(document)) {
             assertFalse(success(engine.requiresFormatConversion(unsupported)));
@@ -674,7 +674,7 @@ class ZoteroWriterTest {
         XTextDocument document = office.newDocument();
         XTextContent footnote = footnoteWithNativeCitation(document);
         String bodyName = nativeMarkName().replace("native-citation", "body-citation");
-        WriterReferenceMarks.create(new DocumentAnnotation(document, bodyName, footnote.getAnchor(), true));
+        WriterReferenceMarks.create(new NamedTextContentPlacement(document, bodyName, footnote.getAnchor(), true));
         DocumentSnapshot before = snapshot(document);
         try (CitationEngine engine = engine(document)) {
             assertReason(Reason.OVERLAPPING_RANGES, engine.refresh(List.of(new BibDatabase(List.of(nativeEntry("native")))), style()));
@@ -720,7 +720,7 @@ class ZoteroWriterTest {
         document.getText().setString("Protected bibliography");
         XTextCursor cursor = document.getText().createTextCursor();
         cursor.gotoEnd(true);
-        UnoTextSection.create(new DocumentAnnotation(document, name, cursor, true));
+        UnoTextSection.create(new NamedTextContentPlacement(document, name, cursor, true));
         return UnoTextSection.getAnchor(document, name).orElseThrow();
     }
 
@@ -733,7 +733,7 @@ class ZoteroWriterTest {
         XText text = query(XText.class, footnote);
         XTextCursor cursor = text.createTextCursor();
         cursor.setString("[native]");
-        WriterReferenceMarks.create(new DocumentAnnotation(document, nativeMarkName(), cursor, true));
+        WriterReferenceMarks.create(new NamedTextContentPlacement(document, nativeMarkName(), cursor, true));
         return footnote;
     }
 
@@ -776,7 +776,7 @@ class ZoteroWriterTest {
         cursor.setString("\n");
         cursor.collapseToEnd();
         cursor.setString(content);
-        WriterReferenceMarks.create(new DocumentAnnotation(document, name, cursor, true));
+        WriterReferenceMarks.create(new NamedTextContentPlacement(document, name, cursor, true));
     }
 
     private static Map<String, String> marks(XTextDocument document) throws Exception {

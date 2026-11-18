@@ -20,10 +20,10 @@ public final class JabRefMarkData {
 
     /// The caller supplies stable citation keys and a document-unique id; neither is generated here.
     ///
-    /// @throws MarkCodecException if the keys or uid cannot be represented in a canonical name
-    public JabRefMarkData(List<String> citationKeys, String uniqueId, CitationType citationType) throws MarkCodecException {
+    /// @throws JabRefMarkCodecException if the keys or uid cannot be represented in a canonical name
+    public JabRefMarkData(List<String> citationKeys, String uniqueId, CitationType citationType) throws JabRefMarkCodecException {
         List<String> keys = List.copyOf(citationKeys);
-        MarkCodec.validate(keys, uniqueId);
+        JabRefMarkCodec.validate(keys, uniqueId);
         this.citationKeys = keys;
         this.uniqueId = uniqueId;
         this.citationType = citationType;
@@ -56,6 +56,6 @@ public final class JabRefMarkData {
 
     @Override
     public String toString() {
-        return MarkCodec.encode(this);
+        return JabRefMarkCodec.encode(this);
     }
 }

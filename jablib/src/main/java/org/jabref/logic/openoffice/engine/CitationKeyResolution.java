@@ -22,11 +22,11 @@ import org.jspecify.annotations.NullMarked;
 
 /// One action's key resolution. Database precedence is the request's order; entry ids are never keys.
 @NullMarked
-final class RenderData {
+final class CitationKeyResolution {
 
     private final Map<String, Optional<CitationLookupResult>> entries = new LinkedHashMap<>();
 
-    RenderData(RenderRequest request) throws RenderException {
+    CitationKeyResolution(RenderRequest request) throws RenderException {
         SequencedSet<CitationGroupId> ids = new LinkedHashSet<>();
         for (CitationGroup group : request.groupsInDocumentOrder()) {
             if (!ids.add(group.groupId) || group.citationsInStorageOrder.isEmpty()) {

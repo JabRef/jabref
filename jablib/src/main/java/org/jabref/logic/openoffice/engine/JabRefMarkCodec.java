@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 /// Keys exclude Unicode whitespace and commas. Uids are opaque identifiers containing ASCII letters,
 /// digits, `_` and `-`, without conflicting with page-info property separators.
 @NullMarked
-public final class MarkCodec {
+public final class JabRefMarkCodec {
 
     private static final String PREFIX = "JABREF_";
     private static final Pattern KEY = Pattern.compile("[^\\s,]+", Pattern.UNICODE_CHARACTER_CLASS);
@@ -24,7 +24,7 @@ public final class MarkCodec {
             "(JABREF_[^\\s,]+(?:, JABREF_[^\\s,]+)*) (NORMAL|IN_TEXT|EMPTY|NOPAR|AUTHOR_ONLY|YEAR_ONLY) ([A-Za-z0-9_-]+)",
             Pattern.UNICODE_CHARACTER_CLASS);
 
-    private MarkCodec() {
+    private JabRefMarkCodec() {
     }
 
     public static String encode(JabRefMarkData mark) {
@@ -33,10 +33,10 @@ public final class MarkCodec {
         return keys + " " + encodeType(mark.citationType()) + " " + mark.uniqueId();
     }
 
-    public static JabRefMarkData decode(String name) throws MarkCodecException {
+    public static JabRefMarkData decode(String name) throws JabRefMarkCodecException {
         Matcher matcher = MARK.matcher(name);
         if (!matcher.matches()) {
-            throw new MarkCodecException(MarkCodecException.Reason.INVALID_MARK_NAME, "Not a canonical JabRef mark name");
+            throw new JabRefMarkCodecException(JabRefMarkCodecException.Reason.INVALID_MARK_NAME, "Not a canonical JabRef mark name");
         }
 
         List<String> keys = KEY_SEPARATOR.splitAsStream(matcher.group(1))
@@ -50,17 +50,17 @@ public final class MarkCodec {
         return MARK.matcher(name).matches();
     }
 
-    static void validate(List<String> citationKeys, String uniqueId) throws MarkCodecException {
+    static void validate(List<String> citationKeys, String uniqueId) throws JabRefMarkCodecException {
         if (citationKeys.isEmpty()) {
-            throw new MarkCodecException(MarkCodecException.Reason.EMPTY_KEYS, "A mark must contain at least one citation key");
+            throw new JabRefMarkCodecException(JabRefMarkCodecException.Reason.EMPTY_KEYS, "A mark must contain at least one citation key");
         }
         for (String key : citationKeys) {
             if (!KEY.matcher(key).matches()) {
-                throw new MarkCodecException(MarkCodecException.Reason.INVALID_KEY, "A citation key must be nonempty and contain neither whitespace nor commas");
+                throw new JabRefMarkCodecException(JabRefMarkCodecException.Reason.INVALID_KEY, "A citation key must be nonempty and contain neither whitespace nor commas");
             }
         }
         if (!UNIQUE_ID.matcher(uniqueId).matches()) {
-            throw new MarkCodecException(MarkCodecException.Reason.INVALID_UNIQUE_ID, "A mark uid must contain only ASCII letters, digits, underscores or hyphens");
+            throw new JabRefMarkCodecException(JabRefMarkCodecException.Reason.INVALID_UNIQUE_ID, "A mark uid must contain only ASCII letters, digits, underscores or hyphens");
         }
     }
 
@@ -81,7 +81,7 @@ public final class MarkCodec {
         };
     }
 
-    private static CitationType decodeType(String type) throws MarkCodecException {
+    private static CitationType decodeType(String type) throws JabRefMarkCodecException {
         return switch (type) {
             case "NORMAL" ->
                     CitationType.AUTHORYEAR_PAR;
@@ -96,7 +96,7 @@ public final class MarkCodec {
             case "YEAR_ONLY" ->
                     CitationType.YEAR_ONLY;
             default ->
-                    throw new MarkCodecException(MarkCodecException.Reason.INVALID_MARK_NAME, "Unknown canonical citation type");
+                    throw new JabRefMarkCodecException(JabRefMarkCodecException.Reason.INVALID_MARK_NAME, "Unknown canonical citation type");
         };
     }
 }

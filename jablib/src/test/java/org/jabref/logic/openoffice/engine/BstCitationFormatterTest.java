@@ -24,39 +24,39 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @NullMarked
-class BstRendererParityTest {
+class BstCitationFormatterTest {
 
     private static final String AUTHOR_DOE_JOHN = "Doe, John";
 
     @Test
-    void extractFirstAuthorLastName_singleAuthor() {
+    void formatShortAuthorList_singleAuthor() {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("Doe", BstCitationFormatter.extractFirstAuthorLastName(entry));
+        assertEquals("Doe", BstCitationFormatter.formatShortAuthorList(entry));
     }
 
     @Test
-    void extractFirstAuthorLastName_twoAuthors() {
+    void formatShortAuthorList_twoAuthors() {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN + " and Roe, Richard")
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("Doe and Roe", BstCitationFormatter.extractFirstAuthorLastName(entry));
+        assertEquals("Doe and Roe", BstCitationFormatter.formatShortAuthorList(entry));
     }
 
     @Test
-    void extractFirstAuthorLastName_threeAuthorsEtAl() {
+    void formatShortAuthorList_threeAuthorsEtAl() {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN + " and Roe, Richard and Poe, Peter")
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("Doe et al.", BstCitationFormatter.extractFirstAuthorLastName(entry));
+        assertEquals("Doe et al.", BstCitationFormatter.formatShortAuthorList(entry));
     }
 
     @Test
-    void extractFirstAuthorLastName_missingAuthorYieldsQuestionMark() {
+    void formatShortAuthorList_missingAuthorYieldsQuestionMark() {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("?", BstCitationFormatter.extractFirstAuthorLastName(entry));
+        assertEquals("?", BstCitationFormatter.formatShortAuthorList(entry));
     }
 
     @Test
@@ -219,7 +219,7 @@ class BstRendererParityTest {
         BstStyle style = BstStyle.createInternal(resourcePath);
 
         assertEquals(new BstCitationFormatter.StyleOrderAndLabels(expectedNumbers, Map.of()),
-                BstCitationFormatter.computeStyleOrderAndLabels(style.createBstVM(), List.of(zebra, alpha), database));
+                BstCitationFormatter.computeStyleOrderAndLabels(style.getBstVM(), List.of(zebra, alpha), database));
     }
 
     static Stream<Arguments> computeStyleOrderAndLabelsNumbersAccordingToTheBstProgram() {

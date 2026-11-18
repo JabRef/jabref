@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
-import org.jabref.logic.openoffice.rangesort.FunctionalTextViewCursor;
 import org.jabref.logic.openoffice.rangesort.RangeSort;
 import org.jabref.logic.openoffice.rangesort.RangeSortEntry;
 import org.jabref.logic.openoffice.rangesort.RangeSortVisual;
 import org.jabref.logic.openoffice.rangesort.RangeSortable;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
+import org.jabref.logic.openoffice.rangesort.RestorableTextViewCursor;
 import org.jabref.logic.openoffice.uno.UnoScreenRefresh;
 import org.jabref.logic.openoffice.uno.UnoTextRange;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
 import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationGroups;
 
@@ -34,20 +34,20 @@ public final class DocumentOrder {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentOrder.class);
 
     public List<CitationGroup> withinTextContainers(XTextDocument document, CitationGroups groups, MarkStore store)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         return inputs(document, groups, store, false).stream().map(RangeSortable::getContent).toList();
     }
 
     public List<CitationGroup> inDocumentOrder(XTextDocument document, CitationGroups groups, MarkStore store,
-                                               Optional<FunctionalTextViewCursor> viewCursor)
-            throws NoDocumentException, WrappedTargetException {
+                                               Optional<RestorableTextViewCursor> viewCursor)
+            throws WriterDocumentAccessException, WrappedTargetException {
         return sort(document, inputs(document, groups, store, true), viewCursor);
     }
 
     public List<CitationGroup> withInsertion(XTextDocument document, CitationGroups groups, MarkStore store,
                                              CitationGroup pending, XTextRange position,
-                                             Optional<FunctionalTextViewCursor> viewCursor)
-            throws NoDocumentException, WrappedTargetException {
+                                             Optional<RestorableTextViewCursor> viewCursor)
+            throws WriterDocumentAccessException, WrappedTargetException {
         List<RangeSortable<CitationGroup>> all = new ArrayList<>(inputs(document, groups, store, false));
         all.add(new RangeSortEntry<>(position, 0, pending));
         RangeSort.RangePartitions<RangeSortable<CitationGroup>> partitions = RangeSort.partitionAndSortRanges(all);
@@ -64,9 +64,9 @@ public final class DocumentOrder {
     }
 
     private List<CitationGroup> sort(XTextDocument document, List<RangeSortable<CitationGroup>> inputs,
-                                     Optional<FunctionalTextViewCursor> viewCursor) {
+                                     Optional<RestorableTextViewCursor> viewCursor) {
         if (viewCursor.isPresent() && !UnoScreenRefresh.hasControllersLocked(document)) {
-            FunctionalTextViewCursor cursor = viewCursor.orElseThrow();
+            RestorableTextViewCursor cursor = viewCursor.orElseThrow();
             try {
                 return RangeSortVisual.visualSort(inputs, document, cursor).stream().map(RangeSortable::getContent).toList();
             } catch (com.sun.star.uno.RuntimeException | IllegalStateException exception) {
@@ -92,11 +92,11 @@ public final class DocumentOrder {
 
     private static List<RangeSortable<CitationGroup>> inputs(XTextDocument document, CitationGroups groups, MarkStore store,
                                                              boolean mapFootnotes)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         Map<XText, List<RangeSortEntry<CitationGroup>>> partitions = new LinkedHashMap<>();
         for (CitationGroup group : groups.getCitationGroupsUnordered()) {
             XTextRange range = store.getMarkRange(group, document)
-                                    .orElseThrow(() -> new NoDocumentException("Missing citation range during document ordering"));
+                                    .orElseThrow(() -> new WriterDocumentAccessException("Missing citation range during document ordering"));
             partitions.computeIfAbsent(range.getText(), _ -> new ArrayList<>()).add(new RangeSortEntry<>(range, 0, group));
         }
         List<RangeSortable<CitationGroup>> result = new ArrayList<>();

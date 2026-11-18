@@ -20,13 +20,13 @@ public class UnoBookmark {
     /// Provides access to bookmarks by name.
     public static XNameAccess getNameAccess(XTextDocument doc)
             throws
-            NoDocumentException {
+            WriterDocumentAccessException {
 
-        XBookmarksSupplier supplier = UnoCast.cast(XBookmarksSupplier.class, doc).get();
+        XBookmarksSupplier supplier = UnoInterfaces.query(XBookmarksSupplier.class, doc).get();
         try {
             return supplier.getBookmarks();
         } catch (DisposedException ex) {
-            throw new NoDocumentException("UnoBookmark.getNameAccess failed with" + ex);
+            throw new WriterDocumentAccessException("UnoBookmark.getNameAccess failed with" + ex);
         }
     }
 
@@ -37,10 +37,10 @@ public class UnoBookmark {
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
             throws
             WrappedTargetException,
-            NoDocumentException {
+            WriterDocumentAccessException {
 
         XNameAccess nameAccess = getNameAccess(doc);
-        return UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
+        return NamedTextContentLookup.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
     }
 
     /// Insert a bookmark with the given name at the cursor provided, or with another name if the one we asked for is already in use.
@@ -49,22 +49,22 @@ public class UnoBookmark {
     ///
     /// @return The XNamed interface of the bookmark.
     /// result.getName() should be checked by the caller, because its name may differ from the one requested.
-    public static XNamed create(DocumentAnnotation documentAnnotation)
+    public static XNamed create(NamedTextContentPlacement placement)
             throws
-            CreationException {
-        return UnoNamed.insertNamedTextContent("com.sun.star.text.Bookmark", documentAnnotation);
+            WriterOperationException {
+        return NamedTextContentInserter.insertNamedTextContent("com.sun.star.text.Bookmark", placement);
     }
 
     /// Remove the named bookmark if it exists.
     public static void removeIfExists(XTextDocument doc, String name)
             throws
-            NoDocumentException,
+            WriterDocumentAccessException,
             WrappedTargetException {
 
         XNameAccess marks = UnoBookmark.getNameAccess(doc);
 
         if (marks.hasByName(name)) {
-            Optional<XTextContent> mark = UnoNameAccess.getTextContentByName(marks, name);
+            Optional<XTextContent> mark = NamedTextContentLookup.getTextContentByName(marks, name);
             if (mark.isEmpty()) {
                 return;
             }

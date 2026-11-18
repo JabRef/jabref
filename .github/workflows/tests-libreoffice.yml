@@ -72,13 +72,13 @@ jobs:
           unit_by_name = {suite.attrib['name']: suite for suite in unit_suites}
           for name, minimum in {
               'org.jabref.logic.openoffice.engine.storage.MarkStoreTest': 7,
-              'org.jabref.logic.openoffice.engine.storage.MarkWriterTest': 5,
+              'org.jabref.logic.openoffice.engine.storage.CitationMarkerWriterTest': 5,
               'org.jabref.logic.openoffice.engine.storage.UndoableDocumentPropertiesTest': 8,
               'org.jabref.logic.openoffice.backend.ReferenceMarkTextWriterTest': 19,
               'org.jabref.logic.openoffice.engine.ConversionMetadataTest': 19,
 
-              'org.jabref.logic.openoffice.engine.DocumentSessionTest': 8,
-              'org.jabref.logic.openoffice.backend.CanonicalReferenceMarkTest': 5,
+              'org.jabref.logic.openoffice.engine.DocumentWriteSessionTest': 8,
+              'org.jabref.logic.openoffice.backend.JabRefMarkCodecCompatibilityTest': 5,
               'org.jabref.logic.openoffice.bst.BstPipelineTest': 7,
           }.items():
               assert name in unit_by_name, f'Required OpenOffice unit suite is missing: {name}'

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.engine.storage.MarkWriter;
+import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.uno.UnoStyle;
 
@@ -41,7 +41,7 @@ class UpdatePipelineTest {
         RendererFactory renderers = mock(RendererFactory.class);
         CitationRenderer renderer = mock(CitationRenderer.class);
         when(renderers.create(style)).thenReturn(renderer);
-        MarkWriter writer = mock(MarkWriter.class);
+        CitationMarkerWriter writer = mock(CitationMarkerWriter.class);
         UpdatePipeline pipeline = new UpdatePipeline(document, mock(OpenOfficePreferences.class), writer, renderers);
         XStyle existing = mock(XStyle.class);
         try (MockedStatic<UnoStyle> styles = mockStatic(UnoStyle.class)) {

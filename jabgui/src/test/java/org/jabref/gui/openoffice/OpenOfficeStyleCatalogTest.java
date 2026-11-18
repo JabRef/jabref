@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
-import org.jabref.logic.openoffice.engine.storage.DocumentStateStore;
+import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -58,25 +58,25 @@ class OpenOfficeStyleCatalogTest {
     @Test
     void pathMatchesAreQualifiedByStoredFamily() {
         assertEquals(List.of(Optional.of(jStyle), Optional.of(bstStyle)), List.of(
-                catalog.find(new DocumentStateStore.State(DocumentStateStore.Family.JSTYLE, "shared-path")),
-                catalog.find(new DocumentStateStore.State(DocumentStateStore.Family.BST, "shared-path"))));
+                catalog.find(new DocumentStyleStore.State(DocumentStyleStore.Family.JSTYLE, "shared-path")),
+                catalog.find(new DocumentStyleStore.State(DocumentStyleStore.Family.BST, "shared-path"))));
     }
 
     @Test
     void cslCanBeRestoredByFilePathOrStyleUri() {
         assertEquals(List.of(Optional.of(cslStyle), Optional.of(cslStyle)), List.of(
-                catalog.find(new DocumentStateStore.State(DocumentStateStore.Family.CSL, cslStyle.getPath())),
-                catalog.find(new DocumentStateStore.State(DocumentStateStore.Family.CSL, cslStyle.getStyleId()))));
+                catalog.find(new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, cslStyle.getPath())),
+                catalog.find(new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, cslStyle.getStyleId()))));
     }
 
     @Test
     void missingStoredStyleDoesNotSelectAnUnrelatedDefault() {
-        assertEquals(Optional.empty(), catalog.find(new DocumentStateStore.State(DocumentStateStore.Family.JSTYLE, "missing-path")));
+        assertEquals(Optional.empty(), catalog.find(new DocumentStyleStore.State(DocumentStyleStore.Family.JSTYLE, "missing-path")));
     }
 
     @ParameterizedTest
-    @EnumSource(DocumentStateStore.Family.class)
-    void canonicalRestorationUsesExplicitStoredFamilyWithoutReadingZoteroPreferences(DocumentStateStore.Family family) throws WrappedTargetException {
+    @EnumSource(DocumentStyleStore.Family.class)
+    void canonicalRestorationUsesExplicitStoredFamilyWithoutReadingZoteroPreferences(DocumentStyleStore.Family family) throws WrappedTargetException {
         OOStyle expected = switch (family) {
             case BST ->
                     bstStyle;
@@ -88,11 +88,11 @@ class OpenOfficeStyleCatalogTest {
         String identity = family.name() + "\n" + expected.getPath();
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
              MockedStatic<ZoteroDocumentPreferences> zotero = mockStatic(ZoteroDocumentPreferences.class)) {
-            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStateStore.PROPERTY_NAME))
+            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME))
                       .thenReturn(Optional.of(identity));
 
             assertEquals(Optional.of(expected), catalog.restore(document, false));
-            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStateStore.PROPERTY_NAME));
+            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME));
             properties.verifyNoMoreInteractions();
             zotero.verifyNoInteractions();
         }
@@ -115,13 +115,13 @@ class OpenOfficeStyleCatalogTest {
     void cslInferenceRejectsOtherStoredFamiliesWithoutReadingStaleZoteroPreferences(String family) throws WrappedTargetException {
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
              MockedStatic<ZoteroDocumentPreferences> zotero = mockStatic(ZoteroDocumentPreferences.class)) {
-            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStateStore.PROPERTY_NAME))
+            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME))
                       .thenReturn(Optional.of(family + "\nshared-path"));
             zotero.when(() -> ZoteroDocumentPreferences.findCitationStyle(document, List.of(cslStyle, externalCslStyle)))
                   .thenReturn(Optional.of(cslStyle));
 
             assertEquals(Optional.empty(), catalog.inferCslStyle(document));
-            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStateStore.PROPERTY_NAME));
+            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME));
             properties.verifyNoMoreInteractions();
             zotero.verifyNoInteractions();
         }
@@ -133,7 +133,7 @@ class OpenOfficeStyleCatalogTest {
         String identity = useUri ? externalCslStyle.getStyleId() : externalCslStyle.getPath();
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
              MockedStatic<ZoteroDocumentPreferences> zotero = mockStatic(ZoteroDocumentPreferences.class)) {
-            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStateStore.PROPERTY_NAME))
+            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME))
                       .thenReturn(Optional.of("CSL\n" + identity));
 
             assertEquals(Optional.of(externalCslStyle), catalog.inferCslStyle(document));
@@ -145,7 +145,7 @@ class OpenOfficeStyleCatalogTest {
     void canonicalCslInferenceDoesNotReplaceAMissingStyleWithStaleZoteroPreferences() throws WrappedTargetException {
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
              MockedStatic<ZoteroDocumentPreferences> zotero = mockStatic(ZoteroDocumentPreferences.class)) {
-            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStateStore.PROPERTY_NAME))
+            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME))
                       .thenReturn(Optional.of("CSL\nmissing-style"));
             zotero.when(() -> ZoteroDocumentPreferences.findCitationStyle(document, List.of(cslStyle, externalCslStyle)))
                   .thenReturn(Optional.of(cslStyle));
@@ -188,7 +188,7 @@ class OpenOfficeStyleCatalogTest {
         AtomicReference<List<CitationStyle>> availableStyles = new AtomicReference<>(List.of(cslStyle));
         OpenOfficeStyleCatalog liveCatalog = new OpenOfficeStyleCatalog(jStyleLoader, availableStyles::get, bstStyleLoader);
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class)) {
-            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStateStore.PROPERTY_NAME))
+            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME))
                       .thenReturn(Optional.of("CSL\nhttps://example.org/styles/research"));
 
             assertEquals(Optional.empty(), liveCatalog.inferCslStyle(document));

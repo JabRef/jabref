@@ -678,17 +678,17 @@ public final class JStyle implements Comparable<JStyle>, OOStyle {
     /// Format a number-based citation marker for the given entries.
     ///
     /// @return The text for the citation.
-    public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries) {
+    public OOText formatNumericCitation(List<CitationMarkerNumericEntry> entries) {
         final int minGroupingCount = this.getMinimumGroupingCount();
-        return JStyleNumericCitationFormatter.getNumCitationMarker2(this,
+        return JStyleNumericCitationFormatter.formatNumericCitation(this,
                 entries,
                 minGroupingCount);
     }
 
     /// For some tests we need to override minGroupingCount.
-    public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries,
+    public OOText formatNumericCitation(List<CitationMarkerNumericEntry> entries,
                                         int minGroupingCount) {
-        return JStyleNumericCitationFormatter.getNumCitationMarker2(this,
+        return JStyleNumericCitationFormatter.formatNumericCitation(this,
                 entries,
                 minGroupingCount);
     }

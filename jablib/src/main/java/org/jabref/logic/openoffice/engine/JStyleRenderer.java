@@ -49,7 +49,7 @@ public final class JStyleRenderer implements CitationRenderer {
 
     @Override
     public RenderResult render(RenderRequest request) throws RenderException {
-        RenderData data = new RenderData(request);
+        CitationKeyResolution data = new CitationKeyResolution(request);
         if (!style.isValid()) {
             throw new RenderException("Cannot render an invalid JStyle");
         }
@@ -67,7 +67,7 @@ public final class JStyleRenderer implements CitationRenderer {
         CitationGroups groups = new CitationGroups(copies);
         groups.setGlobalOrder(request.groupsInDocumentOrder().stream().map(group -> group.groupId).toList());
         try {
-            JStyleCitationProcessor.produceCitationMarkers(groups, RenderData.copyDatabases(request.databases()), style);
+            JStyleCitationProcessor.produceCitationMarkers(groups, CitationKeyResolution.copyDatabases(request.databases()), style);
             Map<CitationGroupId, OOText> markers = new LinkedHashMap<>();
             for (CitationGroup group : groups.getCitationGroupsInGlobalOrder()) {
                 OOText text = group.citationType == CitationType.INVISIBLE_CIT
@@ -106,10 +106,10 @@ public final class JStyleRenderer implements CitationRenderer {
                     text.add(style.formatCitationKeys(resolved.stream().map(Citation::getCitationKey).toList()).toString());
                 } else {
                     List<CitationMarkerNumericEntry> numericEntries = new ArrayList<>(resolved);
-                    text.add(style.getNumCitationMarker2(numericEntries).toString());
+                    text.add(style.formatNumericCitation(numericEntries).toString());
                 }
             }
-            group.getCitationsInLocalOrder().stream().filter(Citation::isUnresolved).forEach(citation -> text.add(RenderData.unresolved(citation.citationKey)));
+            group.getCitationsInLocalOrder().stream().filter(Citation::isUnresolved).forEach(citation -> text.add(CitationKeyResolution.unresolved(citation.citationKey)));
             return OOText.fromString(text.toString());
         }
         return group.getCitationMarker().orElseThrow(() -> new RenderException("JStyle did not render a citation group"));

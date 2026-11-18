@@ -16,7 +16,7 @@ public class UnoTextRange {
     ///
     /// Returns Optional.empty if not in a footnote.
     public static Optional<XTextRange> getFootnoteMarkRange(XTextRange original) {
-        Optional<XFootnote> footer = UnoCast.cast(XFootnote.class, original.getText());
+        Optional<XFootnote> footer = UnoInterfaces.query(XFootnote.class, original.getText());
         // If we are inside a footnote,
         // find the linking footnote marker:
         // The footnote's anchor gives the correct position in the text:
@@ -38,7 +38,7 @@ public class UnoTextRange {
         if (!comparables(a, b)) {
             throw new IllegalArgumentException("compareStarts: got incomparable regions");
         }
-        final XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, a.getText()).get();
+        final XTextRangeCompare compare = UnoInterfaces.query(XTextRangeCompare.class, a.getText()).get();
         return compareStartsUnsafe(compare, a, b);
     }
 
@@ -48,7 +48,7 @@ public class UnoTextRange {
         if (!comparables(a, b)) {
             throw new IllegalArgumentException("compareEnds: got incomparable regions");
         }
-        final XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, a.getText()).get();
+        final XTextRangeCompare compare = UnoInterfaces.query(XTextRangeCompare.class, a.getText()).get();
         return -1 * compare.compareRegionEnds(a, b);
     }
 
@@ -67,7 +67,7 @@ public class UnoTextRange {
         if (!comparables(a, b)) {
             throw new IllegalArgumentException("compareStartsThenEnds: got incomparable regions");
         }
-        final XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, a.getText()).get();
+        final XTextRangeCompare compare = UnoInterfaces.query(XTextRangeCompare.class, a.getText()).get();
         return compareStartsThenEndsUnsafe(compare, a, b);
     }
 }

@@ -21,7 +21,7 @@ public class UnoCrossRef {
     /// Update TextFields, etc. We use it to refresh cross-references in the document.
     public static void refresh(XTextDocument doc) {
         // Refresh the document
-        XRefreshable xRefresh = UnoCast.cast(XRefreshable.class, doc).get();
+        XRefreshable xRefresh = UnoInterfaces.query(XRefreshable.class, doc).get();
         xRefresh.refresh();
     }
 
@@ -32,19 +32,19 @@ public class UnoCrossRef {
                                                                   String referenceMarkName,
                                                                   XTextRange cursor)
             throws
-            CreationException,
+            WriterOperationException,
             WrappedTargetException {
 
         // based on: https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Reference_Marks
-        XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, doc).get();
+        XMultiServiceFactory msf = UnoInterfaces.query(XMultiServiceFactory.class, doc).get();
         // Create a 'GetReference' text field to refer to the reference mark we just inserted,
         // and get it's XPropertySet interface
         XPropertySet xFieldProps;
         try {
             String name = "com.sun.star.text.textfield.GetReference";
-            xFieldProps = UnoCast.cast(XPropertySet.class, msf.createInstance(name)).get();
+            xFieldProps = UnoInterfaces.query(XPropertySet.class, msf.createInstance(name)).get();
         } catch (Exception e) {
-            throw new CreationException(e.getMessage());
+            throw new WriterOperationException(e.getMessage());
         }
 
         try {
@@ -78,7 +78,7 @@ public class UnoCrossRef {
         }
 
         // Get the XTextContent interface of the GetReference text field
-        XTextContent xRefContent = UnoCast.cast(XTextContent.class, xFieldProps).get();
+        XTextContent xRefContent = UnoInterfaces.query(XTextContent.class, xFieldProps).get();
 
         // Insert the text field
         cursor.getText().insertTextContent(cursor.getEnd(), xRefContent, false);

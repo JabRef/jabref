@@ -30,7 +30,7 @@ public class UnoTextDocument {
         if (!missing) {
             try {
                 WriterReferenceMarks.getNameAccess(doc);
-            } catch (NoDocumentException | DisposedException _) {
+            } catch (WriterDocumentAccessException | DisposedException _) {
                 missing = true;
             }
         }
@@ -57,7 +57,7 @@ public class UnoTextDocument {
             return Optional.empty();
         }
 
-        Optional<XPropertySet> propertySet = UnoCast.cast(XPropertySet.class, frame.get());
+        Optional<XPropertySet> propertySet = UnoInterfaces.query(XPropertySet.class, frame.get());
         if (propertySet.isEmpty()) {
             return Optional.empty();
         }
@@ -77,7 +77,7 @@ public class UnoTextDocument {
 
     static Optional<XDocumentProperties> getDocumentProperties(XTextDocument doc) {
         return Optional.ofNullable(doc)
-                       .flatMap(e -> UnoCast.cast(XDocumentPropertiesSupplier.class, e))
+                       .flatMap(e -> UnoInterfaces.query(XDocumentPropertiesSupplier.class, e))
                        .map(XDocumentPropertiesSupplier::getDocumentProperties);
     }
 }

@@ -120,7 +120,7 @@ class UnoRedlinesTest {
         when(change.getPropertyValue(property)).thenReturn(new Object());
         enumerate(change);
 
-        assertThrows(NoDocumentException.class, () -> UnoRedlines.getDeletedRanges(document));
+        assertThrows(WriterDocumentAccessException.class, () -> UnoRedlines.getDeletedRanges(document));
     }
 
     @Test
@@ -129,7 +129,7 @@ class UnoRedlinesTest {
         when(end.getText()).thenReturn(mock(XText.class));
         enumerate(change);
 
-        assertThrows(NoDocumentException.class, () -> UnoRedlines.getDeletedRanges(document));
+        assertThrows(WriterDocumentAccessException.class, () -> UnoRedlines.getDeletedRanges(document));
         verify(anchoredDeletion, never()).gotoRange(end, true);
     }
 
@@ -140,7 +140,7 @@ class UnoRedlinesTest {
         when(change.getPropertyValue("RedlineEnd")).thenThrow(cause);
         enumerate(change);
 
-        NoDocumentException error = assertThrows(NoDocumentException.class, () -> UnoRedlines.getDeletedRanges(document));
+        WriterDocumentAccessException error = assertThrows(WriterDocumentAccessException.class, () -> UnoRedlines.getDeletedRanges(document));
 
         assertSame(cause, error.getCause());
     }
@@ -152,7 +152,7 @@ class UnoRedlinesTest {
         when(changes.hasMoreElements()).thenReturn(true);
         when(changes.nextElement()).thenReturn(change).thenThrow(cause);
 
-        NoDocumentException error = assertThrows(NoDocumentException.class, () -> UnoRedlines.getDeletedRanges(document));
+        WriterDocumentAccessException error = assertThrows(WriterDocumentAccessException.class, () -> UnoRedlines.getDeletedRanges(document));
 
         assertSame(cause, error.getCause());
     }
@@ -162,7 +162,7 @@ class UnoRedlinesTest {
         com.sun.star.uno.RuntimeException cause = new com.sun.star.uno.RuntimeException("Cannot enumerate redlines");
         when(changes.hasMoreElements()).thenThrow(cause);
 
-        NoDocumentException error = assertThrows(NoDocumentException.class, () -> UnoRedlines.getDeletedRanges(document));
+        WriterDocumentAccessException error = assertThrows(WriterDocumentAccessException.class, () -> UnoRedlines.getDeletedRanges(document));
 
         assertSame(cause, error.getCause());
     }
@@ -171,14 +171,14 @@ class UnoRedlinesTest {
     void missingRedlineCollectionFailsClosed() {
         XTextDocument missingCollection = mock(XTextDocument.class, withSettings().extraInterfaces(XRedlinesSupplier.class));
 
-        assertThrows(NoDocumentException.class, () -> UnoRedlines.getDeletedRanges(missingCollection));
+        assertThrows(WriterDocumentAccessException.class, () -> UnoRedlines.getDeletedRanges(missingCollection));
     }
 
     @Test
     void missingRedlinePropertiesFailClosed() throws Exception {
         enumerate(new Object());
 
-        assertThrows(NoDocumentException.class, () -> UnoRedlines.getDeletedRanges(document));
+        assertThrows(WriterDocumentAccessException.class, () -> UnoRedlines.getDeletedRanges(document));
     }
 
     @Test

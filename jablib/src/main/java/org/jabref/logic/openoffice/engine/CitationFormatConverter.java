@@ -21,20 +21,20 @@ import org.jabref.logic.openoffice.backend.ReferenceMarkTextWriter;
 import org.jabref.logic.openoffice.backend.WriterReferenceMark;
 import org.jabref.logic.openoffice.backend.WriterReferenceMark.BoundaryPolicy;
 import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
-import org.jabref.logic.openoffice.engine.storage.DocumentStateStore;
+import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
+import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
-import org.jabref.logic.openoffice.engine.storage.MarkWriter;
 import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
-import org.jabref.logic.openoffice.rangesort.FunctionalTextViewCursor;
 import org.jabref.logic.openoffice.rangesort.RangeSort;
 import org.jabref.logic.openoffice.rangesort.RangeSortEntry;
 import org.jabref.logic.openoffice.rangesort.RangeSortVisual;
 import org.jabref.logic.openoffice.rangesort.RangeSortable;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
+import org.jabref.logic.openoffice.rangesort.RestorableTextViewCursor;
 import org.jabref.logic.openoffice.uno.OOTextWriter;
 import org.jabref.logic.openoffice.uno.UnoTextRange;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -79,12 +79,12 @@ final class CitationFormatConverter {
     }
 
     static boolean required(List<String> names, boolean targetZotero) {
-        return names.stream().anyMatch(targetZotero ? MarkCodec::isCanonicalMarkName : ZoteroReferenceMark::isZoteroReferenceMarkName);
+        return names.stream().anyMatch(targetZotero ? JabRefMarkCodec::isCanonicalMarkName : ZoteroReferenceMark::isZoteroReferenceMarkName);
     }
 
     PreparedInsertion prepare(List<BibEntry> entries, List<BibDatabase> databases, CitationStyle style,
                               CitationType requestedType, String pageInfo, XTextCursor cursor, boolean synchronizeBibliography)
-            throws NoDocumentException, com.sun.star.uno.Exception, RenderException, MarkCodecException, IOException,
+            throws WriterDocumentAccessException, com.sun.star.uno.Exception, RenderException, JabRefMarkCodecException, IOException,
             ZoteroCitationStrategy.StrategyException {
         boolean targetZotero = preferences.getZoteroCompatibilityMode();
         boolean rebuildBibliography = synchronizeBibliography && style.hasBibliography();
@@ -110,7 +110,7 @@ final class CitationFormatConverter {
                         RangeForOverlapCheck.REFERENCE_MARK_KIND, citation.oldName())).toList(), Optional.of(cursor),
                 rebuildBibliography ? Set.of(targetZotero ? ZoteroCitationStrategy.BIBLIOGRAPHY_PREFIX : BibliographySection.NAME) : Set.of());
         for (PlannedCitation citation : citations) {
-            if (MarkCodec.isCanonicalMarkName(citation.oldName())) {
+            if (JabRefMarkCodec.isCanonicalMarkName(citation.oldName())) {
                 String raw = citation.anchor().getString();
                 if (!raw.startsWith("\u200b") || !raw.endsWith("\u200b") || raw.length() < 2) {
                     throw invalidMetadata();
@@ -132,7 +132,7 @@ final class CitationFormatConverter {
                 targetZotero ? "" : preferences.getCslBibliographyTitle(), preferences.getCslBibliographyHeaderFormat(),
                 preferences.getCslBibliographyBodyFormat(), false);
         RenderRequest request = new RenderRequest(citations.stream().map(PlannedCitation::group).toList(), selected, options);
-        RenderData resolved = new RenderData(request);
+        CitationKeyResolution resolved = new CitationKeyResolution(request);
         if (!resolved.unresolvedKeys().isEmpty()) {
             throw new ConversionException("Conversion has unresolved keys: " + resolved.unresolvedKeys(),
                     Localization.lang("Cannot convert citations because these citation keys could not be resolved: %0. Select the matching libraries and try again.", String.join(", ", resolved.unresolvedKeys())));
@@ -165,11 +165,11 @@ final class CitationFormatConverter {
                     name = ZoteroReferenceMark.buildReferenceMark(groupEntries, groupKeys, itemId,
                             citation.group().citationType, new BibDatabaseContext(flattened), entryTypes, uris).name();
                 }
-                if (!citation.oldName().isEmpty() && (MarkCodec.isCanonicalMarkName(citation.oldName()) || metadata.isPresent())) {
+                if (!citation.oldName().isEmpty() && (JabRefMarkCodec.isCanonicalMarkName(citation.oldName()) || metadata.isPresent())) {
                     metadata = Optional.of(ConversionMetadata.capture(citation.group(), name));
                 }
             } else {
-                name = MarkCodec.encode(new JabRefMarkData(groupKeys, citation.group().groupId.citationGroupIdAsString(), citation.group().citationType));
+                name = JabRefMarkCodec.encode(new JabRefMarkData(groupKeys, citation.group().groupId.citationGroupIdAsString(), citation.group().citationType));
                 if (ZoteroReferenceMark.isZoteroReferenceMarkName(citation.oldName())) {
                     metadata = Optional.of(ConversionMetadata.capture(citation.group(), citation.newName()));
                 }
@@ -201,13 +201,13 @@ final class CitationFormatConverter {
 
     // [impl->req~openoffice.zotero-conversion-modifier-compatibility~1]
     private ReadPlan read(List<BibDatabase> selected)
-            throws NoDocumentException, WrappedTargetException, RenderException, MarkCodecException {
+            throws WriterDocumentAccessException, WrappedTargetException, RenderException, JabRefMarkCodecException {
         List<PlannedCitation> result = new ArrayList<>();
         MarkStore store = new MarkStore();
         Set<String> ids = new HashSet<>();
         Set<String> nativeIds = new HashSet<>();
         for (String name : ranges.names(document)) {
-            if (MarkCodec.isCanonicalMarkName(name)) {
+            if (JabRefMarkCodec.isCanonicalMarkName(name)) {
                 CitationGroup group = store.readCitationGroupFromDocumentOrThrow(document, name);
                 if (!ids.add(group.groupId.citationGroupIdAsString())) {
                     throw invalidMetadata();
@@ -251,14 +251,14 @@ final class CitationFormatConverter {
 
     private static Map<String, Optional<String>> propertyChanges(List<PlannedCitation> citations, Map<String, Optional<String>> styles,
                                                                  boolean targetZotero, CitationStyle style)
-            throws MarkCodecException {
+            throws JabRefMarkCodecException {
         Map<String, Optional<String>> changes = new LinkedHashMap<>();
         for (PlannedCitation citation : citations) {
             if (citation.metadata().isPresent()) {
                 changes.put(ConversionMetadata.PREFIX + citation.group().groupId.citationGroupIdAsString(), Optional.of(citation.metadata().orElseThrow().encode()));
             }
-            if (targetZotero && MarkCodec.isCanonicalMarkName(citation.oldName())) {
-                JabRefMarkData old = MarkCodec.decode(citation.oldName());
+            if (targetZotero && JabRefMarkCodec.isCanonicalMarkName(citation.oldName())) {
+                JabRefMarkData old = JabRefMarkCodec.decode(citation.oldName());
                 for (int index = 0; index < old.citationKeys().size(); index++) {
                     changes.put(MarkStore.pageInfoProperty(old.uniqueId(), index), Optional.empty());
                 }
@@ -270,7 +270,7 @@ final class CitationFormatConverter {
             }
         }
         changes.putAll(styles);
-        changes.put(DocumentStateStore.PROPERTY_NAME, Optional.of(DocumentStateStore.Family.CSL.name() + "\n" + style.getStyleId()));
+        changes.put(DocumentStyleStore.PROPERTY_NAME, Optional.of(DocumentStyleStore.Family.CSL.name() + "\n" + style.getStyleId()));
         return changes;
     }
 
@@ -324,11 +324,11 @@ final class CitationFormatConverter {
     private record ReadPlan(List<PlannedCitation> citations, Map<String, String> uris) {
     }
 
-    private static CitationGroup group(JabRefMarkData data, List<String> pages) throws MarkCodecException {
-        return new ConversionMetadata(MarkCodec.encode(data), pages, "").group();
+    private static CitationGroup group(JabRefMarkData data, List<String> pages) throws JabRefMarkCodecException {
+        return new ConversionMetadata(JabRefMarkCodec.encode(data), pages, "").group();
     }
 
-    private List<PlannedCitation> order(List<PlannedCitation> citations) throws NoDocumentException {
+    private List<PlannedCitation> order(List<PlannedCitation> citations) throws WriterDocumentAccessException {
         Map<XText, List<RangeSortEntry<PlannedCitation>>> partitions = new LinkedHashMap<>();
         for (PlannedCitation citation : citations) {
             partitions.computeIfAbsent(citation.anchor().getText(), _ -> new ArrayList<>()).add(new RangeSortEntry<>(citation.anchor(), 0, citation));
@@ -341,7 +341,7 @@ final class CitationFormatConverter {
                 mapped.add(new RangeSortEntry<>(UnoTextRange.getFootnoteMarkRange(entry.getRange()).orElse(entry.getRange()), index, entry.getContent()));
             }
         }
-        OOResult<FunctionalTextViewCursor, String> view = FunctionalTextViewCursor.get(document);
+        OOResult<RestorableTextViewCursor, String> view = RestorableTextViewCursor.get(document);
         if (!view.isError()) {
             try {
                 return RangeSortVisual.visualSort(mapped, document, view.get()).stream().map(RangeSortable::getContent).toList();
@@ -384,7 +384,7 @@ final class CitationFormatConverter {
             return rendered.unresolvedKeys();
         }
 
-        void apply(MarkWriter writer, XTextCursor insertion) throws NoDocumentException, CreationException, com.sun.star.uno.Exception, MarkCodecException {
+        void apply(CitationMarkerWriter writer, XTextCursor insertion) throws WriterDocumentAccessException, WriterOperationException, com.sun.star.uno.Exception, JabRefMarkCodecException {
             writer.clear();
             MarkStore store = new MarkStore();
             for (PlannedCitation citation : citations) {
@@ -418,7 +418,7 @@ final class CitationFormatConverter {
                     }
                 }
                 ReferenceMarkTextWriter.write(document, context, range, Optional.ofNullable(rendered.markers().get(citation.group().groupId))
-                                                                                .orElseThrow(() -> new CreationException("Missing prepared conversion text")));
+                                                                                .orElseThrow(() -> new WriterOperationException("Missing prepared conversion text")));
             }
             if (rebuildBibliography) {
                 if (targetZotero) {

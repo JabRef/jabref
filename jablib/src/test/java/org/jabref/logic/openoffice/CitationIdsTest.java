@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.openoffice.engine.JabRefMarkCodec;
+import org.jabref.logic.openoffice.engine.JabRefMarkCodecException;
 import org.jabref.logic.openoffice.engine.JabRefMarkData;
-import org.jabref.logic.openoffice.engine.MarkCodec;
-import org.jabref.logic.openoffice.engine.MarkCodecException;
 import org.jabref.model.openoffice.style.CitationType;
 
 import org.jspecify.annotations.NullMarked;
@@ -46,9 +46,9 @@ class CitationIdsTest {
     }
 
     @Test
-    void defaultIdentityRoundTripsThroughCanonicalStorage() throws MarkCodecException {
+    void defaultIdentityRoundTripsThroughCanonicalStorage() throws JabRefMarkCodecException {
         JabRefMarkData data = new JabRefMarkData(List.of("key"), CitationIds.newId(), CitationType.AUTHORYEAR_PAR);
 
-        assertEquals(data, MarkCodec.decode(MarkCodec.encode(data)));
+        assertEquals(data, JabRefMarkCodec.decode(JabRefMarkCodec.encode(data)));
     }
 }

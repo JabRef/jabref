@@ -4,7 +4,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.NoDocumentFoundException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
 
 import com.sun.star.lang.DisposedException;
 
@@ -56,8 +56,8 @@ class OOError extends JabRefException {
                 err);
     }
 
-    // For NoDocumentException
-    public static OOError from(NoDocumentException err) {
+    // For WriterDocumentAccessException
+    public static OOError from(WriterDocumentAccessException err) {
         return new OOError(
                 Localization.lang("Not connected to document"),
                 Localization.lang("Not connected to any Writer document."

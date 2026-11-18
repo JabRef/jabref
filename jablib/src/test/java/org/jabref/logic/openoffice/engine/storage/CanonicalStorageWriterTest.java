@@ -21,9 +21,9 @@ import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
 import org.jabref.logic.openoffice.engine.CitationEngine;
 import org.jabref.logic.openoffice.engine.CitationGroupEditor;
 import org.jabref.logic.openoffice.engine.CitationRenderer;
-import org.jabref.logic.openoffice.engine.DocumentSession;
+import org.jabref.logic.openoffice.engine.DocumentWriteSession;
 import org.jabref.logic.openoffice.engine.JStyleRenderer;
-import org.jabref.logic.openoffice.engine.MarkCodec;
+import org.jabref.logic.openoffice.engine.JabRefMarkCodec;
 import org.jabref.logic.openoffice.engine.RenderException;
 import org.jabref.logic.openoffice.engine.RenderOptions;
 import org.jabref.logic.openoffice.engine.RenderRequest;
@@ -33,11 +33,11 @@ import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.logic.openoffice.frontend.DocumentCitations;
 import org.jabref.logic.openoffice.frontend.DocumentOrder;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
-import org.jabref.logic.openoffice.rangesort.FunctionalTextViewCursor;
+import org.jabref.logic.openoffice.rangesort.RestorableTextViewCursor;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
-import org.jabref.logic.openoffice.uno.DocumentAnnotation;
+import org.jabref.logic.openoffice.uno.NamedTextContentPlacement;
 import org.jabref.logic.openoffice.uno.UnoRedlines;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 import org.jabref.model.database.BibDatabase;
@@ -132,11 +132,11 @@ class CanonicalStorageWriterTest {
         documentCitations.citationGroups.lookupCitations(List.of(database));
         documentCitations.citationGroups.imposeLocalOrder(Comparator.comparing(entry -> entry.getField(StandardField.TITLE).orElse("")));
         documentCitations.markStore.savePageInfos(document, group);
-        MarkWriter writer = new MarkWriter(document, office.context());
+        CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context());
         writer.write(documentCitations.markStore, group, OOText.fromString("first"));
         writer.write(documentCitations.markStore, group, OOText.fromString("second"));
 
-        assertEquals(List.of("beta", "alpha", "beta"), MarkCodec.decode(name).citationKeys());
+        assertEquals(List.of("beta", "alpha", "beta"), JabRefMarkCodec.decode(name).citationKeys());
         assertEquals(List.of(name), WriterReferenceMarks.getListOfNames(document));
         XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("canonical-page-info.odt"));
         CitationGroup restored = new DocumentCitations(reopened).citationGroups.getCitationGroupsUnordered().getFirst();
@@ -150,10 +150,10 @@ class CanonicalStorageWriterTest {
         XTextDocument document = office.newDocument();
         XTextCursor cursor = document.getText().createTextCursor();
         cursor.setString("legacy");
-        WriterReferenceMarks.create(new DocumentAnnotation(document, "JR_cite_1_legacy", cursor, true));
+        WriterReferenceMarks.create(new NamedTextContentPlacement(document, "JR_cite_1_legacy", cursor, true));
         cursor.gotoEnd(false);
         cursor.setString("cid");
-        WriterReferenceMarks.create(new DocumentAnnotation(document, "JABREF_legacy CID_1 old NORMAL", cursor, true));
+        WriterReferenceMarks.create(new NamedTextContentPlacement(document, "JABREF_legacy CID_1 old NORMAL", cursor, true));
         DocumentCitations documentCitations = new DocumentCitations(document);
         assertEquals(0, documentCitations.citationGroups.numberOfCitationGroups());
         create(documentCitations, document, List.of("canonical"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR);
@@ -170,7 +170,7 @@ class CanonicalStorageWriterTest {
         CitationGroup visible = create(documentCitations, document, List.of("visible"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR);
         CitationGroup invisible = create(documentCitations, document, List.of("hidden"), List.of(Optional.empty()), CitationType.INVISIBLE_CIT);
         List<String> names = WriterReferenceMarks.getListOfNames(document);
-        MarkWriter writer = new MarkWriter(document, office.context());
+        CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context());
         assertTrue(writer.write(documentCitations.markStore, visible, OOText.fromString("<i>A</i>")));
         assertTrue(writer.write(documentCitations.markStore, visible, OOText.fromString("<b>A</b>")));
         assertFalse(writer.write(documentCitations.markStore, visible, OOText.fromString("<b>A</b>")));
@@ -192,7 +192,7 @@ class CanonicalStorageWriterTest {
         XTextDocument document = office.newDocument();
         DocumentCitations documentCitations = new DocumentCitations(document);
         CitationGroup group = create(documentCitations, document, List.of("alpha"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR);
-        MarkWriter writer = new MarkWriter(document, office.context());
+        CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context());
         writer.write(documentCitations.markStore, group, OOText.fromString("<sup>1</sup>"));
         XPropertySet initial = query(XPropertySet.class, inner(documentCitations, document, group));
         Object height = initial.getPropertyValue("CharHeight");
@@ -239,12 +239,12 @@ class CanonicalStorageWriterTest {
         DocumentCitations documentCitations = new DocumentCitations(document);
         CitationGroup beta = create(documentCitations, document, List.of("beta"), List.of(info("p. 5")), CitationType.AUTHORYEAR_PAR);
         CitationGroup alpha = create(documentCitations, document, List.of("alpha"), List.of(info("p. 7")), CitationType.AUTHORYEAR_PAR);
-        MarkWriter writer = new MarkWriter(document, office.context());
+        CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context());
         writer.write(documentCitations.markStore, beta, OOText.fromString("[1]"));
         writer.write(documentCitations.markStore, alpha, OOText.fromString("[2]"));
         List<String> originalProperties = UnoUserDefinedProperty.getListOfNames(document);
         CitationGroupEditor editor = new CitationGroupEditor(document, office.context(), writer);
-        DocumentSession session = new DocumentSession(document);
+        DocumentWriteSession session = new DocumentWriteSession(document);
 
         assertEquals(true, session.write("Merge citations", () -> editor.merge(documentCitations)).get());
         CitationGroup merged = documentCitations.citationGroups.getCitationGroupsUnordered().getFirst();
@@ -270,8 +270,8 @@ class CanonicalStorageWriterTest {
                 List.of(info("p. 3"), info("p. 4")), CitationType.AUTHOR_ONLY);
         List<String> names = WriterReferenceMarks.getListOfNames(document);
 
-        CitationGroupEditor editor = new CitationGroupEditor(document, office.context(), new MarkWriter(document, office.context()));
-        DocumentSession session = new DocumentSession(document);
+        CitationGroupEditor editor = new CitationGroupEditor(document, office.context(), new CitationMarkerWriter(document, office.context()));
+        DocumentWriteSession session = new DocumentWriteSession(document);
         assertEquals(false, session.write("Merge citations", () -> editor.merge(documentCitations)).get());
         assertEquals(false, session.write("Separate citations", () -> editor.separate(documentCitations)).get());
         assertEquals(names, WriterReferenceMarks.getListOfNames(document));
@@ -286,8 +286,8 @@ class CanonicalStorageWriterTest {
         create(documentCitations, document, List.of("second"), List.of(info("p. 2")), CitationType.AUTHORYEAR_PAR);
         documentCitations.imposeGlobalOrder(document);
         UnoRedlines.setRecordChanges(document, true);
-        CitationGroupEditor editor = new CitationGroupEditor(document, office.context(), new MarkWriter(document, office.context()));
-        DocumentSession session = new DocumentSession(document);
+        CitationGroupEditor editor = new CitationGroupEditor(document, office.context(), new CitationMarkerWriter(document, office.context()));
+        DocumentWriteSession session = new DocumentWriteSession(document);
 
         assertEquals(true, session.write("Merge citations", () -> editor.merge(documentCitations)).get());
         assertTrue(UnoRedlines.getRecordChanges(document));
@@ -331,8 +331,8 @@ class CanonicalStorageWriterTest {
         CitationGroup group = create(documentCitations, document, List.of("alpha"), List.of(info("p. 5")), CitationType.AUTHORYEAR_PAR);
         UnoUserDefinedProperty.setStringProperty(document, "ZOTERO_PREF", "untouched");
         UnoUserDefinedProperty.setStringProperty(document, MarkStore.pageInfoProperty("orphan", 0), "p. 99");
-        DocumentStateStore state = new DocumentStateStore();
-        DocumentStateStore.State expected = new DocumentStateStore.State(DocumentStateStore.Family.CSL, "nature.csl");
+        DocumentStyleStore state = new DocumentStyleStore();
+        DocumentStyleStore.State expected = new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, "nature.csl");
         state.store(document, expected);
         documentCitations.markStore.removeOrphanPageInfos(document);
 
@@ -347,7 +347,7 @@ class CanonicalStorageWriterTest {
     void benchmarkThreeHundredCanonicalInsertionsAndVisualOrdering() throws Exception {
         XTextDocument document = office.newDocument();
         DocumentCitations documentCitations = new DocumentCitations(document);
-        MarkWriter writer = new MarkWriter(document, office.context());
+        CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context());
         List<String> expected = new ArrayList<>();
         long start = System.nanoTime();
         writer.beginUpdate();
@@ -359,7 +359,7 @@ class CanonicalStorageWriterTest {
                 writer.write(documentCitations.markStore, group, OOText.fromString("[" + (index + 1) + "]"));
             }
             long inserted = System.nanoTime();
-            OOResult<FunctionalTextViewCursor, String> cursor = FunctionalTextViewCursor.get(document);
+            OOResult<RestorableTextViewCursor, String> cursor = RestorableTextViewCursor.get(document);
             assertFalse(cursor.isError());
             List<CitationGroup> sorted = new DocumentOrder().inDocumentOrder(document, documentCitations.citationGroups, documentCitations.markStore, Optional.of(cursor.get()));
             long ordered = System.nanoTime();
@@ -384,7 +384,7 @@ class CanonicalStorageWriterTest {
         DocumentCitations documentCitations = new DocumentCitations(document);
         CitationGroup group = create(documentCitations, document, List.of("alpha"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR);
         XUndoManager undo = undoManager(document);
-        try (MarkWriter writer = new MarkWriter(document, office.context())) {
+        try (CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context())) {
             writeInContext(writer, documentCitations, group, undo, "Style A", OOText.fromString("<i>marker</i>"));
             undo.clear();
             writeInContext(writer, documentCitations, group, undo, "Style B", OOText.fromString("<b>marker</b>"));
@@ -412,7 +412,7 @@ class CanonicalStorageWriterTest {
         DocumentCitations documentCitations = new DocumentCitations(document);
         CitationGroup group = create(documentCitations, document, List.of("alpha"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR);
         OOText marker = OOText.fromString("<b>stable</b>");
-        try (MarkWriter writer = new MarkWriter(document, office.context())) {
+        try (CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context())) {
             assertTrue(writer.write(documentCitations.markStore, group, marker));
             assertFalse(writer.write(documentCitations.markStore, group, marker));
             inner(documentCitations, document, group).setString("manual edit");
@@ -437,7 +437,7 @@ class CanonicalStorageWriterTest {
         CitationGroup second = create(documentCitations, document, List.of("beta"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR);
         List<CitationGroup> groups = List.of(first, second);
         Map<CitationGroupId, OOText> markers = Map.of(first.groupId, OOText.fromString("first"), second.groupId, OOText.fromString("second"));
-        try (MarkWriter writer = new MarkWriter(document, office.context())) {
+        try (CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context())) {
             writer.beginUpdate();
             try {
                 assertEquals(2, writer.apply(documentCitations.markStore, groups, markers));
@@ -497,7 +497,7 @@ class CanonicalStorageWriterTest {
         CitationGroup group = create(documentCitations, document, List.of("alpha"), List.of(info("p. 5")), CitationType.AUTHORYEAR_PAR);
         String name = group.getReferenceMarkNameForLinking().orElseThrow();
         String property = MarkStore.pageInfoProperty(group.groupId.citationGroupIdAsString(), 0);
-        try (MarkWriter writer = new MarkWriter(document, office.context())) {
+        try (CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context())) {
             writer.write(documentCitations.markStore, group, OOText.fromString("[1]"));
         }
         XUndoManager undo = undoManager(document);
@@ -543,8 +543,8 @@ class CanonicalStorageWriterTest {
         Map<String, String> originalProperties = pageProperties(document);
         XUndoManager undo = undoManager(document);
         undo.clear();
-        DocumentSession session = new DocumentSession(document);
-        try (MarkWriter writer = new MarkWriter(document, office.context())) {
+        DocumentWriteSession session = new DocumentWriteSession(document);
+        try (CitationMarkerWriter writer = new CitationMarkerWriter(document, office.context())) {
             CitationGroupEditor editor = new CitationGroupEditor(document, office.context(), writer);
             writer.beginUpdate();
             try {
@@ -683,7 +683,7 @@ class CanonicalStorageWriterTest {
         assertTrue(request.getValue().options().includeBibliography());
     }
 
-    private boolean writeInContext(MarkWriter writer, DocumentCitations documentCitations, CitationGroup group, XUndoManager undo,
+    private boolean writeInContext(CitationMarkerWriter writer, DocumentCitations documentCitations, CitationGroup group, XUndoManager undo,
                                    String title, OOText marker) throws Exception {
         writer.beginUpdate();
         try {

@@ -39,7 +39,7 @@ The shared framework separates storage, document actions, and rendering; it does
 ### Canonical identity and rendering
 
 With Zotero compatibility disabled, `CitationEngine` coordinates actions over the shared citation model.
-`MarkCodec` encodes storage-order keys, the stored citation type, and an opaque group uid:
+`JabRefMarkCodec` encodes storage-order keys, the stored citation type, and an opaque group uid:
 
 ```text
 JABREF_<key>[, JABREF_<key2> ...] <TYPE> <uid>
@@ -58,7 +58,7 @@ All six types (`NORMAL`, `IN_TEXT`, `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_O
 Per-citation page information is stored under `JabRef_page_info:<uid>:<storageIndex>` so presentation sorting cannot change its owner.
 
 `JStyleRenderer`, `CslRenderer`, and `BstRenderer` produce final formatted markers and requested bibliography paragraphs before mutation.
-`MarkWriter` rewrites within canonical marks rather than renaming them when numbers change, retaining invisible boundaries for short/invisible citations.
+`CitationMarkerWriter` rewrites within canonical marks rather than renaming them when numbers change, retaining invisible boundaries for short/invisible citations.
 `DocumentCitations` is an action-local mutable/live facade; it is not a document subtype or immutable snapshot.
 `CitationGroupEditor` prepares merge/separate identities and replacements, then the engine renders that proposed state before applying it in one write session without a second render.
 Ordering precedes controller locking and retains the [documented visual-ordering limitations](../code-howtos/openoffice/order-of-appearance.md).
@@ -113,7 +113,7 @@ Replay uses raw property APIs to avoid registering further undo actions.
 Ordinary applied-style and Zotero preference writes remain raw and are not made undoable by this mechanism.
 
 Conversion requires an available, unlocked Writer undo manager and cannot join an existing undo context.
-`DocumentSession.writeWithRollback` owns a root context and sentinel, so successful conversion/insertion is one Undo/Redo step covering citation identities, text, page information, conversion metadata, prepared conversion-style properties, and any normally synchronized target bibliography.
+`DocumentWriteSession.writeWithRollback` owns a root context and sentinel, so successful conversion/insertion is one Undo/Redo step covering citation identities, text, page information, conversion metadata, prepared conversion-style properties, and any normally synchronized target bibliography.
 On ordinary application failure it closes and verifies ownership of the context before undoing only its own transaction, never an earlier user action.
 This automatic failure recovery is new behavior intended to prevent partially replaced citations, not the first introduction of undo grouping.
 Starting the transaction may clear pre-existing redo history even if rollback restores document state.
@@ -146,7 +146,7 @@ Ordinary write sessions do not gain this conversion-specific rollback behavior.
 The Writer integration definitions cover golden canonical documents, cross-family save/reopen, all six types/page slots, current canonical/native Zotero citation conversion, protected ranges, footnotes/tables, superscripts, tracked changes, and ordinary application-failure rollback.
 Native JSON round trips cover URIs, modifiers, and unknown metadata, while modifier fixtures check successful conversion, existing citation-type mapping, and restoration through save/reopen.
 Bibliography assertions follow normal synchronization: all sections unchanged when disabled, target-mode updates only when enabled.
-Storage/codec, `ConversionMetadataTest`, `DocumentSessionTest`, and GUI/controller tests complement the Writer coverage with metadata, property, undo-ownership, and warning-order checks.
+Storage/codec, `ConversionMetadataTest`, `DocumentWriteSessionTest`, and GUI/controller tests complement the Writer coverage with metadata, property, undo-ownership, and warning-order checks.
 These descriptions are not evidence that a new test run passed.
 The [OpenOffice/LibreOffice requirements](../requirements/openoffice.md) provide implementation/test traceability.
 

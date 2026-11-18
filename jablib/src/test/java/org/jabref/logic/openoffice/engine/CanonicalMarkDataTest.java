@@ -14,28 +14,28 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class CanonicalMarkDataTest {
 
     @Test
-    void buildSingleReferenceMarkWithoutDerivedNumber() throws MarkCodecException {
-        assertEquals("JABREF_key1 NORMAL uniqueId1", MarkCodec.encode(new JabRefMarkData(List.of("key1"), "uniqueId1", CitationType.AUTHORYEAR_PAR)));
+    void buildSingleReferenceMarkWithoutDerivedNumber() throws JabRefMarkCodecException {
+        assertEquals("JABREF_key1 NORMAL uniqueId1", JabRefMarkCodec.encode(new JabRefMarkData(List.of("key1"), "uniqueId1", CitationType.AUTHORYEAR_PAR)));
     }
 
     @Test
-    void buildGroupedReferenceMarkWithoutDerivedNumbers() throws MarkCodecException {
-        assertEquals("JABREF_key3, JABREF_key4 IN_TEXT uniqueId3", MarkCodec.encode(new JabRefMarkData(List.of("key3", "key4"), "uniqueId3", CitationType.AUTHORYEAR_INTEXT)));
+    void buildGroupedReferenceMarkWithoutDerivedNumbers() throws JabRefMarkCodecException {
+        assertEquals("JABREF_key3, JABREF_key4 IN_TEXT uniqueId3", JabRefMarkCodec.encode(new JabRefMarkData(List.of("key3", "key4"), "uniqueId3", CitationType.AUTHORYEAR_INTEXT)));
     }
 
     @Test
     void missingTypeIsNotDefaultedFromLegacyMark() {
-        assertThrows(MarkCodecException.class, () -> MarkCodec.decode("JABREF_legacyKey CID_42 legacyUniqueId"));
+        assertThrows(JabRefMarkCodecException.class, () -> JabRefMarkCodec.decode("JABREF_legacyKey CID_42 legacyUniqueId"));
     }
 
     @Test
-    void parseGroupedReferenceMarkWithExplicitType() throws MarkCodecException {
+    void parseGroupedReferenceMarkWithExplicitType() throws JabRefMarkCodecException {
         assertEquals(new JabRefMarkData(List.of("key3", "key4"), "uniqueId3", CitationType.AUTHORYEAR_INTEXT),
-                MarkCodec.decode("JABREF_key3, JABREF_key4 IN_TEXT uniqueId3"));
+                JabRefMarkCodec.decode("JABREF_key3, JABREF_key4 IN_TEXT uniqueId3"));
     }
 
     @Test
     void unrelatedNamesAreRejected() {
-        assertThrows(MarkCodecException.class, () -> MarkCodec.decode("Unrelated citations"));
+        assertThrows(JabRefMarkCodecException.class, () -> JabRefMarkCodec.decode("Unrelated citations"));
     }
 }

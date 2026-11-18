@@ -3,7 +3,7 @@ package org.jabref.logic.openoffice.rangesort;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.openoffice.uno.UnoCast;
+import org.jabref.logic.openoffice.uno.UnoInterfaces;
 import org.jabref.logic.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.util.OOTuple3;
 
@@ -12,9 +12,9 @@ import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
 
-public class RangeOverlapBetween {
+public class BetweenSetsRangeOverlapFinder {
 
-    private RangeOverlapBetween() {
+    private BetweenSetsRangeOverlapFinder() {
     }
 
     /// Check for any overlap between two sets of XTextRange values.
@@ -43,7 +43,7 @@ public class RangeOverlapBetween {
         for (V aHolder : fewHolders) {
             XText aText = aHolder.getRange().getText();
             fewTuples.add(new OOTuple3<>(aText,
-                    UnoCast.cast(XTextRangeCompare.class, aText).get(),
+                    UnoInterfaces.query(XTextRangeCompare.class, aText).get(),
                     aHolder));
         }
 

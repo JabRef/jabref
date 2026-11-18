@@ -43,7 +43,7 @@ This lets insertion render the whole cited set before changing existing document
 
 Visual positions require moving Writer's view cursor, which is restored after sorting.
 The view cursor cannot perform this work while document controllers are locked.
-Canonical insert and refresh therefore order and render before entering `DocumentSession`'s controller-locked write phase.
+Canonical insert and refresh therefore order and render before entering `DocumentWriteSession`'s controller-locked write phase.
 A missing/nonfunctional view cursor, externally locked controllers, or a visual-sort failure triggers the textual fallback with a warning.
 
 ### Visual ordering limitations

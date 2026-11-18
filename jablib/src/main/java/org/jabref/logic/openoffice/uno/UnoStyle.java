@@ -23,11 +23,11 @@ public class UnoStyle {
             throws
             WrappedTargetException {
 
-        XStyleFamiliesSupplier fss = UnoCast.cast(XStyleFamiliesSupplier.class, doc).get();
-        XNameAccess families = UnoCast.cast(XNameAccess.class, fss.getStyleFamilies()).get();
+        XStyleFamiliesSupplier fss = UnoInterfaces.query(XStyleFamiliesSupplier.class, doc).get();
+        XNameAccess families = UnoInterfaces.query(XNameAccess.class, fss.getStyleFamilies()).get();
         XNameContainer xFamily;
         try {
-            xFamily = UnoCast.cast(XNameContainer.class, families.getByName(familyName)).get();
+            xFamily = UnoInterfaces.query(XNameContainer.class, families.getByName(familyName)).get();
         } catch (NoSuchElementException ex) {
             String msg = "Style family name '%s' is not recognized".formatted(familyName);
             throw new IllegalArgumentException(msg, ex);
@@ -35,7 +35,7 @@ public class UnoStyle {
 
         try {
             Object style = xFamily.getByName(styleName);
-            return UnoCast.cast(XStyle.class, style);
+            return UnoInterfaces.query(XStyle.class, style);
         } catch (NoSuchElementException _) {
             return Optional.empty();
         }

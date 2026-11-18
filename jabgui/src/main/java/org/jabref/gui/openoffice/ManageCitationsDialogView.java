@@ -43,7 +43,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
         setResultConverter(btn -> {
             if (btn == ButtonType.OK) {
-                viewModel.storeSettings();
+                viewModel.applyCitationEdits();
             }
             return null;
         });

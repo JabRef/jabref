@@ -21,15 +21,15 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.engine.CitationEngine;
 import org.jabref.logic.openoffice.engine.CitedEntryExporter;
+import org.jabref.logic.openoffice.engine.JabRefMarkCodec;
 import org.jabref.logic.openoffice.engine.JabRefMarkData;
-import org.jabref.logic.openoffice.engine.MarkCodec;
 import org.jabref.logic.openoffice.engine.MissingCitationLabelException;
 import org.jabref.logic.openoffice.engine.MissingWriterStyleException;
 import org.jabref.logic.openoffice.engine.PandocRenderException;
 import org.jabref.logic.openoffice.engine.RenderException;
 import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.logic.openoffice.engine.UpdatePipeline;
-import org.jabref.logic.openoffice.engine.storage.DocumentStateStore;
+import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
 import org.jabref.logic.openoffice.frontend.DocumentCitations;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
@@ -138,7 +138,8 @@ class WriterIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"jstyle", "csl", "bst", "csl-empty"})
     void legacyGoldenMarksSurviveWriterSaveAndReopenWithoutBeingMigrated(String family) throws Exception {
-        XTextDocument document = office.load(resource(family + ".fodt"));
+        String fixture = "csl-empty".equals(family) ? "legacy-csl-empty-citation.fodt" : "legacy-" + family + ".fodt";
+        XTextDocument document = office.load(resource(fixture));
         Map<String, String> expected = legacyMarks(family);
         assertEquals(expected, marks(document));
         if ("csl-empty".equals(family)) {
@@ -207,7 +208,7 @@ class WriterIntegrationTest {
                 "delta", "Delta 2023; p. 4", "epsilon", "Epsilon", "zeta", "2025; p. 6"), originalText);
 
         List<OOStyle> styles = List.of(style("csl"), style("bst"), jstyle);
-        List<DocumentStateStore.Family> families = List.of(DocumentStateStore.Family.CSL, DocumentStateStore.Family.BST, DocumentStateStore.Family.JSTYLE);
+        List<DocumentStyleStore.Family> families = List.of(DocumentStyleStore.Family.CSL, DocumentStyleStore.Family.BST, DocumentStyleStore.Family.JSTYLE);
         for (int index = 0; index < styles.size(); index++) {
             try (CitationEngine engine = engine(document)) {
                 assertEquals(List.of(), success(engine.refresh(List.of(database), styles.get(index))));
@@ -215,7 +216,7 @@ class WriterIntegrationTest {
                 assertEquals(pageInfos, pageProperties(document));
                 assertEquals("", textsByKey(document).get("gamma"));
                 assertEquals(keys, exportedKeys(success(engine.exportCited(List.of(database)))));
-                assertEquals(families.get(index), new DocumentStateStore().read(document).orElseThrow().family());
+                assertEquals(families.get(index), new DocumentStyleStore().read(document).orElseThrow().family());
                 if (index < 2) {
                     assertFalse(textsByKey(document).values().stream().anyMatch(text -> text.contains("p. ")));
                 }
@@ -427,7 +428,8 @@ class WriterIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"jstyle", "csl", "bst", "csl-empty"})
     void engineDoesNotReadExportRewriteOrMigrateLegacyMarks(String family) throws Exception {
-        XTextDocument document = office.load(resource(family + ".fodt"));
+        String fixture = "csl-empty".equals(family) ? "legacy-csl-empty-citation.fodt" : "legacy-" + family + ".fodt";
+        XTextDocument document = office.load(resource(fixture));
         Map<String, String> legacy = marks(document);
         Map<String, Object> legacyProperties = properties(document);
         assertEquals(0, new DocumentCitations(document).citationGroups.numberOfCitationGroups());
@@ -619,7 +621,7 @@ class WriterIntegrationTest {
             case "csl" ->
                     CSLStyleUtils.createCitationStyleFromFile(resource("superscript.csl").toString()).orElseThrow();
             case "bst" ->
-                    BstStyle.loadExternal(resource("golden.bst"));
+                    BstStyle.loadExternal(resource("title-only.bst"));
             default ->
                     new JStyle(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
         };
@@ -668,8 +670,8 @@ class WriterIntegrationTest {
     private static Map<String, JabRefMarkData> identities(XTextDocument document) throws Exception {
         Map<String, JabRefMarkData> result = new LinkedHashMap<>();
         for (String name : marks(document).keySet()) {
-            assertTrue(MarkCodec.isCanonicalMarkName(name), name);
-            result.put(name, MarkCodec.decode(name));
+            assertTrue(JabRefMarkCodec.isCanonicalMarkName(name), name);
+            result.put(name, JabRefMarkCodec.decode(name));
         }
         return result;
     }
@@ -681,7 +683,7 @@ class WriterIntegrationTest {
     private static Map<String, String> textsByKey(XTextDocument document) throws Exception {
         Map<String, String> result = new LinkedHashMap<>();
         for (Map.Entry<String, String> mark : marks(document).entrySet()) {
-            JabRefMarkData data = MarkCodec.decode(mark.getKey());
+            JabRefMarkData data = JabRefMarkCodec.decode(mark.getKey());
             assertEquals(1, data.citationKeys().size());
             String raw = mark.getValue();
             assertTrue(raw.length() >= 2, mark.getKey());

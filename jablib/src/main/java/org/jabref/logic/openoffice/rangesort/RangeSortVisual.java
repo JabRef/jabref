@@ -31,7 +31,7 @@ public class RangeSortVisual {
     /// @return The input, sorted by the elements XTextRange and getIndexInPosition.
     public static <T> List<RangeSortable<T>> visualSort(List<RangeSortable<T>> inputs,
                                                         XTextDocument doc,
-                                                        FunctionalTextViewCursor fcursor) {
+                                                        RestorableTextViewCursor fcursor) {
 
         if (UnoScreenRefresh.hasControllersLocked(doc)) {
             final String msg = "visualSort: with ControllersLocked, viewCursor.gotoRange is probably useless";

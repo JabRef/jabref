@@ -13,12 +13,12 @@ import org.jabref.logic.openoffice.backend.WriterReferenceMark;
 import org.jabref.logic.openoffice.backend.WriterReferenceMark.BoundaryPolicy;
 import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
 import org.jabref.logic.openoffice.backend.WriterTextContext;
+import org.jabref.logic.openoffice.engine.JabRefMarkCodec;
+import org.jabref.logic.openoffice.engine.JabRefMarkCodecException;
 import org.jabref.logic.openoffice.engine.JabRefMarkData;
-import org.jabref.logic.openoffice.engine.MarkCodec;
-import org.jabref.logic.openoffice.engine.MarkCodecException;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
@@ -51,7 +51,7 @@ public final class MarkStore {
     private final WriterReferenceMarks ranges = new WriterReferenceMarks();
     private final Map<CitationGroupId, StoredMark> marks = new LinkedHashMap<>();
 
-    public CitationGroups readAll(XTextDocument document) throws NoDocumentException, WrappedTargetException {
+    public CitationGroups readAll(XTextDocument document) throws WriterDocumentAccessException, WrappedTargetException {
         marks.clear();
         Map<CitationGroupId, CitationGroup> groups = new LinkedHashMap<>();
         Set<String> uniqueIds = new HashSet<>();
@@ -67,21 +67,21 @@ public final class MarkStore {
         return new CitationGroups(groups);
     }
 
-    public List<String> getJabRefReferenceMarkNames(XTextDocument document) throws NoDocumentException {
-        return ranges.names(document).stream().filter(MarkCodec::isCanonicalMarkName).toList();
+    public List<String> getJabRefReferenceMarkNames(XTextDocument document) throws WriterDocumentAccessException {
+        return ranges.names(document).stream().filter(JabRefMarkCodec::isCanonicalMarkName).toList();
     }
 
     public CitationGroup readCitationGroupFromDocumentOrThrow(XTextDocument document, String name)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         JabRefMarkData data;
         try {
-            data = MarkCodec.decode(name);
-        } catch (MarkCodecException exception) {
+            data = JabRefMarkCodec.decode(name);
+        } catch (JabRefMarkCodecException exception) {
             LOGGER.debug("Not a canonical JabRef reference mark: {}", name, exception);
-            throw new NoDocumentException("Not a canonical JabRef reference mark: " + name);
+            throw new WriterDocumentAccessException("Not a canonical JabRef reference mark: " + name);
         }
         WriterReferenceMark range = ranges.find(document, name, BoundaryPolicy.PERSISTENT)
-                                          .orElseThrow(() -> new NoDocumentException("Missing citation range: " + name));
+                                          .orElseThrow(() -> new WriterDocumentAccessException("Missing citation range: " + name));
         List<Citation> citations = new ArrayList<>(data.citationKeys().size());
         for (int index = 0; index < data.citationKeys().size(); index++) {
             Citation citation = new Citation(data.citationKeys().get(index));
@@ -98,7 +98,7 @@ public final class MarkStore {
                                              List<String> keys, List<Optional<OOText>> pageInfos,
                                              CitationType type, XTextCursor position,
                                              boolean insertSpaceBefore, boolean insertSpaceAfter)
-            throws CreationException, NoDocumentException, WrappedTargetException, NotRemoveableException,
+            throws WriterOperationException, WriterDocumentAccessException, WrappedTargetException, NotRemoveableException,
             PropertyVetoException, IllegalTypeException {
         return createCitationGroup(document, context, keys, pageInfos, type, position,
                 insertSpaceBefore, insertSpaceAfter, CitationIds.newId());
@@ -108,19 +108,19 @@ public final class MarkStore {
                                              List<String> keys, List<Optional<OOText>> pageInfos,
                                              CitationType type, XTextCursor position,
                                              boolean insertSpaceBefore, boolean insertSpaceAfter, String uniqueId)
-            throws CreationException, NoDocumentException, WrappedTargetException, NotRemoveableException,
+            throws WriterOperationException, WriterDocumentAccessException, WrappedTargetException, NotRemoveableException,
             PropertyVetoException, IllegalTypeException {
         if (keys.size() != pageInfos.size()) {
-            throw new CreationException("A page-info slot is required for every citation key");
+            throw new WriterOperationException("A page-info slot is required for every citation key");
         }
         JabRefMarkData data;
         try {
             data = new JabRefMarkData(keys, uniqueId, type);
-        } catch (MarkCodecException exception) {
+        } catch (JabRefMarkCodecException exception) {
             LOGGER.debug("Cannot encode citation identity", exception);
-            throw new CreationException("Invalid canonical citation identity: " + exception.reason());
+            throw new WriterOperationException("Invalid canonical citation identity: " + exception.reason());
         }
-        String name = MarkCodec.encode(data);
+        String name = JabRefMarkCodec.encode(data);
         WriterReferenceMark range = ranges.create(document, context, name, position,
                 insertSpaceBefore && !hasAdjacentSpace(position, false),
                 insertSpaceAfter && !hasAdjacentSpace(position, true), BoundaryPolicy.PERSISTENT);
@@ -147,17 +147,17 @@ public final class MarkStore {
         return Optional.ofNullable(marks.get(group.groupId)).map(StoredMark::data);
     }
 
-    public WriterReferenceMark referenceMark(CitationGroup group) throws NoDocumentException {
+    public WriterReferenceMark referenceMark(CitationGroup group) throws WriterDocumentAccessException {
         return stored(group).range();
     }
 
-    private StoredMark stored(CitationGroup group) throws NoDocumentException {
+    private StoredMark stored(CitationGroup group) throws WriterDocumentAccessException {
         return Optional.ofNullable(marks.get(group.groupId))
-                       .orElseThrow(() -> new NoDocumentException("Unknown citation group: " + group.groupId.citationGroupIdAsString()));
+                       .orElseThrow(() -> new WriterDocumentAccessException("Unknown citation group: " + group.groupId.citationGroupIdAsString()));
     }
 
     public void removeCitationGroup(CitationGroup group, XTextDocument document)
-            throws NoDocumentException, WrappedTargetException, NotRemoveableException {
+            throws WriterDocumentAccessException, WrappedTargetException, NotRemoveableException {
         StoredMark mark = stored(group);
         mark.range().removeFromDocument(document);
         for (int index = 0; index < mark.data().citationKeys().size(); index++) {
@@ -167,27 +167,27 @@ public final class MarkStore {
     }
 
     public Optional<XTextRange> getMarkRange(CitationGroup group, XTextDocument document)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         return stored(group).range().getMarkRange(document);
     }
 
     public Optional<XTextCursor> getRawCursorForCitationGroup(CitationGroup group, XTextDocument document)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         return stored(group).range().getRawCursor(document);
     }
 
     public XTextCursor getFillCursorForCitationGroup(CitationGroup group, XTextDocument document)
-            throws NoDocumentException, WrappedTargetException, CreationException {
+            throws WriterDocumentAccessException, WrappedTargetException, WriterOperationException {
         return stored(group).range().getFillCursor(document);
     }
 
     public void cleanFillCursorForCitationGroup(CitationGroup group, XTextDocument document)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         stored(group).range().cleanFillCursor(document);
     }
 
     public void savePageInfos(XTextDocument document, CitationGroup group)
-            throws NoDocumentException, WrappedTargetException, NotRemoveableException, PropertyVetoException, IllegalTypeException {
+            throws WriterDocumentAccessException, WrappedTargetException, NotRemoveableException, PropertyVetoException, IllegalTypeException {
         String uid = stored(group).data().uniqueId();
         for (int index = 0; index < group.citationsInStorageOrder.size(); index++) {
             writePageInfo(document, uid, index, group.citationsInStorageOrder.get(index).getPageInfo());
@@ -204,15 +204,15 @@ public final class MarkStore {
     }
 
     /// Call after a successful update, not while reading or before rendering can fail.
-    public void removeOrphanPageInfos(XTextDocument document) throws NoDocumentException, NotRemoveableException, WrappedTargetException {
+    public void removeOrphanPageInfos(XTextDocument document) throws WriterDocumentAccessException, NotRemoveableException, WrappedTargetException {
         Set<String> liveProperties = new HashSet<>();
         for (String name : getJabRefReferenceMarkNames(document)) {
             try {
-                JabRefMarkData data = MarkCodec.decode(name);
+                JabRefMarkData data = JabRefMarkCodec.decode(name);
                 for (int index = 0; index < data.citationKeys().size(); index++) {
                     liveProperties.add(pageInfoProperty(data.uniqueId(), index));
                 }
-            } catch (MarkCodecException exception) {
+            } catch (JabRefMarkCodecException exception) {
                 LOGGER.debug("Ignoring invalid mark during page-info cleanup: {}", name, exception);
             }
         }
@@ -225,11 +225,11 @@ public final class MarkStore {
 
     /// The legacy dialog edits the last storage slot only; other citations' page infos remain intact.
     public List<CitationEntry> getCitationEntries(XTextDocument document, CitationGroups groups)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         List<CitationEntry> result = new ArrayList<>();
         for (CitationGroup group : groups.getCitationGroupsUnordered()) {
             XTextCursor cursor = getRawCursorForCitationGroup(group, document)
-                    .orElseThrow(() -> new NoDocumentException("Missing citation range"));
+                    .orElseThrow(() -> new WriterDocumentAccessException("Missing citation range"));
             result.add(new CitationEntry(stored(group).range().getRangeName(),
                     WriterTextContext.getCursorStringWithContext(cursor, 30, 30, true),
                     group.citationsInStorageOrder.getLast().getPageInfo().map(pageInfo -> pageInfo.toString())));

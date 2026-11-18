@@ -212,7 +212,7 @@ class ConversionMetadataTest {
         ZoteroReferenceMark mark = ZoteroReferenceMark.parse(name).orElseThrow();
         CitationType expectedType = "suppress-author".equals(modifier) || "mixed-suppression".equals(modifier)
                                     ? CitationType.AUTHORYEAR_INTEXT : CitationType.AUTHORYEAR_PAR;
-        ConversionMetadata metadata = new ConversionMetadata(MarkCodec.encode(new JabRefMarkData(mark.citationKeys(), "stable_uid", expectedType)),
+        ConversionMetadata metadata = new ConversionMetadata(JabRefMarkCodec.encode(new JabRefMarkData(mark.citationKeys(), "stable_uid", expectedType)),
                 List.of("", ""), name);
 
         ConversionMetadata restored = ConversionMetadata.decode(metadata.encode());

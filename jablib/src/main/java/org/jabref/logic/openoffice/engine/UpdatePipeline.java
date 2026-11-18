@@ -5,16 +5,16 @@ import java.util.List;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
-import org.jabref.logic.openoffice.engine.storage.DocumentStateStore;
+import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
+import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
-import org.jabref.logic.openoffice.engine.storage.MarkWriter;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
 import org.jabref.logic.openoffice.uno.UnoCrossRef;
 import org.jabref.logic.openoffice.uno.UnoStyle;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.openoffice.style.CitationGroup;
 
@@ -31,12 +31,12 @@ public final class UpdatePipeline {
 
     private final XTextDocument document;
     private final OpenOfficePreferences preferences;
-    private final MarkWriter writer;
+    private final CitationMarkerWriter writer;
     private final RendererFactory renderers;
     private final BibliographySection bibliography = new BibliographySection();
-    private final DocumentStateStore states = new DocumentStateStore();
+    private final DocumentStyleStore states = new DocumentStyleStore();
 
-    public UpdatePipeline(XTextDocument document, OpenOfficePreferences preferences, MarkWriter writer, RendererFactory renderers) {
+    public UpdatePipeline(XTextDocument document, OpenOfficePreferences preferences, CitationMarkerWriter writer, RendererFactory renderers) {
         this.document = document;
         this.preferences = preferences;
         this.writer = writer;
@@ -73,24 +73,24 @@ public final class UpdatePipeline {
     }
 
     public void apply(OOStyle style, MarkStore store, List<CitationGroup> groups, RenderResult result, boolean rebuildBibliography)
-            throws NoDocumentException, CreationException, WrappedTargetException, NotRemoveableException,
+            throws WriterDocumentAccessException, WriterOperationException, WrappedTargetException, NotRemoveableException,
             IllegalTypeException, PropertyVetoException, RenderException {
         writer.apply(store, groups, result.markers());
         if (rebuildBibliography && renderers.create(style).capabilities().hasBibliography()) {
             bibliography.rebuild(document, result.bibliography(), style instanceof JStyle);
         }
-        DocumentStateStore.State state = switch (style) {
+        DocumentStyleStore.State state = switch (style) {
             case JStyle jStyle ->
-                    new DocumentStateStore.State(DocumentStateStore.Family.JSTYLE, jStyle.getPath());
+                    new DocumentStyleStore.State(DocumentStyleStore.Family.JSTYLE, jStyle.getPath());
             case CitationStyle csl ->
-                    new DocumentStateStore.State(DocumentStateStore.Family.CSL, csl.getStyleId());
+                    new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, csl.getStyleId());
             case BstStyle bst ->
-                    new DocumentStateStore.State(DocumentStateStore.Family.BST, bst.getPath());
+                    new DocumentStyleStore.State(DocumentStyleStore.Family.BST, bst.getPath());
             default ->
-                    throw new CreationException("Unsupported citation style");
+                    throw new WriterOperationException("Unsupported citation style");
         };
         if (style instanceof CitationStyle csl && !ZoteroDocumentPreferences.writeCitationStyle(document, csl)) {
-            throw new CreationException("Could not update document CSL preferences");
+            throw new WriterOperationException("Could not update document CSL preferences");
         }
         states.store(document, state);
         store.removeOrphanPageInfos(document);

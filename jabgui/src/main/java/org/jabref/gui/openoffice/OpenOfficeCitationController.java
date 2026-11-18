@@ -15,8 +15,8 @@ import org.jabref.logic.openoffice.engine.CitationEngine;
 import org.jabref.logic.openoffice.engine.CitedEntryExporter;
 import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.uno.CreationException;
 import org.jabref.logic.openoffice.uno.UnoCursor;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -54,7 +54,7 @@ public class OpenOfficeCitationController {
     private Optional<XTextDocument> engineDocument = Optional.empty();
 
     public OpenOfficeCitationController(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager)
-            throws BootstrapException, CreationException, IOException, InterruptedException {
+            throws BootstrapException, WriterOperationException, IOException, InterruptedException {
         this(new OpenOfficeDocumentConnection(loPath, dialogService), dialogService, openOfficePreferences, bibEntryTypesManager);
     }
 

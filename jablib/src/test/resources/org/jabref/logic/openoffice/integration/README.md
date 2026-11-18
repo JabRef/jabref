@@ -16,16 +16,16 @@ Assertions compare semantic document contents rather than ZIP bytes or Writer-ge
 | Fixture | Format | Contents |
 | --- | --- | --- |
 | `canonical.fodt` | `JABREF_<key>[, JABREF_<key2> ...] <TYPE> <uid>` | Body, footnote, table, and empty citations with explicit `U+200B` boundaries and a 12 pt paragraph default |
-| `jstyle.fodt` | Legacy `JR_cite*` | Body, footnote, table, invisible citation, page-info property |
-| `csl.fodt` | Legacy `JABREF_* CID_n` | Superscript body, footnote, and table citations |
-| `csl-empty.fodt` | Legacy `JABREF_* CID_n ... EMPTY` | Zero-length citation between surrounding words |
-| `bst.fodt` | Legacy `JABREF_* CID_n` | Numeric body, footnote, and table citations |
+| `legacy-jstyle.fodt` | Legacy `JR_cite*` | Body, footnote, table, invisible citation, page-info property |
+| `legacy-csl.fodt` | Legacy `JABREF_* CID_n` | Superscript body, footnote, and table citations |
+| `legacy-csl-empty-citation.fodt` | Legacy `JABREF_* CID_n ... EMPTY` | Zero-length citation between surrounding words |
+| `legacy-bst.fodt` | Legacy `JABREF_* CID_n` | Numeric body, footnote, and table citations |
 
 The legacy fixtures are retained deliberately: Writer must preserve them on save/reopen, but the canonical engine must ignore them rather than silently read or migrate them.
 Canonical assertions check both boundary characters explicitly before inspecting the inner text; they do not remove arbitrary invisible characters to hide a mismatch.
 `superscript.csl` is a small local numeric CSL style with superscript citations and a title-only bibliography.
 It exercises the same superscript rendering behavior used by Nature and AMA without coupling expected text to upstream style changes.
-`golden.bst` emits title-only bibliography entries, allowing the BST VM → real Pandoc → Writer path to have deterministic expected text.
+`title-only.bst` emits title-only bibliography entries, allowing the BST VM → real Pandoc → Writer path to have deterministic expected text.
 `zotero-native.json` is native Zotero citation data without a JabRef URI; tests attach it to a real Writer mark.
 `zotero-numeric.csl` provides deterministic bracketed citations and a numbered, title-only bibliography for Zotero-mode tests.
 
@@ -78,9 +78,23 @@ The tests parse the stored Zotero JSON to assert URI arrays, suppress-author fla
 
 The same `libreOfficeTest` task requires at least 20 invocations from `CanonicalStorageWriterTest`, including undo/redo, page-info restoration, and transactional group-rendering failures.
 The workflow separately runs every OpenOffice unit test using `:jablib:test --tests 'org.jabref.logic.openoffice.*'`.
-It also requires reports for `MarkStoreTest`, `MarkWriterTest`, `PageInfoPropertiesTest`, `CanonicalReferenceMarkTest`, and the real-Pandoc `BstPipelineTest` individually.
-Every OpenOffice unit report is checked for skips, errors, and failures, not only these named suites.
-These are separate required reports, so discovering unrelated tagged tests cannot mask a missing engine, entity-contract, or storage suite.
+It requires each of the following unit-suite reports and minimum invocation counts:
+
+| Unit suite | Minimum invocations |
+| --- | --- |
+| `MarkStoreTest` | 7 |
+| `CitationMarkerWriterTest` | 5 |
+| `UndoableDocumentPropertiesTest` | 8 |
+| `ReferenceMarkTextWriterTest` | 19 |
+| `ConversionMetadataTest` | 19 |
+| `DocumentWriteSessionTest` | 8 |
+| `JabRefMarkCodecCompatibilityTest` | 5 |
+| `BstPipelineTest` | 7 |
+
+The real-Pandoc `BstPipelineTest` needs Pandoc on `PATH`.
+Every OpenOffice unit report is checked for skips, errors, and failures, not only these eight named suites.
+The tagged Writer task additionally requires at least 48 invocations from `CitationFormatConversionWriterTest` for current canonical/native citation conversion.
+These are separate required reports, so discovering unrelated tagged tests cannot mask a missing engine, Zotero, entity-contract, storage, or conversion suite.
 
 ## Isolation and CI enforcement
 
@@ -92,7 +106,7 @@ Documents and the process log for engine acceptance tests are saved under `jabli
 CI uploads those artifacts together with JUnit reports even on failure.
 
 The workflow runs on every pull request and merge-group event, with no path filters, opt-in labels, or allowed failures.
-It requires at least 28 engine, 25 Zotero, 20 canonical storage, and six entity-contract invocations, plus the five named unit suites, with no skips, errors, or failures.
+It requires at least 28 engine, 25 Zotero, 20 canonical storage, six entity-contract, and 48 citation-conversion invocations across five tagged suites, plus the eight named unit suites above, with no skips, errors, or failures.
 The counts are minimums, not upper limits, so adding tests does not require weakening the report guard.
 Repository administrators must make **Required Writer integration** a required branch-protection check; YAML alone cannot enforce that setting.
 

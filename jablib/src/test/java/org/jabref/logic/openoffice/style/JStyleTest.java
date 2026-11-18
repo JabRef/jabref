@@ -83,24 +83,24 @@ class JStyleTest {
 
     // region: helpers
 
-    static String runGetNumCitationMarker2a(JStyle style,
+    static String formatLegacyNumericMarker(JStyle style,
                                             List<Integer> num, int minGroupingCount, boolean inList) {
-        return OOBibStyleTestHelper.runGetNumCitationMarker2a(style, num, minGroupingCount, inList);
+        return JStyleTestHelper.formatLegacyNumericMarker(style, num, minGroupingCount, inList);
     }
 
     static CitationMarkerNumericEntry numEntry(String key, int num, String pageInfoOrNull) {
-        return OOBibStyleTestHelper.numEntry(key, num, pageInfoOrNull);
+        return JStyleTestHelper.numEntry(key, num, pageInfoOrNull);
     }
 
     static CitationMarkerNumericBibEntry numBibEntry(String key, Optional<Integer> num) {
-        return OOBibStyleTestHelper.numBibEntry(key, num);
+        return JStyleTestHelper.numBibEntry(key, num);
     }
 
-    static String runGetNumCitationMarker2b(JStyle style,
+    static String formatNumericMarkerWithPageInfo(JStyle style,
                                             int minGroupingCount,
                                             CitationMarkerNumericEntry... s) {
         List<CitationMarkerNumericEntry> input = Stream.of(s).collect(Collectors.toList());
-        OOText res = style.getNumCitationMarker2(input, minGroupingCount);
+        OOText res = style.formatNumericCitation(input, minGroupingCount);
         return res.toString();
     }
 
@@ -109,7 +109,7 @@ class JStyleTest {
                                                        String uniqueLetterQ,
                                                        String pageInfoQ,
                                                        boolean isFirstAppearanceOfSource) {
-        return OOBibStyleTestHelper.makeCitationMarkerEntry(entry,
+        return JStyleTestHelper.makeCitationMarkerEntry(entry,
                 database,
                 uniqueLetterQ,
                 pageInfoQ,
@@ -127,7 +127,7 @@ class JStyleTest {
                                      String[] uniquefiers,
                                      Boolean[] isFirstAppearanceOfSource,
                                      String[] pageInfo) {
-        return OOBibStyleTestHelper.getCitationMarker2(style,
+        return JStyleTestHelper.getCitationMarker2(style,
                 entries,
                 entryDBMap,
                 inParenthesis,
@@ -143,7 +143,7 @@ class JStyleTest {
                                       String[] uniquefiers,
                                       Boolean[] isFirstAppearanceOfSource,
                                       String[] pageInfo) {
-        return OOBibStyleTestHelper.getCitationMarker2b(style,
+        return JStyleTestHelper.getCitationMarker2b(style,
                 entries,
                 entryDBMap,
                 inParenthesis,
@@ -159,7 +159,7 @@ class JStyleTest {
                                            String[] uniquefiers,
                                            Boolean[] isFirstAppearanceOfSource,
                                            String[] pageInfo) {
-        return OOBibStyleTestHelper.getCitationMarkerForType(style,
+        return JStyleTestHelper.getCitationMarkerForType(style,
                 entries,
                 entryDBMap,
                 citationType,
@@ -177,18 +177,18 @@ class JStyleTest {
                 JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
-        assertEquals("[1] ", runGetNumCitationMarker2a(style, List.of(1), -1, true));
+        assertEquals("[1] ", formatLegacyNumericMarker(style, List.of(1), -1, true));
 
-        assertEquals("[1]", runGetNumCitationMarker2a(style, List.of(1), -1, false));
-        assertEquals("[1]", runGetNumCitationMarker2b(style, -1, numEntry("key", 1, null)));
+        assertEquals("[1]", formatLegacyNumericMarker(style, List.of(1), -1, false));
+        assertEquals("[1]", formatNumericMarkerWithPageInfo(style, -1, numEntry("key", 1, null)));
 
-        assertEquals("[1] ", runGetNumCitationMarker2a(style, List.of(1), 0, true));
+        assertEquals("[1] ", formatLegacyNumericMarker(style, List.of(1), 0, true));
 
         CitationMarkerNumericEntry e2 = numEntry("key", 1, "pp. 55-56");
         assertTrue(e2.getPageInfo().isPresent());
         assertEquals("pp. 55-56", e2.getPageInfo().get().toString());
 
-        OOBibStyleTestHelper.testGetNumCitationMarkerExtra(style);
+        JStyleTestHelper.testGetNumCitationMarkerExtra(style);
     }
 
     @Test
@@ -200,24 +200,24 @@ class JStyleTest {
 
         // unresolved citations look like [??key]
         assertEquals("[" + JStyle.UNDEFINED_CITATION_MARKER + "key" + "]",
-                runGetNumCitationMarker2b(style, 1,
+                formatNumericMarkerWithPageInfo(style, 1,
                         numEntry("key", 0, null)));
 
         // pageInfo is shown for unresolved citations
         assertEquals("[" + JStyle.UNDEFINED_CITATION_MARKER + "key" + "; p1]",
-                runGetNumCitationMarker2b(style, 1,
+                formatNumericMarkerWithPageInfo(style, 1,
                         numEntry("key", 0, "p1")));
 
         // unresolved citations sorted to the front
         assertEquals("[" + JStyle.UNDEFINED_CITATION_MARKER + "key" + "; 2-4]",
-                runGetNumCitationMarker2b(style, 1,
+                formatNumericMarkerWithPageInfo(style, 1,
                         numEntry("x4", 4, ""),
                         numEntry("x2", 2, ""),
                         numEntry("x3", 3, ""),
                         numEntry("key", 0, "")));
 
         assertEquals("[" + JStyle.UNDEFINED_CITATION_MARKER + "key" + "; 1-3]",
-                runGetNumCitationMarker2b(style, 1,
+                formatNumericMarkerWithPageInfo(style, 1,
                         numEntry("x1", 1, ""),
                         numEntry("x2", 2, ""),
                         numEntry("y3", 3, ""),
@@ -228,7 +228,7 @@ class JStyleTest {
                         + JStyle.UNDEFINED_CITATION_MARKER + "x1" + "; "
                         + JStyle.UNDEFINED_CITATION_MARKER + "x2" + "; "
                         + JStyle.UNDEFINED_CITATION_MARKER + "x3" + "]",
-                runGetNumCitationMarker2b(style, 1,
+                formatNumericMarkerWithPageInfo(style, 1,
                         numEntry("x1", 0, ""),
                         numEntry("x2", 0, ""),
                         numEntry("x3", 0, "")));

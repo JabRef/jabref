@@ -276,7 +276,7 @@ Native modifier fixtures check successful conversion with the existing group-lev
 Unsuitable custom properties, unresolved sources, protected ranges, pending deletions, and stale associated conversion metadata are rejected before actual conversion.
 Stale conversion metadata must not block ordinary native Zotero insertion or refresh.
 
-Storage, `ConversionMetadataTest`, `DocumentSessionTest`, and GUI/controller tests complement the real-Writer suite with codec/property checks, the existing warning order, and owned conversion rollback.
+Storage, `ConversionMetadataTest`, `DocumentWriteSessionTest`, and GUI/controller tests complement the real-Writer suite with codec/property checks, the existing warning order, and owned conversion rollback.
 The older GUI already had undo contexts for insertion including conversion, refresh, merge, and separate; new custom-property deltas and automatic conversion-failure rollback are distinct additions.
 Conversion rollback requires an available, unlocked undo manager and a root context of its own, closes and verifies that context before undoing an ordinary application failure, and never undoes an earlier user action.
 Starting the transaction can clear pre-existing redo history even if rollback restores document state; disconnects, lost ownership, or failed rollback have a distinct recovery error, not a universal recovery guarantee.

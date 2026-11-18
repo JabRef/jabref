@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.NoDocumentFoundException;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
-import org.jabref.logic.openoffice.uno.UnoCast;
+import org.jabref.logic.openoffice.uno.UnoInterfaces;
 import org.jabref.logic.openoffice.uno.UnoTextDocument;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
@@ -52,7 +52,7 @@ public class OpenOfficeDocumentConnection {
     public OpenOfficeDocumentConnection(Path loPath, DialogService dialogService)
             throws
             BootstrapException,
-            CreationException, IOException, InterruptedException {
+            WriterOperationException, IOException, InterruptedException {
 
         this.dialogService = dialogService;
         this.componentContext = Bootstrap.bootstrap(loPath);
@@ -61,7 +61,7 @@ public class OpenOfficeDocumentConnection {
 
     private XDesktop createDesktop(XComponentContext context)
             throws
-            CreationException {
+            WriterOperationException {
 
         XMultiComponentFactory sem = context.getServiceManager();
 
@@ -71,9 +71,9 @@ public class OpenOfficeDocumentConnection {
         try {
             desktop = sem.createInstanceWithContext("com.sun.star.frame.Desktop", context);
         } catch (com.sun.star.uno.Exception e) {
-            throw new CreationException(e.getMessage());
+            throw new WriterOperationException(e.getMessage());
         }
-        return UnoCast.cast(XDesktop.class, desktop).get();
+        return UnoInterfaces.query(XDesktop.class, desktop).get();
     }
 
     XComponentContext getComponentContext() {
@@ -110,8 +110,8 @@ public class OpenOfficeDocumentConnection {
 
         while (compEnum.hasMoreElements()) {
             Object next = compEnum.nextElement();
-            XComponent comp = UnoCast.cast(XComponent.class, next).get();
-            Optional<XTextDocument> doc = UnoCast.cast(XTextDocument.class, comp);
+            XComponent comp = UnoInterfaces.query(XComponent.class, next).get();
+            Optional<XTextDocument> doc = UnoInterfaces.query(XTextDocument.class, comp);
             doc.ifPresent(result::add);
         }
         return result;
@@ -224,10 +224,10 @@ public class OpenOfficeDocumentConnection {
         return false;
     }
 
-    /// Returns either a valid XTextDocument in OOResult or a NoDocumentException error
+    /// Returns either a valid XTextDocument in OOResult or a WriterDocumentAccessException error
     public OOResult<XTextDocument, OOError> getXTextDocument() {
         if (isDocumentConnectionMissing()) {
-            return OOResult.error(OOError.from(new NoDocumentException()));
+            return OOResult.error(OOError.from(new WriterDocumentAccessException()));
         }
         return OOResult.ok(this.xTextDocument);
     }

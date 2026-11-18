@@ -71,7 +71,7 @@ public final class CslRenderer implements CitationRenderer {
     }
 
     private RenderResult render(RenderRequest request, StyleCapabilities capabilities) throws RenderException {
-        RenderData data = new RenderData(request);
+        CitationKeyResolution data = new CitationKeyResolution(request);
         try {
             Optional<CSL> processor = data.resolvedKeys().isEmpty() ? Optional.empty() : Optional.of(createProcessor(data));
             BibDatabaseContext alphaContext = new BibDatabaseContext(new BibDatabase(style.isAlphanumericStyle() ? data.flattenedEntries() : List.of()));
@@ -95,7 +95,7 @@ public final class CslRenderer implements CitationRenderer {
                             run.add(citation.citationKey);
                         } else {
                             appendRun(run, groupFragments, processor, alphaContext, renderedClusters);
-                            groupFragments.add(Fragment.literal(RenderData.unresolved(citation.citationKey)));
+                            groupFragments.add(Fragment.literal(CitationKeyResolution.unresolved(citation.citationKey)));
                         }
                     }
                     appendRun(run, groupFragments, processor, alphaContext, renderedClusters);
@@ -129,7 +129,7 @@ public final class CslRenderer implements CitationRenderer {
         }
     }
 
-    private CSL createProcessor(RenderData data) throws IOException, RenderException {
+    private CSL createProcessor(CitationKeyResolution data) throws IOException, RenderException {
         List<CSLItemData> items = new ArrayList<>();
         JabRefItemDataProvider provider = new JabRefItemDataProvider();
         for (String key : data.resolvedKeys()) {
@@ -161,10 +161,10 @@ public final class CslRenderer implements CitationRenderer {
         keys.clear();
     }
 
-    private Fragment inText(String key, RenderData data, Optional<CSL> processor,
+    private Fragment inText(String key, CitationKeyResolution data, Optional<CSL> processor,
                             BibDatabaseContext alphaContext, Map<Integer, String> renderedClusters) throws RenderException {
         if (data.lookup(key).isEmpty()) {
-            return Fragment.literal(RenderData.unresolved(key));
+            return Fragment.literal(CitationKeyResolution.unresolved(key));
         }
         if (style.isAlphanumericStyle()) {
             BibEntry entry = alphaContext.getDatabase().getEntryByCitationKey(key).orElseThrow(() -> new RenderException("Alphanumeric citation is unresolved: " + key));
@@ -180,9 +180,9 @@ public final class CslRenderer implements CitationRenderer {
     /// Fixed JabRef formatting, not CSL author-only/suppress-author semantics. Explicit year suffixes
     /// survive resolution, but citeproc's generated disambiguation suffixes are not reproduced.
     // [impl->req~openoffice.csl-partial-citations~1]
-    private static Fragment partial(String key, CitationType type, RenderData data) throws RenderException {
+    private static Fragment partial(String key, CitationType type, CitationKeyResolution data) throws RenderException {
         if (data.lookup(key).isEmpty()) {
-            return Fragment.literal(RenderData.unresolved(key));
+            return Fragment.literal(CitationKeyResolution.unresolved(key));
         }
         CitationLookupResult source = data.resolved(key);
         String text = (type == CitationType.AUTHOR_ONLY ? shortAuthor(source) : year(source)).orElse(key);

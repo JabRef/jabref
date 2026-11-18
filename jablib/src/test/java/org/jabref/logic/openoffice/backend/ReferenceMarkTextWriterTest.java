@@ -3,10 +3,10 @@ package org.jabref.logic.openoffice.backend;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
 import org.jabref.logic.openoffice.uno.OOTextWriter;
 import org.jabref.logic.openoffice.uno.UnoDispatch;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.ootext.OOText;
 
 import com.sun.star.beans.PropertyVetoException;
@@ -111,10 +111,10 @@ class ReferenceMarkTextWriterTest {
     @Test
     void cleansBoundariesWhenWritingFailsWithoutResettingEndAttributes() throws Exception {
         OOText text = OOText.fromString("<i>A</i>");
-        CreationException failure = new CreationException("Write failed");
+        WriterOperationException failure = new WriterOperationException("Write failed");
         textWriter.when(() -> OOTextWriter.write(document, fill, text)).thenThrow(failure);
 
-        assertSame(failure, assertThrows(CreationException.class,
+        assertSame(failure, assertThrows(WriterOperationException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, text)));
         verify(range).cleanFillCursor(document);
         verify(range).getRawCursor(document);
@@ -135,12 +135,12 @@ class ReferenceMarkTextWriterTest {
     @Test
     void preservesWriteFailureWhenBoundaryCleanupAlsoFails() throws Exception {
         OOText text = OOText.fromString("A");
-        CreationException writeFailure = new CreationException("Write failed");
-        NoDocumentException cleanupFailure = new NoDocumentException("Cleanup failed");
+        WriterOperationException writeFailure = new WriterOperationException("Write failed");
+        WriterDocumentAccessException cleanupFailure = new WriterDocumentAccessException("Cleanup failed");
         textWriter.when(() -> OOTextWriter.write(document, fill, text)).thenThrow(writeFailure);
         doThrow(cleanupFailure).when(range).cleanFillCursor(document);
 
-        CreationException actual = assertThrows(CreationException.class,
+        WriterOperationException actual = assertThrows(WriterOperationException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, text));
 
         assertSame(writeFailure, actual);
@@ -150,10 +150,10 @@ class ReferenceMarkTextWriterTest {
 
     @Test
     void reportsBoundaryCleanupFailureAfterSuccessfulWrite() throws Exception {
-        NoDocumentException failure = new NoDocumentException("Cleanup failed");
+        WriterDocumentAccessException failure = new WriterDocumentAccessException("Cleanup failed");
         doThrow(failure).when(range).cleanFillCursor(document);
 
-        assertSame(failure, assertThrows(NoDocumentException.class,
+        assertSame(failure, assertThrows(WriterDocumentAccessException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, OOText.fromString("A"))));
         dispatch.verifyNoInteractions();
     }
@@ -162,7 +162,7 @@ class ReferenceMarkTextWriterTest {
     void missingMarkFailsBeforeWriting() throws Exception {
         when(range.getRawCursor(document)).thenReturn(Optional.empty());
 
-        NoDocumentException failure = assertThrows(NoDocumentException.class,
+        WriterDocumentAccessException failure = assertThrows(WriterDocumentAccessException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, OOText.fromString("A")));
 
         assertEquals("Missing reference mark cursor: uninterpreted name", failure.getMessage());
@@ -174,10 +174,10 @@ class ReferenceMarkTextWriterTest {
 
     @Test
     void failedFillPreparationDoesNotAttemptBoundaryCleanup() throws Exception {
-        CreationException failure = new CreationException("Damaged boundaries");
+        WriterOperationException failure = new WriterOperationException("Damaged boundaries");
         when(range.getFillCursor(document)).thenThrow(failure);
 
-        assertSame(failure, assertThrows(CreationException.class,
+        assertSame(failure, assertThrows(WriterOperationException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, OOText.fromString("A"))));
         verify(range, never()).cleanFillCursor(document);
         dispatch.verifyNoInteractions();
@@ -187,7 +187,7 @@ class ReferenceMarkTextWriterTest {
     void disappearingMarkAfterWritingIsReported() throws Exception {
         when(range.getRawCursor(document)).thenReturn(Optional.of(raw)).thenReturn(Optional.empty());
 
-        NoDocumentException failure = assertThrows(NoDocumentException.class,
+        WriterDocumentAccessException failure = assertThrows(WriterDocumentAccessException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, OOText.fromString("A")));
 
         assertEquals("Reference mark disappeared while writing: uninterpreted name", failure.getMessage());
@@ -199,7 +199,7 @@ class ReferenceMarkTextWriterTest {
     void missingEscapementPropertiesAreReported() throws Exception {
         when(range.getRawCursor(document)).thenReturn(Optional.of(raw));
 
-        CreationException failure = assertThrows(CreationException.class,
+        WriterOperationException failure = assertThrows(WriterOperationException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, OOText.fromString("<sup>1</sup>")));
 
         assertEquals("Cannot restore reference mark escapement", failure.getMessage());
@@ -214,7 +214,7 @@ class ReferenceMarkTextWriterTest {
         PropertyVetoException cause = new PropertyVetoException("Read-only escapement");
         doThrow(cause).when((XPropertySet) full).setPropertyValue("CharEscapement", (short) 33);
 
-        CreationException failure = assertThrows(CreationException.class,
+        WriterOperationException failure = assertThrows(WriterOperationException.class,
                 () -> ReferenceMarkTextWriter.write(document, context, range, OOText.fromString("<sup>1</sup>")));
 
         assertSame(cause, failure.getCause());

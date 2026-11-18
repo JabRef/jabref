@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 
 /// Persists the last successfully applied JabRef style independently of Zotero's document preferences.
 @NullMarked
-public final class DocumentStateStore {
+public final class DocumentStyleStore {
 
     public static final String PROPERTY_NAME = "JabRef_document_style";
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentStateStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentStyleStore.class);
 
     @NullMarked
     public enum Family {

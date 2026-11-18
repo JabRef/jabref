@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
-import org.jabref.logic.openoffice.engine.storage.DocumentStateStore;
+import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
 import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 
@@ -22,15 +22,15 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @NullMarked
-class OrdinaryStylePropertiesTest {
+class NonUndoableStylePropertiesTest {
     private final XTextDocument document = mock(XTextDocument.class);
 
     @Test
     void ordinaryCanonicalStyleWritesStillUseRawProperties() throws Exception {
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
              MockedStatic<UndoableDocumentProperties> undoable = mockStatic(UndoableDocumentProperties.class)) {
-            new DocumentStateStore().store(document, new DocumentStateStore.State(DocumentStateStore.Family.CSL, "style-id"));
-            properties.verify(() -> UnoUserDefinedProperty.setStringProperty(document, DocumentStateStore.PROPERTY_NAME, "CSL\nstyle-id"));
+            new DocumentStyleStore().store(document, new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, "style-id"));
+            properties.verify(() -> UnoUserDefinedProperty.setStringProperty(document, DocumentStyleStore.PROPERTY_NAME, "CSL\nstyle-id"));
             undoable.verifyNoInteractions();
         }
     }

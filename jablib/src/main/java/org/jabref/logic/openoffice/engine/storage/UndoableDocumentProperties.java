@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.uno.UnoCast;
+import org.jabref.logic.openoffice.uno.UnoInterfaces;
 import org.jabref.logic.openoffice.uno.UnoUndo;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 
@@ -39,7 +39,7 @@ public final class UndoableDocumentProperties {
     /// Validate every conversion delta without coercing typed properties to strings or writing them.
     public static void preflight(XTextDocument document, Map<String, Optional<String>> changes)
             throws WrappedTargetException, IllegalTypeException, PropertyVetoException, NotRemoveableException {
-        XPropertySet properties = UnoUserDefinedProperty.getPropertyContainer(document).flatMap(container -> UnoCast.cast(XPropertySet.class, container))
+        XPropertySet properties = UnoUserDefinedProperty.getPropertyContainer(document).flatMap(container -> UnoInterfaces.query(XPropertySet.class, container))
                                                         .orElseThrow(() -> new WrappedTargetException("Cannot inspect document properties"));
         XPropertySetInfo information = properties.getPropertySetInfo();
         for (Map.Entry<String, Optional<String>> change : changes.entrySet()) {

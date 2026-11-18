@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
-import org.jabref.logic.openoffice.engine.storage.MarkWriter;
 import org.jabref.logic.openoffice.frontend.DocumentCitations;
 import org.jabref.logic.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -52,7 +52,7 @@ class CitationGroupEditorTest {
 
     private final XTextDocument document = mock(XTextDocument.class);
     private final XComponentContext context = mock(XComponentContext.class);
-    private final MarkWriter writer = mock(MarkWriter.class);
+    private final CitationMarkerWriter writer = mock(CitationMarkerWriter.class);
     private final CitationGroupEditor editor = new CitationGroupEditor(document, context, writer);
 
     @Test
@@ -78,7 +78,7 @@ class CitationGroupEditorTest {
             citations.get(index).setPageInfo(pageInfos.get(index));
         }
         CitationGroup created = new CitationGroup(new CitationGroupId(uid), type, citations,
-                Optional.of(MarkCodec.encode(new JabRefMarkData(keys, uid, type))));
+                Optional.of(JabRefMarkCodec.encode(new JabRefMarkData(keys, uid, type))));
         XTextCursor position = mock(XTextCursor.class);
         try (MockedConstruction<MarkStore> stores = storesFor(new CitationGroups(new LinkedHashMap<>()))) {
             DocumentCitations documentCitations = new DocumentCitations(document);
@@ -176,7 +176,7 @@ class CitationGroupEditorTest {
             CitationGroup merged = prepared.groupsInDocumentOrder().getLast();
             assertNotEquals(merged.groupId.citationGroupIdAsString(), repeated.groupsInDocumentOrder().getLast().groupId.citationGroupIdAsString());
             assertEquals(List.of(info("p. 5"), info("p. 7")), merged.citationsInStorageOrder.stream().map(Citation::getPageInfo).toList());
-            assertEquals(merged.groupId.citationGroupIdAsString(), MarkCodec.decode(merged.getReferenceMarkNameForLinking().orElseThrow()).uniqueId());
+            assertEquals(merged.groupId.citationGroupIdAsString(), JabRefMarkCodec.decode(merged.getReferenceMarkNameForLinking().orElseThrow()).uniqueId());
             verify(range, never()).setString(anyString());
             verify(store, never()).removeCitationGroup(any(), any());
             verifyNoInteractions(document, context, writer);
@@ -223,12 +223,12 @@ class CitationGroupEditorTest {
         return range;
     }
 
-    private static CitationGroup group(String uid, CitationType type, List<String> keys, List<Optional<OOText>> pageInfos) throws MarkCodecException {
+    private static CitationGroup group(String uid, CitationType type, List<String> keys, List<Optional<OOText>> pageInfos) throws JabRefMarkCodecException {
         List<Citation> citations = keys.stream().map(Citation::new).toList();
         for (int index = 0; index < citations.size(); index++) {
             citations.get(index).setPageInfo(pageInfos.get(index));
         }
-        return new CitationGroup(new CitationGroupId(uid), type, citations, Optional.of(MarkCodec.encode(new JabRefMarkData(keys, uid, type))));
+        return new CitationGroup(new CitationGroupId(uid), type, citations, Optional.of(JabRefMarkCodec.encode(new JabRefMarkData(keys, uid, type))));
     }
 
     private static CitationGroups groups(CitationGroup... groups) {

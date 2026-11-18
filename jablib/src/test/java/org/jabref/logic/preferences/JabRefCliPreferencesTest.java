@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("Localization.lang")
 @ResourceLock("Preferences")
-class JabRefGuiPreferencesTest {
+class JabRefCliPreferencesTest {
     private static final String LEGACY_OO_STYLE_KEY = "ooBibliographyStyleFile";
 
     private final Map<String, Optional<String>> savedPreferences = new HashMap<>();

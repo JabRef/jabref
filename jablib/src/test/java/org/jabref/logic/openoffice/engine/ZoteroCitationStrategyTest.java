@@ -23,10 +23,10 @@ import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StrategyExcepti
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
 import org.jabref.logic.openoffice.uno.OOTextWriter;
 import org.jabref.logic.openoffice.uno.UnoDispatch;
 import org.jabref.logic.openoffice.uno.UnoRedlines;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -451,7 +451,7 @@ class ZoteroCitationStrategyTest {
 
     @Test
     void documentReadFailureIsReturnedAsCheckedLocalizedError() throws Exception {
-        NoDocumentException cause = new NoDocumentException("Disconnected");
+        WriterDocumentAccessException cause = new WriterDocumentAccessException("Disconnected");
         when(ranges.names(document)).thenThrow(cause);
         OOResult<CitedEntryExporter.ExportResult, JabRefException> result = strategy().exportCited(List.of());
         StrategyException error = assertInstanceOf(StrategyException.class, result.getError());

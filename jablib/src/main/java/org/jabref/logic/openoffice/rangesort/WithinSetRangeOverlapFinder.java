@@ -3,16 +3,16 @@ package org.jabref.logic.openoffice.rangesort;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.openoffice.uno.UnoCast;
+import org.jabref.logic.openoffice.uno.UnoInterfaces;
 import org.jabref.logic.openoffice.uno.UnoTextRange;
 
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
 
-public class RangeOverlapWithin {
+public class WithinSetRangeOverlapFinder {
 
-    private RangeOverlapWithin() {
+    private WithinSetRangeOverlapFinder() {
     }
 
     /// Report identical, overlapping or touching ranges between elements of rangeHolders.
@@ -53,7 +53,7 @@ public class RangeOverlapWithin {
             if (partition.isEmpty()) {
                 continue;
             }
-            XTextRangeCompare cmp = UnoCast.cast(XTextRangeCompare.class,
+            XTextRangeCompare cmp = UnoInterfaces.query(XTextRangeCompare.class,
                     partition.getFirst().getRange().getText()).get();
 
             for (int i = 0; i < (partition.size() - 1); i++) {

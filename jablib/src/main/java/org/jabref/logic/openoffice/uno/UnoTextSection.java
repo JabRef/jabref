@@ -19,13 +19,13 @@ public class UnoTextSection {
     /// @return An XNameAccess to find sections by name.
     public static XNameAccess getNameAccess(XTextDocument doc)
             throws
-            NoDocumentException {
+            WriterDocumentAccessException {
 
-        XTextSectionsSupplier supplier = UnoCast.cast(XTextSectionsSupplier.class, doc).get();
+        XTextSectionsSupplier supplier = UnoInterfaces.query(XTextSectionsSupplier.class, doc).get();
         try {
             return supplier.getTextSections();
         } catch (DisposedException ex) {
-            throw new NoDocumentException("UnoTextSection.getNameAccess failed with" + ex);
+            throw new WriterDocumentAccessException("UnoTextSection.getNameAccess failed with" + ex);
         }
     }
 
@@ -33,7 +33,7 @@ public class UnoTextSection {
     public static Optional<XTextSection> getByName(XTextDocument doc, String name)
             throws
             WrappedTargetException,
-            NoDocumentException {
+            WriterDocumentAccessException {
         XNameAccess nameAccess = getNameAccess(doc);
         try {
             return Optional.ofNullable((XTextSection) ((Any) nameAccess.getByName(name)).getObject());
@@ -49,19 +49,19 @@ public class UnoTextSection {
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
             throws
             WrappedTargetException,
-            NoDocumentException {
+            WriterDocumentAccessException {
 
         XNameAccess nameAccess = getNameAccess(doc);
-        return UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
+        return NamedTextContentLookup.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
     }
 
     /// Create a text section with the provided name and insert it at the provided cursor.
     /// If an XTextSection by that name already exists, LibreOffice (6.4.6.2) creates a section with a name different from what we requested, in "Section {number}" format
-    public static XNamed create(DocumentAnnotation documentAnnotation)
+    public static XNamed create(NamedTextContentPlacement placement)
             throws
-            CreationException {
+            WriterOperationException {
 
-        return UnoNamed.insertNamedTextContent("com.sun.star.text.TextSection", documentAnnotation);
+        return NamedTextContentInserter.insertNamedTextContent("com.sun.star.text.TextSection", placement);
     }
 }
 

@@ -34,7 +34,7 @@ class JStyleNumericMarkers {
 
         for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
             List<CitationMarkerNumericEntry> citations = OOListUtil.map(group.getCitationsInLocalOrder(), citation -> citation);
-            OOText citMarker = style.getNumCitationMarker2(citations);
+            OOText citMarker = style.formatNumericCitation(citations);
             group.setCitationMarker(Optional.of(citMarker));
         }
     }

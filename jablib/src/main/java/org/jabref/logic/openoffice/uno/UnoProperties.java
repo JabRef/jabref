@@ -21,7 +21,7 @@ public class UnoProperties {
     }
 
     public static Optional<XPropertySet> asPropertySet(XPropertyContainer propertyContainer) {
-        return UnoCast.cast(XPropertySet.class, propertyContainer);
+        return UnoInterfaces.query(XPropertySet.class, propertyContainer);
     }
 
     public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertySet propertySet) {

@@ -3,168 +3,159 @@ nav_order: 4
 parent: The LibreOffice Panel
 grand_parent: Code Howtos
 ---
-# Code reorganization
+# Current package layout and ownership
 
-This page retains the historical JStyle reorganization notes, with an updated diagram of the current citation integration.
-The earlier directory descriptions, code sketches, and committed evidence links are historical records; removed backends do not provide compatibility in the current engine.
-See the [current overview](overview.md), [ADR-0083](../../decisions/0083-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) for the active contract.
+The Writer integration separates GUI actions, citation rendering, persistent citation state, and low-level UNO access.
+Use this guide to locate the code responsible for a change; the [architecture overview](overview.md), [ADR-0083](../../decisions/0083-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) define the behavior and compatibility contract.
 
-The current GUI gateway is `OpenOfficeCitationController`, with concise action methods and GUI instances named `citationController`; document selection is handled by `OpenOfficeDocumentConnection`.
-`DocumentCitations` is an action-local facade over a mutable citation model and live Writer storage, not a document subtype or immutable snapshot; core instances are named `documentCitations`.
-`OpenOfficeDocumentConnection.disposeAllBridges()` globally disposes client-side UNO bridges without closing Writer documents or the office application.
-The current UNO text writer is `OOTextWriter`, named for its `OOText` input and the `OOFormat` vocabulary; it is not a style renderer.
-The former `OOProcess` and `OOFormatBibliography` responsibilities now belong to the JStyle citation-processing and bibliography-formatting helpers, coordinated by the shared engine.
+![Current Writer citation integration layers](writer-citation-layers.svg)
 
-Canonical marks use `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`, with no uid-before-type fallback.
-The framework retains the next-CSL-citation-insertion conversion trigger and existing warning; only current canonical and native Zotero citation marks are converted, never legacy `JR_cite*` or `CID_n` marks.
-With bibliography synchronization disabled, every bibliography section's name, text, and properties remain unchanged; with it enabled, normal handling updates only the target mode's managed bibliography, leaving other-format sections alone.
-There is no bibliography conversion, renaming, consolidation, or metadata sidecar.
-`ConversionMetadata` preserves citation identities, all six types, page information, and supported native JSON while the association remains valid.
-Native modifiers do not by themselves block conversion, insertion, or refresh; any item with `suppress-author: true` selects the group's existing in-text citation type, including mixed groups.
-The citation sidecar retains native modifier JSON for restoration on conversion back, without adding locator, affix, or author-only rendering support.
-Stale associated metadata blocks actual conversion only, not ordinary native insertion or refresh.
+## Source roots and package boundaries
 
-The older GUI already grouped insertion including conversion, refresh, merge, and separate in undo contexts; those contexts did not restore custom document properties, as the old Manage citations comment explicitly documented for page information.
-`UndoableDocumentProperties` now supplies custom deltas for page information and citation conversion metadata, with prepared style-property deltas additionally included during conversion; ordinary applied-style and Zotero preference writes remain raw and not undoable by that mechanism.
-The owned root-context rollback in `DocumentSession` is new failure recovery to prevent ordinary failed conversions from leaving partially replaced citations; it does not introduce undo grouping for the first time or guarantee recovery from every UNO failure.
+GUI code lives under `jabgui/src/main/java/org/jabref/gui/openoffice/`.
+The logic and model packages below live under `jablib/src/main/java/org/jabref/`.
 
-Why
+| Package | Responsibility | Principal types |
+| --- | --- | --- |
+| `gui.openoffice` in `jabgui` | Present document actions, select styles, and show results. | `OpenOfficePanel`, `OpenOfficeCitationController`, `OpenOfficeDocumentConnection`, `OpenOfficeStyleCatalog` |
+| `logic.openoffice` | Shared citation identities, preferences, and Zotero protocol support. | `CitationIds`, `OpenOfficePreferences`, `ZoteroReferenceMark`, `ZoteroCitationLinker`, `ZoteroDocumentPreferences` |
+| `logic.openoffice.engine` | Coordinate document actions and compute renderer output. | `CitationEngine`, `UpdatePipeline`, `CitationGroupEditor`, `CitationFormatConverter`, `DocumentWriteSession`, `CitationRenderer` |
+| `logic.openoffice.engine.storage` | Read canonical citations and apply prepared text/property changes. | `MarkStore`, `CitationMarkerWriter`, `DocumentStyleStore`, `UndoableDocumentProperties` |
+| `logic.openoffice.frontend` | Combine the live document with the citation model, ordering, and overlap protection. | `DocumentCitations`, `DocumentOrder`, `RangeForOverlapCheck` |
+| `logic.openoffice.backend` | Work with concrete Writer reference-mark ranges without interpreting citation names. | `WriterReferenceMark`, `WriterReferenceMarks`, `ReferenceMarkTextWriter`, `WriterTextContext` |
+| `logic.openoffice.uno` | Access Writer services, interfaces, cursors, named content, and properties. | `UnoInterfaces`, `NamedTextContentInserter`, `NamedTextContentPlacement`, `NamedTextContentLookup`, `OOTextWriter` |
+| `logic.openoffice.rangesort` | Order UNO ranges and detect overlaps. | `RangeSort`, `RangeSortVisual`, `RestorableTextViewCursor`, `WithinSetRangeOverlapFinder`, `BetweenSetsRangeOverlapFinder` |
+| `logic.openoffice.style` | Load selectable Writer styles and perform JStyle-specific formatting. | `OOStyle`, `JStyle`, `BstStyle`, `JStyleLoader`, `BstStyleLoader`, `JStyleCitationProcessor` |
+| `logic.openoffice.bst` | Convert BST output through Pandoc and normalize its markup. | `BstEntryRenderer`, `PandocLatexConverter`, `BSTFormatUtils` |
+| `logic.openoffice.oocsltext` | Adapt CSL output to Writer-ready text. | `CSLFormatUtils` |
+| `model.openoffice.style` | Represent citations, groups, resolved sources, and presentation state without UNO access. | `Citation`, `CitationGroup`, `CitationGroupId`, `CitationGroups`, `CitedReference`, `CitedReferences` |
+| `model.openoffice.ootext` | Describe formatted output independently of Writer. | `OOText`, `OOFormat` |
+| `model.openoffice.util` | Supply result types and collection helpers used across the integration. | `OOResult`, `OOVoidResult`, `OOListUtil` |
 
-* Separate backend
-* Separate GUI code (dialogs) and logic
-* Data is now organized around `Citation`, `CitationGroup` instead of arrays for citation group fields, and arrays of arrays for citation fields.\
-  Also take `citationKey` as the central data unit, this is what we start with: unresolved `citationKeys` do not stop processing. Although we cannot sort them by author and year, we can still emit a marker that acts as a placeholder and shows the user the problematic key.
+CSL style loading and metadata live in `logic.citationstyle`, including `CitationStyle`, `CSLStyleLoader`, and `CSLStyleMetadata`.
+The `backend` package is concrete Writer infrastructure, not a family-specific citation backend interface.
+UNO access and range sorting belong to `logic`, not to the pure model packages.
 
-## Result
+## GUI gateway and document connection
 
-### Layers
+`OpenOfficePanel` gathers selected entries and libraries, prepares the selected style, and enables actions according to `StyleCapabilities` through `OpenOfficeActionAvailability`.
+`OpenOfficeCitationController` delegates insertion, refresh, merge/separate, citation editing, and cited-entry export to `CitationEngine`; it presents errors, unresolved-key warnings, and the existing format-conversion warning.
+GUI controller instances are named `citationController`.
+Document mutation, renderer dispatch, write-session handling, and Zotero strategy selection belong to the engine rather than the controller.
 
-![Current Writer citation integration layers](layers-v1.svg)
+`OpenOfficeDocumentConnection` bootstraps office access and selects an open Writer document.
+Its static `disposeAllBridges()` operation globally disposes client-side UNO bridges without closing Writer documents or the office application.
+`OpenOfficeInstallationDetector` handles installation-path selection and validation.
 
-The diagram shows the current shared canonical pipeline, separate native Zotero strategy, pure model, and common Writer infrastructure.
-The directory-by-directory notes describe the earlier reorganization, with current JStyle responsibilities mapped below.
+`StyleSelectDialogViewModel` manages style selection and the external-style lifecycle.
+`OpenOfficeStyleCatalog` resolves available JStyle, CSL, and BST styles from stored document identities; manual CSL inference is a separate operation.
+This runtime catalog is distinct from the generated CSL catalog produced by `CitationStyleCatalogGenerator` in `build-support`.
+`ManageCitationsDialogViewModel.applyCitationEdits()` applies edited citation rows through the controller; it does not store dialog preferences.
+`OOError` carries localized dialog messages and titles at the GUI boundary.
 
-### By directories
+## Document actions, rendering, and write sessions
 
-* `model`
-  * `util` : general utilities
-    * (`OOPair`, `OOTuple3`) collect two or three objects without creating a new class
-    * `OOResult` : while an Optional.empty can communicate failure, it cannot provide details.\
-      `OOResult` allows an arbitrary error object to be provided in case of failure.
-    * `OOVoidResult` : for functions returning no result on success, only diagnostics on failure.
-    * `OOListUtil`: some utilities working on List
-  * `uno` : helpers for various tasks via UNO.\
-    These are conceptually independent of JabRef code and logic.
-  * `ootext` : to separate decisions on the format of references and citation marks from the actual insertion into the document, the earlier method `OOUtil.insertOOFormattedTextAtCurrentLocation` was extended to handle new tags that describe actions earlier done in code.
-    * This became `OOTextIntoOO.write`
-      * `(change)` Now all output to the document goes through this, not only those from Layout. This allows the citation markers and `jstyle:Title` to use these tags.
-        * This allows some backward-compatible extensions to jstyle.\
-          `(change)` Added some extra keywords, in `{prefix}_MARKUP_BEFORE`, `{prefix}_MARKUP_AFTER` pairs to allow bracketing some parts of citation marks with text and/or open/close tag pairs.
-    * `OOFormat` contains helpers to create the appropriate tags
-    * `OOText` formalizes the distinction from `String`. I did not change `String` to `OOText` in old code, (in particular in OOStyle).
-  * `rangesort` : ordering objects that have an `XTextRange`, optionally with an extra integer to break ties.
-    * `RangeSort.partitionAndSortRanges` : since `XTextRangeCompare` can only compare `XTextRange` values in the same `XText`, we partition them accordingly and only sort within each partition.
-    * `RangeSortable` (interface), `RangeSortEntry` (implements) :\
-      When we replace `XTextRange` of citation marks in footnotes with the range of the footnote mark, multiple citation marks may be mapped to the same location. To preserve the order between these, `RangeSortable` allows this order to be indicated by returning appropriate indices from `getIndexInPosition`
-    * `RangeSortVisual` : sort in top-to-bottom left-to-right order.\
-      Needs a functional `XTextViewCursor`.\
-      Works on `RangeSortable` values.
-    * `FunctionalTextViewCursor` : helper to get a functional `XTextViewCursor` (cannot always)
-    * `RangeOverlapWithin` : check for overlaps within a set of `XTextRange` values. Probably O(n\*log(n)). Used for all-to-all check of protected ranges.
-    * `RangeOverlapBetween` : check for overlaps between two sets of `XTextRange` values. Assumes one set is small. O(n\*k). Used for checking if the cursor is in a protected range.
-  * `backend` : interfaces to be provided by backends.\
-    May change as new backends may need different APIs.
-  * `style` : data structures and interfaces used while going from ordered list of citation groups to formatted citation markers and bibliography. Does not communicate with the document. Too long to fit here, starting a new section.
+`CitationEngine` is the document-bound action API.
+Canonical actions use a fresh `DocumentCitations` facade combining mutable `CitationGroups` with live `MarkStore` and Writer range access.
+It is an action-local facade, not a document subtype or immutable snapshot; its instances are named `documentCitations`.
 
-## model/style
+Preparation reads and validates the document, establishes citation order, and renders the proposed cited set before document mutation.
+`CitationGroupEditor` prepares merge/separate replacements and applies structural citation changes inside the caller's write session.
+`CitationFormatConverter` prepares conversion between current canonical and native Zotero citation marks on the next CSL insertion.
+`ConversionMetadata` preserves the associated citation state for conversion round trips.
+Legacy `JR_cite*` and `CID_n` marks remain unmanaged rather than being conversion inputs.
 
-At the core,
+`RendererFactory` selects `JStyleRenderer`, `CslRenderer`, or `BstRenderer` through `CitationRenderer`.
+A `RenderRequest` supplies groups in document order, libraries, and options; `RenderResult` contains formatted markers, requested bibliography paragraphs, and unresolved keys.
+`CitationKeyResolution` resolves keys using the request's library precedence and prepares resolved entry data without treating entry IDs as citation keys.
+`CitationNumbering` supplies shared numbering operations, while each renderer retains its style-family ordering and label rules.
+Renderers compute output without writing to Writer.
 
-* we have `Citation` values
-  * represented in the document by their `citationKey`
-  * each may have a `pageInfo`
-* A citation group (`CitationGroup`) has
-  * a list of citations (`citationsInStorageOrder`)
-  * an identifier `CitationGroupId cgid`
-    * this allows to refer to the group
-    * also used to associate the group to its citation markers location (outside the style part, in `Backend52`)
-  * `OODataModel dataModel` is here, in order to handle old (Jabref5.2) structure where pageInfo belonged to CitationGroup not Citation
-  * `referenceMarkNameForLinking` is optional: can be used to crosslink to the citation marker from the bibliography.
-* `CitationGroups` represents the collection of citation groups.\
-  Processing starts with creating a `CitationGroups` instance from the data stored in the document.
-* `CitedReference` represents a cited source, with ordered back references (using `CitationPath`) to the corresponding citations.
-* `CitedReferences` is just an order-preserving collection of `CitedReference` values that also supports lookup by `citationKey`. While producing citation markers, we also create a corresponding `CitedReferences` instance, and store it in `CitationGroups.bibliography`. This is already sorted, its entries have `uniqueLetter` or `number` assigned, but not converted to markup yet.
+`UpdatePipeline` coordinates preparation and application of canonical output.
+`DocumentWriteSession` owns the write-phase undo context, controller locking, and suspension of change recording.
+Ordering precedes controller locking because visual ordering needs to move Writer's view cursor.
+`BibliographySection` manages bibliography sections; `CitedEntryExporter` resolves cited keys into a library without accessing Writer.
 
-Common processing steps:
+`ZoteroCitationStrategy` owns native Zotero storage, ordering, validation, and write policy separately from canonical storage, while using the same `CslRenderer`.
+`ZoteroCitationLinker` prepares URI-link changes without modifying the document, and `ZoteroDocumentPreferences` handles native style preferences.
+Conversion changes citation marks only: normal synchronization leaves all bibliographies unchanged when disabled and updates only the target mode's managed bibliography when enabled.
+For conversion preparation, property undo, and rollback limits, see the [overview](overview.md#compatibility-boundary) and [ADR-0083](../../decisions/0083-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
 
-* We need `globalOrder` for the citation groups (provided externally) `CitationGroups.setGlobalOrder()`
-* We need to look up each citationKey in the bibliography databases:
-  * `CitationGroups.lookupCitations` collects the cited keys, looks up each, then distributes the results to the citations. Uses a temporary `CitedReferences` instance, based on unsorted citations and citation groups.
-* `CitationGroups.imposeLocalOrder` fills `localOrder` in each `CitationGroup`
-* Now we have order of appearance for the citations (`globalOrder` and `localOrder`).\
-  We can create a `CitedReferences` instance (`bibliography`) according to this order.
-* For citations numbered in order of first appearance we number the sources and distribute the numbers to the corresponding citations.
-* For citations numbered in order of bibliography, we sort the bibliography, number, distribute.
-* For author-year citations we have to decide on the letters `uniqueLetter` used to distinguish sources. This needs order of first appearance of the sources and recognizing clashing citation markers. This is done in logic, in `OOProcessAuthorYearMarkers.createUniqueLetters()`
-* We also mark first appearance of each source (`setIsFirstAppearanceOfSourceInCitations`)
+## Canonical identity and storage
 
-The entry point for this processing is: `OOProcess.produceCitationMarkers`.
+`JabRefMarkData` holds storage-order keys, the stored citation type, and the group UID.
+`JabRefMarkCodec` encodes and decodes the canonical mark name; malformed canonical names are reported through `JabRefMarkCodecException`.
+Derived citation numbers and rendered text do not belong to that identity.
+`CitationIds` generates new identities without constraining how existing opaque identifiers are read.
 
-It fills
+`MarkStore` reads canonical identities and per-citation page information, indexed by storage order.
+`CitationMarkerWriter` writes prepared `OOText` inside existing marks and keeps a bounded, connection-local formatted-output baseline rather than a persistent rendering cache.
+`DocumentStyleStore` records the last successfully applied style family and identifier independently of Zotero preferences.
+`UndoableDocumentProperties` registers custom-property undo deltas for page information and citation conversion metadata.
+Ordinary applied-style and Zotero preference writes remain raw; conversion additionally prepares its style-property deltas for undo.
+The [storage contract](overview.md#what-is-stored-in-a-document) describes the exact mark grammar and property keys.
 
-* each `CitationGroup.citationMarker`
-* `CitationGroups.bibliography`
-  * From bibliography `OOFormatBibliography.formatBibliography()` creates an `OOText` ready to be written to the document.
+## Citation model and JStyle processing
 
-## logic/style
+A `Citation` represents one citation key and its page information.
+A `CitationGroup` has a stable `CitationGroupId`, a stored citation type, and citations in storage order.
+`CitationGroups` collects the groups and their global order; presentation order within a group is separate from storage order.
+`CitedReference` and `CitedReferences` organize resolved sources, citation backlinks, bibliography order, and assigned numbers or disambiguation letters.
+These types contain no live UNO ranges.
 
-The JStyle responsibilities below describe the current implementation; see the [current overview](overview.md#architecture-and-entry-points) for the shared engine and other style families.
+`JStyleCitationProcessor.produceCitationMarkers` resolves sources, imposes local order, and dispatches according to the JStyle flags:
 
-* `JStyleLoader` loads bundled and user-selected JStyle files.
-* `OOPreFormatter` converts LaTeX to Unicode and OOText tags.
-* `JStyle` parses `.jstyle` files and exposes style properties and formatting entry points.
-  * `getNumCitationMarker2(...)` delegates numeric citation markers to `JStyleNumericCitationFormatter`.
-  * `createCitationMarker(...)` delegates author-year and partial-type citation markers to `JStyleCitationFormatter`.
-  * `getNormalizedCitationMarker(CitationMarkerNormEntry)` delegates normalization to `JStyleCitationFormatter`.
-  * `getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry)` delegates bibliography labels to `JStyleNumericCitationFormatter`.
-  * Formatting uses per-citation page information and supports unresolved citations through the existing model/style interfaces:
-    * `CitationMarkerNumericEntry`
-    * `CitationMarkerEntry`
-    * `CitationMarkerNumericBibEntry`
-    * `CitationMarkerNormEntry`
-* `JStyleCitationProcessor.produceCitationMarkers` resolves sources, orders citations within groups, and selects `JStyleCitationKeyMarkers`, `JStyleNumericMarkers`, or `JStyleAuthorYearMarkers` according to JStyle flags.
-* `JStyleRenderer.render` invokes the processor and uses `JStyleBibliographyFormatter.formatBibliographyEntry` for requested bibliography paragraphs, returning a `RenderResult` before document mutation.
+- `JStyleCitationKeyMarkers` builds citation-key markers and an unnumbered bibliography; `JStyleCitationKeyFormatter` escapes literal keys while preserving style wrappers.
+- `JStyleNumericMarkers` assigns numbers according to first appearance or bibliography order and produces group markers.
+- `JStyleAuthorYearMarkers` assigns disambiguation letters, records first appearances, and produces author-year markers.
 
-## logic/backend
+`JStyle` exposes the formatting entry points:
 
-Details of encoding and retrieving data stored in a document as well as the citation maker locations. Also contains dataModel-dependent code (which could probably be moved out once the datamodel is settled).
+- `formatNumericCitation(...)` delegates to `JStyleNumericCitationFormatter`, including numeric-range formatting and page information.
+- `getNumCitationMarkerForBibliography(...)` delegates numeric bibliography labels to the same formatter.
+- `createCitationMarker(...)` and `getNormalizedCitationMarker(...)` delegate author-year and partial-type formatting to `JStyleCitationFormatter`.
 
-Creating and finding the bibliography (providing a cursor to write at) should be here too.\
-These are currently in `UpdateBibliography`
+`JStyleRenderer` invokes the processor and uses `JStyleBibliographyFormatter.formatBibliographyEntry` for requested bibliography paragraphs before returning a `RenderResult`.
+`OOPreFormatter` converts LaTeX to Unicode and `OOText` tags for layout output.
+`OOText` and `OOFormat` describe that output; only the logic-layer `OOTextWriter` interprets it into Writer text.
 
-## logic/frontend
+`OOStyle` is the common selectable-style interface for `JStyle`, `CitationStyle`, and `BstStyle`.
+`BstStyle.getBstVM()` exposes its cached parsed program rather than creating a new VM.
+BST whole-cited-set rendering and citation labels belong to `BstRenderer` and `BstCitationFormatter`; Pandoc conversion helpers remain in `logic.openoffice.bst`.
+`CSLFormatUtils` adapts CSL-generated markup rather than selecting a renderer or managing document citations.
 
-* `OOFrontend` : has a `Backend` and `CitationGroups`
-  * Its constructor creates a backend, reads data from the document and creates a CitationGroups instance.
-  * provides functionality that requires both access to the document and the CitationGroups instance
-* `RangeForOverlapCheck` used in `OOFrontend`
-* `UpdateBibliography` : Create, find and update the bibliography in the document using output from `produceCitationMarkers()`
-* `UpdateCitationMarkers` create `CitationGroup`, update citation markers using output from `produceCitationMarkers()`
+## Writer infrastructure and ordering
 
-## logic/action
+`WriterReferenceMarks` creates and locates Writer marks without parsing their citation identities.
+`WriterReferenceMark` and `ReferenceMarkTextWriter` handle range boundaries and text replacement; `WriterTextContext` reads surrounding text for citation management.
+Canonical marks use persistent invisible boundaries, while native Zotero marks use temporary boundaries removed only when safe.
 
-GUI-independent part of implementations of GUI actions.
+The UNO package separates named-content operations:
 
-## gui
+- `NamedTextContentPlacement` describes the document, name, range, and absorption choice for insertion.
+- `NamedTextContentInserter` creates and inserts named Writer content such as reference marks, bookmarks, and sections.
+- `NamedTextContentLookup` finds named content supporting `XTextContent`.
+- `UnoInterfaces.query` obtains an optional UNO interface through `UnoRuntime.queryInterface`; it is not a Java cast.
 
-* `OOError` : common error messages and dialog titles
-  * adds `title` to `Jabrefexception`
-  * converts from some common exception types using type-specific message
-  * contains some dialog messages that do not correspond to exceptions
-* `OOBibBase2` : most activity was moved out from here to parts discussed above.
-  * connecting / selecting a document moved to `OOBibBaseConnect`
-  * the rest connects higher parts of the GUI to actions in logic
-    * does argument and precondition checking
-    * catches all exceptions
-    * shows error and warning dialogs
-    * adds `enterUndoContext`, `leaveUndoContext` around action code
+`WriterOperationException` reports failures performing Writer operations, including service or named-content creation.
+`WriterDocumentAccessException` reports unavailable document or citation-range access.
+Other `Uno*` helpers provide cursor, text-section, property, redline, undo, and controller access; they do not choose citation styles.
+
+`DocumentOrder` coordinates citation-level ordering.
+`RangeSort` compares ranges within compatible text containers, while `RangeSortVisual` uses view-cursor coordinates.
+`RestorableTextViewCursor` obtains a usable view cursor and supports restoring its earlier position or selection.
+`WithinSetRangeOverlapFinder` detects overlaps within one range set; `BetweenSetsRangeOverlapFinder` checks between sets.
+`RangeForOverlapCheck` carries a protected range, its identity, and a description for overlap diagnostics.
+See the [ordering guide](order-of-appearance.md) for footnote mapping, merge adjacency, textual fallback, and visual-layout limitations.
+
+## Tests and further reading
+
+Unit tests mirror the GUI, engine, storage, style, and Writer infrastructure packages.
+`JabRefMarkCodecTest` checks the canonical codec; `JabRefMarkCodecCompatibilityTest` checks its storage boundary against legacy names.
+`BstCitationFormatterTest` exercises BST label/marker helpers, and `NonUndoableStylePropertiesTest` documents the ordinary style-property undo boundary.
+`JStyleTestHelper` supports JStyle formatting tests; `JabRefCliPreferencesTest` checks preference serialization and style persistence.
+
+Real-Writer acceptance tests live in `jablib/src/test/java/org/jabref/logic/openoffice/integration/`, with storage acceptance coverage in `engine/storage`.
+The [testing guide](../testing.md#libreoffice-writer-integration-tests) and [fixture README](https://github.com/JabRef/jabref/blob/main/jablib/src/test/resources/org/jabref/logic/openoffice/integration/README.md) describe the safety gate, minimum invocation counts, and saved artifacts.
+For older design evidence, see the [historical problems page](problems.md).
+For repository orientation, see [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).

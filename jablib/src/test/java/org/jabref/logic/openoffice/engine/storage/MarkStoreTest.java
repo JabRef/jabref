@@ -3,8 +3,8 @@ package org.jabref.logic.openoffice.engine.storage;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationGroupId;
@@ -34,7 +34,7 @@ class MarkStoreTest {
     @ParameterizedTest
     @ValueSource(strings = {"", "white space", "comma,key", "non\u00a0breaking", "line\nbreak"})
     void invalidKeysAreRejectedBeforeAnyDocumentMutation(String key) {
-        CreationException exception = assertThrows(CreationException.class, () -> store.createCitationGroup(document, context,
+        WriterOperationException exception = assertThrows(WriterOperationException.class, () -> store.createCitationGroup(document, context,
                 List.of(key), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR, position, false, false));
 
         assertEquals("Invalid canonical citation identity: INVALID_KEY", exception.getMessage());
@@ -46,7 +46,7 @@ class MarkStoreTest {
         CitationGroup group = new CitationGroup(new CitationGroupId("unknown"), CitationType.AUTHORYEAR_PAR,
                 List.of(new Citation("alpha")), Optional.empty());
 
-        NoDocumentException failure = assertThrows(NoDocumentException.class, () -> store.referenceMark(group));
+        WriterDocumentAccessException failure = assertThrows(WriterDocumentAccessException.class, () -> store.referenceMark(group));
 
         assertEquals("Unknown citation group: unknown", failure.getMessage());
         verifyNoInteractions(document, context, position);
@@ -54,7 +54,7 @@ class MarkStoreTest {
 
     @Test
     void emptyGroupsAreRejectedBeforeAnyDocumentMutation() {
-        CreationException exception = assertThrows(CreationException.class, () -> store.createCitationGroup(document, context,
+        WriterOperationException exception = assertThrows(WriterOperationException.class, () -> store.createCitationGroup(document, context,
                 List.of(), List.of(), CitationType.AUTHORYEAR_PAR, position, false, false));
 
         assertEquals("Invalid canonical citation identity: EMPTY_KEYS", exception.getMessage());
@@ -63,7 +63,7 @@ class MarkStoreTest {
 
     @Test
     void missingPageInfoSlotsAreRejectedBeforeAnyDocumentMutation() {
-        CreationException exception = assertThrows(CreationException.class, () -> store.createCitationGroup(document, context,
+        WriterOperationException exception = assertThrows(WriterOperationException.class, () -> store.createCitationGroup(document, context,
                 List.of("alpha", "beta"), List.of(Optional.empty()), CitationType.AUTHORYEAR_PAR, position, false, false));
 
         assertEquals("A page-info slot is required for every citation key", exception.getMessage());

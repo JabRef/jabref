@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.backend.WriterReferenceMark.BoundaryPolicy;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.DocumentAnnotation;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
-import org.jabref.logic.openoffice.uno.UnoCast;
-import org.jabref.logic.openoffice.uno.UnoNameAccess;
-import org.jabref.logic.openoffice.uno.UnoNamed;
+import org.jabref.logic.openoffice.uno.NamedTextContentInserter;
+import org.jabref.logic.openoffice.uno.NamedTextContentLookup;
+import org.jabref.logic.openoffice.uno.NamedTextContentPlacement;
+import org.jabref.logic.openoffice.uno.UnoInterfaces;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
@@ -33,39 +33,39 @@ public final class WriterReferenceMarks {
     private static final Logger LOGGER = LoggerFactory.getLogger(WriterReferenceMarks.class);
 
     public WriterReferenceMark create(XTextDocument doc, XComponentContext context, String name, XTextCursor position,
-                                      boolean insertSpaceBefore, boolean insertSpaceAfter, BoundaryPolicy boundaryPolicy) throws CreationException {
+                                      boolean insertSpaceBefore, boolean insertSpaceAfter, BoundaryPolicy boundaryPolicy) throws WriterOperationException {
         WriterReferenceMark mark = new WriterReferenceMark(name, boundaryPolicy);
         mark.createInDocument(doc, Optional.of(context), position, insertSpaceBefore, insertSpaceAfter);
         return mark;
     }
 
     public Optional<WriterReferenceMark> find(XTextDocument doc, String name, BoundaryPolicy boundaryPolicy)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         return getAnchor(doc, name).map(_ -> new WriterReferenceMark(name, boundaryPolicy));
     }
 
-    public List<String> names(XTextDocument doc) throws NoDocumentException {
+    public List<String> names(XTextDocument doc) throws WriterDocumentAccessException {
         return getListOfNames(doc);
     }
 
     /// Also used to check whether a document connection is still working.
-    public static XNameAccess getNameAccess(XTextDocument doc) throws NoDocumentException {
-        XReferenceMarksSupplier supplier = UnoCast.cast(XReferenceMarksSupplier.class, doc)
-                                                  .orElseThrow(() -> new NoDocumentException("Document does not supply reference marks"));
+    public static XNameAccess getNameAccess(XTextDocument doc) throws WriterDocumentAccessException {
+        XReferenceMarksSupplier supplier = UnoInterfaces.query(XReferenceMarksSupplier.class, doc)
+                                                  .orElseThrow(() -> new WriterDocumentAccessException("Document does not supply reference marks"));
         try {
             return supplier.getReferenceMarks();
         } catch (DisposedException exception) {
             LOGGER.debug("Cannot access reference marks of a disposed document", exception);
-            throw new NoDocumentException("Cannot access reference marks of a disposed document");
+            throw new WriterDocumentAccessException("Cannot access reference marks of a disposed document");
         }
     }
 
-    public static List<String> getListOfNames(XTextDocument doc) throws NoDocumentException {
+    public static List<String> getListOfNames(XTextDocument doc) throws WriterDocumentAccessException {
         return Optional.ofNullable(getNameAccess(doc).getElementNames()).map(List::of).orElseGet(List::of);
     }
 
     /// Removes the named reference mark and its text, if present.
-    public static void removeIfExists(XTextDocument doc, String name) throws WrappedTargetException, NoDocumentException {
+    public static void removeIfExists(XTextDocument doc, String name) throws WrappedTargetException, WriterDocumentAccessException {
         Optional<XTextContent> mark = getAsTextContent(doc, name);
         if (mark.isEmpty()) {
             return;
@@ -77,17 +77,17 @@ public final class WriterReferenceMarks {
         }
     }
 
-    public static Optional<XTextContent> getAsTextContent(XTextDocument doc, String name) throws NoDocumentException, WrappedTargetException {
-        return UnoNameAccess.getTextContentByName(getNameAccess(doc), name);
+    public static Optional<XTextContent> getAsTextContent(XTextDocument doc, String name) throws WriterDocumentAccessException, WrappedTargetException {
+        return NamedTextContentLookup.getTextContentByName(getNameAccess(doc), name);
     }
 
-    public static Optional<XTextRange> getAnchor(XTextDocument doc, String name) throws NoDocumentException, WrappedTargetException {
+    public static Optional<XTextRange> getAnchor(XTextDocument doc, String name) throws WriterDocumentAccessException, WrappedTargetException {
         return getAsTextContent(doc, name).map(XTextContent::getAnchor);
     }
 
     /// Inserts a raw UNO reference mark; the annotation controls whether its text is absorbed.
     /// Writer permits duplicate names programmatically, so callers must ensure uniqueness.
-    public static XNamed create(DocumentAnnotation documentAnnotation) throws CreationException {
-        return UnoNamed.insertNamedTextContent("com.sun.star.text.ReferenceMark", documentAnnotation);
+    public static XNamed create(NamedTextContentPlacement placement) throws WriterOperationException {
+        return NamedTextContentInserter.insertNamedTextContent("com.sun.star.text.ReferenceMark", placement);
     }
 }

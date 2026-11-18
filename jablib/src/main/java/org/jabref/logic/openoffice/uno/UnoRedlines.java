@@ -33,7 +33,7 @@ public class UnoRedlines {
         // https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Settings
         // "Properties of com.sun.star.text.TextDocument"
 
-        XPropertySet propertySet = UnoCast.cast(XPropertySet.class, doc).get();
+        XPropertySet propertySet = UnoInterfaces.query(XPropertySet.class, doc).get();
 
         try {
             return (boolean) propertySet.getPropertyValue("RecordChanges");
@@ -45,7 +45,7 @@ public class UnoRedlines {
     public static void setRecordChanges(XTextDocument doc, boolean recordChanges)
             throws WrappedTargetException {
 
-        XPropertySet propertySet = UnoCast.cast(XPropertySet.class, doc).get();
+        XPropertySet propertySet = UnoInterfaces.query(XPropertySet.class, doc).get();
 
         try {
             propertySet.setPropertyValue("RecordChanges", recordChanges);
@@ -56,15 +56,15 @@ public class UnoRedlines {
     }
 
     private static Optional<XRedlinesSupplier> getRedlinesSupplier(XTextDocument doc) {
-        return UnoCast.cast(XRedlinesSupplier.class, doc);
+        return UnoInterfaces.query(XRedlinesSupplier.class, doc);
     }
 
     /// Document ranges covered by unaccepted deletions, regardless of the current recording setting.
     /// A redline's own `XTextRange` may belong to detached deleted text; only its `RedlineStart`
     /// and `RedlineEnd` properties identify the real document anchors, including hidden changes.
     ///
-    /// @throws NoDocumentException if pending changes cannot be inspected safely
-    public static List<XTextRange> getDeletedRanges(XTextDocument doc) throws NoDocumentException {
+    /// @throws WriterDocumentAccessException if pending changes cannot be inspected safely
+    public static List<XTextRange> getDeletedRanges(XTextDocument doc) throws WriterDocumentAccessException {
         Optional<XRedlinesSupplier> supplier = getRedlinesSupplier(doc);
         if (supplier.isEmpty()) {
             return List.of();
@@ -80,7 +80,7 @@ public class UnoRedlines {
         }
     }
 
-    private static List<XTextRange> collectDeletedRanges(XEnumeration changes) throws NoDocumentException {
+    private static List<XTextRange> collectDeletedRanges(XEnumeration changes) throws WriterDocumentAccessException {
         List<XTextRange> result = new ArrayList<>();
         while (changes.hasMoreElements()) {
             Object change;
@@ -89,14 +89,14 @@ public class UnoRedlines {
             } catch (NoSuchElementException | WrappedTargetException exception) {
                 throw inspectionFailure("Cannot read pending Writer change", exception);
             }
-            XPropertySet properties = UnoCast.cast(XPropertySet.class, change)
+            XPropertySet properties = UnoInterfaces.query(XPropertySet.class, change)
                                              .orElseThrow(() -> inspectionFailure("Missing Writer redline properties"));
             if (!REDLINE_TYPE_DELETE.equals(redlineProperty(properties, "RedlineType"))) {
                 continue;
             }
-            XTextRange start = UnoCast.cast(XTextRange.class, redlineProperty(properties, "RedlineStart"))
+            XTextRange start = UnoInterfaces.query(XTextRange.class, redlineProperty(properties, "RedlineStart"))
                                       .orElseThrow(() -> inspectionFailure("Missing Writer deletion start anchor"));
-            XTextRange end = UnoCast.cast(XTextRange.class, redlineProperty(properties, "RedlineEnd"))
+            XTextRange end = UnoInterfaces.query(XTextRange.class, redlineProperty(properties, "RedlineEnd"))
                                     .orElseThrow(() -> inspectionFailure("Missing Writer deletion end anchor"));
             if (!UnoRuntime.areSame(start.getText(), end.getText())) {
                 throw inspectionFailure("Writer deletion anchors belong to different text containers");
@@ -108,14 +108,14 @@ public class UnoRedlines {
         return result;
     }
 
-    public static int countDeletedRangesTouching(XTextDocument doc, List<XTextRange> ranges) throws NoDocumentException {
+    public static int countDeletedRangesTouching(XTextDocument doc, List<XTextRange> ranges) throws WriterDocumentAccessException {
         int count = 0;
         for (XTextRange deletedRange : getDeletedRanges(doc)) {
             for (XTextRange range : ranges) {
                 if (!UnoRuntime.areSame(deletedRange.getText(), range.getText())) {
                     continue;
                 }
-                XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, deletedRange.getText())
+                XTextRangeCompare compare = UnoInterfaces.query(XTextRangeCompare.class, deletedRange.getText())
                                                    .orElseThrow(() -> inspectionFailure("Cannot compare Writer deletion anchors"));
                 boolean disjoint;
                 try {
@@ -133,7 +133,7 @@ public class UnoRedlines {
         return count;
     }
 
-    private static Object redlineProperty(XPropertySet properties, String name) throws NoDocumentException {
+    private static Object redlineProperty(XPropertySet properties, String name) throws WriterDocumentAccessException {
         try {
             return properties.getPropertyValue(name);
         } catch (UnknownPropertyException | WrappedTargetException exception) {
@@ -141,14 +141,14 @@ public class UnoRedlines {
         }
     }
 
-    private static NoDocumentException inspectionFailure(String message) {
+    private static WriterDocumentAccessException inspectionFailure(String message) {
         LOGGER.warn(message);
-        return new NoDocumentException(message);
+        return new WriterDocumentAccessException(message);
     }
 
-    private static NoDocumentException inspectionFailure(String message, Throwable cause) {
+    private static WriterDocumentAccessException inspectionFailure(String message, Throwable cause) {
         LOGGER.warn(message, cause);
-        NoDocumentException failure = new NoDocumentException(message);
+        WriterDocumentAccessException failure = new WriterDocumentAccessException(message);
         failure.initCause(cause);
         return failure;
     }

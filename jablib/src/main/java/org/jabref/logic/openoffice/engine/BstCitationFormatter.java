@@ -31,13 +31,13 @@ final class BstCitationFormatter {
     private BstCitationFormatter() {
     }
 
-    static String extractFirstAuthorLastName(BibEntry entry) {
+    static String formatShortAuthorList(BibEntry entry) {
         return entry.getField(StandardField.AUTHOR).map(AuthorList::parse).map(AuthorList::getAsNatbib).orElse("?");
     }
 
     static String authorYearEntry(BibEntry entry, BibDatabase database) {
         String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, database).map(String::strip).filter(value -> !value.isEmpty()).orElse("n.d.");
-        return extractFirstAuthorLastName(entry) + ", " + year;
+        return formatShortAuthorList(entry) + ", " + year;
     }
 
     static String buildAuthorYearCitation(List<BibEntry> entries, BibDatabaseContext context) {
@@ -53,7 +53,7 @@ final class BstCitationFormatter {
     static String buildNumericCitationText(List<String> keys, Map<String, Integer> numbers, List<String> unresolved) {
         StringJoiner text = new StringJoiner(", ", "[", "]");
         keys.stream().filter(numbers::containsKey).map(numbers::get).sorted().forEach(number -> text.add(number.toString()));
-        unresolved.forEach(key -> text.add(RenderData.unresolved(key)));
+        unresolved.forEach(key -> text.add(CitationKeyResolution.unresolved(key)));
         return text.toString();
     }
 
@@ -64,7 +64,7 @@ final class BstCitationFormatter {
     static String buildStyleDefinedCitationText(List<String> keys, Map<String, String> labels, List<String> unresolved) throws MissingCitationLabelException {
         StringJoiner text = new StringJoiner(", ", "[", "]");
         for (String key : keys) {
-            text.add(unresolved.contains(key) ? RenderData.unresolved(key) : StringEscapeUtils.escapeHtml4(getStyleDefinedLabelOrThrow(key, labels)));
+            text.add(unresolved.contains(key) ? CitationKeyResolution.unresolved(key) : StringEscapeUtils.escapeHtml4(getStyleDefinedLabelOrThrow(key, labels)));
         }
         return text.toString();
     }

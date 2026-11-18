@@ -10,11 +10,11 @@ import java.util.Set;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.openoffice.CitationIds;
-import org.jabref.logic.openoffice.engine.storage.MarkWriter;
+import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
 import org.jabref.logic.openoffice.frontend.DocumentCitations;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
 import org.jabref.logic.openoffice.uno.UnoTextRange;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Prepares structural citation changes without modifying Writer. The engine renders the proposed
-/// groups before applying the plan and its final markers in one caller-owned [DocumentSession].
+/// groups before applying the plan and its final markers in one caller-owned [DocumentWriteSession].
 /// This editor neither locks controllers nor changes recording state.
 @NullMarked
 public final class CitationGroupEditor {
@@ -45,9 +45,9 @@ public final class CitationGroupEditor {
 
     private final XTextDocument document;
     private final XComponentContext context;
-    private final MarkWriter writer;
+    private final CitationMarkerWriter writer;
 
-    public CitationGroupEditor(XTextDocument document, XComponentContext context, MarkWriter writer) {
+    public CitationGroupEditor(XTextDocument document, XComponentContext context, CitationMarkerWriter writer) {
         this.document = document;
         this.context = context;
         this.writer = writer;
@@ -58,7 +58,7 @@ public final class CitationGroupEditor {
     public CitationGroup insert(DocumentCitations documentCitations, List<String> keys, List<Optional<OOText>> pageInfos,
                                 CitationType type, XTextCursor position, String uniqueId,
                                 boolean insertSpaceBefore, boolean insertSpaceAfter)
-            throws CreationException, NoDocumentException, WrappedTargetException, NotRemoveableException,
+            throws WriterOperationException, WriterDocumentAccessException, WrappedTargetException, NotRemoveableException,
             PropertyVetoException, IllegalTypeException {
         CitationGroup group = documentCitations.markStore.createCitationGroup(document, context, keys, pageInfos, type, position,
                 insertSpaceBefore, insertSpaceAfter, uniqueId);
@@ -67,7 +67,7 @@ public final class CitationGroupEditor {
     }
 
     public PreparedEdit prepareMerge(DocumentCitations documentCitations, List<CitationGroup> groupsInDocumentOrder)
-            throws NoDocumentException, WrappedTargetException, CreationException {
+            throws WriterDocumentAccessException, WrappedTargetException, WriterOperationException {
         List<Replacement> replacements = new ArrayList<>();
         for (List<CitationGroup> originals : scan(documentCitations)) {
             List<Citation> citations = originals.stream().flatMap(group -> group.citationsInStorageOrder.stream()).toList();
@@ -78,7 +78,7 @@ public final class CitationGroupEditor {
     }
 
     public PreparedEdit prepareSeparate(DocumentCitations documentCitations, List<CitationGroup> groupsInDocumentOrder)
-            throws NoDocumentException, WrappedTargetException, CreationException {
+            throws WriterDocumentAccessException, WrappedTargetException, WriterOperationException {
         List<Replacement> replacements = new ArrayList<>();
         for (CitationGroup original : groupsInDocumentOrder) {
             if (original.citationType != CitationType.AUTHORYEAR_PAR || original.numberOfCitations() <= 1) {
@@ -97,15 +97,15 @@ public final class CitationGroupEditor {
     /// The returned order matches the prepared order, but newly stored groups have new id objects;
     /// their uid strings and canonical names are exactly those used during preparation.
     public List<CitationGroup> apply(DocumentCitations documentCitations, PreparedEdit plan)
-            throws CreationException, NoDocumentException, WrappedTargetException, NotRemoveableException,
+            throws WriterOperationException, WriterDocumentAccessException, WrappedTargetException, NotRemoveableException,
             PropertyVetoException, IllegalTypeException {
         if (plan.documentCitations != documentCitations) {
-            throw new CreationException("Citation edit plan belongs to another document snapshot");
+            throw new WriterOperationException("Citation edit plan belongs to another document snapshot");
         }
         for (Replacement replacement : plan.replacements) {
             for (CitationGroup original : replacement.originals()) {
                 if (documentCitations.getMarkRange(document, original).isEmpty()) {
-                    throw new NoDocumentException("Citation range disappeared after preparing group edits");
+                    throw new WriterDocumentAccessException("Citation range disappeared after preparing group edits");
                 }
             }
         }
@@ -136,7 +136,7 @@ public final class CitationGroupEditor {
     public OOResult<Boolean, JabRefException> merge(DocumentCitations documentCitations) {
         try {
             return applyPlaceholders(documentCitations, prepareMerge(documentCitations, currentOrder(documentCitations)));
-        } catch (CreationException | IllegalTypeException | NoDocumentException | NotRemoveableException | PropertyVetoException | WrappedTargetException exception) {
+        } catch (WriterOperationException | IllegalTypeException | WriterDocumentAccessException | NotRemoveableException | PropertyVetoException | WrappedTargetException exception) {
             LOGGER.warn("Could not merge canonical citation groups", exception);
             return OOResult.error(new JabRefException(exception.toString(), exception));
         }
@@ -146,14 +146,14 @@ public final class CitationGroupEditor {
     public OOResult<Boolean, JabRefException> separate(DocumentCitations documentCitations) {
         try {
             return applyPlaceholders(documentCitations, prepareSeparate(documentCitations, currentOrder(documentCitations)));
-        } catch (CreationException | IllegalTypeException | NoDocumentException | NotRemoveableException | PropertyVetoException | WrappedTargetException | IllegalArgumentException exception) {
+        } catch (WriterOperationException | IllegalTypeException | WriterDocumentAccessException | NotRemoveableException | PropertyVetoException | WrappedTargetException | IllegalArgumentException exception) {
             LOGGER.warn("Could not separate canonical citation groups", exception);
             return OOResult.error(new JabRefException(exception.toString(), exception));
         }
     }
 
     private OOResult<Boolean, JabRefException> applyPlaceholders(DocumentCitations documentCitations, PreparedEdit plan)
-            throws CreationException, NoDocumentException, WrappedTargetException, NotRemoveableException,
+            throws WriterOperationException, WriterDocumentAccessException, WrappedTargetException, NotRemoveableException,
             PropertyVetoException, IllegalTypeException {
         if (!plan.hasChanges()) {
             return OOResult.ok(false);
@@ -175,17 +175,17 @@ public final class CitationGroupEditor {
     }
 
     private Replacement replacement(DocumentCitations documentCitations, List<CitationGroup> originals, List<CitationGroup> proposed)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         XTextRange first = documentCitations.getMarkRange(document, originals.getFirst())
-                                            .orElseThrow(() -> new NoDocumentException("Missing citation range during group-edit preparation"));
+                                            .orElseThrow(() -> new WriterDocumentAccessException("Missing citation range during group-edit preparation"));
         XTextRange last = originals.size() == 1 ? first : documentCitations.getMarkRange(document, originals.getLast())
-                                                                           .orElseThrow(() -> new NoDocumentException("Missing citation range during group-edit preparation"));
+                                                                           .orElseThrow(() -> new WriterDocumentAccessException("Missing citation range during group-edit preparation"));
         XTextCursor range = first.getText().createTextCursorByRange(first.getStart());
         range.gotoRange(last.getEnd(), true);
         return new Replacement(List.copyOf(originals), List.copyOf(proposed), range);
     }
 
-    private static CitationGroup preparedGroup(List<Citation> originals) throws CreationException {
+    private static CitationGroup preparedGroup(List<Citation> originals) throws WriterOperationException {
         String uid = CitationIds.newId();
         List<Citation> citations = new ArrayList<>();
         for (Citation original : originals) {
@@ -196,20 +196,20 @@ public final class CitationGroupEditor {
         JabRefMarkData identity;
         try {
             identity = new JabRefMarkData(citations.stream().map(Citation::getCitationKey).toList(), uid, CitationType.AUTHORYEAR_PAR);
-        } catch (MarkCodecException exception) {
+        } catch (JabRefMarkCodecException exception) {
             LOGGER.debug("Could not prepare canonical citation identity", exception);
-            throw new CreationException("Invalid prepared citation identity: " + exception.reason());
+            throw new WriterOperationException("Invalid prepared citation identity: " + exception.reason());
         }
-        return new CitationGroup(new CitationGroupId(uid), identity.citationType(), citations, Optional.of(MarkCodec.encode(identity)));
+        return new CitationGroup(new CitationGroupId(uid), identity.citationType(), citations, Optional.of(JabRefMarkCodec.encode(identity)));
     }
 
-    private static PreparedEdit plan(DocumentCitations documentCitations, List<CitationGroup> ordered, List<Replacement> replacements) throws CreationException {
+    private static PreparedEdit plan(DocumentCitations documentCitations, List<CitationGroup> ordered, List<Replacement> replacements) throws WriterOperationException {
         Set<CitationGroupId> current = new HashSet<>();
         documentCitations.citationGroups.getCitationGroupsUnordered().forEach(group -> current.add(group.groupId));
         Set<CitationGroupId> supplied = new HashSet<>();
         ordered.forEach(group -> supplied.add(group.groupId));
         if (supplied.size() != ordered.size() || !current.equals(supplied)) {
-            throw new CreationException("Citation edit order does not match the document snapshot");
+            throw new WriterOperationException("Citation edit order does not match the document snapshot");
         }
         Map<CitationGroupId, Replacement> byOriginal = new LinkedHashMap<>();
         for (Replacement replacement : replacements) {
@@ -218,7 +218,7 @@ public final class CitationGroupEditor {
             }
         }
         if (!current.containsAll(byOriginal.keySet())) {
-            throw new CreationException("Citation replacement does not belong to the document snapshot");
+            throw new WriterOperationException("Citation replacement does not belong to the document snapshot");
         }
         Set<CitationGroupId> emitted = new HashSet<>();
         List<CitationGroup> proposed = new ArrayList<>();
@@ -233,19 +233,19 @@ public final class CitationGroupEditor {
         Set<String> uniqueIds = new HashSet<>();
         for (CitationGroup group : proposed) {
             if (!uniqueIds.add(group.groupId.citationGroupIdAsString())) {
-                throw new CreationException("Prepared citation groups have duplicate uids");
+                throw new WriterOperationException("Prepared citation groups have duplicate uids");
             }
         }
         return new PreparedEdit(documentCitations, proposed, replacements);
     }
 
-    private List<List<CitationGroup>> scan(DocumentCitations documentCitations) throws NoDocumentException, WrappedTargetException {
+    private List<List<CitationGroup>> scan(DocumentCitations documentCitations) throws WriterDocumentAccessException, WrappedTargetException {
         List<List<CitationGroup>> result = new ArrayList<>();
         List<CitationGroup> current = new ArrayList<>();
         Optional<XTextRange> previous = Optional.empty();
         for (CitationGroup group : documentCitations.getCitationGroupsSortedWithinPartitions(document, false)) {
             XTextRange range = documentCitations.getMarkRange(document, group)
-                                                .orElseThrow(() -> new NoDocumentException("Missing citation range during merge scan"));
+                                                .orElseThrow(() -> new WriterDocumentAccessException("Missing citation range during merge scan"));
             if (group.citationType != CitationType.AUTHORYEAR_PAR || previous.filter(prior -> separatedOnlyByInlineBlanks(prior, range)).isEmpty()) {
                 if (current.size() > 1) {
                     result.add(List.copyOf(current));

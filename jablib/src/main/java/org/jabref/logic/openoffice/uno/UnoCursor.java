@@ -17,7 +17,7 @@ public class UnoCursor {
     /// Get the cursor positioned by the user.
     public static Optional<XTextViewCursor> getViewCursor(XTextDocument doc) {
         return UnoTextDocument.getCurrentController(doc)
-                              .flatMap(e -> UnoCast.cast(XTextViewCursorSupplier.class, e))
+                              .flatMap(e -> UnoInterfaces.query(XTextViewCursorSupplier.class, e))
                               .map(XTextViewCursorSupplier::getViewCursor);
     }
 

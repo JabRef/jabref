@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /// The flag is one-shot, but one is enough: after a character survives, the caret sits
 /// past the mark's end and the bleed condition can no longer hold. What this does not
 /// protect against is the caret returning to that boundary (click, delete, undo) — see
-/// the write-in-place path in `MarkWriter`.
+/// the write-in-place path in `CitationMarkerWriter`.
 @NullMarked
 public class UnoDispatch {
     private static final Logger LOGGER = LoggerFactory.getLogger(UnoDispatch.class);

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.backend.WriterReferenceMark.BoundaryPolicy;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.DocumentAnnotation;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
+import org.jabref.logic.openoffice.uno.NamedTextContentPlacement;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
@@ -103,7 +103,7 @@ class WriterReferenceMarkTest {
         when(full.getString()).thenReturn(raw);
         WriterReferenceMark mark = marks.find(document, NAME, BoundaryPolicy.PERSISTENT).orElseThrow();
 
-        CreationException exception = assertThrows(CreationException.class, () -> mark.getFillCursor(document));
+        WriterOperationException exception = assertThrows(WriterOperationException.class, () -> mark.getFillCursor(document));
         assertEquals("Reference mark has lost its boundary characters: " + NAME, exception.getMessage());
         verify(full, never()).setString(anyString());
         verifyNoInteractions(left, right);
@@ -115,7 +115,7 @@ class WriterReferenceMarkTest {
         when(full.getString()).thenReturn(raw);
         WriterReferenceMark mark = marks.find(document, NAME, BoundaryPolicy.TEMPORARY).orElseThrow();
 
-        NoDocumentException exception = assertThrows(NoDocumentException.class, () -> mark.cleanFillCursor(document));
+        WriterDocumentAccessException exception = assertThrows(WriterDocumentAccessException.class, () -> mark.cleanFillCursor(document));
         assertEquals("Reference mark has lost its boundary characters: " + NAME, exception.getMessage());
         verifyNoInteractions(left, right);
     }
@@ -128,7 +128,7 @@ class WriterReferenceMarkTest {
 
         assertEquals(Optional.empty(), mark.getRawCursor(document));
         assertEquals(Optional.empty(), marks.find(document, NAME, policy));
-        NoDocumentException exception = assertThrows(NoDocumentException.class, () -> mark.getFillCursor(document));
+        WriterDocumentAccessException exception = assertThrows(WriterDocumentAccessException.class, () -> mark.getFillCursor(document));
         assertEquals("Missing reference mark cursor: " + NAME, exception.getMessage());
     }
 
@@ -147,14 +147,14 @@ class WriterReferenceMarkTest {
 
     @Test
     void missingSupplierProducesCheckedFailure() {
-        assertThrows(NoDocumentException.class, () -> WriterReferenceMarks.getNameAccess(mock(XTextDocument.class)));
+        assertThrows(WriterDocumentAccessException.class, () -> WriterReferenceMarks.getNameAccess(mock(XTextDocument.class)));
     }
 
     @Test
     void rawCreationWithoutServiceFactoryProducesCheckedFailure() {
         XTextDocument unavailable = mock(XTextDocument.class);
-        CreationException exception = assertThrows(CreationException.class,
-                () -> WriterReferenceMarks.create(new DocumentAnnotation(unavailable, NAME, anchor, true)));
+        WriterOperationException exception = assertThrows(WriterOperationException.class,
+                () -> WriterReferenceMarks.create(new NamedTextContentPlacement(unavailable, NAME, anchor, true)));
         assertEquals("Document does not supply a service factory", exception.getMessage());
     }
 
@@ -164,8 +164,8 @@ class WriterReferenceMarkTest {
         XTextDocument factory = mock(XTextDocument.class, withSettings().extraInterfaces(XMultiServiceFactory.class));
         when(((XMultiServiceFactory) factory).createInstance("com.sun.star.text.ReferenceMark"))
                 .thenReturn(named ? mock(XNamed.class) : new Object());
-        CreationException exception = assertThrows(CreationException.class,
-                () -> WriterReferenceMarks.create(new DocumentAnnotation(factory, NAME, anchor, true)));
+        WriterOperationException exception = assertThrows(WriterOperationException.class,
+                () -> WriterReferenceMarks.create(new NamedTextContentPlacement(factory, NAME, anchor, true)));
         assertEquals("Service is not an " + (named ? "XTextContent" : "XNamed") + ": com.sun.star.text.ReferenceMark", exception.getMessage());
     }
 
@@ -174,14 +174,14 @@ class WriterReferenceMarkTest {
         XTextDocument factory = mock(XTextDocument.class, withSettings().extraInterfaces(XMultiServiceFactory.class));
         when(((XMultiServiceFactory) factory).createInstance("com.sun.star.text.ReferenceMark"))
                 .thenThrow(new com.sun.star.uno.Exception("Unavailable service"));
-        CreationException exception = assertThrows(CreationException.class,
-                () -> WriterReferenceMarks.create(new DocumentAnnotation(factory, NAME, anchor, true)));
+        WriterOperationException exception = assertThrows(WriterOperationException.class,
+                () -> WriterReferenceMarks.create(new NamedTextContentPlacement(factory, NAME, anchor, true)));
         assertEquals("Cannot create document service: com.sun.star.text.ReferenceMark", exception.getMessage());
     }
 
     @Test
     void disposedDocumentProducesCheckedFailure() {
         when(((XReferenceMarksSupplier) document).getReferenceMarks()).thenThrow(new DisposedException());
-        assertThrows(NoDocumentException.class, () -> WriterReferenceMarks.getNameAccess(document));
+        assertThrows(WriterDocumentAccessException.class, () -> WriterReferenceMarks.getNameAccess(document));
     }
 }

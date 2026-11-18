@@ -16,7 +16,7 @@ The [requirements](../../requirements/openoffice.md) and [ADR-0083](../../decisi
 
 ## Architecture and entry points
 
-![Writer citation integration architecture](layers-v1.svg)
+![Writer citation integration architecture](writer-citation-layers.svg)
 
 | Area | Entry points | Responsibility |
 | --- | --- | --- |
@@ -25,9 +25,9 @@ The [requirements](../../requirements/openoffice.md) and [ADR-0083](../../decisi
 | Group structure | `CitationGroupEditor` | Prepare replacements without mutation, then apply them in the engine's write session. |
 | Rendering | `RendererFactory`, `CitationRenderer`, `RenderRequest`, `RenderResult` | Compute final markers, bibliography paragraphs when requested, and unresolved keys. |
 | Cited-entry export | `CitedEntryExporter` | Resolve ordered citation keys into a library without accessing Writer. |
-| Canonical storage | `MarkCodec`, `MarkStore`, `UndoableDocumentProperties`, `DocumentStateStore` | Encode identities, read citation/page-info state, register custom-property undo deltas, and store applied-style identity. |
+| Canonical storage | `JabRefMarkCodec`, `MarkStore`, `UndoableDocumentProperties`, `DocumentStyleStore` | Encode identities, read citation/page-info state, register custom-property undo deltas, and store applied-style identity. |
 | Ordering | `DocumentOrder` | Order within text containers, map footnotes for numbering, and use visual positions when available. |
-| Document writes | `MarkWriter`, `BibliographySection`, `DocumentSession` | Apply prepared output and manage write-phase undo, locking, and change recording. |
+| Document writes | `CitationMarkerWriter`, `BibliographySection`, `DocumentWriteSession` | Apply prepared output and manage write-phase undo, locking, and change recording. |
 | Zotero mode | `ZoteroCitationStrategy` | Read and write native Zotero citations with CSL rendering and source linking. |
 | Citation conversion | `CitationFormatConverter`, `ConversionMetadata` | Prepare next-CSL-insertion conversion of citation marks only, preserving citation state in a document sidecar. |
 
@@ -56,7 +56,7 @@ flowchart TD
     Read --> Order[Order existing and pending groups]
     Order --> Render[Render markers and requested bibliography]
     Render -->|Failure| Error[Return without document mutation]
-    Render -->|Success| Session[DocumentSession write phase]
+    Render -->|Success| Session[DocumentWriteSession write phase]
     Session --> Apply[Apply prepared markers and optional bibliography]
     Apply --> State[Store applied style and clean orphan page info]
 ```
@@ -69,7 +69,7 @@ Ordering occurs before controller locking because Writer's view cursor cannot mo
 
 Renderers do not write to Writer.
 BST rendering can require Pandoc and fail; rendering finishes before the canonical write phase begins.
-After preparation, `DocumentSession` groups writes in an undo context, suspends change recording, and locks controllers while applying the output.
+After preparation, `DocumentWriteSession` groups writes in an undo context, suspends change recording, and locks controllers while applying the output.
 `UndoableDocumentProperties` registers custom `XUndoAction` deltas for page-info changes and removals alongside Writer's mark/text edits.
 Undo/redo uses raw property APIs during replay so it does not register further undo actions.
 Ordinary applied-style and Zotero preference setters remain raw and are not made undoable by these page-info deltas.
@@ -103,7 +103,7 @@ JABREF_Smith2000, JABREF_Jones2001 NORMAL group-18
 ```
 
 The type precedes the uid.
-`MarkCodec` has no uid-before-type fallback.
+`JabRefMarkCodec` has no uid-before-type fallback.
 Keys are nonempty and contain neither whitespace nor commas.
 Key order, including repeated keys, is storage order, not renderer sorting order.
 The uid identifies the group independently of citation numbers, labels, and marker text.
@@ -145,10 +145,10 @@ Document custom properties do not travel with citation text copied to another do
 `JabRef_document_style` stores the applied family and identifier: a path for JStyle/BST or a CSL style identifier.
 Selecting a style does not change the last-applied document property; a successful write does.
 CSL operations also maintain Zotero preferences such as `ZOTERO_PREF`.
-Ordinary `DocumentStateStore` and Zotero preference writes use raw property setters, so Undo can restore presentation without restoring their recorded style identity.
+Ordinary `DocumentStyleStore` and Zotero preference writes use raw property setters, so Undo can restore presentation without restoring their recorded style identity.
 Conversion separately prepares those style-property deltas and makes its own writes undoable alongside citation edits.
 
-`MarkWriter` keeps a bounded, connection-local baseline of formatted `OOText` per uid rather than comparing only plain Writer text.
+`CitationMarkerWriter` keeps a bounded, connection-local baseline of formatted `OOText` per uid rather than comparing only plain Writer text.
 Reconnecting clears that baseline, so unchanged text may be rewritten on the first refresh.
 The baseline is not persisted as document properties.
 The canonical managed bibliography uses the `JR_bib` section; JStyle retains its `JR_bib_end` hook.
@@ -230,7 +230,7 @@ There is no bibliography conversion, renaming, consolidation, cleanup, metadata 
 Pre-existing canonical and Zotero sections may therefore coexist.
 
 Conversion requires an available, unlocked undo manager and cannot join another undo context.
-`DocumentSession.writeWithRollback` owns a root context and sentinel, making successful insertion/conversion one Undo/Redo step for citation edits, page-info and conversion metadata, prepared conversion-style properties, and any normally synchronized target bibliography.
+`DocumentWriteSession.writeWithRollback` owns a root context and sentinel, making successful insertion/conversion one Undo/Redo step for citation edits, page-info and conversion metadata, prepared conversion-style properties, and any normally synchronized target bibliography.
 On ordinary application failure it closes and verifies ownership of the context before undoing only its own transaction, never an earlier user action.
 Starting the write transaction may clear pre-existing redo history even if rollback restores document state.
 Disconnects, lost ownership, or failed rollback produce a distinct recovery error; complete recovery is not universally guaranteed and a saved copy may be needed.
@@ -249,5 +249,6 @@ The [Writer integration testing instructions](../testing.md#libreoffice-writer-i
 Golden documents, cross-family save/reopen, citation-mode conversion, all types/page slots, native JSON, protected ranges, superscripts, tracked changes, and rollback are covered by the relevant Writer and unit-test definitions.
 Native modifier fixtures cover successful conversion with the existing citation-type mapping and JSON restoration through save/reopen; they do not establish full modifier rendering support.
 These descriptions do not establish that a particular run passed or remove the documented ordering limitations.
-The [code reorganization](code-reorganization.md) and [problems](problems.md) pages preserve historical design evidence rather than define the current contract.
+The [package layout and ownership guide](code-reorganization.md) maps these responsibilities to current source packages and entry points.
+The [problems page](problems.md) remains a record of historical design evidence, not the current contract.
 For repository exploration, see [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).

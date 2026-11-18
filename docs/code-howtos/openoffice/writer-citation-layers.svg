@@ -56,8 +56,8 @@
   <path class="flow" d="M 342 655 V 675"/>
 
   <rect class="box" x="50" y="675" width="585" height="118" rx="9" fill="#ffffff"/>
-  <text class="component" x="69" y="706">UpdatePipeline + DocumentSession</text>
-  <text class="detail" x="69" y="733">MarkWriter · BibliographySection · DocumentStateStore</text>
+  <text class="component" x="69" y="706">UpdatePipeline + DocumentWriteSession</text>
+  <text class="detail" x="69" y="733">CitationMarkerWriter · BibliographySection · DocumentStyleStore</text>
   <text class="small" x="69" y="760">Undo context, controller lock, and change-recording suspension</text>
   <text class="small muted" x="69" y="783">The synchronization option controls bibliography updates</text>
 

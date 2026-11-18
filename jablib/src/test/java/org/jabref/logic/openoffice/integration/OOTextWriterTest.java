@@ -11,7 +11,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.engine.CitationEngine;
-import org.jabref.logic.openoffice.engine.MarkCodec;
+import org.jabref.logic.openoffice.engine.JabRefMarkCodec;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -186,7 +186,7 @@ class OOTextWriterTest {
     }
 
     private static OOStyle style(String family) throws Exception {
-        return "bst".equals(family) ? BstStyle.loadExternal(resource("golden.bst"))
+        return "bst".equals(family) ? BstStyle.loadExternal(resource("title-only.bst"))
                                     : CSLStyleUtils.createCitationStyleFromFile(resource("zotero-numeric.csl").toString()).orElseThrow();
     }
 
@@ -204,7 +204,7 @@ class OOTextWriterTest {
 
     private static void assertCanonicalCitation(XTextDocument document, String expected) throws Exception {
         XNameAccess marks = query(XReferenceMarksSupplier.class, document).getReferenceMarks();
-        List<String> names = Arrays.stream(marks.getElementNames()).filter(MarkCodec::isCanonicalMarkName).toList();
+        List<String> names = Arrays.stream(marks.getElementNames()).filter(JabRefMarkCodec::isCanonicalMarkName).toList();
         assertEquals(1, names.size());
         XTextRange anchor = query(XTextContent.class, marks.getByName(names.getFirst())).getAnchor();
         assertEquals("\u200b" + expected + "\u200b", anchor.getString());

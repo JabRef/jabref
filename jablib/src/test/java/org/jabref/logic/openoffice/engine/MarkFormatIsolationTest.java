@@ -22,7 +22,7 @@ class MarkFormatIsolationTest {
 
     @ParameterizedTest
     @MethodSource("markCases")
-    void canonicalMarksPreserveCitationKeyCharacters(String legacyName, List<String> keys, String uid, CitationType type) throws MarkCodecException {
+    void canonicalMarksPreserveCitationKeyCharacters(String legacyName, List<String> keys, String uid, CitationType type) throws JabRefMarkCodecException {
         StringJoiner names = new StringJoiner(", ");
         keys.forEach(key -> names.add("JABREF_" + key));
         String wireType = switch (type) {
@@ -36,14 +36,14 @@ class MarkFormatIsolationTest {
                     type.name();
         };
 
-        assertEquals(new JabRefMarkData(keys, uid, type), MarkCodec.decode(names + " " + wireType + " " + uid));
+        assertEquals(new JabRefMarkData(keys, uid, type), JabRefMarkCodec.decode(names + " " + wireType + " " + uid));
     }
 
     @ParameterizedTest
     @MethodSource("markCases")
     void everyFormerCidMarkIsRejectedRatherThanMigrated(String legacyName, List<String> keys, String uid, CitationType type) {
-        assertThrows(MarkCodecException.class, () -> MarkCodec.decode(legacyName));
-        assertFalse(MarkCodec.isCanonicalMarkName(legacyName));
+        assertThrows(JabRefMarkCodecException.class, () -> JabRefMarkCodec.decode(legacyName));
+        assertFalse(JabRefMarkCodec.isCanonicalMarkName(legacyName));
         assertEquals(Optional.empty(), ZoteroReferenceMark.parse(legacyName));
     }
 
@@ -68,7 +68,7 @@ class MarkFormatIsolationTest {
     @ParameterizedTest
     @MethodSource("recognitionCases")
     void storageModesRecognizeOnlyTheirOwnFormats(String name, boolean jabref, boolean zotero) {
-        assertEquals(jabref, MarkCodec.isCanonicalMarkName(name));
+        assertEquals(jabref, JabRefMarkCodec.isCanonicalMarkName(name));
         assertEquals(zotero, ZoteroReferenceMark.isZoteroReferenceMarkName(name));
     }
 

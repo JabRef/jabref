@@ -36,15 +36,15 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
         pageInfos = List.copyOf(pageInfos);
     }
 
-    static ConversionMetadata capture(CitationGroup group, String zoteroName) throws MarkCodecException {
-        return new ConversionMetadata(MarkCodec.encode(new JabRefMarkData(
+    static ConversionMetadata capture(CitationGroup group, String zoteroName) throws JabRefMarkCodecException {
+        return new ConversionMetadata(JabRefMarkCodec.encode(new JabRefMarkData(
                 group.citationsInStorageOrder.stream().map(citation -> citation.citationKey).toList(),
                 group.groupId.citationGroupIdAsString(), group.citationType)),
                 group.citationsInStorageOrder.stream().map(citation -> citation.getPageInfo().map(text -> text.toString()).orElse("")).toList(), zoteroName);
     }
 
-    CitationGroup group() throws MarkCodecException {
-        JabRefMarkData data = MarkCodec.decode(canonicalName);
+    CitationGroup group() throws JabRefMarkCodecException {
+        JabRefMarkData data = JabRefMarkCodec.decode(canonicalName);
         List<Citation> citations = new ArrayList<>();
         for (int index = 0; index < data.citationKeys().size(); index++) {
             Citation citation = new Citation(data.citationKeys().get(index));
@@ -86,14 +86,14 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
             ConversionMetadata metadata = new ConversionMetadata(json.get("canonicalName").getAsString(),
                     json.getAsJsonArray("pageInfos").asList().stream().map(element -> element.getAsString()).toList(),
                     json.get("zoteroName").getAsString());
-            JabRefMarkData canonical = MarkCodec.decode(metadata.canonicalName());
+            JabRefMarkData canonical = JabRefMarkCodec.decode(metadata.canonicalName());
             ZoteroReferenceMark nativeMark = ZoteroReferenceMark.parse(metadata.zoteroName()).orElseThrow(CitationFormatConverter::invalidMetadata);
             if (canonical.citationKeys().size() != metadata.pageInfos().size() || !canonical.citationKeys().equals(nativeMark.citationKeys())) {
                 throw CitationFormatConverter.invalidMetadata();
             }
             identity(metadata.zoteroName());
             return metadata;
-        } catch (JsonParseException | IllegalStateException | UnsupportedOperationException | ClassCastException | NumberFormatException | MarkCodecException exception) {
+        } catch (JsonParseException | IllegalStateException | UnsupportedOperationException | ClassCastException | NumberFormatException | JabRefMarkCodecException exception) {
             throw CitationFormatConverter.invalidMetadata(exception);
         }
     }
@@ -105,12 +105,12 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
         }
         ConversionMetadata metadata = decode(value.orElseThrow());
         try {
-            JabRefMarkData stored = MarkCodec.decode(metadata.canonicalName());
+            JabRefMarkData stored = JabRefMarkCodec.decode(metadata.canonicalName());
             if (!stored.uniqueId().equals(group.groupId.citationGroupIdAsString()) || !stored.citationKeys().equals(
                     group.citationsInStorageOrder.stream().map(citation -> citation.citationKey).toList())) {
                 throw CitationFormatConverter.invalidMetadata();
             }
-        } catch (MarkCodecException exception) {
+        } catch (JabRefMarkCodecException exception) {
             throw CitationFormatConverter.invalidMetadata(exception);
         }
         return Optional.of(metadata);
@@ -126,10 +126,10 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
             }
             ConversionMetadata metadata = decode(UnoUserDefinedProperty.getStringValue(document, property).orElseThrow());
             try {
-                if (!property.equals(PREFIX + MarkCodec.decode(metadata.canonicalName()).uniqueId())) {
+                if (!property.equals(PREFIX + JabRefMarkCodec.decode(metadata.canonicalName()).uniqueId())) {
                     throw CitationFormatConverter.invalidMetadata();
                 }
-            } catch (MarkCodecException exception) {
+            } catch (JabRefMarkCodecException exception) {
                 throw CitationFormatConverter.invalidMetadata(exception);
             }
             if (identity(metadata.zoteroName()).equals(citationIdentity)
@@ -171,14 +171,14 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
             }
             try {
                 ConversionMetadata metadata = decode(value.orElseThrow());
-                if (!metadata.zoteroName().equals(before) || !property.equals(PREFIX + MarkCodec.decode(metadata.canonicalName()).uniqueId())) {
+                if (!metadata.zoteroName().equals(before) || !property.equals(PREFIX + JabRefMarkCodec.decode(metadata.canonicalName()).uniqueId())) {
                     continue;
                 }
                 if (fresh.isPresent()) {
                     return Optional.empty();
                 }
                 fresh = Optional.of(Map.entry(property, metadata));
-            } catch (RenderException | MarkCodecException exception) {
+            } catch (RenderException | JabRefMarkCodecException exception) {
                 LOGGER.debug("Ignoring invalid conversion metadata during native URI-link planning: {}", property, exception);
             }
         }
@@ -198,7 +198,7 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
         return Optional.of(updated);
     }
 
-    void store(XTextDocument document) throws com.sun.star.uno.Exception, MarkCodecException {
-        UndoableDocumentProperties.set(document, PREFIX + MarkCodec.decode(canonicalName).uniqueId(), Optional.of(encode()));
+    void store(XTextDocument document) throws com.sun.star.uno.Exception, JabRefMarkCodecException {
+        UndoableDocumentProperties.set(document, PREFIX + JabRefMarkCodec.decode(canonicalName).uniqueId(), Optional.of(encode()));
     }
 }

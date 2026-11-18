@@ -131,7 +131,7 @@ public class OOTextWriter {
                              @NonNull OOText ootext)
             throws
             WrappedTargetException,
-            CreationException {
+            WriterOperationException {
 
         String lText = OOText.toString(ootext);
 
@@ -314,10 +314,10 @@ public class OOTextWriter {
     ///
     /// In particular, when filling the bibliography title and body.
     public static void removeDirectFormatting(XTextCursor cursor) {
-        XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
+        XMultiPropertyStates mpss = UnoInterfaces.query(XMultiPropertyStates.class, cursor).get();
 
-        XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
-        XPropertyState xPropertyState = UnoCast.cast(XPropertyState.class, cursor).get();
+        XPropertySet propertySet = UnoInterfaces.query(XPropertySet.class, cursor).get();
+        XPropertyState xPropertyState = UnoInterfaces.query(XPropertyState.class, cursor).get();
 
         try {
             // Special handling
@@ -350,7 +350,7 @@ public class OOTextWriter {
                 "ParaStyleName");
 
         // query again, just in case it matters
-        propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
+        propertySet = UnoInterfaces.query(XPropertySet.class, cursor).get();
         XPropertySetInfo propertySetInfo = propertySet.getPropertySetInfo();
 
         // check the result
@@ -374,7 +374,7 @@ public class OOTextWriter {
 
     /// Reset only direct superscript/subscript formatting before rewriting marked-up citation text.
     public static void removeEscapementFormatting(@NonNull XTextCursor cursor) {
-        Optional<XMultiPropertyStates> optionalPropertyStates = UnoCast.cast(XMultiPropertyStates.class, cursor);
+        Optional<XMultiPropertyStates> optionalPropertyStates = UnoInterfaces.query(XMultiPropertyStates.class, cursor);
         if (optionalPropertyStates.isEmpty()) {
             LOGGER.debug("Could not reset escapement format.");
             return;
@@ -451,7 +451,7 @@ public class OOTextWriter {
         final Deque<ArrayList<Optional<Object>>> layers;
 
         FormattingPropertyStack(XTextCursor cursor) {
-            XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
+            XPropertySet propertySet = UnoInterfaces.query(XPropertySet.class, cursor).get();
             XPropertySetInfo propertySetInfo = propertySet.getPropertySetInfo();
 
             // On creation, initialize the property name -- index mapping.
@@ -482,7 +482,7 @@ public class OOTextWriter {
             }
 
             // Get the initial state of the properties and add the first layer.
-            XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
+            XMultiPropertyStates mpss = UnoInterfaces.query(XMultiPropertyStates.class, cursor).get();
             PropertyState[] propertyStates;
             try {
                 propertyStates = mpss.getPropertyStates(goodNames);
@@ -490,7 +490,7 @@ public class OOTextWriter {
                 throw new IllegalStateException("Caught unexpected UnknownPropertyException", ex);
             }
 
-            XMultiPropertySet mps = UnoCast.cast(XMultiPropertySet.class, cursor).get();
+            XMultiPropertySet mps = UnoInterfaces.query(XMultiPropertySet.class, cursor).get();
             Object[] initialValues = mps.getPropertyValues(goodNames);
 
             ArrayList<Optional<Object>> initialValuesOpt = new ArrayList<>(goodSize);
@@ -539,8 +539,8 @@ public class OOTextWriter {
         ///
         /// The idea is to minimize the number of calls to OpenOffice.
         void apply(XTextCursor cursor) {
-            XMultiPropertySet mps = UnoCast.cast(XMultiPropertySet.class, cursor).get();
-            XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
+            XMultiPropertySet mps = UnoInterfaces.query(XMultiPropertySet.class, cursor).get();
+            XMultiPropertyStates mpss = UnoInterfaces.query(XMultiPropertyStates.class, cursor).get();
             ArrayList<Optional<Object>> topLayer = layers.peek();
             try {
                 // select values to be set
@@ -600,7 +600,7 @@ public class OOTextWriter {
     private static boolean isPropertyDefault(XTextCursor cursor, String propertyName)
             throws
             UnknownPropertyException {
-        XPropertyState xPropertyState = UnoCast.cast(XPropertyState.class, cursor).get();
+        XPropertyState xPropertyState = UnoInterfaces.query(XPropertyState.class, cursor).get();
         PropertyState state = xPropertyState.getPropertyState(propertyName);
         if (state == PropertyState.AMBIGUOUS_VALUE) {
             throw new java.lang.IllegalArgumentException("PropertyState.AMBIGUOUS_VALUE"
@@ -737,8 +737,8 @@ public class OOTextWriter {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        XParagraphCursor paragraphCursor = UnoCast.cast(XParagraphCursor.class, cursor).get();
-        XPropertySet propertySet = UnoCast.cast(XPropertySet.class, paragraphCursor).get();
+        XParagraphCursor paragraphCursor = UnoInterfaces.query(XParagraphCursor.class, cursor).get();
+        XPropertySet propertySet = UnoInterfaces.query(XPropertySet.class, paragraphCursor).get();
         try {
             propertySet.setPropertyValue(PARA_STYLE_NAME, paragraphStyle);
             return PASS;

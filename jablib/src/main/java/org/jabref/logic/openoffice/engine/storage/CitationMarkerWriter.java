@@ -6,10 +6,10 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.openoffice.backend.ReferenceMarkTextWriter;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
-import org.jabref.logic.openoffice.uno.UnoCast;
+import org.jabref.logic.openoffice.uno.UnoInterfaces;
 import org.jabref.logic.openoffice.uno.UnoUndo;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationGroupId;
@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
 /// Document edits and undo/redo invalidate that baseline. Callers bracket their own complete write
 /// actions with `beginUpdate` and `endUpdate`, and detach listeners with `close` on disconnect.
 @NullMarked
-public final class MarkWriter implements AutoCloseable {
+public final class CitationMarkerWriter implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MarkWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationMarkerWriter.class);
 
     private final XTextDocument document;
     private final XComponentContext context;
@@ -48,10 +48,10 @@ public final class MarkWriter implements AutoCloseable {
     private final Optional<XUndoManager> undoManager;
     private volatile boolean closed;
 
-    public MarkWriter(XTextDocument document, XComponentContext context) {
+    public CitationMarkerWriter(XTextDocument document, XComponentContext context) {
         this.document = document;
         this.context = context;
-        modifications = UnoCast.cast(XModifyBroadcaster.class, document);
+        modifications = UnoInterfaces.query(XModifyBroadcaster.class, document);
         undoManager = UnoUndo.getXUndoManager(document);
         modifications.ifPresent(broadcaster -> broadcaster.addModifyListener(listener));
         undoManager.ifPresent(manager -> manager.addUndoManagerListener(listener));
@@ -77,11 +77,11 @@ public final class MarkWriter implements AutoCloseable {
 
     /// Returns the number of markers actually rewritten. Missing output is rejected before writing.
     public int apply(MarkStore store, List<CitationGroup> groups, Map<CitationGroupId, OOText> markers)
-            throws NoDocumentException, CreationException, WrappedTargetException {
+            throws WriterDocumentAccessException, WriterOperationException, WrappedTargetException {
         requireOpen();
         for (CitationGroup group : groups) {
             if (!markers.containsKey(group.groupId) || store.getMarkData(group).isEmpty()) {
-                throw new CreationException("Missing rendered text or stored range for citation group: " + group.groupId.citationGroupIdAsString());
+                throw new WriterOperationException("Missing rendered text or stored range for citation group: " + group.groupId.citationGroupIdAsString());
             }
         }
         beginUpdate();
@@ -89,7 +89,7 @@ public final class MarkWriter implements AutoCloseable {
             int changed = 0;
             for (CitationGroup group : groups) {
                 if (write(store, group, Optional.ofNullable(markers.get(group.groupId))
-                                                .orElseThrow(() -> new CreationException("Missing rendered citation text")))) {
+                                                .orElseThrow(() -> new WriterOperationException("Missing rendered citation text")))) {
                     changed++;
                 }
             }
@@ -100,12 +100,12 @@ public final class MarkWriter implements AutoCloseable {
     }
 
     public boolean write(MarkStore store, CitationGroup group, OOText marker)
-            throws NoDocumentException, CreationException, WrappedTargetException {
+            throws WriterDocumentAccessException, WriterOperationException, WrappedTargetException {
         requireOpen();
         beginUpdate();
         try {
             String uid = store.getMarkData(group)
-                              .orElseThrow(() -> new CreationException("Unknown canonical citation group"))
+                              .orElseThrow(() -> new WriterOperationException("Unknown canonical citation group"))
                               .uniqueId();
             OOText text = group.citationType.withText() ? marker : OOText.fromString("");
             if (modifications.isPresent() && Optional.ofNullable(lastWritten.getIfPresent(uid)).filter(text::equals).isPresent()) {
@@ -151,9 +151,9 @@ public final class MarkWriter implements AutoCloseable {
         }
     }
 
-    private void requireOpen() throws CreationException {
+    private void requireOpen() throws WriterOperationException {
         if (closed) {
-            throw new CreationException("Canonical citation writer is closed");
+            throw new WriterOperationException("Canonical citation writer is closed");
         }
     }
 

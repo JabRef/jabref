@@ -9,15 +9,15 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.engine.BibliographySection;
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
-import org.jabref.logic.openoffice.rangesort.FunctionalTextViewCursor;
+import org.jabref.logic.openoffice.rangesort.BetweenSetsRangeOverlapFinder;
 import org.jabref.logic.openoffice.rangesort.RangeOverlap;
-import org.jabref.logic.openoffice.rangesort.RangeOverlapBetween;
-import org.jabref.logic.openoffice.rangesort.RangeOverlapWithin;
 import org.jabref.logic.openoffice.rangesort.RangeSort;
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
+import org.jabref.logic.openoffice.rangesort.RestorableTextViewCursor;
+import org.jabref.logic.openoffice.rangesort.WithinSetRangeOverlapFinder;
 import org.jabref.logic.openoffice.uno.UnoRedlines;
 import org.jabref.logic.openoffice.uno.UnoTextRange;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationGroup;
@@ -50,7 +50,7 @@ public class DocumentCitations {
     public final MarkStore markStore;
     public final CitationGroups citationGroups;
 
-    public DocumentCitations(XTextDocument doc) throws NoDocumentException, WrappedTargetException {
+    public DocumentCitations(XTextDocument doc) throws WriterDocumentAccessException, WrappedTargetException {
 
         this.markStore = new MarkStore();
         this.citationGroups = markStore.readAll(doc);
@@ -61,7 +61,7 @@ public class DocumentCitations {
     /// This is (1) sufficient for combineCiteMarkers which looks for consecutive XTextRanges within each XText, (2) not confused by multicolumn layout or multipage display.
     public List<CitationGroup>
     getCitationGroupsSortedWithinPartitions(XTextDocument doc, boolean mapFootnotesToFootnoteMarks)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         DocumentOrder order = new DocumentOrder();
         return mapFootnotesToFootnoteMarks
                ? order.inDocumentOrder(doc, citationGroups, markStore, Optional.empty())
@@ -86,8 +86,8 @@ public class DocumentCitations {
                                              boolean insertSpaceBefore,
                                              boolean insertSpaceAfter)
             throws
-            CreationException,
-            NoDocumentException,
+            WriterOperationException,
+            WriterDocumentAccessException,
             WrappedTargetException,
             NotRemoveableException,
             PropertyVetoException,
@@ -107,7 +107,7 @@ public class DocumentCitations {
 
     /// Remove `group` both from the document and notify `citationGroups`
     public void removeCitationGroup(CitationGroup group, XTextDocument doc)
-            throws WrappedTargetException, NoDocumentException, NotRemoveableException {
+            throws WrappedTargetException, WriterDocumentAccessException, NotRemoveableException {
 
         markStore.removeCitationGroup(group, doc);
         this.citationGroups.afterRemoveCitationGroup(group);
@@ -116,7 +116,7 @@ public class DocumentCitations {
     public void removeCitationGroups(List<CitationGroup> citationGroups, XTextDocument doc)
             throws
             WrappedTargetException,
-            NoDocumentException,
+            WriterDocumentAccessException,
             NotRemoveableException {
 
         for (CitationGroup group : citationGroups) {
@@ -128,13 +128,13 @@ public class DocumentCitations {
     ///
     /// @return Optional.empty() if the reference mark is missing.
     public Optional<XTextRange> getMarkRange(XTextDocument doc, CitationGroup group)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
         return markStore.getMarkRange(group, doc);
     }
 
     /// @return A RangeForOverlapCheck for each citation group. result.size() == nRefMarks
     public List<RangeForOverlapCheck<CitationGroupId>> getCitationRanges(XTextDocument doc)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
 
         List<RangeForOverlapCheck<CitationGroupId>> result =
                 new ArrayList<>(citationGroups.numberOfCitationGroups());
@@ -155,7 +155,7 @@ public class DocumentCitations {
     }
 
     public List<RangeForOverlapCheck<CitationGroupId>> bibliographyRanges(XTextDocument doc)
-            throws NoDocumentException, WrappedTargetException {
+            throws WriterDocumentAccessException, WrappedTargetException {
 
         List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
 
@@ -252,7 +252,7 @@ public class DocumentCitations {
             ranges.addAll(footnoteMarkRanges(citationRanges));
 
             List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
-                    RangeOverlapBetween.findFirst(doc,
+                    BetweenSetsRangeOverlapFinder.findFirst(doc,
                             userRanges,
                             ranges,
                             requireSeparation);
@@ -262,7 +262,7 @@ public class DocumentCitations {
             }
             return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
                     rangeOverlapsToMessage(overlaps)));
-        } catch (NoDocumentException | WrappedTargetException e) {
+        } catch (WriterDocumentAccessException | WrappedTargetException e) {
             return OOVoidResult.error(new JabRefException(e.getMessage(), e));
         }
     }
@@ -280,7 +280,7 @@ public class DocumentCitations {
                                 + Localization.lang("Use [Edit]/[Track Changes]/[Manage] to resolve them first.")));
             }
             return OOVoidResult.ok();
-        } catch (NoDocumentException | WrappedTargetException exception) {
+        } catch (WriterDocumentAccessException | WrappedTargetException exception) {
             return OOVoidResult.error(new JabRefException(exception.toString(), exception));
         }
     }
@@ -300,14 +300,14 @@ public class DocumentCitations {
             ranges.addAll(footnoteMarkRanges(citationRanges));
 
             List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
-                    RangeOverlapWithin.findOverlappingRanges(doc, ranges, requireSeparation, reportAtMost);
+                    WithinSetRangeOverlapFinder.findOverlappingRanges(doc, ranges, requireSeparation, reportAtMost);
 
             if (overlaps.isEmpty()) {
                 return OOVoidResult.ok();
             }
             return OOVoidResult.error(new JabRefException("Found overlapping or touching ranges",
                     rangeOverlapsToMessage(overlaps)));
-        } catch (NoDocumentException | WrappedTargetException e) {
+        } catch (WriterDocumentAccessException | WrappedTargetException e) {
             return OOVoidResult.error(new JabRefException(e.getMessage(), e));
         }
     }
@@ -328,7 +328,7 @@ public class DocumentCitations {
     ///
     /// Wish: selecting an entry (or a button in the line) in the GUI could move the cursor in the document to the entry.
     public List<CitationEntry> getCitationEntries(XTextDocument doc)
-            throws WrappedTargetException, NoDocumentException {
+            throws WrappedTargetException, WriterDocumentAccessException {
         return this.markStore.getCitationEntries(doc, citationGroups);
     }
 
@@ -342,9 +342,9 @@ public class DocumentCitations {
         this.markStore.applyCitationEntries(doc, citationEntries);
     }
 
-    public void imposeGlobalOrder(XTextDocument doc) throws WrappedTargetException, NoDocumentException {
-        OOResult<FunctionalTextViewCursor, String> cursor = FunctionalTextViewCursor.get(doc);
-        Optional<FunctionalTextViewCursor> available = cursor.isError() ? Optional.empty() : Optional.of(cursor.get());
+    public void imposeGlobalOrder(XTextDocument doc) throws WrappedTargetException, WriterDocumentAccessException {
+        OOResult<RestorableTextViewCursor, String> cursor = RestorableTextViewCursor.get(doc);
+        Optional<RestorableTextViewCursor> available = cursor.isError() ? Optional.empty() : Optional.of(cursor.get());
         citationGroups.setGlobalOrder(new ArrayList<>(new DocumentOrder().inDocumentOrder(doc, citationGroups, markStore, available).stream().map(group -> group.groupId).toList()));
     }
 }

@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.jabref.logic.openoffice.backend.ReferenceMarkTextWriter;
 import org.jabref.logic.openoffice.backend.WriterReferenceMark;
 import org.jabref.logic.openoffice.engine.JabRefMarkData;
-import org.jabref.logic.openoffice.uno.CreationException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 @NullMarked
-class MarkWriterTest {
+class CitationMarkerWriterTest {
     private final XTextDocument document = mock(XTextDocument.class,
             withSettings().extraInterfaces(XModifyBroadcaster.class, XUndoManagerSupplier.class));
     private final XUndoManager undoManager = mock(XUndoManager.class);
@@ -52,7 +52,7 @@ class MarkWriterTest {
     private final CitationGroup group = new CitationGroup(new CitationGroupId("uid"), CitationType.AUTHORYEAR_PAR,
             List.of(new Citation("alpha")), Optional.of("JABREF_alpha NORMAL uid"));
     private final OOText marker = OOText.fromString("A");
-    private MarkWriter writer;
+    private CitationMarkerWriter writer;
     private XModifyListener modifications;
     private XUndoManagerListener undo;
 
@@ -61,7 +61,7 @@ class MarkWriterTest {
         when(((XUndoManagerSupplier) document).getUndoManager()).thenReturn(undoManager);
         when(store.getMarkData(group)).thenReturn(Optional.of(new JabRefMarkData(List.of("alpha"), "uid", CitationType.AUTHORYEAR_PAR)));
         when(store.referenceMark(group)).thenReturn(range);
-        writer = new MarkWriter(document, context);
+        writer = new CitationMarkerWriter(document, context);
         ArgumentCaptor<XModifyListener> modifyListener = ArgumentCaptor.forClass(XModifyListener.class);
         verify((XModifyBroadcaster) document).addModifyListener(modifyListener.capture());
         modifications = modifyListener.getValue();
@@ -133,23 +133,23 @@ class MarkWriterTest {
         writer.close();
         verify((XModifyBroadcaster) document).removeModifyListener(modifications);
         verify(undoManager).removeUndoManagerListener(undo);
-        assertThrows(CreationException.class, this::write);
+        assertThrows(WriterOperationException.class, this::write);
     }
 
     @Test
     void disposingTheDocumentMakesTheWriterUnusable() throws Exception {
         assertTrue(write());
         modifications.disposing(new EventObject(document));
-        assertThrows(CreationException.class, this::write);
+        assertThrows(WriterOperationException.class, this::write);
     }
 
     @Test
     void delegatesUnmodifiedFormattedTextAndCachesOnlySuccessfulWrites() throws Exception {
         OOText formatted = OOText.fromString("<span lang=\"en\"><sup>1</sup></span>");
-        CreationException failure = new CreationException("Writing failed");
+        WriterOperationException failure = new WriterOperationException("Writing failed");
         try (MockedStatic<ReferenceMarkTextWriter> textWriter = mockStatic(ReferenceMarkTextWriter.class)) {
             textWriter.when(() -> ReferenceMarkTextWriter.write(document, context, range, formatted)).thenThrow(failure);
-            assertSame(failure, assertThrows(CreationException.class, () -> writer.write(store, group, formatted)));
+            assertSame(failure, assertThrows(WriterOperationException.class, () -> writer.write(store, group, formatted)));
             textWriter.when(() -> ReferenceMarkTextWriter.write(document, context, range, formatted)).thenAnswer(_ -> null);
 
             assertTrue(writer.write(store, group, formatted));

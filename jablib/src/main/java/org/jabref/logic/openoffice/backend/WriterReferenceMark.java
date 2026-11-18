@@ -2,12 +2,12 @@ package org.jabref.logic.openoffice.backend;
 
 import java.util.Optional;
 
-import org.jabref.logic.openoffice.uno.CreationException;
-import org.jabref.logic.openoffice.uno.DocumentAnnotation;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
-import org.jabref.logic.openoffice.uno.UnoCast;
+import org.jabref.logic.openoffice.uno.NamedTextContentPlacement;
 import org.jabref.logic.openoffice.uno.UnoCursor;
 import org.jabref.logic.openoffice.uno.UnoDispatch;
+import org.jabref.logic.openoffice.uno.UnoInterfaces;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
@@ -62,7 +62,7 @@ public final class WriterReferenceMark {
     }
 
     void createInDocument(XTextDocument doc, Optional<XComponentContext> context, XTextCursor position,
-                          boolean insertSpaceBefore, boolean insertSpaceAfter) throws CreationException {
+                          boolean insertSpaceBefore, boolean insertSpaceAfter) throws WriterOperationException {
         position.collapseToEnd();
         XTextCursor cursor = safeInsertSpacesBetweenReferenceMarks(position.getEnd(), 2);
         XTextCursor cursorBefore = cursor.getText().createTextCursorByRange(cursor.getStart());
@@ -71,7 +71,7 @@ public final class WriterReferenceMark {
         cursor.goRight((short) 1, false);
         cursor.getText().insertString(cursor, BOUNDARY + BOUNDARY, true);
         XTextRange endRange = cursor.getEnd();
-        WriterReferenceMarks.create(new DocumentAnnotation(doc, rangeName, cursor, true));
+        WriterReferenceMarks.create(new NamedTextContentPlacement(doc, rangeName, cursor, true));
 
         if (!insertSpaceBefore) {
             cursorBefore.goRight((short) 1, true);
@@ -88,13 +88,13 @@ public final class WriterReferenceMark {
     }
 
     private static Optional<XComponentContext> findComponentContext(XTextDocument doc) {
-        Optional<XPropertySet> properties = UnoCast.cast(XMultiServiceFactory.class, doc)
-                                                   .flatMap(factory -> UnoCast.cast(XPropertySet.class, factory));
+        Optional<XPropertySet> properties = UnoInterfaces.query(XMultiServiceFactory.class, doc)
+                                                   .flatMap(factory -> UnoInterfaces.query(XPropertySet.class, factory));
         if (properties.isEmpty()) {
             return Optional.empty();
         }
         try {
-            return UnoCast.cast(XComponentContext.class, properties.orElseThrow().getPropertyValue("DefaultContext"));
+            return UnoInterfaces.query(XComponentContext.class, properties.orElseThrow().getPropertyValue("DefaultContext"));
         } catch (UnknownPropertyException | WrappedTargetException exception) {
             LOGGER.debug("Could not resolve LibreOffice component context from document", exception);
             return Optional.empty();
@@ -105,27 +105,27 @@ public final class WriterReferenceMark {
         return rangeName;
     }
 
-    public void removeFromDocument(XTextDocument doc) throws WrappedTargetException, NoDocumentException {
+    public void removeFromDocument(XTextDocument doc) throws WrappedTargetException, WriterDocumentAccessException {
         WriterReferenceMarks.removeIfExists(doc, rangeName);
     }
 
     /// Returns an empty optional when the mark has disappeared from the document.
-    public Optional<XTextRange> getMarkRange(XTextDocument doc) throws NoDocumentException, WrappedTargetException {
+    public Optional<XTextRange> getMarkRange(XTextDocument doc) throws WriterDocumentAccessException, WrappedTargetException {
         return WriterReferenceMarks.getAnchor(doc, rangeName);
     }
 
     /// The mark's full cursor, without preparing it for filling or requiring cleanup.
-    public Optional<XTextCursor> getRawCursor(XTextDocument doc) throws NoDocumentException, WrappedTargetException {
+    public Optional<XTextCursor> getRawCursor(XTextDocument doc) throws WriterDocumentAccessException, WrappedTargetException {
         return WriterReferenceMarks.getAsTextContent(doc, rangeName)
                                    .flatMap(UnoCursor::getTextCursorOfTextContentAnchor);
     }
 
-    private XTextCursor requireRawCursor(XTextDocument doc) throws NoDocumentException, WrappedTargetException {
-        return getRawCursor(doc).orElseThrow(() -> new NoDocumentException("Missing reference mark cursor: " + rangeName));
+    private XTextCursor requireRawCursor(XTextDocument doc) throws WriterDocumentAccessException, WrappedTargetException {
+        return getRawCursor(doc).orElseThrow(() -> new WriterDocumentAccessException("Missing reference mark cursor: " + rangeName));
     }
 
     /// Obtain a cursor strictly inside the mark. Must be followed by [#cleanFillCursor].
-    public XTextCursor getFillCursor(XTextDocument doc) throws NoDocumentException, WrappedTargetException, CreationException {
+    public XTextCursor getFillCursor(XTextDocument doc) throws WriterDocumentAccessException, WrappedTargetException, WriterOperationException {
         XTextCursor full = requireRawCursor(doc);
         String fullText = full.getString();
         if (boundaryPolicy == BoundaryPolicy.PERSISTENT) {
@@ -139,7 +139,7 @@ public final class WriterReferenceMark {
             full = requireRawCursor(doc);
             fullText = full.getString();
             if (fullText.length() < 2) {
-                throw new CreationException("Reference mark is too short after recreation: " + rangeName);
+                throw new WriterOperationException("Reference mark is too short after recreation: " + rangeName);
             }
         }
 
@@ -169,22 +169,22 @@ public final class WriterReferenceMark {
         return inner;
     }
 
-    private void requireBoundaries(String text) throws CreationException {
+    private void requireBoundaries(String text) throws WriterOperationException {
         if (text.length() < 2 || !text.startsWith(BOUNDARY) || !text.endsWith(BOUNDARY)) {
-            throw new CreationException("Reference mark has lost its boundary characters: " + rangeName);
+            throw new WriterOperationException("Reference mark has lost its boundary characters: " + rangeName);
         }
     }
 
     /// Remove temporary boundaries only when safe: keep both for empty content, and the left
     /// boundary for one character. Persistent boundaries are never removed.
-    public void cleanFillCursor(XTextDocument doc) throws NoDocumentException, WrappedTargetException {
+    public void cleanFillCursor(XTextDocument doc) throws WriterDocumentAccessException, WrappedTargetException {
         if (boundaryPolicy == BoundaryPolicy.PERSISTENT) {
             return;
         }
         XTextCursor full = requireRawCursor(doc);
         String fullText = full.getString();
         if (fullText.length() < 2 || !fullText.startsWith(BOUNDARY) || !fullText.endsWith(BOUNDARY)) {
-            throw new NoDocumentException("Reference mark has lost its boundary characters: " + rangeName);
+            throw new WriterDocumentAccessException("Reference mark has lost its boundary characters: " + rangeName);
         }
         int contentLength = fullText.length() - 2;
         if (contentLength >= 1) {

@@ -4,7 +4,7 @@ import org.jspecify.annotations.NullMarked;
 
 /// Invalid canonical mark data or a name that is not in the canonical JabRef format.
 @NullMarked
-public final class MarkCodecException extends Exception {
+public final class JabRefMarkCodecException extends Exception {
 
     @NullMarked
     public enum Reason {
@@ -16,7 +16,7 @@ public final class MarkCodecException extends Exception {
 
     private final Reason reason;
 
-    public MarkCodecException(Reason reason, String message) {
+    public JabRefMarkCodecException(Reason reason, String message) {
         super(message);
         this.reason = reason;
     }

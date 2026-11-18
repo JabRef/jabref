@@ -61,7 +61,7 @@ final class JStyleNumericCitationFormatter {
     }
 
     /*
-     * emitBlock : a helper for getNumCitationMarker2
+     * emitBlock : a helper for formatNumericCitation
      *
      * Given a block containing either a single entry or two or more
      * entries that are joinable into an "i-j" form, append to {@code stringBuilder} the
@@ -174,7 +174,7 @@ final class JStyleNumericCitationFormatter {
     /// @param minGroupingCount Zero and negative means never group. Only used by tests to override the value in style.
     /// @return The text for the citation.
     ///
-    public static OOText getNumCitationMarker2(JStyle style,
+    public static OOText formatNumericCitation(JStyle style,
                                                List<CitationMarkerNumericEntry> entries,
                                                int minGroupingCount) {
 
@@ -210,7 +210,7 @@ final class JStyleNumericCitationFormatter {
         for (int i = 0; i < nCitations; i++) {
             final CitationMarkerNumericEntry current = sorted.get(i);
             if (current.getNumber().isPresent() && current.getNumber().get() < 0) {
-                throw new IllegalArgumentException("getNumCitationMarker2: found negative number");
+                throw new IllegalArgumentException("formatNumericCitation: found negative number");
             }
 
             if (currentBlock.isEmpty()) {

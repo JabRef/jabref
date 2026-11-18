@@ -28,7 +28,7 @@ public class UnoSelection {
             LOGGER.warn("UnoSelection.getSelectionSupplier: getCurrentController(doc) returned empty");
             return Optional.empty();
         }
-        Optional<XSelectionSupplier> supplier = UnoCast.cast(XSelectionSupplier.class, controller.get());
+        Optional<XSelectionSupplier> supplier = UnoInterfaces.query(XSelectionSupplier.class, controller.get());
         if (supplier.isEmpty()) {
             LOGGER.warn("UnoSelection.getSelectionSupplier: cast to XSelectionSupplier returned empty");
             return Optional.empty();
@@ -62,7 +62,7 @@ public class UnoSelection {
         if (selection == null) {
             return Optional.empty();
         }
-        Optional<XServiceInfo> result = UnoCast.cast(XServiceInfo.class, selection);
+        Optional<XServiceInfo> result = UnoInterfaces.query(XServiceInfo.class, selection);
         if (result.isEmpty()) {
             LOGGER.warn("cast to XServiceInfo returned empty");
             return Optional.empty();

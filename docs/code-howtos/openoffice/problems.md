@@ -75,7 +75,7 @@ The canonical integration now registers custom undo actions through `UndoableDoc
 Merge and Separate combine structural edits, final formatted output, and page-info changes in one undo context.
 Next-CSL-insertion format conversion also includes its citation sidecar and prepared applied-style and Zotero preference properties in one owned root undo context.
 The conversion-failure rollback described below is new recovery behavior to prevent partial citation corruption after ordinary application failures.
-`DocumentSession.writeWithRollback` requires unlocked undo support, rejects nesting, and rolls back ordinary application failures only after closing and verifying ownership of that context.
+`DocumentWriteSession.writeWithRollback` requires unlocked undo support, rejects nesting, and rolls back ordinary application failures only after closing and verifying ownership of that context.
 Starting the write transaction can clear pre-existing redo history even when rollback restores the document; disconnects, lost ownership, and rollback failures require a distinct recovery error rather than an unconditional rollback claim.
 Ordinary updates retain raw style-property setters and do not gain this rollback behavior.
 The original conversion trigger and modifier compatibility remain: modifiers do not block conversion, and any native author suppression maps to the group's in-text citation type rather than adding full native rendering semantics.

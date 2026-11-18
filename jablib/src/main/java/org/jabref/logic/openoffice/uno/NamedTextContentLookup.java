@@ -7,17 +7,18 @@ import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextContent;
 
-public class UnoNameAccess {
+/// Finds Writer text content in a UNO name-indexed collection.
+public class NamedTextContentLookup {
 
-    private UnoNameAccess() {
+    private NamedTextContentLookup() {
     }
 
-    /// @return null if name not found, or if the result does not support the XTextContent interface.
+    /// @return An empty optional if the name is absent or its object does not support `XTextContent`.
     public static Optional<XTextContent> getTextContentByName(XNameAccess nameAccess, String name)
             throws
             WrappedTargetException {
         try {
-            return UnoCast.cast(XTextContent.class, nameAccess.getByName(name));
+            return UnoInterfaces.query(XTextContent.class, nameAccess.getByName(name));
         } catch (NoSuchElementException _) {
             return Optional.empty();
         }

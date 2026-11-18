@@ -34,7 +34,7 @@ public class ManageCitationsDialogViewModel {
         }
     }
 
-    public void storeSettings() {
+    public void applyCitationEdits() {
         List<CitationEntry> citationEntries = citations.stream().map(CitationEntryViewModel::toCitationEntry).collect(Collectors.toList());
         citationController.applyCitationEntries(citationEntries);
     }

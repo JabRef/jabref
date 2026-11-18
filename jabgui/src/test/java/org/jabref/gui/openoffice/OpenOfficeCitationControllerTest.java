@@ -17,8 +17,8 @@ import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.uno.NoDocumentException;
 import org.jabref.logic.openoffice.uno.UnoCursor;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -503,7 +503,7 @@ class OpenOfficeCitationControllerTest {
             OpenOfficeCitationController citationController = controller();
             citationController.capabilities(style);
             CitationEngine engine = engines.constructed().getFirst();
-            when(connection.getXTextDocument()).thenReturn(OOResult.error(OOError.from(new NoDocumentException())));
+            when(connection.getXTextDocument()).thenReturn(OOResult.error(OOError.from(new WriterDocumentAccessException())));
 
             citationController.refresh(List.of(new BibDatabase()), style);
 

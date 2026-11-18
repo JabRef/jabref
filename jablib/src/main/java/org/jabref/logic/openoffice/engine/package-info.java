@@ -1,9 +1,9 @@
 /// Writer citation rendering and document-action coordination.
 /// Start with [CitationEngine] for the document-bound API; [UpdatePipeline] prepares and applies
-/// canonical renderer output, while [DocumentSession] controls the write phase.
+/// canonical renderer output, while [DocumentWriteSession] controls the write phase.
 /// [CitationGroupEditor] owns structural insertion, merging, and separation inside the caller's session.
 /// [RendererFactory] selects [JStyleRenderer], [CslRenderer], or [BstRenderer] through [CitationRenderer].
-/// [MarkCodec] defines canonical identities; their document storage lives in
+/// [JabRefMarkCodec] defines canonical identities; their document storage lives in
 /// [org.jabref.logic.openoffice.engine.storage].
 /// [ZoteroCitationStrategy] keeps CSL-only Zotero storage separate from canonical JabRef marks.
 /// [CitedEntryExporter] resolves ordered citation keys into a library without accessing Writer.

@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 
 @NullMarked
 @ResourceLock("Localization.lang")
-class DocumentSessionTest {
+class DocumentWriteSessionTest {
     private static final String TITLE = "Insert citation";
     private final XTextDocument document = mock(XTextDocument.class);
     private final XUndoManager manager = mock(XUndoManager.class);
@@ -86,7 +86,7 @@ class DocumentSessionTest {
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class);
              MockedStatic<UnoRedlines> recording = recording()) {
             undo.when(() -> UnoUndo.getXUndoManager(document)).thenReturn(Optional.of(manager));
-            OOResult<?, JabRefException> result = new DocumentSession(document).writeWithRollback(TITLE, () -> OOResult.error(original));
+            OOResult<?, JabRefException> result = new DocumentWriteSession(document).writeWithRollback(TITLE, () -> OOResult.error(original));
             assertSame(original, result.getError());
             verify(manager).undo();
             verify(manager).clearRedo();
@@ -100,7 +100,7 @@ class DocumentSessionTest {
         doThrow(new com.sun.star.lang.IllegalArgumentException("Injected registration failure")).when(manager).addUndoAction(any());
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class)) {
             undo.when(() -> UnoUndo.getXUndoManager(document)).thenReturn(Optional.of(manager));
-            assertTrue(new DocumentSession(document).writeWithRollback(TITLE, () -> OOResult.ok("must not run")).isError());
+            assertTrue(new DocumentWriteSession(document).writeWithRollback(TITLE, () -> OOResult.ok("must not run")).isError());
             verify(manager, never()).undo();
             verify(document, never()).lockControllers();
         }
@@ -111,7 +111,7 @@ class DocumentSessionTest {
         rootContext(2);
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class)) {
             undo.when(() -> UnoUndo.getXUndoManager(document)).thenReturn(Optional.of(manager));
-            assertTrue(new DocumentSession(document).writeWithRollback(TITLE, () -> OOResult.ok("must not run")).isError());
+            assertTrue(new DocumentWriteSession(document).writeWithRollback(TITLE, () -> OOResult.ok("must not run")).isError());
             verify(manager, never()).addUndoAction(any());
             verify(manager, never()).undo();
             verify(document, never()).lockControllers();
@@ -127,7 +127,7 @@ class DocumentSessionTest {
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class);
              MockedStatic<UnoRedlines> recording = recording()) {
             undo.when(() -> UnoUndo.getXUndoManager(document)).thenReturn(Optional.of(manager));
-            OOResult<?, JabRefException> result = new DocumentSession(document).writeWithRollback(TITLE, () -> OOResult.error(original));
+            OOResult<?, JabRefException> result = new DocumentWriteSession(document).writeWithRollback(TITLE, () -> OOResult.error(original));
             assertTrue(result.isError());
             assertTrue(Optional.ofNullable(result.getError().getLocalizedMessage()).orElseThrow().contains("could not be rolled back completely"));
             assertSame(rollback, Optional.ofNullable(result.getError().getCause()).orElseThrow().getCause());
@@ -148,7 +148,7 @@ class DocumentSessionTest {
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class);
              MockedStatic<UnoRedlines> recording = recording()) {
             undo.when(() -> UnoUndo.getXUndoManager(document)).thenReturn(Optional.of(manager));
-            OOResult<?, JabRefException> result = new DocumentSession(document).writeWithRollback(TITLE, () -> OOResult.error(original));
+            OOResult<?, JabRefException> result = new DocumentWriteSession(document).writeWithRollback(TITLE, () -> OOResult.error(original));
             assertTrue(Optional.ofNullable(result.getError().getLocalizedMessage()).orElseThrow().contains("could not be rolled back completely"));
             assertSame(original, result.getError().getCause());
         }
@@ -160,7 +160,7 @@ class DocumentSessionTest {
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class);
              MockedStatic<UnoRedlines> recording = recording()) {
             undo.when(() -> UnoUndo.getXUndoManager(document)).thenReturn(Optional.of(manager));
-            OOResult<?, JabRefException> result = new DocumentSession(document).writeWithRollback(TITLE, () -> {
+            OOResult<?, JabRefException> result = new DocumentWriteSession(document).writeWithRollback(TITLE, () -> {
                 Optional.ofNullable(listener.get()).orElseThrow().allActionsCleared(new EventObject(manager));
                 return OOResult.error(new JabRefException("Write failed after external undo reset"));
             });
@@ -174,7 +174,7 @@ class DocumentSessionTest {
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class)) {
             undo.when(() -> UnoUndo.getXUndoManager(document)).thenReturn(Optional.empty());
             Supplier<OOResult<String, JabRefException>> action = mock();
-            assertTrue(new DocumentSession(document).writeWithRollback(TITLE, action).isError());
+            assertTrue(new DocumentWriteSession(document).writeWithRollback(TITLE, action).isError());
             verify(action, never()).get();
         }
     }
@@ -184,7 +184,7 @@ class DocumentSessionTest {
         try (MockedStatic<UnoUndo> undo = mockStatic(UnoUndo.class);
              MockedStatic<UnoRedlines> recording = recording()) {
             JabRefException original = new JabRefException("Ordinary write failure");
-            OOResult<?, JabRefException> result = new DocumentSession(document).write(TITLE, () -> OOResult.error(original));
+            OOResult<?, JabRefException> result = new DocumentWriteSession(document).write(TITLE, () -> OOResult.error(original));
             assertSame(original, result.getError());
             verify(manager, never()).undo();
             undo.verify(() -> UnoUndo.enterUndoContext(document, TITLE));

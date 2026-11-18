@@ -53,7 +53,7 @@ import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.uno.CreationException;
+import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -447,7 +447,7 @@ public class OpenOfficePanel {
 
         Task<OpenOfficeCitationController> connectTask = new Task<>() {
             @Override
-            protected OpenOfficeCitationController call() throws BootstrapException, CreationException, IOException, InterruptedException {
+            protected OpenOfficeCitationController call() throws BootstrapException, WriterOperationException, IOException, InterruptedException {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
                 Path path = Path.of(openOfficePreferences.getExecutablePath());
@@ -509,7 +509,7 @@ public class OpenOfficePanel {
         taskExecutor.execute(connectTask);
     }
 
-    private OpenOfficeCitationController createCitationController(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
+    private OpenOfficeCitationController createCitationController(Path loPath) throws BootstrapException, WriterOperationException, IOException, InterruptedException {
         return new OpenOfficeCitationController(loPath, dialogService, openOfficePreferences, entryTypesManager);
     }
 

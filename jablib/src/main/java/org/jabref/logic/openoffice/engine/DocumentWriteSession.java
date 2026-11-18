@@ -30,12 +30,12 @@ import org.slf4j.LoggerFactory;
 /// Groups a prepared document mutation into one undo action. Visual ordering and rendering happen
 /// before the controller lock, because Writer's view cursor cannot move while controllers are locked.
 @NullMarked
-public final class DocumentSession {
+public final class DocumentWriteSession {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentWriteSession.class);
     private final XTextDocument document;
 
-    public DocumentSession(XTextDocument document) {
+    public DocumentWriteSession(XTextDocument document) {
         this.document = document;
     }
 
@@ -139,7 +139,7 @@ public final class DocumentSession {
     private static boolean hasSecondaryFailure(Throwable failure) {
         // Failed property compensation or Track Changes restoration can leave state outside UNO's undo log.
         return failure instanceof UnoRedlines.TrackChangesRestoreException || failure.getSuppressed().length > 0
-                || Optional.ofNullable(failure.getCause()).map(DocumentSession::hasSecondaryFailure).orElse(false);
+                || Optional.ofNullable(failure.getCause()).map(DocumentWriteSession::hasSecondaryFailure).orElse(false);
     }
 
     private JabRefException rollbackFailure(Throwable cause) {

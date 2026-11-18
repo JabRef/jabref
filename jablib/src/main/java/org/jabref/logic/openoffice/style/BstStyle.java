@@ -74,7 +74,7 @@ public final class BstStyle implements OOStyle {
     }
 
     /// Returns the parsed [BstVM] for this style.
-    public BstVM createBstVM() {
+    public BstVM getBstVM() {
         return bstVM;
     }
 

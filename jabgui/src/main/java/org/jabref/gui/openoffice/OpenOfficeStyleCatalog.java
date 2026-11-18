@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
-import org.jabref.logic.openoffice.engine.storage.DocumentStateStore;
+import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
@@ -38,13 +38,13 @@ final class OpenOfficeStyleCatalog {
         if (zoteroMode) {
             return ZoteroDocumentPreferences.findCitationStyle(document, cslStyles.get()).map(style -> style);
         }
-        return new DocumentStateStore().read(document).flatMap(this::find);
+        return new DocumentStyleStore().read(document).flatMap(this::find);
     }
 
     Optional<CitationStyle> inferCslStyle(XTextDocument document) throws WrappedTargetException {
-        Optional<DocumentStateStore.State> stored = new DocumentStateStore().read(document);
+        Optional<DocumentStyleStore.State> stored = new DocumentStyleStore().read(document);
         if (stored.isPresent()) {
-            return stored.filter(state -> state.family() == DocumentStateStore.Family.CSL)
+            return stored.filter(state -> state.family() == DocumentStyleStore.Family.CSL)
                          .flatMap(state -> cslStyles.get().stream()
                                                     .filter(style -> state.styleId().equals(style.getPath()) || state.styleId().equals(style.getStyleId()))
                                                     .findFirst());
@@ -52,14 +52,14 @@ final class OpenOfficeStyleCatalog {
         return ZoteroDocumentPreferences.findCitationStyle(document, cslStyles.get());
     }
 
-    Optional<OOStyle> find(DocumentStateStore.State state) {
+    Optional<OOStyle> find(DocumentStyleStore.State state) {
         Stream<StyleOption> jStyles = jStyleLoader.getStyles().stream()
-                                                  .map(style -> new StyleOption(DocumentStateStore.Family.JSTYLE, style, Set.of(style.getPath())));
+                                                  .map(style -> new StyleOption(DocumentStyleStore.Family.JSTYLE, style, Set.of(style.getPath())));
         Stream<StyleOption> cslStyles = this.cslStyles.get().stream()
-                                                      .map(style -> new StyleOption(DocumentStateStore.Family.CSL, style,
+                                                      .map(style -> new StyleOption(DocumentStyleStore.Family.CSL, style,
                                                               Set.copyOf(List.of(style.getPath(), style.getStyleId()))));
         Stream<StyleOption> bstStyles = bstStyleLoader.getStyles().stream()
-                                                      .map(style -> new StyleOption(DocumentStateStore.Family.BST, style, Set.of(style.getPath())));
+                                                      .map(style -> new StyleOption(DocumentStyleStore.Family.BST, style, Set.of(style.getPath())));
         return Stream.of(jStyles, cslStyles, bstStyles).flatMap(stream -> stream)
                      .filter(option -> option.family() == state.family() && option.identifiers().contains(state.styleId()))
                      .map(StyleOption::style)
@@ -77,6 +77,6 @@ final class OpenOfficeStyleCatalog {
     }
 
     @NullMarked
-    private record StyleOption(DocumentStateStore.Family family, OOStyle style, Set<String> identifiers) {
+    private record StyleOption(DocumentStyleStore.Family family, OOStyle style, Set<String> identifiers) {
     }
 }
