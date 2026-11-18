@@ -203,7 +203,7 @@ class ZoteroCitationStrategyTest {
 
     @ParameterizedTest
     @MethodSource("unsupportedNativeNames")
-    // [utest->req~openoffice.zotero-modifier-compatibility~1]
+        // [utest->req~openoffice.zotero-modifier-compatibility~1]
     void readingNativeModifiersRetainsMetadataAndExistingGroupType(String name) throws Exception {
         when(ranges.names(document)).thenReturn(List.of(name));
         when(ranges.find(document, name, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));

@@ -195,7 +195,7 @@ class ConversionMetadataTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"locator", "label", "prefix", "suffix", "author-only", "suppress-author", "mixed-suppression"})
-    // [utest->req~openoffice.zotero-conversion-modifier-compatibility~1]
+        // [utest->req~openoffice.zotero-conversion-modifier-compatibility~1]
     void nativeModifiersSurviveMetadataRoundTripWithExistingGroupType(String modifier) throws Exception {
         JsonObject json = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(NATIVE)).getAsJsonObject();
         JsonObject first = json.getAsJsonArray("citationItems").get(0).getAsJsonObject();

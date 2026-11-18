@@ -238,7 +238,7 @@ class ZoteroWriterTest {
 
     @ParameterizedTest
     @MethodSource("nativeModifierUpdates")
-    // [utest->req~openoffice.zotero-modifier-compatibility~1]
+        // [utest->req~openoffice.zotero-modifier-compatibility~1]
     void ordinaryNativeModifiersAllowUpdatesAndPreserveMetadata(String operation, String location, String field, String expectedText) throws Exception {
         XTextDocument document = office.newDocument();
         document.getText().setString("New citation: .\n");
