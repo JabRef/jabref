@@ -182,7 +182,7 @@ class OpenOfficePanelTest {
         }
 
         @Test
-        // [utest->req~openoffice.preferences-shortcut~1]
+            // [utest->req~openoffice.preferences-shortcut~1]
         void settingsMenuOpensLibreOfficePreferencesWithoutAWriterConnection() throws ReflectiveOperationException {
             when(citationController.isDocumentConnectionMissing()).thenReturn(true);
             Button settings = button("settingsB");
@@ -192,7 +192,7 @@ class OpenOfficePanelTest {
             JavaFxExtension.invokeAndWait(() -> {
                 assertDoesNotThrow(() -> updateAvailability.invoke(panel));
                 assertFalse(settings.isDisabled());
-                try (MockedConstruction<PreferencesDialogView> views = mockConstruction(PreferencesDialogView.class, (view, context) ->
+                try (MockedConstruction<PreferencesDialogView> views = mockConstruction(PreferencesDialogView.class, (_, context) ->
                         assertEquals(List.of(OpenOfficeTab.class), context.arguments()))) {
                     MenuItem moreSettings = settings.getContextMenu().getItems().stream()
                                                     .filter(item -> lang("More settings").equals(item.getText())).findFirst().orElseThrow();

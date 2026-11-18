@@ -53,7 +53,7 @@ public final class ReferenceMarkTextWriter {
             return;
         }
         XPropertySet properties = UnoInterfaces.query(XPropertySet.class, cursor)
-                                         .orElseThrow(() -> new WriterOperationException("Cannot restore reference mark escapement"));
+                                               .orElseThrow(() -> new WriterOperationException("Cannot restore reference mark escapement"));
         try {
             properties.setPropertyValue("CharEscapement", superscript ? (short) 33 : (short) -10);
             properties.setPropertyValue("CharEscapementHeight", (byte) 58);

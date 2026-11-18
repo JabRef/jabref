@@ -26,7 +26,7 @@ public class NamedTextContentInserter {
             WriterOperationException {
 
         XMultiServiceFactory msf = UnoInterfaces.query(XMultiServiceFactory.class, placement.doc())
-                                          .orElseThrow(() -> new WriterOperationException("Document does not supply a service factory"));
+                                                .orElseThrow(() -> new WriterOperationException("Document does not supply a service factory"));
 
         Object xObject;
         try {
@@ -37,12 +37,12 @@ public class NamedTextContentInserter {
         }
 
         XNamed xNamed = UnoInterfaces.query(XNamed.class, xObject)
-                               .orElseThrow(() -> new WriterOperationException("Service is not an XNamed: " + service));
+                                     .orElseThrow(() -> new WriterOperationException("Service is not an XNamed: " + service));
         xNamed.setName(placement.name());
 
         // get XTextContent interface
         XTextContent xTextContent = UnoInterfaces.query(XTextContent.class, xObject)
-                                           .orElseThrow(() -> new WriterOperationException("Service is not an XTextContent: " + service));
+                                                 .orElseThrow(() -> new WriterOperationException("Service is not an XTextContent: " + service));
         placement.range().getText().insertTextContent(placement.range(), xTextContent, placement.absorb());
         return xNamed;
     }

@@ -97,8 +97,8 @@ class JStyleTest {
     }
 
     static String formatNumericMarkerWithPageInfo(JStyle style,
-                                            int minGroupingCount,
-                                            CitationMarkerNumericEntry... s) {
+                                                  int minGroupingCount,
+                                                  CitationMarkerNumericEntry... s) {
         List<CitationMarkerNumericEntry> input = Stream.of(s).collect(Collectors.toList());
         OOText res = style.formatNumericCitation(input, minGroupingCount);
         return res.toString();

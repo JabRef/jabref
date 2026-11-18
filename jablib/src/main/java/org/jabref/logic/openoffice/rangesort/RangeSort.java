@@ -27,7 +27,7 @@ public class RangeSort {
 
         HolderComparatorWithinPartition(XText text) {
             cmp = UnoInterfaces.query(XTextRangeCompare.class, text)
-                         .orElseThrow(IllegalArgumentException::new);
+                               .orElseThrow(IllegalArgumentException::new);
         }
 
         /// Assumes a and b belong to the same XText as cmp.

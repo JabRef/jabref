@@ -310,7 +310,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             return false;
         }
         XTextRangeCompare compare = UnoInterfaces.query(XTextRangeCompare.class, left.getText())
-                                           .orElseThrow(() -> new WriterDocumentAccessException("Cannot compare protected Zotero ranges"));
+                                                 .orElseThrow(() -> new WriterDocumentAccessException("Cannot compare protected Zotero ranges"));
         return compare.compareRegionStarts(left, right) == 0 && compare.compareRegionEnds(left, right) == 0;
     }
 
@@ -319,7 +319,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             return false;
         }
         XTextRangeCompare compare = UnoInterfaces.query(XTextRangeCompare.class, left.getText())
-                                           .orElseThrow(() -> new WriterDocumentAccessException("Cannot compare protected Zotero ranges"));
+                                                 .orElseThrow(() -> new WriterDocumentAccessException("Cannot compare protected Zotero ranges"));
         if (compare.compareRegionStarts(left, right) == 0 && compare.compareRegionEnds(left, right) == 0) {
             return true;
         }
