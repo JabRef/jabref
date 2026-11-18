@@ -219,11 +219,7 @@ public class GroupTreeNodeTest {
         root.subscribeToDescendantChanged(_ -> descendantChanges.incrementAndGet());
 
         child.setGroup(
-                new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT, ','),
-                true,
-                true,
-                entries);
-
+                new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT, ','));
         assertEquals(1, descendantChanges.get());
     }
 

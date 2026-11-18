@@ -75,7 +75,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
                                       List<BibEntry> entriesInDatabase) {
         AbstractGroup oldGroup = getGroup();
         groupProperty.set(newGroup);
-        notifyAboutDescendantChange(this);
 
         List<FieldChange> changes = new ArrayList<>();
         boolean shouldRemoveFromOldGroup = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);
@@ -93,6 +92,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
                 changes.addAll(entryChanger.add(entriesMatchedByOldGroup));
             }
         }
+        notifyAboutDescendantChange(this);
         return changes;
     }
 
