@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -203,20 +204,23 @@ public class BibDatabaseContext {
                                                     .map(this::getFileDirectoryPath)
                                                     .orElse(null);
 
-        Path bibOrMainFileDirectory;
-
-        // BIB file directory or Main file directory (according to (global) preferences)
-        if (preferences.shouldStoreFilesRelativeToBibFile()) {
-            bibOrMainFileDirectory = getDatabaseDirectory().orElse(null);
-        } else {
-            bibOrMainFileDirectory = preferences.getMainFileDirectory().orElse(null);
-        }
-
         return new FileDirectories(
                 userFileDirectory,
                 librarySpecificFileDirectory,
-                bibOrMainFileDirectory
+                getFallbackFileDirectory(preferences).orElse(null)
         );
+    }
+
+    /// Returns the fallback file directory, which comes after any user-specific and library-specific
+    /// directories in the lookup order.
+    ///
+    /// Depending on the file preferences, this is either the directory containing the `.bib`
+    /// file or the global main file directory. Library metadata is not read.
+    public Optional<Path> getFallbackFileDirectory(FilePreferences preferences) {
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
+            return getDatabaseDirectory();
+        }
+        return preferences.getMainFileDirectory();
     }
 
     public Optional<Path> getDatabaseDirectory() {
@@ -237,6 +241,20 @@ public class BibDatabaseContext {
         return getFileDirectories(preferences).stream()
                                               .filter(Files::exists)
                                               .findFirst();
+    }
+
+    /// Resolves a file directory as it is stored in the metadata of this library.
+    ///
+    /// A relative directory is resolved against the directory of the `.bib` file.
+    /// It stays relative if this library has not been saved yet.
+    /// An empty optional is returned if the directory is not a valid path.
+    public Optional<Path> resolveFileDirectory(String directory) {
+        try {
+            return Optional.of(getFileDirectoryPath(directory));
+        } catch (InvalidPathException e) {
+            LOGGER.debug("Invalid file directory {}", directory, e);
+            return Optional.empty();
+        }
     }
 
     /// @return The absolute path for the given directory

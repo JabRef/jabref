@@ -21,7 +21,6 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -104,6 +103,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String BIND_NAMES = "bindNames";
     public static final String BINDINGS = "bindings";
     public static final String MACOS_KEY_BINDING_DEFAULTS_MIGRATED = "macOSKeyBindingDefaultsMigrated";
+    public static final String MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED = "macOSTextEditingKeyBindingDefaultsMigrated";
     // endregion
 
     // region column names
@@ -1464,16 +1464,5 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         });
 
         return keyBindingRepository;
-    }
-
-    /// In GUI mode, we can look up the directory better
-    @Override
-    protected Path getDefaultPath() {
-        return NativeDesktop.get().getDefaultFileChooserDirectory();
-    }
-
-    @Override
-    protected boolean moveToTrashSupported() {
-        return NativeDesktop.get().moveToTrashSupported();
     }
 }
