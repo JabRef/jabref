@@ -172,106 +172,200 @@ public final class PreviewHtmlProcessor {
 
     private static Optional<Character> toSuperscriptChar(char c) {
         Character sup = switch (c) {
-            case '0' -> '⁰';
-            case '1' -> '¹';
-            case '2' -> '²';
-            case '3' -> '³';
-            case '4' -> '⁴';
-            case '5' -> '⁵';
-            case '6' -> '⁶';
-            case '7' -> '⁷';
-            case '8' -> '⁸';
-            case '9' -> '⁹';
-            case '+' -> '⁺';
-            case '-' -> '⁻';
-            case '=' -> '⁼';
-            case '(' -> '⁽';
-            case ')' -> '⁾';
-            case 'a' -> 'ᵃ';
-            case 'b' -> 'ᵇ';
-            case 'c' -> 'ᶜ';
-            case 'd' -> 'ᵈ';
-            case 'e' -> 'ᵉ';
-            case 'f' -> 'ᶠ';
-            case 'g' -> 'ᵍ';
-            case 'h' -> 'ʰ';
-            case 'i' -> 'ⁱ';
-            case 'j' -> 'ʲ';
-            case 'k' -> 'ᵏ';
-            case 'l' -> 'ˡ';
-            case 'm' -> 'ᵐ';
-            case 'n' -> 'ⁿ';
-            case 'o' -> 'ᵒ';
-            case 'p' -> 'ᵖ';
-            case 'r' -> 'ʳ';
-            case 's' -> 'ˢ';
-            case 't' -> 'ᵗ';
-            case 'u' -> 'ᵘ';
-            case 'v' -> 'ᵛ';
-            case 'w' -> 'ʷ';
-            case 'x' -> 'ˣ';
-            case 'y' -> 'ʸ';
-            case 'z' -> 'ᶻ';
-            case 'A' -> 'ᴬ';
-            case 'B' -> 'ᴮ';
-            case 'D' -> 'ᴰ';
-            case 'E' -> 'ᴱ';
-            case 'G' -> 'ᴳ';
-            case 'H' -> 'ᴴ';
-            case 'I' -> 'ᴵ';
-            case 'J' -> 'ᴶ';
-            case 'K' -> 'ᴷ';
-            case 'L' -> 'ᴸ';
-            case 'M' -> 'ᴹ';
-            case 'N' -> 'ᴺ';
-            case 'O' -> 'ᴼ';
-            case 'P' -> 'ᴾ';
-            case 'R' -> 'ᴿ';
-            case 'T' -> 'ᵀ';
-            case 'U' -> 'ᵁ';
-            case 'W' -> 'ᵂ';
-            case ' ' -> ' ';
-            default -> null;
+            case '0' ->
+                    '⁰';
+            case '1' ->
+                    '¹';
+            case '2' ->
+                    '²';
+            case '3' ->
+                    '³';
+            case '4' ->
+                    '⁴';
+            case '5' ->
+                    '⁵';
+            case '6' ->
+                    '⁶';
+            case '7' ->
+                    '⁷';
+            case '8' ->
+                    '⁸';
+            case '9' ->
+                    '⁹';
+            case '+' ->
+                    '⁺';
+            case '-' ->
+                    '⁻';
+            case '=' ->
+                    '⁼';
+            case '(' ->
+                    '⁽';
+            case ')' ->
+                    '⁾';
+            case 'a' ->
+                    'ᵃ';
+            case 'b' ->
+                    'ᵇ';
+            case 'c' ->
+                    'ᶜ';
+            case 'd' ->
+                    'ᵈ';
+            case 'e' ->
+                    'ᵉ';
+            case 'f' ->
+                    'ᶠ';
+            case 'g' ->
+                    'ᵍ';
+            case 'h' ->
+                    'ʰ';
+            case 'i' ->
+                    'ⁱ';
+            case 'j' ->
+                    'ʲ';
+            case 'k' ->
+                    'ᵏ';
+            case 'l' ->
+                    'ˡ';
+            case 'm' ->
+                    'ᵐ';
+            case 'n' ->
+                    'ⁿ';
+            case 'o' ->
+                    'ᵒ';
+            case 'p' ->
+                    'ᵖ';
+            case 'r' ->
+                    'ʳ';
+            case 's' ->
+                    'ˢ';
+            case 't' ->
+                    'ᵗ';
+            case 'u' ->
+                    'ᵘ';
+            case 'v' ->
+                    'ᵛ';
+            case 'w' ->
+                    'ʷ';
+            case 'x' ->
+                    'ˣ';
+            case 'y' ->
+                    'ʸ';
+            case 'z' ->
+                    'ᶻ';
+            case 'A' ->
+                    'ᴬ';
+            case 'B' ->
+                    'ᴮ';
+            case 'D' ->
+                    'ᴰ';
+            case 'E' ->
+                    'ᴱ';
+            case 'G' ->
+                    'ᴳ';
+            case 'H' ->
+                    'ᴴ';
+            case 'I' ->
+                    'ᴵ';
+            case 'J' ->
+                    'ᴶ';
+            case 'K' ->
+                    'ᴷ';
+            case 'L' ->
+                    'ᴸ';
+            case 'M' ->
+                    'ᴹ';
+            case 'N' ->
+                    'ᴺ';
+            case 'O' ->
+                    'ᴼ';
+            case 'P' ->
+                    'ᴾ';
+            case 'R' ->
+                    'ᴿ';
+            case 'T' ->
+                    'ᵀ';
+            case 'U' ->
+                    'ᵁ';
+            case 'W' ->
+                    'ᵂ';
+            case ' ' ->
+                    ' ';
+            default ->
+                    null;
         };
         return Optional.ofNullable(sup);
     }
 
     private static Optional<Character> toSubscriptChar(char c) {
         Character sub = switch (c) {
-            case '0' -> '₀';
-            case '1' -> '₁';
-            case '2' -> '₂';
-            case '3' -> '₃';
-            case '4' -> '₄';
-            case '5' -> '₅';
-            case '6' -> '₆';
-            case '7' -> '₇';
-            case '8' -> '₈';
-            case '9' -> '₉';
-            case '+' -> '₊';
-            case '-' -> '₋';
-            case '=' -> '₌';
-            case '(' -> '₍';
-            case ')' -> '₎';
-            case 'a' -> 'ₐ';
-            case 'e' -> 'ₑ';
-            case 'h' -> 'ₕ';
-            case 'i' -> 'ᵢ';
-            case 'j' -> 'ⱼ';
-            case 'k' -> 'ₖ';
-            case 'l' -> 'ₗ';
-            case 'm' -> 'ₘ';
-            case 'n' -> 'ₙ';
-            case 'o' -> 'ₒ';
-            case 'p' -> 'ₚ';
-            case 'r' -> 'ᵣ';
-            case 's' -> 'ₛ';
-            case 't' -> 'ₜ';
-            case 'u' -> 'ᵤ';
-            case 'v' -> 'ᵥ';
-            case 'x' -> 'ₓ';
-            case ' ' -> ' ';
-            default -> null;
+            case '0' ->
+                    '₀';
+            case '1' ->
+                    '₁';
+            case '2' ->
+                    '₂';
+            case '3' ->
+                    '₃';
+            case '4' ->
+                    '₄';
+            case '5' ->
+                    '₅';
+            case '6' ->
+                    '₆';
+            case '7' ->
+                    '₇';
+            case '8' ->
+                    '₈';
+            case '9' ->
+                    '₉';
+            case '+' ->
+                    '₊';
+            case '-' ->
+                    '₋';
+            case '=' ->
+                    '₌';
+            case '(' ->
+                    '₍';
+            case ')' ->
+                    '₎';
+            case 'a' ->
+                    'ₐ';
+            case 'e' ->
+                    'ₑ';
+            case 'h' ->
+                    'ₕ';
+            case 'i' ->
+                    'ᵢ';
+            case 'j' ->
+                    'ⱼ';
+            case 'k' ->
+                    'ₖ';
+            case 'l' ->
+                    'ₗ';
+            case 'm' ->
+                    'ₘ';
+            case 'n' ->
+                    'ₙ';
+            case 'o' ->
+                    'ₒ';
+            case 'p' ->
+                    'ₚ';
+            case 'r' ->
+                    'ᵣ';
+            case 's' ->
+                    'ₛ';
+            case 't' ->
+                    'ₜ';
+            case 'u' ->
+                    'ᵤ';
+            case 'v' ->
+                    'ᵥ';
+            case 'x' ->
+                    'ₓ';
+            case ' ' ->
+                    ' ';
+            default ->
+                    null;
         };
         return Optional.ofNullable(sub);
     }
@@ -315,13 +409,20 @@ public final class PreviewHtmlProcessor {
                 return OptionalDouble.of((percent / 100.0) * 16.0);
             }
             return switch (trimmed) {
-                case "xx-small" -> OptionalDouble.of(9.0);
-                case "x-small" -> OptionalDouble.of(10.0);
-                case "small" -> OptionalDouble.of(13.0);
-                case "medium" -> OptionalDouble.of(16.0);
-                case "large" -> OptionalDouble.of(18.0);
-                case "x-large" -> OptionalDouble.of(24.0);
-                case "xx-large" -> OptionalDouble.of(32.0);
+                case "xx-small" ->
+                        OptionalDouble.of(9.0);
+                case "x-small" ->
+                        OptionalDouble.of(10.0);
+                case "small" ->
+                        OptionalDouble.of(13.0);
+                case "medium" ->
+                        OptionalDouble.of(16.0);
+                case "large" ->
+                        OptionalDouble.of(18.0);
+                case "x-large" ->
+                        OptionalDouble.of(24.0);
+                case "xx-large" ->
+                        OptionalDouble.of(32.0);
                 default -> {
                     double raw = Double.parseDouble(trimmed);
                     yield OptionalDouble.of(raw);
@@ -336,14 +437,22 @@ public final class PreviewHtmlProcessor {
         try {
             int size = Integer.parseInt(sizeAttr.trim());
             return switch (size) {
-                case 1 -> OptionalDouble.of(10.0);
-                case 2 -> OptionalDouble.of(13.0);
-                case 3 -> OptionalDouble.of(16.0);
-                case 4 -> OptionalDouble.of(18.0);
-                case 5 -> OptionalDouble.of(24.0);
-                case 6 -> OptionalDouble.of(32.0);
-                case 7 -> OptionalDouble.of(48.0);
-                default -> OptionalDouble.empty();
+                case 1 ->
+                        OptionalDouble.of(10.0);
+                case 2 ->
+                        OptionalDouble.of(13.0);
+                case 3 ->
+                        OptionalDouble.of(16.0);
+                case 4 ->
+                        OptionalDouble.of(18.0);
+                case 5 ->
+                        OptionalDouble.of(24.0);
+                case 6 ->
+                        OptionalDouble.of(32.0);
+                case 7 ->
+                        OptionalDouble.of(48.0);
+                default ->
+                        OptionalDouble.empty();
             };
         } catch (NumberFormatException e) {
             return OptionalDouble.empty();
