@@ -154,16 +154,16 @@ class ZoteroCitationStrategyTest {
     }
 
     @Test
-    void nativeCapabilitiesDoNotExposeCanonicalPartialCitationApproximations() {
+    void nativeCapabilitiesExposeOnlyNormalAndInTextInsertion() {
         when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
         try (CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
-            assertEquals(List.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT),
+            assertEquals(List.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT),
                     engine.capabilities(style()).supportedTypes().stream().sorted().toList());
         }
     }
 
     @ParameterizedTest
-    @EnumSource(value = CitationType.class, names = {"AUTHOR_ONLY", "YEAR_ONLY", "AUTHORYEAR_NOPAR"})
+    @EnumSource(value = CitationType.class, names = {"AUTHOR_ONLY", "YEAR_ONLY", "AUTHORYEAR_NOPAR", "INVISIBLE_CIT"})
     void unsupportedTypesAreNotSilentlyReinterpreted(CitationType type) {
         OOResult<List<String>, JabRefException> result = strategy().insert(List.of(entry("a", "A")), List.of(), style(), type, "", cursor, false);
 
@@ -327,7 +327,7 @@ class ZoteroCitationStrategyTest {
     }
 
     @Test
-    void emptyZoteroCitationStaysEmptyAfterFreshStrategyAndRead() throws Exception {
+    void blankNativeCitationUsesItsJsonTypeInsteadOfAnInvisibleTextHeuristic() throws Exception {
         when(ranges.names(document)).thenReturn(List.of(ZOTERO));
         when(cursor.getString()).thenReturn("\u200b\u200b");
         CitationStyle style = style();
@@ -340,7 +340,8 @@ class ZoteroCitationStrategyTest {
             assertEquals(List.of(), strategy().refresh(List.of(database), style).get());
             assertEquals(List.of(), strategy().refresh(List.of(database), style).get());
 
-            writer.verify(() -> OOTextWriter.write(document, cursor, OOText.fromString("")), times(2));
+            writer.verify(() -> OOTextWriter.write(document, cursor, OOText.fromString("<span lang=\"zxx\">[1]</span>")), times(2));
+            assertEquals(CitationType.AUTHORYEAR_PAR, strategy().read().getFirst().group().citationType);
         }
     }
 

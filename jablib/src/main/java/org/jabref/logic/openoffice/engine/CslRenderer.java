@@ -64,9 +64,9 @@ public final class CslRenderer implements CitationRenderer {
         return render(request, capabilities());
     }
 
-    /// Keeps native Zotero's existing three-type rendering separate from JabRef's partial-citation approximations.
+    /// Native Zotero rendering uses normal or in-text citations; other canonical types remain recoverable through conversion metadata.
     RenderResult renderNative(RenderRequest request) throws RenderException {
-        return render(request, new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT),
+        return render(request, new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT),
                 style.hasBibliography(), false, false));
     }
 

@@ -165,7 +165,9 @@ With Zotero compatibility mode disabled, CSL also supports the existing author-o
 Author-only uses short author names, then editor names, then the citation key; year-only uses the resolved year, then a parsed date year, then the citation key.
 Multiple entries retain storage order and repetitions and are joined with semicolons.
 These are style-independent approximations: explicit year suffixes survive, but CSL-specific name formatting and processor-generated disambiguation suffixes are not reproduced, and year-only is not general native author suppression.
-Page information and the unsupported no-parentheses choice remain disabled for CSL, while native Zotero mode keeps its original three-type rendering and does not expose these partial-citation choices.
+Page information and the unsupported no-parentheses choice remain disabled for CSL, while native Zotero insertion supports only normal (`AUTHORYEAR_PAR`) and narrative (`AUTHORYEAR_INTEXT`) citations and does not expose invisible or partial-citation choices.
+Native JSON determines the normal or narrative type; empty or zero-width mark text does not imply invisibility.
+Canonical JabRef invisible citations remain unchanged.
 
 A render pass considers the entire cited set rather than storing a number beside each key.
 Numeric CSL styles use citeproc's cluster updates and bibliography order rather than patching digits in existing text.
@@ -213,7 +215,8 @@ Invalid metadata, unresolved sources, unsuitable properties, protected ranges, a
 
 `ConversionMetadata` stores a document-local citation sidecar under `JabRef_citation_conversion:<uid>`.
 It preserves the canonical uid, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, including URI links, opaque identifiers, and harmless unknown metadata, while the association remains valid through conversion and save/reopen.
-Previously stored canonical partial types and page information survive but are not rendered in Zotero mode.
+Canonical `EMPTY` and canonical-only partial types use the normal visible citation fallback in Zotero mode; page information remains stored but is not rendered.
+Converting back restores the canonical uid, storage-order keys, stored type, and page information from the sidecar, including invisible rendering for `EMPTY`.
 Native modifiers do not introduce a rejection in format conversion, insertion, or refresh.
 These operations retain the existing rendering behavior: visible locators and affixes can disappear when citations are regenerated, author-only is ignored, and any item with `suppress-author: true` selects group-level in-text/narrative rendering, including mixed groups.
 Native JSON remains in native marks or the conversion sidecar, which restores the original modifiers when converting back; retaining metadata is not full modifier rendering support.

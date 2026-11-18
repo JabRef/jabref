@@ -59,9 +59,9 @@ These tests do not replace the pure renderer/parity tests or the separate 300-ci
 
 - A unique native duplicate gains a JabRef URI without losing the native URI, JSON metadata, mark text, or citation identity; later insertion reuses that native URI.
 - Ambiguous duplicate candidates remain unlinked and export as unresolved rather than selecting an arbitrary library entry.
-- Normal, in-text, and empty marks remain independent through refresh, fresh engine connections, export, and save/reopen; empty marks stay invisible and included in the bibliography.
+- Normal and in-text marks remain independent through refresh, fresh engine connections, export, and save/reopen; native JSON determines the type, not empty or zero-width mark text.
 - Zotero-mode refresh leaves canonical and legacy CID/JStyle marks, `JR_bib`, and JabRef-specific document properties untouched.
-- Non-CSL styles, unsupported partial citation types, page info, and group edits are rejected without changing document contents.
+- Non-CSL styles, invisible and partial citation types, page info, and group edits are rejected for native insertion or editing without changing document contents.
 
 The tests parse the stored Zotero JSON to assert URI arrays, suppress-author flags, metadata, and stable names instead of treating successful rendering alone as sufficient.
 
@@ -94,6 +94,9 @@ It requires each of the following unit-suite reports and minimum invocation coun
 The real-Pandoc `BstPipelineTest` needs Pandoc on `PATH`.
 Every OpenOffice unit report is checked for skips, errors, and failures, not only these eight named suites.
 The tagged Writer task additionally requires at least 48 invocations from `CitationFormatConversionWriterTest` for current canonical/native citation conversion.
+Conversion preserves canonical identities, storage-order keys, all six types, and every page-info slot in the document sidecar through save/reopen.
+In Zotero mode, converted `EMPTY` and canonical-only partial types use the normal visible citation fallback; converting back restores the canonical state, including invisible rendering for `EMPTY`.
+Canonical JabRef invisible citations remain unchanged.
 These are separate required reports, so discovering unrelated tagged tests cannot mask a missing engine, Zotero, entity-contract, storage, or conversion suite.
 
 ## Isolation and CI enforcement

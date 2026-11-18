@@ -329,17 +329,20 @@ class OpenOfficePanelTest {
         }
 
         @Test
-        void citeSpecialButtonRemainsDisabledForNativeCapabilities() throws ReflectiveOperationException {
+        void citeSpecialAndEmptyButtonsRemainDisabledForNativeCapabilities() throws ReflectiveOperationException {
             when(preferences.getCurrentStyle()).thenReturn(selectedStyle);
             when(citationController.capabilities(selectedStyle)).thenReturn(new StyleCapabilities(
-                    Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT), true, false, false));
+                    Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT), true, false, false));
             Button selectDocument = button("selectDocument");
             Button citeSpecial = button("citeSpecial");
+            Button citeEmpty = button("citeEmpty");
 
             JavaFxExtension.invokeAndWait(() -> {
                 selectDocument.fire();
                 assertTrue(citeSpecial.isDisabled());
+                assertTrue(citeEmpty.isDisabled());
                 citeSpecial.fire();
+                citeEmpty.fire();
             });
 
             verify(dialogs, never()).showCustomDialogAndWait(any(CiteSpecialDialogView.class));

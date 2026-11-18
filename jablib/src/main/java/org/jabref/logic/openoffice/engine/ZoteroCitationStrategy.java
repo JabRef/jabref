@@ -362,13 +362,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             ZoteroReferenceMark mark = parsed.orElseThrow();
             WriterReferenceMark range = ranges.find(document, name, BoundaryPolicy.TEMPORARY).orElseThrow(() -> new WriterDocumentAccessException("Missing Zotero citation range"));
             XTextRange anchor = range.getMarkRange(document).orElseThrow(() -> new WriterDocumentAccessException("Missing Zotero citation anchor"));
-            String content = range.getRawCursor(document).orElseThrow(() -> new WriterDocumentAccessException("Missing Zotero citation cursor")).getString();
-            // Zotero's JSON model has normal and suppress-author types only. Preserve empty citations
-            // through their empty content, including the invisible boundary characters Writer needs.
-            CitationType type = content.codePoints().allMatch(character -> character == 0x200B)
-                                ? CitationType.INVISIBLE_CIT
-                                : mark.citationType() == CitationType.AUTHORYEAR_INTEXT ? CitationType.AUTHORYEAR_INTEXT : CitationType.AUTHORYEAR_PAR;
-            result.add(new StoredCitation(mark, group(name, mark.citationKeys(), type), anchor, Optional.of(range), name));
+            result.add(new StoredCitation(mark, group(name, mark.citationKeys(), mark.citationType()), anchor, Optional.of(range), name));
         }
         return result;
     }
@@ -492,8 +486,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     static CitationType requireType(CitationType type) throws StrategyException {
         return switch (type) {
             case AUTHORYEAR_PAR,
-                 AUTHORYEAR_INTEXT,
-                 INVISIBLE_CIT ->
+                 AUTHORYEAR_INTEXT ->
                     type;
             default ->
                     throw new StrategyException(Reason.UNSUPPORTED_TYPE, "Zotero mode does not support this citation type", Localization.lang("Cannot generate citation based on selected citation style."));

@@ -233,20 +233,20 @@ class CslRendererTest {
     }
 
     @Test
-    void nativeRenderingApproximatesPartialModesWithNormalCitations() throws RenderException {
+    void nativeRenderingApproximatesCanonicalOnlyModesWithNormalCitations() throws RenderException {
         RenderRequest request = request(List.of(group("author", CitationType.AUTHOR_ONLY, "a"), group("year", CitationType.YEAR_ONLY, "b"),
                         group("nopar", CitationType.AUTHORYEAR_NOPAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "b"),
                         group("invisible", CitationType.INVISIBLE_CIT, "c"), group("normal", CitationType.AUTHORYEAR_PAR, "c")),
                 List.of(entry("a", "A"), entry("b", "B"), entry("c", "C")));
 
-        assertEquals(List.of("[1]", "[2]", "[1]", "Smith [2]", "", "[3]"), markers(request, renderer(false, false).renderNative(request)));
+        assertEquals(List.of("[1]", "[2]", "[1]", "Smith [2]", "[3]", "[3]"), markers(request, renderer(false, false).renderNative(request)));
     }
 
     @ParameterizedTest
     @MethodSource("partialStyles")
-    void nativeRenderingMatchesCanonicalRenderingForOriginalTypes(CitationStyle style) throws RenderException {
+    void nativeRenderingMatchesCanonicalRenderingForSupportedTypes(CitationStyle style) throws RenderException {
         RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "a"),
-                group("invisible", CitationType.INVISIBLE_CIT, "b")), List.of(entry("a", "A"), entry("b", "B")));
+                group("other", CitationType.AUTHORYEAR_PAR, "b")), List.of(entry("a", "A"), entry("b", "B")));
         CslRenderer renderer = new CslRenderer(style, entryTypesManager);
 
         assertEquals(renderer.render(request), renderer.renderNative(request));

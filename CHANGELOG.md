@@ -45,7 +45,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added author-only and year-only approximations for CSL citations through "Cite special" outside Zotero mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added "More settings" to the Writer panel's Settings menu, opening OpenOffice/LibreOffice preferences. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added restoration of each Writer document's last-applied JStyle, CSL, or BST style when connecting. [#17673](https://github.com/JabRef/jabref/pull/17673)
-- We added "Insert empty citation" in Zotero compatibility mode, retaining invisible citations through refresh and reopening. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added Writer citation refresh for CSL styles without bibliographies. [#17673](https://github.com/JabRef/jabref/pull/17673)
 
 ### Changed

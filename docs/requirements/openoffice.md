@@ -42,7 +42,8 @@ Global disconnects, lost ownership, and failed rollbacks produce a distinct reco
 Ordinary updates retain raw style-property setters outside the conversion-specific undo contract.
 
 A persistent per-document citation sidecar preserves canonical uids, storage-order keys, all six stored citation types, every page-info slot, and supported native Zotero citation JSON, identifiers, URIs, and harmless unknown metadata across conversion and save/reopen.
-Previously stored canonical partial-citation types and page information remain stored but are not rendered in Zotero mode.
+Canonical `EMPTY` and canonical-only partial types render as normal visible citations in Zotero mode; page information remains stored but is not rendered.
+Converting back restores the canonical uid, storage-order keys, stored type, and every page-info slot from the sidecar, including invisible rendering for `EMPTY`.
 Native modifiers do not block conversion; their JSON remains in the citation sidecar and is restored when converting back to native format.
 Conversion retains the existing group-level citation-type mapping rather than adding full native modifier rendering.
 An externally edited native mark still associated through its `citationID` or reference-mark suffix causes conversion to fail rather than restore stale canonical state.
@@ -59,6 +60,8 @@ Needs: impl, utest
 
 Ordinary native insertion and refresh must not introduce a rejection solely because existing citations contain locators, labels, prefixes, suffixes, author-only items, or mixed per-item author suppression.
 These operations retain the existing rendering behavior: modifiers remain in native JSON, but locators and affixes are not rendered, author-only is not implemented, and any author suppression selects JabRef's group-level narrative rendering.
+Native insertion supports only normal and narrative citations; native JSON determines the type, not empty or zero-width mark text.
+Canonical JabRef invisible citations remain unchanged.
 This is compatibility with existing behavior, not complete support for native Zotero modifier semantics.
 Format conversion follows the same compatibility policy.
 

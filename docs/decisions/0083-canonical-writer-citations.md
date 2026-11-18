@@ -84,7 +84,10 @@ Invalid metadata, unresolved sources, unsuitable properties, protected ranges, a
 
 `ConversionMetadata` persists the citation-only sidecar under `JabRef_citation_conversion:<uid>`.
 It preserves canonical uids, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, URI links, opaque identifiers, and harmless unknown metadata through conversion and save/reopen while the association remains valid.
-Canonical partial types and page information survive but are not rendered in Zotero mode.
+Canonical `EMPTY` and canonical-only partial types use the normal visible citation fallback in Zotero mode; page information remains stored but is not rendered.
+Converting back restores the canonical uid, storage-order keys, stored type, and every page-info slot from the sidecar, including invisible rendering for `EMPTY`.
+Native insertion supports only normal and narrative citations; native JSON determines the type, not empty or zero-width mark text.
+Canonical JabRef invisible citations remain unchanged.
 Native modifiers do not block conversion; any item with `suppress-author: true` maps its group to the existing JabRef in-text citation type, including mixed groups.
 The sidecar retains native modifier JSON for restoration on conversion back, but the renderer does not gain locator, affix, or author-only support.
 Opaque native JSON may include Zotero display properties; preserving those fields does not make the sidecar a rendering or numbering cache.

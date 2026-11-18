@@ -79,7 +79,7 @@ class CiteSpecialDialogViewTest {
     void nativeCapabilitiesDisablePartialOptionsAndIgnoreTheirPreferences(CitationType preferredType) {
         JavaFxExtension.invokeAndWait(() -> {
             StyleCapabilities nativeCapabilities = new StyleCapabilities(
-                    Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT), true, false, false);
+                    Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT), true, false, false);
             CiteSpecialDialogView dialog = new CiteSpecialDialogView(preferredType, nativeCapabilities);
 
             assertTrue(citationOption(dialog, CitationType.AUTHOR_ONLY).isDisabled());

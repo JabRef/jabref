@@ -170,42 +170,75 @@ class CitationFormatConversionWriterTest {
     void allCanonicalTypesGroupUidKeyOrderAndPageSlotsSurviveBothConversionsAndSaveReopen() throws Exception {
         XTextDocument document = office.newDocument();
         MarkStore store = new MarkStore();
+        Map<CitationType, String> canonicalNames = new LinkedHashMap<>();
         Map<String, List<Optional<String>>> expected = new LinkedHashMap<>();
         for (CitationType type : CitationType.values()) {
             XTextCursor end = separatedEnd(document);
             CitationGroup group = store.createCitationGroup(document, office.context(), List.of("beta", "alpha"),
                     List.of(Optional.of(OOText.fromString("<b>p. 4</b>")), Optional.of(OOText.fromString("pp. 7–9"))),
                     type, end, false, false, "stable_" + type.name());
-            expected.put(group.getReferenceMarkNameForLinking().orElseThrow(), List.of(Optional.of("<b>p. 4</b>"), Optional.of("pp. 7–9")));
+            String name = group.getReferenceMarkNameForLinking().orElseThrow();
+            canonicalNames.put(type, name);
+            expected.put(name, List.of(Optional.of("<b>p. 4</b>"), Optional.of("pp. 7–9")));
         }
+        String emptyName = Optional.ofNullable(canonicalNames.get(CitationType.INVISIBLE_CIT)).orElseThrow();
+        assertEquals("\u200b\u200b", WriterReferenceMarks.getAnchor(document, emptyName).orElseThrow().getString());
         try (CitationEngine engine = engine(document, preferences(true))) {
             insert(engine, document, "alpha", false);
         }
         assertEquals(List.of(), bibliographyNames(document));
+        Map<String, String> snapshots = conversionSnapshots(document);
+        assertEquals(expected.size(), snapshots.size());
         Map<CitationType, String> nativeText = new LinkedHashMap<>();
-        for (String value : conversionSnapshots(document).values()) {
-            JsonObject metadata = JsonParser.parseString(value).getAsJsonObject();
-            CitationType originalType = JabRefMarkCodec.decode(metadata.get("canonicalName").getAsString()).citationType();
-            nativeText.put(originalType, WriterReferenceMarks.getAnchor(document, metadata.get("zoteroName").getAsString()).orElseThrow().getString());
+        for (Map.Entry<String, String> snapshot : snapshots.entrySet()) {
+            JsonObject metadata = JsonParser.parseString(snapshot.getValue()).getAsJsonObject();
+            String canonicalName = metadata.get("canonicalName").getAsString();
+            JabRefMarkData original = JabRefMarkCodec.decode(canonicalName);
+            assertEquals(canonicalNames.get(original.citationType()), canonicalName);
+            assertEquals("JabRef_citation_conversion:" + original.uniqueId(), snapshot.getKey());
+            assertEquals(Optional.ofNullable(expected.get(canonicalName)).orElseThrow().stream().map(page -> page.orElseThrow()).toList(),
+                    metadata.getAsJsonArray("pageInfos").asList().stream().map(page -> page.getAsString()).toList());
+            String zoteroName = metadata.get("zoteroName").getAsString();
+            ZoteroReferenceMark nativeMark = ZoteroReferenceMark.parse(zoteroName).orElseThrow();
+            assertEquals(List.of("beta", "alpha"), nativeMark.citationKeys());
+            assertEquals(original.citationType() == CitationType.AUTHORYEAR_INTEXT ? CitationType.AUTHORYEAR_INTEXT : CitationType.AUTHORYEAR_PAR,
+                    nativeMark.citationType());
+            nativeText.put(original.citationType(), WriterReferenceMarks.getAnchor(document, zoteroName).orElseThrow().getString());
         }
-        assertEquals(List.of(nativeText.get(CitationType.AUTHORYEAR_PAR), nativeText.get(CitationType.AUTHORYEAR_PAR)),
-                List.of(nativeText.get(CitationType.AUTHOR_ONLY), nativeText.get(CitationType.YEAR_ONLY)));
+        assertEquals(canonicalNames.keySet(), nativeText.keySet());
+        String normalNativeText = Optional.ofNullable(nativeText.get(CitationType.AUTHORYEAR_PAR)).orElseThrow();
+        assertFalse(normalNativeText.replace("\u200b", "").isBlank());
+        assertEquals(List.of(normalNativeText, normalNativeText, normalNativeText),
+                List.of(nativeText.get(CitationType.AUTHOR_ONLY), nativeText.get(CitationType.YEAR_ONLY), nativeText.get(CitationType.INVISIBLE_CIT)));
+        Map<String, String> nativeMarks = snapshot(document).marks();
         XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("types-in-zotero.odt"));
+        assertEquals(nativeMarks, snapshot(reopened).marks());
+        assertEquals(snapshots, conversionSnapshots(reopened));
         try (CitationEngine engine = engine(reopened, preferences(false))) {
             assertTrue(success(engine.requiresFormatConversion(style())));
             insert(engine, reopened, "beta", false);
         }
+        assertEquals("\u200b\u200b", WriterReferenceMarks.getAnchor(reopened, emptyName).orElseThrow().getString());
+        Map<String, String> restoredSnapshots = conversionSnapshots(reopened);
+        XTextDocument canonical = office.saveAndReload(reopened, temporaryDirectory.resolve("types-back-in-canonical.odt"));
+        assertEquals(restoredSnapshots, conversionSnapshots(canonical));
         MarkStore restored = new MarkStore();
         for (Map.Entry<String, List<Optional<String>>> entry : expected.entrySet()) {
-            CitationGroup group = restored.readCitationGroupFromDocumentOrThrow(reopened, entry.getKey());
+            CitationGroup group = restored.readCitationGroupFromDocumentOrThrow(canonical, entry.getKey());
+            JabRefMarkData original = JabRefMarkCodec.decode(entry.getKey());
+            assertEquals(original.citationType(), group.citationType);
+            assertEquals(original.uniqueId(), group.groupId.citationGroupIdAsString());
+            assertEquals(Optional.of(entry.getKey()), group.getReferenceMarkNameForLinking());
             assertEquals(List.of("beta", "alpha"), group.citationsInStorageOrder.stream().map(citation -> citation.citationKey).toList());
             assertEquals(entry.getValue(), group.citationsInStorageOrder.stream().map(citation -> citation.getPageInfo().map(text -> text.toString())).toList());
-            if (group.citationType.isPartial()) {
+            if (group.citationType == CitationType.INVISIBLE_CIT) {
+                assertEquals("\u200b\u200b", WriterReferenceMarks.getAnchor(canonical, entry.getKey()).orElseThrow().getString());
+            } else if (group.citationType.isPartial()) {
                 String expectedText = group.citationType == CitationType.AUTHOR_ONLY ? "Beta; Alpha" : "2021; 2020";
-                assertEquals("\u200b" + expectedText + "\u200b", WriterReferenceMarks.getAnchor(reopened, entry.getKey()).orElseThrow().getString());
+                assertEquals("\u200b" + expectedText + "\u200b", WriterReferenceMarks.getAnchor(canonical, entry.getKey()).orElseThrow().getString());
             }
         }
-        assertEquals(List.of(), bibliographyNames(reopened));
+        assertEquals(List.of(), bibliographyNames(canonical));
     }
 
     @Test
