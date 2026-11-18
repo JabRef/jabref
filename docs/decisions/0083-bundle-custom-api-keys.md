@@ -8,13 +8,6 @@ parent: Decision Records
 
 Needs: impl
 
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
-
 ## Context and Problem Statement
 
 macOS grants application access separately for each keychain item.
