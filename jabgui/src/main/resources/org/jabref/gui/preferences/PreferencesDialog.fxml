@@ -27,7 +27,6 @@
                     </VBox.margin>
                 </CustomTextField>
                 <ListView fx:id="preferencesTabList" styleClass="preferences-tab-list" VBox.vgrow="ALWAYS"/>
-                <VBox prefHeight="10.0" VBox.vgrow="SOMETIMES"/>
                 <HBox alignment="BOTTOM_LEFT" spacing="3.0">
                     <padding>
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
