@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,6 +25,9 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader.ImportResult;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.openoffice.ZoteroReferenceMark;
+import org.jabref.logic.openoffice.action.ImportCited;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.undo.JabRefUndoManager;
@@ -33,13 +37,19 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -50,10 +60,29 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
+
+    private static final String NATIVE_ZOTERO_REFERENCE_MARK = ZoteroReferenceMark.PREFIX + """
+            {
+              "citationItems": [{
+                "id": 587,
+                "uris": ["http://zotero.org/users/123/items/ABCD1234"],
+                "itemData": {
+                  "id": 587,
+                  "type": "article-journal",
+                  "title": "Quantum transport in graphene",
+                  "DOI": "10.1234/native.2024",
+                  "author": [{"family": "Smith", "given": "Jane"}],
+                  "issued": {"date-parts": [[2024]]}
+                }
+              }]
+            }
+            """ + " RNDabcdefghij";
 
     private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
@@ -448,20 +477,7 @@ class ImportHandlerTest {
     void importCitedEntriesPreservesExplicitKeysWhenGenerateNewKeyOnImportIsEnabled() {
         BibDatabase database = new BibDatabase();
         BibDatabaseContext databaseContext = new BibDatabaseContext(database);
-        when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
-        when(preferences.getMergeDialogPreferences()).thenReturn(mock(MergeDialogPreferences.class));
-        GlobalCitationKeyPatterns keyPatterns = GlobalCitationKeyPatterns.fromPattern("[auth:transliterate:camel][year]");
-        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
-                keyPatterns,
-                new SimpleObjectProperty<>(',')));
+        configureCitedImportPreferences();
 
         BibEntry entryWithDocumentKey = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("DocumentKey")
@@ -478,6 +494,126 @@ class ImportHandlerTest {
         assertEquals(List.of("DocumentKey", "Doe2025"), database.getEntries().stream()
                                                                 .map(entry -> entry.getCitationKey().orElseThrow())
                                                                 .toList());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith2024", "DocumentKey"})
+    @ResourceLock("Localization.lang")
+    void importCitedEntriesPreservesExplicitKeyAfterEarlierKeylessZoteroImport(String explicitKey) {
+        configureCitedImportPreferences();
+        BibDatabase database = new BibDatabase();
+        ImportHandler handler = handlerFor(new BibDatabaseContext(database), new JabRefUndoManager());
+        List<BibEntry> zoteroEntries = ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK));
+        assertEquals(List.of(Optional.empty()), zoteroEntries.stream().map(BibEntry::getCitationKey).toList());
+
+        handler.importEntriesWithDuplicateCheckPreservingCitationKeys(zoteroEntries);
+
+        BibEntry importedZoteroEntry = database.getEntries().getFirst();
+        assertEquals(Optional.of("Smith2024"), importedZoteroEntry.getCitationKey());
+        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithJabRef(smithEntryWithDocumentKey(explicitKey))));
+        assertEquals(List.of(Optional.of(explicitKey)), citedEntries.stream().map(BibEntry::getCitationKey).toList());
+        assertEquals(Optional.empty(), handler.findDuplicate(citedEntries.getFirst()));
+
+        handler.importEntriesWithDuplicateCheckPreservingCitationKeys(citedEntries);
+
+        assertEquals(List.of(importedZoteroEntry, smithEntryWithDocumentKey(explicitKey)), database.getEntries());
+        assertEquals(List.of(Optional.of("Smith2024"), Optional.of(explicitKey)),
+                database.getEntries().stream().map(BibEntry::getCitationKey).toList());
+        assertEquals(List.of(Optional.of("10.1234/native.2024"), Optional.of("10.1234/jabref.2024")),
+                database.getEntries().stream().map(entry -> entry.getField(StandardField.DOI)).toList());
+    }
+
+    @Test
+    @ResourceLock("Localization.lang")
+    void importCitedEntriesKeepsUnrelatedPublicationsWhenGeneratedKeyMatchesLaterExplicitKeyInSameBatch() {
+        configureCitedImportPreferences();
+        BibDatabase database = new BibDatabase();
+        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(
+                NATIVE_ZOTERO_REFERENCE_MARK,
+                citeWithJabRef(smithEntryWithDocumentKey("Smith2024"))));
+        assertEquals(List.of(Optional.empty(), Optional.of("Smith2024")), citedEntries.stream().map(BibEntry::getCitationKey).toList());
+        BibEntry expectedZoteroEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Smith2024")
+                .withField(StandardField.AUTHOR, "Smith, Jane")
+                .withField(StandardField.DATE, "2024")
+                .withField(StandardField.TITLE, "Quantum transport in graphene")
+                .withField(StandardField.DOI, "10.1234/native.2024");
+
+        handlerFor(new BibDatabaseContext(database), new JabRefUndoManager())
+                .importEntriesWithDuplicateCheckPreservingCitationKeys(citedEntries);
+
+        assertEquals(List.of(expectedZoteroEntry, smithEntryWithDocumentKey("Smith2024")), database.getEntries());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DuplicateResolverDialog.DuplicateResolverResult.class, names = {"KEEP_LEFT", "KEEP_RIGHT", "KEEP_BOTH"})
+    @ResourceLock("Localization.lang")
+    void importCitedEntriesUsesOrdinaryDuplicateDecisionWhenExplicitKeyAlreadyExists(DuplicateResolverDialog.DuplicateResolverResult decision) {
+        configureCitedImportPreferences();
+        BibEntry existingEntry = smithEntryWithDocumentKey("Smith2024").withField(StandardField.NOTE, "Library notes");
+        BibDatabase database = new BibDatabase(List.of(existingEntry));
+        ImportHandler handler = Mockito.spy(handlerFor(new BibDatabaseContext(database), new JabRefUndoManager()));
+        BibEntry expectedImportedEntry = smithEntryWithDocumentKey("Smith2024").withField(StandardField.NOTE, "Document notes");
+        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithJabRef(expectedImportedEntry)));
+        assertEquals(List.of(Optional.of("Smith2024")), citedEntries.stream().map(BibEntry::getCitationKey).toList());
+        BibEntry citedEntry = citedEntries.getFirst();
+        assertEquals(Optional.of(existingEntry), handler.findDuplicate(citedEntry));
+        Mockito.doReturn(CompletableFuture.completedFuture(new DuplicateDecisionResult(decision, expectedImportedEntry)))
+               .when(handler).getDuplicateDecision(any(BibEntry.class), same(existingEntry), eq(DuplicateResolverDialog.DuplicateResolverResult.BREAK));
+
+        handler.importEntriesWithDuplicateCheckPreservingCitationKeys(citedEntries);
+
+        ArgumentCaptor<BibEntry> importedEntryCaptor = ArgumentCaptor.forClass(BibEntry.class);
+        Mockito.verify(handler).getDuplicateDecision(importedEntryCaptor.capture(), same(existingEntry), eq(DuplicateResolverDialog.DuplicateResolverResult.BREAK));
+        assertNotSame(citedEntry, importedEntryCaptor.getValue());
+        assertEquals(expectedImportedEntry, importedEntryCaptor.getValue());
+        List<BibEntry> expectedEntries = switch (decision) {
+            case KEEP_RIGHT ->
+                    List.of(expectedImportedEntry);
+            case KEEP_BOTH ->
+                    List.of(existingEntry, expectedImportedEntry);
+            default ->
+                    List.of(existingEntry);
+        };
+        assertEquals(expectedEntries, database.getEntries());
+    }
+
+    private static BibEntry smithEntryWithDocumentKey(String citationKey) {
+        return new BibEntry(StandardEntryType.Article)
+                .withCitationKey(citationKey)
+                .withField(StandardField.AUTHOR, "Smith, Jane")
+                .withField(StandardField.DATE, "2024")
+                .withField(StandardField.TITLE, "Medieval trade across the Baltic")
+                .withField(StandardField.DOI, "10.1234/jabref.2024");
+    }
+
+    private static String citeWithJabRef(BibEntry entry) {
+        return ZoteroReferenceMark.buildReferenceMark(
+                List.of(entry),
+                List.of(entry.getCitationKey().orElseThrow()),
+                List.of(0),
+                1,
+                CSLCitationType.NORMAL,
+                new BibDatabaseContext(new BibDatabase(List.of(entry))),
+                new BibEntryTypesManager(),
+                Map.of()).getName();
+    }
+
+    private void configureCitedImportPreferences() {
+        when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
+        when(preferences.getMergeDialogPreferences()).thenReturn(mock(MergeDialogPreferences.class));
+        GlobalCitationKeyPatterns keyPatterns = GlobalCitationKeyPatterns.fromPattern("[auth:transliterate:camel][year]");
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                keyPatterns,
+                new SimpleObjectProperty<>(',')));
     }
 
     private ImportHandler handlerFor(BibDatabaseContext databaseContext, JabRefUndoManager journal) {

@@ -148,6 +148,10 @@ Needs: impl, utest
 `feat~import.libreoffice.cited-entries~1`
 
 When a LibreOffice document contains Zotero-compatible reference marks, the user can import their cited entries into the active library. Marks in other formats do not provide the data needed for this import.
+Repeated citations are collected by Zotero item identity, preferring the item URI, with explicit citation keys used when no item identity is available.
+An existing citation key in the target library must not silently exclude a cited entry; bibliographic duplicates go through the ordinary import duplicate handler.
+Explicit document keys are retained, while Zotero-only entries receive generated keys.
+Importing without an open library or a connected document reports the missing prerequisite without reading citations.
 
 Needs: impl, utest
 

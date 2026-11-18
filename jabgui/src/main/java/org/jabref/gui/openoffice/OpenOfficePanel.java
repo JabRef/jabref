@@ -378,24 +378,34 @@ public class OpenOfficePanel {
     }
 
     private void importEntries() {
-        LibraryTab targetTab = tabContainer.getCurrentLibraryTab();
+        Optional<LibraryTab> targetTab = Optional.ofNullable(tabContainer.getCurrentLibraryTab());
+        if (targetTab.isEmpty()) {
+            dialogService.notify(Localization.lang("No library open"));
+            return;
+        }
+        Optional<OOBibBase> connection = Optional.ofNullable(ooBase);
+        if (connection.isEmpty()) {
+            dialogService.notify(Localization.lang("Not connected to document"));
+            return;
+        }
 
+        OOBibBase connectedBase = connection.orElseThrow();
         String errorTitle = Localization.lang("Unable to import cited entries");
-        OOResult<XTextDocument, OOError> documentResult = ooBase.getXTextDocument();
-        if (ooBase.testDialog(errorTitle, documentResult.asVoidResult())) {
+        OOResult<XTextDocument, OOError> documentResult = connectedBase.getXTextDocument();
+        if (connectedBase.testDialog(errorTitle, documentResult.asVoidResult())) {
             return;
         }
 
         try {
             List<String> markNames = UnoReferenceMark.getListOfNames(documentResult.get());
-            ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(markNames, targetTab.getDatabase());
+            List<BibEntry> citedEntries = ImportCited.collectCitedEntries(markNames);
 
-            if (citedEntries.newEntries().isEmpty()) {
+            if (citedEntries.isEmpty()) {
                 dialogService.notify(Localization.lang("No new cited entries to import"));
                 return;
             }
 
-            targetTab.importCitedEntriesWithDuplicateCheck(citedEntries.newEntries());
+            targetTab.orElseThrow().importCitedEntriesWithDuplicateCheck(citedEntries);
         } catch (NoDocumentException ex) {
             dialogService.notify(Localization.lang("Not connected to document"));
             LOGGER.info("Could not import", ex);

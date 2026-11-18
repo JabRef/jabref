@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.openoffice.ZoteroCitationMarkParser.ParsedEntry;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -106,21 +107,22 @@ class ZoteroCitationMarkParserTest {
     }
 
     @Test
-    void parseCslCitationJsonForImportLeavesZoteroItemWithoutCitationKey() {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImport(JOURNAL_ARTICLE_CSL_JSON);
-        BibEntry entry = entries.getFirst();
+    void parseCslCitationJsonForImportWithIdentityLeavesZoteroItemWithoutCitationKey() {
+        List<ParsedEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity(JOURNAL_ARTICLE_CSL_JSON);
+        ParsedEntry parsedEntry = entries.getFirst();
 
-        assertEquals(Optional.empty(), entry.getCitationKey());
+        assertEquals(Optional.empty(), parsedEntry.entry().getCitationKey());
+        assertEquals(Optional.of("id:Zotero-587"), parsedEntry.itemIdentity());
     }
 
     @Test
-    void parseCslCitationJsonForImportReturnsEmptyForNullRoot() {
-        assertEquals(List.of(), ZoteroCitationMarkParser.parseCslCitationJsonForImport("null"));
+    void parseCslCitationJsonForImportWithIdentityReturnsEmptyForNullRoot() {
+        assertEquals(List.of(), ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity("null"));
     }
 
     @Test
-    void parseCslCitationJsonForImportKeepsJabRefUriCitationKey() {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImport("""
+    void parseCslCitationJsonForImportWithIdentityKeepsJabRefUriCitationKey() {
+        List<ParsedEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity("""
                 {
                   "citationItems": [
                     {
@@ -137,14 +139,15 @@ class ZoteroCitationMarkParserTest {
                   ]
                 }
                 """);
-        BibEntry entry = entries.getFirst();
+        ParsedEntry parsedEntry = entries.getFirst();
 
-        assertEquals(Optional.of("Smith2020"), entry.getCitationKey());
+        assertEquals(Optional.of("Smith2020"), parsedEntry.entry().getCitationKey());
+        assertEquals(Optional.of("uri:http://zotero.org/users/123/items/ABCD1234"), parsedEntry.itemIdentity());
     }
 
     @Test
-    void parseCslCitationJsonForImportKeepsCitationKeyOfItemData() {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImport("""
+    void parseCslCitationJsonForImportWithIdentityKeepsCitationKeyOfItemData() {
+        List<ParsedEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity("""
                 {
                   "citationItems": [
                     {
@@ -162,9 +165,10 @@ class ZoteroCitationMarkParserTest {
                   ]
                 }
                 """);
-        BibEntry entry = entries.getFirst();
+        ParsedEntry parsedEntry = entries.getFirst();
 
-        assertEquals(Optional.of("Doe2026"), entry.getCitationKey());
+        assertEquals(Optional.of("Doe2026"), parsedEntry.entry().getCitationKey());
+        assertEquals(Optional.of("uri:http://zotero.org/users/123/items/ABCD1234"), parsedEntry.itemIdentity());
     }
 
     @ParameterizedTest
