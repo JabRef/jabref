@@ -31,6 +31,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -131,7 +132,8 @@ class BackupUIManagerTest extends JavaFxTest {
                 });
         // Sealed, so deep stubs cannot mock it
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+        CustomizedPreviewStyle style = new CustomizedPreviewStyle("name", "");
+        doReturn(new TextBasedPreviewLayout(style.id(), style.name(), style.text(), mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
                 .when(previewPreferences).getSelectedPreviewLayout();
         Injector.setModelOrService(DialogService.class, dialogService);
         Injector.setModelOrService(GuiPreferences.class, preferences);
