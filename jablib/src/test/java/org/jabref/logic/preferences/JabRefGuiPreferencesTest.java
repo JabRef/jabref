@@ -27,6 +27,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -106,9 +107,9 @@ class JabRefGuiPreferencesTest {
 
             preferences.clear();
 
-            assertEquals(false, preferences.hasKey("isolatedValue"));
-            assertEquals(false, preferences.getProxyPreferences().shouldPersistPassword());
-            assertEquals(false, preferences.getGitPreferences().getPersistPat());
+            assertFalse(preferences.hasKey("isolatedValue"));
+            assertFalse(preferences.getProxyPreferences().shouldPersistPassword());
+            assertFalse(preferences.getGitPreferences().getPersistPat());
             assertEquals(CiteDrivePreferences.getDefault().shouldPersistRefreshToken(), preferences.getCiteDrivePreferences().shouldPersistRefreshToken());
             assertEquals(beforeReset, secrets);
             assertEquals(List.of(), trustStores.constructed());
