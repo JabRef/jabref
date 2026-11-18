@@ -7,7 +7,8 @@ parent: Requirements
 `req~keyring.plain-text-storage~1`
 
 The proxy password, the GitHub personal access token, and custom API keys are stored as plain text in the system keyring.
-Each secret has its own location (`org.jabref.proxy`, `org.jabref.github`, `org.jabref.apikeys`).
+Proxy passwords and GitHub tokens have their own locations (`org.jabref.proxy`, `org.jabref.github`).
+Custom API keys share one item at `org.jabref.apikeys.bundle`.
 Clearing a secret removes it from the keyring.
 
 Rationale: Older JabRef versions encrypted these secrets before storing them in the keyring.
@@ -26,6 +27,17 @@ A legacy value that cannot be decrypted (e.g., because the owner or the host nam
 A cleared secret must not come back from its legacy location, even if the legacy entry cannot be deleted.
 
 Rationale: Migrating on read keeps existing secrets working without a separate migration step.
+
+Needs: impl, utest
+
+## Custom API keys must be loaded from one keyring item
+`req~keyring.api-key-bundle~1`
+
+Saved custom API keys share one keyring item, so loading them requires one password read after migration.
+Normal preferences record only which keys are stored; startup must skip the keyring when no keys are stored or persistence is disabled.
+Blank keys and built-in defaults must not be stored as custom secrets.
+Existing separate entries must be preserved until their values have been written successfully to the shared item.
+Migration can still require one approval per existing protected item.
 
 Needs: impl, utest
 
