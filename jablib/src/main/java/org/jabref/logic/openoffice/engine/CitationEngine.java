@@ -15,7 +15,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.CitationIds;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
-import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StrategyException;
 import org.jabref.logic.openoffice.engine.storage.MarkWriter;
 import org.jabref.logic.openoffice.frontend.DocumentCitations;
 import org.jabref.logic.openoffice.frontend.DocumentOrder;
@@ -127,7 +126,7 @@ public final class CitationEngine implements AutoCloseable {
             return insertWithConversion(entries, databases, cslStyle, requestedType, pageInfo, cursor, rebuildBibliography);
         }
         if (preferences.getZoteroCompatibilityMode()) {
-            return writeNativeSession(Localization.lang("Insert citation"),
+            return writeSession(Localization.lang("Insert citation"),
                     () -> zotero.insert(entries, databases, style, requestedType, pageInfo, cursor, rebuildBibliography));
         }
         try {
@@ -212,7 +211,7 @@ public final class CitationEngine implements AutoCloseable {
             return OOResult.error(unavailable());
         }
         if (preferences.getZoteroCompatibilityMode()) {
-            return writeNativeSession(Localization.lang("Refresh bibliography"), () -> zotero.refresh(databases, style));
+            return writeSession(Localization.lang("Refresh bibliography"), () -> zotero.refresh(databases, style));
         }
         try {
             DocumentCitations documentCitations = new DocumentCitations(document);
@@ -338,18 +337,6 @@ public final class CitationEngine implements AutoCloseable {
         } catch (com.sun.star.uno.Exception | NoDocumentException exception) {
             return OOVoidResult.error(failure(Localization.lang("Problem modifying citation"), exception));
         }
-    }
-
-    private OOResult<List<String>, JabRefException> writeNativeSession(String title, Supplier<OOResult<List<String>, JabRefException>> action) {
-        // Even an empty Writer undo context can evict older undo actions when the history is full.
-        try {
-            zotero.requireSupportedModifiers();
-        } catch (StrategyException exception) {
-            return OOResult.error(exception);
-        } catch (NoDocumentException | com.sun.star.uno.RuntimeException exception) {
-            return OOResult.error(failure(Localization.lang("Problem collecting citations"), exception));
-        }
-        return writeSession(title, action);
     }
 
     private <T> OOResult<T, JabRefException> writeSession(String title, Supplier<OOResult<T, JabRefException>> action) {

@@ -54,13 +54,13 @@ With synchronization enabled and a style that has a bibliography, normal handlin
 
 Needs: impl, utest
 
-## Native Zotero citation updates must reject unsupported modifiers before mutation
-`req~openoffice.zotero-modifier-safe-update~1`
+## Native Zotero citation updates must retain existing modifier compatibility
+`req~openoffice.zotero-modifier-compatibility~1`
 
-Ordinary native Zotero insertion and refresh reject existing citations with nonempty locators, labels, prefixes, suffixes, author-only items, or mixed per-item author suppression before changing any citation, bibliography, document property, or undo history.
-The error explains that no citations were changed and directs the user to update the citations in Zotero.
-Uniform author suppression remains supported, and export-cited remains available because it does not rewrite citations.
-This modifier check does not impose conversion-sidecar freshness requirements on ordinary native updates.
+Ordinary native insertion and refresh must not introduce a rejection solely because existing citations contain locators, labels, prefixes, suffixes, author-only items, or mixed per-item author suppression.
+These operations retain the existing rendering behavior: modifiers remain in native JSON, but locators and affixes are not rendered, author-only is not implemented, and any author suppression selects JabRef's group-level narrative rendering.
+This is compatibility with existing behavior, not complete support for native Zotero modifier semantics.
+Actual format conversion retains its separate modifier validation.
 
 Needs: impl, utest
 

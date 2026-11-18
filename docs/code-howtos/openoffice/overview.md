@@ -207,10 +207,10 @@ Invalid metadata, unsupported citation modifiers, unresolved sources, unsuitable
 `ConversionMetadata` stores a document-local citation sidecar under `JabRef_citation_conversion:<uid>`.
 It preserves the canonical uid, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, including URI links, opaque identifiers, and harmless unknown metadata, while the association remains valid through conversion and save/reopen.
 Previously stored canonical partial types and page information survive but are not rendered in Zotero mode.
-Native nonempty locators, labels, prefixes, suffixes, author-only items, and mixed per-item `suppress-author` flags are rejected before conversion or ordinary native insertion/refresh with an actionable error; uniform suppression is supported.
-`ZoteroCitationModifiers` validates these modifiers before linking, rendering, or writing native updates, independently of conversion-sidecar freshness checks.
-A rejected update leaves citations, bibliography, document properties, and undo history unchanged and directs the user to update the citations in Zotero; this is not locator conversion or rendering support.
-Export-cited still reads these citations because it does not rewrite them.
+Native nonempty locators, labels, prefixes, suffixes, author-only items, and mixed per-item `suppress-author` flags are rejected before actual format conversion with an actionable error; uniform suppression is supported.
+`ZoteroCitationModifiers` validates conversion eligibility, not ordinary native insertion or refresh.
+Ordinary native updates retain the existing rendering behavior rather than adding modifier support or a new rejection: native JSON retains the modifiers, but visible locators and affixes can disappear when citations are regenerated, author-only is ignored, and any author suppression selects group-level narrative rendering.
+Export-cited remains read-only.
 The sidecar is not a rendered-output cache: opaque native JSON may include Zotero display properties that are preserved rather than used for rendering.
 
 A native citation's `citationID` or mark suffix associates it with its sidecar.

@@ -16,7 +16,7 @@ final class ZoteroCitationModifiers {
     private ZoteroCitationModifiers() {
     }
 
-    // [impl->req~openoffice.zotero-modifier-safe-update~1]
+    // [impl->req~openoffice.next-citation-format-conversion~1]
     static void requireSupportedModifiers(String name) throws RenderException {
         try {
             JsonObject citation = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(name)).getAsJsonObject();
