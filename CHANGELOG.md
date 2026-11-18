@@ -163,6 +163,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening the backup folder from the backup dialog failed when a custom file browser was set. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
+- We fixed an issue where the RIS export wrote wrong start and end pages when the pages field started with whitespace. [#17774](https://github.com/JabRef/jabref/issues/17774)
 
 ### Removed
 
