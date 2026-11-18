@@ -758,7 +758,7 @@ class CitationFormatConversionWriterTest {
         String nativeSuffix = ZoteroReferenceMark.parse(nativeName).orElseThrow().uniqueId();
         expectedJson.getAsJsonArray("citationItems").forEach(item -> item.getAsJsonObject().getAsJsonArray("uris").add("http://www.jabref.org/native"));
         String linkedName = ZoteroReferenceMark.PREFIX + expectedJson + " " + nativeSuffix;
-        List<String> expectedKeys = expectedJson.getAsJsonArray("citationItems").asList().stream().map(item -> "native").toList();
+        List<String> expectedKeys = expectedJson.getAsJsonArray("citationItems").asList().stream().map(_ -> "native").toList();
         Snapshot before = snapshot(document);
         try (CitationEngine engine = engine(document, preferences(false))) {
             assertTrue(success(engine.requiresFormatConversion(style())));

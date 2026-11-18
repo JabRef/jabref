@@ -1,5 +1,5 @@
 ---
-nav_order: 80
+nav_order: 83
 parent: Decision Records
 date: 2026-11-02
 ---
@@ -23,7 +23,7 @@ How can citation style families share document actions without making stored cit
 * Validate and render proposed changes before replacing document content.
 * Keep native Zotero storage separate while preserving the established next-insertion conversion trigger and warning.
 * Make legacy incompatibility explicit instead of guessing a migration.
-* Avoid silently losing unsupported native citation semantics.
+* Preserve native modifier metadata while retaining existing rendering behavior.
 
 ## Considered Options
 

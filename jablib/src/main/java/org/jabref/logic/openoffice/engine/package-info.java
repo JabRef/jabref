@@ -10,7 +10,7 @@
 /// Low-level document access helpers live in [org.jabref.logic.openoffice.uno].
 ///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/openoffice/overview.html">Writer integration overview</a>
-/// @see <a href="https://devdocs.jabref.org/decisions/0080-canonical-writer-citations.html">Canonical Writer citation decision</a>
+/// @see <a href="https://devdocs.jabref.org/decisions/0083-canonical-writer-citations.html">Canonical Writer citation decision</a>
 @NullMarked
 package org.jabref.logic.openoffice.engine;
 

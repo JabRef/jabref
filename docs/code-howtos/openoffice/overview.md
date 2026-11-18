@@ -12,7 +12,7 @@ Zotero compatibility mode uses a separate CSL-only strategy and native Zotero st
 
 Open the panel from **View → OpenOffice/LibreOffice**.
 The [user documentation](https://docs.jabref.org/cite/openofficeintegration) describes panel operations.
-The [requirements](../../requirements/openoffice.md) and [ADR-0080](../../decisions/0080-canonical-writer-citations.md) define the citation compatibility contract.
+The [requirements](../../requirements/openoffice.md) and [ADR-0083](../../decisions/0083-canonical-writer-citations.md) define the citation compatibility contract.
 
 ## Architecture and entry points
 

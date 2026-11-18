@@ -6,8 +6,8 @@ grand_parent: Code Howtos
 # Code reorganization
 
 This page retains the historical JStyle reorganization notes, with an updated diagram of the current citation integration.
-The directory descriptions, code sketches, and committed evidence links below are historical records; removed backends do not provide compatibility in the current engine.
-See the [current overview](overview.md), [ADR-0080](../../decisions/0080-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) for the active contract.
+The earlier directory descriptions, code sketches, and committed evidence links are historical records; removed backends do not provide compatibility in the current engine.
+See the [current overview](overview.md), [ADR-0083](../../decisions/0083-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) for the active contract.
 
 The current GUI gateway is `OpenOfficeCitationController`, with concise action methods and GUI instances named `citationController`; document selection is handled by `OpenOfficeDocumentConnection`.
 `DocumentCitations` is an action-local facade over a mutable citation model and live Writer storage, not a document subtype or immutable snapshot; core instances are named `documentCitations`.
@@ -19,7 +19,9 @@ Canonical marks use `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 
 The framework retains the next-CSL-citation-insertion conversion trigger and existing warning; only current canonical and native Zotero citation marks are converted, never legacy `JR_cite*` or `CID_n` marks.
 With bibliography synchronization disabled, every bibliography section's name, text, and properties remain unchanged; with it enabled, normal handling updates only the target mode's managed bibliography, leaving other-format sections alone.
 There is no bibliography conversion, renaming, consolidation, or metadata sidecar.
-`ConversionMetadata` preserves citation identities, all six types, page information, and supported native JSON while the association remains valid; unsupported native citation modifiers fail before conversion to avoid content loss.
+`ConversionMetadata` preserves citation identities, all six types, page information, and supported native JSON while the association remains valid.
+Native modifiers do not by themselves block conversion, insertion, or refresh; any item with `suppress-author: true` selects the group's existing in-text citation type, including mixed groups.
+The citation sidecar retains native modifier JSON for restoration on conversion back, without adding locator, affix, or author-only rendering support.
 Stale associated metadata blocks actual conversion only, not ordinary native insertion or refresh.
 
 The older GUI already grouped insertion including conversion, refresh, merge, and separate in undo contexts; those contexts did not restore custom document properties, as the old Manage citations comment explicitly documented for page information.
@@ -40,7 +42,7 @@ Why
 ![Current Writer citation integration layers](layers-v1.svg)
 
 The diagram shows the current shared canonical pipeline, separate native Zotero strategy, pure model, and common Writer infrastructure.
-The directory-by-directory notes below describe the earlier reorganization, not the current package layout.
+The directory-by-directory notes describe the earlier reorganization, with current JStyle responsibilities mapped below.
 
 ### By directories
 
@@ -116,22 +118,22 @@ It fills
 
 ## logic/style
 
-* `StyleLoader` : not changed (knows about default styles) Used by GUI
-* `OOPreFormatter` : LaTeX code to unicode and OOText tags. (not changed)
-* `OOBibStyle` : is mostly concerned by loading/parsing jstyle files and presenting its pieces to the rest. Originally it also contains code to format numeric and author-year citation markers.
-  * Details of their new implementations are in `OOBibStyleGetNumCitationMarker` and `OOBibStyleGetCitationMarker`
-  * The new implementations
-    * support pageInfo for each citation
-    * support unresolved citations
-    * instead of `List<Integer>` and (`List<BibEntry>` plus arrays and database) they expect more self-contained entries `List<CitationMarkerNumericEntry>`, `List<CitationMarkerEntry>`.
-    * We have distinct methods for `getNormalizedCitationMarker(CitationMarkerNormEntry)` and `getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry)`.
-    * The corresponding interfaces in model/style:
-      * `CitationMarkerNumericEntry`
-      * `CitationMarkerEntry`
-      * `CitationMarkerNumericBibEntry`
-      * `CitationMarkerNormEntry`\
-        describe their expected input entries.
-* `OOProcess.produceCitationMarkers` is the main entry point for style application. Calls to specific implementations in `OOProcessCitationKeyMarkers`, `OOProcessNumericMarkers` and `OOProcessAuthorYearMarkers` according to jstyle flags.
+The JStyle responsibilities below describe the current implementation; see the [current overview](overview.md#architecture-and-entry-points) for the shared engine and other style families.
+
+* `JStyleLoader` loads bundled and user-selected JStyle files.
+* `OOPreFormatter` converts LaTeX to Unicode and OOText tags.
+* `JStyle` parses `.jstyle` files and exposes style properties and formatting entry points.
+  * `getNumCitationMarker2(...)` delegates numeric citation markers to `JStyleNumericCitationFormatter`.
+  * `createCitationMarker(...)` delegates author-year and partial-type citation markers to `JStyleCitationFormatter`.
+  * `getNormalizedCitationMarker(CitationMarkerNormEntry)` delegates normalization to `JStyleCitationFormatter`.
+  * `getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry)` delegates bibliography labels to `JStyleNumericCitationFormatter`.
+  * Formatting uses per-citation page information and supports unresolved citations through the existing model/style interfaces:
+    * `CitationMarkerNumericEntry`
+    * `CitationMarkerEntry`
+    * `CitationMarkerNumericBibEntry`
+    * `CitationMarkerNormEntry`
+* `JStyleCitationProcessor.produceCitationMarkers` resolves sources, orders citations within groups, and selects `JStyleCitationKeyMarkers`, `JStyleNumericMarkers`, or `JStyleAuthorYearMarkers` according to JStyle flags.
+* `JStyleRenderer.render` invokes the processor and uses `JStyleBibliographyFormatter.formatBibliographyEntry` for requested bibliography paragraphs, returning a `RenderResult` before document mutation.
 
 ## logic/backend
 

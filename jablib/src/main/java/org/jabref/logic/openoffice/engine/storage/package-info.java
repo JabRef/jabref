@@ -8,7 +8,7 @@
 /// [org.jabref.logic.openoffice.uno].
 ///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/openoffice/overview.html#what-is-stored-in-a-document">Canonical document storage</a>
-/// @see <a href="https://devdocs.jabref.org/decisions/0080-canonical-writer-citations.html">Canonical Writer citation decision</a>
+/// @see <a href="https://devdocs.jabref.org/decisions/0083-canonical-writer-citations.html">Canonical Writer citation decision</a>
 @NullMarked
 package org.jabref.logic.openoffice.engine.storage;
 
