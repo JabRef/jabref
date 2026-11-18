@@ -153,6 +153,15 @@ class ZoteroCitationStrategyTest {
         return Stream.of(mock(JStyle.class), mock(BstStyle.class));
     }
 
+    @Test
+    void nativeCapabilitiesDoNotExposeCanonicalPartialCitationApproximations() {
+        when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
+        try (CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            assertEquals(List.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT),
+                    engine.capabilities(style()).supportedTypes().stream().sorted().toList());
+        }
+    }
+
     @ParameterizedTest
     @EnumSource(value = CitationType.class, names = {"AUTHOR_ONLY", "YEAR_ONLY", "AUTHORYEAR_NOPAR"})
     void unsupportedTypesAreNotSilentlyReinterpreted(CitationType type) {

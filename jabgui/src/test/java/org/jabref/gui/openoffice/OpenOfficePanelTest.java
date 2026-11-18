@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -41,6 +43,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedConstruction;
@@ -48,6 +51,8 @@ import org.mockito.MockedConstruction;
 import static org.jabref.logic.l10n.Localization.lang;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -76,6 +81,10 @@ class OpenOfficePanelTest {
                         new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.INVISIBLE_CIT), true, true, true),
                         new OpenOfficeActionAvailability(true, true, true, false, true, true, true, true)),
                 Arguments.of(
+                        new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT,
+                                CitationType.AUTHOR_ONLY, CitationType.YEAR_ONLY), true, false, false),
+                        new OpenOfficeActionAvailability(true, true, true, true, true, true, false, false)),
+                Arguments.of(
                         new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT), true, false, false),
                         new OpenOfficeActionAvailability(true, true, true, false, true, true, false, false)),
                 Arguments.of(
@@ -90,6 +99,15 @@ class OpenOfficePanelTest {
                 Arguments.of(
                         new StyleCapabilities(Set.of(), false, false, false),
                         new OpenOfficeActionAvailability(false, false, false, false, false, false, false, false)));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CitationType.class, names = {"AUTHOR_ONLY", "YEAR_ONLY"})
+    void eitherPartialCitationEnablesCiteSpecialWithoutPageInfo(CitationType citationType) {
+        StyleCapabilities capabilities = new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, citationType), true, false, false);
+
+        assertEquals(new OpenOfficeActionAvailability(true, true, false, true, true, true, false, false),
+                OpenOfficeActionAvailability.forCapabilities(true, true, capabilities));
     }
 
     @Test
@@ -242,6 +260,57 @@ class OpenOfficePanelTest {
                 verify(dialogs).showErrorDialogAndWait(anyString(), anyString());
                 assertEquals(previousStyle, field("currentStyle"));
             }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = CitationType.class, names = {"AUTHOR_ONLY", "YEAR_ONLY"})
+        void citeSpecialUsesCurrentCapabilitiesAndInsertsSelectedPartialType(CitationType citationType) throws ReflectiveOperationException, IOException {
+            prepareScenario("ready");
+            StyleCapabilities capabilities = new StyleCapabilities(
+                    Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT,
+                            CitationType.AUTHOR_ONLY, CitationType.YEAR_ONLY), true, false, false);
+            when(citationController.capabilities(selectedStyle)).thenReturn(capabilities);
+            when(preferences.getCiteSpecialCitationType()).thenReturn(CitationType.AUTHORYEAR_NOPAR);
+            when(dialogs.showCustomDialogAndWait(any(CiteSpecialDialogView.class))).thenAnswer(invocation -> {
+                CiteSpecialDialogView dialog = invocation.getArgument(0);
+                RadioButton inPar = JavaFxExtension.lookup(dialog.getDialogPane(), "#inPar", RadioButton.class);
+                RadioButton noPar = JavaFxExtension.lookup(dialog.getDialogPane(), "#noPar", RadioButton.class);
+                assertTrue(inPar.isSelected());
+                assertTrue(noPar.isDisabled());
+                RadioButton option = JavaFxExtension.lookup(dialog.getDialogPane(), ".radio-button", RadioButton.class,
+                        button -> button.getUserData() == citationType);
+                option.fire();
+                return Optional.of(dialog.getResultConverter().call(ButtonType.OK));
+            });
+            Button selectDocument = button("selectDocument");
+            Button citeSpecial = button("citeSpecial");
+
+            JavaFxExtension.invokeAndWait(() -> {
+                selectDocument.fire();
+                assertFalse(citeSpecial.isDisabled());
+                citeSpecial.fire();
+            });
+
+            verify(citationController).insertCitation(List.of(entry), List.of(database), selectedStyle, citationType, "");
+            verify(preferences).setCiteSpecialCitationType(citationType);
+        }
+
+        @Test
+        void citeSpecialButtonRemainsDisabledForNativeCapabilities() throws ReflectiveOperationException {
+            when(preferences.getCurrentStyle()).thenReturn(selectedStyle);
+            when(citationController.capabilities(selectedStyle)).thenReturn(new StyleCapabilities(
+                    Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT), true, false, false));
+            Button selectDocument = button("selectDocument");
+            Button citeSpecial = button("citeSpecial");
+
+            JavaFxExtension.invokeAndWait(() -> {
+                selectDocument.fire();
+                assertTrue(citeSpecial.isDisabled());
+                citeSpecial.fire();
+            });
+
+            verify(dialogs, never()).showCustomDialogAndWait(any(CiteSpecialDialogView.class));
+            verify(citationController, never()).insertCitation(anyList(), anyList(), any(), any(), anyString());
         }
 
         @Test

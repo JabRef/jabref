@@ -397,7 +397,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     }
 
     private RenderResult render(List<StoredCitation> citations, List<BibDatabase> databases, CitationStyle style, boolean bibliography) throws RenderException {
-        return new CslRenderer(style, entryTypes).render(new RenderRequest(citations.stream().map(StoredCitation::group).toList(), databases, options(bibliography)));
+        return new CslRenderer(style, entryTypes).renderNative(new RenderRequest(citations.stream().map(StoredCitation::group).toList(), databases, options(bibliography)));
     }
 
     private RenderOptions options(boolean bibliography) {

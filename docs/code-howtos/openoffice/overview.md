@@ -161,6 +161,11 @@ JStyle supports page information and group editing; CSL and BST retain stored pa
 Zotero mode disables page-info and group editing.
 Insertion coerces unsupported new types according to capabilities, while rendering an existing canonical citation with another family does not replace its stored type.
 Returning to a supporting family can restore a stored partial citation's presentation.
+With Zotero compatibility mode disabled, CSL also supports the existing author-only and year-only choices in Cite special using fixed JabRef formatting.
+Author-only uses short author names, then editor names, then the citation key; year-only uses the resolved year, then a parsed date year, then the citation key.
+Multiple entries retain storage order and repetitions and are joined with semicolons.
+These are style-independent approximations: explicit year suffixes survive, but CSL-specific name formatting and processor-generated disambiguation suffixes are not reproduced, and year-only is not general native author suppression.
+Page information and the unsupported no-parentheses choice remain disabled for CSL, while native Zotero mode keeps its original three-type rendering and does not expose these partial-citation choices.
 
 A render pass considers the entire cited set rather than storing a number beside each key.
 Numeric CSL styles use citeproc's cluster updates and bibliography order rather than patching digits in existing text.

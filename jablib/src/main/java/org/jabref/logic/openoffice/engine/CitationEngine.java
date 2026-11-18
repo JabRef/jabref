@@ -86,7 +86,7 @@ public final class CitationEngine implements AutoCloseable {
         try {
             StyleCapabilities capabilities = renderers().create(style).capabilities();
             return preferences.getZoteroCompatibilityMode()
-                   ? new StyleCapabilities(capabilities.supportedTypes(), capabilities.hasBibliography(), false, false)
+                   ? new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT), capabilities.hasBibliography(), false, false)
                    : capabilities;
         } catch (RenderException exception) {
             LOGGER.debug("Cannot determine citation style capabilities", exception);

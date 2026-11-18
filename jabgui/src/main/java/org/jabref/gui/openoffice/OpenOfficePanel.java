@@ -536,7 +536,8 @@ public class OpenOfficePanel {
 
         String pageInfo = "";
         if (addPageInfo) {
-            Optional<CiteSpecialDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new CiteSpecialDialogView(openOfficePreferences.getCiteSpecialCitationType()));
+            Optional<CiteSpecialDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(
+                    new CiteSpecialDialogView(openOfficePreferences.getCiteSpecialCitationType(), citationController.capabilities(currentStyle)));
             if (citeDialogViewModel.isPresent()) {
                 CiteSpecialDialogViewModel model = citeDialogViewModel.get();
                 if (!model.pageInfoProperty().getValue().isEmpty()) {

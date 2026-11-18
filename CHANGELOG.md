@@ -40,7 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added <kbd>Ctrl</kbd> + <kbd>C</kbd> copy support for selected entries in the global search results window. [#17310](https://github.com/JabRef/jabref/issues/17310)
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
-- We added switching between JStyle, CSL, and BST citation styles within the same Writer document. [#14962](https://github.com/JabRef/jabref/issues/14962)
+- We added switching between JStyle, CSL, and BST in Writer, plus CSL author-only and year-only citations. [#14962](https://github.com/JabRef/jabref/issues/14962)
 
 ### Changed
 

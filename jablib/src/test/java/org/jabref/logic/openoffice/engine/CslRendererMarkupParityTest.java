@@ -20,10 +20,12 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.jabref.logic.openoffice.engine.RendererTestData.entry;
 import static org.jabref.logic.openoffice.engine.RendererTestData.group;
+import static org.jabref.logic.openoffice.engine.RendererTestData.numericStyle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
@@ -60,6 +62,41 @@ class CslRendererMarkupParityTest {
 
         assertEquals(OOFormat.setLocaleNone(OOText.fromString(expected)), result.markers().get(target.groupId));
         assertEquals(Optional.of(OOText.fromString(previousText)), target.getCitationMarker());
+    }
+
+    // [utest->req~openoffice.csl-partial-citations~1]
+    @ParameterizedTest
+    @MethodSource("partialTextCases")
+    void partialFieldsAndFallbackKeysAreEscapedAsLiteralText(CitationType type, BibEntry entry, String expected) throws RenderException {
+        CitationGroup target = group("partial", type, entry.getCitationKey().orElseThrow());
+        RenderRequest request = new RenderRequest(List.of(target), List.of(new BibDatabase(List.of(entry))), new RenderOptions(BstCitationFormat.NUMERIC));
+        RenderResult result = new CslRenderer(numericStyle(false, false), new BibEntryTypesManager()).render(request);
+
+        assertEquals(OOFormat.setLocaleNone(OOText.fromString(expected)), result.markers().get(target.groupId));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CitationType.class, names = {"AUTHOR_ONLY", "YEAR_ONLY"})
+    void entirelyUnresolvedPartialGroupsRemainVisibleAndEscaped(CitationType type) throws RenderException {
+        String key = "<i>missing</i>&";
+        CitationGroup target = group("missing", type, key, key);
+        RenderRequest request = new RenderRequest(List.of(target), List.of(), new RenderOptions(BstCitationFormat.NUMERIC));
+        RenderResult result = new CslRenderer(numericStyle(false, false), new BibEntryTypesManager()).render(request);
+
+        assertEquals(List.of(OOFormat.setLocaleNone(OOText.fromString("Unresolved(&lt;i&gt;missing&lt;/i&gt;&amp;); Unresolved(&lt;i&gt;missing&lt;/i&gt;&amp;)")), List.of(key)),
+                List.of(result.markers().get(target.groupId), result.unresolvedKeys()));
+    }
+
+    private static Stream<Arguments> partialTextCases() {
+        return Stream.of(
+                Arguments.of(CitationType.AUTHOR_ONLY, new BibEntry().withCitationKey("key").withField(StandardField.AUTHOR, "{<i>Smith</i> & Co.}"),
+                        "{&lt;i&gt;Smith&lt;/i&gt; &amp; Co.}"),
+                Arguments.of(CitationType.AUTHOR_ONLY, new BibEntry().withCitationKey("key").withField(StandardField.AUTHOR, "A&B, Jane"), "A&amp;B"),
+                Arguments.of(CitationType.AUTHOR_ONLY, new BibEntry().withCitationKey("key").withField(StandardField.EDITOR, "{<b>Jones</b> & Co.}"),
+                        "{&lt;b&gt;Jones&lt;/b&gt; &amp; Co.}"),
+                Arguments.of(CitationType.YEAR_ONLY, new BibEntry().withCitationKey("key").withField(StandardField.YEAR, "2020b"), "2020b"),
+                Arguments.of(CitationType.AUTHOR_ONLY, new BibEntry().withCitationKey("<i>key</i>&"), "&lt;i&gt;key&lt;/i&gt;&amp;"),
+                Arguments.of(CitationType.YEAR_ONLY, new BibEntry().withCitationKey("<i>key</i>&"), "&lt;i&gt;key&lt;/i&gt;&amp;"));
     }
 
     private static Stream<Arguments> markupCases() {

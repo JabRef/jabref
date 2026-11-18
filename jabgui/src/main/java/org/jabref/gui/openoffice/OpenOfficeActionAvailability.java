@@ -11,9 +11,11 @@ record OpenOfficeActionAvailability(boolean cite, boolean citeInText, boolean ci
 
     static OpenOfficeActionAvailability forCapabilities(boolean connected, boolean hasDatabase, StyleCapabilities capabilities) {
         boolean canCite = connected && hasDatabase && !capabilities.supportedTypes().isEmpty();
+        boolean supportsCiteSpecial = capabilities.supportedTypes().stream().anyMatch(CitationType::isPartial)
+                                      || (capabilities.supportsPageInfo() && capabilities.supportedTypes().contains(CitationType.AUTHORYEAR_INTEXT));
         return new OpenOfficeActionAvailability(canCite, canCite,
                 canCite && capabilities.supportedTypes().contains(CitationType.INVISIBLE_CIT),
-                canCite && capabilities.supportsPageInfo() && capabilities.supportedTypes().contains(CitationType.AUTHORYEAR_INTEXT),
+                canCite && supportsCiteSpecial,
                 canCite,
                 connected && hasDatabase && capabilities.hasBibliography(),
                 connected && capabilities.supportsGroupEditing(),

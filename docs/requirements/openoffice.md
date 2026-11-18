@@ -73,6 +73,19 @@ The citation sidecar retains native JSON, identifiers, and modifiers for restora
 
 Needs: impl, utest
 
+## Canonical CSL citations must render JabRef-defined partial citations
+`req~openoffice.csl-partial-citations~1`
+
+With Zotero compatibility mode disabled, Cite special offers the existing author-only and year-only types for CSL styles.
+Author-only uses JabRef's short-author formatting, falling back to editor names and then the citation key.
+Year-only uses the resolved year, falling back to the parsed date's year and then the citation key; it is a bare-year approximation, not general CSL author suppression.
+These fixed formats apply to numeric, author-year, and alphanumeric styles, preserve group order and repeated entries, and escape user-provided text.
+Explicit suffixes in the year field survive, but the approximation does not reproduce processor-generated disambiguation suffixes or CSL name-formatting rules.
+All resolved sources still participate in document numbering and bibliography output, and stored citation types and page information remain unchanged by rendering.
+Unsupported dialog choices and page information are disabled; JStyle and native Zotero capabilities remain unchanged.
+
+Needs: impl, utest
+
 ## Successful citation insertion must warn about unresolved existing citation keys
 `req~openoffice.insertion-unresolved-warning~1`
 

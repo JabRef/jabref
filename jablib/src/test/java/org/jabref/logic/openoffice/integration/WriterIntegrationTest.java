@@ -228,6 +228,40 @@ class WriterIntegrationTest {
     }
 
     @ParameterizedTest
+    @CsvSource({"AUTHOR_ONLY, Alpha", "YEAR_ONLY, 2020"})
+    // [utest->req~openoffice.csl-partial-citations~1]
+    void canonicalCslPartialCitationsKeepTheirTypeAndTextAcrossRefreshAndReopen(CitationType type, String expectedText) throws Exception {
+        XTextDocument document = office.newDocument();
+        document.getText().setString("Citations: .\nBibliography below.");
+        XTextCursor cursor = document.getText().createTextCursor();
+        cursor.goRight((short) 11, false);
+        BibDatabase database = database();
+        OOStyle selectedStyle = style("csl");
+        try (CitationEngine engine = engine(document)) {
+            assertTrue(engine.capabilities(selectedStyle).supportedTypes().contains(type));
+            assertFalse(engine.capabilities(selectedStyle).supportsPageInfo());
+            assertEquals(List.of(), success(engine.insert(List.of(entry(database, "alpha")), List.of(database), selectedStyle, type, "", cursor, false)));
+            cursor.setString(" | ");
+            cursor.collapseToEnd();
+            assertEquals(List.of(), success(engine.insert(List.of(entry(database, "beta")), List.of(database), selectedStyle,
+                    CitationType.AUTHORYEAR_PAR, "", cursor, true)));
+            assertEquals(List.of(), success(engine.refresh(List.of(database), selectedStyle)));
+            assertEquals(Map.of("alpha", expectedText, "beta", "2"), textsByKey(document));
+            assertEquals(List.of(type, CitationType.AUTHORYEAR_PAR), groups(document).stream().map(group -> group.citationType).toList());
+            assertBibliographyOrder(document, List.of("Alpha title", "Beta title"));
+            assertEquals(List.of("alpha", "beta"), exportedKeys(success(engine.exportCited(List.of(database)))));
+        }
+        Map<String, JabRefMarkData> original = identities(document);
+        XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("csl-" + type + ".odt"));
+        try (CitationEngine engine = engine(reopened)) {
+            assertEquals(List.of(), success(engine.refresh(List.of(database), selectedStyle)));
+            assertEquals(original, identities(reopened));
+            assertEquals(Map.of("alpha", expectedText, "beta", "2"), textsByKey(reopened));
+            assertBibliographyOrder(reopened, List.of("Alpha title", "Beta title"));
+        }
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"jstyle", "csl", "bst"})
     void insertionRenumbersExistingMarkersAndBibliographyInDocumentOrder(String family) throws Exception {
         XTextDocument document = office.newDocument();

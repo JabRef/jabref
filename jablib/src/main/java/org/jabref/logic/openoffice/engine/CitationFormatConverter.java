@@ -189,7 +189,7 @@ final class CitationFormatConverter {
             failure.initCause(exception);
             throw failure;
         }
-        RenderResult rendered = renderer.render(request);
+        RenderResult rendered = targetZotero ? renderer.renderNative(request) : renderer.render(request);
         for (PlannedCitation citation : complete) {
             if (!rendered.markers().containsKey(citation.group().groupId)) {
                 throw new RenderException("Renderer omitted a prepared conversion group");

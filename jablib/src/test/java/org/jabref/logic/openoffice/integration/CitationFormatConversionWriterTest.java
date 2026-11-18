@@ -182,6 +182,14 @@ class CitationFormatConversionWriterTest {
             insert(engine, document, "alpha", false);
         }
         assertEquals(List.of(), bibliographyNames(document));
+        Map<CitationType, String> nativeText = new LinkedHashMap<>();
+        for (String value : conversionSnapshots(document).values()) {
+            JsonObject metadata = JsonParser.parseString(value).getAsJsonObject();
+            CitationType originalType = MarkCodec.decode(metadata.get("canonicalName").getAsString()).citationType();
+            nativeText.put(originalType, WriterReferenceMarks.getAnchor(document, metadata.get("zoteroName").getAsString()).orElseThrow().getString());
+        }
+        assertEquals(List.of(nativeText.get(CitationType.AUTHORYEAR_PAR), nativeText.get(CitationType.AUTHORYEAR_PAR)),
+                List.of(nativeText.get(CitationType.AUTHOR_ONLY), nativeText.get(CitationType.YEAR_ONLY)));
         XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("types-in-zotero.odt"));
         try (CitationEngine engine = engine(reopened, preferences(false))) {
             assertTrue(success(engine.requiresFormatConversion(style())));
@@ -192,6 +200,10 @@ class CitationFormatConversionWriterTest {
             CitationGroup group = restored.readCitationGroupFromDocumentOrThrow(reopened, entry.getKey());
             assertEquals(List.of("beta", "alpha"), group.citationsInStorageOrder.stream().map(citation -> citation.citationKey).toList());
             assertEquals(entry.getValue(), group.citationsInStorageOrder.stream().map(citation -> citation.getPageInfo().map(text -> text.toString())).toList());
+            if (group.citationType.isPartial()) {
+                String expectedText = group.citationType == CitationType.AUTHOR_ONLY ? "Beta; Alpha" : "2021; 2020";
+                assertEquals("\u200b" + expectedText + "\u200b", WriterReferenceMarks.getAnchor(reopened, entry.getKey()).orElseThrow().getString());
+            }
         }
         assertEquals(List.of(), bibliographyNames(reopened));
     }
