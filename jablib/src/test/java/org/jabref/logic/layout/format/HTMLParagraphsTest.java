@@ -24,6 +24,8 @@ class HTMLParagraphsTest {
         return Stream.of(
                 Arguments.of("", ""),
                 Arguments.of("<p>\nHello\n</p>", "Hello"),
+                Arguments.of("<p>\nPrice is $5\n</p>\n<p>\nNext\n</p>", "Price is $5\n\nNext"),
+                Arguments.of("<p>\nPath C:\\docs\n</p>\n<p>\nNext\n</p>", "Path C:\\docs\n\nNext"),
                 Arguments.of("<p>\nHello\nWorld\n</p>", "Hello\nWorld"),
                 Arguments.of("<p>\nHello World\n</p>\n<p>\nWhat a lovely day\n</p>", "Hello World\n   \nWhat a lovely day\n"),
                 Arguments.of("<p>\nHello World\n</p>\n<p>\nCould not be any better\n</p>\n<p>\nWhat a lovely day\n</p>", "Hello World\n \n\nCould not be any better\n\nWhat a lovely day\n")
