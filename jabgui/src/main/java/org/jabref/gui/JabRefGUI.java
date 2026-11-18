@@ -23,6 +23,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -97,6 +98,7 @@ public class JabRefGUI extends Application {
     private static ThemeManager themeManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static NativeDesktop nativeDesktop;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
 
     private static DialogService dialogService;
@@ -145,7 +147,8 @@ public class JabRefGUI extends Application {
                     taskExecutor,
                     gitHandlerRegistry,
                     journalAbbreviationRepository,
-                    oAuthSessionRegistry);
+                    oAuthSessionRegistry,
+                    nativeDesktop);
 
             openWindow();
 
@@ -263,6 +266,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+
+        JabRefGUI.nativeDesktop = NativeDesktop.create(getHostServices(), preferences, clipBoardManager);
+        Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
@@ -391,6 +397,8 @@ public class JabRefGUI extends Application {
 
         LOGGER.debug("installing CSS");
         themeManager.updateCssOnScene(scene);
+
+        TextInputKeyBindings.registerSecondaryWindows(mainStage, preferences.getKeyBindingRepository());
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
