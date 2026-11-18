@@ -160,8 +160,8 @@ class BackupManagerTest {
         assertEquals(emptyBackup, BackupManager.getLatestBackupPath(originalFile, backupDir).orElseThrow());
     }
 
+    /// [utest->req~jabgui.autosaveandbackup.complete-backup~1]
     @Test
-        // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
     void restoringAnEmptyBackupLeavesTheOriginalFileUnchanged(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@article{existing}");
@@ -195,9 +195,9 @@ class BackupManagerTest {
         assertInstanceOf(DirectoryNotEmptyException.class, failure.exception());
     }
 
+    /// [utest->req~jabgui.autosaveandbackup.backup-every-edit~1]
     @ParameterizedTest
     @ValueSource(strings = {"", "A"})
-        // [utest->req~jabgui.autosaveandbackup.backup-every-edit~1]
     void typingIntoNewOrExistingFieldIsBackedUp(String initialValue, @TempDir Path tempDir) throws IOException, ParseException {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry").withField(StandardField.EDITOR, initialValue);
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
@@ -234,8 +234,8 @@ class BackupManagerTest {
         }
     }
 
+    /// [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
     @Test
-        // [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
     void editAfterSnapshotIsIncludedInNextBackup(@TempDir Path tempDir) throws IOException, ParseException {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
@@ -272,8 +272,8 @@ class BackupManagerTest {
         }
     }
 
+    /// [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
     @Test
-        // [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
     void failedBackupCommitLeavesEditsPending(@TempDir Path tempDir) throws IOException, ParseException {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
@@ -298,8 +298,8 @@ class BackupManagerTest {
         }
     }
 
+    /// [utest->req~jabgui.autosaveandbackup.serialized-writes~1]
     @Test
-        // [utest->req~jabgui.autosaveandbackup.serialized-writes~1]
     void shutdownWaitsForScheduledBackupBeforeWritingNewestEdit(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
