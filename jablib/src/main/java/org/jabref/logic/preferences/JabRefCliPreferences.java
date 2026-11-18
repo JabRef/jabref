@@ -490,6 +490,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static JabRefCliPreferences singleton;
 
     private final Preferences preferencesNode;
+    private final boolean resetsGlobalStores;
+    private boolean resettingIsolatedNode;
 
     /// Cache variables
     private LibraryPreferences libraryPreferences;
@@ -546,11 +548,16 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     public JabRefCliPreferences() {
-        this(Preferences.userRoot().node("/org/jabref"));
+        this(Preferences.userRoot().node("/org/jabref"), true);
     }
 
     public JabRefCliPreferences(Preferences preferencesNode) {
+        this(preferencesNode, false);
+    }
+
+    private JabRefCliPreferences(Preferences preferencesNode, boolean resetsGlobalStores) {
         this.preferencesNode = preferencesNode;
+        this.resetsGlobalStores = resetsGlobalStores;
         try {
             Path preferencesPath = Path.of("jabref.xml");
             if (Files.exists(preferencesPath)) {
@@ -996,6 +1003,9 @@ public class JabRefCliPreferences implements CliPreferences {
     /// empty map if the keyring cannot be opened, so callers tell failure from "all slots empty" by size
     /// (`result.size() == slots.size()` iff the open succeeded; an empty `slots` is a no-op).
     private Map<KeyringSlot, String> readKeyring(List<KeyringSlot> slots) {
+        if (resettingIsolatedNode) {
+            return Map.of();
+        }
         Map<KeyringSlot, String> result = new HashMap<>();
         try (Keyring keyring = Keyring.create()) {
             for (KeyringSlot slot : slots) {
@@ -1076,6 +1086,9 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Writes each secret as plain text to its slot in a single keyring session. A blank secret clears its slot.
     /// In both cases, a legacy encrypted value of the slot is removed, so that it cannot be migrated later.
     private void writeKeyring(Map<KeyringSlot, String> secrets) {
+        if (resettingIsolatedNode) {
+            return;
+        }
         // [impl->req~keyring.plain-text-storage~1]
         // [impl->req~keyring.legacy-migration~1]
         try (Keyring keyring = Keyring.create()) {
@@ -1181,13 +1194,29 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
     @Override
     public void clear() throws BackingStoreException {
+        boolean wasResettingIsolatedNode = resettingIsolatedNode;
+        resettingIsolatedNode = !resetsGlobalStores;
+        try {
+            if (resetsGlobalStores) {
+                clearGlobalStores();
+            }
+            clearPreferencesNode();
+        } finally {
+            resettingIsolatedNode = wasResettingIsolatedNode;
+        }
+    }
+
+    private void clearGlobalStores() throws BackingStoreException {
+        clearTruststoreFromCustomCertificates();
+        clearCustomFetcherKeys();
+        getSharedDatabasePreferences().clearAllConnections();
+    }
+
+    private void clearPreferencesNode() throws BackingStoreException {
         clearAllBibEntryTypes();
         removeDeclinedCustomEntryTypes();
         clearCitationKeyPatterns();
-        clearTruststoreFromCustomCertificates();
-        clearCustomFetcherKeys();
         preferencesNode.clear();
-        getSharedDatabasePreferences().clearAllConnections();
 
         initializeAll();
 
@@ -1774,6 +1803,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// The refresh token lives in the system keyring only: never in the preferences, which can be exported as plain text
     private @Nullable RefreshToken getCiteDriveToken(String apiBaseUrl) {
+        if (resettingIsolatedNode) {
+            return null;
+        }
         try (final Keyring keyring = Keyring.create()) {
             return parseCiteDriveToken(keyring.getPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT), apiBaseUrl);
         } catch (PasswordAccessException _) {
@@ -1786,6 +1818,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// If the keyring is not available, the token is kept in memory only (login needed after restart)
     private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
+        if (resettingIsolatedNode) {
+            return;
+        }
         try (final Keyring keyring = Keyring.create()) {
             if (refreshToken == null) {
                 keyring.deletePassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT);
