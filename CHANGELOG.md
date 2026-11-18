@@ -41,8 +41,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added <kbd>Ctrl</kbd> + <kbd>C</kbd> copy support for selected entries in the global search results window. [#17310](https://github.com/JabRef/jabref/issues/17310)
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
-- We added switching between JStyle, CSL, and BST in Writer, plus CSL author-only and year-only citations. [#14962](https://github.com/JabRef/jabref/issues/14962)
-- We added a shortcut from the Writer panel to OpenOffice/LibreOffice preferences. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We added switching among JStyle, CSL, and BST without reinserting citations, preserving types and page information outside Zotero mode. [#14962](https://github.com/JabRef/jabref/issues/14962)
+- We added author-only and year-only approximations for CSL citations through "Cite special" outside Zotero mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We added "More settings" to the Writer panel's Settings menu, opening OpenOffice/LibreOffice preferences. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We added restoration of each Writer document's last-applied JStyle, CSL, or BST style when connecting. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We added "Insert empty citation" in Zotero compatibility mode, retaining invisible citations through refresh and reopening. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We added Writer citation refresh for CSL styles without bibliographies. [#17673](https://github.com/JabRef/jabref/pull/17673)
 
 ### Changed
 
@@ -62,7 +66,17 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed "OK" to "Remove" button in Remove subgroups, Remove field name and Remove keyword. [#12706](https://github.com/JabRef/jabref/issues/12706)
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We shortened read-status and priority menu labels and made read and low-priority icons easier to distinguish. [#17691](https://github.com/JabRef/jabref/pull/17691)
-- We changed Writer integration: older JStyle, CSL, and BST citations are no longer managed; no migration is provided. [#14962](https://github.com/JabRef/jabref/issues/14962)
+- We changed Writer insertion to refresh existing citations consistently, respect bibliography synchronization, and avoid duplicate surrounding spaces. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer updates to show unresolved citations and list every missing key, including after successful insertion. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Zotero compatibility conversions to retain stored citation details across reopening and Undo/Redo, recovering failures when safe. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer error messages to explain protected areas, unavailable citations, missing styles, and Pandoc problems. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer updates to preserve existing citations and bibliographies when citation formatting fails. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer style selection to preserve Zotero preferences; disable compatibility mode explicitly before using JStyle or BST. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer's "Infer style" action to remain available across style families while still identifying CSL styles only. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer style removal to confirm the clicked style and keep selections consistent after removal. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer bibliography refresh to clear obsolete entries and extra blank paragraphs, updating only the selected citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed "Separate citations" to leave in-text, invisible, no-parentheses, author-only, and year-only groups unchanged. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed Writer refresh to use textual citation ordering when visual ordering is unavailable. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We hide the "Move deleted files to trash" preference on platforms without a trash. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
 
 ### Fixed
@@ -140,6 +154,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
 - We fixed an issue where "Automatically set file links" did not work when no external file types were configured. [#15084](https://github.com/JabRef/jabref/issues/15084)
 - We fixed an issue where citing organisations in JStyle format was not sorting or displaying properly in LibreOffice. [#11725](https://github.com/JabRef/jabref/issues/11725)
+- We fixed CSL updates changing existing citations between normal, in-text, and invisible forms. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed Writer page information being lost, misassigned, combined, retained after clearing, or restored incorrectly by Undo. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed numeric CSL updates altering unrelated numbers or citation formatting. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed BST bibliographies losing numbering and disambiguation shared between entries. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed literal markup in Writer bibliography headings and JStyle citation keys being interpreted as formatting. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed JStyle citation-key mode incorrectly applying numeric bibliography formatting. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed Writer citation updates overlooking pending tracked deletions after change recording was disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed Writer actions reloading an unrelated JStyle instead of the selected style. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed an issue where "Perform OCR" button remained enabled for broken or missing linked files. [#16736](https://github.com/JabRef/jabref/issues/16736)
 - We fixed an issue where icons kept a large size after lowering the font size until JabRef was restarted. [#17556](https://github.com/JabRef/jabref/issues/17556)
 - We fixed an issue where the "Backup found" dialog appeared while another library's tab was selected. [#16919](https://github.com/JabRef/jabref/pull/16919)
@@ -167,6 +189,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We removed legacy JabRef Writer citations from updates, bibliographies, and exports; their text remains visible without automatic migration. [#14962](https://github.com/JabRef/jabref/issues/14962)
 - We removed the "Waiting for AI reply..." notification; the AI chat already shows a progress indicator. [#17145](https://github.com/JabRef/jabref/pull/17145)
 - We temporarily removed the language handling for Docling due to a bug in RapidOCR. [#17674](https://github.com/JabRef/jabref/pull/17674)
 
