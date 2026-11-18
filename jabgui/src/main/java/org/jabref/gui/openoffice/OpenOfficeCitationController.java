@@ -291,6 +291,19 @@ public class OpenOfficeCitationController {
         return Optional.of(result.database());
     }
 
+    public Optional<List<BibEntry>> importCited() {
+        String title = Localization.lang("Unable to import cited entries");
+        OOResult<CitationEngine, OOError> current = getEngine();
+        if (showErrorIfPresent(title, current.asVoidResult())) {
+            return Optional.empty();
+        }
+        OOResult<List<BibEntry>, JabRefException> result = current.get().importCited();
+        if (showErrorIfPresent(title, result.asVoidResult().mapError(OOError::from))) {
+            return Optional.empty();
+        }
+        return result.getOptional();
+    }
+
     private void showUnresolvedKeys(String title, List<String> keys) {
         dialogService.showErrorDialogAndWait(title,
                 Localization.lang("Your OpenOffice/LibreOffice document references at least %0 citation keys which could not be found in your current library. Some of these are %1.",

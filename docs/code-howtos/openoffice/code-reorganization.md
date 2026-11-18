@@ -18,7 +18,7 @@ The logic and model packages below live under `jablib/src/main/java/org/jabref/`
 | Package | Responsibility | Principal types |
 | --- | --- | --- |
 | `gui.openoffice` in `jabgui` | Present document actions, select styles, and show results. | `OpenOfficePanel`, `OpenOfficeCitationController`, `OpenOfficeDocumentConnection`, `CslStyleResolver` |
-| `logic.openoffice` | Shared citation identities, preferences, and Zotero protocol support. | `CitationIds`, `OpenOfficePreferences`, `ZoteroReferenceMark`, `ZoteroCitationLinker`, `ZoteroDocumentPreferences` |
+| `logic.openoffice` | Shared citation identities, preferences, and Zotero protocol support. | `CitationIds`, `ImportCited`, `OpenOfficePreferences`, `ZoteroReferenceMark`, `ZoteroCitationLinker`, `ZoteroDocumentPreferences` |
 | `logic.openoffice.engine` | Coordinate document actions and compute renderer output. | `CitationEngine`, `UpdatePipeline`, `CitationGroupEditor`, `CitationFormatConverter`, `DocumentWriteSession`, `CitationRenderer` |
 | `logic.openoffice.engine.storage` | Read canonical citations and apply prepared text/property changes. | `MarkStore`, `CitationMarkerWriter`, `DocumentStyleStore`, `UndoableDocumentProperties` |
 | `logic.openoffice.frontend` | Combine the live document with the citation model, ordering, and overlap protection. | `DocumentCitations`, `DocumentOrder`, `RangeForOverlapCheck` |
@@ -39,7 +39,7 @@ UNO access and range sorting belong to `logic`, not to the pure model packages.
 ## GUI gateway and document connection
 
 `OpenOfficePanel` gathers selected entries and libraries, prepares the selected style, and enables actions according to `StyleCapabilities` through `OpenOfficeActionAvailability`.
-`OpenOfficeCitationController` delegates insertion, refresh, merge/separate, citation editing, and cited-entry export to `CitationEngine`; it presents errors, unresolved-key warnings, and the existing format-conversion warning.
+`OpenOfficeCitationController` delegates insertion, refresh, merge/separate, citation editing, and cited-entry import/export to `CitationEngine`; it presents errors, unresolved-key warnings, and the existing format-conversion warning.
 GUI controller instances are named `citationController`.
 Document mutation, renderer dispatch, write-session handling, and Zotero strategy selection belong to the engine rather than the controller.
 
@@ -56,6 +56,13 @@ Connecting to or selecting a Writer document retains the last selected style fro
 The resolver is distinct from the generated CSL catalog produced by `CitationStyleCatalogGenerator` in `build-support`.
 `ManageCitationsDialogViewModel.applyCitationEdits()` applies edited citation rows through the controller; it does not store dialog preferences.
 `OOError` carries localized dialog messages and titles at the GUI boundary.
+
+For **Import cited**, the panel captures the active `LibraryTab` before calling `OpenOfficeCitationController.importCited()`, which delegates to the read-only `CitationEngine.importCited()` API.
+`ImportCited` in `logic.openoffice` collects native Zotero-compatible entry data; canonical and legacy marks are ignored, and collection never triggers document writes or format conversion.
+Deduplication uses the native URI, otherwise the explicit key, otherwise the numeric item ID; key-only and URI-bearing representations remain separate for ordinary bibliographic duplicate handling.
+The captured tab's existing `ImportHandler` owns duplicate decisions, explicit-key conflict warnings, batch key reservations, and library insertion.
+Cited-entry batches serialize the whole per-entry import operation so later duplicate searches see earlier accepted entries; general imports retain their existing concurrency and preferences.
+See [cited-entry importing](overview.md#importing-cited-entries) for identity precedence and the separation from export-cited lookup.
 
 ## Document actions, rendering, and write sessions
 

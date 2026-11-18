@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.ImportCited;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.ZoteroCitationLinker;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
@@ -160,6 +161,98 @@ class ZoteroCitationStrategyTest {
             assertEquals(List.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT),
                     engine.capabilities(style()).supportedTypes().stream().sorted().toList());
         }
+    }
+
+    @Test
+    void importCitedDelegatesReferenceMarkNamesToCollector() {
+        List<String> names = List.of(ZOTERO, CANONICAL);
+        List<BibEntry> entries = List.of(entry("a", "A"));
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             MockedStatic<ImportCited> collector = mockStatic(ImportCited.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(names);
+            collector.when(() -> ImportCited.collectCitedEntries(names)).thenReturn(entries);
+
+            assertSame(entries, engine.importCited().get());
+
+            marks.verify(() -> WriterReferenceMarks.getListOfNames(document));
+            collector.verify(() -> ImportCited.collectCitedEntries(names));
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void importCitedReadsNativeDataWithoutStyleChecksConversionOrDocumentMutation(boolean zoteroMode) {
+        when(preferences.getZoteroCompatibilityMode()).thenReturn(zoteroMode);
+        String nativeMark = ZoteroReferenceMark.PREFIX + """
+                {"citationID":"native","citationItems":[{"id":587,\
+                "uris":["http://zotero.org/users/123/items/ABCD1234"],\
+                "itemData":{"id":587,"type":"article-journal","title":"Native Zotero article",\
+                "DOI":"10.1234/native.2024"}}]} RNDklmnopqrst""";
+        List<String> names = List.of(CANONICAL, ZOTERO, nativeMark, LEGACY_CID, LEGACY_JSTYLE);
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             MockedStatic<CitationFormatConverter> conversion = mockStatic(CitationFormatConverter.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(names);
+
+            List<BibEntry> imported = engine.importCited().get();
+
+            assertEquals(List.of(Optional.of("a"), Optional.empty()), imported.stream().map(BibEntry::getCitationKey).toList());
+            assertEquals(List.of(Optional.of("A"), Optional.of("Native Zotero article")),
+                    imported.stream().map(importedEntry -> importedEntry.getField(StandardField.TITLE)).toList());
+            assertEquals(Optional.of("10.1234/native.2024"), imported.getLast().getField(StandardField.DOI));
+            marks.verify(() -> WriterReferenceMarks.getListOfNames(document));
+            marks.verifyNoMoreInteractions();
+            conversion.verifyNoInteractions();
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void importCitedReturnsSuccessfulEmptyListForEmptyOrCanonicalOnlyDocument(boolean canonicalOnly) {
+        List<String> names = canonicalOnly ? List.of(CANONICAL, LEGACY_CID, LEGACY_JSTYLE) : List.of();
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(names);
+
+            assertEquals(Optional.of(List.of()), engine.importCited().getOptional());
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @Test
+    void importCitedRejectsClosedEngineWithoutReadingDocument() {
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            engine.close();
+
+            assertEquals(Localization.lang("Not connected to any Writer document. Please make sure a document is open, and use the 'Select Writer document' button to connect to it."),
+                    engine.importCited().getError().getLocalizedMessage());
+            marks.verifyNoInteractions();
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("importReadFailures")
+    void importCitedReturnsLocalizedReadFailureWithoutDocumentMutation(Exception cause) {
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenThrow(cause);
+
+            JabRefException error = engine.importCited().getError();
+
+            assertEquals(Localization.lang("Unable to import cited entries"), error.getLocalizedMessage());
+            assertSame(cause, error.getCause());
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    private static Stream<Exception> importReadFailures() {
+        return Stream.of(new WriterDocumentAccessException("Reference marks unavailable"),
+                new com.sun.star.uno.RuntimeException("Reference mark read failed"));
     }
 
     @ParameterizedTest

@@ -6,7 +6,7 @@ grand_parent: Code Howtos
 # Overview
 
 The OpenOffice/LibreOffice panel connects JabRef libraries to a Writer document.
-It inserts citations, refreshes their presentation, generates a bibliography, and exports cited entries to a library.
+It inserts citations, refreshes their presentation, generates a bibliography, exports cited entries, and imports entries embedded in Zotero-compatible documents.
 JStyle, CSL, and BST styles share canonical JabRef citations when Zotero compatibility mode is disabled.
 Zotero compatibility mode uses a separate CSL-only strategy and native Zotero storage.
 
@@ -25,6 +25,7 @@ The [requirements](../../requirements/openoffice.md) and [ADR-0083](../../decisi
 | Group structure | `CitationGroupEditor` | Prepare replacements without mutation, then apply them in the engine's write session. |
 | Rendering | `RendererFactory`, `CitationRenderer`, `RenderRequest`, `RenderResult` | Compute final markers, bibliography paragraphs when requested, and unresolved keys. |
 | Cited-entry export | `CitedEntryExporter` | Resolve ordered citation keys into a library without accessing Writer. |
+| Cited-entry import | `CitationEngine.importCited`, `ImportCited` | Collect embedded Zotero entries read-only for the existing library import flow. |
 | Canonical storage | `JabRefMarkCodec`, `MarkStore`, `UndoableDocumentProperties`, `DocumentStyleStore` | Encode identities, read citation/page-info state, register custom-property undo deltas, and store applied-style identity. |
 | Ordering | `DocumentOrder` | Order within text containers, map footnotes for numbering, and use visual positions when available. |
 | Document writes | `CitationMarkerWriter`, `BibliographySection`, `DocumentWriteSession` | Apply prepared output and manage write-phase undo, locking, and change recording. |
@@ -35,7 +36,7 @@ The engine and renderers live in `jablib/src/main/java/org/jabref/logic/openoffi
 `DocumentCitations` and `DocumentOrder` are in `logic/openoffice/frontend/`.
 `DocumentCitations` is an action-local facade combining a mutable `CitationGroups` model with live `MarkStore` and Writer range access, not a document subtype or immutable snapshot.
 Core facade instances are named `documentCitations`; GUI controller instances are named `citationController`.
-`OpenOfficeCitationController` exposes concise action methods such as `insertCitation`, `refresh`, `mergeCitations`, `separateCitations`, and `exportCited`.
+`OpenOfficeCitationController` exposes concise action methods such as `insertCitation`, `refresh`, `mergeCitations`, `separateCitations`, `exportCited`, and `importCited`.
 `OpenOfficeDocumentConnection.disposeAllBridges()` is a global static shutdown operation: it disposes client-side UNO bridges without closing Writer documents or the office application.
 
 Low-level UNO helpers and `OOTextWriter` are in `logic/openoffice/uno/`.
@@ -86,6 +87,30 @@ A style without a bibliography can still update citation markers without rebuild
 If existing citations cannot be resolved in the selected libraries, a successful insertion shows an "Unresolved citations" warning listing every returned key and advising the user to open the corresponding libraries and refresh.
 The warning applies with synchronization enabled or disabled; the insertion succeeds, but existing markers may show unresolved keys, and synchronization may omit their bibliography entries.
 Stored keys remain available for resolution after reopening the libraries and refreshing.
+
+## Importing cited entries
+
+**Import cited** reads bibliographic data embedded in native Zotero-compatible reference marks, including JabRef-linked marks in that format.
+It ignores canonical JabRef and legacy marks, which do not embed the required entry data.
+Unlike **Export cited**, it does not resolve citation keys against open libraries to collect the entries.
+
+`OpenOfficePanel` captures the active `LibraryTab` before collection and delegates through `OpenOfficeCitationController.importCited()` to `CitationEngine.importCited()`.
+The engine uses `ImportCited` to collect embedded entries without a write session, document mutation, or citation-format conversion, independently of the selected compatibility mode.
+The panel passes the result to the captured tab's normal `ImportHandler`, so changing the active tab does not retarget the import.
+Missing library or document prerequisites are reported before collection.
+
+Collection prefers native item URIs, then explicit document keys, then fallback numeric item IDs.
+Only citations with the same selected identity are deduplicated, preserving the first collected position and bibliographic data; a later explicit key is retained when the first citation with that identity was keyless.
+Key-only and URI-bearing representations remain separate even when their keys match, and both reach the serialized ordinary bibliographic duplicate handler.
+An extra duplicate prompt is safer than dropping a potentially unrelated publication based solely on a shared key.
+
+For cited-entry imports, the handler serializes each complete duplicate search, user decision, key adjustment, and insertion before starting the next entry's search.
+This lets later entries find earlier accepted bibliographic duplicates without changing general imports' concurrent processing or preference behavior.
+All explicit batch keys are reserved before generating keys for keyless entries, including during suffix selection.
+When batch reservations are supplied, generated-key collision checks use each candidate's final normalized form against both reserved keys and existing library keys.
+If an unrelated library entry owns an explicit document key, the handler warns and declines that entry's insertion rather than renaming it or creating duplicate keys.
+Replacing or merging a duplicate is also declined with a warning if the outcome would silently drop another explicit key from the cited batch.
+The [import requirements](../../requirements/import.md#user-can-import-cited-entries-from-zotero-compatible-libreoffice-documents) define identity collection, key preservation, and batch duplicate handling.
 
 ## What is stored in a document
 

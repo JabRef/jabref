@@ -44,6 +44,7 @@ import org.mockito.MockedStatic;
 
 import static org.jabref.logic.l10n.Localization.lang;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -402,6 +403,85 @@ class OpenOfficeCitationControllerTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void importCitedDelegatesWithoutModeOrStyleChecksAndPreservesEntries(boolean zoteroMode) {
+        when(preferences.getZoteroCompatibilityMode()).thenReturn(zoteroMode);
+        BibEntry entry = new BibEntry();
+        List<BibEntry> entries = List.of(entry, new BibEntry(entry));
+        try (MockedConstruction<CitationEngine> engines = mockConstruction(CitationEngine.class,
+                (engine, _) -> when(engine.importCited()).thenReturn(OOResult.ok(entries)))) {
+            Optional<List<BibEntry>> result = controller().importCited();
+
+            assertSame(entries, result.orElseThrow());
+            assertEquals(Optional.empty(), entry.getCitationKey());
+            CitationEngine engine = engines.constructed().getFirst();
+            verify(engine).importCited();
+            verifyNoMoreInteractions(engine);
+            verifyNoInteractions(dialogs, document, context, preferences, entryTypes, style);
+        }
+    }
+
+    @Test
+    void importCitedPreservesSuccessfulEmptyList() {
+        try (MockedConstruction<CitationEngine> engines = mockEngines()) {
+            assertEquals(Optional.of(List.of()), controller().importCited());
+
+            CitationEngine engine = engines.constructed().getFirst();
+            verify(engine).importCited();
+            verifyNoMoreInteractions(engine);
+            verifyNoInteractions(dialogs, document, context, preferences, entryTypes, style);
+        }
+    }
+
+    @Test
+    void importCitedPresentsEngineFailureAndReturnsEmptyOptional() {
+        JabRefException error = new JabRefException("Import read failed", "Document reference marks are unavailable");
+        try (MockedConstruction<CitationEngine> engines = mockConstruction(CitationEngine.class,
+                (engine, _) -> when(engine.importCited()).thenReturn(OOResult.error(error)))) {
+            assertEquals(Optional.empty(), controller().importCited());
+
+            verify(dialogs).showErrorDialogAndWait(lang("Unable to import cited entries"), error.getLocalizedMessage());
+            CitationEngine engine = engines.constructed().getFirst();
+            verify(engine).importCited();
+            verifyNoMoreInteractions(engine);
+            verifyNoInteractions(document, context, preferences, entryTypes, style);
+        }
+    }
+
+    @Test
+    void importCitedWithoutDocumentPresentsConnectionErrorWithoutConstructingEngine() {
+        OOError error = OOError.from(new WriterDocumentAccessException());
+        when(connection.getXTextDocument()).thenReturn(OOResult.error(error));
+        try (MockedConstruction<CitationEngine> engines = mockEngines()) {
+            assertEquals(Optional.empty(), controller().importCited());
+
+            assertEquals(List.of(), engines.constructed());
+            verify(dialogs).showErrorDialogAndWait(lang("Unable to import cited entries"), error.getLocalizedMessage());
+            verifyNoInteractions(document, context, preferences, entryTypes, style);
+        }
+    }
+
+    @Test
+    void importCitedAfterConnectionLossClosesCachedEngineWithoutCollectingAgain() {
+        try (MockedConstruction<CitationEngine> engines = mockEngines()) {
+            OpenOfficeCitationController citationController = controller();
+            assertEquals(Optional.of(List.of()), citationController.importCited());
+            OOError error = OOError.from(new WriterDocumentAccessException());
+            when(connection.getXTextDocument()).thenReturn(OOResult.error(error));
+
+            assertEquals(Optional.empty(), citationController.importCited());
+
+            assertEquals(1, engines.constructed().size());
+            CitationEngine engine = engines.constructed().getFirst();
+            verify(engine).importCited();
+            verify(engine).close();
+            verifyNoMoreInteractions(engine);
+            verify(dialogs).showErrorDialogAndWait(lang("Unable to import cited entries"), error.getLocalizedMessage());
+            verifyNoInteractions(document, context, preferences, entryTypes, style);
+        }
+    }
+
     @Test
     void manageCitationsUsesEngineForBothReadAndApply() {
         CitationEntry entry = new CitationEntry("canonical", "context", Optional.of("p. 5"));
@@ -529,6 +609,7 @@ class OpenOfficeCitationControllerTest {
         return mockConstruction(CitationEngine.class, (engine, _) -> {
             when(engine.capabilities(any())).thenReturn(new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR), true, false, false));
             when(engine.requiresFormatConversion(any())).thenReturn(OOResult.ok(false));
+            when(engine.importCited()).thenReturn(OOResult.ok(List.of()));
             when(engine.refresh(anyList(), any())).thenReturn(OOResult.ok(List.of()));
             when(engine.merge(anyList(), any())).thenReturn(OOResult.ok(List.of()));
             when(engine.separate(anyList(), any())).thenReturn(OOResult.ok(List.of()));

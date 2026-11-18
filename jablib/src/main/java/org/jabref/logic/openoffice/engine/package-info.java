@@ -7,6 +7,9 @@
 /// [org.jabref.logic.openoffice.engine.storage].
 /// [ZoteroCitationStrategy] keeps CSL-only Zotero storage separate from canonical JabRef marks.
 /// [CitedEntryExporter] resolves ordered citation keys into a library without accessing Writer.
+/// `CitationEngine.importCited()` delegates embedded Zotero entry collection to
+/// [org.jabref.logic.openoffice.ImportCited] without document writes or format conversion.
+/// Duplicate handling and target-library insertion belong to the GUI's existing import pipeline.
 /// Low-level document access helpers live in [org.jabref.logic.openoffice.uno].
 ///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/openoffice/overview.html">Writer integration overview</a>

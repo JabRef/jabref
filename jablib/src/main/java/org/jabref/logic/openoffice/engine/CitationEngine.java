@@ -13,6 +13,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.CitationIds;
+import org.jabref.logic.openoffice.ImportCited;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
 import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
@@ -312,6 +313,17 @@ public final class CitationEngine implements AutoCloseable {
         } catch (WriterDocumentAccessException | WrappedTargetException e) {
             LOGGER.debug("Could not collect cited entries for export", e);
             return OOResult.error(new JabRefException(e.getMessage(), e));
+        }
+    }
+
+    public OOResult<List<BibEntry>, JabRefException> importCited() {
+        if (closed) {
+            return OOResult.error(unavailable());
+        }
+        try {
+            return OOResult.ok(ImportCited.collectCitedEntries(WriterReferenceMarks.getListOfNames(document)));
+        } catch (WriterDocumentAccessException | com.sun.star.uno.RuntimeException exception) {
+            return OOResult.error(failure(Localization.lang("Unable to import cited entries"), exception));
         }
     }
 

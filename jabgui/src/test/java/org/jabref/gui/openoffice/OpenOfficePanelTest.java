@@ -18,6 +18,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferencesDialogView;
@@ -144,6 +145,7 @@ class OpenOfficePanelTest {
         private final OpenOfficePanel panel = mock(OpenOfficePanel.class, CALLS_REAL_METHODS);
         private final DialogService dialogs = mock(DialogService.class);
         private final LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        private final LibraryTab targetTab = mock(LibraryTab.class);
         private final OpenOfficePreferences preferences = mock(OpenOfficePreferences.class);
         private final CslStyleResolver resolver = mock(CslStyleResolver.class);
         private final OpenOfficeCitationController citationController = mock(OpenOfficeCitationController.class);
@@ -182,6 +184,82 @@ class OpenOfficePanelTest {
             setField("bstStyleLoader", mock(BstStyleLoader.class));
             setField("journalAbbreviationRepository", mock(JournalAbbreviationRepository.class));
             JavaFxExtension.invokeAndWait(() -> assertDoesNotThrow(this::initializePanel));
+        }
+
+        @Test
+        void importWithoutLibraryStopsBeforeReadingTheDocument() {
+            JavaFxExtension.invokeAndWait(() -> assertDoesNotThrow(() -> invoke("importEntries")));
+
+            verify(dialogs).notify(lang("No library open"));
+            verify(citationController, never()).importCited();
+            verifyNoInteractions(targetTab);
+        }
+
+        @Test
+        void failedCitationCollectionDoesNotStartLibraryImport() {
+            when(tabContainer.getCurrentLibraryTab()).thenReturn(targetTab);
+            when(citationController.importCited()).thenReturn(Optional.empty());
+
+            JavaFxExtension.invokeAndWait(() -> assertDoesNotThrow(() -> invoke("importEntries")));
+
+            verify(citationController).importCited();
+            verifyNoInteractions(targetTab);
+            verify(dialogs, never()).notify(anyString());
+        }
+
+        @Test
+        void emptyCitationCollectionReportsNothingToImport() {
+            when(tabContainer.getCurrentLibraryTab()).thenReturn(targetTab);
+            when(citationController.importCited()).thenReturn(Optional.of(List.of()));
+
+            JavaFxExtension.invokeAndWait(() -> assertDoesNotThrow(() -> invoke("importEntries")));
+
+            verify(dialogs).notify(lang("No new cited entries to import"));
+            verifyNoInteractions(targetTab);
+        }
+
+        @Test
+        void importActionForwardsCitationsToTheCapturedLibraryWithoutFilteringByKey() throws ReflectiveOperationException {
+            when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
+            when(tabContainer.getCurrentLibraryTab()).thenReturn(targetTab);
+            when(citationController.importCited()).thenReturn(Optional.of(List.of(entry)));
+            Button importCitations = button("importCitations");
+
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(this::refreshActionAvailability);
+                assertFalse(importCitations.isDisabled());
+                importCitations.fire();
+            });
+
+            verify(targetTab).importCitedEntriesWithDuplicateCheck(List.of(entry));
+            verify(targetTab, never()).getDatabase();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {false, true})
+        void importActionRequiresZoteroCompatibilityMode(boolean zoteroMode) throws ReflectiveOperationException {
+            when(preferences.getZoteroCompatibilityMode()).thenReturn(zoteroMode);
+            Button importCitations = button("importCitations");
+
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(this::refreshActionAvailability);
+                assertEquals(!zoteroMode, importCitations.isDisabled());
+            });
+        }
+
+        @Test
+        void importActionIsDisabledWithoutDocumentConnection() throws ReflectiveOperationException {
+            when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
+            when(citationController.isDocumentConnectionMissing()).thenReturn(true);
+            Button importCitations = button("importCitations");
+
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(this::refreshActionAvailability);
+                assertTrue(importCitations.isDisabled());
+                importCitations.fire();
+            });
+
+            verify(citationController, never()).importCited();
         }
 
         @Test
@@ -507,6 +585,12 @@ class OpenOfficePanelTest {
 
         private void initializePanel() throws ReflectiveOperationException {
             Method method = OpenOfficePanel.class.getDeclaredMethod("initPanel");
+            method.setAccessible(true);
+            method.invoke(panel);
+        }
+
+        private void invoke(String name) throws ReflectiveOperationException {
+            Method method = OpenOfficePanel.class.getDeclaredMethod(name);
             method.setAccessible(true);
             method.invoke(panel);
         }

@@ -91,6 +91,7 @@ public class OpenOfficePanel {
     private final Button unmerge = new Button(Localization.lang("Separate citations"));
     private final Button manageCitations = new Button(Localization.lang("Manage citations"));
     private final Button exportCitations = new Button(Localization.lang("Export cited"));
+    private final Button importCitations = new Button(Localization.lang("Import cited"));
     private final Button modifyBibliographyProperties = new Button(Localization.lang("Bibliography properties"));
     private final Button settingsB = new Button(Localization.lang("Settings"));
     private final Button inferCslStyle = new Button(Localization.lang("Infer style"));
@@ -298,6 +299,10 @@ public class OpenOfficePanel {
         exportCitations.setTooltip(new Tooltip(Localization.lang("Collect cited entries into a new library")));
         exportCitations.setOnAction(_ -> exportEntries());
 
+        importCitations.setMaxWidth(Double.MAX_VALUE);
+        importCitations.setTooltip(new Tooltip(Localization.lang("Import cited")));
+        importCitations.setOnAction(_ -> importEntries());
+
         updateButtonAvailability();
 
         HBox hbox = new HBox();
@@ -311,7 +316,7 @@ public class OpenOfficePanel {
         flow.setPrefWrapLength(200);
         flow.getChildren().addAll(setStyleFile, cite, citeInText, inferCslStyle);
         flow.getChildren().addAll(citeSpecial, citeEmpty, merge, unmerge);
-        flow.getChildren().addAll(manageCitations, exportCitations, modifyBibliographyProperties, settingsB);
+        flow.getChildren().addAll(manageCitations, exportCitations, importCitations, modifyBibliographyProperties, settingsB);
 
         vbox.setFillWidth(true);
         vbox.getChildren().addAll(hbox, flow);
@@ -342,6 +347,26 @@ public class OpenOfficePanel {
                     gitHandlerRegistry);
             tabContainer.addTab(libraryTab, true);
         }
+    }
+
+    private void importEntries() {
+        Optional<LibraryTab> targetTab = Optional.ofNullable(tabContainer.getCurrentLibraryTab());
+        if (targetTab.isEmpty()) {
+            dialogService.notify(Localization.lang("No library open"));
+            return;
+        }
+        Optional<OpenOfficeCitationController> connection = Optional.ofNullable(citationController);
+        if (connection.isEmpty()) {
+            dialogService.notify(Localization.lang("Not connected to document"));
+            return;
+        }
+        connection.orElseThrow().importCited().ifPresent(entries -> {
+            if (entries.isEmpty()) {
+                dialogService.notify(Localization.lang("No new cited entries to import"));
+            } else {
+                targetTab.orElseThrow().importCitedEntriesWithDuplicateCheck(entries);
+            }
+        });
     }
 
     private List<BibDatabase> getDatabaseList() {
@@ -434,6 +459,7 @@ public class OpenOfficePanel {
         unmerge.setDisable(!available.groupEditing());
         manageCitations.setDisable(!available.manageCitations());
         exportCitations.setDisable(!(connected && hasDatabase));
+        importCitations.setDisable(!(connected && hasDatabase && openOfficePreferences.getZoteroCompatibilityMode()));
         modifyBibliographyProperties.setDisable(!available.bibliography());
         pageInfoSupported.set(connected && capabilities.supportsPageInfo());
     }

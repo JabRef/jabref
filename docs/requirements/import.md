@@ -153,6 +153,49 @@ The definition the user accepts is the one from the library file, and it replace
 
 Needs: impl, utest
 
+## User can import cited entries from Zotero-compatible LibreOffice documents
+`feat~import.libreoffice.cited-entries~1`
+
+When a LibreOffice document contains native Zotero-compatible reference marks, the user can import their embedded bibliographic entries into the library active when the action starts.
+Canonical JabRef and legacy marks are ignored; collection is read-only and does not modify the document or trigger citation-format conversion.
+Each citation's collection identity is its native item URI, otherwise its explicit citation key, otherwise its numeric Zotero item ID.
+Only citations sharing that collection identity are deduplicated, retaining the first collected position and bibliographic data; a later explicit document key is retained when the first citation under that identity was keyless.
+Key-only and URI-bearing representations stay separate even when they share a citation key; both reach ordinary bibliographic duplicate handling.
+Bibliographic duplicates pass through the ordinary import handler and its duplicate-resolution preferences, subject to the cited-entry key-preservation and batch-ordering requirements below.
+Explicit document keys are retained, while entries without one receive generated keys.
+Importing without an open library or a connected document reports the missing prerequisite without reading citations.
+
+Origin: <https://github.com/JabRef/jabref/issues/16516>
+
+Needs: impl, utest
+
+## Cited-entry imports must preserve explicit document keys without creating duplicate citation keys
+`req~import.libreoffice.unambiguous-keys~1`
+
+If an unrelated entry in the target library already owns an explicit document key, the cited entry is not inserted and the user receives a warning rather than a silent rename or a second owner of that key.
+Normal bibliographic duplicate decisions must also preserve the explicit document key without conflicting with another entry; otherwise the import is declined with a warning.
+Replacing or merging an earlier accepted entry is also declined with a warning if the outcome would silently drop another explicit document key from the cited batch.
+All explicit keys in the collected batch are reserved before generating keys for keyless entries, including keys belonging to later entries.
+Generated keys, including suffixed candidates, avoid both existing library keys and those reservations.
+When batch reservations are supplied, these collision checks use each candidate's final normalized form.
+For example, an earlier keyless entry with base `Smith2024` receives `Smith2024a` when a later entry explicitly uses `Smith2024` and `Smith2024a` is free.
+
+Origin: <https://github.com/JabRef/jabref/pull/17851#issuecomment-6973013062>
+
+Needs: impl, utest
+
+## Cited-entry imports must finish processing each entry before searching for duplicates of the next entry
+`req~import.libreoffice.batch-duplicates~1`
+
+Within a cited-entry import batch, duplicate search, the user's decision, key adjustment, and any resulting insertion complete before the next entry's duplicate search begins.
+Later searches therefore see earlier accepted entries, including when distinct document item identities describe the same bibliographic entry.
+The ordinary import handler and duplicate-resolution preferences remain in use.
+Other imports retain their existing concurrent processing and citation-key preference behavior.
+
+Origin: <https://github.com/JabRef/jabref/pull/17851#issuecomment-6973013062>
+
+Needs: impl, utest
+
 ## PDF book detection must exclude conference article pages with grouped article evidence
 `req~import.pdf.conference-article-exclusion~1`
 
