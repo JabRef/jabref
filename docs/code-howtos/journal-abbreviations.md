@@ -31,7 +31,7 @@ Bundled LTWA data is loaded lazily once per JVM and shared across repositories a
 Its private prefix and suffix trees are populated only during construction; each lookup uses its own parser and listener state.
 Initialization is synchronized, and failed loads can be retried rather than caching an empty fallback.
 Journal-list contents remain separate for each repository.
-See [Share bundled LTWA data](../decisions/0082-share-bundled-ltwa-data.md) for the lifecycle decision.
+See [Share bundled LTWA data](../decisions/0083-share-bundled-ltwa-data.md) for the lifecycle decision.
 
 External list paths retain their order in `AbbreviationPreferences.getExternalJournalLists()`.
 `getDisabledExternalJournalLists()` stores disabled paths separately; the loader skips them without changing the precedence of enabled lists.
