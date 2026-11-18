@@ -1,10 +1,12 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -23,8 +25,10 @@ import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecifica
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachment;
+import org.jspecify.annotations.NullMarked;
 
 /// Imports an embedded Bib-File from the PDF.
+@NullMarked
 public class PdfEmbeddedBibFileImporter extends PdfImporter {
 
     private final BibtexParser bibtexParser;
@@ -41,68 +45,76 @@ public class PdfEmbeddedBibFileImporter extends PdfImporter {
         if (nameDictionary != null) {
             PDEmbeddedFilesNameTreeNode efTree = nameDictionary.getEmbeddedFiles();
             if (efTree != null) {
-                Map<String, PDComplexFileSpecification> names = efTree.getNames();
-                if (names != null) {
-                    allParsedEntries.addAll(extractAndParseFiles(names));
-                } else {
-                    List<PDNameTreeNode<PDComplexFileSpecification>> kids = efTree.getKids();
-                    if (kids != null) {
-                        for (PDNameTreeNode<PDComplexFileSpecification> node : kids) {
-                            names = node.getNames();
-                            allParsedEntries.addAll(extractAndParseFiles(names));
-                        }
-                    }
-                }
+                allParsedEntries.addAll(extractAndParseNameTree(efTree));
             }
         }
         // extract files from annotations
         for (PDPage page : document.getPages()) {
             for (PDAnnotation annotation : page.getAnnotations()) {
                 if (annotation instanceof PDAnnotationFileAttachment annotationFileAttachment) {
-                    PDComplexFileSpecification fileSpec = (PDComplexFileSpecification) annotationFileAttachment.getFile();
-                    allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));
+                    allParsedEntries.addAll(extractAndParseAttachment(annotationFileAttachment));
                 }
             }
         }
         return new ParserResult(allParsedEntries);
     }
 
+    /// External file references and attachments without an embedded file do not contain importable entries.
+    private List<BibEntry> extractAndParseAttachment(PDAnnotationFileAttachment attachment) throws IOException, ParseException {
+        if (!(attachment.getFile() instanceof PDComplexFileSpecification fileSpec)) {
+            return List.of();
+        }
+        Optional<PDEmbeddedFile> embeddedFile = searchEmbeddedFile(fileSpec);
+        if (embeddedFile.isEmpty()) {
+            return List.of();
+        }
+        return extractAndParseFile(embeddedFile.orElseThrow());
+    }
+
+    /// Name-tree nodes can contain names, child nodes, or neither; visit all descendants to find embedded files.
+    private List<BibEntry> extractAndParseNameTree(PDNameTreeNode<PDComplexFileSpecification> node) throws IOException, ParseException {
+        List<BibEntry> entries = new ArrayList<>();
+        Map<String, PDComplexFileSpecification> names = node.getNames();
+        if (names != null) {
+            entries.addAll(extractAndParseFiles(names));
+        }
+        List<PDNameTreeNode<PDComplexFileSpecification>> kids = node.getKids();
+        if (kids != null) {
+            for (PDNameTreeNode<PDComplexFileSpecification> child : kids) {
+                entries.addAll(extractAndParseNameTree(child));
+            }
+        }
+        return entries;
+    }
+
     private List<BibEntry> extractAndParseFiles(Map<String, PDComplexFileSpecification> names) throws IOException, ParseException {
         List<BibEntry> allParsedEntries = new ArrayList<>();
         for (Map.Entry<String, PDComplexFileSpecification> entry : names.entrySet()) {
             String filename = entry.getKey();
-            FileUtil.getFileExtension(filename);
             if (FileUtil.isBibFile(Path.of(filename))) {
-                PDComplexFileSpecification fileSpec = entry.getValue();
-                allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));
+                Optional<PDEmbeddedFile> embeddedFile = searchEmbeddedFile(entry.getValue());
+                if (embeddedFile.isPresent()) {
+                    allParsedEntries.addAll(extractAndParseFile(embeddedFile.orElseThrow()));
+                }
             }
         }
         return allParsedEntries;
     }
 
     private List<BibEntry> extractAndParseFile(PDEmbeddedFile embeddedFile) throws IOException, ParseException {
-        return bibtexParser.parseEntries(embeddedFile.createInputStream());
+        try (InputStream inputStream = embeddedFile.createInputStream()) {
+            return bibtexParser.parseEntries(inputStream);
+        }
     }
 
-    private static PDEmbeddedFile getEmbeddedFile(PDComplexFileSpecification fileSpec) {
-        // search for the first available alternative of the embedded file
-        PDEmbeddedFile embeddedFile = null;
-        if (fileSpec != null) {
-            embeddedFile = fileSpec.getEmbeddedFileUnicode();
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFileDos();
-            }
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFileMac();
-            }
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFileUnix();
-            }
-            if (embeddedFile == null) {
-                embeddedFile = fileSpec.getEmbeddedFile();
-            }
-        }
-        return embeddedFile;
+    /// Prefer the Unicode variant, followed by platform-specific variants and the generic embedded file.
+    /// Later variants are only read when earlier ones are absent.
+    private static Optional<PDEmbeddedFile> searchEmbeddedFile(PDComplexFileSpecification fileSpec) {
+        return Optional.ofNullable(fileSpec.getEmbeddedFileUnicode())
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFileDos()))
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFileMac()))
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFileUnix()))
+                       .or(() -> Optional.ofNullable(fileSpec.getEmbeddedFile()));
     }
 
     @Override

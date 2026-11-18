@@ -99,12 +99,17 @@ public class JabRefDialogService implements DialogService {
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
+        return createDialog(type, title, content, true);
+    }
+
+    private FXDialog createDialog(AlertType type, String title, String content, boolean editable) {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
 
         TextArea area = new TextArea(content);
+        area.setEditable(editable);
         area.setWrapText(true);
 
         alert.getDialogPane().setContent(area);
@@ -214,7 +219,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void showWarningDialogAndWait(String title, String content) {
-        FXDialog alert = createDialog(AlertType.WARNING, title, content);
+        FXDialog alert = createDialog(AlertType.WARNING, title, content, false);
         alert.showAndWait();
     }
 

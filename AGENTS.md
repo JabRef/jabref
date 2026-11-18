@@ -364,6 +364,10 @@ npx markdownlint-cli2 "*.md"
 
 - Run `./gradlew rewriteRun` to fix Java formatting issues.
 - Run `docker run -v $(pwd):/github/workspace ghcr.io/leventebajczi/intellij-format:master "*.java" "" ".idea/codeStyles/Project.xml"` to fix more Java formatting issues.
+- If an IntelliJ MCP server is connected, format the changed Java files with its `reformat_file` tool instead, passing project-relative paths as a JSON array: `reformat_file --files ["jablib/src/main/java/org/jabref/logic/Foo.java"]`.
+  It applies the project's code style and saves to disk. It prints a diff for every file it changed and only `ok` when nothing changed.
+  Then run `git diff` and keep only changes on lines your change touched; revert any reformatting of untouched code.
+  Do not run it on FXML files: it puts every attribute on its own line, which does not match how JabRef writes FXML.
 
 ### Logic tests
 
@@ -505,7 +509,7 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ### Branches
 
-- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; CI labels a PR `dev: into-stable` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
+- `main` is the development branch; pull requests target it. `black-forest` in JabRef/jabref-black-forest is the last release plus ported fixes; CI labels a PR `dev: send-to-black-forest` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
 
 ### Commits
 
