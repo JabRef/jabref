@@ -18,7 +18,7 @@ The logic and model packages below live under `jablib/src/main/java/org/jabref/`
 | Package | Responsibility | Principal types |
 | --- | --- | --- |
 | `gui.openoffice` in `jabgui` | Present document actions, select styles, and show results. | `OpenOfficePanel`, `OpenOfficeCitationController`, `OpenOfficeDocumentConnection`, `CslStyleResolver` |
-| `logic.openoffice` | Shared citation identities, preferences, and Zotero protocol support. | `CitationIds`, `ImportCited`, `OpenOfficePreferences`, `ZoteroReferenceMark`, `ZoteroCitationLinker`, `ZoteroDocumentPreferences` |
+| `logic.openoffice` | Shared citation identities, preferences, and Zotero protocol support. | `CitationIds`, `CitedEntryCollector`, `OpenOfficePreferences`, `ZoteroReferenceMark`, `ZoteroCitationLinker`, `ZoteroDocumentPreferences` |
 | `logic.openoffice.engine` | Coordinate document actions and compute renderer output. | `CitationEngine`, `UpdatePipeline`, `CitationGroupEditor`, `CitationFormatConverter`, `DocumentWriteSession`, `CitationRenderer` |
 | `logic.openoffice.engine.storage` | Read canonical citations and apply prepared text/property changes. | `MarkStore`, `CitationMarkerWriter`, `DocumentStyleStore`, `UndoableDocumentProperties` |
 | `logic.openoffice.frontend` | Combine the live document with the citation model, ordering, and overlap protection. | `DocumentCitations`, `DocumentOrder`, `RangeForOverlapCheck` |
@@ -58,7 +58,7 @@ The resolver is distinct from the generated CSL catalog produced by `CitationSty
 `OOError` carries localized dialog messages and titles at the GUI boundary.
 
 For **Import cited**, the panel captures the active `LibraryTab` before calling `OpenOfficeCitationController.importCited()`, which delegates to the read-only `CitationEngine.importCited()` API.
-`ImportCited` in `logic.openoffice` collects native Zotero-compatible entry data; canonical and legacy marks are ignored, and collection never triggers document writes or format conversion.
+`CitedEntryCollector` in `logic.openoffice` collects native Zotero-compatible entry data; canonical and legacy marks are ignored, and collection never triggers document writes or format conversion.
 Deduplication uses the native URI, otherwise the explicit key, otherwise the numeric item ID; key-only and URI-bearing representations remain separate for ordinary bibliographic duplicate handling.
 The captured tab's existing `ImportHandler` owns duplicate decisions, explicit-key conflict warnings, batch key reservations, and library insertion.
 Cited-entry batches serialize the whole per-entry import operation so later duplicate searches see earlier accepted entries; general imports retain their existing concurrency and preferences.

@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 /// Only Zotero-compatible reference marks carry the bibliographic data of the cited entries (as CSL JSON).
 /// JabRef reference marks name the citation keys only and are therefore ignored.
 @NullMarked
-public class ImportCited {
+public class CitedEntryCollector {
 
     private enum IdentityType {
         CITATION_KEY,
@@ -29,7 +29,7 @@ public class ImportCited {
     private record CitationIdentity(IdentityType type, String value) {
     }
 
-    private ImportCited() {
+    private CitedEntryCollector() {
     }
 
     /// Collects the entries cited by the Zotero-compatible reference marks of a document.

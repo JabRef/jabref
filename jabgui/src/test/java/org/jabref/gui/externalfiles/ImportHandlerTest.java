@@ -39,7 +39,7 @@ import org.jabref.logic.importer.ImportFormatReader.ImportResult;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.ImportCited;
+import org.jabref.logic.openoffice.CitedEntryCollector;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.engine.CitedEntryExporter;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -672,7 +672,7 @@ class ImportHandlerTest {
         configureCitedImportPreferences();
         BibDatabase database = new BibDatabase();
         ImportHandler handler = handlerFor(new BibDatabaseContext(database), new JabRefUndoManager(), executor);
-        List<BibEntry> zoteroEntries = ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK));
+        List<BibEntry> zoteroEntries = CitedEntryCollector.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK));
         assertEquals(List.of(Optional.empty()), zoteroEntries.stream().map(BibEntry::getCitationKey).toList());
 
         JavaFxExtension.invokeAndWait(() -> handler.importEntriesWithDuplicateCheckPreservingCitationKeys(zoteroEntries));
@@ -680,7 +680,7 @@ class ImportHandlerTest {
 
         BibEntry importedZoteroEntry = database.getEntries().getFirst();
         assertEquals(Optional.of("Smith2024"), importedZoteroEntry.getCitationKey());
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithJabRef(smithEntryWithDocumentKey(explicitKey))));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(citeWithJabRef(smithEntryWithDocumentKey(explicitKey))));
         assertEquals(List.of(Optional.of(explicitKey)), citedEntries.stream().map(BibEntry::getCitationKey).toList());
         assertEquals(Optional.empty(), handler.findDuplicate(citedEntries.getFirst()));
 
@@ -708,7 +708,7 @@ class ImportHandlerTest {
         DeferredTaskExecutor executor = new DeferredTaskExecutor();
         configureCitedImportPreferences();
         BibDatabase database = new BibDatabase();
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(
                 NATIVE_ZOTERO_REFERENCE_MARK,
                 citeWithJabRef(smithEntryWithDocumentKey("Smith2024"))));
         assertEquals(List.of(Optional.empty(), Optional.of("Smith2024")), citedEntries.stream().map(BibEntry::getCitationKey).toList());
@@ -743,7 +743,7 @@ class ImportHandlerTest {
         BibDatabase database = new BibDatabase(List.of(existingEntry));
         ImportHandler handler = Mockito.spy(handlerFor(new BibDatabaseContext(database), new JabRefUndoManager(), executor));
         BibEntry expectedImportedEntry = smithEntryWithDocumentKey("Smith2024").withField(StandardField.NOTE, "Document notes");
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithJabRef(expectedImportedEntry)));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(citeWithJabRef(expectedImportedEntry)));
         assertEquals(List.of(Optional.of("Smith2024")), citedEntries.stream().map(BibEntry::getCitationKey).toList());
         BibEntry citedEntry = citedEntries.getFirst();
         assertEquals(Optional.of(existingEntry), handler.findDuplicate(citedEntry));
@@ -784,7 +784,7 @@ class ImportHandlerTest {
         BibDatabase database = new BibDatabase(List.of(existingEntry));
         DeferredTaskExecutor executor = new DeferredTaskExecutor();
         ImportHandler handler = handlerFor(new BibDatabaseContext(database), new JabRefUndoManager(), executor);
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(
                 NATIVE_ZOTERO_REFERENCE_MARK,
                 citeWithJabRef(smithEntryWithDocumentKey("Smith2024a"))));
 
@@ -899,7 +899,7 @@ class ImportHandlerTest {
     void citedKeyConflictIsCheckedBeforeRemovingTheBibliographicDuplicate(DuplicateResolverDialog.DuplicateResolverResult decision) {
         configureCitedImportPreferences();
         BibEntry duplicate = smithEntryWithDocumentKey("LibraryKey");
-        BibEntry keyOwner = new BibEntry(ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK)).getFirst()).withCitationKey("Smith2024");
+        BibEntry keyOwner = new BibEntry(CitedEntryCollector.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK)).getFirst()).withCitationKey("Smith2024");
         BibEntry documentEntry = smithEntryWithDocumentKey("Smith2024");
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(duplicate, keyOwner)));
         JabRefUndoManager journal = new JabRefUndoManager();
@@ -928,13 +928,13 @@ class ImportHandlerTest {
         // [utest->req~import.libreoffice.unambiguous-keys~1]
     void citedReplacementCannotDisplaceAnEarlierExplicitBatchKey(DuplicateResolverDialog.DuplicateResolverResult decision, String replacementKey) {
         configureCitedImportPreferences();
-        BibEntry firstEntry = ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK)).getFirst().withCitationKey("Smith2024");
+        BibEntry firstEntry = CitedEntryCollector.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK)).getFirst().withCitationKey("Smith2024");
         String laterMark = "keyless".equals(replacementKey)
                            ? NATIVE_ZOTERO_REFERENCE_MARK.replace("587", "588")
                                                          .replace("users/123/items/ABCD1234", "users/456/items/WXYZ9876")
                                                          .replace("RNDabcdefghij", "RNDklmnopqrst")
                            : citeWithJabRef(new BibEntry(firstEntry).withCitationKey(replacementKey), Map.of(replacementKey, "http://zotero.org/users/456/items/WXYZ9876"));
-        List<BibEntry> entries = ImportCited.collectCitedEntries(List.of(
+        List<BibEntry> entries = CitedEntryCollector.collectCitedEntries(List.of(
                 citeWithJabRef(firstEntry, Map.of("Smith2024", "http://zotero.org/users/123/items/ABCD1234")),
                 laterMark,
                 citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
@@ -980,9 +980,9 @@ class ImportHandlerTest {
     @ResourceLock("Localization.lang")
     void keylessCitedReplacementCanDisplaceAnExistingKeyNotReservedByTheBatch(DuplicateResolverDialog.DuplicateResolverResult decision) {
         configureCitedImportPreferences();
-        BibEntry existingEntry = ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK)).getFirst().withCitationKey("LibraryKey");
+        BibEntry existingEntry = CitedEntryCollector.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK)).getFirst().withCitationKey("LibraryKey");
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(existingEntry)));
-        List<BibEntry> entries = ImportCited.collectCitedEntries(List.of(
+        List<BibEntry> entries = CitedEntryCollector.collectCitedEntries(List.of(
                 NATIVE_ZOTERO_REFERENCE_MARK,
                 citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
         DeferredTaskExecutor executor = new DeferredTaskExecutor();
@@ -1013,7 +1013,7 @@ class ImportHandlerTest {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
         DeferredTaskExecutor executor = new DeferredTaskExecutor();
         ImportHandler handler = handlerFor(context, new JabRefUndoManager(), executor);
-        List<BibEntry> entries = ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK, citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
+        List<BibEntry> entries = CitedEntryCollector.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK, citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
         EntryImportHandlerTracker tracker = trackerFor(context, entries.size());
         CompletableFuture<Void> completed = startCitedImport(handler, entries, tracker);
         if (cancelAdjustment) {
@@ -1079,7 +1079,7 @@ class ImportHandlerTest {
         DeferredTaskExecutor executor = new DeferredTaskExecutor();
         ImportHandler handler = Mockito.spy(handlerFor(context, new JabRefUndoManager(), executor));
         Mockito.doThrow(new IllegalArgumentException("Cannot search duplicates")).doCallRealMethod().when(handler).findDuplicate(any());
-        List<BibEntry> entries = ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK, citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
+        List<BibEntry> entries = CitedEntryCollector.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK, citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
         EntryImportHandlerTracker tracker = trackerFor(context, entries.size());
 
         CompletableFuture<Void> completed = startCitedImport(handler, entries, tracker);
@@ -1132,7 +1132,7 @@ class ImportHandlerTest {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
         DeferredTaskExecutor executor = new DeferredTaskExecutor();
         ImportHandler handler = handlerFor(context, new JabRefUndoManager(), executor);
-        List<BibEntry> entries = ImportCited.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK, citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
+        List<BibEntry> entries = CitedEntryCollector.collectCitedEntries(List.of(NATIVE_ZOTERO_REFERENCE_MARK, citeWithJabRef(smithEntryWithDocumentKey("DocumentKey"))));
         entries.getFirst().withCitationKey("OriginalKey");
 
         JavaFxExtension.invokeAndWait(() -> handler.importEntriesWithDuplicateCheck(null, entries));
@@ -1147,7 +1147,7 @@ class ImportHandlerTest {
     }
 
     private static List<BibEntry> distinctZoteroItemsForSamePaper() {
-        return ImportCited.collectCitedEntries(List.of(
+        return CitedEntryCollector.collectCitedEntries(List.of(
                 NATIVE_ZOTERO_REFERENCE_MARK,
                 NATIVE_ZOTERO_REFERENCE_MARK.replace("587", "588")
                                             .replace("users/123/items/ABCD1234", "users/456/items/WXYZ9876")

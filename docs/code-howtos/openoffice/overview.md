@@ -25,7 +25,7 @@ The [requirements](../../requirements/openoffice.md) and [ADR-0083](../../decisi
 | Group structure | `CitationGroupEditor` | Prepare replacements without mutation, then apply them in the engine's write session. |
 | Rendering | `RendererFactory`, `CitationRenderer`, `RenderRequest`, `RenderResult` | Compute final markers, bibliography paragraphs when requested, and unresolved keys. |
 | Cited-entry export | `CitedEntryExporter` | Resolve ordered citation keys into a library without accessing Writer. |
-| Cited-entry import | `CitationEngine.importCited`, `ImportCited` | Collect embedded Zotero entries read-only for the existing library import flow. |
+| Cited-entry import | `CitationEngine.importCited`, `CitedEntryCollector` | Collect embedded Zotero entries read-only for the existing library import flow. |
 | Canonical storage | `JabRefMarkCodec`, `MarkStore`, `UndoableDocumentProperties`, `DocumentStyleStore` | Encode identities, read citation/page-info state, register custom-property undo deltas, and store applied-style identity. |
 | Ordering | `DocumentOrder` | Order within text containers, map footnotes for numbering, and use visual positions when available. |
 | Document writes | `CitationMarkerWriter`, `BibliographySection`, `DocumentWriteSession` | Apply prepared output and manage write-phase undo, locking, and change recording. |
@@ -95,7 +95,7 @@ It ignores canonical JabRef and legacy marks, which do not embed the required en
 Unlike **Export cited**, it does not resolve citation keys against open libraries to collect the entries.
 
 `OpenOfficePanel` captures the active `LibraryTab` before collection and delegates through `OpenOfficeCitationController.importCited()` to `CitationEngine.importCited()`.
-The engine uses `ImportCited` to collect embedded entries without a write session, document mutation, or citation-format conversion, independently of the selected compatibility mode.
+The engine uses `CitedEntryCollector` to collect embedded entries without a write session, document mutation, or citation-format conversion, independently of the selected compatibility mode.
 The panel passes the result to the captured tab's normal `ImportHandler`, so changing the active tab does not retarget the import.
 Missing library or document prerequisites are reported before collection.
 

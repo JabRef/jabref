@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // [utest->feat~import.libreoffice.cited-entries~1]
 @NullMarked
-class ImportCitedTest {
+class CitedEntryCollectorTest {
 
     private static final String ZOTERO_ONLY_CITATION_JSON = """
             {
@@ -59,7 +59,7 @@ class ImportCitedTest {
 
     @Test
     void ignoresNonZoteroReferenceMarks() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of("JABREF_Smith2020 CID_1 abcd1234 NORMAL", "JR_cite1_1_Smith2020", "CSL_CITATION " + ZOTERO_ONLY_CITATION_JSON + " RNDabcdefghij"));
 
         assertEquals(List.of(), citedEntries);
@@ -67,14 +67,14 @@ class ImportCitedTest {
 
     @Test
     void keepsCitationKeyOfJabRefUri() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithJabRef(smithEntry())));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(citeWithJabRef(smithEntry())));
 
         assertEquals(List.of(Optional.of("Smith2020")), citationKeysOf(citedEntries));
     }
 
     @Test
     void clearsZoteroItemIdPlaceholderOfZoteroOnlyEntry() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithZotero("RNDabcdefghij")));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(citeWithZotero("RNDabcdefghij")));
 
         assertEquals(List.of(Optional.empty()), citationKeysOf(citedEntries));
         assertEquals(List.of(Optional.of("Cited from Zotero")), titlesOf(citedEntries));
@@ -82,7 +82,7 @@ class ImportCitedTest {
 
     @Test
     void collectsNativeZoteroCitationJsonWithoutAssigningCitationKey() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(ZoteroReferenceMark.PREFIX + ZOTERO_ONLY_CITATION_JSON + " RNDabcdefghij"));
 
         assertEquals(List.of(Optional.empty()), citationKeysOf(citedEntries));
@@ -97,7 +97,7 @@ class ImportCitedTest {
     void keepsNativeKeylessZoteroItemAlongsideExplicitSmith2024Item() {
         BibEntry explicitKeyEntry = smithEntry().withCitationKey("Smith2024");
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(ZoteroReferenceMark.PREFIX + ZOTERO_ONLY_CITATION_JSON + " RNDabcdefghij",
                         citeWithJabRef(explicitKeyEntry)));
 
@@ -107,7 +107,7 @@ class ImportCitedTest {
 
     @Test
     void collectsEveryEntryOfCitationGroup() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithJabRef(smithEntry(), jonesEntry())));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(citeWithJabRef(smithEntry(), jonesEntry())));
 
         assertEquals(List.of(Optional.of("Smith2020"), Optional.of("Jones2021")), citationKeysOf(citedEntries));
     }
@@ -117,7 +117,7 @@ class ImportCitedTest {
         // The entry was edited between the two citations, so both reference marks name "Smith2020", but carry different data
         BibEntry editedSmithEntry = smithEntry().withField(StandardField.TITLE, "Reference mark compatibility, revised");
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithJabRef(1, smithEntry()), citeWithJabRef(2, jonesEntry()), citeWithJabRef(3, editedSmithEntry)));
 
         assertEquals(List.of(Optional.of("Reference mark compatibility"), Optional.of("Citations in word processors")), titlesOf(citedEntries));
@@ -143,7 +143,7 @@ class ImportCitedTest {
                                           ? List.of(linkedNativeMark, jonesMark, jabRefOnlyMark, laterMark)
                                           : List.of(jabRefOnlyMark, jonesMark, linkedNativeMark, laterMark);
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(referenceMarkNames);
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(referenceMarkNames);
 
         assertEquals(Map.of("Smith2024", zoteroUri), links.zoteroUriByCitationKey());
         assertEquals(jabRefOnlyMark, links.updatedName(jabRefOnlyMark));
@@ -171,7 +171,7 @@ class ImportCitedTest {
                                           : List.of(jabRefOnlyMark, nativeLinkedMark);
         List<BibEntry> expectedEntries = nativeCitationFirst ? List.of(nativeEntry, jabRefEntry) : List.of(jabRefEntry, nativeEntry);
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(referenceMarkNames);
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(referenceMarkNames);
 
         assertEquals(List.of(Optional.of("Smith2020"), Optional.of("Smith2020")), citationKeysOf(citedEntries));
         assertEquals(titlesOf(expectedEntries), titlesOf(citedEntries));
@@ -192,7 +192,7 @@ class ImportCitedTest {
                                           ? List.of(firstNativeMark, secondNativeMark, jabRefOnlyMark, laterJabRefOnlyMark)
                                           : List.of(jabRefOnlyMark, firstNativeMark, secondNativeMark, laterJabRefOnlyMark);
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(referenceMarkNames);
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(referenceMarkNames);
 
         List<Optional<String>> expectedTitles = nativeCitationsFirst
                                                 ? List.of(Optional.of("First linked source"), Optional.of("Second linked source"), Optional.of("Reference mark compatibility"))
@@ -203,7 +203,7 @@ class ImportCitedTest {
 
     @Test
     void collectsZoteroOnlyEntryCitedTwiceOnce() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", "Cited from Zotero", "RNDabcdefghij"),
                         citeWithZotero("587", "Cited from Zotero", "RNDklmnopqrst")));
 
@@ -212,7 +212,7 @@ class ImportCitedTest {
 
     @Test
     void keepsFirstDataWhenKeylessZoteroItemMetadataChanges() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", "Original title", "RNDabcdefghij"),
                         citeWithZotero("587", "Updated title", "RNDklmnopqrst")));
 
@@ -221,7 +221,7 @@ class ImportCitedTest {
 
     @Test
     void keepsDistinctKeylessZoteroItemsWithIdenticalMetadata() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", "Same title", "RNDabcdefghij"),
                         citeWithZotero("588", "Same title", "RNDklmnopqrst")));
 
@@ -232,7 +232,7 @@ class ImportCitedTest {
     @Test
     void keepsKeylessZoteroItemsWithSameItemIdFromDifferentLibraries() {
         // Two co-authors cite from their own Zotero libraries, where the item ids are only unique per library
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", List.of("http://zotero.org/users/123/items/ABCD1234"), "From library of user 123", "RNDabcdefghij"),
                         citeWithZotero("587", List.of("http://zotero.org/users/456/items/WXYZ9876"), "From library of user 456", "RNDklmnopqrst")));
 
@@ -241,7 +241,7 @@ class ImportCitedTest {
 
     @Test
     void collectsKeylessZoteroItemWithSameUriOnceEvenIfItemIdsDiffer() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", List.of("http://zotero.org/users/123/items/ABCD1234"), "Cited from Zotero", "RNDabcdefghij"),
                         citeWithZotero("601", List.of("http://zotero.org/users/123/items/ABCD1234"), "Cited from Zotero", "RNDklmnopqrst")));
 
@@ -250,7 +250,7 @@ class ImportCitedTest {
 
     @Test
     void keepsDistinctZoteroUrisWithSameExplicitCitationKey() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", List.of("http://zotero.org/users/123/items/ABCD1234", "http://www.jabref.org/Smith2024"), "First source", "RNDabcdefghij"),
                         citeWithZotero("587", List.of("http://zotero.org/users/456/items/WXYZ9876", "http://www.jabref.org/Smith2024"), "Unrelated source", "RNDklmnopqrst")));
 
@@ -260,7 +260,7 @@ class ImportCitedTest {
 
     @Test
     void collectsZoteroItemWithSameUriOnceEvenIfIdsAndExplicitKeysDiffer() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", List.of("http://zotero.org/users/123/items/ABCD1234", "http://www.jabref.org/Smith2024"), "Original title", "RNDabcdefghij"),
                         citeWithZotero("601", List.of("http://zotero.org/users/123/items/ABCD1234", "http://www.jabref.org/Smith2024Revised"), "Updated title", "RNDklmnopqrst")));
 
@@ -270,7 +270,7 @@ class ImportCitedTest {
 
     @Test
     void keepsLaterJabRefCitationKeyForInitiallyKeylessZoteroItem() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(ZoteroReferenceMark.PREFIX + ZOTERO_ONLY_CITATION_JSON + " RNDabcdefghij",
                         citeWithJabRef(2, jonesEntry()),
                         citeWithZotero("601", List.of("http://zotero.org/users/123/items/ABCD1234", "http://www.jabref.org/Smith2024"), "Updated title", "RNDklmnopqrst")));
@@ -283,7 +283,7 @@ class ImportCitedTest {
 
     @Test
     void keepsFirstExplicitCitationKeyWhenLaterRepresentationIsKeyless() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("601", List.of("http://zotero.org/users/123/items/ABCD1234", "http://www.jabref.org/Smith2024"), "First title", "RNDabcdefghij"),
                         ZoteroReferenceMark.PREFIX + ZOTERO_ONLY_CITATION_JSON + " RNDklmnopqrst"));
 
@@ -308,7 +308,7 @@ class ImportCitedTest {
                 }
                 """ + " RNDklmnopqrst";
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(ZoteroReferenceMark.PREFIX + ZOTERO_ONLY_CITATION_JSON + " RNDabcdefghij", explicitKeyMark));
 
         assertEquals(List.of(Optional.of("Smith2024")), citationKeysOf(citedEntries));
@@ -317,7 +317,7 @@ class ImportCitedTest {
 
     @Test
     void collectsKeylessZoteroItemWithoutUriOnceByItemId() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(citeWithZotero("587", List.of(), "Original title", "RNDabcdefghij"),
                         citeWithZotero("587", List.of(), "Updated title", "RNDklmnopqrst")));
 
@@ -349,7 +349,7 @@ class ImportCitedTest {
                 }
                 """ + " RNDabcdefghij";
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(referenceMark));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(referenceMark));
 
         assertEquals(List.of(Optional.empty()), citationKeysOf(citedEntries));
         assertEquals(List.of(Optional.of("Original title")), titlesOf(citedEntries));
@@ -378,7 +378,7 @@ class ImportCitedTest {
                 }
                 """ + " RNDabcdefghij";
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(referenceMark));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(referenceMark));
 
         assertEquals(List.of(Optional.of("Smith2024")), citationKeysOf(citedEntries));
         assertEquals(List.of(Optional.of("Original title")), titlesOf(citedEntries));
@@ -405,7 +405,7 @@ class ImportCitedTest {
                 }
                 """ + " RNDabcdefghij";
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(referenceMark));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(referenceMark));
 
         assertEquals(List.of(Optional.empty(), Optional.empty()), citationKeysOf(citedEntries));
         assertEquals(List.of(Optional.of("Same title"), Optional.of("Same title")), titlesOf(citedEntries));
@@ -418,7 +418,7 @@ class ImportCitedTest {
                 .withCitationKey("Smith2020")
                 .withField(StandardField.TITLE, "An unrelated book");
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(citeWithJabRef(unrelatedEntry)));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(citeWithJabRef(unrelatedEntry)));
 
         assertEquals(citationKeysOf(library.getEntries()), citationKeysOf(citedEntries));
         assertEquals(List.of(Optional.of("An unrelated book")), titlesOf(citedEntries));
@@ -427,7 +427,7 @@ class ImportCitedTest {
 
     @Test
     void ignoresReferenceMarkWithMalformedJson() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(
                 List.of(ZoteroReferenceMark.PREFIX + "{\"citationItems\": [ RNDabcdefghij", ZoteroReferenceMark.PREFIX + "{this is not json} RNDabcdefghij"));
 
         assertEquals(List.of(), citedEntries);
@@ -457,14 +457,14 @@ class ImportCitedTest {
                 }
                 """ + " RNDabcdefghij";
 
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of(markWithNullValues, citeWithZotero("RNDklmnopqrst")));
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of(markWithNullValues, citeWithZotero("RNDklmnopqrst")));
 
         assertEquals(List.of(Optional.of("Null URIs"), Optional.of("Cited from Zotero")), titlesOf(citedEntries));
     }
 
     @Test
     void collectsNothingFromDocumentWithoutReferenceMarks() {
-        List<BibEntry> citedEntries = ImportCited.collectCitedEntries(List.of());
+        List<BibEntry> citedEntries = CitedEntryCollector.collectCitedEntries(List.of());
 
         assertEquals(List.of(), citedEntries);
     }

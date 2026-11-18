@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.ImportCited;
+import org.jabref.logic.openoffice.CitedEntryCollector;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.ZoteroCitationLinker;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
@@ -168,15 +168,15 @@ class ZoteroCitationStrategyTest {
         List<String> names = List.of(ZOTERO, CANONICAL);
         List<BibEntry> entries = List.of(entry("a", "A"));
         try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
-             MockedStatic<ImportCited> collector = mockStatic(ImportCited.class);
+             MockedStatic<CitedEntryCollector> collector = mockStatic(CitedEntryCollector.class);
              CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
             marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(names);
-            collector.when(() -> ImportCited.collectCitedEntries(names)).thenReturn(entries);
+            collector.when(() -> CitedEntryCollector.collectCitedEntries(names)).thenReturn(entries);
 
             assertSame(entries, engine.importCited().get());
 
             marks.verify(() -> WriterReferenceMarks.getListOfNames(document));
-            collector.verify(() -> ImportCited.collectCitedEntries(names));
+            collector.verify(() -> CitedEntryCollector.collectCitedEntries(names));
             verifyNoInteractions(document, context, ranges, preferences);
         }
     }
