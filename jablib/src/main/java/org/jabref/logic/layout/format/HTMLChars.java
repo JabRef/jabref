@@ -182,7 +182,7 @@ public class HTMLChars implements ParamLayoutFormatter {
                                   .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                                   .replace("\n", "<br>") // Replace single line breaks with <br>
                                   .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                                  .replaceAll("\\$([^$]*)\\$", this.keepCurlyBraces ? "\\\\{$1\\\\}" : "$1}");
+                                  .replaceAll("\\$([^$]*)\\$", this.keepCurlyBraces ? "\\\\{$1\\\\}" : "$1");
     }
 
     private String getHTMLTag(String latexCommand) {

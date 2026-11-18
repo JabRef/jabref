@@ -86,7 +86,8 @@ class HTMLCharsTest {
         return Stream.of(
                 Arguments.of("&dollar;", "\\$"),
                 Arguments.of("&sigma;", "$\\sigma$"),
-                Arguments.of("A 32&nbsp;mA &Sigma;&Delta;-modulator", "A 32~{mA} {$\\Sigma\\Delta$}-modulator")
+                Arguments.of("A 32&nbsp;mA &Sigma;&Delta;-modulator", "A 32~{mA} {$\\Sigma\\Delta$}-modulator"),
+                Arguments.of("Zn-diffused LiNbO<sub>3</sub>:Er<sup>3+</sup>/Yb<sup>3+</sup>", "${Zn-diffused LiNbO\\textsubscript{3}:Er\\textsuperscript{3+}/Yb\\textsuperscript{3+}}$")
         );
     }
 

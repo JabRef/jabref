@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -67,6 +68,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private PreviewLayout layout;
     private String layoutText;
     private long updateSequence;
+    private OptionalDouble currentTemplateFontSize = OptionalDouble.empty();
+    private Optional<String> currentTemplateFontFamily = Optional.empty();
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
@@ -96,11 +99,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         // Surrounding layouts (preview panel, dialogs) rely on a stable preferred size,
         // not on the content-dependent one of the rendered nodes
         setPrefSize(800, 600);
+        setMinHeight(0);
+        setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
         previewView = new RichHtmlView();
         previewView.getStyleClass().add("preview-viewer-content");
         previewView.setOptions(HtmlRenderOptions.defaults()
                                                 .withLinkHandler(this::openLink)
-                                                .withBaseFontSize(resolveBaseFontSize()));
+                                                .withBaseFontSize(resolveBaseFontSize(OptionalDouble.empty())));
         // The outer ScrollPane scrolls (scroll sync, tooltips); the area sizes to its content
         previewView.setUseContentHeight(true);
         setContent(previewView);
@@ -114,18 +119,21 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     /// @return the base font size in CSS pixels (JavaFX user units), matching whatever
     /// [org.jabref.gui.theme.ThemeManager] applies to the rest of the UI via the scene root's
-    /// "-fx-font-size". ThemeManager expresses the size in CSS `pt` (`-fx-font-size: Xpt`), but
-    /// `Font.font(size)` in the JavaFX Font API takes CSS pixels (user units), not typographic
-    /// points — so the stored pt value must be converted (1pt = 96/72 px).
-    private double resolveBaseFontSize() {
-        double pt = workspacePreferences.shouldOverrideDefaultFontSize()
-                    ? workspacePreferences.getMainFontSize()
-                    : WorkspacePreferences.getDefault().getMainFontSize();
-        return pt * 96.0 / 72.0;
+    /// "-fx-font-size", or the template's specified font size, or -1 to let [HtmlRenderOptions]
+    /// fall back to the system default font size.
+    private double resolveBaseFontSize(OptionalDouble templateFontSize) {
+        if (workspacePreferences.shouldOverrideDefaultFontSize()) {
+            return workspacePreferences.getMainFontSize() * 96.0 / 72.0;
+        }
+        return templateFontSize.orElse(-1);
+    }
+
+    private @Nullable String resolveBaseFontFamily(Optional<String> templateFontFamily) {
+        return templateFontFamily.orElse(null);
     }
 
     private void updateBaseFontSize() {
-        previewView.setOptions(previewView.getOptions().withBaseFontSize(resolveBaseFontSize()));
+        previewView.setOptions(previewView.getOptions().withBaseFontSize(resolveBaseFontSize(currentTemplateFontSize)));
     }
 
     private void openLink(String href) {
@@ -279,17 +287,32 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        UiTaskExecutor.runInJavaFXThread(() -> previewView.setHtml(getHighlightedLayoutText()));
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            PreviewHtmlProcessor.Result processed = PreviewHtmlProcessor.process(getHighlightedLayoutText());
+            this.currentTemplateFontSize = processed.fontSize();
+            this.currentTemplateFontFamily = processed.fontFamily();
+
+            HtmlRenderOptions options = previewView.getOptions()
+                                                   .withBaseFontSize(resolveBaseFontSize(currentTemplateFontSize))
+                                                   .withBaseFontFamily(resolveBaseFontFamily(currentTemplateFontFamily));
+            previewView.setHtml(processed.html(), options);
+        });
     }
 
     private void renderLayoutTextWithCurrentOptions() {
         String highlightedLayoutText = getHighlightedLayoutText();
         UiTaskExecutor.runInJavaFXThread(() -> {
-            HtmlRenderOptions options = previewView.getOptions();
+            PreviewHtmlProcessor.Result processed = PreviewHtmlProcessor.process(highlightedLayoutText);
+            this.currentTemplateFontSize = processed.fontSize();
+            this.currentTemplateFontFamily = processed.fontFamily();
+
+            HtmlRenderOptions options = previewView.getOptions()
+                                                   .withBaseFontSize(resolveBaseFontSize(currentTemplateFontSize))
+                                                   .withBaseFontFamily(resolveBaseFontFamily(currentTemplateFontFamily));
             HtmlRenderOptions optionsWithBaseUri = getBaseURL()
                     .map(options::withBaseUri)
                     .orElseGet(options::withoutBaseUri);
-            previewView.setHtml(highlightedLayoutText, optionsWithBaseUri);
+            previewView.setHtml(processed.html(), optionsWithBaseUri);
             setHvalue(0);
         });
     }

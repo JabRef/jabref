@@ -477,6 +477,9 @@ public class PreferencesMigrations {
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
                                                   .replace("\\format[HTMLChars]{\\abstract}", "\\format[LatexToUnicode,HTMLChars]{\\abstract}")
+                                                  .replace("\\format[HTMLChars]{\\title}", "\\format[LatexToUnicode,HTMLChars]{\\title}")
+                                                  .replace("\\format[HTMLChars]{\\booktitle}", "\\format[LatexToUnicode,HTMLChars]{\\booktitle}")
+                                                  .replace("\\format[HTMLChars]{\\journal}", "\\format[LatexToUnicode,HTMLChars]{\\journal}")
                                                   .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
                                                   .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__")
                                                   .replace("\\end{pages}__NEWLINE__\\begin{abstract}", """

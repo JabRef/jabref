@@ -141,7 +141,7 @@ class GuiPreferencesMigrationsTest {
         String migratedPreviewStyle = """
                 <font face="sans-serif">__NEWLINE__\
                 Custom preview style with no migration patterns.__NEWLINE__\
-                \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
+                \\begin{title}<BR><b>\\format[LatexToUnicode,HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
                 \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
                 \\begin{note}<BR>\\format[HTMLChars]{\\note}\\end{note}__NEWLINE__\
                 \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
