@@ -48,7 +48,7 @@ public class NumericFieldComparator implements Comparator<String> {
             // We assume that "null" is "less than" any other value.
             if (val1 == null) {
                 return -1;
-            } else if(val2 == null) {
+            } else if (val2 == null) {
                 return 1;
             } else {
                 return val1.compareTo(val2);
