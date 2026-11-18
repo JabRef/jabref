@@ -99,7 +99,9 @@
 .padding-top-4 { -fx-padding: 0.333em 0 0 0; }
 .padding-top-12 { -fx-padding: 1em 0 0 0; }
 
-.padding-right-4 { -fx-padding: 0 0.333em 0 0; }
+.padding-right-4,
+.table-row-cell > .table-cell.padding-right-4,
+.tree-table-row-cell > .tree-table-cell.padding-right-4 { -fx-padding: 0 0.333em 0 0; }
 
 .padding-bottom-4 { -fx-padding: 0 0 0.333em 0; }
 
@@ -113,7 +115,9 @@
 /* Alignment */
 .align-center { -fx-alignment: center; }
 .align-center-left { -fx-alignment: center-left; }
-.align-center-right { -fx-alignment: center-right; }
+.align-center-right,
+.table-row-cell > .table-cell.align-center-right,
+.tree-table-row-cell > .tree-table-cell.align-center-right { -fx-alignment: center-right; }
 .align-top-left { -fx-alignment: top-left; }
 .align-top-center { -fx-alignment: top-center; }
 .align-baseline-left { -fx-alignment: baseline-left; }

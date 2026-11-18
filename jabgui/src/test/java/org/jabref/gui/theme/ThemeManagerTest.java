@@ -11,12 +11,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.css.PseudoClass;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -26,6 +37,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -34,6 +46,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.mockito.Answers;
@@ -424,6 +438,78 @@ class ThemeManagerTest {
     void defaultIconSizeMatchesIkonliDefault() {
         // IkonliIcon.DEFAULT_SIZE = 8
         assertEquals(8, new FontIcon().getIconSize(), "Default icon size of JabRef should match Ikonli default");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ThemePreset.class, names = {"JABREF", "NORD"})
+    void indexColumnRemainsRightAlignedInTallRows(ThemePreset theme) {
+        JavaFxExtension.invokeAndWait(() -> {
+            TableView<String> table = new TableView<>();
+            table.getStyleClass().add("main-table");
+            table.pseudoClassStateChanged(PseudoClass.getPseudoClass("wrap-text"), true);
+            TableColumn<String, String> indexColumn = new TableColumn<>("#");
+            indexColumn.getStyleClass().add("align-center-right");
+            indexColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue()));
+            table.getColumns().add(indexColumn);
+            table.getItems().addAll("1", "10", "100");
+
+            assertCellUtilitiesInBothColorSchemes(theme, table, () -> {
+                List<Pos> alignments = table.lookupAll(".table-cell").stream()
+                                            .filter(node -> node instanceof TableCell<?, ?> cell && !cell.isEmpty())
+                                            .map(node -> ((TableCell<?, ?>) node).getAlignment())
+                                            .toList();
+                assertEquals(List.of(Pos.CENTER_RIGHT, Pos.CENTER_RIGHT, Pos.CENTER_RIGHT), alignments);
+            });
+        });
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ThemePreset.class, names = {"JABREF", "NORD"})
+    void shortcutIconsFitTheirCompactRightAlignedCells(ThemePreset theme) {
+        JavaFxExtension.invokeAndWait(() -> {
+            TreeTableView<String> table = new TreeTableView<>(new TreeItem<>("Action"));
+            table.getStyleClass().add("keybinding-table");
+            TreeTableColumn<String, String> actionColumn = new TreeTableColumn<>("Action");
+            new ViewModelTreeTableCellFactory<String>().withText(value -> value).install(actionColumn);
+            TreeTableColumn<String, String> resetColumn = new TreeTableColumn<>();
+            resetColumn.setMinWidth(30);
+            resetColumn.setPrefWidth(30);
+            resetColumn.setMaxWidth(30);
+            new ViewModelTreeTableCellFactory<String>()
+                    .withGraphic(_ -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
+                    .withStyleClasses(() -> List.of("align-center-right", "padding-right-4"))
+                    .install(resetColumn);
+            table.getColumns().addAll(List.of(actionColumn, resetColumn));
+
+            assertCellUtilitiesInBothColorSchemes(theme, table, () -> {
+                TreeTableCell<?, ?> cell = table.lookupAll(".tree-table-cell").stream()
+                                                .filter(node -> node instanceof TreeTableCell<?, ?> candidate
+                                                        && candidate.getTableColumn() == resetColumn && !candidate.isEmpty())
+                                                .map(node -> (TreeTableCell<?, ?>) node)
+                                                .findFirst().orElseThrow();
+                assertEquals(Pos.CENTER_RIGHT, cell.getAlignment());
+                assertEquals(0, cell.getPadding().getLeft());
+                double availableWidth = cell.getWidth() - cell.getPadding().getLeft() - cell.getPadding().getRight();
+                assertTrue(availableWidth >= cell.getGraphic().getLayoutBounds().getWidth());
+            });
+        });
+    }
+
+    private static void assertCellUtilitiesInBothColorSchemes(ThemePreset theme, Node table, Runnable assertions) {
+        StackPane root = new StackPane(table);
+        Scene scene = new Scene(root, 400, 200);
+        List<String> stylesheets = new ArrayList<>();
+        theme.getParent().ifPresent(parent -> stylesheets.add(parent.getStyleSheet().getSceneStylesheetLocation()));
+        stylesheets.add(theme.getStyleSheet().getSceneStylesheetLocation());
+        stylesheets.add(ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation());
+        scene.getStylesheets().setAll(stylesheets);
+        root.resize(400, 200);
+        for (ColorScheme scheme : List.of(ColorScheme.LIGHT, ColorScheme.DARK)) {
+            scene.getPreferences().setColorScheme(scheme);
+            root.applyCss();
+            root.layout();
+            assertions.run();
+        }
     }
 
     private void assertIconSizeFollowsFontSize(FontIcon icon) {
