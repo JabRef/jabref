@@ -1,6 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -8,27 +7,22 @@ import java.util.function.Supplier;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
 import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
-import org.jabref.logic.openoffice.style.JStyle;
-import org.jabref.logic.openoffice.style.JStyleLoader;
-import org.jabref.logic.openoffice.style.OOStyle;
 
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import org.jspecify.annotations.NullMarked;
 
-/// Reloads JStyles and infers bundled and external CSL styles without rendering or changing document metadata.
+/// Resolves bundled and external CSL styles from document metadata without rendering or changing the document.
 @NullMarked
-final class OpenOfficeStyleCatalog {
+final class CslStyleResolver {
 
-    private final JStyleLoader jStyleLoader;
     private final Supplier<List<CitationStyle>> cslStyles;
 
-    OpenOfficeStyleCatalog(JStyleLoader jStyleLoader, Supplier<List<CitationStyle>> cslStyles) {
-        this.jStyleLoader = jStyleLoader;
+    CslStyleResolver(Supplier<List<CitationStyle>> cslStyles) {
         this.cslStyles = cslStyles;
     }
 
-    Optional<CitationStyle> inferCslStyle(XTextDocument document) throws WrappedTargetException {
+    Optional<CitationStyle> resolve(XTextDocument document) throws WrappedTargetException {
         Optional<DocumentStyleStore.State> stored = new DocumentStyleStore().read(document);
         if (stored.isPresent()) {
             return stored.filter(state -> state.family() == DocumentStyleStore.Family.CSL)
@@ -37,15 +31,5 @@ final class OpenOfficeStyleCatalog {
                                                     .findFirst());
         }
         return ZoteroDocumentPreferences.findCitationStyle(document, cslStyles.get());
-    }
-
-    OOStyle reload(OOStyle selected) throws IOException {
-        Optional<JStyle> jStyle = jStyleLoader.getStyles().stream().filter(selected::equals).findFirst();
-        if (jStyle.isEmpty()) {
-            return selected;
-        }
-        JStyle reloaded = jStyle.orElseThrow();
-        reloaded.ensureUpToDate();
-        return reloaded;
     }
 }

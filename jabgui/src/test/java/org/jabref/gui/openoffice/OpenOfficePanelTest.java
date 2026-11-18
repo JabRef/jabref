@@ -57,12 +57,14 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
@@ -143,7 +145,7 @@ class OpenOfficePanelTest {
         private final DialogService dialogs = mock(DialogService.class);
         private final LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
         private final OpenOfficePreferences preferences = mock(OpenOfficePreferences.class);
-        private final OpenOfficeStyleCatalog styles = mock(OpenOfficeStyleCatalog.class);
+        private final CslStyleResolver resolver = mock(CslStyleResolver.class);
         private final OpenOfficeCitationController citationController = mock(OpenOfficeCitationController.class);
         private final StateManager stateManager = mock(StateManager.class);
         private final JStyle previousStyle = mock(JStyle.class);
@@ -156,7 +158,6 @@ class OpenOfficePanelTest {
             when(preferences.zoteroCompatibilityModeProperty()).thenReturn(new SimpleBooleanProperty());
             when(selectedStyle.getPath()).thenReturn("selected.jstyle");
             when(selectedStyle.getName()).thenReturn("Selected style");
-            when(styles.reload(any())).thenAnswer(invocation -> invocation.getArgument(0, OOStyle.class));
             when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
             when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(entry));
             when(citationController.capabilities(any())).thenReturn(new StyleCapabilities(EnumSet.allOf(CitationType.class), true, true, true));
@@ -170,7 +171,7 @@ class OpenOfficePanelTest {
             setField("dialogService", dialogs);
             setField("tabContainer", tabContainer);
             setField("openOfficePreferences", preferences);
-            setField("styleCatalog", styles);
+            setField("cslStyleResolver", resolver);
             setField("citationController", citationController);
             setField("stateManager", stateManager);
             setField("currentStyle", previousStyle);
@@ -210,16 +211,33 @@ class OpenOfficePanelTest {
         }
 
         @Test
-        void stylePreparationReturnsTrueAndUsesTheReloadedStyle() throws ReflectiveOperationException, IOException {
-            JStyle reloaded = mock(JStyle.class);
+        void stylePreparationRefreshesTheSelectedJstyleWithoutReplacingIt() throws ReflectiveOperationException, IOException {
             when(preferences.getCurrentStyle()).thenReturn(selectedStyle);
-            when(styles.reload(selectedStyle)).thenReturn(reloaded);
 
             JavaFxExtension.invokeAndWait(() -> assertEquals(Boolean.TRUE,
                     assertDoesNotThrow(() -> invoke("getOrUpdateTheStyle", "Prepare style"))));
 
-            assertEquals(reloaded, field("currentStyle"));
-            verify(preferences).setCurrentStyle(reloaded);
+            assertSame(selectedStyle, field("currentStyle"));
+            verify(selectedStyle).ensureUpToDate();
+            verify(preferences, never()).setCurrentStyle(any());
+            verify(previousStyle, never()).ensureUpToDate();
+            verifyNoInteractions(resolver, field("jStyleLoader"));
+        }
+
+        @ParameterizedTest
+        @ValueSource(classes = {CitationStyle.class, BstStyle.class})
+        void stylePreparationKeepsCslAndBstStylesWithoutJstyleReloading(Class<? extends OOStyle> styleClass) throws ReflectiveOperationException, IOException {
+            OOStyle selected = mock(styleClass);
+            when(preferences.getCurrentStyle()).thenReturn(selected);
+
+            JavaFxExtension.invokeAndWait(() -> assertEquals(Boolean.TRUE,
+                    assertDoesNotThrow(() -> invoke("getOrUpdateTheStyle", "Prepare style"))));
+
+            assertSame(selected, field("currentStyle"));
+            verify(previousStyle, never()).ensureUpToDate();
+            verify(selectedStyle, never()).ensureUpToDate();
+            verify(preferences, never()).setCurrentStyle(any());
+            verifyNoInteractions(resolver, field("jStyleLoader"));
         }
 
         @ParameterizedTest
@@ -385,7 +403,7 @@ class OpenOfficePanelTest {
             setField("currentStyle", mock(CitationStyle.class));
             CitationStyle inferred = mock(CitationStyle.class);
             when(inferred.getName()).thenReturn("External CSL style");
-            when(citationController.inferCslStyleFromDocument(styles)).thenReturn(OOResult.ok(Optional.of(inferred)));
+            when(citationController.inferCslStyleFromDocument(resolver)).thenReturn(OOResult.ok(Optional.of(inferred)));
             Button infer = button("inferCslStyle");
 
             JavaFxExtension.invokeAndWait(() -> {
@@ -396,7 +414,7 @@ class OpenOfficePanelTest {
 
             assertEquals(lang("Infer CSL style from document"), infer.getTooltip().getText());
             assertEquals(inferred, field("currentStyle"));
-            verify(citationController).inferCslStyleFromDocument(styles);
+            verify(citationController).inferCslStyleFromDocument(resolver);
             verify(dialogs).notify(lang("Inferred CSL style: '%0'", "External CSL style"));
         }
 
@@ -404,7 +422,7 @@ class OpenOfficePanelTest {
         void missingCslInferenceKeepsTheSelectedStyle() throws ReflectiveOperationException {
             CitationStyle selectedCslStyle = mock(CitationStyle.class);
             setField("currentStyle", selectedCslStyle);
-            when(citationController.inferCslStyleFromDocument(styles)).thenReturn(OOResult.ok(Optional.empty()));
+            when(citationController.inferCslStyleFromDocument(resolver)).thenReturn(OOResult.ok(Optional.empty()));
             Button infer = button("inferCslStyle");
 
             JavaFxExtension.invokeAndWait(() -> {
@@ -432,7 +450,7 @@ class OpenOfficePanelTest {
             assertEquals(selected, field("currentStyle"));
             verify(preferences, never()).setCurrentStyle(any());
             verify(citationController, never()).inferCslStyleFromDocument(any());
-            verifyNoInteractions(styles);
+            verifyNoInteractions(resolver);
         }
 
         @Test
@@ -453,7 +471,7 @@ class OpenOfficePanelTest {
             verify(preferences, never()).setCurrentStyle(any());
             verify(citationController, never()).capabilities(any());
             verify(citationController, never()).inferCslStyleFromDocument(any());
-            verifyNoInteractions(styles);
+            verifyNoInteractions(resolver);
         }
 
         private void prepareScenario(String scenario) throws IOException {
@@ -461,7 +479,7 @@ class OpenOfficePanelTest {
                 when(preferences.getCurrentStyle()).thenReturn(selectedStyle);
             }
             if ("reload-failed".equals(scenario)) {
-                when(styles.reload(selectedStyle)).thenThrow(new IOException("unavailable"));
+                doThrow(new IOException("unavailable")).when(selectedStyle).ensureUpToDate();
             }
         }
 

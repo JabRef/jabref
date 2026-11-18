@@ -185,9 +185,11 @@ The panel's Settings menu provides More settings, which opens JabRef preferences
 Style registries have explicit family-specific sources.
 The CSL registry uses `CSLStyleLoader::getStyles`, including configured external CSL styles; it does not accidentally restrict the catalog to bundled styles.
 JStyle and BST retain their bundled defaults alongside their configured external styles.
+For style preparation, `OpenOfficePanel` calls `JStyle.ensureUpToDate()` directly on the actual selected JStyle; CSL and BST instances are left untouched.
 The panel retains the last selected style from global preferences at startup and when connecting to or selecting a Writer document.
 No style family is inferred or restored automatically from document metadata.
 Manual **Infer style** is available only with a CSL style selected and a connected Writer document.
+It uses the package-private `CslStyleResolver.resolve(XTextDocument)` to resolve document metadata against the current styles from a live `Supplier<List<CitationStyle>>`.
 Choosing another family does not turn manual CSL inference into a JStyle/BST heuristic.
 
 The style dialogs share the external-file picker and narrow private removal helpers, not a new generic style-management framework.

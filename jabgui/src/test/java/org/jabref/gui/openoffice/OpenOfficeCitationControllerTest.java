@@ -450,32 +450,32 @@ class OpenOfficeCitationControllerTest {
     }
 
     @Test
-    void cslInferenceSelectsOnlyTheCatalogCslResult() throws WrappedTargetException {
+    void cslInferenceSelectsOnlyTheResolverCslResult() throws WrappedTargetException {
         CitationStyle inferred = mock(CitationStyle.class);
-        OpenOfficeStyleCatalog catalog = mock(OpenOfficeStyleCatalog.class);
-        when(catalog.inferCslStyle(document)).thenReturn(Optional.of(inferred));
+        CslStyleResolver resolver = mock(CslStyleResolver.class);
+        when(resolver.resolve(document)).thenReturn(Optional.of(inferred));
 
-        assertEquals(Optional.of(inferred), controller().inferCslStyleFromDocument(catalog).get());
+        assertEquals(Optional.of(inferred), controller().inferCslStyleFromDocument(resolver).get());
         verify(preferences).setCurrentStyle(inferred);
-        verify(catalog).inferCslStyle(document);
-        verifyNoMoreInteractions(catalog);
+        verify(resolver).resolve(document);
+        verifyNoMoreInteractions(resolver);
     }
 
     @Test
     void missingCslInferenceLeavesTheCurrentStyleUnchanged() throws WrappedTargetException {
-        OpenOfficeStyleCatalog catalog = mock(OpenOfficeStyleCatalog.class);
-        when(catalog.inferCslStyle(document)).thenReturn(Optional.empty());
+        CslStyleResolver resolver = mock(CslStyleResolver.class);
+        when(resolver.resolve(document)).thenReturn(Optional.empty());
 
-        assertEquals(Optional.empty(), controller().inferCslStyleFromDocument(catalog).get());
+        assertEquals(Optional.empty(), controller().inferCslStyleFromDocument(resolver).get());
         verify(preferences, never()).setCurrentStyle(any());
     }
 
     @Test
     void cslInferenceFailureLeavesTheCurrentStyleUnchanged() throws WrappedTargetException {
-        OpenOfficeStyleCatalog catalog = mock(OpenOfficeStyleCatalog.class);
-        when(catalog.inferCslStyle(document)).thenThrow(new WrappedTargetException("document metadata unavailable"));
+        CslStyleResolver resolver = mock(CslStyleResolver.class);
+        when(resolver.resolve(document)).thenThrow(new WrappedTargetException("document metadata unavailable"));
 
-        assertEquals("document metadata unavailable", controller().inferCslStyleFromDocument(catalog).getError().getLocalizedMessage());
+        assertEquals("document metadata unavailable", controller().inferCslStyleFromDocument(resolver).getError().getLocalizedMessage());
         verify(preferences, never()).setCurrentStyle(any());
     }
 

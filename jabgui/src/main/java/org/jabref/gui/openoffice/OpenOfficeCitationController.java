@@ -129,13 +129,13 @@ public class OpenOfficeCitationController {
         return getEngine().map(current -> current.capabilities(style)).getOptional().orElse(NO_CAPABILITIES);
     }
 
-    OOResult<Optional<CitationStyle>, OOError> inferCslStyleFromDocument(OpenOfficeStyleCatalog styles) {
+    OOResult<Optional<CitationStyle>, OOError> inferCslStyleFromDocument(CslStyleResolver resolver) {
         OOResult<XTextDocument, OOError> document = getXTextDocument();
         if (document.isError()) {
             return OOResult.error(document.getError());
         }
         try {
-            Optional<CitationStyle> inferred = styles.inferCslStyle(document.get());
+            Optional<CitationStyle> inferred = resolver.resolve(document.get());
             inferred.ifPresent(openOfficePreferences::setCurrentStyle);
             return OOResult.ok(inferred);
         } catch (WrappedTargetException exception) {

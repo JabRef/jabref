@@ -1,6 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -8,14 +7,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
 import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
-import org.jabref.logic.openoffice.style.JStyle;
-import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import org.jspecify.annotations.NullMarked;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -23,29 +19,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @NullMarked
-class OpenOfficeStyleCatalogTest {
+class CslStyleResolverTest {
 
-    private final JStyleLoader jStyleLoader = mock(JStyleLoader.class);
-    private final JStyle jStyle = mock(JStyle.class);
     private final CitationStyle cslStyle = new CitationStyle("ieee.csl", "http://www.zotero.org/styles/ieee", "in-text", "IEEE", "IEEE", true, true, false, false, "source", true);
     private final CitationStyle externalCslStyle = new CitationStyle("external/research.csl", "https://example.org/styles/research", "in-text", "Research", "Research", true, true, false, false, "source", false);
     private final XTextDocument document = mock(XTextDocument.class);
-    private final OpenOfficeStyleCatalog catalog = new OpenOfficeStyleCatalog(jStyleLoader, () -> List.of(cslStyle, externalCslStyle));
-
-    @BeforeEach
-    void loadCatalog() {
-        when(jStyleLoader.getStyles()).thenReturn(List.of(jStyle));
-    }
+    private final CslStyleResolver resolver = new CslStyleResolver(() -> List.of(cslStyle, externalCslStyle));
 
     @ParameterizedTest
     @ValueSource(strings = {"JSTYLE", "BST"})
@@ -57,7 +40,7 @@ class OpenOfficeStyleCatalogTest {
             zotero.when(() -> ZoteroDocumentPreferences.findCitationStyle(document, List.of(cslStyle, externalCslStyle)))
                   .thenReturn(Optional.of(cslStyle));
 
-            assertEquals(Optional.empty(), catalog.inferCslStyle(document));
+            assertEquals(Optional.empty(), resolver.resolve(document));
             properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME));
             properties.verifyNoMoreInteractions();
             zotero.verifyNoInteractions();
@@ -74,7 +57,7 @@ class OpenOfficeStyleCatalogTest {
             properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME))
                       .thenReturn(Optional.of("CSL\n" + identity));
 
-            assertEquals(Optional.of(expected), catalog.inferCslStyle(document));
+            assertEquals(Optional.of(expected), resolver.resolve(document));
             zotero.verifyNoInteractions();
         }
     }
@@ -88,7 +71,7 @@ class OpenOfficeStyleCatalogTest {
             zotero.when(() -> ZoteroDocumentPreferences.findCitationStyle(document, List.of(cslStyle, externalCslStyle)))
                   .thenReturn(Optional.of(cslStyle));
 
-            assertEquals(Optional.empty(), catalog.inferCslStyle(document));
+            assertEquals(Optional.empty(), resolver.resolve(document));
             zotero.verifyNoInteractions();
         }
     }
@@ -100,14 +83,14 @@ class OpenOfficeStyleCatalogTest {
             properties.when(() -> UnoUserDefinedProperty.getStringValue(document, property))
                       .thenReturn(Optional.of("<data><style id=\"https://example.org/styles/research\"/></data>"));
 
-            assertEquals(Optional.of(externalCslStyle), catalog.inferCslStyle(document));
+            assertEquals(Optional.of(externalCslStyle), resolver.resolve(document));
         }
     }
 
     @Test
     void cslInferenceWithoutStoredStyleReturnsEmpty() throws WrappedTargetException {
         try (MockedStatic<UnoUserDefinedProperty> _ = mockStatic(UnoUserDefinedProperty.class)) {
-            assertEquals(Optional.empty(), catalog.inferCslStyle(document));
+            assertEquals(Optional.empty(), resolver.resolve(document));
         }
     }
 
@@ -117,41 +100,21 @@ class OpenOfficeStyleCatalogTest {
             properties.when(() -> UnoUserDefinedProperty.getStringValue(document, "ZOTERO_PREF_1"))
                       .thenReturn(Optional.of("<data><style id=\"https://example.org/styles/missing\"/></data>"));
 
-            assertEquals(Optional.empty(), catalog.inferCslStyle(document));
+            assertEquals(Optional.empty(), resolver.resolve(document));
         }
     }
 
     @Test
-    void cslInferenceUsesStylesAddedAfterRegistryConstruction() throws WrappedTargetException {
+    void cslInferenceUsesStylesAddedAfterResolverConstruction() throws WrappedTargetException {
         AtomicReference<List<CitationStyle>> availableStyles = new AtomicReference<>(List.of(cslStyle));
-        OpenOfficeStyleCatalog liveCatalog = new OpenOfficeStyleCatalog(jStyleLoader, availableStyles::get);
+        CslStyleResolver liveResolver = new CslStyleResolver(availableStyles::get);
         try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class)) {
             properties.when(() -> UnoUserDefinedProperty.getStringValue(document, DocumentStyleStore.PROPERTY_NAME))
                       .thenReturn(Optional.of("CSL\nhttps://example.org/styles/research"));
 
-            assertEquals(Optional.empty(), liveCatalog.inferCslStyle(document));
+            assertEquals(Optional.empty(), liveResolver.resolve(document));
             availableStyles.set(List.of(cslStyle, externalCslStyle));
-            assertEquals(Optional.of(externalCslStyle), liveCatalog.inferCslStyle(document));
+            assertEquals(Optional.of(externalCslStyle), liveResolver.resolve(document));
         }
-    }
-
-    @Test
-    void reloadingASelectedJstyleUsesTheSelectedCatalogEntry() throws IOException {
-        assertSame(jStyle, catalog.reload(jStyle));
-        verify(jStyle).ensureUpToDate();
-    }
-
-    @Test
-    void reloadingCslDoesNotReloadAnUnrelatedJstyle() throws IOException {
-        assertSame(cslStyle, catalog.reload(cslStyle));
-        verify(jStyle, never()).ensureUpToDate();
-    }
-
-    @Test
-    void reloadFailureIsNotSilentlyReplacedByADefault() throws IOException {
-        IOException failure = new IOException("changed external style is unavailable");
-        doThrow(failure).when(jStyle).ensureUpToDate();
-
-        assertSame(failure, assertThrows(IOException.class, () -> catalog.reload(jStyle)));
     }
 }

@@ -53,6 +53,7 @@ import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.uno.WriterOperationException;
@@ -108,7 +109,7 @@ public class OpenOfficePanel {
     private final JStyleLoader jStyleLoader;
     private final CSLStyleLoader cslStyleLoader;
     private final BstStyleLoader bstStyleLoader;
-    private final OpenOfficeStyleCatalog styleCatalog;
+    private final CslStyleResolver cslStyleResolver;
     private final BooleanProperty pageInfoSupported = new SimpleBooleanProperty();
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -154,7 +155,7 @@ public class OpenOfficePanel {
 
         cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
         bstStyleLoader = new BstStyleLoader(openOfficePreferences);
-        styleCatalog = new OpenOfficeStyleCatalog(jStyleLoader, CSLStyleLoader::getStyles);
+        cslStyleResolver = new CslStyleResolver(CSLStyleLoader::getStyles);
 
         ActionFactory factory = new ActionFactory();
 
@@ -195,20 +196,21 @@ public class OpenOfficePanel {
             OOError.noValidStyleSelected().setTitle(title).showErrorDialog(dialogService);
             return false;
         }
-        try {
-            currentStyle = styleCatalog.reload(selected.orElseThrow());
-            if (currentStyle != selected.orElseThrow()) {
-                openOfficePreferences.setCurrentStyle(currentStyle);
+        OOStyle selectedStyle = selected.orElseThrow();
+        if (selectedStyle instanceof JStyle jStyle) {
+            try {
+                jStyle.ensureUpToDate();
+            } catch (IOException exception) {
+                String path = selectedStyle.getPath();
+                LOGGER.warn("Unable to reload style file '{}'", path, exception);
+                new OOError(title, Localization.lang("Unable to reload style file '%0'. %1", path, String.valueOf(exception.getMessage())), exception)
+                        .showErrorDialog(dialogService);
+                return false;
             }
-            updateButtonAvailability();
-            return true;
-        } catch (IOException exception) {
-            String path = selected.orElseThrow().getPath();
-            LOGGER.warn("Unable to reload style file '{}'", path, exception);
-            new OOError(title, Localization.lang("Unable to reload style file '%0'. %1", path, String.valueOf(exception.getMessage())), exception)
-                    .showErrorDialog(dialogService);
-            return false;
         }
+        currentStyle = selectedStyle;
+        updateButtonAvailability();
+        return true;
     }
 
     private void initPanel() {
@@ -565,7 +567,7 @@ public class OpenOfficePanel {
 
     private void inferCslStyleFromDocument() {
         final String errorDialogTitle = Localization.lang("Could not infer CSL style from document");
-        OOResult<Optional<CitationStyle>, OOError> result = citationController.inferCslStyleFromDocument(styleCatalog);
+        OOResult<Optional<CitationStyle>, OOError> result = citationController.inferCslStyleFromDocument(cslStyleResolver);
         if (result.ifError(error -> citationController.showDialog(error.setTitle(errorDialogTitle))).isError()) {
             return;
         }

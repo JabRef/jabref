@@ -17,7 +17,7 @@ The logic and model packages below live under `jablib/src/main/java/org/jabref/`
 
 | Package | Responsibility | Principal types |
 | --- | --- | --- |
-| `gui.openoffice` in `jabgui` | Present document actions, select styles, and show results. | `OpenOfficePanel`, `OpenOfficeCitationController`, `OpenOfficeDocumentConnection`, `OpenOfficeStyleCatalog` |
+| `gui.openoffice` in `jabgui` | Present document actions, select styles, and show results. | `OpenOfficePanel`, `OpenOfficeCitationController`, `OpenOfficeDocumentConnection`, `CslStyleResolver` |
 | `logic.openoffice` | Shared citation identities, preferences, and Zotero protocol support. | `CitationIds`, `OpenOfficePreferences`, `ZoteroReferenceMark`, `ZoteroCitationLinker`, `ZoteroDocumentPreferences` |
 | `logic.openoffice.engine` | Coordinate document actions and compute renderer output. | `CitationEngine`, `UpdatePipeline`, `CitationGroupEditor`, `CitationFormatConverter`, `DocumentWriteSession`, `CitationRenderer` |
 | `logic.openoffice.engine.storage` | Read canonical citations and apply prepared text/property changes. | `MarkStore`, `CitationMarkerWriter`, `DocumentStyleStore`, `UndoableDocumentProperties` |
@@ -47,10 +47,11 @@ Document mutation, renderer dispatch, write-session handling, and Zotero strateg
 Its static `disposeAllBridges()` operation globally disposes client-side UNO bridges without closing Writer documents or the office application.
 `OpenOfficeInstallationDetector` handles installation-path selection and validation.
 
-`StyleSelectDialogViewModel` manages style selection and the external-style lifecycle.
-`OpenOfficeStyleCatalog` provides manual CSL inference from document metadata and reloads the selected JStyle when needed.
+`StyleSelectDialogViewModel` manages style selection and the external-style lifecycle through `JStyleLoader`, `CSLStyleLoader`, and `BstStyleLoader`.
+The package-private `CslStyleResolver.resolve(XTextDocument)` resolves document metadata only for manual CSL inference using a live `Supplier<List<CitationStyle>>`.
+`OpenOfficePanel` prepares the actual selected JStyle by calling `JStyle.ensureUpToDate()` directly; it leaves CSL and BST styles untouched.
 Connecting to or selecting a Writer document retains the last selected style from global preferences, without automatic style inference or restoration.
-This runtime catalog is distinct from the generated CSL catalog produced by `CitationStyleCatalogGenerator` in `build-support`.
+The resolver is distinct from the generated CSL catalog produced by `CitationStyleCatalogGenerator` in `build-support`.
 `ManageCitationsDialogViewModel.applyCitationEdits()` applies edited citation rows through the controller; it does not store dialog preferences.
 `OOError` carries localized dialog messages and titles at the GUI boundary.
 
