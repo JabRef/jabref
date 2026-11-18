@@ -468,12 +468,16 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByProgress.setMaxSize(25, 25);
 
         // Create import and review buttons for both sides
-        Button importCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
+        Button importCitingButton = new Button(
+                Localization.lang("Add selected entry(s) to library"),
+                IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
         importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
         Button reviewCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
         reviewCitingButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
 
-        Button importCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
+        Button importCitedByButton = new Button(
+                Localization.lang("Add selected entry(s) to library"),
+                IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
         importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
         Button reviewCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
         reviewCitedByButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
@@ -582,7 +586,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                         hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = ControlHelper.iconButton(IconTheme.JabRefIcons.LINK);
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
-                        jumpTo.getStyleClass().add("h1");
                         jumpTo.setOnMouseClicked(_ -> jumpToEntry(entry));
                         vContainer.getChildren().add(jumpTo);
 
@@ -600,7 +603,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                             }
                         });
-                        addToggle.getStyleClass().addAll("addEntryButton", "h1");
+                        addToggle.getStyleClass().addAll("addEntryButton");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
                         vContainer.getChildren().add(addToggle);
                     }
