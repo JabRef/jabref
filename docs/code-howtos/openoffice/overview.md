@@ -182,7 +182,7 @@ The panel's Settings menu provides More settings, which opens JabRef preferences
 Style registries have explicit family-specific sources.
 The CSL registry uses `CSLStyleLoader::getStyles`, including configured external CSL styles; it does not accidentally restrict the catalog to bundled styles.
 JStyle and BST retain their bundled defaults alongside their configured external styles.
-Manual style inference is CSL-only; restoration of explicitly stored applied-style metadata across families is a separate operation.
+Manual style inference is available only with a CSL style selected and a connected Writer document; automatic restoration of stored JStyle, CSL, and BST styles is a separate operation.
 Choosing another family does not turn manual CSL inference into a JStyle/BST heuristic.
 
 The style dialogs share the external-file picker and narrow private removal helpers, not a new generic style-management framework.

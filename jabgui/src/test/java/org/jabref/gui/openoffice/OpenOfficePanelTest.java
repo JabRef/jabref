@@ -28,6 +28,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.engine.StyleCapabilities;
+import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
@@ -345,14 +346,49 @@ class OpenOfficePanelTest {
             verify(citationController, never()).insertCitation(anyList(), anyList(), any(), any(), anyString());
         }
 
+        @ParameterizedTest
+        @ValueSource(classes = {JStyle.class, BstStyle.class})
+        void inferenceButtonIsDisabledForNonCslStyles(Class<? extends OOStyle> styleClass) throws ReflectiveOperationException {
+            setField("currentStyle", mock(styleClass));
+            Button infer = button("inferCslStyle");
+
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(this::refreshActionAvailability);
+                assertTrue(infer.isDisabled());
+                infer.fire();
+            });
+
+            verify(citationController, never()).inferCslStyleFromDocument(any());
+        }
+
+        @Test
+        void inferenceButtonIsDisabledWithoutAWriterConnection() throws ReflectiveOperationException {
+            setField("currentStyle", mock(CitationStyle.class));
+            when(citationController.isDocumentConnectionMissing()).thenReturn(true);
+            Button infer = button("inferCslStyle");
+
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(this::refreshActionAvailability);
+                assertTrue(infer.isDisabled());
+                infer.fire();
+            });
+
+            verify(citationController, never()).inferCslStyleFromDocument(any());
+        }
+
         @Test
         void inferenceButtonSelectsOnlyTheCslResult() throws ReflectiveOperationException {
+            setField("currentStyle", mock(CitationStyle.class));
             CitationStyle inferred = mock(CitationStyle.class);
             when(inferred.getName()).thenReturn("External CSL style");
             when(citationController.inferCslStyleFromDocument(styles)).thenReturn(OOResult.ok(Optional.of(inferred)));
             Button infer = button("inferCslStyle");
 
-            JavaFxExtension.invokeAndWait(infer::fire);
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(this::refreshActionAvailability);
+                assertFalse(infer.isDisabled());
+                infer.fire();
+            });
 
             assertEquals(lang("Infer CSL style from document"), infer.getTooltip().getText());
             assertEquals(inferred, field("currentStyle"));
@@ -363,12 +399,18 @@ class OpenOfficePanelTest {
 
         @Test
         void missingCslInferenceKeepsTheSelectedStyle() throws ReflectiveOperationException {
+            CitationStyle selectedCslStyle = mock(CitationStyle.class);
+            setField("currentStyle", selectedCslStyle);
             when(citationController.inferCslStyleFromDocument(styles)).thenReturn(OOResult.ok(Optional.empty()));
             Button infer = button("inferCslStyle");
 
-            JavaFxExtension.invokeAndWait(infer::fire);
+            JavaFxExtension.invokeAndWait(() -> {
+                assertDoesNotThrow(this::refreshActionAvailability);
+                assertFalse(infer.isDisabled());
+                infer.fire();
+            });
 
-            assertEquals(previousStyle, field("currentStyle"));
+            assertEquals(selectedCslStyle, field("currentStyle"));
             verify(dialogs).notify(lang("No CSL style could be inferred from the document."));
         }
 
@@ -412,6 +454,12 @@ class OpenOfficePanelTest {
 
         private Button button(String name) throws ReflectiveOperationException {
             return (Button) field(name);
+        }
+
+        private void refreshActionAvailability() throws ReflectiveOperationException {
+            Method method = OpenOfficePanel.class.getDeclaredMethod("updateButtonAvailability");
+            method.setAccessible(true);
+            method.invoke(panel);
         }
 
         private void initializePanel() throws ReflectiveOperationException {

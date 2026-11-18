@@ -427,7 +427,7 @@ public class OpenOfficePanel {
         citeInText.setDisable(!available.citeInText());
         citeEmpty.setDisable(!available.citeEmpty());
         citeSpecial.setDisable(!available.citeSpecial());
-        inferCslStyle.setDisable(!connected);
+        inferCslStyle.setDisable(!connected || !(currentStyle instanceof CitationStyle));
         updateBibliography.setDisable(!available.refresh());
         merge.setDisable(!available.groupEditing());
         unmerge.setDisable(!available.groupEditing());

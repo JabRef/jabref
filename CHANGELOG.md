@@ -72,7 +72,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed Writer error messages to explain protected areas, unavailable citations, missing styles, and Pandoc problems. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed Writer updates to preserve existing citations and bibliographies when citation formatting fails. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed Writer style selection to preserve Zotero preferences; disable compatibility mode explicitly before using JStyle or BST. [#17673](https://github.com/JabRef/jabref/pull/17673)
-- We changed Writer's "Infer style" action to remain available across style families while still identifying CSL styles only. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed Writer style removal to confirm the clicked style and keep selections consistent after removal. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed Writer bibliography refresh to clear obsolete entries and extra blank paragraphs, updating only the selected citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed "Separate citations" to leave in-text, invisible, no-parentheses, author-only, and year-only groups unchanged. [#17673](https://github.com/JabRef/jabref/pull/17673)
