@@ -37,8 +37,12 @@ public class NumericFieldComparator implements Comparator<String> {
         if (i1present && i2present) {
             return i1 - i2;
         } else if (i1present) {
+            // The first one was parsable, but not the second one.
+            //This means we consider one > two
             return 1;
         } else if (i2present) {
+            // The second one was parsable, but not the first one.
+            // This means we consider one < two
             return -1;
         } else {
             // We assume that "null" is "less than" any other value.
