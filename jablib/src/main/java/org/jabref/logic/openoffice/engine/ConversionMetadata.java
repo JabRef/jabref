@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
-import org.jabref.logic.openoffice.engine.ZoteroCitationModifiers.UnsupportedModifiersException;
 import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -143,20 +141,6 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
             }
         }
         return found;
-    }
-
-    static void requireSupportedModifiers(String name) throws RenderException {
-        try {
-            ZoteroCitationModifiers.requireSupportedModifiers(name);
-        } catch (UnsupportedModifiersException exception) {
-            LOGGER.debug("Cannot convert native Zotero citation modifiers", exception);
-            CitationFormatConverter.ConversionException failure = new CitationFormatConverter.ConversionException("Unsupported native Zotero citation modifiers",
-                    Localization.lang("Cannot convert Zotero citations with locators, labels, prefixes, suffixes, author-only items, or mixed author suppression. Remove these modifiers in Zotero and try again."));
-            failure.initCause(exception);
-            throw failure;
-        } catch (RenderException exception) {
-            throw CitationFormatConverter.invalidMetadata(exception);
-        }
     }
 
     static String identity(String name) throws RenderException {

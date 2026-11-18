@@ -33,7 +33,7 @@ Detection rereads document marks, including after reconnecting, rather than depe
 Legacy `JR_cite*` and `CID_n` marks remain unmanaged and unchanged, including in mixed-format documents.
 
 The combined converted and pending citations and any target-mode bibliography requested by normal synchronization are rendered once before document mutation.
-Preparation failures, including invalid metadata, unsupported native semantics, unresolved sources, protected ranges, unsuitable custom-property types or attributes, and rendering failures, leave marks, properties, text, and undo history unchanged.
+Preparation failures, including invalid metadata, unresolved sources, protected ranges, unsuitable custom-property types or attributes, and rendering failures, leave marks, properties, text, and undo history unchanged.
 Conversion requires an available, unlocked Writer undo manager and its own root undo context; nesting inside another undo operation is rejected before document writes.
 Successful conversion and insertion form one Undo/Redo step covering identities, formatted text, any normally synchronized target-mode bibliography, page-info properties, citation conversion metadata, and prepared applied-style and Zotero preference properties.
 An ordinary application failure is rolled back only after closing and verifying ownership of that context, without undoing earlier user actions.
@@ -43,8 +43,8 @@ Ordinary updates retain raw style-property setters outside the conversion-specif
 
 A persistent per-document citation sidecar preserves canonical uids, storage-order keys, all six stored citation types, every page-info slot, and supported native Zotero citation JSON, identifiers, URIs, and harmless unknown metadata across conversion and save/reopen.
 Previously stored canonical partial-citation types and page information remain stored but are not rendered in Zotero mode.
-Native Zotero citations with nonempty locators, labels, prefixes, suffixes, author-only items, or mixed per-item author suppression are rejected before conversion with an actionable error, not converted while silently omitting their semantics.
-Uniform author suppression is supported; rejecting a locator-bearing native citation leaves its existing text and JSON unchanged.
+Native modifiers do not block conversion; their JSON remains in the citation sidecar and is restored when converting back to native format.
+Conversion retains the existing group-level citation-type mapping rather than adding full native modifier rendering.
 An externally edited native mark still associated through its `citationID` or reference-mark suffix causes conversion to fail rather than restore stale canonical state.
 Replacing both identity fields or deleting the sidecar loses the association; canonical-only state cannot then be reconstructed from the native citation.
 
@@ -60,7 +60,16 @@ Needs: impl, utest
 Ordinary native insertion and refresh must not introduce a rejection solely because existing citations contain locators, labels, prefixes, suffixes, author-only items, or mixed per-item author suppression.
 These operations retain the existing rendering behavior: modifiers remain in native JSON, but locators and affixes are not rendered, author-only is not implemented, and any author suppression selects JabRef's group-level narrative rendering.
 This is compatibility with existing behavior, not complete support for native Zotero modifier semantics.
-Actual format conversion retains its separate modifier validation.
+Format conversion follows the same compatibility policy.
+
+Needs: impl, utest
+
+## Native Zotero format conversion must retain existing modifier compatibility
+`req~openoffice.zotero-conversion-modifier-compatibility~1`
+
+Locators, labels, prefixes, suffixes, author-only items, and mixed per-item author suppression must not by themselves prevent conversion.
+As in the existing integration, any item with `suppress-author: true` maps its group to JabRef's in-text citation type; other native modifiers do not add new rendering semantics.
+The citation sidecar retains native JSON, identifiers, and modifiers for restoration on conversion back to native format, including after save/reopen.
 
 Needs: impl, utest
 

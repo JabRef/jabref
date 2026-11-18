@@ -202,14 +202,14 @@ Only current canonical and native Zotero citation marks participate; `JR_cite*` 
 `CitationFormatConverter` prepares existing and pending citations, source linking, replacement identities, optional normally synchronized target bibliography output, and style-property deltas.
 Required custom-property types, writability, and removability are preflighted before mutation.
 One render supplies final markers and any requested bibliography output; application does not render again.
-Invalid metadata, unsupported citation modifiers, unresolved sources, unsuitable properties, protected ranges, and rendering failures stop preparation before document writes or undo-history changes.
+Invalid metadata, unresolved sources, unsuitable properties, protected ranges, and rendering failures stop preparation before document writes or undo-history changes.
 
 `ConversionMetadata` stores a document-local citation sidecar under `JabRef_citation_conversion:<uid>`.
 It preserves the canonical uid, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, including URI links, opaque identifiers, and harmless unknown metadata, while the association remains valid through conversion and save/reopen.
 Previously stored canonical partial types and page information survive but are not rendered in Zotero mode.
-Native nonempty locators, labels, prefixes, suffixes, author-only items, and mixed per-item `suppress-author` flags are rejected before actual format conversion with an actionable error; uniform suppression is supported.
-`ZoteroCitationModifiers` validates conversion eligibility, not ordinary native insertion or refresh.
-Ordinary native updates retain the existing rendering behavior rather than adding modifier support or a new rejection: native JSON retains the modifiers, but visible locators and affixes can disappear when citations are regenerated, author-only is ignored, and any author suppression selects group-level narrative rendering.
+Native modifiers do not introduce a rejection in format conversion, insertion, or refresh.
+These operations retain the existing rendering behavior: visible locators and affixes can disappear when citations are regenerated, author-only is ignored, and any item with `suppress-author: true` selects group-level in-text/narrative rendering, including mixed groups.
+Native JSON remains in native marks or the conversion sidecar, which restores the original modifiers when converting back; retaining metadata is not full modifier rendering support.
 Export-cited remains read-only.
 The sidecar is not a rendered-output cache: opaque native JSON may include Zotero display properties that are preserved rather than used for rendering.
 
@@ -242,7 +242,7 @@ Owned conversion-failure rollback is new recovery behavior intended to prevent o
 
 The [Writer integration testing instructions](../testing.md#libreoffice-writer-integration-tests) describe the required LibreOffice/Pandoc setup, dedicated task, standard test reports, and saved documents/logs.
 Golden documents, cross-family save/reopen, citation-mode conversion, all types/page slots, native JSON, protected ranges, superscripts, tracked changes, and rollback are covered by the relevant Writer and unit-test definitions.
-The native locator fixture establishes unchanged content on rejection, not successful locator conversion.
+Native modifier fixtures cover successful conversion with the existing citation-type mapping and JSON restoration through save/reopen; they do not establish full modifier rendering support.
 These descriptions do not establish that a particular run passed or remove the documented ordering limitations.
 The [code reorganization](code-reorganization.md) and [problems](problems.md) pages preserve historical design evidence rather than define the current contract.
 For repository exploration, see [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).

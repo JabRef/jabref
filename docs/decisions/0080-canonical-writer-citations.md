@@ -80,13 +80,13 @@ Legacy `JR_cite*` and `CID_n` marks are not conversion inputs.
 `CitationFormatConverter` prepares the combined existing and pending citations, native linking, replacement identities, optional normally synchronized target-mode bibliography output, and style-property deltas.
 Required custom-property types, writability, and removability are preflighted.
 One render pass supplies final output before application; application does not render again.
-Invalid metadata, unsupported native citation modifiers, unresolved sources, unsuitable properties, protected ranges, and rendering failures stop preparation before document writes or undo-history changes.
+Invalid metadata, unresolved sources, unsuitable properties, protected ranges, and rendering failures stop preparation before document writes or undo-history changes.
 
 `ConversionMetadata` persists the citation-only sidecar under `JabRef_citation_conversion:<uid>`.
 It preserves canonical uids, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, URI links, opaque identifiers, and harmless unknown metadata through conversion and save/reopen while the association remains valid.
 Canonical partial types and page information survive but are not rendered in Zotero mode.
-Native nonempty locators, labels, prefixes, suffixes, author-only items, and mixed per-item `suppress-author` flags are rejected before conversion with an actionable error; uniform suppression is supported.
-Rejected locator-bearing citations keep their existing text and JSON; successful locator conversion/rendering is not claimed.
+Native modifiers do not block conversion; any item with `suppress-author: true` maps its group to the existing JabRef in-text citation type, including mixed groups.
+The sidecar retains native modifier JSON for restoration on conversion back, but the renderer does not gain locator, affix, or author-only support.
 Opaque native JSON may include Zotero display properties; preserving those fields does not make the sidecar a rendering or numbering cache.
 
 The JSON `citationID` or mark suffix associates a native citation with its sidecar.
@@ -134,7 +134,7 @@ Ordinary write sessions do not gain this conversion-specific rollback behavior.
 * Good, because rendering failures are reported before existing content is replaced.
 * Good, because group edits preserve page-info ownership and can be undone with their structural/text changes.
 * Good, because the established next-CSL-insertion trigger and citation-only conversion boundary remain.
-* Good, because unsupported native citation modifiers fail before content can be silently lost.
+* Good, because conversion retains the existing modifier compatibility and citation-type mapping without introducing a new rejection.
 * Good, because owned conversion rollback can recover ordinary application failures without undoing earlier user work.
 * Bad, because legacy JabRef mark formats are incompatible and are not migrated.
 * Bad, because metadata association can be invalidated or lost by external edits.
@@ -144,7 +144,7 @@ Ordinary write sessions do not gain this conversion-specific rollback behavior.
 ### Confirmation
 
 The Writer integration definitions cover golden canonical documents, cross-family save/reopen, all six types/page slots, current canonical/native Zotero citation conversion, protected ranges, footnotes/tables, superscripts, tracked changes, and ordinary application-failure rollback.
-Native JSON round trips cover supported URI and unknown metadata, while the native locator fixture checks pre-write rejection with content unchanged.
+Native JSON round trips cover URIs, modifiers, and unknown metadata, while modifier fixtures check successful conversion, existing citation-type mapping, and restoration through save/reopen.
 Bibliography assertions follow normal synchronization: all sections unchanged when disabled, target-mode updates only when enabled.
 Storage/codec, `ConversionMetadataTest`, `DocumentSessionTest`, and GUI/controller tests complement the Writer coverage with metadata, property, undo-ownership, and warning-order checks.
 These descriptions are not evidence that a new test run passed.

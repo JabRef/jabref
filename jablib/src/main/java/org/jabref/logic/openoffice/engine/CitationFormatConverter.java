@@ -174,9 +174,6 @@ final class CitationFormatConverter {
                     metadata = Optional.of(ConversionMetadata.capture(citation.group(), citation.newName()));
                 }
             }
-            if (ZoteroReferenceMark.isZoteroReferenceMarkName(name)) {
-                ConversionMetadata.requireSupportedModifiers(name);
-            }
             if (!plannedNames.add(name)) {
                 throw invalidMetadata();
             }
@@ -202,6 +199,7 @@ final class CitationFormatConverter {
                 Collections.unmodifiableMap(new LinkedHashMap<>(propertyChanges)));
     }
 
+    // [impl->req~openoffice.zotero-conversion-modifier-compatibility~1]
     private ReadPlan read(List<BibDatabase> selected)
             throws NoDocumentException, WrappedTargetException, RenderException, MarkCodecException {
         List<PlannedCitation> result = new ArrayList<>();
@@ -217,12 +215,8 @@ final class CitationFormatConverter {
                 WriterReferenceMark mark = store.referenceMark(group);
 
                 Optional<ConversionMetadata> metadata = ConversionMetadata.forCanonical(document, group);
-                if (metadata.isPresent()) {
-                    ConversionMetadata.requireSupportedModifiers(metadata.orElseThrow().zoteroName());
-                }
                 result.add(new PlannedCitation(group, name, mark.getMarkRange(document).orElseThrow(), name, metadata));
             } else if (ZoteroReferenceMark.isZoteroReferenceMarkName(name)) {
-                ConversionMetadata.requireSupportedModifiers(name);
                 ZoteroReferenceMark mark = ZoteroReferenceMark.parse(name).orElseThrow(CitationFormatConverter::invalidMetadata);
                 if (!nativeIds.add(ConversionMetadata.identity(name))) {
                     throw invalidMetadata();

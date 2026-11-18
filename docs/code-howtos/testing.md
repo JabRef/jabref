@@ -272,8 +272,8 @@ Rendering failures, including missing Pandoc for BST, must leave preparation tar
 Conversion changes citation marks only: with synchronization disabled, all bibliography section names, text, and properties remain unchanged; with synchronization enabled, normal handling updates or creates only the target mode's managed bibliography and leaves other-format sections alone.
 There is no bibliography conversion, renaming, consolidation, sidecar, or rejection based on bibliography settings.
 Citation round trips preserve all six canonical types, uids, storage-order keys, every page-info slot, and supported native JSON through save/reopen while the metadata association remains valid.
-The native locator fixture checks a clear pre-write rejection with existing text and JSON unchanged, not locator conversion support.
-Other unsupported native modifiers, unsuitable custom properties, unresolved sources, protected ranges, pending deletions, and stale associated conversion metadata are rejected before actual conversion.
+Native modifier fixtures check successful conversion with the existing group-level citation-type mapping and native JSON restoration through save/reopen, not full locator or modifier rendering support.
+Unsuitable custom properties, unresolved sources, protected ranges, pending deletions, and stale associated conversion metadata are rejected before actual conversion.
 Stale conversion metadata must not block ordinary native Zotero insertion or refresh.
 
 Storage, `ConversionMetadataTest`, `DocumentSessionTest`, and GUI/controller tests complement the real-Writer suite with codec/property checks, the existing warning order, and owned conversion rollback.

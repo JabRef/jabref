@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
 import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
@@ -30,10 +29,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -197,40 +194,33 @@ class ConversionMetadataTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"locator", "label", "prefix", "suffix"})
-    void nonemptyNativeCitationModifiersAreRejected(String field) {
-        String name = ZoteroReferenceMark.PREFIX + "{\"citationItems\":[{\"" + field + "\":\"value\"}]}";
-        assertThrows(RenderException.class, () -> ConversionMetadata.requireSupportedModifiers(name));
-    }
-
-    @Test
-    void conversionRetainsItsOwnModifierGuidanceAndTheValidationCause() {
-        RenderException error = assertThrows(RenderException.class, () -> ConversionMetadata.requireSupportedModifiers(NATIVE));
-
-        assertEquals(Optional.of(Localization.lang("Cannot convert Zotero citations with locators, labels, prefixes, suffixes, author-only items, or mixed author suppression. Remove these modifiers in Zotero and try again.")), error.localizedMessage());
-        assertEquals("Unsupported native Zotero citation modifiers", assertInstanceOf(RenderException.class, error.getCause()).getMessage());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"{}", "[]", "null", "not JSON", "{\"citationItems\":null}",
-            "{\"citationItems\":{}}", "{\"citationItems\":[null]}", "{\"citationItems\":[{\"suppress-author\":{}}]}"})
-    void malformedNativeModifiersRetainInvalidMetadataGuidance(String json) {
-        RenderException error = assertThrows(RenderException.class,
-                () -> ConversionMetadata.requireSupportedModifiers(ZoteroReferenceMark.PREFIX + json));
-
-        assertEquals(CitationFormatConverter.invalidMetadata().localizedMessage(), error.localizedMessage());
-        assertInstanceOf(RenderException.class, error.getCause());
-    }
-
-    @Test
-    void uniformSuppressionIsSupportedButMixedSuppressionIsRejected() {
-        for (String flags : List.of("", "\"suppress-author\":true,")) {
-            String item = "{" + flags + "\"id\":\"opaque\",\"unknown-metadata\":42}";
-            String name = ZoteroReferenceMark.PREFIX + "{\"citationItems\":[" + item + "," + item + "]}";
-            assertDoesNotThrow(() -> ConversionMetadata.requireSupportedModifiers(name));
+    @ValueSource(strings = {"locator", "label", "prefix", "suffix", "author-only", "suppress-author", "mixed-suppression"})
+    // [utest->req~openoffice.zotero-conversion-modifier-compatibility~1]
+    void nativeModifiersSurviveMetadataRoundTripWithExistingGroupType(String modifier) throws Exception {
+        JsonObject json = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(NATIVE)).getAsJsonObject();
+        JsonObject first = json.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+        if ("suppress-author".equals(modifier)) {
+            json.getAsJsonArray("citationItems").forEach(item -> item.getAsJsonObject().addProperty("suppress-author", true));
+        } else if ("mixed-suppression".equals(modifier)) {
+            first.addProperty("suppress-author", true);
+        } else if ("author-only".equals(modifier)) {
+            first.addProperty(modifier, true);
+        } else {
+            first.addProperty(modifier, "value");
         }
-        String mixed = ZoteroReferenceMark.PREFIX + "{\"citationItems\":[{\"suppress-author\":true},{\"suppress-author\":false}]}";
-        assertThrows(RenderException.class, () -> ConversionMetadata.requireSupportedModifiers(mixed));
+        String name = ZoteroReferenceMark.PREFIX + json + " RNDnative1234";
+        ZoteroReferenceMark mark = ZoteroReferenceMark.parse(name).orElseThrow();
+        CitationType expectedType = "suppress-author".equals(modifier) || "mixed-suppression".equals(modifier)
+                                    ? CitationType.AUTHORYEAR_INTEXT : CitationType.AUTHORYEAR_PAR;
+        ConversionMetadata metadata = new ConversionMetadata(MarkCodec.encode(new JabRefMarkData(mark.citationKeys(), "stable_uid", expectedType)),
+                List.of("", ""), name);
+
+        ConversionMetadata restored = ConversionMetadata.decode(metadata.encode());
+
+        assertEquals(metadata, restored);
+        assertEquals(name, restored.zoteroName());
+        assertEquals(expectedType, restored.group().citationType);
+        assertEquals(expectedType, mark.citationType());
     }
 
     @Test
