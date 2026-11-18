@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
@@ -129,7 +130,8 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         setGraphic(toGraphic.apply(rowItem, item));
                     }
                     if (alignment != null) {
-                        setAlignment(alignment);
+                        // Inline style, because the theme's `-fx-alignment` of table cells would override `setAlignment`
+                        setStyle("-fx-alignment: " + alignment.name().toLowerCase(Locale.ROOT).replace('_', '-'));
                     }
                     if (toTooltip != null) {
                         String tooltipText = toTooltip.apply(rowItem, item);

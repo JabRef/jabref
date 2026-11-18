@@ -272,6 +272,16 @@
     -fx-fixed-cell-size: -1;
 }
 
+/* Keeps the cell content vertically centered in rows of fixed size.
+   - JavaFX switches a cell with unstyled alignment to top-left as soon as the row is taller than 24px
+     (TableRowSkinBase, JDK-8115536). With an em-based cell size that happens at larger fonts and with wrapped text.
+   - TableCellSkinBase subtracts the bottom padding twice, so any vertical padding moves the content up. */
+.table-row-cell > .table-cell,
+.tree-table-row-cell > .tree-table-cell {
+    -fx-alignment: center-left;
+    -fx-padding: 0 1em 0 1em;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -color-fg-muted;
 }
