@@ -2,6 +2,7 @@ package org.jabref.gui.welcome.quicksettings;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 
@@ -34,6 +35,9 @@ public class MainFileDirectoryDialog extends FXDialog {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        okButton.disableProperty().bind(viewModel.pathValidProperty().not());
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {

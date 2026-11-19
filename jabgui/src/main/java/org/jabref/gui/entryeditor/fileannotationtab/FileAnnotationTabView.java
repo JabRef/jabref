@@ -24,6 +24,7 @@ import javafx.scene.text.TextAlignment;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -55,6 +56,7 @@ public class FileAnnotationTabView {
     @Inject private StateManager stateManager;
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
+    @Inject private NativeDesktop nativeDesktop;
 
     public FileAnnotationTabView(BibEntry entry, FileAnnotationCache fileAnnotationCache) {
         this.entry = entry;
@@ -70,7 +72,8 @@ public class FileAnnotationTabView {
                 entry,
                 stateManager,
                 preferences,
-                dialogService);
+                dialogService,
+                nativeDesktop);
 
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());

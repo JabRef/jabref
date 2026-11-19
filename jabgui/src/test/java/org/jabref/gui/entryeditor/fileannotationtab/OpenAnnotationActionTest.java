@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -32,16 +33,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/// Covers the path through a reader JabRef knows. The remaining branches end in the static
-/// `NativeDesktop.get()`, which starts a real program, so they are left to manual testing.
+/// Covers the paths through a configured reader. The document viewer branch is left to manual testing.
 @DisabledOnOs(value = OS.MAC, disabledReason = "No reader can be told a page on macOS, so no command line is built")
 class OpenAnnotationActionTest {
 
     private static final Path PDF_FILE = Path.of("C:/My Library/some paper.pdf");
     private static final Path SUMATRA = Path.of("C:/Program Files/SumatraPDF/SumatraPDF.exe");
+    private static final Path READER_WITHOUT_PAGE_SUPPORT = Path.of("C:/Program Files/Some Reader/reader.exe");
     private static final int PAGE = 7;
 
     private final DialogService dialogService = mock(DialogService.class);
+    private final NativeDesktop nativeDesktop = mock(NativeDesktop.class);
     private final StateManager stateManager = mock(StateManager.class);
     private final ProcessBuilder processBuilder = mock(ProcessBuilder.class);
     private final Process process = mock(Process.class);
@@ -97,6 +99,19 @@ class OpenAnnotationActionTest {
     }
 
     @Test
+    void readerThatCannotBeToldAPageOpensTheFileWithoutPage() throws IOException {
+        ExternalFileType pdfType = mock(ExternalFileType.class);
+        when(pdfType.getExtension()).thenReturn("pdf");
+        when(pdfType.getOpenWithApplication()).thenReturn(READER_WITHOUT_PAGE_SUPPORT.toString());
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(pdfType));
+
+        action().openAtAnnotation(PDF_FILE, annotationOnPage(PAGE), processBuilder);
+
+        verify(nativeDesktop).openFile(PDF_FILE.toString(), "pdf");
+        verify(dialogService).notify(Localization.lang("The configured PDF reader cannot open a PDF at a specific page."));
+    }
+
+    @Test
     void actionIsExecutableOnlyWithBothAFileAndAnAnnotation() {
         assertFalse(actionFor(new SimpleObjectProperty<>(), annotationProperty()).executableProperty().get());
         assertFalse(actionFor(new SimpleObjectProperty<>(PDF_FILE), new SimpleObjectProperty<>()).executableProperty().get());
@@ -110,7 +125,7 @@ class OpenAnnotationActionTest {
     private OpenAnnotationAction actionFor(ObjectProperty<Path> currentFile,
                                            ObjectProperty<FileAnnotationViewModel> currentAnnotation) {
         return new OpenAnnotationAction(currentFile, currentAnnotation, new BibEntry(),
-                stateManager, preferences, dialogService);
+                stateManager, preferences, dialogService, nativeDesktop);
     }
 
     private static ObjectProperty<FileAnnotationViewModel> annotationProperty() {

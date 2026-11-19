@@ -153,6 +153,17 @@ The definition the user accepts is the one from the library file, and it replace
 
 Needs: impl, utest
 
+## User can import cited entries from Zotero-compatible LibreOffice documents
+`feat~import.libreoffice.cited-entries~1`
+
+When a LibreOffice document contains Zotero-compatible reference marks, the user can import their cited entries into the active library. Marks in other formats do not provide the data needed for this import.
+Repeated citations are collected by Zotero item identity, preferring the item URI, with explicit citation keys used when no item identity is available.
+An existing citation key in the target library must not silently exclude a cited entry; bibliographic duplicates go through the ordinary import duplicate handler.
+Explicit document keys are retained, while Zotero-only entries receive generated keys.
+Importing without an open library or a connected document reports the missing prerequisite without reading citations.
+
+Needs: impl, utest
+
 ## PDF book detection must exclude conference article pages with grouped article evidence
 `req~import.pdf.conference-article-exclusion~1`
 
