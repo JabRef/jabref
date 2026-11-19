@@ -31,7 +31,7 @@ public class CitationsDisplay extends ListView<Citation> {
                                                 .withTooltip(this::getDisplayTooltip)
                                                 .install(this);
 
-        this.getStyleClass().add("citationsList");
+        this.getStyleClass().addAll("citationsList", "variable-cell-size");
     }
 
     public ObjectProperty<Path> basePathProperty() {

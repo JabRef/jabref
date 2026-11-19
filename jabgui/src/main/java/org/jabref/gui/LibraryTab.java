@@ -351,6 +351,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
+    public void importCitedEntriesWithDuplicateCheck(List<BibEntry> entries) {
+        importHandler.importEntriesWithDuplicateCheckPreservingCitationKeys(entries);
+    }
+
     private void initializeComponentsAndListeners(boolean isDummyContext) {
         if (!isDummyContext) {
             createSearchContext();
