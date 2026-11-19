@@ -19,7 +19,9 @@ on:
       - reopened
       - labeled
   merge_group:
-  # Nightly build of the jabgui native binary for macOS (see compute-matrix)
+  # Nightly build of the jabgui native binary for macOS (see compute-matrix).
+  # Heads-up: native-image is short of memory on the 7 GB macOS runner, so this build can take up to 6 hours
+  # (the GitHub limit for a job) and keeps one macOS runner busy for that time.
   schedule:
     # Every day at 02:17 UTC. Not at the full hour: GitHub delays or drops scheduled runs under the high load at the
     # start of every hour, see https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
@@ -518,7 +520,7 @@ jobs:
 
           # jabgui native is built for Linux (x64, arm64) and Windows (x64) on every build.
           # macOS silicon is built only nightly and on manual dispatch: on the 7 GB macOS runner, native-image
-          # takes 1 to 2 hours, and the next push to main would cancel such a long build.
+          # can take up to 6 hours, and the next push to main would cancel such a long build.
           JABGUI_NATIVE_MATRIX_JSON='{
             "include": [
               {
@@ -1202,9 +1204,9 @@ jobs:
         ${{ fromJSON(needs.compute-matrix.outputs.jabgui-native-matrix) }}
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.displayName }} jabgui native binary
-    # The build takes about 10 minutes on Linux and Windows, and 1 to 2 hours on the 7 GB macOS runner.
+    # The build takes about 10 minutes on Linux and Windows, and up to 6 hours on the 7 GB macOS runner.
     # On a runner that is short of memory it would otherwise hang for hours.
-    timeout-minutes: ${{ matrix.os == 'macos-15' && 180 || 60 }}
+    timeout-minutes: ${{ matrix.os == 'macos-15' && 360 || 60 }}
     steps:
       - name: Skip native binary build because it is not needed for this event
         if: needs.conditions.outputs.should-build != 'true'
