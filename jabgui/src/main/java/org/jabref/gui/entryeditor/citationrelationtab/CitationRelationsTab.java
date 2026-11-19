@@ -647,7 +647,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
                     showEntrySource.setOnMouseClicked(_ -> showEntrySourceDialog(entry.entry()));
                     rowButtons.add(showEntrySource);
-
                     // Arrange the buttons in a grid with two columns to save vertical space
                     GridPane buttonGrid = new GridPane();
                     buttonGrid.setHgap(4);
@@ -656,7 +655,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                         buttonGrid.add(rowButtons.get(i), i % 2, i / 2);
                     }
 
-                    hContainer.getChildren().addAll(entryNode, separator, buttonGrid);                    hContainer.getStyleClass().add("padding-4-0");
+                    hContainer.getChildren().addAll(entryNode, separator, buttonGrid);
+                    hContainer.getStyleClass().add("padding-4-0");
 
                     return hContainer;
                 })
