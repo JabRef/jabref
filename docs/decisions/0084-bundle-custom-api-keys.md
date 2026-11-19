@@ -1,5 +1,5 @@
 ---
-nav_order: 83
+nav_order: 84
 parent: Decision Records
 ---
 
@@ -23,6 +23,8 @@ How can JabRef load saved custom API keys with one keyring read across supported
 * Store the custom API keys together as a JSON object in one keyring item.
 
 ## Decision Outcome
+
+Chosen option: "Store the custom API keys together as a JSON object in one keyring item", because one shared item avoids repeated permission dialogs when loading saved keys.
 
 This storage format applies to macOS, Linux, and Windows through the existing platform-specific keyring backends.
 Store custom API keys together at service `org.jabref.apikeys.bundle`, account `keys`.

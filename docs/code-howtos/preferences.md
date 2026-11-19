@@ -140,7 +140,7 @@ Further rules:
   Custom API keys share one JSON object in a single keyring item; `fetcherCustomKeyBundleNames` records only their names in preferences.
   An empty name list or disabled persistence prevents keyring reads at startup.
   An absent name list identifies installations that still need migration from separate keyring items.
-  See [ADR 0083](../decisions/0083-bundle-custom-api-keys.md).
+  See [ADR 0084](../decisions/0084-bundle-custom-api-keys.md).
 
 ## Adding a new preference
 
