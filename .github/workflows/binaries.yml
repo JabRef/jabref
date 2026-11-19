@@ -587,7 +587,7 @@ jobs:
       - name: Run GitVersion
         if: needs.conditions.outputs.should-build == 'true'
         id: gitversion
-        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
+        uses: gittools/actions/gitversion/execute@220647997b450f3e9364b6cf6a357197f17d924b # v4.7.2
       - name: Normalize branch name
         if: needs.conditions.outputs.should-build == 'true'
         id: normalize
@@ -1109,7 +1109,7 @@ jobs:
       # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
       - name: Set up Liberica NIK (native-image with AWT support)
         if: needs.conditions.outputs.should-build == 'true'
-        uses: graalvm/setup-graalvm@f70bc8032f90a104502824a54bcb94b6f01715bc # v1
+        uses: graalvm/setup-graalvm@60e76998d25690099182b796e99b8804da582d90 # v1
         with:
           distribution: 'liberica'
           java-package: ${{ matrix.javaPackage }}
