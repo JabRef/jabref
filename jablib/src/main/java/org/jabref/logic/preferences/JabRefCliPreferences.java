@@ -365,6 +365,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
 
     // Abbreviation preferences
+    private static final String DISABLED_EXTERNAL_JOURNAL_LISTS = "disabledExternalJournalLists";
+    private static final String USE_BUILT_IN_JOURNAL_LIST = "useBuiltInJournalList";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
     private static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
@@ -1318,6 +1320,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
                 getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
         );
+
+        abbreviationPreferences.setUseBuiltInJournalList(getBoolean(USE_BUILT_IN_JOURNAL_LIST, true));
+        bindBoolean(abbreviationPreferences.useBuiltInJournalListProperty(), USE_BUILT_IN_JOURNAL_LIST, true);
+
+        abbreviationPreferences.setDisabledExternalJournalLists(convertStringToList(get(DISABLED_EXTERNAL_JOURNAL_LISTS,
+                convertListToString(defaultValues.getDisabledExternalJournalLists()))));
+        bindCustomList(abbreviationPreferences.getDisabledExternalJournalLists(), DISABLED_EXTERNAL_JOURNAL_LISTS, defaultValues.getDisabledExternalJournalLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
 
         bindCustomList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
