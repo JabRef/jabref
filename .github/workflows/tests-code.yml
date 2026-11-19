@@ -650,7 +650,11 @@ jobs:
       - name: Publish jablib to the local Maven repository
         # -Dmaven.repo.local: the jbang-check action points JBANG_REPO at ~/.jbang/repository,
         # so the snapshot has to be published there instead of into ~/.m2.
-        run: gradle -Dmaven.repo.local="$HOME/.jbang/repository" -PprojVersion=6.0 :jablib:publishToMavenLocal
+        # Gradle does not replace Maven's provenance records for previously downloaded snapshots.
+        # Remove the cached jablib snapshot so JBang recognizes the publication as locally installed.
+        run: |
+          rm -rf "$HOME/.jbang/repository/org/jabref/jablib/6.0-SNAPSHOT"
+          gradle -Dmaven.repo.local="$HOME/.jbang/repository" -PprojVersion=6.0 :jablib:publishToMavenLocal
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
