@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;
@@ -320,6 +321,31 @@ class XmpUtilWriterTest {
             assertEquals(booktitle, document.getDocumentInformation().getCustomMetadataValue("bibtex/booktitle"));
             assertEquals(series, document.getDocumentInformation().getCustomMetadataValue("bibtex/series"));
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("latexTextFields")
+    void reimportOfLatexFieldReturnsSingleEntry(Field field, String original, String plainText) throws IOException, TransformerException {
+        Path pdf = createDefaultFile("reimport.pdf", tempDir);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, new BibEntry().withField(field, original), new BibDatabase());
+
+        assertEquals(1, new XmpUtilReader().readXmp(pdf, xmpPreferences).size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("latexFieldsStoredAsBibtexInDocumentInformation")
+    void reimportRestoresOriginalLatex(Field field) throws IOException, TransformerException {
+        String original = "M{\\\"u}ller \\& Sons";
+        Path pdf = createDefaultFile("restore.pdf", tempDir);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, new BibEntry().withField(field, original), new BibDatabase());
+
+        List<BibEntry> reimported = new XmpUtilReader().readXmp(pdf, xmpPreferences);
+
+        assertEquals(List.of(Optional.of(original)), reimported.stream().map(entry -> entry.getField(field)).toList());
+    }
+
+    private static Stream<Field> latexFieldsStoredAsBibtexInDocumentInformation() {
+        return Stream.of("editor", "publisher", "coverage", "rights", "source").map(FieldFactory::parseField);
     }
 
     /// Creates a temporary PDF-file with a single empty page.
