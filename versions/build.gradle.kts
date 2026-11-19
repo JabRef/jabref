@@ -28,10 +28,10 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
-    api(platform("com.konghq:unirest-java-bom:4.11.5"))
+    api(platform("com.konghq:unirest-java-bom:4.11.8"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.23.0"))
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.7.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
     api(platform("org.glassfish.hk2:hk2-bom:4.0.3"))
@@ -54,7 +54,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.9.0")
+    api("com.dlsc.gemsfx:gemsfx:4.14.1")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.6.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -78,7 +78,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.5.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.5.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.5.1")
-    api("com.uber.nullaway:nullaway:0.14.3")
+    api("com.uber.nullaway:nullaway:0.14.4")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("com.vladsch.flexmark:flexmark-ext-tables:0.64.8")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
@@ -140,7 +140,7 @@ dependencies.constraints {
     api("org.graalvm.sdk:nativeimage:25.5.5.0.3")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.6.Final")
-    api("org.hisp.dhis:json-tree:1.13.0")
+    api("org.hisp.dhis:json-tree:1.14.0")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jabref:html-to-node:0.3.0")

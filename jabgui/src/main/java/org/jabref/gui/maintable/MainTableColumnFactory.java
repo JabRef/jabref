@@ -150,6 +150,15 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
+    /// Keeps the column exactly as wide as the node plus [ColumnPreferences#ICON_COLUMN_MARGIN], so it follows the font size.
+    public static void bindExactWidth(TableColumn<?, ?> column, Node node) {
+        node.layoutBoundsProperty().subscribe(bounds -> {
+            if (bounds.getWidth() > 0) {
+                setExactWidth(column, bounds.getWidth() + ColumnPreferences.ICON_COLUMN_MARGIN);
+            }
+        });
+    }
+
     /// Creates a column for the match category.
     /// This column is always hidden but is used for sorting the table
     /// in the floating mode. The order of the [MatchCategory] enum constants
@@ -188,6 +197,7 @@ public class MainTableColumnFactory {
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
+        bindExactWidth(column, headerGraphic);
         column.setResizable(false);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
