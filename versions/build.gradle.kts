@@ -28,7 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
-    api(platform("com.konghq:unirest-java-bom:4.11.8"))
+    api(platform("com.konghq:unirest-java-bom:4.11.9"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.23.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.7.0"))
@@ -66,7 +66,7 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    api("com.google.errorprone:error_prone_core:2.52.0")
+    api("com.google.errorprone:error_prone_core:2.53.0")
     api("com.google.guava:guava:33.8.0-jre")
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
