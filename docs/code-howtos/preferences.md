@@ -64,6 +64,9 @@ classDiagram
 * GUI code obtains the preferences object via dependency injection (see [ADR-0055](../decisions/0055-dependency-injection-approach.md)) and hands the needed preference objects on.
 * Since preference objects are observable, code which must react on a changed setting listens to the property instead of re-reading the value.
 * In tests, create the preference objects directly or mock them. See [Preferences in tests](testing.md#preferences-in-tests).
+  Integration tests can pass a dedicated `java.util.prefs.Preferences` node to `new JabRefCliPreferences(node)` or `new JabRefGuiPreferences(node)`; remove the node after the test.
+  Calling `clear()` on these injected instances resets their node and preference objects without clearing shared-database connections, the certificate truststore, or system keyring secrets.
+  Instances created with the no-argument constructors retain the full reset behavior.
 
 ### Preferences dialog
 

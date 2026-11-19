@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
@@ -21,7 +22,6 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -134,6 +134,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     private static final String CONFIRM_DELETE = "confirmDelete";
     private static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
+    private static final String WRAP_MAIN_TABLE_TEXT = "wrapMainTableText";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
     // endregion
 
@@ -309,6 +310,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private DonationPreferences donationPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private MathSciNetPreferences mathSciNetPreferences;
+
+    public JabRefGuiPreferences() {
+        super();
+    }
+
+    public JabRefGuiPreferences(Preferences preferencesNode) {
+        super(preferencesNode);
+    }
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).
@@ -715,6 +724,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints()),
                 getBoolean(CONFIRM_DELETE, defaultValues.shouldConfirmDelete()),
                 getBoolean(CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar()),
+                getBoolean(WRAP_MAIN_TABLE_TEXT, defaultValues.shouldWrapMainTableText()),
                 getStringList(SELECTED_SLR_CATALOGS));
 
         bindCustom(workspacePreferences.languageProperty(), LANGUAGE, defaultValues.getLanguage(),
@@ -740,6 +750,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(workspacePreferences.showAdvancedHintsProperty(), SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints());
         bindBoolean(workspacePreferences.confirmDeleteProperty(), CONFIRM_DELETE, defaultValues.shouldConfirmDelete());
         bindBoolean(workspacePreferences.hideTabBarProperty(), CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar());
+        bindBoolean(workspacePreferences.wrapMainTableTextProperty(), WRAP_MAIN_TABLE_TEXT, defaultValues.shouldWrapMainTableText());
         bindCustomList(workspacePreferences.getSelectedSlrCatalogs(), SELECTED_SLR_CATALOGS, defaultValues.getSelectedSlrCatalogs(),
                 boundList -> putStringList(SELECTED_SLR_CATALOGS, boundList),
                 () -> getStringList(SELECTED_SLR_CATALOGS));
@@ -1462,16 +1473,5 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         });
 
         return keyBindingRepository;
-    }
-
-    /// In GUI mode, we can look up the directory better
-    @Override
-    protected Path getDefaultPath() {
-        return NativeDesktop.get().getDefaultFileChooserDirectory();
-    }
-
-    @Override
-    protected boolean moveToTrashSupported() {
-        return NativeDesktop.get().moveToTrashSupported();
     }
 }

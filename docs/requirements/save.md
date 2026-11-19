@@ -55,6 +55,32 @@ The file manager selects the backup where the platform supports file selection.
 
 Needs: impl, utest
 
+## Backup must batch field edits into scheduled writes
+`req~jabgui.autosaveandbackup.backup-every-edit~1`
+
+Typing into a newly added or existing field must mark the library for backup, including single-character changes.
+Keystrokes must only mark a backup as pending; they must not trigger serialization or disk writes.
+The backup timer must batch pending edits into at most one backup write per interval (currently 19 seconds).
+The next scheduled backup must contain the latest field value so recovery can detect and restore unsaved edits after a crash.
+
+Needs: impl, utest
+
+## Backup completion must preserve pending edits made after its snapshot
+`req~jabgui.autosaveandbackup.preserve-pending-edits~1`
+
+A field edit received after a backup captures its snapshot must remain pending for the next scheduled backup, even if the older snapshot is written successfully.
+A failed backup must leave its edits pending for another attempt.
+
+Needs: impl, utest
+
+## Backup writers for a library must execute one at a time
+`req~jabgui.autosaveandbackup.serialized-writes~1`
+
+Scheduled backups and backups requested during shutdown must serialize generation capture, snapshot creation, file commit, and completion acknowledgement.
+A shutdown backup must wait for an in-flight backup before capturing the latest edits, so an older snapshot cannot replace the final backup.
+
+Needs: impl, utest
+
 ## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
