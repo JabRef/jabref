@@ -148,6 +148,8 @@ You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor
 
 ## Measure performance
 
+For test-worker heap and allocation investigations, see [Profiling Gradle test memory with JFR](profiling-gradle-tests.md).
+
 Try out the [YourKit Java Profiler](https://www.yourkit.com).
 
 ## equals
