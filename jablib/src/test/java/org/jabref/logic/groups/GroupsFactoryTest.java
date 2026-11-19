@@ -5,6 +5,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.search.inmemory.InMemoryLibrarySearcher;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -12,11 +17,71 @@ import org.jabref.model.groups.SearchGroup;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
 class GroupsFactoryTest {
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            0, 0, RANKING, rank1, false
+            0, 1, RANKING, rank2, false
+            0, 2, RANKING, rank3, false
+            0, 3, RANKING, rank4, false
+            0, 4, RANKING, rank5, false
+            1, 0, RELEVANCE, relevant, false
+            1, 1, RELEVANCE, relevant, true
+            2, 0, QUALITY, qualityAssured, false
+            2, 1, QUALITY, qualityAssured, true
+            3, 0, PRINTED, printed, false
+            3, 1, PRINTED, printed, true
+            4, 0, PRIORITY, prio1, false
+            4, 1, PRIORITY, prio2, false
+            4, 2, PRIORITY, prio3, false
+            5, 0, READ_STATUS, read, false
+            5, 1, READ_STATUS, skimmed, false
+            """)
+    void markingFiltersMatchExactValues(int parentIndex, int leafIndex, SpecialField field, String value, boolean negative) {
+        BibEntry exact = new BibEntry().withField(field, value);
+        BibEntry similar = new BibEntry().withField(field, "not" + value);
+        BibEntry absent = new BibEntry();
+        BibDatabaseContext library = new BibDatabaseContext();
+        library.getDatabase().insertEntries(List.of(exact, similar, absent));
+        GroupTreeNode marking = GroupsFactory.createMarkingAndGradingGroups();
+        SearchGroup leaf = (SearchGroup) marking.getChildren().get(parentIndex).getChildren().get(leafIndex).getGroup();
+        InMemoryLibrarySearcher searcher = new InMemoryLibrarySearcher(library, BibEntryPreferences.getDefault());
+
+        assertEquals(negative ? Set.of(similar, absent) : Set.of(exact), Set.copyOf(searcher.getMatches(leaf.getSearchQuery())));
+        SearchGroup parent = (SearchGroup) marking.getChildren().get(parentIndex).getGroup();
+        assertEquals(Set.of(exact, similar), Set.copyOf(searcher.getMatches(parent.getSearchQuery())));
+    }
+
+    @Test
+    void markingAndGradingGroupShowsEntriesWithAnySpecialField() {
+        List<BibEntry> marked = Stream.of(SpecialField.RANKING, SpecialField.RELEVANCE, SpecialField.QUALITY,
+                                              SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.READ_STATUS)
+                                      .map(field -> new BibEntry().withField(field, "any"))
+                                      .toList();
+        BibDatabaseContext library = new BibDatabaseContext();
+        library.getDatabase().insertEntries(marked);
+        library.getDatabase().insertEntry(new BibEntry());
+        SearchGroup marking = (SearchGroup) GroupsFactory.createMarkingAndGradingGroups().getGroup();
+        InMemoryLibrarySearcher searcher = new InMemoryLibrarySearcher(library, BibEntryPreferences.getDefault());
+
+        assertEquals(Set.copyOf(marked), Set.copyOf(searcher.getMatches(marking.getSearchQuery())));
+    }
+
+    /// Like the expressions of the marking and grading groups, these are stored in libraries and identify the groups there
+    @Test
+    void groupsWithoutFilesOrGroupsHaveStableExpressions() {
+        assertEquals(List.of("file !=~.*", "groups !=~.*"),
+                Stream.of(GroupsFactory.createWithoutFilesGroup(), GroupsFactory.createWithoutGroupsGroup())
+                      .map(SearchGroup::getSearchExpression)
+                      .toList());
+    }
 
     /// The search expressions are stored in the libraries of the users and identify the suggested groups there.
     /// Changing one makes the existing groups unrecognizable, so that "Add JabRef suggested groups" adds them a second time.

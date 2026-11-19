@@ -12,10 +12,10 @@ import org.jspecify.annotations.NullMarked;
 
 /// The groups offered by "Add JabRef suggested groups", and how they are merged into the group tree of a library.
 ///
-/// A suggested group is recognized by its position in the tree and by its search expression, never by its name:
-/// the name is translated at the moment the group is created and the user may rename it, while the search expression
-/// is what makes the group what it is.
-/// A suggested group whose expression the user changed is therefore treated as the user's own group, and the suggestion is added again.
+/// A suggested group is recognized by its parent in the tree and by its search criteria (search expression, search flags,
+/// and hierarchy), never by its name: the name is translated at the moment the group is created and the user may rename it,
+/// while the search criteria are what make the group what it is.
+/// A suggested group whose search criteria the user changed is therefore treated as the user's own group, and the suggestion is added again.
 @NullMarked
 public final class SuggestedGroups {
 
@@ -27,13 +27,16 @@ public final class SuggestedGroups {
     ///
     /// A missing group is inserted before the next suggested group that is present, or as last child if there is none.
     /// Groups that are already present are not moved.
+    /// A missing group whose name another group of the library already has gets a number appended to its name.
     ///
     /// @return the roots of the added subtrees, in the order of the suggestions
     public static List<GroupTreeNode> addMissing(GroupTreeNode allEntries) {
         List<GroupTreeNode> added = new ArrayList<>();
         for (MissingSuggestion missing : findMissing(createSuggestions(), allEntries)) {
             int index = insertionIndex(missing.parent(), missing.followingSuggestions());
-            added.add(missing.parent().addChild(missing.suggestion().copySubtree(), index));
+            GroupTreeNode suggestion = missing.suggestion().copySubtree();
+            suggestion.iterateOverTree().forEach(node -> useFreeName(allEntries, node));
+            added.add(missing.parent().addChild(suggestion, index));
         }
         return added;
     }
@@ -41,6 +44,17 @@ public final class SuggestedGroups {
     /// Tells whether every suggested group is present below `allEntries`.
     public static boolean areAllPresent(GroupTreeNode allEntries) {
         return findMissing(createSuggestions(), allEntries).isEmpty();
+    }
+
+    /// Tells whether the tree below `allEntries` contains a search group other than a suggested group, wherever it is placed.
+    /// The suggested groups use the current search syntax; another search group of a library without a search syntax version
+    /// may still use an older one.
+    public static boolean containsOtherSearchGroups(GroupTreeNode allEntries) {
+        List<AbstractGroup> suggestions = createSuggestions().iterateOverTree().map(GroupTreeNode::getGroup).toList();
+        return allEntries.iterateOverTree()
+                         .map(GroupTreeNode::getGroup)
+                         .filter(SearchGroup.class::isInstance)
+                         .anyMatch(group -> suggestions.stream().noneMatch(suggestion -> isSameSuggestion(group, suggestion)));
     }
 
     /// Creates the suggested groups below a stand-in for the "All entries" root.
@@ -67,6 +81,15 @@ public final class SuggestedGroups {
         return missing;
     }
 
+    /// Group names are unique within a library, see [GroupTreeNode#findGroupByName(String)].
+    /// Paths of group names identify groups, for example when dragging them.
+    private static void useFreeName(GroupTreeNode allEntries, GroupTreeNode suggestion) {
+        String name = suggestion.getName();
+        for (int number = 2; allEntries.findGroupByName(suggestion.getName()).isPresent(); number++) {
+            suggestion.getGroup().nameProperty().set(name + " (" + number + ")");
+        }
+    }
+
     private static int insertionIndex(GroupTreeNode parent, List<GroupTreeNode> followingSuggestions) {
         return followingSuggestions.stream()
                                    .map(following -> findPresent(parent, following))
@@ -87,7 +110,8 @@ public final class SuggestedGroups {
         return group instanceof SearchGroup searchGroup
                 && suggestion instanceof SearchGroup suggestedSearchGroup
                 && searchGroup.getSearchExpression().equals(suggestedSearchGroup.getSearchExpression())
-                && searchGroup.getSearchFlags().equals(suggestedSearchGroup.getSearchFlags());
+                && searchGroup.getSearchFlags().equals(suggestedSearchGroup.getSearchFlags())
+                && searchGroup.getHierarchicalContext() == suggestedSearchGroup.getHierarchicalContext();
     }
 
     private record MissingSuggestion(GroupTreeNode parent, GroupTreeNode suggestion, List<GroupTreeNode> followingSuggestions) {

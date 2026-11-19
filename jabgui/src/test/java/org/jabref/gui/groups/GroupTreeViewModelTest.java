@@ -12,12 +12,14 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.exporter.GroupSerializer;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.NoOpSearchBackend;
@@ -35,9 +37,11 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.undo.CompoundEdit;
 
 import com.google.common.eventbus.Subscribe;
@@ -327,6 +331,26 @@ class GroupTreeViewModelTest {
 
         assertEquals(3, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
+        // The only search group present is a suggested one, which uses the current syntax
+        assertEquals(Optional.of(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+    }
+
+    /// Migrating search groups of an older syntax also rewrites the suggested groups, which use the current syntax
+    @Test
+    // [utest->req~ux.groups.suggested-groups-need-current-syntax~1]
+    void addsNoSuggestedGroupsWhileSearchGroupsNeedMigration() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        root.addSubgroup(new SearchGroup("Old syntax", GroupHierarchyType.INDEPENDENT, "title = test", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        List<String> before = new GroupSerializer().serializeTree(root);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
+
+        assertEquals(before, new GroupSerializer().serializeTree(databaseContext.getMetaData().getGroups().orElseThrow()));
+        assertEquals(Optional.empty(), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+        assertFalse(journal.canUndo());
+        verify(dialogService).notify(Localization.lang("The search groups of this library use an outdated syntax. Reopen the library and migrate them before adding suggested groups."));
     }
 
     @Test
@@ -379,10 +403,31 @@ class GroupTreeViewModelTest {
                         GroupsFactory.createWithoutGroupsGroup().getName(),
                         GroupsFactory.createMarkingAndGradingGroups().getGroup().getName()),
                 childNames());
+        // The first search groups of a library use the current syntax, so reopening it must not offer to migrate them
+        assertEquals(Optional.of(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
 
         assertTrue(journal.canUndo(), "adding the suggested groups was not recorded");
-        JavaFxExtension.invokeAndWait(journal::undo);
+        List<String> created = new GroupSerializer().serializeTree(databaseContext.getMetaData().getGroups().orElseThrow());
+        var storedSelection = FXCollections.<GroupTreeNode>observableArrayList();
+        JavaFxExtension.invokeAndWait(() -> {
+            storedSelection.setAll(databaseContext.getMetaData().getGroups().orElseThrow().getChildren().getLast());
+            when(stateManager.getSelectedGroups(databaseContext)).thenReturn(storedSelection);
+            doAnswer(invocation -> {
+                storedSelection.setAll(invocation.<List<GroupTreeNode>>getArgument(1));
+                return null;
+            }).when(stateManager).setSelectedGroups(any(BibDatabaseContext.class), any());
+            journal.undo();
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+        });
         assertEquals(List.of(), childNames());
+        assertEquals(List.of(groupTree.rootGroupProperty().getValue().getGroupNode()), storedSelection);
+        assertEquals(storedSelection, selectedGroupNodes());
+        assertEquals(Optional.empty(), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+        assertFalse(journal.canUndo());
+        JavaFxExtension.invokeAndWait(journal::redo);
+        assertEquals(created, new GroupSerializer().serializeTree(databaseContext.getMetaData().getGroups().orElseThrow()));
+        assertEquals(Optional.of(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
     }
 
     /// Whether the whole tree is created or a single group restored, the selection shows what was added.
@@ -468,6 +513,21 @@ class GroupTreeViewModelTest {
         verify(stateManager, never()).clearSelectedGroups(any(BibDatabaseContext.class));
     }
 
+    /// Storing the same selection again makes the entry table recompute which entries the selected groups match
+    @Test
+    void switchingLibrariesLeavesUnchangedSelectionAlone() {
+        BibDatabaseContext secondDatabase = new BibDatabaseContext();
+        secondDatabase.setDatabasePath(Path.of("second.bib"));
+        setUpLibraryWithGroup(databaseContext, "A");
+        setUpLibraryWithGroup(secondDatabase, "B");
+        clearInvocations(stateManager);
+
+        activeDatabase.setValue(Optional.of(secondDatabase));
+        activeDatabase.setValue(Optional.of(databaseContext));
+
+        verify(stateManager, never()).setSelectedGroups(any(BibDatabaseContext.class), any());
+    }
+
     @Test
         // [utest->req~ux.groups.shared-update-preserves-selection~1]
     void sharedDatabaseGroupUpdatePreservesSelection() {
@@ -487,6 +547,26 @@ class GroupTreeViewModelTest {
         assertEquals(List.of(selectedGroup), storedSelection);
         assertEquals(List.of("A"), selectedGroupNodes().stream().map(GroupTreeNode::getName).toList());
         verify(stateManager, never()).clearSelectedGroups(databaseContext);
+    }
+
+    /// A change below the selected group gives it a node that no longer equals the old one
+    @Test
+        // [utest->req~ux.groups.shared-update-preserves-selection~1]
+    void sharedDatabaseGroupUpdatePreservesSelectionOfChangedGroup() {
+        setUpLibraryWithGroup(databaseContext, "A");
+        GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode updatedGroup = updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        updatedGroup.addSubgroup(new ExplicitGroup("A1", GroupHierarchyType.INDEPENDENT, ','));
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+        clearInvocations(stateManager);
+
+        JavaFxExtension.invokeAndWait(() -> databaseContext.getMetaData().setGroups(updatedRoot));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertEquals(List.of(updatedGroup), selectedGroupNodes());
+        verify(stateManager, never()).setSelectedGroups(databaseContext, List.of(updatedRoot));
     }
 
     private GroupTreeNode setUpLibraryWithGroup(BibDatabaseContext library, String name) {

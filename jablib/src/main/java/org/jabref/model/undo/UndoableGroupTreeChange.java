@@ -24,7 +24,15 @@ import org.jspecify.annotations.NullMarked;
 /// the library does — fine for comparing two changes, but do not put these in a hash-based
 /// collection.
 @NullMarked
-public record UndoableGroupTreeChange(MetaData metaData, Optional<GroupTreeNode> before, Optional<GroupTreeNode> after) implements BibChange {
+public record UndoableGroupTreeChange(MetaData metaData,
+                                      Optional<GroupTreeNode> before,
+                                      Optional<GroupTreeNode> after,
+                                      Optional<String> beforeSyntax,
+                                      Optional<String> afterSyntax) implements BibChange {
+
+    public UndoableGroupTreeChange(MetaData metaData, Optional<GroupTreeNode> before, Optional<GroupTreeNode> after) {
+        this(metaData, before, after, metaData.getSerializedGroupSearchSyntaxVersion(), metaData.getSerializedGroupSearchSyntaxVersion());
+    }
 
     public UndoableGroupTreeChange {
         before = before.map(GroupTreeNode::copySubtree);
@@ -33,11 +41,14 @@ public record UndoableGroupTreeChange(MetaData metaData, Optional<GroupTreeNode>
 
     @Override
     public UndoableGroupTreeChange inverted() {
-        return new UndoableGroupTreeChange(metaData, after, before);
+        return new UndoableGroupTreeChange(metaData, after, before, afterSyntax, beforeSyntax);
     }
 
     @Override
     public ApplyResult apply() {
+        if (!beforeSyntax.equals(afterSyntax)) {
+            metaData.setSerializedGroupSearchSyntaxVersion(afterSyntax, MetaDataChangeSource.JOURNAL);
+        }
         after.map(GroupTreeNode::copySubtree)
              .ifPresentOrElse(root -> metaData.setGroups(root, MetaDataChangeSource.JOURNAL),
                      () -> metaData.clearGroups(MetaDataChangeSource.JOURNAL));

@@ -314,9 +314,11 @@ Needs: impl, utest
 ## Suggested groups must be recognized independently of their name
 `req~ux.groups.suggested-groups-recognized-by-expression~1`
 
-"Add JabRef suggested groups" recognizes a suggested group that is already present by its position in the group tree and its search expression.
+"Add JabRef suggested groups" recognizes a group under the expected parent when its search expression, search options, and hierarchy mode match the suggestion.
 Its name is not used: it is translated when the group is created and the user may rename it.
+If a user changes the expression, search options, or hierarchy mode, the action preserves the customized group and adds the missing suggestion.
 Thus, running the action again after changing the language or renaming a suggested group adds no duplicates ([#16147](https://github.com/JabRef/jabref/issues/16147)).
+If another group of the library has the name of the added suggestion, the suggestion gets a number appended to its name.
 
 Needs: impl, utest
 
@@ -325,6 +327,15 @@ Needs: impl, utest
 
 "Add JabRef suggested groups" adds the group "Marking and grading" with one group per special field (rank, relevance, quality, print status, priority, read status) and below it one group per value of the field.
 For a field with a single value, such as relevance, a second group holds the entries without that value, including the entries without the field ([#16147](https://github.com/JabRef/jabref/issues/16147)).
+
+Needs: impl, utest
+
+## Suggested groups must not be added before the search groups are migrated
+`req~ux.groups.suggested-groups-need-current-syntax~1`
+
+"Add JabRef suggested groups" adds no group to a library whose search groups were not migrated to the current syntax, and asks the user to migrate them first.
+The migration rewrites every search group of the library, so it would also rewrite the suggested groups, which use the current syntax.
+A library whose only search groups are suggested groups is marked as using the current syntax.
 
 Needs: impl, utest
 
