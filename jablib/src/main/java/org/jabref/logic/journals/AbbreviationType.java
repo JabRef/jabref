@@ -1,5 +1,7 @@
 package org.jabref.logic.journals;
 
+import java.util.Arrays;
+
 /// Defines the different abbreviation types that JabRef can operate with.
 ///
 /// DEFAULT: Default abbreviation type, which is the standard behavior.
@@ -10,5 +12,12 @@ public enum AbbreviationType {
     DEFAULT,
     DOTLESS,
     SHORTEST_UNIQUE,
-    LTWA
+    LTWA;
+
+    public static AbbreviationType safeValueOf(String name) {
+        return Arrays.stream(values())
+                     .filter(type -> type.name().equals(name))
+                     .findFirst()
+                     .orElse(DEFAULT);
+    }
 }

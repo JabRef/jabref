@@ -18,6 +18,8 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationType.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalMode.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/*.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/BackgroundTask.java
