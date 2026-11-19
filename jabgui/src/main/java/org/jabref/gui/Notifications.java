@@ -6,9 +6,11 @@ import java.util.Optional;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
@@ -17,12 +19,18 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
+import com.dlsc.gemsfx.infocenter.InfoCenterEvent;
 import com.dlsc.gemsfx.infocenter.Notification;
+import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationView;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Notifications {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Notifications.class);
+
     private Notifications() {
     }
 
@@ -43,9 +51,16 @@ public class Notifications {
 
     @NullMarked
     public static class DonationNotification extends Notification<Object> {
-        public DonationNotification(String title, String description) {
+        private final Runnable onDismissForever;
+
+        public DonationNotification(String title, String description, Runnable onDismissForever) {
             super(title, description);
+            this.onDismissForever = onDismissForever;
             setOnClick(_ -> OnClickBehaviour.NONE);
+        }
+
+        public Runnable getOnDismissForever() {
+            return onDismissForever;
         }
     }
 
@@ -55,6 +70,28 @@ public class Notifications {
             super(notification);
             getStyleClass().add("donation-notification");
             setGraphic(IconTheme.JabRefIcons.DONATE.getGraphicNode());
+
+            // GemsFX renders all actions as equally sized buttons; "Dismiss forever" should be less prominent,
+            // so it is added as a link below the actions box instead of being a NotificationAction.
+            Hyperlink dismissForever = new Hyperlink(Localization.lang("Dismiss forever"));
+            dismissForever.getStyleClass().add("dismiss-forever-link");
+            dismissForever.visibleProperty().bind(notification.expandedProperty());
+            dismissForever.managedProperty().bind(notification.expandedProperty());
+            dismissForever.setOnAction(_ -> {
+                fireEvent(new InfoCenterEvent(InfoCenterEvent.HIDE, notification));
+                notification.getOnDismissForever().run();
+                notification.remove();
+            });
+            if (lookup(".text-container") instanceof VBox textContainer) {
+                textContainer.getChildren().add(dismissForever);
+            } else {
+                // GemsFX internals changed; keep the option reachable as a regular action button
+                LOGGER.warn("Could not find GemsFX notification text container; showing 'Dismiss forever' as button");
+                notification.getActions().addFirst(new NotificationAction<>(Localization.lang("Dismiss forever"), _ -> {
+                    notification.getOnDismissForever().run();
+                    return OnClickBehaviour.HIDE_AND_REMOVE;
+                }));
+            }
         }
     }
 

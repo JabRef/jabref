@@ -800,7 +800,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         // [impl->req~shared-database.reopen-on-startup~1]
-        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService(preferences.getSharedDatabasePreferences());
         for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
             reconnectSharedDatabase(sessionService, reconnection);
         }

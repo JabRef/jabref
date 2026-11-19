@@ -86,6 +86,7 @@ public class DOI implements Identifier {
     private static final String HTTP_EXP = "https?://[^\\s]+?" + DOI_EXP;
     private static final String SHORT_DOI_HTTP_EXP = "https?://[^\\s]+?" + SHORT_DOI_EXP;
     // Pattern
+    private static final Pattern DOI_RESOLVER_PREFIX = Pattern.compile("^https?://(?:www\\.|dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
     private static final Pattern EXACT_DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
     private static final Pattern FIND_DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_DOI_EXP, Pattern.CASE_INSENSITIVE);
     // Pattern (short DOI)
@@ -173,6 +174,53 @@ public class DOI implements Identifier {
 
             return Optional.of(new DOI(cleanedDOI));
         } catch (IllegalArgumentException | NullPointerException _) {
+            return Optional.empty();
+        }
+    }
+
+    /// The decoded identifier and its original representation in a DOI link.
+    public record LinkSearchTerms(String decoded, String encoded) {
+    }
+
+    /// Extracts DOI link search terms without applying lossy DOI cleanup.
+    public static Optional<LinkSearchTerms> extractLinkSearchTerms(String text) {
+        String input = text.trim();
+        if (input.chars().anyMatch(Character::isWhitespace)) {
+            return Optional.empty();
+        }
+        Matcher shortcut = EXACT_SHORT_DOI_SHORTCUT.matcher(input);
+        if (shortcut.matches()) {
+            String term = shortcut.group(DOI_GROUP);
+            return Optional.of(new LinkSearchTerms(term, term));
+        }
+        String lowerCase = input.toLowerCase(Locale.ROOT);
+        if (lowerCase.startsWith("doi.org/")) {
+            input = "https://" + input;
+        } else if (!lowerCase.startsWith("doi:") && !DOI_RESOLVER_PREFIX.matcher(input).find()) {
+            return Optional.empty();
+        }
+        try {
+            String decoded = URLDecoder.decode(input.replace("+", "%2B"), StandardCharsets.UTF_8);
+            Matcher decodedShortcut = EXACT_SHORT_DOI_SHORTCUT.matcher(decoded);
+            if (decodedShortcut.matches()) {
+                String encoded = input.substring(input.lastIndexOf('/') + 1);
+                return Optional.of(new LinkSearchTerms(decodedShortcut.group(DOI_GROUP), encoded));
+            }
+            Matcher matcher = EXACT_DOI_PATT.matcher(decoded);
+            if (matcher.matches()) {
+                Matcher encodedMatcher = EXACT_DOI_PATT.matcher(input);
+                String encoded = encodedMatcher.matches() ? encodedMatcher.group(DOI_GROUP) : matcher.group(DOI_GROUP);
+                return Optional.of(new LinkSearchTerms(matcher.group(DOI_GROUP), encoded));
+            }
+            Matcher shortMatcher = EXACT_SHORT_DOI_PATT.matcher(decoded);
+            if (shortMatcher.matches()) {
+                Matcher encodedMatcher = EXACT_SHORT_DOI_PATT.matcher(input);
+                String encoded = encodedMatcher.matches() ? encodedMatcher.group(DOI_GROUP) : shortMatcher.group(DOI_GROUP);
+                return Optional.of(new LinkSearchTerms(shortMatcher.group(DOI_GROUP), encoded));
+            }
+            return Optional.empty();
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Could not decode DOI link", e);
             return Optional.empty();
         }
     }

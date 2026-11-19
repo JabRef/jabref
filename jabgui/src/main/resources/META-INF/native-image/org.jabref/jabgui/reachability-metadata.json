@@ -1189,6 +1189,16 @@
       ]
     },
     {
+      "type": "sun.lwawt.macosx.LWCToolkit",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "installToolkitThreadInJava",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "sun.awt.windows.WToolkit",
       "jniAccessible": true,
       "methods": [

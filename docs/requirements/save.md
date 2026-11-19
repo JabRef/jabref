@@ -31,6 +31,15 @@ A failed write must leave the original file untouched and must not leave tempora
 
 Needs: impl, utest
 
+## Template export failures must preserve the destination file
+`req~logic.exporter.preserve-output-on-template-failure~1`
+
+If loading or rendering a required layout fails, an existing destination remains unchanged and a new destination is not created, even if output has already been generated.
+
+See [JabRef/jabref#17423](https://github.com/JabRef/jabref/issues/17423).
+
+Needs: impl, utest
+
 ## Backup system must not overwrite valid backups on write failure
 `req~jabgui.autosaveandbackup.complete-backup~1`
 

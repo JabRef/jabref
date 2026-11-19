@@ -2,7 +2,9 @@ package org.jabref.gui.externalfiles;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Platform;
@@ -77,6 +80,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.BREAK;
+import static org.jabref.gui.externalfiles.ImportFilesResultItemViewModel.Status.FAILURE;
+import static org.jabref.gui.externalfiles.ImportFilesResultItemViewModel.Status.SUCCESS;
+import static org.jabref.gui.externalfiles.ImportFilesResultItemViewModel.Status.WARNING;
 
 // TODO: Much of this code seems to be logic (and not UI)
 public class ImportHandler {
@@ -197,25 +203,29 @@ public class ImportHandler {
                     try {
                         if (FileUtil.isPDFFile(file)) {
                             final List<BibEntry> pdfEntriesInFile;
+                            Optional<String> pdfWarning = Optional.empty();
 
                             // Details: See ADR-0043
                             if (files.size() == 1) {
                                 pdfEntriesInFile = new ArrayList<>(1);
                                 UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                                    MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(file, preferences, taskExecutor);
-                                    dialogService.showCustomDialogAndWait(dialog).ifPresent(pdfEntriesInFile::add);
+                                    showPdfMergeDialog(file).ifPresent(pdfEntriesInFile::add);
                                 });
+                                if (pdfEntriesInFile.isEmpty()) {
+                                    continue;
+                                }
                             } else {
                                 ParserResult pdfImporterResult = contentImporter.importPDFContent(file, targetBibDatabaseContext, filePreferences);
                                 pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
                                 if (pdfImporterResult.hasWarnings()) {
-                                    addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
+                                    pdfWarning = Optional.of(pdfImporterResult.getErrorMessage());
                                 }
                             }
 
                             if (pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with a file link."));
+                                String message = Localization.lang("No BibTeX data was found. An empty entry was created with a file link.");
+                                addResultToList(file, false, pdfWarning.map(warning -> Localization.lang("%0: %1", message, warning)).orElse(message));
                             } else {
                                 generateKeys(pdfEntriesInFile);
                                 pdfEntriesInFile.forEach(entry -> {
@@ -227,10 +237,12 @@ public class ImportHandler {
                                     // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                                     // Similar code as org.jabref.gui.preview.PreviewPanel.PreviewPanel
                                     DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);
-                                    addToImportEntriesGroup(pdfEntriesInFile);
-                                    entriesToAdd.addAll(pdfEntriesInFile);
-                                    addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                                 });
+                                addToImportEntriesGroup(pdfEntriesInFile);
+                                entriesToAdd.addAll(pdfEntriesInFile);
+                                pdfWarning.ifPresentOrElse(
+                                        warning -> addResultToList(file, WARNING, Localization.lang("File was imported as %0, but warnings were reported: %1", "PDF", warning)),
+                                        () -> addResultToList(file, true, Localization.lang("File was successfully imported as a new entry")));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             ParserResult bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -241,9 +253,11 @@ public class ImportHandler {
                             if (success) {
                                 message = Localization.lang("Bib entry was successfully imported");
                             } else {
-                                message = bibtexParserResult.getErrorMessage();
+                                message = entries.isEmpty()
+                                          ? bibtexParserResult.getErrorMessage()
+                                          : Localization.lang("File was imported as %0, but warnings were reported: %1", "BibTeX", bibtexParserResult.getErrorMessage());
                             }
-                            addResultToList(file, success, message);
+                            addResultToList(file, success ? SUCCESS : entries.isEmpty() ? FAILURE : WARNING, message);
                         } else if (!importFormatReader.hasImporterForFile(file)) {
                             entriesToAdd.add(createEmptyEntryWithLink(file));
                             addResultToList(file, false, Localization.lang("Could not auto-detect file format. An empty entry was created with file link."));
@@ -252,14 +266,14 @@ public class ImportHandler {
                                 ImportResult importResult = ImportHandler.this.importFormatReader.importWithAutoDetection(file);
                                 AutoDetectionImportOutcome importOutcome = createAutoDetectionImportOutcome(file, importResult);
                                 entriesToAdd.addAll(importOutcome.entriesToAdd());
-                                addResultToList(file, importOutcome.success(), importOutcome.message());
+                                addResultToList(file, importOutcome.status(), importOutcome.message());
                             } catch (ImportException e) {
                                 LOGGER.warn("Could not import file {} using auto-detection", file, e);
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("Could not auto-detect file format. An empty entry was created with file link."));
                             }
                         }
-                    } catch (IOException ex) {
+                    } catch (IOException | IllegalCharsetNameException | UnsupportedCharsetException ex) {
                         LOGGER.error("Error importing", ex);
                         addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()));
 
@@ -277,10 +291,63 @@ public class ImportHandler {
             }
 
             private void addResultToList(Path newFile, boolean success, String logMessage) {
-                ImportFilesResultItemViewModel result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
-                results.add(result);
+                addResultToList(newFile, success ? SUCCESS : FAILURE, logMessage);
+            }
+
+            private void addResultToList(Path file, ImportFilesResultItemViewModel.Status status, String message) {
+                if (status != SUCCESS) {
+                    LOGGER.warn("Import diagnostics for {}: {}", file, message);
+                }
+                results.add(new ImportFilesResultItemViewModel(file, status, message));
             }
         };
+    }
+
+    Optional<BibEntry> showPdfMergeDialog(Path file) {
+        MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(file, preferences, taskExecutor);
+        return dialogService.showCustomDialogAndWait(dialog);
+    }
+
+    /// Imports dropped files in the background and reports any import warnings or task failure.
+    ///
+    /// @param files        files to import into the target library
+    /// @param transferMode how linked files should be handled during import
+    public void importDroppedFiles(List<Path> files, TransferMode transferMode) {
+        importFilesInBackground(files, transferMode)
+                .onSuccess(this::showImportErrors)
+                .onFailure(this::showImportFailure)
+                .executeWith(taskExecutor);
+    }
+
+    /// Shows a warning listing the files with import diagnostics, if any.
+    // [impl->req~import.dropped-file-diagnostics~1]
+    public void showImportErrors(List<ImportFilesResultItemViewModel> results) {
+        List<ImportFilesResultItemViewModel> errors = results.stream().filter(result -> result.status() != SUCCESS).toList();
+        if (errors.isEmpty()) {
+            return;
+        }
+        boolean hasBibFile = errors.stream().anyMatch(result -> FileUtil.isBibFile(Path.of(result.file().get())));
+        String guidance = hasBibFile
+                          ? Localization.lang("Check the syntax and encoding of the BibTeX file and correct any errors.")
+                          : Localization.lang("Check the affected files and correct any errors.");
+        StringJoiner files = new StringJoiner("\n");
+        errors.stream().limit(5).forEach(result -> files.add(FileUtil.shortenFileName(Path.of(result.file().get()).getFileName().toString(), 60)));
+        StringJoiner paragraphs = new StringJoiner("\n\n");
+        paragraphs.add(guidance);
+        paragraphs.add(files.toString());
+        if (errors.size() > 5) {
+            paragraphs.add(Localization.lang("Additional files are listed in the event log."));
+        }
+        paragraphs.add(Localization.lang("See the event log for details. Some entries may have been imported."));
+        dialogService.showWarningDialogAndWait(Localization.lang("Import warnings"), paragraphs.toString());
+    }
+
+    /// Logs an unexpected import task failure and shows its details to the user.
+    ///
+    /// @param exception failure raised by the import task
+    public void showImportFailure(Exception exception) {
+        LOGGER.error("Error importing dropped files", exception);
+        dialogService.showErrorDialogAndWait(Localization.lang("Import error"), exception);
     }
 
     /// Inserts the imported entries and releases the library the import held.
@@ -289,10 +356,8 @@ public class ImportHandler {
     /// one Ctrl+Z, and what the insert sets off — group assignment, and the tab's automatic
     /// assignment to the selected groups — is recorded inside that step rather than after it.
     private void insertImported(List<BibEntry> entriesToAdd, UndoSuspension suspended) {
-        try {
+        try (suspended) {
             importEntries(entriesToAdd);
-        } finally {
-            suspended.close();
         }
     }
 
@@ -312,28 +377,27 @@ public class ImportHandler {
             if (importedEntries.isEmpty()) {
                 return new AutoDetectionImportOutcome(
                         List.of(createEmptyEntryWithLink(file)),
-                        false,
-                        Localization.lang("No importable data was found in %0. An empty entry was created with file link.", importResult.format())
-                                + " "
-                                + importResult.parserResult().getErrorMessage());
+                        FAILURE,
+                        Localization.lang("No importable data was found in %0. An empty entry was created with file link. %1",
+                                importResult.format(), importResult.parserResult().getErrorMessage()));
             }
-            return new AutoDetectionImportOutcome(importedEntries, false, warningMessage);
+            return new AutoDetectionImportOutcome(importedEntries, WARNING, warningMessage);
         }
 
         if (importedEntries.isEmpty()) {
             return new AutoDetectionImportOutcome(
                     List.of(createEmptyEntryWithLink(file)),
-                    false,
+                    FAILURE,
                     Localization.lang("No importable data was found in %0. An empty entry was created with file link.", importResult.format()));
         }
 
         return new AutoDetectionImportOutcome(
                 importedEntries,
-                true,
+                SUCCESS,
                 Localization.lang("File was successfully imported as %0", importResult.format()));
     }
 
-    record AutoDetectionImportOutcome(List<BibEntry> entriesToAdd, boolean success, String message) {
+    record AutoDetectionImportOutcome(List<BibEntry> entriesToAdd, ImportFilesResultItemViewModel.Status status, String message) {
     }
 
     /// Cleans up the given entries and adds them to the library.

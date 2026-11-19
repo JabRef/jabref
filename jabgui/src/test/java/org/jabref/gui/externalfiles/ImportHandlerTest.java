@@ -1,5 +1,7 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -14,6 +17,7 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -40,10 +44,13 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
@@ -70,6 +77,8 @@ class ImportHandlerTest {
     private GuiPreferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
+    @Mock
+    private DialogService dialogService;
 
     @BeforeEach
     void setUp() {
@@ -102,7 +111,7 @@ class ImportHandlerTest {
                 new DummyFileUpdateMonitor(),
                 new JabRefUndoManager(),
                 mock(StateManager.class),
-                mock(DialogService.class),
+                dialogService,
                 new CurrentThreadTaskExecutor());
 
         testEntry = new BibEntry(StandardEntryType.Article)
@@ -143,6 +152,108 @@ class ImportHandlerTest {
             assertEquals(choice ? 1 : 0, downloads.constructed().size());
             downloads.constructed().forEach(download -> verify(download).download(Mockito.eq(false), any()));
         }
+    }
+
+    @Test
+        // [utest->req~import.dropped-file-diagnostics~1]
+    void importErrorsShowOnlyUnsuccessfulResults() {
+        importHandler.showImportErrors(List.of(
+                new ImportFilesResultItemViewModel(Path.of("good.bib"), true, "Imported"),
+                new ImportFilesResultItemViewModel(Path.of("bad.bib"), false, "Invalid entry"),
+                new ImportFilesResultItemViewModel(Path.of("other.bib"), ImportFilesResultItemViewModel.Status.WARNING, "Imported with warnings")));
+
+        verify(dialogService).showWarningDialogAndWait("Import warnings", "Check the syntax and encoding of the BibTeX file and correct any errors.\n\nbad.bib\nother.bib\n\nSee the event log for details. Some entries may have been imported.");
+    }
+
+    @Test
+    void nonBibtexImportErrorsSuggestCheckingTheFile() {
+        importHandler.showImportErrors(List.of(new ImportFilesResultItemViewModel(Path.of("bad.ris"), false, "Invalid format")));
+
+        verify(dialogService).showWarningDialogAndWait("Import warnings", "Check the affected files and correct any errors.\n\nbad.ris\n\nSee the event log for details. Some entries may have been imported.");
+    }
+
+    @Test
+    void longImportDiagnosticsAreShortened() {
+        List<ImportFilesResultItemViewModel> results = java.util.stream.IntStream.range(0, 20)
+                                                                                 .mapToObj(index -> new ImportFilesResultItemViewModel(Path.of("file" + index + ".bib"), false, "x".repeat(2000)))
+                                                                                 .toList();
+
+        importHandler.showImportErrors(results);
+
+        ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+        verify(dialogService).showWarningDialogAndWait(Mockito.eq("Import warnings"), message.capture());
+        assertTrue(message.getValue().length() < 500);
+        assertTrue(message.getValue().contains("Additional files are listed in the event log."));
+        assertFalse(message.getValue().contains("x".repeat(50)));
+        assertFalse(message.getValue().contains("file5.bib"));
+    }
+
+    @Test
+    void unexpectedImportFailureShowsError() {
+        IOException failure = new IOException("Cannot read file");
+
+        importHandler.showImportFailure(failure);
+
+        verify(dialogService).showErrorDialogAndWait("Import error", failure);
+    }
+
+    @Test
+    void successfulImportsDoNotShowWarning() {
+        importHandler.showImportErrors(List.of(new ImportFilesResultItemViewModel(Path.of("good.bib"), true, "Imported")));
+
+        Mockito.verifyNoInteractions(dialogService);
+    }
+
+    @Test
+    @ExtendWith(JavaFxExtension.class)
+    void cancellingPdfMergeDoesNotCreateAnEntryOrShowWarning() throws Exception {
+        when(bibDatabaseContext.getDatabasePath()).thenReturn(Optional.empty());
+        ImportHandler handler = Mockito.spy(importHandler);
+        Mockito.doReturn(Optional.empty()).when(handler).showPdfMergeDialog(Path.of("cancelled.pdf"));
+        Mockito.doNothing().when(handler).importEntries(any());
+
+        List<ImportFilesResultItemViewModel> results = handler.importFilesInBackground(List.of(Path.of("cancelled.pdf")), TransferMode.COPY).call();
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(List.of(), results);
+        verify(handler).importEntries(List.of());
+        Mockito.verifyNoInteractions(dialogService);
+    }
+
+    @Test
+    @ExtendWith(JavaFxExtension.class)
+    void droppedInvalidBibFileShowsWarning(@TempDir Path directory) throws IOException {
+        when(bibDatabaseContext.getDatabasePath()).thenReturn(Optional.empty());
+        ImportHandler handler = Mockito.spy(importHandler);
+        Mockito.doNothing().when(handler).importEntries(any());
+        Path file = directory.resolve("invalid.bib");
+        Files.writeString(file, "@article{broken, title={unclosed}");
+
+        handler.importDroppedFiles(List.of(file), TransferMode.COPY);
+        JavaFxExtension.awaitEvents();
+
+        verify(dialogService).showWarningDialogAndWait("Import warnings", "Check the syntax and encoding of the BibTeX file and correct any errors.\n\ninvalid.bib\n\nSee the event log for details. Some entries may have been imported.");
+    }
+
+    @Test
+    @ExtendWith(JavaFxExtension.class)
+    void partiallyImportedBibFileHasWarningStatus(@TempDir Path directory) throws Exception {
+        when(bibDatabaseContext.getDatabasePath()).thenReturn(Optional.empty());
+        ImportHandler handler = Mockito.spy(importHandler);
+        Mockito.doNothing().when(handler).importEntries(any());
+        Path file = directory.resolve("partial.bib");
+        Files.writeString(file, """
+                @article{valid, title={A valid entry}}
+                @article{broken, title={unclosed}
+                """);
+
+        List<ImportFilesResultItemViewModel> results = handler.importFilesInBackground(List.of(file), TransferMode.COPY).call();
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(1, results.size());
+        assertEquals(ImportFilesResultItemViewModel.Status.WARNING, results.getFirst().status());
+        assertTrue(results.getFirst().isSuccess());
+        assertTrue(results.getFirst().message().get().contains("File was imported as BibTeX"));
     }
 
     @Test
@@ -196,7 +307,7 @@ class ImportHandlerTest {
 
         ImportHandler.AutoDetectionImportOutcome outcome = importHandler.createAutoDetectionImportOutcome(Path.of("sample.ris"), importResult);
 
-        assertFalse(outcome.success());
+        assertEquals(ImportFilesResultItemViewModel.Status.WARNING, outcome.status());
         assertEquals(List.of(importedEntry), outcome.entriesToAdd());
         assertEquals("File was imported as RIS, but warnings were reported: Warning text", outcome.message());
     }
@@ -210,7 +321,7 @@ class ImportHandlerTest {
 
         ImportHandler.AutoDetectionImportOutcome outcome = importHandler.createAutoDetectionImportOutcome(Path.of("sample.ris"), importResult);
 
-        assertFalse(outcome.success());
+        assertEquals(ImportFilesResultItemViewModel.Status.FAILURE, outcome.status());
         assertEquals(1, outcome.entriesToAdd().size());
         assertEquals("No importable data was found in RIS. An empty entry was created with file link. Warning text", outcome.message());
     }
