@@ -30,7 +30,7 @@ dependencies {
     api(platform("ai.djl:bom:0.40.0"))
     api(platform("com.konghq:unirest-java-bom:4.11.9"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.23.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.24.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.7.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
@@ -54,7 +54,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.14.1")
+    api("com.dlsc.gemsfx:gemsfx:4.16.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.6.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -130,7 +130,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.87")
-    api("org.controlsfx:controlsfx:11.2.6")
+    api("org.controlsfx:controlsfx:11.2.7")
     api("org.eclipse.jgit:org.eclipse.jgit:7.8.1.202611041320-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.8.1.202611041320-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:7.8.1.202611041320-r")
