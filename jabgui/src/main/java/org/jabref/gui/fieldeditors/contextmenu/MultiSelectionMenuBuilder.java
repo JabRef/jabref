@@ -228,7 +228,7 @@ record MultiSelectionMenuBuilder(
 
         for (Path fileToSelect : representativeByDir.values()) {
             try {
-                NativeDesktop.get().openFolderAndSelectFile(fileToSelect);
+                NativeDesktop.openFolderAndSelectFile(fileToSelect, preferences.getExternalApplicationsPreferences(), dialogService);
             } catch (IOException e) {
                 LOGGER.warn("Could not open folder and select file: {}", fileToSelect, e);
             }
