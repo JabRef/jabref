@@ -389,13 +389,11 @@ public class BibEntry {
                 continue;
             }
             Optional<BibEntry> xdataEntry = database.getEntryByCitationKey(key);
-            if (xdataEntry.isPresent()) {
-                Optional<String> directValue = getInheritableFieldOrAlias(xdataEntry.get(), field, getFieldOrAlias);
-                if (directValue.isPresent()) {
-                    return directValue;
-                }
-                pushXDataKeys(xdataEntry.get(), keysToVisit, visitedKeys);
+            Optional<String> directValue = xdataEntry.flatMap(target -> getInheritableFieldOrAlias(target, field, getFieldOrAlias));
+            if (directValue.isPresent()) {
+                return directValue;
             }
+            xdataEntry.ifPresent(target -> pushXDataKeys(target, keysToVisit, visitedKeys));
         }
         return Optional.empty();
     }

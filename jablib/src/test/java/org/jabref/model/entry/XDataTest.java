@@ -226,5 +226,121 @@ class XDataTest {
 
         assertEquals(Optional.of("Deep Publisher"), book.getResolvedFieldOrAlias(StandardField.PUBLISHER, db));
     }
+
+    @Test
+    void resolvesArticleFieldsThroughTransitiveXDataChain() {
+        BibEntry journalXData = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("journal-pub")
+                .withField(StandardField.JOURNALTITLE, "Journal of XData Testing")
+                .withField(StandardField.PUBLISHER, "Macmillan")
+                .withField(StandardField.LOCATION, "New York and London");
+
+        BibEntry issueXData = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("journal-issue")
+                .withField(StandardField.VOLUME, "42")
+                .withField(StandardField.NUMBER, "3")
+                .withField(StandardField.DATE, "2024")
+                .withField(StandardField.NOTE, "Special Issue")
+                .withField(StandardField.XDATA, "journal-pub");
+
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("art1")
+                .withField(StandardField.AUTHOR, "Ellington, Edward")
+                .withField(StandardField.TITLE, "Transitive Article XData")
+                .withField(StandardField.XDATA, "journal-issue");
+
+        BibDatabase db = new BibDatabase(List.of(journalXData, issueXData, article));
+
+        assertEquals(Optional.of("Journal of XData Testing"), article.getResolvedFieldOrAlias(StandardField.JOURNALTITLE, db));
+        assertEquals(Optional.of("Journal of XData Testing"), article.getResolvedFieldOrAlias(StandardField.JOURNAL, db));
+        assertEquals(Optional.of("Macmillan"), article.getResolvedFieldOrAlias(StandardField.PUBLISHER, db));
+        assertEquals(Optional.of("New York and London"), article.getResolvedFieldOrAlias(StandardField.LOCATION, db));
+        assertEquals(Optional.of("New York and London"), article.getResolvedFieldOrAlias(StandardField.ADDRESS, db));
+        assertEquals(Optional.of("42"), article.getResolvedFieldOrAlias(StandardField.VOLUME, db));
+        assertEquals(Optional.of("3"), article.getResolvedFieldOrAlias(StandardField.NUMBER, db));
+        assertEquals(Optional.of("2024"), article.getResolvedFieldOrAlias(StandardField.DATE, db));
+        assertEquals(Optional.of("2024"), article.getResolvedFieldOrAlias(StandardField.YEAR, db));
+        assertEquals(Optional.of("Special Issue"), article.getResolvedFieldOrAlias(StandardField.NOTE, db));
+    }
+
+    @Test
+    void resolvesArticleFieldsFromMultipleXDataEntriesWithLeftToRightPrecedence() {
+        BibEntry issue1 = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("issue-1")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.NOTE, "Primary Note");
+
+        BibEntry issue2 = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("issue-2")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.NOTE, "Secondary Note")
+                .withField(StandardField.PUBLISHER, "Macmillan")
+                .withField(StandardField.EID, "e123");
+
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("art2")
+                .withField(StandardField.AUTHOR, "Pillington, Peter")
+                .withField(StandardField.XDATA, "issue-1, issue-2");
+
+        BibDatabase db = new BibDatabase(List.of(issue1, issue2, article));
+
+        assertEquals(Optional.of("1"), article.getResolvedFieldOrAlias(StandardField.NUMBER, db));
+        assertEquals(Optional.of("Primary Note"), article.getResolvedFieldOrAlias(StandardField.NOTE, db));
+        assertEquals(Optional.of("Macmillan"), article.getResolvedFieldOrAlias(StandardField.PUBLISHER, db));
+        assertEquals(Optional.of("e123"), article.getResolvedFieldOrAlias(StandardField.EID, db));
+    }
+
+    @Test
+    void directArticleFieldTakesPrecedenceOverXData() {
+        BibEntry xdata = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("macmillan-art")
+                .withField(StandardField.JOURNALTITLE, "Biber Quarterly")
+                .withField(StandardField.PUBLISHER, "Macmillan")
+                .withField(StandardField.LOCATION, "New York and London")
+                .withField(StandardField.NUMBER, "7")
+                .withField(StandardField.NOTE, "A Note");
+
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("art-direct")
+                .withField(StandardField.AUTHOR, "Pillington, Peter")
+                .withField(StandardField.PUBLISHER, "Routledge")
+                .withField(StandardField.NUMBER, "12")
+                .withField(StandardField.XDATA, "macmillan-art");
+
+        BibDatabase db = new BibDatabase(List.of(xdata, article));
+
+        assertEquals(Optional.of("Routledge"), article.getResolvedFieldOrAlias(StandardField.PUBLISHER, db));
+        assertEquals(Optional.of("12"), article.getResolvedFieldOrAlias(StandardField.NUMBER, db));
+        assertEquals(Optional.of("New York and London"), article.getResolvedFieldOrAlias(StandardField.LOCATION, db));
+        assertEquals(Optional.of("Biber Quarterly"), article.getResolvedFieldOrAlias(StandardField.JOURNALTITLE, db));
+        assertEquals(Optional.of("A Note"), article.getResolvedFieldOrAlias(StandardField.NOTE, db));
+    }
+
+    @Test
+    void circularAndMissingXDataReferencesInArticleTerminateSafely() {
+        BibEntry loop1 = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("loop:1")
+                .withField(StandardField.NOTE, "Note");
+        BibEntry loop2 = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("loop:2")
+                .withField(StandardField.XDATA, "loop:3");
+        BibEntry loop3 = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("loop:3")
+                .withField(StandardField.XDATA, "loop");
+        BibEntry loop = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("loop")
+                .withField(StandardField.XDATA, "loop:1, loop:2");
+
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("art-loop")
+                .withField(StandardField.AUTHOR, "Ellington, Edward")
+                .withField(StandardField.DATE, "1923")
+                .withField(StandardField.XDATA, "missingxd, loop");
+
+        BibDatabase db = new BibDatabase(List.of(loop1, loop2, loop3, loop, article));
+
+        assertEquals(Optional.of("Note"), article.getResolvedFieldOrAlias(StandardField.NOTE, db));
+        assertTrue(article.getResolvedFieldOrAlias(StandardField.PUBLISHER, db).isEmpty());
+    }
 }
 

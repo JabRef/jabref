@@ -78,15 +78,23 @@ public class BstVM {
     /// Transforms the given list of BibEntries to a rendered list of references using the parsed bst program
     ///
     /// @param bibEntries  list of entries to convert
-    /// @param bibDatabase the bibDatabase used for resolving strings / crossref
+    /// @param bibDatabase the bibDatabase used for resolving strings / crossref / xdata
     /// @return list of references in plain text form
     public String render(List<BibEntry> bibEntries, BibDatabase bibDatabase) {
+        return render(bibEntries, bibDatabase, bibDatabase.getPreamble().orElse(""));
+    }
+
+    public String renderWithoutPreamble(List<BibEntry> bibEntries, BibDatabase bibDatabase) {
+        return render(bibEntries, bibDatabase, "");
+    }
+
+    public String render(List<BibEntry> bibEntries, BibDatabase bibDatabase, String preamble) {
         // needs to be modifiable due to sort operations later
         List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).collect(Collectors.toList());
 
         StringBuilder resultBuffer = new StringBuilder();
 
-        BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase, path);
+        BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase, path, preamble);
         bstVMContext.functions().putAll(new BstFunctions(bstVMContext, resultBuffer).getBuiltInFunctions());
         bstVMContext.integers().put("entry.max$", Integer.MAX_VALUE);
         bstVMContext.integers().put("global.max$", Integer.MAX_VALUE);
