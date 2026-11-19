@@ -359,6 +359,23 @@ class XmpUtilWriterTest {
         return Stream.of("editor", "publisher", "coverage", "rights", "source").map(FieldFactory::parseField);
     }
 
+    @ParameterizedTest
+    @CsvSource({"10.1000/abc\\_def, 10.1000/abc_def", "10.1000/a\\&b, 10.1000/a&b", "10.1000/xyz123, 10.1000/xyz123"})
+    void exportsDoiAsPlainTextInDublinCore(String original, String plainText) throws IOException, TransformerException {
+        exportsLatexAsPlainTextInDublinCore(StandardField.DOI, original, plainText);
+    }
+
+    @Test
+    void reimportRestoresOriginalLatexInDoi() throws IOException, TransformerException {
+        String original = "10.1000/abc\\_def";
+        Path pdf = createDefaultFile("doi.pdf", tempDir);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, new BibEntry().withField(StandardField.DOI, original), new BibDatabase());
+
+        List<BibEntry> reimported = new XmpUtilReader().readXmp(pdf, xmpPreferences);
+
+        assertEquals(List.of(Optional.of(original)), reimported.stream().map(entry -> entry.getField(StandardField.DOI)).toList());
+    }
+
     /// Creates a temporary PDF-file with a single empty page.
     private Path createDefaultFile(String fileName, Path tempDir) throws IOException {
         // create a default PDF

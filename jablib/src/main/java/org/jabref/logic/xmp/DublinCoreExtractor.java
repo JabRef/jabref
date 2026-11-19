@@ -294,7 +294,7 @@ public class DublinCoreExtractor {
 
     /// BibTeX:doi; DC: 'dc:identifier'
     private void fillIdentifier(String identifier) {
-        dcSchema.setIdentifier(unprotectTermsFormatter.format(identifier));
+        dcSchema.setIdentifier(XmpUtilShared.toPlainText(identifier));
     }
 
     /// BibTeX: publisher, DC: dc:publisher
