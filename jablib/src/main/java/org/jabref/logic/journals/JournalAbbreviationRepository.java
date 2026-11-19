@@ -1,5 +1,6 @@
 package org.jabref.logic.journals;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Comparator;
@@ -9,33 +10,62 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// A repository for all journal abbreviations, including add and find methods.
 public class JournalAbbreviationRepository {
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
-    private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
-    private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationRepository.class);
     private final StringSimilarity similarity = new StringSimilarity();
-    private final LtwaRepository ltwaRepository;
+    private volatile RepositoryData data;
+    private final AtomicLong loadGeneration = new AtomicLong();
+    // CSV readers must not observe files partway through a rewrite.
+    private final Object journalFileLock = new Object();
+    private Optional<BackgroundTask<Optional<JournalAbbreviationRepository>>> pendingReload = Optional.empty();
+    private final AtomicLong saveGeneration = new AtomicLong();
+    private final Map<Path, List<Abbreviation>> pendingJournalWrites = new HashMap<>();
+    private final Set<Abbreviation> addedCustomAbbreviations = new TreeSet<>();
+
+    @NullMarked
+    private static class RepositoryData {
+        private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
+        private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
+        private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
+        private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
+        private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
+        private final LtwaRepository ltwaRepository;
+
+        private RepositoryData(LtwaRepository ltwaRepository) {
+            this.ltwaRepository = ltwaRepository;
+        }
+    }
+
+    public JournalAbbreviationRepository(LtwaRepository ltwaRepository) {
+        this.data = new RepositoryData(ltwaRepository);
+    }
 
     /// Initializes the internal data based on the abbreviations found in the given MV file
     ///
     /// @param journalList    The path to the MV file containing the journal abbreviations.
     /// @param ltwaRepository The LTWA repository to use for abbreviations.
     public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
+        this(ltwaRepository);
         MVMap<String, Abbreviation> mvFullToAbbreviationObject;
         try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
             mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
@@ -47,27 +77,128 @@ public class JournalAbbreviationRepository {
                         abbreviationString,
                         shortestUniqueAbbreviation
                 );
-                fullToAbbreviationObject.put(name, newAbbreviation);
-                abbreviationToAbbreviationObject.put(abbreviationString, newAbbreviation);
-                dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
-                shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
+                data.fullToAbbreviationObject.put(name, newAbbreviation);
+                data.abbreviationToAbbreviationObject.put(abbreviationString, newAbbreviation);
+                data.dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
+                data.shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
             });
         }
-        this.ltwaRepository = ltwaRepository;
     }
 
     /// Initializes the repository with demonstration data. Used if no abbreviation file is found.
     public JournalAbbreviationRepository() {
+        this(new LtwaRepository());
         Abbreviation newAbbreviation = new Abbreviation(
                 "Demonstration",
                 "Demo",
                 "Dem"
         );
-        fullToAbbreviationObject.put("Demonstration", newAbbreviation);
-        abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
-        dotlessToAbbreviationObject.put("Demo", newAbbreviation);
-        shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
-        ltwaRepository = new LtwaRepository();
+        data.fullToAbbreviationObject.put("Demonstration", newAbbreviation);
+        data.abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
+        data.dotlessToAbbreviationObject.put("Demo", newAbbreviation);
+        data.shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
+    }
+
+    /// Loads a snapshot of saved preferences and publishes only the latest requested load.
+    public synchronized void reload(AbbreviationPreferences preferences, TaskExecutor executor) {
+        // [impl->req~journals.cancel-obsolete-reloads~1]
+        long generation = loadGeneration.incrementAndGet();
+        pendingReload.ifPresent(BackgroundTask::cancel);
+        AbbreviationPreferences snapshot = new AbbreviationPreferences(
+                List.copyOf(preferences.getExternalJournalLists()), preferences.shouldUseFJournalField(), preferences.shouldEnableMscKeywordDescriptions());
+        snapshot.setUseBuiltInJournalList(preferences.shouldUseBuiltInJournalList());
+        snapshot.setDisabledExternalJournalLists(List.copyOf(preferences.getDisabledExternalJournalLists()));
+        // [impl->req~journals.coordinate-csv-access~1]
+        var task = BackgroundTask
+                .wrap(() -> {
+                    // A canceled library read may need to finish before another full repository can be loaded.
+                    synchronized (journalFileLock) {
+                        if (generation != loadGeneration.get()) {
+                            return Optional.<JournalAbbreviationRepository>empty();
+                        }
+                        return Optional.of(JournalAbbreviationLoader.loadRepository(snapshot));
+                    }
+                })
+                .onSuccess(repository -> repository.ifPresent(result -> finishReload(generation, result)))
+                .onFailure(exception -> {
+                    synchronized (this) {
+                        if (generation == loadGeneration.get()) {
+                            pendingReload = Optional.empty();
+                            LOGGER.error("Failed to reload journal abbreviations", exception);
+                            handleLoadFailure(generation, snapshot);
+                        }
+                    }
+                });
+        pendingReload = Optional.of(task);
+        task.executeWith(executor);
+    }
+
+    public void saveJournalLists(Map<Path, List<Abbreviation>> files, AbbreviationPreferences preferences,
+                                 TaskExecutor executor, Runnable onSuccess, Consumer<Set<Path>> onWriteFailure) {
+        long generation;
+        Map<Path, List<Abbreviation>> pendingSnapshot;
+        synchronized (pendingJournalWrites) {
+            generation = saveGeneration.incrementAndGet();
+            Set<Path> selectedPaths = preferences.getExternalJournalLists().stream().map(Path::of).collect(java.util.stream.Collectors.toSet());
+            pendingJournalWrites.keySet().retainAll(selectedPaths);
+            pendingJournalWrites.putAll(files);
+            pendingSnapshot = Map.copyOf(pendingJournalWrites);
+        }
+        BackgroundTask.wrap(() -> {
+                          synchronized (journalFileLock) {
+                              if (generation == saveGeneration.get()) {
+                                  Map<Path, List<Abbreviation>> failed = new HashMap<>();
+                                  for (Map.Entry<Path, List<Abbreviation>> file : pendingSnapshot.entrySet()) {
+                                      try {
+                                          AbbreviationWriter.writeOrCreate(file.getKey(), file.getValue());
+                                      } catch (IOException e) {
+                                          LOGGER.error("Failed to write journal list {}", file.getKey(), e);
+                                          failed.put(file.getKey(), file.getValue());
+                                      }
+                                  }
+                                  return failed;
+                              }
+                          }
+                          return Map.<Path, List<Abbreviation>>of();
+                      }).onSuccess(failed -> {
+                          if (generation == saveGeneration.get()) {
+                              synchronized (pendingJournalWrites) {
+                                  if (generation == saveGeneration.get()) {
+                                      pendingJournalWrites.clear();
+                                      pendingJournalWrites.putAll(failed);
+                                  }
+                              }
+                              if (failed.isEmpty()) {
+                                  onSuccess.run();
+                              } else {
+                                  // [impl->req~journals.report-write-failures~1]
+                                  onWriteFailure.accept(Set.copyOf(failed.keySet()));
+                              }
+                              reload(preferences, executor);
+                          }
+                      }).onFailure(exception -> LOGGER.error("Failed to store journal preferences", exception))
+                      .executeWith(executor);
+    }
+
+    public Optional<List<Abbreviation>> getPendingJournalList(Path path) {
+        synchronized (pendingJournalWrites) {
+            return Optional.ofNullable(pendingJournalWrites.get(path));
+        }
+    }
+
+    protected void handleLoadFailure(long generation, AbbreviationPreferences preferences) {
+    }
+
+    protected synchronized void finishReload(long generation, JournalAbbreviationRepository repository) {
+        if (generation == loadGeneration.get()) {
+            pendingReload = Optional.empty();
+            installRepository(repository);
+        }
+    }
+
+    protected void installRepository(JournalAbbreviationRepository repository) {
+        repository.data.customAbbreviations.addAll(addedCustomAbbreviations);
+        data = repository.data;
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -102,20 +233,21 @@ public class JournalAbbreviationRepository {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return Optional.of(journalName);
         }
-        return ltwaRepository.abbreviate(journalName);
+        return data.ltwaRepository.abbreviate(journalName);
     }
 
     /// Returns true if the given journal name is in its abbreviated form (e.g. Phys. Rev. Lett.). The test is strict,
     /// i.e., journals whose abbreviation is the same as the full name are not considered
     public boolean isAbbreviatedName(String journalName) {
+        RepositoryData data = this.data;
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
-        return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
-                || abbreviationToAbbreviationObject.containsKey(journal)
-                || dotlessToAbbreviationObject.containsKey(journal)
-                || shortestUniqueToAbbreviationObject.containsKey(journal);
+        return data.customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
+                || data.abbreviationToAbbreviationObject.containsKey(journal)
+                || data.dotlessToAbbreviationObject.containsKey(journal)
+                || data.shortestUniqueToAbbreviationObject.containsKey(journal);
     }
 
     /// Attempts to get the abbreviation of the journal given.
@@ -123,35 +255,36 @@ public class JournalAbbreviationRepository {
     ///
     /// @param input The journal name (either full name or abbreviated name).
     public Optional<Abbreviation> get(String input) {
+        RepositoryData data = this.data;
         // Clean up input: trim and unescape ampersand
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
-        Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
-                                                                       .filter(abbreviation -> isMatched(journal, abbreviation))
-                                                                       .findFirst();
+        Optional<Abbreviation> customAbbreviation = data.customAbbreviations.stream()
+                                                                            .filter(abbreviation -> isMatched(journal, abbreviation))
+                                                                            .findFirst();
         if (customAbbreviation.isPresent()) {
             return customAbbreviation;
         }
 
-        Optional<Abbreviation> abbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
-                                                      .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
-                                                      .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
-                                                      .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
+        Optional<Abbreviation> abbreviation = Optional.ofNullable(data.fullToAbbreviationObject.get(journal))
+                                                      .or(() -> Optional.ofNullable(data.abbreviationToAbbreviationObject.get(journal)))
+                                                      .or(() -> Optional.ofNullable(data.dotlessToAbbreviationObject.get(journal)))
+                                                      .or(() -> Optional.ofNullable(data.shortestUniqueToAbbreviationObject.get(journal)));
 
         if (abbreviation.isEmpty()) {
-            abbreviation = findAbbreviationFuzzyMatched(journal);
+            abbreviation = findAbbreviationFuzzyMatched(data, journal);
         }
 
         return abbreviation;
     }
 
-    private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
-        Optional<Abbreviation> customMatch = findBestFuzzyMatched(customAbbreviations, input);
+    private Optional<Abbreviation> findAbbreviationFuzzyMatched(RepositoryData data, String input) {
+        Optional<Abbreviation> customMatch = findBestFuzzyMatched(data.customAbbreviations, input);
         if (customMatch.isPresent()) {
             return customMatch;
         }
 
-        return findBestFuzzyMatched(fullToAbbreviationObject.values(), input);
+        return findBestFuzzyMatched(data.fullToAbbreviationObject.values(), input);
     }
 
     /// Fuzzy searches abbreviations
@@ -192,15 +325,20 @@ public class JournalAbbreviationRepository {
         return Optional.of(candidates.getFirst());
     }
 
-    public void addCustomAbbreviation(@NonNull Abbreviation abbreviation) {
+    public synchronized void addCustomAbbreviation(@NonNull Abbreviation abbreviation) {
         // We do NOT want to keep duplicates
         // The set automatically "removes" duplicates
         // What is a duplicate? An abbreviation is NOT the same if any field is NOT equal (e.g., if the shortest unique differs, the abbreviation is NOT the same)
-        customAbbreviations.add(abbreviation);
+        addedCustomAbbreviations.add(abbreviation);
+        data.customAbbreviations.add(abbreviation);
+    }
+
+    void addLoadedAbbreviations(Collection<Abbreviation> abbreviations) {
+        data.customAbbreviations.addAll(abbreviations);
     }
 
     public Collection<Abbreviation> getCustomAbbreviations() {
-        return customAbbreviations;
+        return data.customAbbreviations;
     }
 
     public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
@@ -224,10 +362,10 @@ public class JournalAbbreviationRepository {
     }
 
     public Set<String> getFullNames() {
-        return fullToAbbreviationObject.keySet();
+        return data.fullToAbbreviationObject.keySet();
     }
 
     public Collection<Abbreviation> getAllLoaded() {
-        return fullToAbbreviationObject.values();
+        return data.fullToAbbreviationObject.values();
     }
 }
