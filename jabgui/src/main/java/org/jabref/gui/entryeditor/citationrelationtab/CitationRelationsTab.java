@@ -121,6 +121,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final EntryEditorPreferences entryEditorPreferences;
     private final MainTableTooltip previewTooltip;
     private ComboBox<CitationFetcherType> fetcherCombo;
+    private final SplitMenuButton importButton;
+    private final MenuItem reviewMenuItem;
     private @Nullable CitationComponents currentCitingComponents;
     private @Nullable CitationComponents currentCitedByComponents;
 
@@ -170,6 +172,16 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.previewTooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
         // Close the preview automatically when the user clicks somewhere outside of it.
         this.previewTooltip.setAutoHide(true);
+
+        this.reviewMenuItem = new MenuItem(
+                Localization.lang("Review and add selected entry(s) one by one"),
+                IconTheme.JabRefIcons.EDIT_ENTRY.getGraphicNode());
+        this.importButton = new SplitMenuButton(reviewMenuItem);
+        importButton.setText(Localization.lang("Add selected entry(s) to library"));
+        importButton.setGraphic(IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
+        importButton.setDisable(true);
+        importButton.setOnAction(_ -> importCheckedEntries());
+        reviewMenuItem.setOnAction(_ -> reviewCheckedEntries());
 
         initFetcherCombo();
     }
@@ -439,6 +451,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
         CheckListView<CitationRelationItem> citedByListView = new CheckListView<>();
+        citingListView.getStyleClass().add("variable-cell-size");
+        citedByListView.getStyleClass().add("variable-cell-size");
         // Allow the list views to expand/shrink with the window size
         citingListView.setMaxHeight(Double.MAX_VALUE);
         citingListView.setMinHeight(0);
@@ -469,28 +483,23 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByProgress.setMaxSize(25, 25);
 
         // Create import and review buttons for both sides
-        // Create one split button per side: main click adds, the dropdown offers review
-        MenuItem reviewCitingItem = new MenuItem(
-                Localization.lang("Review and add selected entry(s) one by one"),
-                IconTheme.JabRefIcons.EDIT_ENTRY.getGraphicNode());
-        SplitMenuButton importCitingButton = new SplitMenuButton(reviewCitingItem);
-        importCitingButton.setText(Localization.lang("Add selected entry(s) to library"));
-        importCitingButton.setGraphic(IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
+        Button importCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
+        importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
+        Button reviewCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
+        reviewCitingButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
 
-        MenuItem reviewCitedByItem = new MenuItem(
-                Localization.lang("Review and add selected entry(s) one by one"),
-                IconTheme.JabRefIcons.EDIT_ENTRY.getGraphicNode());
-        SplitMenuButton importCitedByButton = new SplitMenuButton(reviewCitedByItem);
-        importCitedByButton.setText(Localization.lang("Add selected entry(s) to library"));
-        importCitedByButton.setGraphic(IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
+        Button importCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
+        importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
+        Button reviewCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
+        reviewCitedByButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
 
-        hideNodes(importCitingButton, importCitedByButton);
+        hideNodes(importCitingButton, reviewCitingButton, importCitedByButton, reviewCitedByButton);
 
-        HBox citingActions = new HBox(8, importCitingButton, citingProgress, abortCitingButton, refreshCitingButton);
+        HBox citingActions = new HBox(8, citingProgress, abortCitingButton, refreshCitingButton);
         citingActions.setAlignment(Pos.CENTER_RIGHT);
         citingHeader.setRight(citingActions);
 
-        HBox citedByActions = new HBox(8, importCitedByButton, citedByProgress, abortCitedButton, refreshCitedByButton);
+        HBox citedByActions = new HBox(8, citedByProgress, abortCitedButton, refreshCitedByButton);
         citedByActions.setAlignment(Pos.CENTER_RIGHT);
         citedByHeader.setRight(citedByActions);
 
@@ -505,8 +514,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                 abortCitingButton,
                 refreshCitingButton,
                 CitationFetcher.SearchType.CITES,
-                importCitingButton,
-                reviewCitingItem,
                 citingProgress);
 
         CitationComponents citedByComponents = new CitationComponents(
@@ -515,12 +522,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                 abortCitedButton,
                 refreshCitedByButton,
                 CitationFetcher.SearchType.CITED_BY,
-                importCitedByButton,
-                reviewCitedByItem,
                 citedByProgress);
 
         this.currentCitingComponents = citingComponents;
         this.currentCitedByComponents = citedByComponents;
+        updateImportButtonState();
 
         // click refresh button will trigger refresh from the remote
         refreshCitingButton.setOnMouseClicked(_ -> handleRefresh(citingComponents, citedByComponents));
@@ -560,7 +566,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private HBox getTopBar() {
         Label fetcherLabel = new Label(Localization.lang("Citation fetcher"));
-        HBox topBar = new HBox(8, fetcherLabel, fetcherCombo);
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox topBar = new HBox(8, fetcherLabel, fetcherCombo, spacer, importButton);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(5, 10, 5, 10));
         return topBar;
@@ -605,7 +613,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                             }
                         });
-                        addToggle.getStyleClass().add("addEntryButton");
+                        addToggle.getStyleClass().addAll("addEntryButton");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
                         rowButtons.add(addToggle);
                     }
@@ -646,7 +654,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                     Button showEntrySource = ControlHelper.iconButton(IconTheme.JabRefIcons.SOURCE);
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
                     showEntrySource.setOnMouseClicked(_ -> showEntrySourceDialog(entry.entry()));
+
                     rowButtons.add(showEntrySource);
+
                     // Arrange the buttons in a grid with two columns to save vertical space
                     GridPane buttonGrid = new GridPane();
                     buttonGrid.setHgap(4);
@@ -905,10 +915,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationsRelationsTabViewModel.trackCitationSearch(citationComponents.searchType(), task);
 
         showNodes(citationComponents.abortButton(), citationComponents.progress());
-        hideNodes(citationComponents.refreshButton(), citationComponents.importButton());
+        hideNodes(citationComponents.refreshButton());
 
         citationComponents.abortButton().setOnAction(_ -> {
-            hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
+            hideNodes(citationComponents.abortButton(), citationComponents.progress());
             showNodes(citationComponents.refreshButton());
             task.cancel(false);
             citationsRelationsTabViewModel.clearTrackedCitationSearch(citationComponents.searchType(), task);
@@ -931,7 +941,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     return;
                 }
                 LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
-                hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
+                hideNodes(citationComponents.abortButton(), citationComponents.progress());
                 boolean isCites = citationComponents.searchType() == CitationFetcher.SearchType.CITES;
                 // The tab has room for details; the notification stays short and free of exception internals.
                 String labelText = isCites
@@ -1013,11 +1023,48 @@ public class CitationRelationsTab extends EntryEditorTab {
         } else {
             citationComponents.listView().refresh();
         }
-        BooleanBinding booleanBind = Bindings.isEmpty(citationComponents.listView().getCheckModel().getCheckedItems());
-        citationComponents.importButton().disableProperty().bind(booleanBind);
-        citationComponents.importButton().setOnAction(_ -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
-        citationComponents.reviewMenuItem().setOnAction(_ -> reviewAndImportEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
-        showNodes(citationComponents.refreshButton(), citationComponents.importButton());
+        updateImportButtonState();
+        showNodes(citationComponents.refreshButton());
+    }
+
+    /// Enables the shared import button when at least one entry is checked in either list.
+    /// Re-bound after each search, because setting new items gives a list a new check model.
+    private void updateImportButtonState() {
+        importButton.disableProperty().unbind();
+        if (currentCitingComponents == null || currentCitedByComponents == null) {
+            importButton.setDisable(true);
+            return;
+        }
+        importButton.disableProperty().bind(
+                Bindings.isEmpty(currentCitingComponents.listView().getCheckModel().getCheckedItems())
+                        .and(Bindings.isEmpty(currentCitedByComponents.listView().getCheckModel().getCheckedItems())));
+    }
+
+    private List<CitationComponents> getCurrentComponents() {
+        if (currentCitingComponents == null || currentCitedByComponents == null) {
+            return List.of();
+        }
+        return List.of(currentCitingComponents, currentCitedByComponents);
+    }
+
+    /// Imports the checked entries of both lists, each with its own citation direction.
+    private void importCheckedEntries() {
+        for (CitationComponents components : getCurrentComponents()) {
+            List<CitationRelationItem> checked = List.copyOf(components.listView().getCheckModel().getCheckedItems());
+            if (!checked.isEmpty()) {
+                importEntries(checked, components.searchType(), components.entry());
+            }
+        }
+    }
+
+    /// Reviews the checked entries of both lists, each with its own citation direction.
+    private void reviewCheckedEntries() {
+        for (CitationComponents components : getCurrentComponents()) {
+            List<CitationRelationItem> checked = List.copyOf(components.listView().getCheckModel().getCheckedItems());
+            if (!checked.isEmpty()) {
+                reviewAndImportEntries(checked, components.searchType(), components.entry());
+            }
+        }
     }
 
     private void hideNodes(Node... nodes) {
