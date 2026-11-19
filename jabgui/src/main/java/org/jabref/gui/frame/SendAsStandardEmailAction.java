@@ -7,6 +7,7 @@ import java.util.List;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -32,8 +33,9 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
                                      GuiPreferences preferences,
                                      StateManager stateManager,
                                      BibEntryTypesManager entryTypesManager,
-                                     TaskExecutor taskExecutor) {
-        super(dialogService, preferences, stateManager, taskExecutor);
+                                     TaskExecutor taskExecutor,
+                                     NativeDesktop nativeDesktop) {
+        super(dialogService, preferences, stateManager, taskExecutor, nativeDesktop);
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
