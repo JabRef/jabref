@@ -44,6 +44,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
@@ -59,6 +60,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.theme.StyleClasses;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
@@ -79,6 +81,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +93,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private static final PseudoClass MATCHING_SEARCH_NOT_GROUPS = PseudoClass.getPseudoClass("matching-search-not-groups");
     private static final PseudoClass MATCHING_GROUPS_NOT_SEARCH = PseudoClass.getPseudoClass("matching-groups-not-search");
     private static final PseudoClass NOT_MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass("not-matching-search-and-groups");
+    private static final PseudoClass WRAP_TEXT = PseudoClass.getPseudoClass("wrap-text");
 
     private final LibraryTab libraryTab;
     private final StateManager stateManager;
@@ -101,9 +105,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
+    private final NativeDesktop nativeDesktop;
     private final ClipboardContentGenerator clipboardContentGenerator;
     private final ColumnPreferencesApplier columnPreferencesApplier;
     private final ColumnPreferencesRecorder columnPreferencesRecorder;
+    private final Subscription wrapTextSubscription;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
@@ -122,7 +128,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
-                     ImportHandler importHandler) {
+                     ImportHandler importHandler,
+                     NativeDesktop nativeDesktop) {
         super();
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
@@ -133,7 +140,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.taskExecutor = taskExecutor;
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
+        this.nativeDesktop = nativeDesktop;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
+        wrapTextSubscription = BindingsHelper.includePseudoClassWhen(this, WRAP_TEXT, preferences.getWorkspacePreferences().wrapMainTableTextProperty());
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -171,7 +180,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         journalAbbreviationRepository,
                         entryTypesManager,
-                        importHandler))
+                        importHandler,
+                        nativeDesktop))
                 .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))
                 .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_NOT_GROUPS))
                 .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_GROUPS_NOT_SEARCH))
@@ -608,6 +618,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void dispose() {
+        wrapTextSubscription.unsubscribe();
         columnPreferencesApplier.unbind();
         columnPreferencesRecorder.unbind();
         database.getDatabase().unregisterListener(this);
