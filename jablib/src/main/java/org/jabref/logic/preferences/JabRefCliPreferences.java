@@ -485,10 +485,13 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
-    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
     // The only instance of this class:
     private static JabRefCliPreferences singleton;
+
+    private final Preferences preferencesNode;
+    private final boolean resetsGlobalStores;
+    private boolean resettingIsolatedNode;
 
     /// Cache variables
     private LibraryPreferences libraryPreferences;
@@ -544,10 +547,17 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    /// @implNote The constructor was made public because dependency injection via constructor
-    /// required widespread refactoring, currently we are using reflection in some formatters
-    /// to gain access
     public JabRefCliPreferences() {
+        this(Preferences.userRoot().node("/org/jabref"), true);
+    }
+
+    public JabRefCliPreferences(Preferences preferencesNode) {
+        this(preferencesNode, false);
+    }
+
+    private JabRefCliPreferences(Preferences preferencesNode, boolean resetsGlobalStores) {
+        this.preferencesNode = preferencesNode;
+        this.resetsGlobalStores = resetsGlobalStores;
         try {
             Path preferencesPath = Path.of("jabref.xml");
             if (Files.exists(preferencesPath)) {
@@ -623,47 +633,47 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param key The key to check.
     /// @return true if the key is set, false otherwise.
     public boolean hasKey(String key) {
-        return PREFS_NODE.get(key, null) != null;
+        return preferencesNode.get(key, null) != null;
     }
 
     public String get(String key, String def) {
-        return PREFS_NODE.get(key, def);
+        return preferencesNode.get(key, def);
     }
 
     public boolean getBoolean(String key, boolean def) {
-        return PREFS_NODE.getBoolean(key, def);
+        return preferencesNode.getBoolean(key, def);
     }
 
     public int getInt(String key, int def) {
-        return PREFS_NODE.getInt(key, def);
+        return preferencesNode.getInt(key, def);
     }
 
     public double getDouble(String key, double def) {
-        return PREFS_NODE.getDouble(key, def);
+        return preferencesNode.getDouble(key, def);
     }
 
     public void put(String key, String value) {
-        PREFS_NODE.put(key, value);
+        preferencesNode.put(key, value);
     }
 
     public void putBoolean(String key, boolean value) {
-        PREFS_NODE.putBoolean(key, value);
+        preferencesNode.putBoolean(key, value);
     }
 
     public void putInt(String key, int value) {
-        PREFS_NODE.putInt(key, value);
+        preferencesNode.putInt(key, value);
     }
 
     public void putInt(String key, Number value) {
-        PREFS_NODE.putInt(key, value.intValue());
+        preferencesNode.putInt(key, value.intValue());
     }
 
     public void putDouble(String key, double value) {
-        PREFS_NODE.putDouble(key, value);
+        preferencesNode.putDouble(key, value);
     }
 
     protected void remove(String key) {
-        PREFS_NODE.remove(key);
+        preferencesNode.remove(key);
     }
 
     /// Puts a list of strings into the Preferences, by linking its elements with a
@@ -723,7 +733,7 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
         try {
-            PREFS_NODE.flush();
+            preferencesNode.flush();
         } catch (BackingStoreException ex) {
             LOGGER.warn("Cannot communicate with backing store", ex);
         }
@@ -993,6 +1003,9 @@ public class JabRefCliPreferences implements CliPreferences {
     /// empty map if the keyring cannot be opened, so callers tell failure from "all slots empty" by size
     /// (`result.size() == slots.size()` iff the open succeeded; an empty `slots` is a no-op).
     private Map<KeyringSlot, String> readKeyring(List<KeyringSlot> slots) {
+        if (resettingIsolatedNode) {
+            return Map.of();
+        }
         Map<KeyringSlot, String> result = new HashMap<>();
         try (Keyring keyring = Keyring.create()) {
             for (KeyringSlot slot : slots) {
@@ -1073,6 +1086,9 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Writes each secret as plain text to its slot in a single keyring session. A blank secret clears its slot.
     /// In both cases, a legacy encrypted value of the slot is removed, so that it cannot be migrated later.
     private void writeKeyring(Map<KeyringSlot, String> secrets) {
+        if (resettingIsolatedNode) {
+            return;
+        }
         // [impl->req~keyring.plain-text-storage~1]
         // [impl->req~keyring.legacy-migration~1]
         try (Keyring keyring = Keyring.create()) {
@@ -1163,7 +1179,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public void exportPreferences(Path path) throws JabRefException {
         LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(path)) {
-            PREFS_NODE.exportSubtree(os);
+            preferencesNode.exportSubtree(os);
         } catch (BackingStoreException
                  | IOException ex) {
             throw new JabRefException(
@@ -1178,13 +1194,29 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
     @Override
     public void clear() throws BackingStoreException {
+        boolean wasResettingIsolatedNode = resettingIsolatedNode;
+        resettingIsolatedNode = !resetsGlobalStores;
+        try {
+            if (resetsGlobalStores) {
+                clearGlobalStores();
+            }
+            clearPreferencesNode();
+        } finally {
+            resettingIsolatedNode = wasResettingIsolatedNode;
+        }
+    }
+
+    private void clearGlobalStores() throws BackingStoreException {
+        clearTruststoreFromCustomCertificates();
+        clearCustomFetcherKeys();
+        getSharedDatabasePreferences().clearAllConnections();
+    }
+
+    private void clearPreferencesNode() throws BackingStoreException {
         clearAllBibEntryTypes();
         removeDeclinedCustomEntryTypes();
         clearCitationKeyPatterns();
-        clearTruststoreFromCustomCertificates();
-        clearCustomFetcherKeys();
-        PREFS_NODE.clear();
-        getSharedDatabasePreferences().clearAllConnections();
+        preferencesNode.clear();
 
         initializeAll();
 
@@ -1263,7 +1295,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void removeDeclinedCustomEntryTypes() {
         try {
-            PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
+            preferencesNode.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
         } catch (BackingStoreException e) {
             LOGGER.info("Clearing declined custom entry types failed.", e);
         }
@@ -1442,7 +1474,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @Override
     public Set<String> getDeclinedCustomEntryTypes() {
         try {
-            return Set.of(PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).keys());
+            return Set.of(preferencesNode.node(DECLINED_CUSTOM_ENTRY_TYPES).keys());
         } catch (BackingStoreException e) {
             LOGGER.info("Reading declined custom entry types failed.", e);
             return Set.of();
@@ -1452,7 +1484,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Stores each fingerprint as a key without a value: a key is limited to 80 characters, a value to 8192.
     @Override
     public void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes) {
-        Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
+        Preferences node = preferencesNode.node(DECLINED_CUSTOM_ENTRY_TYPES);
         declinedEntryTypes.forEach(declined -> node.put(declined, ""));
         try {
             node.flush();
@@ -1461,16 +1493,16 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+    private Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
-               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
-               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
+               ? preferencesNode.node(CUSTOMIZED_BIBTEX_TYPES)
+               : preferencesNode.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
-    private static Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
+    private Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
-               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES_V2)
-               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
+               ? preferencesNode.node(CUSTOMIZED_BIBTEX_TYPES_V2)
+               : preferencesNode.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
     }
     // endregion
 
@@ -1771,6 +1803,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// The refresh token lives in the system keyring only: never in the preferences, which can be exported as plain text
     private @Nullable RefreshToken getCiteDriveToken(String apiBaseUrl) {
+        if (resettingIsolatedNode) {
+            return null;
+        }
         try (final Keyring keyring = Keyring.create()) {
             return parseCiteDriveToken(keyring.getPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT), apiBaseUrl);
         } catch (PasswordAccessException _) {
@@ -1783,6 +1818,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// If the keyring is not available, the token is kept in memory only (login needed after restart)
     private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
+        if (resettingIsolatedNode) {
+            return;
+        }
         try (final Keyring keyring = Keyring.create()) {
             if (refreshToken == null) {
                 keyring.deletePassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT);
@@ -1824,7 +1862,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private @NonNull GlobalCitationKeyPatterns getGlobalCitationKeyPattern(CitationKeyPatternPreferences defaults) {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(
                 get(CITATION_KEY_DEFAULT_PATTERN, defaults.getKeyPatterns().getDefaultValue().stringRepresentation()));
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = preferencesNode.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
             for (String key : keys) {
@@ -1849,7 +1887,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         // Store overridden definitions in Preferences.
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = preferencesNode.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1865,7 +1903,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearCitationKeyPatterns() throws BackingStoreException {
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = preferencesNode.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
     }
     // endregion
@@ -2719,9 +2757,9 @@ public class JabRefCliPreferences implements CliPreferences {
         Map<KeyringSlot, String> keys = new HashMap<>();
 
         for (FetcherApiKey apiKey : defaults.getApiKeys()) {
-            names.add(apiKey.getName());
+            names.add(apiKey.name());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
+            keys.put(KeyringSlot.customApiKey(apiKey.name()), apiKey.key());
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);

@@ -54,7 +54,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.13.0")
+    api("com.dlsc.gemsfx:gemsfx:4.14.1")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.6.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -78,7 +78,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.5.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.5.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.5.1")
-    api("com.uber.nullaway:nullaway:0.14.3")
+    api("com.uber.nullaway:nullaway:0.14.4")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("com.vladsch.flexmark:flexmark-ext-tables:0.64.8")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
