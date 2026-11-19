@@ -21,7 +21,7 @@ public class XmpUtilShared {
 
     public static final String BIBTEX_DI_FIELD_NAME_PREFIX = "bibtex/";
 
-    private static final Pattern ORDINAL_IN_SUPERSCRIPT = Pattern.compile("(?<=\\d)\\\\textsuperscript\\{(st|nd|rd|th)\\}");
+    private static final Pattern ORDINAL_IN_SUPERSCRIPT = Pattern.compile("(?<=\\d\\}?)\\\\textsuperscript\\{(st|nd|rd|th)\\}");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilShared.class);
 

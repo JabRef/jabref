@@ -275,9 +275,20 @@ class XmpUtilWriterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"1\\textsuperscript{st}, 1st", "2\\textsuperscript{nd}, 2nd", "3\\textsuperscript{rd}, 3rd", "10\\textsuperscript{th}, 10th"})
+    @CsvSource({"1\\textsuperscript{st}, 1st", "2\\textsuperscript{nd}, 2nd", "3\\textsuperscript{rd}, 3rd", "10\\textsuperscript{th}, 10th", "{10}\\textsuperscript{th}, 10th"})
     void exportsOrdinalSuffixesAsPlainText(String original, String plainText) throws IOException, TransformerException {
         exportsLatexAsPlainTextInDublinCore(StandardField.TITLE, original, plainText);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"10\\textsuperscript{th}, 10th", "{10}\\textsuperscript{th}, 10th"})
+    void exportsOrdinalSuffixesAsPlainTextInDocumentInformation(String original, String plainText) throws IOException, TransformerException {
+        Path pdf = createDefaultFile("ordinal.pdf", tempDir);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, new BibEntry().withField(StandardField.TITLE, original), new BibDatabase());
+
+        try (PDDocument document = Loader.loadPDF(pdf.toFile())) {
+            assertEquals(plainText, document.getDocumentInformation().getTitle());
+        }
     }
 
     @Test
