@@ -58,6 +58,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
                     .install(this);
         } else {
             MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
+            MainTableColumnFactory.bindExactWidth(this, headerGraphic);
             this.setResizable(false);
 
             if (specialField.isSingleValueField()) {
@@ -90,6 +91,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
     private Rating createSpecialRating(BibEntryTableViewModel entry, Optional<SpecialFieldValueViewModel> value) {
         Rating ranking = new Rating();
+        MainTableColumnFactory.bindExactWidth(this, ranking);
 
         if (value.isPresent()) {
             ranking.setRating(value.get().getValue().toRating());

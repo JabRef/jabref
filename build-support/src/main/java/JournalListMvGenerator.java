@@ -16,6 +16,7 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationWriter.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationPreferences.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
