@@ -31,6 +31,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -468,27 +469,28 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByProgress.setMaxSize(25, 25);
 
         // Create import and review buttons for both sides
-        Button importCitingButton = new Button(
-                Localization.lang("Add selected entry(s) to library"),
-                IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
-        importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
-        Button reviewCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
-        reviewCitingButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
+        // Create one split button per side: main click adds, the dropdown offers review
+        MenuItem reviewCitingItem = new MenuItem(
+                Localization.lang("Review and add selected entry(s) one by one"),
+                IconTheme.JabRefIcons.EDIT_ENTRY.getGraphicNode());
+        SplitMenuButton importCitingButton = new SplitMenuButton(reviewCitingItem);
+        importCitingButton.setText(Localization.lang("Add selected entry(s) to library"));
+        importCitingButton.setGraphic(IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
 
-        Button importCitedByButton = new Button(
-                Localization.lang("Add selected entry(s) to library"),
-                IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
-        importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
-        Button reviewCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.EDIT_ENTRY);
-        reviewCitedByButton.setTooltip(new Tooltip(Localization.lang("Review and add selected entry(s) one by one")));
+        MenuItem reviewCitedByItem = new MenuItem(
+                Localization.lang("Review and add selected entry(s) one by one"),
+                IconTheme.JabRefIcons.EDIT_ENTRY.getGraphicNode());
+        SplitMenuButton importCitedByButton = new SplitMenuButton(reviewCitedByItem);
+        importCitedByButton.setText(Localization.lang("Add selected entry(s) to library"));
+        importCitedByButton.setGraphic(IconTheme.JabRefIcons.ADD_ENTRY.getGraphicNode());
 
-        hideNodes(importCitingButton, reviewCitingButton, importCitedByButton, reviewCitedByButton);
+        hideNodes(importCitingButton, importCitedByButton);
 
-        HBox citingActions = new HBox(8, importCitingButton, reviewCitingButton, citingProgress, abortCitingButton, refreshCitingButton);
+        HBox citingActions = new HBox(8, importCitingButton, citingProgress, abortCitingButton, refreshCitingButton);
         citingActions.setAlignment(Pos.CENTER_RIGHT);
         citingHeader.setRight(citingActions);
 
-        HBox citedByActions = new HBox(8, importCitedByButton, reviewCitedByButton, citedByProgress, abortCitedButton, refreshCitedByButton);
+        HBox citedByActions = new HBox(8, importCitedByButton, citedByProgress, abortCitedButton, refreshCitedByButton);
         citedByActions.setAlignment(Pos.CENTER_RIGHT);
         citedByHeader.setRight(citedByActions);
 
@@ -504,7 +506,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 refreshCitingButton,
                 CitationFetcher.SearchType.CITES,
                 importCitingButton,
-                reviewCitingButton,
+                reviewCitingItem,
                 citingProgress);
 
         CitationComponents citedByComponents = new CitationComponents(
@@ -514,7 +516,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 refreshCitedByButton,
                 CitationFetcher.SearchType.CITED_BY,
                 importCitedByButton,
-                reviewCitedByButton,
+                reviewCitedByItem,
                 citedByProgress);
 
         this.currentCitingComponents = citingComponents;
@@ -580,19 +582,19 @@ public class CitationRelationsTab extends EntryEditorTab {
                     HBox hContainer = new HBox();
                     hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
-                    VBox vContainer = new VBox();
+                    List<Node> rowButtons = new ArrayList<>();
 
                     if (entry.isLocal()) {
                         hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = ControlHelper.iconButton(IconTheme.JabRefIcons.LINK);
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.setOnMouseClicked(_ -> jumpToEntry(entry));
-                        vContainer.getChildren().add(jumpTo);
+                        rowButtons.add(jumpTo);
 
                         Button compareButton = ControlHelper.iconButton(IconTheme.JabRefIcons.MERGE_ENTRIES);
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entry")));
                         compareButton.setOnMouseClicked(_ -> openPossibleDuplicateEntriesWindow(entry, listView));
-                        vContainer.getChildren().add(compareButton);
+                        rowButtons.add(compareButton);
                     } else {
                         ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
                         addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
@@ -603,9 +605,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                             }
                         });
-                        addToggle.getStyleClass().addAll("addEntryButton");
+                        addToggle.getStyleClass().add("addEntryButton");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
-                        vContainer.getChildren().add(addToggle);
+                        rowButtons.add(addToggle);
                     }
 
                     if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
@@ -623,7 +625,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
                         });
-                        vContainer.getChildren().addLast(openWeb);
+                        rowButtons.add(openWeb);
                     }
 
                     Button showPreview = ControlHelper.iconButton(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW);
@@ -639,16 +641,22 @@ public class CitationRelationsTab extends EntryEditorTab {
                             previewTooltip.show(showPreview, event.getScreenX(), event.getScreenY());
                         });
                     });
-                    vContainer.getChildren().addLast(showPreview);
+                    rowButtons.add(showPreview);
 
                     Button showEntrySource = ControlHelper.iconButton(IconTheme.JabRefIcons.SOURCE);
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
                     showEntrySource.setOnMouseClicked(_ -> showEntrySourceDialog(entry.entry()));
+                    rowButtons.add(showEntrySource);
 
-                    vContainer.getChildren().addLast(showEntrySource);
+                    // Arrange the buttons in a grid with two columns to save vertical space
+                    GridPane buttonGrid = new GridPane();
+                    buttonGrid.setHgap(4);
+                    buttonGrid.setVgap(4);
+                    for (int i = 0; i < rowButtons.size(); i++) {
+                        buttonGrid.add(rowButtons.get(i), i % 2, i / 2);
+                    }
 
-                    hContainer.getChildren().addAll(entryNode, separator, vContainer);
-                    hContainer.getStyleClass().add("padding-4-0");
+                    hContainer.getChildren().addAll(entryNode, separator, buttonGrid);                    hContainer.getStyleClass().add("padding-4-0");
 
                     return hContainer;
                 })
@@ -897,10 +905,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationsRelationsTabViewModel.trackCitationSearch(citationComponents.searchType(), task);
 
         showNodes(citationComponents.abortButton(), citationComponents.progress());
-        hideNodes(citationComponents.refreshButton(), citationComponents.importButton(), citationComponents.reviewButton());
+        hideNodes(citationComponents.refreshButton(), citationComponents.importButton());
 
         citationComponents.abortButton().setOnAction(_ -> {
-            hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton(), citationComponents.reviewButton());
+            hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
             showNodes(citationComponents.refreshButton());
             task.cancel(false);
             citationsRelationsTabViewModel.clearTrackedCitationSearch(citationComponents.searchType(), task);
@@ -923,7 +931,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     return;
                 }
                 LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
-                hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton(), citationComponents.reviewButton());
+                hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
                 boolean isCites = citationComponents.searchType() == CitationFetcher.SearchType.CITES;
                 // The tab has room for details; the notification stays short and free of exception internals.
                 String labelText = isCites
@@ -1007,10 +1015,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
         BooleanBinding booleanBind = Bindings.isEmpty(citationComponents.listView().getCheckModel().getCheckedItems());
         citationComponents.importButton().disableProperty().bind(booleanBind);
-        citationComponents.importButton().setOnMouseClicked(_ -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
-        citationComponents.reviewButton().disableProperty().bind(booleanBind);
-        citationComponents.reviewButton().setOnMouseClicked(_ -> reviewAndImportEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
-        showNodes(citationComponents.refreshButton(), citationComponents.importButton(), citationComponents.reviewButton());
+        citationComponents.importButton().setOnAction(_ -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
+        citationComponents.reviewMenuItem().setOnAction(_ -> reviewAndImportEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
+        showNodes(citationComponents.refreshButton(), citationComponents.importButton());
     }
 
     private void hideNodes(Node... nodes) {
