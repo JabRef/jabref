@@ -75,7 +75,6 @@ import org.jabref.model.util.OptionalUtil;
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,12 +86,6 @@ import static org.jabref.gui.externalfiles.ImportFilesResultItemViewModel.Status
 
 // TODO: Much of this code seems to be logic (and not UI)
 public class ImportHandler {
-
-    @NullMarked
-    private enum KeyGenerationPolicy {
-        RESPECT_IMPORT_PREFERENCE,
-        PRESERVE_EXPLICIT_KEYS
-    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
 
@@ -234,7 +227,7 @@ public class ImportHandler {
                                 String message = Localization.lang("No BibTeX data was found. An empty entry was created with a file link.");
                                 addResultToList(file, false, pdfWarning.map(warning -> Localization.lang("%0: %1", message, warning)).orElse(message));
                             } else {
-                                generateKeys(pdfEntriesInFile, KeyGenerationPolicy.RESPECT_IMPORT_PREFERENCE);
+                                generateKeys(pdfEntriesInFile);
                                 pdfEntriesInFile.forEach(entry -> {
                                     if (entry.getFiles().size() > 1) {
                                         LOGGER.warn("Entry has more than one file attached. This is not supported.");
@@ -425,10 +418,6 @@ public class ImportHandler {
     /// joins the same step, so taking the import back takes the assignments with it.
     // [impl->req~logic.undo.entry-insert-recorded~1]
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
-        importCleanedEntries(transferInformation, entries, KeyGenerationPolicy.RESPECT_IMPORT_PREFERENCE);
-    }
-
-    private void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries, KeyGenerationPolicy keyGenerationPolicy) {
         if (entries.isEmpty()) {
             // An import that collected nothing - cancelled, or every file failed - is not a step,
             // and must not report the library as changed.
@@ -437,7 +426,7 @@ public class ImportHandler {
         undoManager.addEdit(Localization.lang("Import entries"), edit -> {
             targetBibDatabaseContext.getDatabase().insertEntries(entries);
             edit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entries));
-            generateKeys(entries, keyGenerationPolicy);
+            generateKeys(entries);
             setAutomaticFields(entries);
             addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
             addToImportEntriesGroup(entries);
@@ -448,7 +437,7 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
-        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext), KeyGenerationPolicy.RESPECT_IMPORT_PREFERENCE);
+        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext));
     }
 
     /// Imports an entry into the database with duplicate checking and handling.
@@ -458,7 +447,7 @@ public class ImportHandler {
     /// @param entry    the entry to import (original will not be modified)
     /// @param decision the duplicate resolution strategy to apply
     /// @param tracker  tracks the import status of the entry
-    private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker, KeyGenerationPolicy keyGenerationPolicy) {
+    private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
         // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
         BibEntry entryToInsert = cleanUpEntry(entryCopy);
@@ -478,7 +467,7 @@ public class ImportHandler {
                                               markNotImported(duplicateInLibrary, decisionResult.decision(), tracker);
                                               return;
                                           }
-                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker, keyGenerationPolicy);
+                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker);
                                       })
                                       .exceptionally(exception -> {
                                           tracker.markSkipped();
@@ -487,7 +476,7 @@ public class ImportHandler {
                                       });
                               return;
                           }
-                          continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker, keyGenerationPolicy);
+                          continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker);
                       }).executeWith(taskExecutor);
     }
 
@@ -505,16 +494,16 @@ public class ImportHandler {
         }
     }
 
-    private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker, KeyGenerationPolicy keyGenerationPolicy) {
+    private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker) {
         BackgroundTask.wrap(() -> adjustLinkedFilesForTargetIfRequired(transferInformation, entryForImport))
                       .onFailure(e -> {
                           LOGGER.error("Error adjusting linked files for target", e);
                           dialogService.notify(Localization.lang("Could not adjust linked files. The entry was imported without linked-file adjustments."));
-                          importCleanedEntries(transferInformation, List.of(entryForImport), keyGenerationPolicy);
+                          importCleanedEntries(transferInformation, List.of(entryForImport));
                           tracker.markImported(entryForImport);
                       })
                       .onSuccess(adjustedEntry -> {
-                          importCleanedEntries(transferInformation, List.of(adjustedEntry), keyGenerationPolicy);
+                          importCleanedEntries(transferInformation, List.of(adjustedEntry));
                           tracker.markImported(adjustedEntry);
                           // Remove source entries only once the whole move has succeeded, so a failure partway through doesn't leave already-removed entries unrecoverable
                           if (transferInformation != null && transferInformation.transferMode() == org.jabref.model.TransferMode.MOVE && tracker.getImportedCount() == transferInformation.sourceEntries().size()) {
@@ -691,15 +680,14 @@ public class ImportHandler {
     /// Generate keys for given entries if globally configured - or citation key is empty
     ///
     /// @param entries entries to generate keys for
-    private void generateKeys(List<BibEntry> entries, KeyGenerationPolicy keyGenerationPolicy) {
+    private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
                                                                                      .getKeyPatterns()),
                 targetBibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
         entries.stream()
-               .filter(entry -> entry.getCitationKey().isEmpty() ||
-                       (keyGenerationPolicy == KeyGenerationPolicy.RESPECT_IMPORT_PREFERENCE && preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()))
+               .filter(entry -> entry.getCitationKey().isEmpty() || preferences.getImporterPreferences().shouldGenerateNewKeyOnImport())
                .forEach(keyGenerator::generateAndSetKey);
     }
 
@@ -785,43 +773,26 @@ public class ImportHandler {
     }
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd) {
-        importEntriesWithDuplicateCheck(
-                transferInformation,
-                entriesToAdd,
-                new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext, entriesToAdd.size()),
-                KeyGenerationPolicy.RESPECT_IMPORT_PREFERENCE);
-    }
-
-    /// Imports document citations while preserving explicit keys and generating keys for entries without one.
-    public void importEntriesWithDuplicateCheckPreservingCitationKeys(List<BibEntry> entriesToAdd) {
-        importEntriesWithDuplicateCheck(
-                null,
-                entriesToAdd,
-                new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext, entriesToAdd.size()),
-                KeyGenerationPolicy.PRESERVE_EXPLICIT_KEYS);
+        importEntriesWithDuplicateCheck(transferInformation, entriesToAdd, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext, entriesToAdd.size()));
     }
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
-        importEntriesWithDuplicateCheck(transferInformation, entriesToAdd, tracker, KeyGenerationPolicy.RESPECT_IMPORT_PREFERENCE);
-    }
-
-    private void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker, KeyGenerationPolicy keyGenerationPolicy) {
         resetBatchDuplicateDecisionState();
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
                 LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, keyGenerationPolicy);
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
                 firstEntry = false;
                 continue;
             }
             if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
                 DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
-                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker, keyGenerationPolicy);
+                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker);
             } else {
                 LOGGER.debug("Not first entry, pref flag is false, we use BREAK");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, keyGenerationPolicy);
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
             }
         }
     }

@@ -31,7 +31,6 @@ import org.junit.jupiter.api.io.TempDir;
 import static java.nio.file.DirectoryStream.Filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,17 +51,17 @@ class UnlinkedFilesCrawlerTest {
         Path deepSubDir = subDir.resolve("nested");
         Files.createDirectories(deepSubDir);
         Files.createFile(deepSubDir.resolve("deep.png"));
-        Path allowed = Files.createFile(testRoot.resolve("allowed.pdf"));
 
         // Allow all files at the PDF filter level so only the gitignore filter applies
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = mock(UnlinkedPDFFileFilter.class);
-        when(unlinkedPDFFileFilter.accept(any(Path.class), anyBoolean())).thenReturn(true);
+        when(unlinkedPDFFileFilter.accept(any(Path.class))).thenReturn(true);
 
         UnlinkedFilesCrawler unlinkedFilesCrawler = newCrawler(testRoot, unlinkedPDFFileFilter, mock(BibDatabaseContext.class), mock(FilePreferences.class));
 
         FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(testRoot, unlinkedPDFFileFilter);
 
-        assertEquals(List.of(allowed), fileNodeViewModel.getChildren().stream().map(FileNodeViewModel::getPath).toList());
+        // The ignored files must not appear in the results; thus the root node has no children
+        assertEquals(new FileNodeViewModel(testRoot), fileNodeViewModel);
     }
 
     @Test
@@ -73,17 +72,15 @@ class UnlinkedFilesCrawlerTest {
         Path subDir = testRoot.resolve("subdir");
         Files.createDirectories(subDir);
         Files.createFile(subDir.resolve("test.png"));
-        Path allowed = Files.createFile(subDir.resolve("allowed.pdf"));
 
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = mock(UnlinkedPDFFileFilter.class);
-        when(unlinkedPDFFileFilter.accept(any(Path.class), anyBoolean())).thenReturn(true);
+        when(unlinkedPDFFileFilter.accept(any(Path.class))).thenReturn(true);
 
         UnlinkedFilesCrawler unlinkedFilesCrawler = newCrawler(testRoot, unlinkedPDFFileFilter, mock(BibDatabaseContext.class), mock(FilePreferences.class));
 
         FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(testRoot, unlinkedPDFFileFilter);
 
-        assertEquals(List.of(subDir), fileNodeViewModel.getChildren().stream().map(FileNodeViewModel::getPath).toList());
-        assertEquals(List.of(allowed), fileNodeViewModel.getChildren().getFirst().getChildren().stream().map(FileNodeViewModel::getPath).toList());
+        assertEquals(new FileNodeViewModel(testRoot), fileNodeViewModel);
     }
 
     @Test

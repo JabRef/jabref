@@ -39,48 +39,11 @@ Rendering or scrolling the result tree must not perform file-system searches.
 
 Needs: impl, utest
 
-## Unlinked-files search must apply applicable ignore rules in precedence order
-`req~jabgui.externalfiles.unlinked-files.search.gitignore-precedence~1`
-
-Apply built-in ignore rules first, followed by `.gitignore` rules from ancestor directories to the current directory. Ancestor rules remain applicable across nested Git repository boundaries. A later matching rule may override an earlier rule, including a built-in rule. Interpret literal braces in patterns as filename characters.
-
-Related issue: [JabRef/jabref#17546](https://github.com/JabRef/jabref/issues/17546)
-
-Needs: impl, utest
-
-## Unlinked-files search must match ignore rules without regard to case on Windows
-`req~jabgui.externalfiles.unlinked-files.search.gitignore-windows-case~1`
-
-Needs: impl, utest
-
-## Unlinked-files search must match directory-only ignore rules against the entry itself
-`req~jabgui.externalfiles.unlinked-files.search.gitignore-symlink~1`
-
-A symbolic link to a directory is not itself a directory for matching a directory-only rule.
-
-Needs: impl, utest
-
 ## PDF preview pane in unlinked-files dialog must allow closing and release resources
 `req~jabgui.externalfiles.unlinked-files.preview.close~1`
 
 The user can close the PDF preview side pane in the unlinked-files dialog and show it again when needed.
 Closing the side pane releases the displayed PDF document.
-
-Needs: impl, utest
-
-## Empty file directory fields in library properties must show the effective directory as prompt text
-`req~jabgui.libraryproperties.file-directory.effective-prompt~1`
-
-When a directory field in the "General" tab of the library properties is empty, it shows the absolute directory JabRef falls back to as greyed prompt text.
-The prompt text is never stored in the library.
-
-- Library-specific file directory: the main file directory or the directory of the `.bib` file, depending on the preference to store files relative to the `.bib` file.
-- User-specific file directory: the library-specific file directory as currently entered, otherwise the same directory as for the library-specific file directory.
-- LaTeX file directory: the directory of the `.bib` file, otherwise the working directory.
-
-If there is no directory to fall back to (e.g., an unsaved library whose files are stored relative to the `.bib` file), the field stays empty.
-
-[Issue 17572](https://github.com/JabRef/jabref/issues/17572)
 
 Needs: impl, utest
 

@@ -63,12 +63,12 @@ public class FilePreferences {
                 true,                                // createBackup
                 Directories.getBackupDirectory(),    // backupDirectory
                 true,                                // confirmDeleteLinkedFile
-                true,                                // moveToTrash
+                false,                               // moveToTrash
                 true,                                // adjustFileLinksOnTransfer
                 true,                                // copyLinkedFilesOnTransfer
                 false,                               // moveLinkedFilesOnTransfer - defensive, not to cause the impression of files being lost
                 true,                                // shouldKeepDownloadUrl
-                Directories.getDocumentsDirectory(), // lastUsedDirectory
+                Path.of("/"),                        // lastUsedDirectory
                 true,                                // openFileExplorerInFileDirectory
                 false                                // openFileExplorerInLastUsedDirectory
         );

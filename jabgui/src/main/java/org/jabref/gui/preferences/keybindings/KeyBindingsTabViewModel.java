@@ -14,7 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
@@ -24,10 +23,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
-import org.jabref.gui.preferences.keybindings.presets.MacOsKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.util.OptionalObjectProperty;
 
 import org.jspecify.annotations.NonNull;
@@ -53,9 +50,6 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
         keyBindingPresets.add(new BashKeyBindingPreset());
         keyBindingPresets.add(new NewEntryBindingPreset());
-        if (OS.OS_X) {
-            keyBindingPresets.add(new MacOsKeyBindingPreset());
-        }
     }
 
     /// Read all keybindings from the keybinding repository and create table keybinding models for them
@@ -206,20 +200,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        Map<KeyBinding, String> presetBindings = preset.getKeyBindings();
-        if (preset instanceof MacOsKeyBindingPreset) {
-            presetBindings.keySet().forEach(binding -> keyBindingRepository.put(binding, ""));
-            presetBindings.forEach((binding, value) -> {
-                if (value.isEmpty() || keyBindingRepository.getKeyBindings().keySet().stream()
-                                                           .filter(other -> other != binding)
-                                                           .map(keyBindingRepository::getKeyCombination)
-                                                           .noneMatch(combination -> combination.filter(KeyCombination.valueOf(value)::equals).isPresent())) {
-                    keyBindingRepository.put(binding, value);
-                }
-            });
-        } else {
-            presetBindings.forEach(keyBindingRepository::put);
-        }
+        preset.getKeyBindings().forEach(keyBindingRepository::put);
         setValues();
     }
 

@@ -142,8 +142,7 @@ class ContentSelectorViewModelTest {
 
     private void removeKeyword(Field field, String keyword) {
         when(dialogService.showConfirmationDialogAndWait(Localization.lang("Remove keyword"),
-                Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keyword),
-                Localization.lang("Remove")))
+                Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keyword)))
                 .thenReturn(true);
 
         viewModel.showRemoveKeywordConfirmationDialog(field, keyword);
@@ -163,8 +162,7 @@ class ContentSelectorViewModelTest {
     private void removeField(Field field) {
         when(dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove field name"),
-                Localization.lang("Are you sure you want to remove field name: \"%0\"?", FieldTextMapper.getDisplayName(field)),
-                Localization.lang("Remove")))
+                Localization.lang("Are you sure you want to remove field name: \"%0\"?", FieldTextMapper.getDisplayName(field))))
                 .thenReturn(true);
 
         viewModel.showRemoveFieldNameConfirmationDialog(field);

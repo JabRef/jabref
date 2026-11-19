@@ -4,7 +4,7 @@ grand_parent: Getting into the code
 nav_order: 99
 ---
 
-# Troubleshooting
+# Trouble shooting
 
 ## Changes in `jablib/src/main/resources/csl-styles` are shown
 

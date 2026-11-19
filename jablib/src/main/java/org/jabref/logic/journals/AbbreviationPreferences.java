@@ -10,10 +10,8 @@ import javafx.collections.ObservableList;
 public class AbbreviationPreferences {
 
     private final ObservableList<String> externalJournalLists;
-    private final ObservableList<String> disabledExternalJournalLists = FXCollections.observableArrayList();
     private final BooleanProperty useFJournalField;
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
-    private final BooleanProperty useBuiltInJournalList = new SimpleBooleanProperty(true);
 
     public AbbreviationPreferences(List<String> externalJournalLists,
                                    boolean useFJournalField,
@@ -35,18 +33,6 @@ public class AbbreviationPreferences {
         return new AbbreviationPreferences();
     }
 
-    public BooleanProperty useBuiltInJournalListProperty() {
-        return useBuiltInJournalList;
-    }
-
-    public boolean shouldUseBuiltInJournalList() {
-        return useBuiltInJournalList.get();
-    }
-
-    public void setUseBuiltInJournalList(boolean value) {
-        useBuiltInJournalList.set(value);
-    }
-
     public ObservableList<String> getExternalJournalLists() {
         return externalJournalLists;
     }
@@ -54,14 +40,6 @@ public class AbbreviationPreferences {
     public void setExternalJournalLists(List<String> list) {
         externalJournalLists.clear();
         externalJournalLists.addAll(list);
-    }
-
-    public ObservableList<String> getDisabledExternalJournalLists() {
-        return disabledExternalJournalLists;
-    }
-
-    public void setDisabledExternalJournalLists(List<String> list) {
-        disabledExternalJournalLists.setAll(list);
     }
 
     public boolean shouldUseFJournalField() {

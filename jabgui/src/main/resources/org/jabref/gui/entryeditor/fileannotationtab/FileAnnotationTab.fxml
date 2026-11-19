@@ -24,7 +24,7 @@
                         <Label minWidth="-Infinity" text="%File"/>
                         <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
                     </HBox>
-                    <ListView fx:id="annotationList" styleClass="variable-cell-size" VBox.vgrow="ALWAYS"/>
+                    <ListView fx:id="annotationList" VBox.vgrow="ALWAYS"/>
                 </children>
             </VBox>
         </masterNode>
@@ -33,14 +33,6 @@
                 <HBox spacing="4">
                     <Label fx:id="author"/>
                     <Pane HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="openAtAnnotationButton" onAction="#openAtAnnotation" styleClass="icon-button">
-                        <graphic>
-                            <JabRefIconView glyph="PDF_FILE"/>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%Open at annotation"/>
-                        </tooltip>
-                    </Button>
                     <Button onAction="#copy" styleClass="icon-button">
                         <graphic>
                             <JabRefIconView glyph="COPY"/>

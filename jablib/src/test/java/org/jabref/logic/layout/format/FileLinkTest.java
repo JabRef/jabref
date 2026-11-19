@@ -1,7 +1,5 @@
 package org.jabref.logic.layout.format;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
@@ -9,8 +7,6 @@ import java.util.stream.Stream;
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,13 +29,6 @@ class FileLinkTest {
             fileLinkLayoutFormatter.setArgument(desiredDocType);
         }
         assertEquals(formattedFileLink, fileLinkLayoutFormatter.format(originalFileLink));
-    }
-
-    @Test
-    void absoluteLinkWithoutAnyFileDirectory(@TempDir Path tempDir) throws IOException {
-        Path file = Files.createFile(tempDir.resolve("test.pdf"));
-
-        assertEquals(file.toString(), new FileLink(List.of(), null).format(file.toString()));
     }
 
     private static Stream<Arguments> provideFileLinks() {

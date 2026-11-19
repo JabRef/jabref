@@ -1,4 +1,50 @@
 package org.jabref.logic.preferences;
 
-public record FetcherApiKey(String name, boolean shouldUse, String key) {
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+public class FetcherApiKey {
+    private final StringProperty name;
+    private final BooleanProperty use;
+    private final StringProperty key;
+
+    public FetcherApiKey(String name, boolean use, String key) {
+        this.name = new SimpleStringProperty(name);
+        this.use = new SimpleBooleanProperty(use);
+        this.key = new SimpleStringProperty(key);
+    }
+
+    public String getName() {
+        return name.getValue();
+    }
+
+    public StringProperty nameProperty() {
+        return name;
+    }
+
+    public boolean shouldUse() {
+        return use.getValue();
+    }
+
+    public BooleanProperty useProperty() {
+        return use;
+    }
+
+    public void setUse(boolean useCustom) {
+        this.use.setValue(useCustom);
+    }
+
+    public String getKey() {
+        return key.getValue();
+    }
+
+    public StringProperty keyProperty() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key.setValue(key);
+    }
 }

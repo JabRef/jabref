@@ -21,7 +21,6 @@ import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -130,13 +129,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final OAuthSessionRegistry oAuthSessionRegistry;
-    private final NativeDesktop nativeDesktop;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final SplitPane horizontalSplit = new SplitPane();
     private final SidePane sidePane;
-    private final ScrollPane sidePaneScroll = new ScrollPane();
     private final SplitPane verticalSplit = new SplitPane();
     private final TabPane tabbedPane = new TabPane();
     private final EntryEditor entryEditor;
@@ -157,8 +154,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        TaskExecutor taskExecutor,
                        GitHandlerRegistry gitHandlerRegistry,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       OAuthSessionRegistry oAuthSessionRegistry,
-                       NativeDesktop nativeDesktop) {
+                       OAuthSessionRegistry oAuthSessionRegistry) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -171,7 +167,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.oAuthSessionRegistry = oAuthSessionRegistry;
-        this.nativeDesktop = nativeDesktop;
 
         setId("frame");
 
@@ -219,8 +214,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                gitHandlerRegistry,
-                nativeDesktop);
+                gitHandlerRegistry);
 
         this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
@@ -283,8 +277,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryEditor,
                 gitHandlerRegistry,
                 journalAbbreviationRepository,
-                oAuthSessionRegistry,
-                nativeDesktop
+                oAuthSessionRegistry
         );
 
         VBox head = new VBox(0, mainMenu, mainToolBar);
@@ -297,14 +290,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         horizontalSplit.getItems().addAll(verticalSplit);
         horizontalSplit.setOrientation(Orientation.HORIZONTAL);
 
-        sidePaneScroll.setContent(sidePane);
-        sidePaneScroll.setFitToWidth(true);
-        sidePaneScroll.setFitToHeight(true);
-        sidePaneScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        sidePaneScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        sidePaneScroll.getStyleClass().add("side-pane-scroll");
-
-        SplitPane.setResizableWithParent(sidePaneScroll, false);
+        SplitPane.setResizableWithParent(sidePane, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
@@ -314,11 +300,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
             unsubscribeHorizontalDivider();
-            horizontalSplit.getItems().remove(sidePaneScroll);
+            horizontalSplit.getItems().remove(sidePane);
         } else {
-            if (!horizontalSplit.getItems().contains(sidePaneScroll)) {
+            if (!horizontalSplit.getItems().contains(sidePane)) {
                 horizontalSplit.setVisible(false);
-                horizontalSplit.getItems().addFirst(sidePaneScroll);
+                horizontalSplit.getItems().addFirst(sidePane);
                 Platform.runLater(() -> {
                     updateHorizontalDividerPosition();
                     horizontalSplit.setVisible(true);

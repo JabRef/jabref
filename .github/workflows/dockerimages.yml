@@ -69,7 +69,7 @@ jobs:
           versionSpec: "6.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@220647997b450f3e9364b6cf6a357197f17d924b # v4.7.2
+        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
       - name: Build and push
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:

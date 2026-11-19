@@ -46,7 +46,7 @@ In case interaction using the web browser is too slow, you can use a VNC connect
 1. Install [VNC Connect](https://www.realvnc.com/en/connect/)
 2. Use `vscode` as password
 
-## Troubleshooting
+## Trouble shooting
 
 In case there are reading errors on the file system, the docker container probably is out of order.
 Close VS Code.

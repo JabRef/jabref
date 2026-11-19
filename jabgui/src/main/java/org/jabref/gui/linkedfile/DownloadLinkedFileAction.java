@@ -57,8 +57,6 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private final LinkedFile linkedFile;
     private final String suggestedName;
     private final String downloadUrl;
-    private final String linkToReplace;
-    private final Optional<LinkedFile> replacementSnapshot;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
@@ -82,42 +80,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     String suggestedName,
                                     boolean keepHtmlLink,
                                     UndoManager undoManager) {
-        this(databaseContext,
-                entry,
-                linkedFile,
-                downloadUrl,
-                dialogService,
-                externalApplicationsPreferences,
-                filePreferences,
-                taskExecutor,
-                suggestedName,
-                keepHtmlLink,
-                undoManager,
-                linkedFile.getLink());
-    }
-
-    public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
-                                    BibEntry entry,
-                                    LinkedFile linkedFile,
-                                    String downloadUrl,
-                                    DialogService dialogService,
-                                    ExternalApplicationsPreferences externalApplicationsPreferences,
-                                    FilePreferences filePreferences,
-                                    TaskExecutor taskExecutor,
-                                    String suggestedName,
-                                    boolean keepHtmlLink,
-                                    UndoManager undoManager,
-                                    String linkToReplace) {
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.linkedFile = linkedFile;
         this.suggestedName = suggestedName;
         this.downloadUrl = downloadUrl;
-        this.linkToReplace = linkToReplace;
-        this.replacementSnapshot = entry.getFiles().stream()
-                                        .filter(file -> file.getLink().equals(linkToReplace))
-                                        .findFirst()
-                                        .map(file -> new LinkedFile(file.getDescription(), file.getLink(), file.getFileType(), file.getSourceUrl()));
         this.dialogService = dialogService;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.filePreferences = filePreferences;
@@ -198,31 +165,28 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     }
 
     /// @param targetDirectory The directory to store the file into. Is an absolute path.
-    void onSuccess(Path targetDirectory, Path downloadedFile) {
+    private void onSuccess(Path targetDirectory, Path downloadedFile) {
         assert targetDirectory.isAbsolute();
 
-        Optional<Path> duplicate;
+        boolean isDuplicate;
         boolean isHtml;
         try {
-            duplicate = FileNameUniqueness.deleteDuplicateAndGetOriginal(targetDirectory, downloadedFile.getFileName(), dialogService::notify);
+            isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, downloadedFile.getFileName(), dialogService::notify);
         } catch (IOException e) {
             LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
             return;
         }
 
-        if (duplicate.isPresent() && linkToReplace.equals(linkedFile.getLink())) {
+        if (isDuplicate) {
             // We do not add duplicate files.
             // The downloaded file was deleted in {@link org.jabref.logic.util.io.FileNameUniqueness.isDuplicatedFile]}
             LOGGER.info("File {} already exists in target directory {}.", downloadedFile.getFileName(), targetDirectory);
             return;
         }
 
-        // [impl->req~fetchers.fulltext-duplicate-replacement~1]
-        Path survivingFile = duplicate.orElse(downloadedFile);
-
         // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
         LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
-                survivingFile,
+                downloadedFile,
                 databaseContext.getFileDirectories(filePreferences),
                 externalApplicationsPreferences);
         if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
@@ -248,33 +212,14 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                         entry.getField(StandardField.FILE).orElse(null),
                         FileFieldWriter.getStringRepresentation(newFiles)));
                 try {
-                    Files.deleteIfExists(downloadedFile);
+                    Files.delete(downloadedFile);
                 } catch (IOException e) {
                     LOGGER.error("Could not delete downloaded file {}.", downloadedFile, e);
                 }
             }
         } else {
-            attachDownloadedFile(newLinkedFile);
+            entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
         }
-    }
-
-    void attachDownloadedFile(LinkedFile downloadedFile) {
-        if (linkToReplace.equals(linkedFile.getLink())) {
-            entry.replaceDownloadedFile(linkToReplace, downloadedFile);
-            return;
-        }
-
-        List<LinkedFile> files = new ArrayList<>(entry.getFiles());
-        int replacementIndex = replacementSnapshot.map(files::indexOf).orElse(-1);
-        if (replacementIndex >= 0) {
-            downloadedFile.setDescription(files.get(replacementIndex).getDescription());
-            files.set(replacementIndex, downloadedFile);
-        } else {
-            files.addFirst(downloadedFile);
-        }
-        undoManager.applyEdit(new UndoableFieldChange(entry, StandardField.FILE,
-                entry.getField(StandardField.FILE).orElse(null),
-                FileFieldWriter.getStringRepresentation(files)));
     }
 
     private void onFailure(URLDownload urlDownload, Exception ex) {

@@ -104,21 +104,12 @@ public class Notifications {
 
         public UiNotification(String title, String description, Duration duration) {
             super(title, description);
-            closeAfter(duration);
+            new DelayedExecution(duration, this::remove).start();
         }
 
         public UiNotification withAutoClose(Duration duration) {
-            closeAfter(duration);
+            new DelayedExecution(duration, this::remove).start();
             return this;
-        }
-
-        private void closeAfter(Duration duration) {
-            // Removing fails if the notification is in no group: the user removed it already, or it was never shown
-            new DelayedExecution(duration, () -> {
-                if (getGroup() != null) {
-                    remove();
-                }
-            }).start();
         }
     }
 

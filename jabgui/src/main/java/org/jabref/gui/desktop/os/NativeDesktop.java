@@ -9,25 +9,25 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
-
-import javafx.application.HostServices;
-import javafx.util.Duration;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Notifications;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,28 +38,24 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
-import com.dlsc.gemsfx.infocenter.NotificationAction;
-import org.jspecify.annotations.NullMarked;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.entry.field.StandardField.PDF;
 import static org.jabref.model.entry.field.StandardField.PS;
 import static org.jabref.model.entry.field.StandardField.URL;
 
-/// This class bundles OS specific implementations for file/application open handling methods.
+/// This class contains bundles OS specific implementations for file directories and file/application open handling methods.
 /// In case the default does not work, subclasses provide the correct behavior.
 ///
 /// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the [JabKit#initLogging].
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration/
 ///
-/// AWT's [Desktop] is avoided where possible, as it is not available on all platforms; see
-/// https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform.
-/// Web links are opened via JavaFX [HostServices].
+/// See https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
+/// https://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT.
 ///
 /// For non-GUI things, see [org.jabref.logic.os.OS].
-@NullMarked
 @AllowedToUseAwt("Because of moveToTrash() is not available elsewhere.")
 public abstract class NativeDesktop {
     // No LOGGER may be initialized directly
@@ -67,24 +63,15 @@ public abstract class NativeDesktop {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
-    private final HostServices hostServices;
-    private final GuiPreferences preferences;
-    private final ClipBoardManager clipBoardManager;
-
-    protected NativeDesktop(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
-        this.hostServices = hostServices;
-        this.preferences = preferences;
-        this.clipBoardManager = clipBoardManager;
-    }
-
     /// Open a http/pdf/ps viewer for the given link string.
     ///
     /// Opening a PDF file at the file field is done at [org.jabref.gui.fieldeditors.LinkedFileViewModel#open]
-    public void openExternalViewer(BibDatabaseContext databaseContext,
-                                   String initialLink,
-                                   Field initialField,
-                                   DialogService dialogService,
-                                   BibEntry entry)
+    public static void openExternalViewer(BibDatabaseContext databaseContext,
+                                          GuiPreferences preferences,
+                                          String initialLink,
+                                          Field initialField,
+                                          DialogService dialogService,
+                                          BibEntry entry)
             throws IOException {
         String link = initialLink;
         Field field = initialField;
@@ -111,10 +98,10 @@ public abstract class NativeDesktop {
                 }
             }
         } else if (StandardField.DOI == field) {
-            openDoi(link);
+            openDoi(link, preferences);
             return;
         } else if (StandardField.ISBN == field) {
-            openIsbn(link);
+            openIsbn(link, preferences);
             return;
         } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
@@ -139,17 +126,17 @@ public abstract class NativeDesktop {
 
         switch (field) {
             case URL ->
-                    openBrowser(link);
+                    openBrowser(link, preferences.getExternalApplicationsPreferences());
             case PS -> {
                 try {
-                    openFile(link, PS.getName());
+                    get().openFile(link, PS.getName(), preferences.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
             }
             case PDF -> {
                 try {
-                    openFile(link, PDF.getName());
+                    get().openFile(link, PDF.getName(), preferences.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
@@ -160,26 +147,26 @@ public abstract class NativeDesktop {
         }
     }
 
-    private void openDoi(String doi) throws IOException {
+    private static void openDoi(String doi, GuiPreferences preferences) throws IOException {
         String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
-        openBrowser(link);
+        openBrowser(link, preferences.getExternalApplicationsPreferences());
     }
 
-    public void openCustomDoi(String link, DialogService dialogService) {
+    public static void openCustomDoi(String link, GuiPreferences preferences, DialogService dialogService) {
         DOI.parse(link)
            .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
            .ifPresent(uri -> {
                try {
-                   openBrowser(uri);
+                   openBrowser(uri, preferences.getExternalApplicationsPreferences());
                } catch (IOException e) {
                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                }
            });
     }
 
-    private void openIsbn(String isbn) throws IOException {
+    private static void openIsbn(String isbn, GuiPreferences preferences) throws IOException {
         String link = "https://openlibrary.org/isbn/" + isbn;
-        openBrowser(link);
+        openBrowser(link, preferences.getExternalApplicationsPreferences());
     }
 
     /// Open an external file, attempting to use the correct viewer for it.
@@ -188,59 +175,88 @@ public abstract class NativeDesktop {
     /// @param databaseContext The database this file belongs to.
     /// @param link            The filename.
     /// @return false if the link couldn't be resolved, true otherwise.
-    public boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
-                                             String link,
-                                             final Optional<ExternalFileType> type) throws IOException {
+    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
+                                                    ExternalApplicationsPreferences externalApplicationsPreferences,
+                                                    FilePreferences filePreferences,
+                                                    String link,
+                                                    final Optional<ExternalFileType> type) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
-            openBrowser(link);
+            openBrowser(link, externalApplicationsPreferences);
             return true;
         }
-        Optional<Path> file = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
+        Optional<Path> file = FileUtil.find(databaseContext, link, filePreferences);
         if (file.isEmpty()) {
             return false;
         }
 
-        openFileWithApplication(file.get().toString(), type.map(ExternalFileType::getOpenWithApplication).orElse(""));
+        String filePath = file.get().toString();
+        openExternalFilePlatformIndependent(type, filePath, externalApplicationsPreferences);
         return true;
+    }
+
+    private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType,
+                                                            String filePath,
+                                                            ExternalApplicationsPreferences externalApplicationsPreferences)
+            throws IOException {
+        if (fileType.isPresent()) {
+            String application = fileType.get().getOpenWithApplication();
+
+            if (application.isEmpty()) {
+                get().openFile(filePath, fileType.get().getExtension(), externalApplicationsPreferences);
+            } else {
+                get().openFileWithApplication(filePath, application);
+            }
+        } else {
+            // File type is not given and therefore no application specified
+            // Let the OS handle the opening of the file
+            get().openFile(filePath, "", externalApplicationsPreferences);
+        }
     }
 
     /// Opens a file browser of the folder of the given file. If possible, the file is selected
     ///
     /// @param fileLink the location of the file
     /// @throws IOException if the default file browser cannot be opened
-    public void openFolderAndSelectFile(Path fileLink, DialogService dialogService) throws IOException {
-        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+    public static void openFolderAndSelectFile(Path fileLink,
+                                               ExternalApplicationsPreferences externalApplicationsPreferences,
+                                               DialogService dialogService) throws IOException {
+        if (fileLink == null) {
+            return;
+        }
+
         boolean useCustomFileBrowser = externalApplicationsPreferences.useCustomFileBrowser();
         if (!useCustomFileBrowser) {
-            openFolderAndSelectFileWithDefaultFileBrowser(fileLink);
+            get().openFolderAndSelectFile(fileLink);
             return;
         }
         String absolutePath = fileLink.toAbsolutePath().getParent().toString();
         List<String> command = externalApplicationsPreferences.getCustomFileBrowserCommand();
         if (command.isEmpty() || command.getFirst().isBlank()) {
             LoggerFactory.getLogger(NativeDesktop.class).info("No custom file browser command defined");
-            openFolderAndSelectFileWithDefaultFileBrowser(fileLink);
+            get().openFolderAndSelectFile(fileLink);
             return;
         }
         executeCommand(command, absolutePath, dialogService);
     }
 
-    /// Opens a new console: in the given directory itself, or, given a file, in the file's
-    /// parent directory.
+    /// Opens a new console starting on the given file location
     ///
-    /// @param fileOrDirectory Location the console should be opened at.
-    public void openConsole(Path fileOrDirectory, DialogService dialogService) throws IOException {
-        Path absolute = fileOrDirectory.toAbsolutePath();
-        String absolutePath = Files.isDirectory(absolute) ? absolute.toString() : absolute.getParent().toString();
+    /// @param file Location the console should be opened at.
+    public static void openConsole(Path file, GuiPreferences preferences, DialogService dialogService) throws IOException {
+        if (file == null) {
+            return;
+        }
+
+        String absolutePath = file.toAbsolutePath().getParent().toString();
 
         boolean useCustomTerminal = preferences.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {
-            openConsoleWithDefaultTerminal(absolutePath, dialogService);
+            get().openConsole(absolutePath, dialogService);
             return;
         }
         List<String> command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
         if (command.isEmpty() || command.getFirst().isBlank()) {
-            openConsoleWithDefaultTerminal(absolutePath, dialogService);
+            get().openConsole(absolutePath, dialogService);
             LoggerFactory.getLogger(NativeDesktop.class).info("Preference for custom terminal is empty. Using default terminal.");
             return;
         }
@@ -254,41 +270,46 @@ public abstract class NativeDesktop {
         dialogService.notify(Localization.lang("Executing command \"%0\"...", String.join(" ", subcommands)));
 
         try {
-            startProcess(new ProcessBuilder(subcommands).directory(Path.of(absolutePath).toFile()));
+            ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
+            processBuilder.directory(Path.of(absolutePath).toFile());
+            Process process = processBuilder.start();
+
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", String.join(" ", subcommands)));
         }
     }
 
-    /// Starts a program that runs independently of JabRef.
-    /// Its output is discarded and its stdin is closed, as it never gets input: no pipe stays open until garbage collection,
-    /// and no thread reads from a long-running program, which would delay JabRef's shutdown.
-    protected static void startProcess(ProcessBuilder processBuilder) throws IOException {
-        // The program's error output is discarded, so this is the only trace of a failing launch.
-        // The arguments are not logged: they may carry mail contents or login URLs.
-        List<String> command = processBuilder.command();
-        LoggerFactory.getLogger(NativeDesktop.class).debug("Starting {} with {} argument(s)", command.getFirst(), command.size() - 1);
-        Process process = processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                                        .redirectError(ProcessBuilder.Redirect.DISCARD)
-                                        .start();
-        process.getOutputStream().close();
+    /// Opens the given URL using the system browser
+    ///
+    /// @param url the URL to open
+    public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        openBrowser(url, externalApplicationsPreferences, _ -> {
+            // Terminal failure is already logged where it is caught
+        });
     }
 
     /// Opens the given URL using the system browser
     ///
-    /// @param url the URL to open
-    public void openBrowser(String url) throws IOException {
-        launchBrowser(url);
+    /// @param url            the URL to open
+    /// @param onAsyncFailure invoked (from a background thread) when opening fails after this
+    ///                                                                                         method has already returned; synchronous failures throw instead
+    public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences, Consumer<IOException> onAsyncFailure) throws IOException {
+        openBrowser(url, externalApplicationsPreferences, onAsyncFailure, get());
     }
 
-    /// @return `false` if the browser was started via [HostServices], which does not report whether that succeeded
-    private boolean launchBrowser(String url) throws IOException {
-        String browser = configuredApplication("html");
-        if (!browser.isEmpty()) {
+    @VisibleForTesting
+    static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences, Consumer<IOException> onAsyncFailure, NativeDesktop desktop) throws IOException {
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
+        if (fileType.isPresent() && !fileType.get().getOpenWithApplication().isEmpty()) {
             // The user configured a custom browser; hand it the URL string unmodified
-            openFileWithApplication(url, browser);
-            return true;
+            desktop.openFileWithApplication(url, fileType.get().getOpenWithApplication());
+            return;
         }
         // A URL must be opened via a URL-aware API: the file-open path runs it through
         // Path.of(...), which collapses "https://" to "https:/" and yields a bogus filesystem path
@@ -298,56 +319,58 @@ public abstract class NativeDesktop {
         } catch (IllegalArgumentException e) {
             // Not URI-parseable (e.g. unencoded spaces); the OS URL handlers accept the raw string
             LoggerFactory.getLogger(NativeDesktop.class).debug("Could not parse {} as URI, falling back to the OS URL handler", url, e);
-            openUrlWithSystemHandler(url);
-            return true;
+            desktop.openUrlWithSystemHandler(url);
+            return;
         }
-        // On Windows, HostServices hands every URI to the web browser, also mailto: and links to other programs.
-        // The OS handler dispatches by scheme. createUri also produces relative URIs, which only the OS handler can resolve.
-        if ("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme())) {
-            showDocument(uri.toASCIIString());
-            return false;
+        // Desktop.browse rejects relative URIs, which createUri also produces; those go to the platform opener
+        if (uri.isAbsolute() && desktop.supportsDesktopBrowse()) {
+            // Desktop.browse may block on some Linux desktops, so keep it off the JavaFX thread
+            HeadlessExecutorService.INSTANCE.execute(() -> {
+                try {
+                    desktop.desktopBrowse(uri);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(NativeDesktop.class).warn("Desktop.browse failed for {}, falling back to the OS URL handler", url, e);
+                    try {
+                        desktop.openUrlWithSystemHandler(url);
+                    } catch (IOException e2) {
+                        LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser for {}", url, e2);
+                        onAsyncFailure.accept(e2);
+                    }
+                }
+            });
+        } else {
+            desktop.openUrlWithSystemHandler(url);
         }
-        openUrlWithSystemHandler(uri.isAbsolute() ? uri.toASCIIString() : url);
-        return true;
     }
 
-    public void openBrowser(URI url) throws IOException {
-        openBrowser(url.toASCIIString());
+    /// Whether the AWT desktop integration can open URLs. Overridable for tests.
+    boolean supportsDesktopBrowse() {
+        return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     }
 
-    /// Not via [HostServices#showDocument], because on Windows that starts the web browser instead of the mail client.
-    public void openMailClient(URI mailto) throws IOException {
-        openUrlWithSystemHandler(mailto.toASCIIString());
+    /// Opens the URI via the AWT desktop integration. Overridable for tests.
+    void desktopBrowse(URI uri) throws IOException {
+        Desktop.getDesktop().browse(uri);
+    }
+
+    public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        openBrowser(url.toASCIIString(), externalApplicationsPreferences);
     }
 
     /// Opens the url with the users standard Browser. If that fails a popup will be shown to instruct the user to open the link manually and the link gets copied to the clipboard
     ///
     /// @param url the URL to open
-    public void openBrowserShowPopup(String url, DialogService dialogService) {
+    public static void openBrowserShowPopup(String url, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
         try {
-            if (!launchBrowser(url)) {
-                // A failure would go unnoticed, so the link stays reachable for a while
-                dialogService.notify(new UnconfirmedBrowserLaunchNotification(url, dialogService, clipBoardManager));
-            }
+            openBrowser(url, externalApplicationsPreferences,
+                    exception -> UiTaskExecutor.runInJavaFXThread(() -> showManualOpenPopup(url, dialogService, exception)));
         } catch (IOException exception) {
             showManualOpenPopup(url, dialogService, exception);
         }
     }
 
-    private static final class UnconfirmedBrowserLaunchNotification extends Notifications.UiNotification {
-        UnconfirmedBrowserLaunchNotification(String url, DialogService dialogService, ClipBoardManager clipBoardManager) {
-            super(Localization.lang("Opening link in the browser"),
-                    Localization.lang("If no browser opened, copy the link and open it manually."));
-            withAutoClose(Duration.seconds(10));
-            getActions().add(new NotificationAction<>(Localization.lang("Copy link"), _ -> {
-                clipBoardManager.setContent(url);
-                dialogService.notify(Localization.lang("The link has been copied to the clipboard."));
-                return OnClickBehaviour.REMOVE;
-            }));
-        }
-    }
-
-    private void showManualOpenPopup(String url, DialogService dialogService, IOException exception) {
+    private static void showManualOpenPopup(String url, DialogService dialogService, IOException exception) {
+        ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         clipBoardManager.setContent(url);
         LoggerFactory.getLogger(NativeDesktop.class).error("Could not open browser", exception);
         String couldNotOpenBrowser = Localization.lang("Could not open browser.");
@@ -357,131 +380,50 @@ public abstract class NativeDesktop {
         dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
     }
 
-    // region Deprecated static helpers
-    // The passed preferences are ignored: all callers pass parts of the same GuiPreferences the instance was created with.
-
-    /// @deprecated Use [#openExternalViewer(BibDatabaseContext, String, Field, DialogService, BibEntry)] of the injected instance
-    @Deprecated
-    public static void openExternalViewer(BibDatabaseContext databaseContext,
-                                          GuiPreferences preferences,
-                                          String initialLink,
-                                          Field initialField,
-                                          DialogService dialogService,
-                                          BibEntry entry) throws IOException {
-        get().openExternalViewer(databaseContext, initialLink, initialField, dialogService, entry);
-    }
-
-    /// @deprecated Use [#openCustomDoi(String, DialogService)] of the injected instance
-    @Deprecated
-    public static void openCustomDoi(String link, GuiPreferences preferences, DialogService dialogService) {
-        get().openCustomDoi(link, dialogService);
-    }
-
-    /// @deprecated Use [#openExternalFileAnyFormat(BibDatabaseContext, String, Optional)] of the injected instance
-    @Deprecated
-    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
-                                                    ExternalApplicationsPreferences externalApplicationsPreferences,
-                                                    FilePreferences filePreferences,
-                                                    String link,
-                                                    final Optional<ExternalFileType> type) throws IOException {
-        return get().openExternalFileAnyFormat(databaseContext, link, type);
-    }
-
-    /// @deprecated Use [#openFolderAndSelectFile(Path, DialogService)] of the injected instance
-    @Deprecated
-    public static void openFolderAndSelectFile(Path fileLink,
-                                               ExternalApplicationsPreferences externalApplicationsPreferences,
-                                               DialogService dialogService) throws IOException {
-        get().openFolderAndSelectFile(fileLink, dialogService);
-    }
-
-    /// @deprecated Use [#openConsole(Path, DialogService)] of the injected instance
-    @Deprecated
-    public static void openConsole(Path file, GuiPreferences preferences, DialogService dialogService) throws IOException {
-        get().openConsole(file, dialogService);
-    }
-
-    /// @deprecated Use [#openBrowser(String)] of the injected instance
-    @Deprecated
-    public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        get().openBrowser(url);
-    }
-
-    /// @deprecated Use [#openBrowser(URI)] of the injected instance
-    @Deprecated
-    public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        get().openBrowser(url);
-    }
-
-    /// @deprecated Use [#openBrowserShowPopup(String, DialogService)] of the injected instance
-    @Deprecated
-    public static void openBrowserShowPopup(String url, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
-        get().openBrowserShowPopup(url, dialogService);
-    }
-
-    private static NativeDesktop get() {
-        return Injector.instantiateModelOrService(NativeDesktop.class);
-    }
-
-    // endregion
-
-    public static NativeDesktop create(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
+    public static NativeDesktop get() {
         if (OS.WINDOWS) {
-            return new Windows(hostServices, preferences, clipBoardManager);
+            return new Windows();
         } else if (OS.OS_X) {
-            return new OSX(hostServices, preferences, clipBoardManager);
+            return new OSX();
         } else if (OS.LINUX) {
-            return new Linux(hostServices, preferences, clipBoardManager);
+            return new Linux();
         }
-        return new DefaultDesktop(hostServices, preferences, clipBoardManager);
+        return new DefaultDesktop();
     }
 
-    public void openFile(String filePath, String fileType) throws IOException {
-        openFileWithApplication(filePath, configuredApplication(fileType));
-    }
+    public abstract void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException;
 
-    /// @return the application configured for the file type, or an empty string for the OS default application
-    private String configuredApplication(String extension) {
-        return ExternalFileTypes.getExternalFileTypeByExt(extension, preferences.getExternalApplicationsPreferences())
-                                .map(ExternalFileType::getOpenWithApplication)
-                                .orElse("");
-    }
-
-    /// Does not report failures, so callers cannot detect that no browser could be started.
-    protected final void showDocument(String uri) {
-        // On Linux, JavaFX probes the browser candidates with blocking `which` calls; keep them off the calling (often FX) thread
-        HeadlessExecutorService.INSTANCE.execute(() -> hostServices.showDocument(uri));
-    }
-
-    /// The OS handler dispatches by scheme, e.g., `mailto:` to the mail client.
-    /// The URL must never be run through `Path.of`, which mangles it.
-    protected abstract void openUrlWithSystemHandler(String url) throws IOException;
+    /// Hands the URL string, unmodified, to the OS's URL-aware handler.
+    /// Used when `Desktop.browse` is unsupported, not applicable, or failed;
+    /// the URL must never be run through `Path.of`, which mangles it.
+    public abstract void openUrlWithSystemHandler(String url) throws IOException;
 
     /// Opens a file on an Operating System, using the given application.
     ///
     /// @param filePath    The filename.
-    /// @param application Link to the app that opens the file. If empty, the OS default application is used.
-    protected void openFileWithApplication(String filePath, String application) throws IOException {
-        if (application.isEmpty()) {
-            openFileWithDefaultApplication(filePath);
-        } else {
-            openFileWithCustomApplication(filePath, application);
-        }
-    }
+    /// @param application Link to the app that opens the file.
+    public abstract void openFileWithApplication(String filePath, String application) throws IOException;
 
-    protected abstract void openFileWithDefaultApplication(String filePath) throws IOException;
+    public abstract void openFolderAndSelectFile(Path file) throws IOException;
 
-    /// `application` is never empty.
-    protected abstract void openFileWithCustomApplication(String filePath, String application) throws IOException;
-
-    protected abstract void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException;
-
-    protected abstract void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException;
+    public abstract void openConsole(String absolutePath, DialogService dialogService) throws IOException;
 
     /// Returns the path to the system's applications folder.
     ///
     /// @return the path
     public abstract Path getApplicationDirectory();
+
+    /// Get the user's default file chooser directory
+    ///
+    /// @return the path
+    public Path getDefaultFileChooserDirectory() {
+        Path userDirectory = Directories.getUserDirectory();
+        Path documents = userDirectory.resolve("Documents");
+        if (!Files.exists(documents)) {
+            return userDirectory;
+        }
+        return documents;
+    }
 
     /// Moves the given file to the trash.
     ///
@@ -495,7 +437,6 @@ public abstract class NativeDesktop {
     }
 
     public boolean moveToTrashSupported() {
-        // getDesktop throws if AWT has no desktop integration (e.g., headless or missing GTK); then there is no trash
-        return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
+        return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
     }
 }

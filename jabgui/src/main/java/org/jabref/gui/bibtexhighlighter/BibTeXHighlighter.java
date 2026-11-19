@@ -120,16 +120,7 @@ public class BibTeXHighlighter implements SyntaxDecorator {
         }
 
         cachedFullText = fullText;
-        // Veneer's lexer uses Unicode code-point offsets; Java strings use UTF-16 offsets.
-        int[] utf16Offsets = new int[fullText.codePointCount(0, fullText.length()) + 1];
-        for (int codePointIndex = 0, offset = 0; offset < fullText.length(); codePointIndex++) {
-            utf16Offsets[codePointIndex] = offset;
-            offset += Character.charCount(fullText.codePointAt(offset));
-        }
-        utf16Offsets[utf16Offsets.length - 1] = fullText.length();
-        cachedRegions = syntaxHighlighter.computeHighlightRegions(fullText).stream()
-                                         .map(region -> new BibTeXHighlightRegion(utf16Offsets[region.start()], utf16Offsets[region.end()], region.category()))
-                                         .toList();
+        cachedRegions = syntaxHighlighter.computeHighlightRegions(fullText);
         lineStarts = starts;
         cacheDirty = false;
     }

@@ -1,7 +1,6 @@
 package org.jabref.gui.bibtexhighlighter;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -12,13 +11,11 @@ import org.jabref.logic.util.OptionalObjectProperty;
 import com.airhacks.afterburner.injection.Injector;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.model.CodeTextModel;
-import jfx.incubator.scene.control.richtext.model.RichParagraph;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,26 +49,6 @@ class BibTeXHighlighterTest {
     @AfterEach
     void tearDown() {
         Injector.forgetAll();
-    }
-
-    @Test
-    void highlightsWholeFieldNamesAfterEmoji() {
-        String firstLine = "@Article{🍯🍫🌚,";
-        String secondLine = "  author = {Example},";
-        String thirdLine = "  title = {Title},";
-        when(model.size()).thenReturn(3);
-        when(model.getPlainText(0)).thenReturn(firstLine);
-        when(model.getPlainText(1)).thenReturn(secondLine);
-        when(model.getPlainText(2)).thenReturn(thirdLine);
-        highlighter = new BibTeXHighlighter(stateManager, new BibTeXSyntaxHighlighter());
-
-        RichParagraph author = highlighter.createRichParagraph(model, 1);
-        RichParagraph title = highlighter.createRichParagraph(model, 2);
-
-        assertEquals(List.of("  ", "author", " = ", "{Example}", ","),
-                IntStream.range(0, author.getSegmentCount()).mapToObj(index -> author.getSegment(index).getText()).toList());
-        assertEquals(List.of("  ", "title", " = ", "{Title}", ","),
-                IntStream.range(0, title.getSegmentCount()).mapToObj(index -> title.getSegment(index).getText()).toList());
     }
 
     @Test

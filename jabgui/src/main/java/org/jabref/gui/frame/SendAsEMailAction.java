@@ -1,5 +1,6 @@
 package org.jabref.gui.frame;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -19,7 +21,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /// Therefore, the folder(s), where the file(s) belonging to the entry are stored,
 /// are opened. This feature is disabled by default and can be switched on at
 /// preferences/external programs
-@NullMarked
+@AllowedToUseAwt("Requires AWT to send an email")
 public abstract class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
@@ -39,18 +40,15 @@ public abstract class SendAsEMailAction extends SimpleCommand {
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
-    private final NativeDesktop nativeDesktop;
 
     public SendAsEMailAction(DialogService dialogService,
                              GuiPreferences preferences,
                              StateManager stateManager,
-                             TaskExecutor taskExecutor,
-                             NativeDesktop nativeDesktop) {
+                             TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.nativeDesktop = nativeDesktop;
     }
 
     @Override
@@ -66,7 +64,7 @@ public abstract class SendAsEMailAction extends SimpleCommand {
     }
 
     private String sendEmail() throws URISyntaxException, IOException {
-        if (stateManager.getActiveDatabase().isEmpty()) {
+        if (!Desktop.isDesktopSupported() || stateManager.getActiveDatabase().isEmpty()) {
             return Localization.lang("Error creating email");
         }
 
@@ -77,7 +75,8 @@ public abstract class SendAsEMailAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
         URI uriMailTo = getUriMailTo(entries);
 
-        nativeDesktop.openMailClient(uriMailTo);
+        Desktop desktop = Desktop.getDesktop();
+        desktop.mail(uriMailTo);
 
         return "%s: %d".formatted(Localization.lang("Entries added to an email"), entries.size());
     }

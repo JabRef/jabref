@@ -67,17 +67,15 @@ public class FulltextFetchers {
     }
 
     public Optional<FetcherResult> findFullTextPDF(BibEntry entry) {
-        return findFullTextPDFAndUpdateDoi(new BibEntry(entry));
-    }
+        // for accuracy, fetch DOI first but do not modify entry
+        BibEntry clonedEntry = new BibEntry(entry);
+        Optional<DOI> doi = clonedEntry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-    /// Finds full text and writes a discovered DOI to the supplied entry.
-    /// Callers performing background lookups should supply an entry snapshot.
-    public Optional<FetcherResult> findFullTextPDFAndUpdateDoi(BibEntry entry) {
-        if (entry.getField(StandardField.DOI).flatMap(DOI::parse).isEmpty()) {
-            findDoiForEntry(entry);
+        if (doi.isEmpty()) {
+            findDoiForEntry(clonedEntry);
         }
 
-        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(entry, fetchers), FETCHER_TIMEOUT, TimeUnit.SECONDS);
+        List<Future<Optional<FetcherResult>>> result = HeadlessExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, fetchers), FETCHER_TIMEOUT, TimeUnit.SECONDS);
 
         return result.stream()
                      .map(FulltextFetchers::getResults)

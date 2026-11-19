@@ -7,7 +7,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -18,7 +17,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.dlsc.gemsfx.infocenter.Notification;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,21 +29,12 @@ public class CiteDrivePushAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
-    private final NativeDesktop nativeDesktop;
-    private final ClipBoardManager clipBoardManager;
 
-    public CiteDrivePushAction(DialogService dialogService,
-                               StateManager stateManager,
-                               GuiPreferences preferences,
-                               OAuthSessionRegistry oAuthSessionRegistry,
-                               NativeDesktop nativeDesktop,
-                               ClipBoardManager clipBoardManager) {
+    public CiteDrivePushAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
-        this.nativeDesktop = nativeDesktop;
-        this.clipBoardManager = clipBoardManager;
-        this.citeDriveOAuthService = CiteDriveLoginAction.createOAuthService(dialogService, preferences, oAuthSessionRegistry, nativeDesktop, clipBoardManager);
+        this.citeDriveOAuthService = CiteDriveLoginAction.createOAuthService(dialogService, preferences, oAuthSessionRegistry);
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
@@ -73,16 +62,7 @@ public class CiteDrivePushAction extends SimpleCommand {
                     try {
                         if (CiteDrivePush.push(database, entries, session.accessToken(), preferences, dialogService, session.pushEndpoint())) {
                             // [impl->req~citedrive.push.import-page~1]
-                            String importPage = session.importPage().toASCIIString();
-                            UiTaskExecutor.runInJavaFXThread(() -> {
-                                dialogService.notify(new CiteDriveLoginAction.PageNotification(
-                                        Localization.lang("Import into CiteDrive"),
-                                        Localization.lang("Continue on the CiteDrive import page in the browser. If no browser opened, open the import page from here or copy the link."),
-                                        Localization.lang("Open import page"),
-                                        importPage, dialogService, nativeDesktop, clipBoardManager,
-                                        Notification.OnClickBehaviour.REMOVE));
-                                CiteDriveLoginAction.openPage(nativeDesktop, importPage);
-                            });
+                            UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(session.importPage().toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences()));
                         }
                     } catch (IOException e) {
                         LOGGER.error("CiteDrive push failed", e);

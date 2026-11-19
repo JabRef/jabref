@@ -23,14 +23,6 @@ class IfPluralTest {
     }
 
     @Test
-    void organizationContainingAndIsOneEditor() {
-        ParamLayoutFormatter formatter = new IfPlural();
-        formatter.setArgument("Eds.,Ed.");
-        assertEquals("Ed.", formatter.format("{Research and Development Institute}"));
-        assertEquals("Eds.", formatter.format("{Research and Development Institute} and Jane Doe"));
-    }
-
-    @Test
     void formatNull() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");

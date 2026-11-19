@@ -20,9 +20,6 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.util.OptionalObjectProperty;
 
 public class WorkspacePreferences {
-
-    private static final int DEF_FONT_SIZE = 9;
-
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
@@ -34,7 +31,6 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty confirmDelete;
     private final BooleanProperty confirmHideTabBar;
-    private final BooleanProperty wrapMainTableText;
     private final ObservableList<String> selectedSlrCatalogs;
 
     public WorkspacePreferences(Language language,
@@ -47,7 +43,6 @@ public class WorkspacePreferences {
                                 boolean showAdvancedHints,
                                 boolean confirmDelete,
                                 boolean confirmHideTabBar,
-                                boolean wrapMainTableText,
                                 List<String> selectedSlrCatalogs) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
@@ -60,7 +55,6 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
-        this.wrapMainTableText = new SimpleBooleanProperty(wrapMainTableText);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
     }
 
@@ -69,7 +63,7 @@ public class WorkspacePreferences {
         this(
                 Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
                 false,                                                      // Default font size override
-                DEF_FONT_SIZE,                                              // Default font size
+                9,                                                          // Default font size
                 ThemePreset.JABREF,                                         // Default theme
                 ThemeColorScheme.FOLLOW_SYSTEM,                             // Default color scheme is follow system
                 null,                                                       // Custom theme
@@ -77,7 +71,6 @@ public class WorkspacePreferences {
                 true,                                                       // Default show advanced hints
                 true,                                                       // Default confirm delete
                 true,                                                       // Default confirm hide tab bar
-                true,                                                       // Default wrap main table text
                 List.of()                                                   // Default selected SLR catalogs
         );
     }
@@ -96,7 +89,6 @@ public class WorkspacePreferences {
         this.showAdvancedHints.set(preferences.shouldShowAdvancedHints());
         this.confirmDelete.set(preferences.shouldConfirmDelete());
         this.confirmHideTabBar.set(preferences.shouldHideTabBar());
-        this.wrapMainTableText.set(preferences.shouldWrapMainTableText());
         this.selectedSlrCatalogs.setAll(preferences.getSelectedSlrCatalogs());
     }
 
@@ -206,18 +198,6 @@ public class WorkspacePreferences {
 
     public void setHideTabBar(boolean hideTabBar) {
         this.confirmHideTabBar.set(hideTabBar);
-    }
-
-    public boolean shouldWrapMainTableText() {
-        return wrapMainTableText.get();
-    }
-
-    public BooleanProperty wrapMainTableTextProperty() {
-        return wrapMainTableText;
-    }
-
-    public void setWrapMainTableText(boolean wrapMainTableText) {
-        this.wrapMainTableText.set(wrapMainTableText);
     }
 
     public ObservableList<String> getSelectedSlrCatalogs() {

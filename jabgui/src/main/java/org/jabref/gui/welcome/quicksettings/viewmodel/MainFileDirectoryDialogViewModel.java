@@ -2,8 +2,6 @@ package org.jabref.gui.welcome.quicksettings.viewmodel;
 
 import java.nio.file.Path;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -12,12 +10,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.util.strings.StringUtil;
 
 public class MainFileDirectoryDialogViewModel extends AbstractViewModel {
     private final StringProperty pathProperty = new SimpleStringProperty("");
-    // A blank path would be saved as an empty relative path and disable storing files relative to the library
-    private final BooleanBinding pathValid = Bindings.createBooleanBinding(() -> StringUtil.isNotBlank(pathProperty.get()), pathProperty);
 
     private final FilePreferences filePreferences;
     private final DialogService dialogService;
@@ -33,10 +28,6 @@ public class MainFileDirectoryDialogViewModel extends AbstractViewModel {
 
     public StringProperty pathProperty() {
         return pathProperty;
-    }
-
-    public BooleanBinding pathValidProperty() {
-        return pathValid;
     }
 
     public void browseForDirectory() {

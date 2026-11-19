@@ -26,7 +26,7 @@
 # has that path when nix-ld creates it. The shellHook below checks for it and
 # points at the fix rather than letting the build fail with a bare
 # "No such file or directory". See the troubleshooting guide:
-# docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/troubleshooting.md
+# docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/trouble-shooting.md
 #
 # The JDK here is only a *bootstrap* for the Gradle wrapper: `./gradlew` is a
 # shell script that needs an existing `java` to start Gradle at all, and

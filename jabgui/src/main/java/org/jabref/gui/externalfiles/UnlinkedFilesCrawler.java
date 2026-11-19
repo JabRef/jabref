@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
@@ -128,13 +128,6 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
     /// @return FileNodeViewModel containing the data of the current directory and all subdirectories
     /// @throws IOException if directory is not a directory or empty
     FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter) throws IOException {
-        if ((directory == null) || !Files.isDirectory(directory)) {
-            throw new IOException("Invalid directory for searching: %s".formatted(directory));
-        }
-        return searchDirectory(directory, unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory));
-    }
-
-    private FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter, GitIgnoreFileFilter gitIgnoreFilter) throws IOException {
         // Return null if the directory is not valid.
         if ((directory == null) || !Files.isDirectory(directory)) {
             throw new IOException("Invalid directory for searching: %s".formatted(directory));
@@ -147,20 +140,17 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
         // Filters:
         //   1. UnlinkedPDFFileFilter
         //   2. GitIgnoreFilter
-        List<Path> subDirectories = new ArrayList<>();
-        List<Path> files = new ArrayList<>();
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
-            for (Path path : dirStream) {
-                BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-                boolean isDirectory = attributes.isDirectory() || (attributes.isSymbolicLink() && Files.isDirectory(path));
-                if (unlinkedPDFFileFilter.accept(path, isDirectory) && gitIgnoreFilter.accept(path, attributes.isDirectory())) {
-                    (isDirectory ? subDirectories : files).add(path);
-                }
-            }
+        ChainedFilters filters = new ChainedFilters(List.of(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory)));
+        Map<Boolean, List<Path>> directoryAndFilePartition;
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory, filters);
+             Stream<Path> filesStream = StreamSupport.stream(dirStream.spliterator(), false)) {
+            directoryAndFilePartition = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
         } catch (IOException e) {
             LOGGER.error("Error while searching files", e);
             return fileNodeViewModelForCurrentDirectory;
         }
+        List<Path> subDirectories = directoryAndFilePartition.get(true);
+        List<Path> files = directoryAndFilePartition.get(false);
 
         // at this point, only unlinked PDFs AND unignored files are contained
 
@@ -169,7 +159,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
 
         // now we crawl into the found subdirectories first (!)
         for (Path subDirectory : subDirectories) {
-            FileNodeViewModel subRoot = searchDirectory(subDirectory, unlinkedPDFFileFilter, gitIgnoreFilter.forSubdirectory(subDirectory));
+            FileNodeViewModel subRoot = searchDirectory(subDirectory, unlinkedPDFFileFilter);
             if (!subRoot.getChildren().isEmpty()) {
                 fileCountOfSubdirectories += subRoot.getFileCount();
                 fileNodeViewModelForCurrentDirectory.getChildren().add(subRoot);

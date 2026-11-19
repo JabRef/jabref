@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -172,6 +173,58 @@ class XDataTest {
         BibDatabase db = new BibDatabase(List.of(xdata, book));
 
         assertTrue(book.getResolvedFieldOrAlias(field, db).isEmpty());
+    }
+
+    @Test
+    void keyLookupDoesNotInheritForbiddenSortkeyFromXData() {
+        BibEntry xdataWithSortkey = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("CAT")
+                .withField(StandardField.SORTKEY, "xdata-sortkey");
+
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("Knuth")
+                .withField(StandardField.XDATA, "CAT");
+
+        BibDatabase db = new BibDatabase(List.of(xdataWithSortkey, book));
+
+        assertTrue(book.getResolvedFieldOrAlias(StandardField.SORTKEY, db).isEmpty());
+        assertTrue(book.getResolvedFieldOrAlias(StandardField.KEY, db).isEmpty());
+
+        BibEntry xdataWithKey = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("CAT-KEY")
+                .withField(StandardField.KEY, "xdata-key");
+        db.insertEntry(xdataWithKey);
+        book.setField(StandardField.XDATA, "CAT, CAT-KEY");
+
+        assertEquals(Optional.of("xdata-key"), book.getResolvedFieldOrAlias(StandardField.KEY, db));
+
+        book.setField(StandardField.SORTKEY, "own-sortkey");
+        assertEquals(Optional.of("own-sortkey"), book.getResolvedFieldOrAlias(StandardField.KEY, db));
+    }
+
+    @Test
+    void resolvesDeepXDataChainIteratively() {
+        List<BibEntry> entries = new ArrayList<>();
+        int chainLength = 64;
+        for (int i = 0; i < chainLength; i++) {
+            BibEntry xdata = new BibEntry(new UnknownEntryType("xdata"))
+                    .withCitationKey("xdata-" + i);
+            if (i < (chainLength - 1)) {
+                xdata.withField(StandardField.XDATA, "xdata-" + (i + 1));
+            } else {
+                xdata.withField(StandardField.PUBLISHER, "Deep Publisher");
+            }
+            entries.add(xdata);
+        }
+
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("Knuth")
+                .withField(StandardField.XDATA, "xdata-0");
+        entries.add(book);
+
+        BibDatabase db = new BibDatabase(entries);
+
+        assertEquals(Optional.of("Deep Publisher"), book.getResolvedFieldOrAlias(StandardField.PUBLISHER, db));
     }
 }
 

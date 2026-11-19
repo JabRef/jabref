@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -137,7 +139,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         BibEntry entry = new BibEntry(originalEntry);
         new ConvertToBibtexCleanup().cleanup(entry);
         convertBracedMathToUnicode(entry);
-        String result = bstVM.render(List.of(entry), databaseContext.getDatabase());
+        String result = bstVM.render(List.of(entry), withoutPreamble(databaseContext.getDatabase()));
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
         // Remove all LaTeX comments
@@ -171,6 +173,33 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = new RemoveTilde().format(result);
         result = MULTIPLE_SPACES_PATTERN.matcher(result.trim()).replaceAll(" ");
         return result;
+    }
+
+    private static BibDatabase withoutPreamble(BibDatabase database) {
+        if (database.getPreamble().isEmpty()) {
+            return database;
+        }
+        return new BibDatabase() {
+            @Override
+            public Optional<String> getPreamble() {
+                return Optional.empty();
+            }
+
+            @Override
+            public synchronized Optional<BibEntry> getEntryByCitationKey(String key) {
+                return database.getEntryByCitationKey(key);
+            }
+
+            @Override
+            public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
+                return database.getReferencedEntry(entry);
+            }
+
+            @Override
+            public String resolveForStrings(String content) {
+                return database.resolveForStrings(content);
+            }
+        };
     }
 
     private static String convertInlineSmallCapsToHtml(String latex) {

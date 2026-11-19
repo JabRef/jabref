@@ -12,7 +12,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.clipboard.ClipBoardManager;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
@@ -57,8 +56,7 @@ public class RightClickMenu {
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
                                      BibEntryTypesManager entryTypesManager,
-                                     ImportHandler importHandler,
-                                     NativeDesktop nativeDesktop) {
+                                     ImportHandler importHandler) {
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
@@ -78,7 +76,7 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                createSendSubMenu(factory, dialogService, stateManager, preferences, entryTypesManager, taskExecutor, nativeDesktop),
+                createSendSubMenu(factory, dialogService, stateManager, preferences, entryTypesManager, taskExecutor),
 
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, () -> libraryTab, dialogService, preferences, stateManager),
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, () -> libraryTab, dialogService, preferences, stateManager),
@@ -225,12 +223,11 @@ public class RightClickMenu {
                                           StateManager stateManager,
                                           GuiPreferences preferences,
                                           BibEntryTypesManager entryTypesManager,
-                                          TaskExecutor taskExecutor,
-                                          NativeDesktop nativeDesktop) {
+                                          TaskExecutor taskExecutor) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor, nativeDesktop)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor)),
                 new SeparatorMenuItem()
         );
 

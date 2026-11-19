@@ -292,7 +292,7 @@ class BackupUIManagerTest extends JavaFxTest {
 
         AtomicReference<@Nullable String> dialogContent = new AtomicReference<>();
         interact(() -> {
-            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class), dialogService);
+            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class));
             StackPane content = (StackPane) dialog.getDialogPane().getContent();
             HyperlinkLabel hyperlink = (HyperlinkLabel) content.getChildren().getFirst();
             dialogContent.set(hyperlink.getText());

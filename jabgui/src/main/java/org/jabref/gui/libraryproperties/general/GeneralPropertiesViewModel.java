@@ -7,11 +7,9 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -22,14 +20,12 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.formatter.bibtexfields.KeywordSeparatorMigration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.UndoManager;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
@@ -51,11 +47,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
-
-    // Prompt texts show where JabRef looks for files while a field is empty. They are never stored in the library.
-    private final StringProperty librarySpecificDirectoryPromptProperty = new SimpleStringProperty("");
-    private final StringProperty userSpecificFileDirectoryPromptProperty = new SimpleStringProperty("");
-    private final StringProperty laTexFileDirectoryPromptProperty = new SimpleStringProperty("");
 
     private final Validator librarySpecificFileDirectoryValidator;
     private final Validator userSpecificFileDirectoryValidator;
@@ -87,14 +78,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
                 laTexFileDirectoryProperty,
                 mainDirectoryPath -> validateDirectory(mainDirectoryPath, "LaTeX")
         );
-
-        // The user-specific directory takes precedence over the library-specific one, so its fallback follows what is currently typed there
-        userSpecificFileDirectoryPromptProperty.bind(Bindings.createStringBinding(
-                () -> resolveDirectory(librarySpecificDirectoryProperty.get())
-                        .map(Path::toString)
-                        .orElse(librarySpecificDirectoryPromptProperty.get()),
-                librarySpecificDirectoryProperty,
-                librarySpecificDirectoryPromptProperty));
     }
 
     @Override
@@ -108,17 +91,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
         keywordSeparatorProperty.setValue(metaData.getKeywordSeparator().map(Object::toString).orElse(""));
-
-        // [impl->req~jabgui.libraryproperties.file-directory.effective-prompt~1]
-        FilePreferences filePreferences = preferences.getFilePreferences();
-        librarySpecificDirectoryPromptProperty.setValue(databaseContext.getFallbackFileDirectory(filePreferences)
-                                                                       .map(directory -> directory.toAbsolutePath().normalize().toString())
-                                                                       .orElse(""));
-        // Same fallback as the LaTeX citations tab uses when no LaTeX file directory is set
-        laTexFileDirectoryPromptProperty.setValue(FileUtil.getInitialDirectory(databaseContext, filePreferences.getWorkingDirectory())
-                                                          .toAbsolutePath()
-                                                          .normalize()
-                                                          .toString());
     }
 
     @Override
@@ -251,29 +223,6 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty keywordSeparatorProperty() {
         return this.keywordSeparatorProperty;
-    }
-
-    public ReadOnlyStringProperty librarySpecificDirectoryPromptProperty() {
-        return this.librarySpecificDirectoryPromptProperty;
-    }
-
-    public ReadOnlyStringProperty userSpecificFileDirectoryPromptProperty() {
-        return this.userSpecificFileDirectoryPromptProperty;
-    }
-
-    public ReadOnlyStringProperty laTexFileDirectoryPromptProperty() {
-        return this.laTexFileDirectoryPromptProperty;
-    }
-
-    /// Resolves a directory entered in this tab to the absolute directory the file lookup uses.
-    /// Blank input and invalid paths resolve to an empty optional.
-    private Optional<Path> resolveDirectory(String directory) {
-        if (directory.isBlank()) {
-            return Optional.empty();
-        }
-
-        return databaseContext.resolveFileDirectory(directory.trim())
-                              .map(path -> path.toAbsolutePath().normalize());
     }
 
     private Path getBrowseDirectory(String configuredDir) {

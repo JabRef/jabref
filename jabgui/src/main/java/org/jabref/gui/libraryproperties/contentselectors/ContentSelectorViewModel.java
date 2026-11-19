@@ -131,9 +131,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
         boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove field name"),
-                Localization.lang("Are you sure you want to remove field name: \"%0\"?", FieldTextMapper.getDisplayName(fieldToRemove)),
-                // [impl->req~ui.dialogs.confirmation.naming~1]
-                Localization.lang("Remove")
+                Localization.lang("Are you sure you want to remove field name: \"%0\"?", FieldTextMapper.getDisplayName(fieldToRemove))
         );
 
         if (deleteConfirmed) {
@@ -173,11 +171,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     }
 
     void showRemoveKeywordConfirmationDialog(Field field, String keywordToRemove) {
-        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove keyword"),
-                Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keywordToRemove),
-                // [impl->req~ui.dialogs.confirmation.naming~1]
-                Localization.lang("Remove"));
+        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(Localization.lang("Remove keyword"), Localization.lang("Are you sure you want to remove keyword: \"%0\"?", keywordToRemove));
         if (deleteConfirmed) {
             removeKeyword(field, keywordToRemove);
         }

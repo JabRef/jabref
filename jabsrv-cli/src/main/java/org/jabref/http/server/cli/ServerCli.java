@@ -127,7 +127,7 @@ public class ServerCli implements Callable<Integer> {
                 remotePreferences,
                 preferences.getCiteDrivePreferences(),
                 oAuthSessionRegistry,
-                page -> System.out.println("Open this address in your browser to log in to CiteDrive:\n" + page.uri()),
+                authUrl -> System.out.println("Open this address in your browser to log in to CiteDrive:\n" + authUrl),
                 // This server already receives the callback, whatever the preferences say
                 () -> true);
 

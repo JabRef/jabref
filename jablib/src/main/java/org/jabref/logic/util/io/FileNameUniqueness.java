@@ -3,7 +3,6 @@ package org.jabref.logic.util.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,11 +57,6 @@ public class FileNameUniqueness {
     /// false when there is no "similar" file name or the content is different from that of files with "similar" name
     /// @throws IOException Fail when the file is not exist or something wrong when reading the file
     public static boolean isDuplicatedFile(@NonNull Path directory, @NonNull Path fileName, @NonNull Consumer<String> messageOnDeletion) throws IOException {
-        return deleteDuplicateAndGetOriginal(directory, fileName, messageOnDeletion).isPresent();
-    }
-
-    /// Deletes a duplicate download and returns the surviving file, if one exists.
-    public static Optional<Path> deleteDuplicateAndGetOriginal(Path directory, Path fileName, Consumer<String> messageOnDeletion) throws IOException {
         String extensionSuffix = FileUtil.getFileExtension(fileName).orElse("");
         extensionSuffix = extensionSuffix.isEmpty() ? extensionSuffix : "." + extensionSuffix;
         String newFilename = FileUtil.getBaseName(fileName) + extensionSuffix;
@@ -71,7 +65,7 @@ public class FileNameUniqueness {
         String originalFileName = fileNameWithoutDuplicated + extensionSuffix;
 
         if (newFilename.equals(originalFileName)) {
-            return Optional.empty();
+            return false;
         }
 
         Path originalFile = directory.resolve(originalFileName);
@@ -86,7 +80,7 @@ public class FileNameUniqueness {
                 } catch (IOException _) {
                     LOGGER.error("File '{}' is a duplicate of '{}'. Could not delete '{}'.", fileName, originalFileName, fileName);
                 }
-                return Optional.of(originalFile);
+                return true;
             }
 
             originalFileName = fileNameWithoutDuplicated +
@@ -95,11 +89,11 @@ public class FileNameUniqueness {
             counter++;
 
             if (newFilename.equals(originalFileName)) {
-                return Optional.empty();
+                return false;
             }
             originalFile = directory.resolve(originalFileName);
         }
-        return Optional.empty();
+        return false;
     }
 
     /// This is the opposite function of getNonOverWritingFileName

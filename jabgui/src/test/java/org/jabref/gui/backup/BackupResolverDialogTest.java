@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.testutils.JavaFxTest;
@@ -62,7 +61,7 @@ class BackupResolverDialogTest extends JavaFxTest {
         Window.getWindows().addListener(raisedFontSizeListener);
 
         backupResolverDialog = new BackupResolverDialog(
-                Path.of("library.bib"), Path.of("backups"), mock(ExternalApplicationsPreferences.class), mock(DialogService.class));
+                Path.of("library.bib"), Path.of("backups"), mock(ExternalApplicationsPreferences.class));
         backupResolverDialog.initOwner(stage);
         interact(backupResolverDialog::show);
     }

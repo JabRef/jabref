@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -61,7 +60,7 @@ public class CiteDriveOAuthService {
     private final RemotePreferences remotePreferences;
     private final CiteDrivePreferences citeDrivePreferences;
     private final OAuthSessionRegistry sessionRegistry;
-    private final Consumer<AuthorizationPage> authorizationPageOpener;
+    private final Consumer<URI> authorizationPageOpener;
     private final BooleanSupplier callbackServerEnabler;
 
     /// @param authorizationPageOpener shows the CiteDrive login page to the user (in the browser)
@@ -69,7 +68,7 @@ public class CiteDriveOAuthService {
     public CiteDriveOAuthService(RemotePreferences remotePreferences,
                                  CiteDrivePreferences citeDrivePreferences,
                                  OAuthSessionRegistry sessionRegistry,
-                                 Consumer<AuthorizationPage> authorizationPageOpener,
+                                 Consumer<URI> authorizationPageOpener,
                                  BooleanSupplier callbackServerEnabler) {
         this(remotePreferences, citeDrivePreferences, sessionRegistry, authorizationPageOpener, callbackServerEnabler,
                 citeDrivePreferences::getAuthorizationEndpoint, citeDrivePreferences::getTokenEndpoint, HTTPRequest::send);
@@ -79,7 +78,7 @@ public class CiteDriveOAuthService {
     public CiteDriveOAuthService(RemotePreferences remotePreferences,
                                  CiteDrivePreferences citeDrivePreferences,
                                  OAuthSessionRegistry sessionRegistry,
-                                 Consumer<AuthorizationPage> authorizationPageOpener,
+                                 Consumer<URI> authorizationPageOpener,
                                  BooleanSupplier callbackServerEnabler,
                                  URI authEndpoint,
                                  URI tokenEndpoint) {
@@ -91,7 +90,7 @@ public class CiteDriveOAuthService {
     CiteDriveOAuthService(RemotePreferences remotePreferences,
                           CiteDrivePreferences citeDrivePreferences,
                           OAuthSessionRegistry sessionRegistry,
-                          Consumer<AuthorizationPage> authorizationPageOpener,
+                          Consumer<URI> authorizationPageOpener,
                           BooleanSupplier callbackServerEnabler,
                           TokenRequestSender tokenRequestSender) {
         this(remotePreferences, citeDrivePreferences, sessionRegistry, authorizationPageOpener, callbackServerEnabler,
@@ -101,7 +100,7 @@ public class CiteDriveOAuthService {
     private CiteDriveOAuthService(RemotePreferences remotePreferences,
                                   CiteDrivePreferences citeDrivePreferences,
                                   OAuthSessionRegistry sessionRegistry,
-                                  Consumer<AuthorizationPage> authorizationPageOpener,
+                                  Consumer<URI> authorizationPageOpener,
                                   BooleanSupplier callbackServerEnabler,
                                   Supplier<URI> authEndpoint,
                                   Supplier<URI> tokenEndpoint,
@@ -114,12 +113,6 @@ public class CiteDriveOAuthService {
         this.authEndpoint = authEndpoint;
         this.tokenEndpoint = tokenEndpoint;
         this.tokenRequestSender = tokenRequestSender;
-    }
-
-    /// The CiteDrive login page of one login attempt
-    ///
-    /// @param finished completes when this attempt succeeded, failed, or timed out; other attempts may still be pending
-    public record AuthorizationPage(URI uri, CompletionStage<?> finished) {
     }
 
     /// Lets the user log in in the browser. Also stores the refresh token.
@@ -154,9 +147,9 @@ public class CiteDriveOAuthService {
                 .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
                 .build()
                 .toURI();
-        CompletableFuture<Optional<AuthorizedSession>> session = codeFuture.thenApplyAsync(code -> exchangeCodeForToken(code, codeVerifier, configuration));
-        authorizationPageOpener.accept(new AuthorizationPage(authUrl, session));
-        return session;
+        authorizationPageOpener.accept(authUrl);
+
+        return codeFuture.thenApplyAsync(code -> exchangeCodeForToken(code, codeVerifier, configuration));
     }
 
     private URI getCallBackUri() {

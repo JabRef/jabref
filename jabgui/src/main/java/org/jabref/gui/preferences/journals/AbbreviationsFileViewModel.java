@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -27,7 +26,6 @@ public class AbbreviationsFileViewModel {
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(
             FXCollections.observableArrayList());
     private final ReadOnlyBooleanProperty isBuiltInList;
-    private final BooleanProperty enabled = new SimpleBooleanProperty(true);
     private final String name;
     private final Optional<Path> path;
 
@@ -83,14 +81,6 @@ public class AbbreviationsFileViewModel {
 
     public ReadOnlyBooleanProperty isBuiltInListProperty() {
         return isBuiltInList;
-    }
-
-    public BooleanProperty enabledProperty() {
-        return enabled;
-    }
-
-    public String getDisplayName() {
-        return path.map(Path::getFileName).map(Path::toString).orElse(name);
     }
 
     @Override

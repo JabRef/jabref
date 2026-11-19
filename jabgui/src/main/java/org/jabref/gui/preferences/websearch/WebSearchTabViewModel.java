@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -190,10 +189,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, isEnabled, keyIsCustomizable);
             if (keyIsCustomizable) {
                 savedApiKeys.stream()
-                            .filter(apiKey -> apiKey.name().equals(fetcher.getName()))
+                            .filter(apiKey -> apiKey.getName().equals(fetcher.getName()))
                             .findFirst()
                             .ifPresent(apiKey -> {
-                                fetcherViewModel.apiKeyProperty().set(apiKey.key());
+                                fetcherViewModel.apiKeyProperty().set(apiKey.getKey());
                                 fetcherViewModel.useCustomApiKeyProperty().set(apiKey.shouldUse());
                             });
             }
@@ -209,10 +208,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             }
             FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, false, true);
             savedApiKeys.stream()
-                        .filter(apiKey -> apiKey.name().equals(fetcher.getName()))
+                        .filter(apiKey -> apiKey.getName().equals(fetcher.getName()))
                         .findFirst()
                         .ifPresent(apiKey -> {
-                            fetcherViewModel.apiKeyProperty().set(apiKey.key());
+                            fetcherViewModel.apiKeyProperty().set(apiKey.getKey());
                             fetcherViewModel.useCustomApiKeyProperty().set(apiKey.shouldUse());
                         });
             fetchers.add(fetcherViewModel);
@@ -256,18 +255,16 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                         .map(FetcherViewModel::getName)
                         .toList());
 
-        Set<FetcherApiKey> apiKeysToStore = fetchers.stream()
-                                                    .filter(FetcherViewModel::isCustomizable)
-                                                    .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
-                                                    .collect(Collectors.toSet());
+        List<FetcherApiKey> apiKeysToStore = fetchers.stream()
+                                                     .filter(FetcherViewModel::isCustomizable)
+                                                     .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
+                                                     .toList();
 
-        Set<FetcherApiKey> newApiKeys = apikeyPersistAvailableProperty.get() ? apiKeysToStore : Set.of();
-        boolean persistChanged = importerPreferences.shouldPersistCustomKeys() != apikeyPersistProperty.get();
-        // Each set change rewrites the whole keyring, which is slow, so only replace the keys when something changed
-        if (persistChanged || !Objects.equals(importerPreferences.getApiKeys(), newApiKeys)) {
-            importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
-            importerPreferences.getApiKeys().clear();
-            importerPreferences.getApiKeys().addAll(newApiKeys);
+        // Must be set before keys are set
+        importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
+        importerPreferences.getApiKeys().clear();
+        if (apikeyPersistAvailableProperty.get()) {
+            importerPreferences.getApiKeys().addAll(apiKeysToStore);
         }
 
         // Save custom URL templates to preferences

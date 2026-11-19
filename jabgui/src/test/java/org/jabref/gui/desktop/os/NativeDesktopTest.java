@@ -1,23 +1,24 @@
 package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
-import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Notifications;
-import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.testutils.JavaFxTest;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,15 +28,7 @@ import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /// The "browser" in these tests is a shell script recording its argument, so the assertions catch
@@ -43,7 +36,7 @@ import static org.mockito.Mockito.when;
 /// online links through `Path.of`, which collapses `https://` and truncates query strings).
 @NullMarked
 @DisabledOnOs(OS.WINDOWS)
-class NativeDesktopTest extends JavaFxTest {
+class NativeDesktopTest {
 
     private static final String URL_WITH_QUERY = "https://journals.plos.org/plosmedicine/article/file?id=10.1371/journal.pmed.1004085&type=printable";
 
@@ -73,8 +66,10 @@ class NativeDesktopTest extends JavaFxTest {
     @Test
     void openBrowserPassesFullUrlToCustomBrowser() throws IOException, InterruptedException {
         ExternalFileType htmlType = new CustomExternalFileType("URL", "html", "text/html", recorder.toString(), "www", IconTheme.JabRefIcons.WWW);
+        ExternalApplicationsPreferences preferences = mock(ExternalApplicationsPreferences.class);
+        when(preferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(htmlType));
 
-        new Windows(mock(HostServices.class), preferencesWith(htmlType), mock(ClipBoardManager.class)).openBrowser(URL_WITH_QUERY);
+        NativeDesktop.openBrowser(URL_WITH_QUERY, preferences, FakeDesktop.NO_FAILURE_EXPECTED, new Windows());
 
         assertEquals(URL_WITH_QUERY, recordedArgument());
     }
@@ -83,70 +78,126 @@ class NativeDesktopTest extends JavaFxTest {
     void windowsOpenFileWithApplicationKeepsUrlIntact() throws IOException, InterruptedException {
         // The Windows implementation is executable on POSIX, which is enough to pin down that the
         // URL is passed through verbatim instead of being run through Path.of
-        new Windows(mock(HostServices.class), preferencesWith(), mock(ClipBoardManager.class)).openFileWithApplication(URL_WITH_QUERY, recorder.toString());
+        new Windows().openFileWithApplication(URL_WITH_QUERY, recorder.toString());
 
         assertEquals(URL_WITH_QUERY, recordedArgument());
     }
 
     @Test
-    void openBrowserPassesFullUrlToShowDocument() throws IOException {
-        HostServices hostServices = mock(HostServices.class);
+    void openBrowserPassesFullUrlToDesktopBrowse() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        FakeDesktop desktop = new FakeDesktop(true, false, false);
 
-        NativeDesktop.create(hostServices, preferencesWith(), mock(ClipBoardManager.class)).openBrowser(URL_WITH_QUERY);
+        NativeDesktop.openBrowser(URL_WITH_QUERY, noCustomBrowser(), FakeDesktop.NO_FAILURE_EXPECTED, desktop);
 
-        verify(hostServices, timeout(5000)).showDocument(URL_WITH_QUERY);
+        assertEquals(URL_WITH_QUERY, desktop.browsed.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void openBrowserFallsBackToSystemHandlerWhenBrowseFails() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        FakeDesktop desktop = new FakeDesktop(true, true, false);
+
+        NativeDesktop.openBrowser(URL_WITH_QUERY, noCustomBrowser(), FakeDesktop.NO_FAILURE_EXPECTED, desktop);
+
+        assertEquals(URL_WITH_QUERY, desktop.systemHandled.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void openBrowserReportsAsyncFailureWhenAllMechanismsFail() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        FakeDesktop desktop = new FakeDesktop(true, true, true);
+        CompletableFuture<IOException> failure = new CompletableFuture<>();
+
+        NativeDesktop.openBrowser(URL_WITH_QUERY, noCustomBrowser(), failure::complete, desktop);
+
+        assertEquals("system handler failed", failure.get(5, TimeUnit.SECONDS).getMessage());
+    }
+
+    @Test
+    void openBrowserUsesSystemHandlerWhenBrowseUnsupported() throws IOException {
+        FakeDesktop desktop = new FakeDesktop(false, false, false);
+
+        NativeDesktop.openBrowser(URL_WITH_QUERY, noCustomBrowser(), FakeDesktop.NO_FAILURE_EXPECTED, desktop);
+
+        assertEquals(URL_WITH_QUERY, desktop.systemHandled.getNow(""));
     }
 
     @Test
     void openBrowserUsesSystemHandlerForUnparseableUrl() throws IOException {
-        NativeDesktop desktop = spy(NativeDesktop.create(mock(HostServices.class), preferencesWith(), mock(ClipBoardManager.class)));
-        doNothing().when(desktop).openUrlWithSystemHandler(anyString());
+        FakeDesktop desktop = new FakeDesktop(true, false, false);
         String urlWithSpace = "https://example.org/some path?x=1&y=2";
 
-        desktop.openBrowser(urlWithSpace);
+        NativeDesktop.openBrowser(urlWithSpace, noCustomBrowser(), FakeDesktop.NO_FAILURE_EXPECTED, desktop);
 
-        verify(desktop).openUrlWithSystemHandler(urlWithSpace);
+        assertEquals(urlWithSpace, desktop.systemHandled.getNow(""));
     }
 
-    @Test
-    void openBrowserUsesSystemHandlerForMailto() throws IOException {
-        HostServices hostServices = mock(HostServices.class);
-        NativeDesktop desktop = spy(NativeDesktop.create(hostServices, preferencesWith(), mock(ClipBoardManager.class)));
-        doNothing().when(desktop).openUrlWithSystemHandler(anyString());
-
-        desktop.openBrowser("mailto:someone@example.org");
-
-        verify(desktop).openUrlWithSystemHandler("mailto:someone@example.org");
-        verifyNoInteractions(hostServices);
-    }
-
-    @Test
-    void openBrowserShowPopupNotifiesWhenTheLaunchCannotBeConfirmed() {
-        DialogService dialogService = mock(DialogService.class);
-        NativeDesktop desktop = NativeDesktop.create(mock(HostServices.class), preferencesWith(), mock(ClipBoardManager.class));
-
-        // The notification closes itself through a JavaFX animation
-        interact(() -> desktop.openBrowserShowPopup(URL_WITH_QUERY, dialogService));
-
-        verify(dialogService).notify(isA(Notifications.UiNotification.class));
-    }
-
-    @Test
-    void openBrowserShowPopupDoesNotNotifyForTheSystemHandler() throws IOException {
-        DialogService dialogService = mock(DialogService.class);
-        NativeDesktop desktop = spy(NativeDesktop.create(mock(HostServices.class), preferencesWith(), mock(ClipBoardManager.class)));
-        doNothing().when(desktop).openUrlWithSystemHandler(anyString());
-
-        desktop.openBrowserShowPopup("mailto:someone@example.org", dialogService);
-
-        verify(dialogService, never()).notify(isA(Notifications.UiNotification.class));
-    }
-
-    private static GuiPreferences preferencesWith(ExternalFileType... externalFileTypes) {
-        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(externalFileTypes));
-        GuiPreferences preferences = mock(GuiPreferences.class);
-        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+    private static ExternalApplicationsPreferences noCustomBrowser() {
+        ExternalApplicationsPreferences preferences = mock(ExternalApplicationsPreferences.class);
+        when(preferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet());
         return preferences;
+    }
+
+    private static final class FakeDesktop extends NativeDesktop {
+        static final Consumer<IOException> NO_FAILURE_EXPECTED = e -> {
+            throw new AssertionError("Unexpected async failure", e);
+        };
+
+        final CompletableFuture<String> browsed = new CompletableFuture<>();
+        final CompletableFuture<String> systemHandled = new CompletableFuture<>();
+
+        private final boolean browseSupported;
+        private final boolean browseFails;
+        private final boolean systemHandlerFails;
+
+        private FakeDesktop(boolean browseSupported, boolean browseFails, boolean systemHandlerFails) {
+            this.browseSupported = browseSupported;
+            this.browseFails = browseFails;
+            this.systemHandlerFails = systemHandlerFails;
+        }
+
+        @Override
+        boolean supportsDesktopBrowse() {
+            return browseSupported;
+        }
+
+        @Override
+        void desktopBrowse(URI uri) throws IOException {
+            if (browseFails) {
+                throw new IOException("browse failed");
+            }
+            browsed.complete(uri.toASCIIString());
+        }
+
+        @Override
+        public void openUrlWithSystemHandler(String url) throws IOException {
+            if (systemHandlerFails) {
+                throw new IOException("system handler failed");
+            }
+            systemHandled.complete(url);
+        }
+
+        @Override
+        public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void openFileWithApplication(String filePath, String application) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void openFolderAndSelectFile(Path file) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void openConsole(String absolutePath, DialogService dialogService) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Path getApplicationDirectory() {
+            throw new UnsupportedOperationException();
+        }
     }
 }

@@ -25,7 +25,6 @@ public class FileAnnotation {
     private final String content;
     private final FileAnnotationType annotationType;
     private final Optional<FileAnnotation> linkedFileAnnotation;
-    private final Optional<AnnotationArea> area;
 
     /// A flexible constructor, mainly used as dummy if there is actually no annotation.
     ///
@@ -36,30 +35,22 @@ public class FileAnnotation {
     /// @param annotationType the type of the annotation
     public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
                           final String content, final FileAnnotationType annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
-        this(author, timeModified, pageNumber, content, annotationType, linkedFileAnnotation, Optional.empty());
-    }
-
-    public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
-                          final String content, final FileAnnotationType annotationType,
-                          final Optional<FileAnnotation> linkedFileAnnotation, final Optional<AnnotationArea> area) {
         this.author = author;
         this.timeModified = timeModified;
         this.page = pageNumber;
         this.content = parseContent(content);
         this.annotationType = annotationType;
         this.linkedFileAnnotation = linkedFileAnnotation;
-        this.area = area;
     }
 
     /// Creating a normal FileAnnotation from a PDAnnotation.
     ///
     /// @param annotation The actual annotation that holds the information
     /// @param pageNumber The page of the pdf where the annotation occurs
-    /// @param area       Where the annotation sits on that page
-    public FileAnnotation(final PDAnnotation annotation, final int pageNumber, final Optional<AnnotationArea> area) {
+    public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
         this(annotation.getCOSObject().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.empty(), area);
+                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.empty());
     }
 
     /// For creating a FileAnnotation that has a connection to another FileAnnotation. Needed when creating a text
@@ -67,12 +58,10 @@ public class FileAnnotation {
     ///
     /// @param annotation           The actual annotation that holds the information
     /// @param pageNumber           The page of the pdf where the annotation occurs
-    /// @param area                 Where the annotation sits on that page
     /// @param linkedFileAnnotation The corresponding note of a marked text area.
-    public FileAnnotation(final PDAnnotation annotation, final int pageNumber, final Optional<AnnotationArea> area,
-                          FileAnnotation linkedFileAnnotation) {
+    public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
         this(annotation.getCOSObject().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.of(linkedFileAnnotation), area);
+                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.of(linkedFileAnnotation));
     }
 
     /// Parses a String into a LocalDateTime.
@@ -168,10 +157,6 @@ public class FileAnnotation {
 
     public FileAnnotationType getAnnotationType() {
         return annotationType;
-    }
-
-    public Optional<AnnotationArea> getArea() {
-        return area;
     }
 
     public boolean hasLinkedAnnotation() {

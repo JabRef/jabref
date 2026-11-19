@@ -53,7 +53,6 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         Node headerGraphic = IconTheme.JabRefIcons.FILE.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked files")));
         this.setGraphic(headerGraphic);
-        MainTableColumnFactory.bindExactWidth(this, headerGraphic);
 
         new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                 .withGraphic(this::createFileIcon)
@@ -89,11 +88,9 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
         setCommonSettings();
 
-        Node headerGraphic = ExternalFileTypes.getExternalFileTypeByName(fileType, preferences.getExternalApplicationsPreferences())
-                                              .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
-                                              .getGraphicNode();
-        this.setGraphic(headerGraphic);
-        MainTableColumnFactory.bindExactWidth(this, headerGraphic);
+        this.setGraphic(ExternalFileTypes.getExternalFileTypeByName(fileType, preferences.getExternalApplicationsPreferences())
+                                         .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
+                                         .getGraphicNode());
 
         new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                 .withGraphic((entry, linkedFiles) -> createFileIcon(entry, linkedFiles.stream()

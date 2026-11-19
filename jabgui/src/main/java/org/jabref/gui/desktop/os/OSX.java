@@ -2,50 +2,55 @@ package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
-import javafx.application.HostServices;
-
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.clipboard.ClipBoardManager;
-import org.jabref.gui.preferences.GuiPreferences;
-
-import org.jspecify.annotations.NullMarked;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 
 /// This class contains macOS (OSX) specific implementations for file directories and file/application open handling methods.
 ///
 /// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the [JabKit#initLogging].
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration/
-@NullMarked
+@AllowedToUseAwt("Requires AWT to open a file")
 public class OSX extends NativeDesktop {
 
-    public OSX(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
-        super(hostServices, preferences, clipBoardManager);
+    @Override
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
+        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
+            openFileWithApplication(filePath, type.get().getOpenWithApplication());
+        } else {
+            String[] cmd = {"/usr/bin/open", filePath};
+            Runtime.getRuntime().exec(cmd);
+        }
     }
 
     @Override
-    protected void openFileWithDefaultApplication(String filePath) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", filePath));
+    public void openUrlWithSystemHandler(String url) throws IOException {
+        new ProcessBuilder("/usr/bin/open", url).start();
     }
 
     @Override
-    protected void openUrlWithSystemHandler(String url) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", url));
+    public void openFileWithApplication(String filePath, String application) throws IOException {
+        // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
+        String[] cmd = (application != null) && !application.isEmpty() ? new String[] {"/usr/bin/open", "-a",
+                application, filePath} : new String[] {"/usr/bin/open", filePath};
+        new ProcessBuilder(cmd).start();
     }
 
     @Override
-    protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", "-a", application, filePath));
+    public void openFolderAndSelectFile(Path file) throws IOException {
+        String[] cmd = {"/usr/bin/open", "-R", file.toString()};
+        Runtime.getRuntime().exec(cmd);
     }
 
     @Override
-    protected void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", "-R", file.toString()));
-    }
-
-    @Override
-    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        startProcess(new ProcessBuilder("open", "-a", "Terminal", absolutePath));
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
+        new ProcessBuilder("open", "-a", "Terminal", absolutePath).start();
     }
 
     @Override
