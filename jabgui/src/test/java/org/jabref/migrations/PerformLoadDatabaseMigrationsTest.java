@@ -50,13 +50,17 @@ import static org.mockito.Mockito.when;
 @ResourceLock("Localization.lang")
 class PerformLoadDatabaseMigrationsTest {
 
+    private static List<PostOpenMigration> allMigrations(Character keywordSeparator) {
+        return List.of(new ConvertLegacyExplicitGroups(), new ConvertMarkingToGroups(keywordSeparator), new SpecialFieldsToSeparateFields(keywordSeparator));
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {1, 10, 11, 1000})
     void migrationBatchesChangesAndRestoresEntryObservation(int entryCount) {
         List<BibEntry> entries = IntStream.range(0, entryCount)
                                           .mapToObj(index -> new BibEntry().withCitationKey("Entry" + index)
                                                                            .withField(InternalField.MARKED_INTERNAL, "[Owner:6]")
-                                                                           .withField(StandardField.KEYWORDS, "topic, printed"))
+                                                                           .withField(StandardField.KEYWORDS, "topic, prio1"))
                                           .toList();
         ParserResult result = new ParserResult(entries);
         ObservableList<BibEntry> observedEntries = result.getDatabase().getEntries();
@@ -69,13 +73,13 @@ class PerformLoadDatabaseMigrationsTest {
             }
         });
 
-        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, ',');
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, allMigrations(','));
 
         assertEquals(List.of(), updateSizes);
         assertEquals(entries, result.getDatabase().getEntries());
         assertSame(entries.getFirst(), result.getDatabase().getEntries().getFirst());
         assertEquals(Optional.of("Owner:6"), entries.getFirst().getField(StandardField.GROUPS));
-        assertEquals(Optional.of("printed"), entries.getLast().getField(SpecialField.PRINTED));
+        assertEquals(Optional.of("prio1"), entries.getLast().getField(SpecialField.PRIORITY));
         assertTrue(result.getChangedOnMigration());
 
         entries.getFirst().setField(StandardField.TITLE, "Changed after migration");
@@ -93,7 +97,7 @@ class PerformLoadDatabaseMigrationsTest {
                                        .withField(InternalField.MARKED_INTERNAL, "[Owner:6]");
         ParserResult result = new ParserResult(List.of(parent, child));
 
-        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, ',');
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, allMigrations(','));
 
         assertEquals(Optional.of("Parent"), child.getField(StandardField.CROSSREF));
         assertEquals(Set.of(child), result.getDatabase().getEntriesForCitationKey("Parent"));
@@ -119,7 +123,7 @@ class PerformLoadDatabaseMigrationsTest {
             }
         });
 
-        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, ',');
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, allMigrations(','));
 
         Reference.reachabilityFence(observedEntries);
         assertEquals(List.of(), changes);
@@ -144,7 +148,7 @@ class PerformLoadDatabaseMigrationsTest {
         root.addSubgroup(legacyGroup);
         result.getMetaData().setGroups(root);
 
-        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, ';');
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, allMigrations(';'));
 
         StringWriter saved = new StringWriter();
         new BibDatabaseWriter(new BibWriter(saved, "\n"),
@@ -156,7 +160,7 @@ class PerformLoadDatabaseMigrationsTest {
         when(preferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult reopened = new BibtexParser(preferences).parse(Reader.of(saved.toString()));
 
-        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(reopened, reopened.getDatabaseContext().getKeywordSeparator(','));
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(reopened, allMigrations(reopened.getDatabaseContext().getKeywordSeparator(',')));
 
         assertFalse(reopened.getChangedOnMigration());
         assertEquals(Optional.of(';'), reopened.getMetaData().getKeywordSeparator());
