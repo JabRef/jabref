@@ -102,6 +102,10 @@ public class XmpUtilReader {
             BibEntry first = result.getFirst();
             switch (BibEntryCompare.compareEntries(first, entry)) {
                 case SUBSET -> {
+                    // The document information has no explicit type unless it stores `bibtex/entrytype`; keep the Dublin Core type then
+                    if (entry.getType().equals(BibEntry.DEFAULT_TYPE)) {
+                        entry.setType(first.getType());
+                    }
                     result.removeFirst();
                     result.addFirst(entry);
                 }
