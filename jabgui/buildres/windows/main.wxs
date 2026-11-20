@@ -147,6 +147,15 @@
         <RegistryKey Root="HKMU" Key="Software\Microsoft\Edge\NativeMessagingHosts\org.jabref.jabref" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
           <RegistryValue Type="string" Value="[INSTALLDIR]jabref-chrome.json"/>
         </RegistryKey>
+        <RegistryKey Root="HKMU" Key="SOFTWARE\Mozilla\NativeMessagingHosts\jabext_bridge" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Value="[INSTALLDIR]jabext-firefox.json"/>
+        </RegistryKey>
+        <RegistryKey Root="HKMU" Key="Software\Google\Chrome\NativeMessagingHosts\jabext_bridge" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Value="[INSTALLDIR]jabext-chrome.json"/>
+        </RegistryKey>
+        <RegistryKey Root="HKMU" Key="Software\Microsoft\Edge\NativeMessagingHosts\jabext_bridge" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
+          <RegistryValue Type="string" Value="[INSTALLDIR]jabext-chrome.json"/>
+        </RegistryKey>
         <RegistryKey Root="HKMU" Key="Software\Google\Chrome\Extensions\bifehkofibaamoeaopjglfkddgkijdlh" Action="createAndRemoveOnUninstall" ForceCreateOnInstall="yes">
           <RegistryValue Type="string" Name="update_url" Value="https://clients2.google.com/service/update2/crx" />
         </RegistryKey>

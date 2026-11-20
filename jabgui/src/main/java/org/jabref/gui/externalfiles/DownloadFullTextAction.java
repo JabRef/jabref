@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -16,6 +17,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.externalfiles.LocalFulltextAttacher;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -190,7 +192,15 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// @param result          the fetcher result containing the URL and any required download headers
     /// @param entry           the entry "value"
     void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry, Optional<String> brokenPdfLink) {
-        LinkedFile newLinkedFile = new LinkedFile(result.source(), "");
+        URL source = result.source();
+        // A file: URL points at a PDF already on disk; attach it locally so it runs through the
+        // same move-and-rename pipeline as an HTTP download. Online URLs use the download path below.
+        if ("file".equalsIgnoreCase(source.getProtocol())) {
+            LocalFulltextAttacher.attach(source, entry, databaseContext, preferences.getFilePreferences(), taskExecutor, dialogService);
+            return;
+        }
+
+        LinkedFile newLinkedFile = new LinkedFile(source, "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
