@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
@@ -37,28 +38,39 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final String unwantedCharacters;
     private final Character keywordSeparator;
+    private final Set<String> reservedCitationKeys;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this(bibDatabaseContext, citationKeyPatternPreferences, Set.of());
+    }
+
+    /// Creates a generator with an immutable snapshot of citation keys reserved by an import batch.
+    public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext,
+                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                Set<String> reservedCitationKeys) {
         this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
                 citationKeyPatternPreferences,
-                bibDatabaseContext.getKeywordSeparator(citationKeyPatternPreferences.getKeywordSeparator()));
+                bibDatabaseContext.getKeywordSeparator(citationKeyPatternPreferences.getKeywordSeparator()),
+                reservedCitationKeys);
     }
 
     public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,
                                 @NonNull BibDatabase database,
                                 @NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this(citeKeyPattern, database, citationKeyPatternPreferences, citationKeyPatternPreferences.getKeywordSeparator());
+        this(citeKeyPattern, database, citationKeyPatternPreferences, citationKeyPatternPreferences.getKeywordSeparator(), Set.of());
     }
 
     private CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern,
                                  BibDatabase database,
                                  CitationKeyPatternPreferences citationKeyPatternPreferences,
-                                 Character keywordSeparator) {
+                                 Character keywordSeparator,
+                                 Set<String> reservedCitationKeys) {
         this.citeKeyPattern = citeKeyPattern;
         this.database = database;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.keywordSeparator = keywordSeparator;
+        this.reservedCitationKeys = Set.copyOf(reservedCitationKeys);
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
@@ -169,16 +181,17 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// @param oldKey the old key
     /// @return a key, if needed, with an appended letter
     private String appendLettersToKey(String key, String oldKey) {
-        long occurrences = database.getNumberOfCitationKeyOccurrences(key);
+        String collisionKey = getCollisionKey(key);
+        long occurrences = database.getNumberOfCitationKeyOccurrences(collisionKey);
 
-        if ((occurrences > 0) && Objects.equals(oldKey, key)) {
+        if ((occurrences > 0) && Objects.equals(oldKey, collisionKey)) {
             occurrences--; // No change, so we can accept one dupe.
         }
 
         boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix()
                 == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
 
-        if (alwaysAddLetter || occurrences != 0) {
+        if (alwaysAddLetter || occurrences != 0 || reservedCitationKeys.contains(collisionKey)) {
             // The key is already in use, so we must modify it.
             boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
                     == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
@@ -192,16 +205,26 @@ public class CitationKeyGenerator extends BracketedPattern {
                 moddedKey = key + getAppendix(number);
                 number++;
 
-                occurrences = database.getNumberOfCitationKeyOccurrences(moddedKey);
+                collisionKey = getCollisionKey(moddedKey);
+                occurrences = database.getNumberOfCitationKeyOccurrences(collisionKey);
                 // only happens if #getAddition() is buggy
-                if (Objects.equals(oldKey, moddedKey)) {
+                if (Objects.equals(oldKey, collisionKey)) {
                     occurrences--;
                 }
-            } while (occurrences > 0);
+            } while (occurrences > 0 || reservedCitationKeys.contains(collisionKey));
 
             key = moddedKey;
         }
         return key;
+    }
+
+    // [impl->req~import.libreoffice.unambiguous-keys~1]
+    private String getCollisionKey(String key) {
+        // Preserve legacy collision checks for callers that do not reserve import keys.
+        if (reservedCitationKeys.isEmpty()) {
+            return key;
+        }
+        return transliterateIfNeeded(cleanKey(key, unwantedCharacters));
     }
 
     public String transliterateIfNeeded(String key) {

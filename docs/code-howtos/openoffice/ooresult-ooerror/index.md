@@ -5,6 +5,10 @@ grand_parent: Code Howtos
 ---
 # About OOError, OOResult, and OOVoidResult
 
+This page records the earlier error-handling design; its examples are historical, not the current citation-engine API.
+The current panel delegates through its `citationController` (`OpenOfficeCitationController`), while engine actions use an action-local `documentCitations` (`DocumentCitations`) facade.
+See the [current overview](../overview.md) for citation-only conversion, normal bibliography synchronization, and the distinction between existing undo contexts and new property undo/rollback.
+
 ## Context
 
 ### Relieve GUI panel code
@@ -17,20 +21,20 @@ Some types of exceptions are caught in _different GUI actions_, often resulting 
 
 Problems found during _precondition checking_ (for example: do we have a connection to a document) and error conditions (for example: lost connection to a document during an action) can overlap.
 
-### OOBibBase as a precondition and exception handling layer
+### OpenOfficeCitationController as a precondition and exception handling layer
 
-Since most of the code originally in `OOBibBase` was moved to `logic` and almost all GUI actions go through `OOBibBase`, it seemed a good location to collect precondition checking and exception handling code.
+Since most of the code originally in `OOBibBase` was moved to `logic` and almost all GUI actions go through `OpenOfficeCitationController`, it seemed a good location to collect precondition checking and exception handling code.
 
 Note: some of the precondition checking still needs to stay in `OpenOfficePanel`: for example to provide a list of selected `BibEntry` instances, it needs to go through some steps from `frame.getCurrentLibraryTab()` to `(!entries.isEmpty() && checkThatEntriesHaveKeys(entries))`
 
-To avoid `OOBibBase` depending on the higher level `OpenOfficePanel` message texts needed in `OOBibBase` were moved from `OpenOfficePanel` to `OOError`. (Others stayed, but could be moved if that seems worthwhile)
+To avoid `OpenOfficeCitationController` depending on the higher level `OpenOfficePanel` message texts needed in `OpenOfficeCitationController` were moved from `OpenOfficePanel` to `OOError`. (Others stayed, but could be moved if that seems worthwhile)
 
 ## OOError
 
 * `OOError` is a collection of data used in error dialogs.
   * It is a `JabRefException` with an added field: `localizedTitle`
   * It can store: a dialog title, a localized message (optionally a non-localized message as well) and a `Throwable`
-  * I used it in `OOBibBase` as a unified format for errors to be shown in an error dialog.
+  * I used it in `OpenOfficeCitationController` as a unified format for errors to be shown in an error dialog.
   * Static constructors in `OOError` provide uniform translation from some exception types to `OOError` with the corresponding localized messages:\
     `public static OOError from(SomeException ex)`\
     There is also `public static OOError fromMisc(Exception ex)` for exception types not handled individually. (It has a different name, to avoid ambiguity)
@@ -44,7 +48,7 @@ Some questions:
   * con: `OOError.setTitle()` currently just sets `this.localizedTitle` and returns `this`. For static instances this would modify a shared resource unless we create a new copy in `setTitle`. However `setTitle` can be called repeatedly on the same object: as we bubble up, we can be more specific about the context.
 * Should we remove title from `OOError`?
   * pro: we almost always override its original value
-  * con: may need to duplicate the title in different files (preconditions for an action in OpenOfficePanel and in OOBibBase)
+  * con: may need to duplicate the title in different files (preconditions for an action in OpenOfficePanel and in OpenOfficeCitationController)
 * Should we include `OOError.showErrorDialog` ?
   * pro: since it was intended _for_ error dialogs, it is nice to provide this.
   * con: the reference to `DialogService` forces it to `gui`, thus it cannot be used in `logic` or `model`
@@ -72,7 +76,7 @@ While concentrating on these and on "do not throw exceptions here" ... using a [
   Methods returning a Result could.
 * `Result` shares the problem (with any other solutions) that in a function several types of errors may occur, but we can only return a single error type. Java solves this using checked exceptions being all descendants of Exception. (Also adds try/catch/catch to select cases based on the exceptions type, and some checking against forgotten cases of checked exception types)
 
-In `OOBibBase` I used `OOError` as the unified error type: it can store error messages and wrap exceptions. It contains everything we need for an error dialog. On the other hand it does not support programmatic dissection.
+In `OpenOfficeCitationController` I used `OOError` as the unified error type: it can store error messages and wrap exceptions. It contains everything we need for an error dialog. On the other hand it does not support programmatic dissection.
 
 ### Implementation
 

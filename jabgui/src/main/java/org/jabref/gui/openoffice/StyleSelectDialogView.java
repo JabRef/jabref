@@ -1,6 +1,8 @@
 package org.jabref.gui.openoffice;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -28,14 +30,11 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
-import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
-import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.preview.BstPreviewLayout;
@@ -150,9 +149,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         setupBstStylesTab();
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences(journalAbbreviationRepository).getCurrentStyle();
-        if (currentStyle instanceof CitationStyle) {
+        if (CSLStyleLoader.getStyles().stream().anyMatch(style -> style.equals(currentStyle))) {
             tabPane.getSelectionModel().select(cslStyleTab);
-        } else if (currentStyle instanceof BstStyle) {
+        } else if (bstStyleLoader.getStyles().stream().anyMatch(style -> style.equals(currentStyle))) {
             tabPane.getSelectionModel().select(bstStyleTab);
         } else {
             tabPane.getSelectionModel().select(jStyleTab);
@@ -173,22 +172,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslPathColumn.setCellValueFactory(cellData -> cellData.getValue().pathProperty());
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
-                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
-                    if (internalStyle) {
-                        return;
-                    }
-
-                    event.consume();
-
-                    if (event.getButton() != MouseButton.PRIMARY) {
-                        return;
-                    }
-
-                    viewModel.deleteCslStyle(style.getLayout().citationStyle());
-                })
-                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
+        createDeleteCellFactory((CSLStyleSelectViewModel style) -> viewModel.deleteCslStyle(style.getLayout().citationStyle()))
                 .install(cslDeleteColumn);
 
         new ViewModelTableRowFactory<CSLStyleSelectViewModel>()
@@ -234,10 +218,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         jStyleFileColumn.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         jStyleDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        new ValueTableCellFactory<JStyleSelectViewModel, Boolean>()
-                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(_ -> _ -> viewModel.deleteJStyle())
-                .withTooltip(_ -> Localization.lang("Remove style"))
+        createDeleteCellFactory((JStyleSelectViewModel style) -> viewModel.deleteJStyle(style.getJStyle()))
                 .install(jStyleDeleteColumn);
 
         edit.setOnAction(_ -> viewModel.editJStyle());
@@ -254,13 +235,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .withContextMenu(_ -> createContextMenu())
                 .install(jStylesTable);
 
-        jStylesTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
-            if (newValue == null) {
-                viewModel.selectedJStyleProperty().setValue(oldValue);
-            } else {
-                viewModel.selectedJStyleProperty().setValue(newValue);
-            }
-        });
+        jStylesTable.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) ->
+                Optional.ofNullable(newValue).ifPresent(viewModel.selectedJStyleProperty()::setValue));
 
         jStylesTable.setItems(viewModel.jStylesProperty());
 
@@ -273,13 +249,27 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
         jStylePreviewBox.getChildren().add(previewBook);
 
-        EasyBind.subscribe(viewModel.selectedJStyleProperty(), style -> {
-            if (viewModel.getSelectedStyle() instanceof JStyle) {
-                jStylesTable.getSelectionModel().select(style);
-                previewArticle.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Article)));
-                previewBook.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Book)));
-            }
-        });
+        EasyBind.subscribe(viewModel.selectedJStyleProperty(), style -> Optional.ofNullable(style).ifPresentOrElse(selected -> {
+            jStylesTable.getSelectionModel().select(selected);
+            previewArticle.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Article)));
+            previewBook.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Book)));
+        }, () -> jStylesTable.getSelectionModel().clearSelection()));
+    }
+
+    private <T> ValueTableCellFactory<T, Boolean> createDeleteCellFactory(Consumer<T> deleteStyle) {
+        return new ValueTableCellFactory<T, Boolean>()
+                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
+                    if (internalStyle) {
+                        return;
+                    }
+                    event.consume();
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        deleteStyle.accept(style);
+                        updateCurrentStyleLabel();
+                    }
+                })
+                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"));
     }
 
     private PreviewViewer initializePreviewViewer(BibEntry entry) {
@@ -348,20 +338,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         bstFileColumn.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         bstDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        new ValueTableCellFactory<BstStyleSelectViewModel, Boolean>()
-                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
-                    if (internalStyle) {
-                        return;
-                    }
-                    event.consume();
-                    if (event.getButton() != MouseButton.PRIMARY) {
-                        return;
-                    }
-                    viewModel.deleteBstStyle(style.getBstStyle());
-                    bstStylesTable.getItems().remove(style);
-                })
-                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
+        createDeleteCellFactory((BstStyleSelectViewModel style) -> viewModel.deleteBstStyle(style.getBstStyle()))
                 .install(bstDeleteColumn);
 
         new ViewModelTableRowFactory<BstStyleSelectViewModel>()
@@ -388,11 +365,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         PreviewViewer bstPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
         bstPreviewBox.getChildren().add(bstPreviewViewer);
 
-        EasyBind.subscribe(viewModel.selectedBstStyleProperty(), vm -> {
-            if (vm != null) {
-                bstPreviewViewer.setLayout(BstPreviewLayout.of(vm.getBstStyle()));
-            }
-        });
+        EasyBind.subscribe(viewModel.selectedBstStyleProperty(), style -> Optional.ofNullable(style).ifPresentOrElse(selected -> {
+            bstStylesTable.getSelectionModel().select(selected);
+            bstPreviewViewer.setLayout(BstPreviewLayout.of(selected.getBstStyle()));
+        }, () -> bstStylesTable.getSelectionModel().clearSelection()));
 
         // Select the first style if nothing is selected yet (so preview is not blank on open)
         if (viewModel.selectedBstStyleProperty().get() == null && !bstStylesTable.getItems().isEmpty()) {
@@ -446,23 +422,20 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         }
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences(journalAbbreviationRepository).getCurrentStyle();
-        if (currentStyle instanceof CitationStyle currentCitationStyle) {
-            for (int i = 0; i < cslStylesTable.getItems().size(); i++) {
-                CSLStyleSelectViewModel item = cslStylesTable.getItems().get(i);
-                if (item.getLayout().getFilePath().equals(currentCitationStyle.getFilePath())) {
-                    cslStylesTable.scrollTo(i);
-                    cslStylesTable.getSelectionModel().select(i);
-                    break;
-                }
+        for (int i = 0; i < cslStylesTable.getItems().size(); i++) {
+            CSLStyleSelectViewModel item = cslStylesTable.getItems().get(i);
+            if (item.getLayout().citationStyle().equals(currentStyle)) {
+                cslStylesTable.scrollTo(i);
+                cslStylesTable.getSelectionModel().select(i);
+                return;
             }
-        } else if (currentStyle instanceof BstStyle currentBstStyle) {
-            for (int i = 0; i < bstStylesTable.getItems().size(); i++) {
-                BstStyleSelectViewModel item = bstStylesTable.getItems().get(i);
-                if (item.getStylePath().equals(currentBstStyle.getPath())) {
-                    bstStylesTable.scrollTo(i);
-                    bstStylesTable.getSelectionModel().select(i);
-                    break;
-                }
+        }
+        for (int i = 0; i < bstStylesTable.getItems().size(); i++) {
+            BstStyleSelectViewModel item = bstStylesTable.getItems().get(i);
+            if (item.getBstStyle().equals(currentStyle)) {
+                bstStylesTable.scrollTo(i);
+                bstStylesTable.getSelectionModel().select(i);
+                return;
             }
         }
     }

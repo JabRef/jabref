@@ -10,7 +10,7 @@ parent: Decision Records
 JabRef's [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration) supports [CSL styles](https://citationstyles.org/) and [JStyles](https://jstyles.jabref.org/), but not [BST](https://text2bib.org/bsts) (BibTeX style) files, although many publishers still distribute only `.bst`.
 Initial BST support existed in the OpenOffice panel but was removed as unfinished ([#602](https://github.com/JabRef/jabref/pull/602), tracked in [#624](https://github.com/JabRef/jabref/issues/624)); the [stated blocker](https://github.com/JabRef/jabref/pull/602#issuecomment-167756642) was that `.bst` files such as `IEEEtran.bst` emit "quite a bit of non-trivial latex code to parse".
 
-Supporting BST in LibreOffice documents is the goal. The open question is: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
+Supporting BST in LibreOffice documents is the goal. The open question is: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextWriter` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
 **How do we convert BST's LaTeX output into `OOText`?**
 
 Every option below produces BST-styled citations in a LibreOffice document. They differ only in who parses the LaTeX and what formatting survives.
@@ -21,7 +21,7 @@ Every option below produces BST-styled citations in a LibreOffice document. They
 * Preservation of semantic formatting (italics, bold, small caps) rather than flattening to plain text
 * Long-term maintenance burden of any LaTeX parser JabRef would own
 * Dependency footprint and portability across Windows, macOS, and Linux
-* Reuse of existing, reviewed JabRef code (`CSLFormatUtils.transformHTML`, `OOTextIntoOO`, the numbering logic in `CSLReferenceMarkManager`)
+* Reuse of existing, reviewed JabRef code (`CSLFormatUtils.transformHTML`, `OOTextWriter`, and the numbering logic then in `CSLReferenceMarkManager`)
 * The feature has stalled twice; a credible answer to the known blocker is required
 
 ## Considered Options
@@ -103,7 +103,7 @@ A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `
 
 ### Hybrid: Pandoc primary with SnuggleTeX-based pure-Java fallback
 
-Description: keep Pandoc as the primary converter; when it is not available, fall back to a limited, in-process path leveraging SnuggleTeX-backed LaTeX→Unicode and preview-style transforms for inline emphasis/quotes. The fallback would map only the subset supported by `OOTextIntoOO` and document reduced fidelity.
+Description: keep Pandoc as the primary converter; when it is not available, fall back to a limited, in-process path leveraging SnuggleTeX-backed LaTeX→Unicode and preview-style transforms for inline emphasis/quotes. The fallback would map only the subset supported by `OOTextWriter` and document reduced fidelity.
 
 * Good, because BST bibliography would work without installing Pandoc (lower barrier)
 * Good, because it is fully in-process and reuses existing JabRef code (preview transforms, `LatexToUnicodeAdapter`)
@@ -113,9 +113,17 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 
 ## More Information
 
-The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `BSTFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
-`BSTFormatUtils` will be an analogue of the existing `CSLStyleUtils`, with it dealing with conversion of pandoc-flavored HTML to OO-flavored HTML.
-Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL. An analogous `BSTReferenceMarkManager` is to be implemented to support appearance-first as well as `.bst`-style defined bibliography ordering.
+### Current implementation
+
+The conversion decision remains in use within the shared citation engine described in [ADR-0084](0084-canonical-writer-citations.md).
+`BstRenderer` resolves the whole cited set through `CitationKeyResolution` and executes `BstVM.render` for that set.
+`BstCitationFormatter.parseBibliography` separates bibliography keys, optional labels, and LaTeX entry bodies.
+Requested bibliography bodies pass through one batched `PandocLatexConverter.latexToHtml` call, then `BSTFormatUtils.convertPandocHtmlToOOText`, before becoming `OOText` in a `RenderResult`.
+`CitationMarkerWriter` and `OOTextWriter` apply prepared output during the engine's write phase, not while rendering.
+
+The original implementation reused numbering from `CSLReferenceMarkManager` and proposed an analogous `BSTReferenceMarkManager`.
+Those managers are no longer active classes: `BstRenderer` derives numbering from the resolved cited set and BST bibliography order through `CitationNumbering.bibliographyOrder`.
+The current [package layout and ownership guide](../code-howtos/openoffice/code-reorganization.md) identifies the rendering, storage, and Writer infrastructure boundaries.
 
 The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
 
@@ -136,8 +144,9 @@ Everything in the LaTeX -> HTML step - brace nesting, ligatures, quote forms, ti
 Changing `BstVM` to emit HTML instead of LaTeX was examined and is not viable: the markup originates in string literals inside the `.bst` programs themselves, which the virtual machine only concatenates, so there is nothing at the VM level to reinterpret. It is therefore not listed as an option.
 
 `.bst` files define only the rendering of the bibliography, not the in-text citation format - in LaTeX that responsibility belongs to packages such as `natbib`, not to the style file.
-JabRef therefore supplies the citation format itself, offering two fixed choices, numeric and author-year, analogous to the default JStyles.
-This is orthogonal to the decision recorded here: the conversion problem concerns the bibliography entries, and the same Pandoc pipeline serves both citation formats.
+The original implementation therefore supplied two fixed citation formats, numeric and author-year, analogous to the default JStyles.
+The current `BstRenderer` also supports style-defined citations using optional labels extracted from bibliography output by `BstCitationFormatter`.
+This is orthogonal to the decision recorded here: the Pandoc conversion problem concerns bibliography entry bodies, not the selection of citation-marker format.
 
 Related issues: [#624](https://github.com/JabRef/jabref/issues/624), [#11102](https://github.com/JabRef/jabref/issues/11102), [#602](https://github.com/JabRef/jabref/pull/602).
 Pandoc was first suggested for this purpose in [#624](https://github.com/JabRef/jabref/issues/624).

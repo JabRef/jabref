@@ -2,7 +2,11 @@
 parent: The LibreOffice Panel
 grand_parent: Code Howtos
 ---
-# Alternatives to using OOResult and OOVoidResult in OOBibBase
+# Alternatives to using OOResult and OOVoidResult in OpenOfficeCitationController
+
+The alternatives and code sketches below are historical, not current implementation instructions.
+Current GUI and core facade instances are named `citationController` and `documentCitations`; the latter has type `DocumentCitations`, formerly `CitationDocument` in these sketches.
+See the [current overview](../overview.md) for active APIs; the historical examples and evidence links below are retained.
 
 (Talk about ADRs prompted me to think about alternatives to what I used.)
 
@@ -429,11 +433,11 @@ if (testDialog(title,
 }
 XTextDocument doc = odoc.get();
 
-OOResult<OOFrontend, OOError> ofr = getFrontend(doc);
+OOResult<CitationDocument, OOError> ofr = getFrontend(doc);
 if (testDialog(title, ofr)) {
     return;
 }
-OOFrontend fr = ofr.get();
+CitationDocument fr = ofr.get();
 
 OOResult<XTextCursor, OOError> cursor = getUserCursorForTextInsertion(doc);
 if (testDialog(title, cursor)) {
@@ -451,7 +455,7 @@ try {
   XTextDocument doc = getXTextDocument();
   styleIsRequired(style);
   selectedBibEntryIsRequired(entries, OOError::noEntriesSelectedForCitation);
-  OOFrontend fr = getFrontend(doc);
+  CitationDocument fr = getFrontend(doc);
   XTextCursor cursor = getUserCursorForTextInsertion(doc);
   ...
 } catch (PreconditionException ex) {

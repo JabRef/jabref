@@ -1,9 +1,25 @@
 ---
 nav_order: 68
 parent: Decision Records
+status: partially superseded by ADR-0084
 ---
 
 # Use a Preference to Handle Zotero Reference Marks
+
+[ADR-0084](0084-canonical-writer-citations.md) replaces the legacy JabRef mark encoding described below, not the explicit Zotero compatibility preference or the next-insertion conversion policy.
+The decision below is a historical record; its `CID_n` encoding is no longer supported.
+
+In the current integration, a format mismatch triggers conversion only on the next CSL citation insertion, after the existing "Reference mark format" / "Converting references to selected format" warning.
+Toggling the preference, opening a document, selecting a style, refreshing, or exporting cited entries does not trigger conversion.
+Conversion is limited to current canonical JabRef marks ↔ supported native Zotero marks; neither `JR_cite*` nor `CID_n` legacy marks are migrated.
+The independent document-action framework preserves the old trigger, warning, and native modifier compatibility.
+Native citation locators, labels, prefixes, suffixes, author-only items, and mixed per-item author suppression do not by themselves block conversion, insertion, or refresh.
+Any item with `suppress-author: true` selects the group's existing in-text citation type, including mixed groups.
+The citation sidecar retains native modifier JSON for restoration on conversion back, without adding locator, affix, or author-only rendering support.
+Conversion changes citation marks only, not bibliographies.
+With synchronization disabled, all bibliography section names, text, and properties stay unchanged; with synchronization enabled, normal updates affect only the target mode's managed bibliography, leaving other-format sections alone.
+No bibliography renaming, consolidation, sidecar, or rejection based on bibliography settings is part of citation conversion.
+See [ADR-0084's conversion policy](0084-canonical-writer-citations.md) for citation metadata preservation, the root-undo requirement, rollback limits, and the possible loss of pre-existing redo history.
 
 ## Context and Problem Statement
 
