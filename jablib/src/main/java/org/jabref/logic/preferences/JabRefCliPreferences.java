@@ -470,6 +470,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String IMPORTER_WORKING_DIRECTORY = "importWorkingDirectory";
     private static final String IMPORTER_WARN_ABOUT_DUPLICATES = "warnAboutDuplicatesInInspection";
     private static final String IMPORTER_CUSTOM_FORMAT = "customImportFormat";
+    private static final String FETCHER_CUSTOM_KEY_BUNDLE_NAMES = "fetcherCustomKeyBundleNames";
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
     private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
@@ -540,6 +541,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// See [ADR 0081](https://devdocs.jabref.org/decisions/0081-store-keyring-secrets-without-application-encryption.html) for why no extra encryption is used.
     private record KeyringSlot(String service, String account, String legacyService) {
         // [impl->adr~keyring.no-application-encryption~1]
+        static final KeyringSlot CUSTOM_API_KEYS = new KeyringSlot("org.jabref.apikeys.bundle", "keys", "org.jabref.apikeys.bundle");
         static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref.proxy", "proxy", "org.jabref");
         static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref.github", "github", "org.jabref");
 
@@ -1026,6 +1028,9 @@ public class JabRefCliPreferences implements CliPreferences {
         try {
             return keyring.getPassword(slot.service(), slot.account());
         } catch (PasswordAccessException _) {
+            if (slot.equals(KeyringSlot.CUSTOM_API_KEYS)) {
+                return "";
+            }
             return migrateLegacySecret(keyring, slot);
         }
     }
@@ -1079,24 +1084,32 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Writes (or, for a blank secret, clears) a single slot.
-    private void writeKeyring(KeyringSlot slot, String secret) {
+    private boolean writeKeyring(KeyringSlot slot, String secret) {
         Map<KeyringSlot, String> single = new HashMap<>();
         single.put(slot, secret);
-        writeKeyring(single);
+        return writeKeyring(single);
     }
 
     /// Writes each secret as plain text to its slot in a single keyring session. A blank secret clears its slot.
     /// In both cases, a legacy encrypted value of the slot is removed, so that it cannot be migrated later.
-    private void writeKeyring(Map<KeyringSlot, String> secrets) {
+    private boolean writeKeyring(Map<KeyringSlot, String> secrets) {
         if (resettingIsolatedNode) {
-            return;
+            return false;
         }
         // [impl->req~keyring.plain-text-storage~1]
         // [impl->req~keyring.legacy-migration~1]
         try (Keyring keyring = Keyring.create()) {
             for (Map.Entry<KeyringSlot, String> entry : secrets.entrySet()) {
                 KeyringSlot slot = entry.getKey();
-                if (StringUtil.isNotBlank(entry.getValue())) {
+                if (slot.equals(KeyringSlot.CUSTOM_API_KEYS)) {
+                    if (StringUtil.isNotBlank(entry.getValue())) {
+                        keyring.setPassword(slot.service(), slot.account(), entry.getValue());
+                    } else {
+                        if (!deleteFromKeyring(keyring, slot.service(), slot.account())) {
+                            return false;
+                        }
+                    }
+                } else if (StringUtil.isNotBlank(entry.getValue())) {
                     keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
                     deleteFromKeyring(keyring, slot.legacyService(), slot.account());
                 } else {
@@ -1109,7 +1122,9 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         } catch (Exception ex) {
             LOGGER.warn("Could not open keyring", ex);
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -2676,6 +2691,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindSet(importerPreferences.getApiKeys(), FETCHER_CUSTOM_KEY_NAMES, defaultValues.getApiKeys(),
                 _ -> storeFetcherKeys(importerPreferences),
                 () -> getFetcherKeys(defaultValues.getApiKeys()));
+        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (_, _, _) -> storeFetcherKeys(importerPreferences));
         bindSet(importerPreferences.getCustomImporters(), IMPORTER_CUSTOM_FORMAT, defaultValues.getCustomImporters(),
                 this::storeCustomImportFormats,
                 () -> getCustomImportFormats(defaultValues.getCustomImporters()));
@@ -2733,61 +2749,127 @@ public class JabRefCliPreferences implements CliPreferences {
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
-        List<String> keys = getFetcherKeysFromKeyring(names);
-
-        if (names.size() != uses.size() || names.size() != keys.size()) {
+        if (names.size() != uses.size()) {
             LOGGER.warn("Could not load fetcher keys from preferences. Will ignore.");
             return defaults;
         }
-
+        Map<String, String> defaultKeys = defaults.stream().collect(Collectors.toMap(FetcherApiKey::name, FetcherApiKey::key));
+        Map<String, String> keys = getBoolean(FETCHER_CUSTOM_KEY_PERSIST, false)
+                                   ? getFetcherKeysFromKeyring(names) : Map.of();
         for (int i = 0; i < names.size(); i++) {
-            fetcherApiKeys.add(new FetcherApiKey(
-                    names.get(i),
-                    (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
-                    i < keys.size() ? keys.get(i) : ""));
+            String name = names.get(i);
+            fetcherApiKeys.add(new FetcherApiKey(name, Boolean.parseBoolean(uses.get(i)),
+                    keys.getOrDefault(name, defaultKeys.getOrDefault(name, ""))));
         }
-
         return fetcherApiKeys;
     }
 
-    /// Reads the stored API keys aligned to `names` order ("" where a key is absent), or an empty list if the
-    /// keyring is unavailable, so the caller falls back to default keys on a size mismatch.
-    private List<String> getFetcherKeysFromKeyring(List<String> names) {
+    private Map<String, String> getFetcherKeysFromKeyring(List<String> names) {
+        // [impl->req~keyring.api-key-bundle~1]
+        // [impl->adr~bundle-custom-api-keys~1]
+        // The metadata distinguishes an empty store from an installation that still needs migration.
+        if (names.isEmpty() || (hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES) && getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty())) {
+            return Map.of();
+        }
+        Map<KeyringSlot, String> bundle = readKeyring(List.of(KeyringSlot.CUSTOM_API_KEYS));
+        if (bundle.isEmpty()) {
+            return Map.of();
+        }
+        String json = bundle.get(KeyringSlot.CUSTOM_API_KEYS);
+        if (StringUtil.isNotBlank(json)) {
+            return parseFetcherKeys(json);
+        }
+        if (hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES)) {
+            return Map.of();
+        }
+
         List<KeyringSlot> slots = names.stream().map(KeyringSlot::customApiKey).toList();
         Map<KeyringSlot, String> stored = readKeyring(slots);
         if (stored.size() != slots.size()) {
-            return List.of();
+            return Map.of();
         }
-        return slots.stream().map(stored::get).toList();
+        Map<String, String> keys = new HashMap<>();
+        stored.forEach((slot, secret) -> {
+            if (StringUtil.isNotBlank(secret)) {
+                keys.put(slot.account(), secret);
+            }
+        });
+        if (storeFetcherKeyBundle(keys)) {
+            clearIndividualFetcherKeys(keys.keySet().stream().toList());
+        }
+        return keys;
     }
 
-    private void storeFetcherKeys(ImporterPreferences defaults) {
+    private Map<String, String> parseFetcherKeys(String json) {
+        try {
+            Object parsed = new JSONParser(JSONParser.MODE_RFC4627).parse(json);
+            if (parsed instanceof Map<?, ?> values && values.entrySet().stream()
+                                                            .allMatch(entry -> entry.getKey() instanceof String && entry.getValue() instanceof String)) {
+                Map<String, String> keys = new HashMap<>();
+                values.forEach((name, secret) -> keys.put((String) name, (String) secret));
+                return keys;
+            }
+            LOGGER.warn("Invalid custom API key bundle");
+        } catch (net.minidev.json.parser.ParseException _) {
+            // Parser exceptions can contain secrets from the input.
+            LOGGER.warn("Could not parse custom API key bundle");
+        }
+        return Map.of();
+    }
+
+    private boolean storeFetcherKeyBundle(Map<String, String> keys) {
+        if (resettingIsolatedNode) {
+            return false;
+        }
+        if (keys.isEmpty() && (!hasKey(FETCHER_CUSTOM_KEY_NAMES)
+                || (hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES) && getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty()))) {
+            putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, List.of());
+            return true;
+        }
+        if (writeKeyring(KeyringSlot.CUSTOM_API_KEYS, keys.isEmpty() ? "" : JSONObject.toJSONString(keys))) {
+            putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, keys.keySet().stream().sorted().toList());
+            return true;
+        }
+        return false;
+    }
+
+    private void storeFetcherKeys(ImporterPreferences preferences) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
-        Map<KeyringSlot, String> keys = new HashMap<>();
-
-        for (FetcherApiKey apiKey : defaults.getApiKeys()) {
+        Map<String, String> keys = new HashMap<>();
+        Map<String, String> defaultKeys = ImporterPreferences.getDefault().getApiKeys().stream()
+                                                             .collect(Collectors.toMap(FetcherApiKey::name, FetcherApiKey::key));
+        for (FetcherApiKey apiKey : preferences.getApiKeys()) {
             names.add(apiKey.name());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.put(KeyringSlot.customApiKey(apiKey.name()), apiKey.key());
+            if (StringUtil.isNotBlank(apiKey.key()) && !apiKey.key().equals(defaultKeys.get(apiKey.name()))) {
+                keys.put(apiKey.name(), apiKey.key().trim());
+            }
         }
-
-        putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
-        putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-
-        if (defaults.shouldPersistCustomKeys()) {
-            writeKeyring(keys);
-        } else {
+        if (preferences.shouldPersistCustomKeys()) {
+            storeFetcherKeyBundle(keys);
+        } else if (hasKey(FETCHER_CUSTOM_KEY_NAMES)) {
             clearCustomFetcherKeys();
         }
+        putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
+        putStringList(FETCHER_CUSTOM_KEY_USES, uses);
     }
 
     private void clearCustomFetcherKeys() {
+        if (!hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES)) {
+            clearIndividualFetcherKeys(getStringList(FETCHER_CUSTOM_KEY_NAMES));
+        }
+        storeFetcherKeyBundle(Map.of());
+    }
+
+    private void clearIndividualFetcherKeys(List<String> names) {
         Map<KeyringSlot, String> cleared = new HashMap<>();
-        for (String name : getStringList(FETCHER_CUSTOM_KEY_NAMES)) {
+        for (String name : names) {
             cleared.put(KeyringSlot.customApiKey(name), "");
         }
-        writeKeyring(cleared);
+        if (!cleared.isEmpty()) {
+            writeKeyring(cleared);
+        }
     }
 
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {

@@ -137,6 +137,10 @@ Further rules:
 * Defaults depending on the user's language must not be localized when the preferences are initialized, because the language may change later. See [ADR-0023](../decisions/0023-localized-preferences.md).
 * Defaults depending on the operating system (e.g., paths, commands) are computed in the preference object, too, e.g., using `org.jabref.logic.os.OS`.
 * Secrets (passwords, API keys, tokens) are not stored in the backing store but in the system keyring.
+  Custom API keys share one JSON object in a single keyring item; `fetcherCustomKeyBundleNames` records only their names in preferences.
+  An empty name list or disabled persistence prevents keyring reads at startup.
+  An absent name list identifies installations that still need migration from separate keyring items.
+  See [ADR 0084](../decisions/0084-bundle-custom-api-keys.md).
 
 ## Adding a new preference
 
