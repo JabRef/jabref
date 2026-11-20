@@ -14,18 +14,15 @@ import static org.mockito.Mockito.when;
 
 @NullMarked
 class OpenLibrarySideEffectTest {
-
     @Test
-    void findsOnlyTheNamedWalkthroughLibrary() {
-        LibraryTab untitledLibrary = mock(LibraryTab.class);
-        when(untitledLibrary.getText()).thenReturn("Untitled library");
-        LibraryTab walkthroughLibrary = mock(LibraryTab.class);
-        when(walkthroughLibrary.getText()).thenReturn("Example Library (Chocolate.bib)");
+    void doesNotFindUserLibraryWithMatchingTitle() {
+        LibraryTab userLibrary = mock(LibraryTab.class);
+        when(userLibrary.getText()).thenReturn("Example Library (Chocolate.bib)");
 
         Optional<LibraryTab> foundLibrary = OpenLibrarySideEffect.findWalkthroughLibraryTab(
-                List.of(untitledLibrary, walkthroughLibrary), null, "Chocolate.bib");
+                List.of(userLibrary), null);
 
-        assertEquals(Optional.of(walkthroughLibrary), foundLibrary);
+        assertEquals(Optional.empty(), foundLibrary);
     }
 
     @Test
@@ -34,7 +31,7 @@ class OpenLibrarySideEffectTest {
         when(createdLibrary.getText()).thenReturn("untitled");
 
         Optional<LibraryTab> foundLibrary = OpenLibrarySideEffect.findWalkthroughLibraryTab(
-                List.of(createdLibrary), createdLibrary, "Chocolate.bib");
+                List.of(createdLibrary), createdLibrary);
 
         assertEquals(Optional.of(createdLibrary), foundLibrary);
     }

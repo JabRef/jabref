@@ -65,4 +65,22 @@ class MetaDataDiffTest {
 
         assertNotEquals(Optional.empty(), MetaDataDiff.compare(one, two));
     }
+
+    @Test
+    void libraryNameDifferenceIsDetected() {
+        MetaData original = new MetaData();
+        MetaData changed = new MetaData();
+        changed.setLibraryName("My library");
+
+        assertNotEquals(Optional.empty(), MetaDataDiff.compare(original, changed));
+    }
+
+    @Test
+    void libraryDescriptionDifferenceIsDetected() {
+        MetaData original = new MetaData();
+        MetaData changed = new MetaData();
+        changed.setLibraryDescription("My library description");
+
+        assertNotEquals(Optional.empty(), MetaDataDiff.compare(original, changed));
+    }
 }

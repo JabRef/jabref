@@ -172,6 +172,22 @@ public class MetaDataParserTest {
     }
 
     @Test
+    void libraryNameAndDescriptionWithBracesRoundTrip() throws ParseException {
+        MetaData original = new MetaData();
+        original.setLibraryName("Draft {v2");
+        original.setLibraryDescription("Notes}; with semicolon");
+
+        GlobalCitationKeyPatterns globalPattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+        Map<String, String> serialized = MetaDataSerializer.getSerializedStringMap(original, globalPattern);
+
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(new MetaData(), serialized, ',', "userAndHost");
+
+        assertEquals(Optional.of("Draft {v2"), parsed.getLibraryName());
+        assertEquals(Optional.of("Notes}; with semicolon"), parsed.getLibraryDescription());
+    }
+
+    @Test
     void parsesWindowsPathsInLatexFileDirectoryCorrectly() throws ParseException {
         String userHost = "user-host";
         String rawKey = "fileDirectoryLatex-" + userHost;

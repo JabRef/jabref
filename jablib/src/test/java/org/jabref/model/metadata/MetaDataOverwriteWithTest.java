@@ -85,6 +85,8 @@ class MetaDataOverwriteWithTest {
         metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of()));
         metaData.setMode(BibDatabaseMode.BIBLATEX);
         metaData.setLibraryAbbreviationType(AbbreviationType.DOTLESS);
+        metaData.setLibraryName("My library");
+        metaData.setLibraryDescription("My library description");
         metaData.setKeywordSeparator(';');
         metaData.addContentSelector(new ContentSelector(StandardField.AUTHOR, "Einstein"));
         metaData.setLibrarySpecificFileDirectory("/tmp/library");

@@ -51,6 +51,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
+    private final StringProperty libraryNameProperty = new SimpleStringProperty("");
+    private final StringProperty libraryDescriptionProperty = new SimpleStringProperty("");
 
     // Prompt texts show where JabRef looks for files while a field is empty. They are never stored in the library.
     private final StringProperty librarySpecificDirectoryPromptProperty = new SimpleStringProperty("");
@@ -108,13 +110,15 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
         keywordSeparatorProperty.setValue(metaData.getKeywordSeparator().map(Object::toString).orElse(""));
+        libraryNameProperty.setValue(metaData.getLibraryName().orElse(""));
+        libraryDescriptionProperty.setValue(metaData.getLibraryDescription().orElse(""));
 
         // [impl->req~jabgui.libraryproperties.file-directory.effective-prompt~1]
         FilePreferences filePreferences = preferences.getFilePreferences();
         librarySpecificDirectoryPromptProperty.setValue(databaseContext.getFallbackFileDirectory(filePreferences)
                                                                        .map(directory -> directory.toAbsolutePath().normalize().toString())
                                                                        .orElse(""));
-        // Same fallback as the LaTeX citations tab uses when no LaTeX file directory is set
+
         laTexFileDirectoryPromptProperty.setValue(FileUtil.getInitialDirectory(databaseContext, filePreferences.getWorkingDirectory())
                                                           .toAbsolutePath()
                                                           .normalize()
@@ -146,6 +150,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         } else if (laTexFileDirectoryStatus().isValid()) {
             metaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
+
+        metaData.setLibraryName(libraryNameProperty.getValue());
+        metaData.setLibraryDescription(libraryDescriptionProperty.getValue());
 
         storeKeywordSeparator(metaData);
     }
@@ -251,6 +258,14 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty keywordSeparatorProperty() {
         return this.keywordSeparatorProperty;
+    }
+
+    public StringProperty libraryNameProperty() {
+        return this.libraryNameProperty;
+    }
+
+    public StringProperty libraryDescriptionProperty() {
+        return this.libraryDescriptionProperty;
     }
 
     public ReadOnlyStringProperty librarySpecificDirectoryPromptProperty() {

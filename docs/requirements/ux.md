@@ -343,3 +343,9 @@ See <https://github.com/JabRef/jabref/issues/16529>.
 Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
+## Library tabs must display custom library names
+`req~ux.library-name.tab-label~1`
+
+When a library has a custom name, its tab must display that name instead of the filename. If no custom name is set, the filename must be displayed. Tab labels must remain distinguishable when multiple open libraries have the same display name.
+
+Needs: impl
