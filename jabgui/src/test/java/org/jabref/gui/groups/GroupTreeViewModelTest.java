@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
@@ -23,6 +24,7 @@ import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.logic.exporter.GroupSerializer;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.NoOpSearchBackend;
@@ -69,9 +71,11 @@ import org.mockito.MockedConstruction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -503,7 +507,7 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -516,8 +520,28 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
+        // The only search group present is a suggested one, which uses the current syntax
+        assertEquals(Optional.of(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+    }
+
+    /// Migrating search groups of an older syntax also rewrites the suggested groups, which use the current syntax
+    @Test
+    // [utest->req~ux.groups.suggested-groups-need-current-syntax~1]
+    void addsNoSuggestedGroupsWhileSearchGroupsNeedMigration() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        root.addSubgroup(new SearchGroup("Old syntax", GroupHierarchyType.INDEPENDENT, "title = test", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        List<String> before = new GroupSerializer().serializeTree(root);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
+
+        assertEquals(before, new GroupSerializer().serializeTree(databaseContext.getMetaData().getGroups().orElseThrow()));
+        assertEquals(Optional.empty(), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+        assertFalse(journal.canUndo());
+        verify(dialogService).notify(Localization.lang("The search groups of this library use an outdated syntax. Reopen the library and migrate them before adding suggested groups."));
     }
 
     @Test
@@ -526,12 +550,113 @@ class GroupTreeViewModelTest {
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutGroupsGroup());
-        assertEquals(2, rootGroup.getChildren().size());
+        rootGroup.getGroupNode().addChild(GroupsFactory.createMarkingAndGradingGroups());
+        assertEquals(3, rootGroup.getChildren().size());
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
+    }
+
+    /// The name of a suggested group is translated when the group is created, so after switching
+    /// the language it no longer matches the name a new suggestion gets.
+    @Test
+    // [utest->req~ux.groups.suggested-groups-recognized-by-expression~1]
+    void shouldNotDuplicateSuggestedGroupsCreatedInAnotherLanguage() {
+        GroupTreeNode root = createLibraryWithAllSuggestedGroups();
+        root.iterateOverTree()
+            .filter(node -> node != root)
+            .forEach(node -> node.getGroup().nameProperty().set("Übersetzt: " + node.getGroup().getName()));
+        List<String> translatedNames = childNames();
+        long groupsBefore = root.iterateOverTree().count();
+        GroupNodeViewModel rootGroup = groupTree.rootGroupProperty().getValue();
+
+        assertTrue(rootGroup.hasAllSuggestedGroups());
+
+        // Runs on the JavaFX thread, so that it does not edit the tree while the queued refresh walks it
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(rootGroup));
+
+        assertEquals(translatedNames, childNames());
+        assertEquals(groupsBefore, root.iterateOverTree().count());
+    }
+
+    @Test
+        // [utest->req~logic.undo.group-operations-recorded~1]
+    void addingSuggestedGroupsIsOneUndoStep() {
+        databaseContext.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+
+        // Both operations edit the tree the queued refresh reads, so they run on the JavaFX thread
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
+        assertEquals(List.of(
+                        GroupsFactory.createWithoutFilesGroup().getName(),
+                        GroupsFactory.createWithoutGroupsGroup().getName(),
+                        GroupsFactory.createMarkingAndGradingGroups().getGroup().getName()),
+                childNames());
+        // The first search groups of a library use the current syntax, so reopening it must not offer to migrate them
+        assertEquals(Optional.of(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+
+        assertTrue(journal.canUndo(), "adding the suggested groups was not recorded");
+        List<String> created = new GroupSerializer().serializeTree(databaseContext.getMetaData().getGroups().orElseThrow());
+        var storedSelection = FXCollections.<GroupTreeNode>observableArrayList();
+        JavaFxExtension.invokeAndWait(() -> {
+            storedSelection.setAll(databaseContext.getMetaData().getGroups().orElseThrow().getChildren().getLast());
+            when(stateManager.getSelectedGroups(databaseContext)).thenReturn(storedSelection);
+            doAnswer(invocation -> {
+                storedSelection.setAll(invocation.<List<GroupTreeNode>>getArgument(1));
+                return null;
+            }).when(stateManager).setSelectedGroups(any(BibDatabaseContext.class), any());
+            journal.undo();
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+        assertEquals(List.of(), childNames());
+        assertEquals(List.of(groupTree.rootGroupProperty().getValue().getGroupNode()), storedSelection);
+        assertEquals(storedSelection, selectedGroupNodes());
+        assertEquals(Optional.empty(), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+        assertFalse(journal.canUndo());
+        JavaFxExtension.invokeAndWait(journal::redo);
+        assertEquals(created, new GroupSerializer().serializeTree(databaseContext.getMetaData().getGroups().orElseThrow()));
+        assertEquals(Optional.of(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1), databaseContext.getMetaData().getGroupSearchSyntaxVersion());
+    }
+
+    /// Whether the whole tree is created or a single group restored, the selection shows what was added.
+    @Test
+    void selectsRestoredGroupOnly() {
+        GroupTreeNode root = createLibraryWithAllSuggestedGroups();
+        GroupTreeNode rank = root.getChildren().getLast().getChildren().getFirst();
+        AbstractGroup threeStars = rank.getChildren().get(2).getGroup();
+        rank.getChildren().get(2).removeFromParent();
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
+
+        assertEquals(List.of(threeStars), groupTree.selectedGroupsProperty().stream().map(group -> group.getGroupNode().getGroup()).toList());
+    }
+
+    @Test
+    void notificationCountsAllCreatedGroups() {
+        databaseContext.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.addSuggestedGroups(groupTree.rootGroupProperty().getValue()));
+
+        long createdGroups = databaseContext.getMetaData().getGroups().orElseThrow().iterateOverTree().count() - 1;
+        assertEquals(25, createdGroups);
+        verify(dialogService).notify(Localization.lang("Created %0 suggested groups.", "25"));
+    }
+
+    /// Replaces the library's groups by "All entries" with every suggested group below it
+    private GroupTreeNode createLibraryWithAllSuggestedGroups() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        root.addSubgroup(GroupsFactory.createWithoutFilesGroup());
+        root.addSubgroup(GroupsFactory.createWithoutGroupsGroup());
+        root.addChild(GroupsFactory.createMarkingAndGradingGroups());
+        databaseContext.getMetaData().setGroups(root);
+        // The view model reads the tree when it is told about the library, and refreshes on later
+        // changes only through Platform.runLater - so it is rebuilt here rather than waited on.
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        return root;
     }
 
     @Test
@@ -579,13 +704,28 @@ class GroupTreeViewModelTest {
         verify(stateManager, never()).clearSelectedGroups(any(BibDatabaseContext.class));
     }
 
+    /// Storing the same selection again makes the entry table recompute which entries the selected groups match
+    @Test
+    void switchingLibrariesLeavesUnchangedSelectionAlone() {
+        BibDatabaseContext secondDatabase = new BibDatabaseContext();
+        secondDatabase.setDatabasePath(Path.of("second.bib"));
+        setUpLibraryWithGroup(databaseContext, "A");
+        setUpLibraryWithGroup(secondDatabase, "B");
+        clearInvocations(stateManager);
+
+        activeDatabase.setValue(Optional.of(secondDatabase));
+        activeDatabase.setValue(Optional.of(databaseContext));
+
+        verify(stateManager, never()).setSelectedGroups(any(BibDatabaseContext.class), any());
+    }
+
     @Test
         // [utest->req~ux.groups.shared-update-preserves-selection~1]
     void sharedDatabaseGroupUpdatePreservesSelection() {
-        GroupTreeNode selectedGroup = setUpLibraryWithGroup(databaseContext, "A");
+        setUpLibraryWithGroup(databaseContext, "A");
         var storedSelection = stateManager.getSelectedGroups(databaseContext);
         GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
-        updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode updatedGroup = updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
         updatedRoot.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
 
         groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
@@ -595,9 +735,29 @@ class GroupTreeViewModelTest {
         JavaFxExtension.invokeAndWait(() -> {
         });
 
-        assertEquals(List.of(selectedGroup), storedSelection);
-        assertEquals(List.of("A"), selectedGroupNodes().stream().map(GroupTreeNode::getName).toList());
+        assertSame(updatedGroup, storedSelection.getFirst());
+        assertSame(updatedGroup, selectedGroupNodes().getFirst());
         verify(stateManager, never()).clearSelectedGroups(databaseContext);
+    }
+
+    /// A change below the selected group gives it a node that no longer equals the old one
+    @Test
+    // [utest->req~ux.groups.shared-update-preserves-selection~1]
+    void sharedDatabaseGroupUpdatePreservesSelectionOfChangedGroup() {
+        setUpLibraryWithGroup(databaseContext, "A");
+        GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode updatedGroup = updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        updatedGroup.addSubgroup(new ExplicitGroup("A1", GroupHierarchyType.INDEPENDENT, ','));
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+        clearInvocations(stateManager);
+
+        JavaFxExtension.invokeAndWait(() -> databaseContext.getMetaData().setGroups(updatedRoot));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertEquals(List.of(updatedGroup), selectedGroupNodes());
+        verify(stateManager, never()).setSelectedGroups(databaseContext, List.of(updatedRoot));
     }
 
     private GroupTreeNode setUpLibraryWithGroup(BibDatabaseContext library, String name) {
@@ -609,6 +769,10 @@ class GroupTreeViewModelTest {
             storedSelection.clear();
             return null;
         }).when(stateManager).clearSelectedGroups(library);
+        doAnswer(invocation -> {
+            storedSelection.setAll(invocation.<List<GroupTreeNode>>getArgument(1));
+            return null;
+        }).when(stateManager).setSelectedGroups(eq(library), any());
         // the root is attached last otherwise refresh will overlap with stubbing
         // the second invokeAndWait() waits for the refresh queued by setGroups to finish
         JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));

@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -27,6 +28,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
+import org.jabref.gui.importer.actions.SearchGroupsMigrationAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -34,7 +36,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
-import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.groups.SuggestedGroups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
@@ -223,14 +225,23 @@ public class GroupTreeViewModel extends AbstractViewModel {
         updatingDisplayedGroups = true;
         try {
             rootGroup.setValue(newRoot);
-            if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
-                stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
+            BibDatabaseContext database = newDatabase.orElseThrow();
+            // A group that stays in an updated tree may have changed below it, so that its node no longer equals the old one
+            List<GroupNodeViewModel> restoredSelection = stateManager.getSelectedGroups(database).stream()
+                                                                     .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
+                                                                                                  .or(() -> newRoot.getGroupNode()
+                                                                                                                   .getChildByPath(selectedGroup.getPath())
+                                                                                                                   .flatMap(newRoot::findGroupNodeViewModel)))
+                                                                     .flatMap(Optional::stream)
+                                                                     .toList();
+            selectedGroups.setAll(restoredSelection.isEmpty() ? List.of(newRoot) : restoredSelection);
+            List<GroupTreeNode> restoredNodes = selectedGroups.stream().map(GroupNodeViewModel::getGroupNode).toList();
+            // Storing an unchanged selection again would make the entry table recompute the group matches
+            List<GroupTreeNode> storedNodes = stateManager.getSelectedGroups(database);
+            if (storedNodes.size() != restoredNodes.size()
+                    || IntStream.range(0, storedNodes.size()).anyMatch(i -> storedNodes.get(i) != restoredNodes.get(i))) {
+                stateManager.setSelectedGroups(database, restoredNodes);
             }
-            selectedGroups.setAll(
-                    stateManager.getSelectedGroups(newDatabase.get()).stream()
-                                .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
-                                                             .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
-                                .toList());
         } finally {
             updatingDisplayedGroups = false;
         }
@@ -302,11 +313,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> {
             MetaData metaData = database.getMetaData();
             Optional<GroupTreeNode> before = metaData.getGroups().map(GroupTreeNode::copySubtree);
+            Optional<String> beforeSyntax = metaData.getSerializedGroupSearchSyntaxVersion();
             stateManager.getUndoManager(database).addEdit(name, edit -> {
                 try {
                     operation.accept(edit);
                 } finally {
-                    writeBackAndRecord(metaData, before, edit);
+                    writeBackAndRecord(metaData, before, beforeSyntax, edit);
                 }
             });
         });
@@ -323,14 +335,15 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Called also when the operation failed part-way: the tree holds what it managed to change,
     /// and a step that took back only the entry assignments would leave the library in a state
     /// nothing describes. The journal hands over a failed block's changes for the same reason.
-    private void writeBackAndRecord(MetaData metaData, Optional<GroupTreeNode> before, CompoundEdit edit) {
+    private void writeBackAndRecord(MetaData metaData, Optional<GroupTreeNode> before, Optional<String> beforeSyntax, CompoundEdit edit) {
         // Written back as a journalled change: the step below describes it, so the tab must not
         // mark the library for it — undoing the step brings the library back, marker included.
         writeGroupChangesToMetaData(MetaDataChangeSource.JOURNAL);
         // Sorting an already sorted group, or dropping one where it already is, changes nothing:
         // recording that would enable Undo over a step that does nothing.
-        if (!before.equals(metaData.getGroups())) {
-            edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
+        Optional<String> afterSyntax = metaData.getSerializedGroupSearchSyntaxVersion();
+        if (!before.equals(metaData.getGroups()) || !beforeSyntax.equals(afterSyntax)) {
+            edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups(), beforeSyntax, afterSyntax));
         }
     }
 
@@ -344,33 +357,34 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// @param parent The "All Entries" parent node.
     public void addSuggestedGroups(GroupNodeViewModel parent) {
         currentDatabase.ifPresent(database -> {
-            GroupTreeNode rootNode = parent.getGroupNode();
-            List<GroupTreeNode> newSuggestedSubgroups = new ArrayList<>();
-
-            // 1. Create "Entries without linked files" group if it doesn't exist
-            SearchGroup withoutFilesGroup = GroupsFactory.createWithoutFilesGroup();
-            if (!parent.hasSimilarSearchGroup(withoutFilesGroup)) {
-                GroupTreeNode subGroup = rootNode.addSubgroup(withoutFilesGroup);
-                newSuggestedSubgroups.add(subGroup);
+            GroupTreeNode root = parent.getGroupNode();
+            MetaData metaData = database.getMetaData();
+            // [impl->req~ux.groups.suggested-groups-need-current-syntax~1]
+            // Migrating search groups of an older syntax rewrites every search group, also the suggested ones
+            if (metaData.getGroupSearchSyntaxVersion().isEmpty() && SuggestedGroups.containsOtherSearchGroups(root)) {
+                dialogService.notify(Localization.lang("The search groups of this library use an outdated syntax. Reopen the library and migrate them before adding suggested groups."));
+                return;
             }
 
-            // 2. Create "Entries without groups" group if it doesn't exist
-            SearchGroup withoutGroupsGroup = GroupsFactory.createWithoutGroupsGroup();
-            if (!parent.hasSimilarSearchGroup(withoutGroupsGroup)) {
-                GroupTreeNode subGroup = rootNode.addSubgroup(withoutGroupsGroup);
-                newSuggestedSubgroups.add(subGroup);
-            }
+            recordTreeChange(Localization.lang("Add JabRef suggested groups"), _ -> {
+                List<GroupTreeNode> newSuggestedSubgroups = SuggestedGroups.addMissing(root);
+                // Any search group already present is a suggested one, so the library uses the current syntax
+                if (metaData.getGroupSearchSyntaxVersion().isEmpty() && !newSuggestedSubgroups.isEmpty()) {
+                    metaData.setSerializedGroupSearchSyntaxVersion(Optional.of(SearchGroupsMigrationAction.VERSION_6_0_ALPHA_1.toString()), MetaDataChangeSource.JOURNAL);
+                }
 
-            selectedGroups.setAll(newSuggestedSubgroups
-                    .stream()
-                    .map(newSubGroup -> rootGroup.get() != null
-                                        ? rootGroup.get().findGroupNodeViewModel(newSubGroup).orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
-                                        : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
-                    .toList());
+                selectedGroups.setAll(newSuggestedSubgroups
+                        .stream()
+                        .map(newSubGroup -> rootGroup.get() != null
+                                            ? rootGroup.get().findGroupNodeViewModel(newSubGroup).orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                                            : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                        .toList());
 
-            writeGroupChangesToMetaData();
-
-            dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
+                long createdGroups = newSuggestedSubgroups.stream()
+                                                          .flatMap(GroupTreeNode::iterateOverTree)
+                                                          .count();
+                dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(createdGroups)));
+            });
         });
     }
 

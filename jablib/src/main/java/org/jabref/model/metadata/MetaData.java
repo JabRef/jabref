@@ -167,6 +167,15 @@ public class MetaData {
         postChange();
     }
 
+    public void setSerializedGroupSearchSyntaxVersion(Optional<String> version, MetaDataChangeSource source) {
+        groupSearchSyntaxVersion = version.map(Version::parse);
+        postChange(source);
+    }
+
+    public Optional<String> getSerializedGroupSearchSyntaxVersion() {
+        return groupSearchSyntaxVersion.map(Version::toString);
+    }
+
     public Optional<Version> getGroupSearchSyntaxVersion() {
         return this.groupSearchSyntaxVersion;
     }

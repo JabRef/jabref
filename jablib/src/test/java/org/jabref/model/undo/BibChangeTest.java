@@ -160,6 +160,20 @@ class BibChangeTest {
         assertEquals(Optional.empty(), metaData.getGroups());
     }
 
+    /// Adding the first search groups records the syntax they use, so undoing that takes the record back too.
+    @Test
+    void undoingAGroupTreeChangePutsTheEarlierSearchSyntaxBack() {
+        MetaData metaData = new MetaData();
+        UndoableGroupTreeChange change = new UndoableGroupTreeChange(
+                metaData, Optional.empty(), Optional.of(groupTree("Books")), Optional.empty(), Optional.of("6.0-alpha_1"));
+
+        change.apply();
+        assertEquals(Optional.of("6.0-alpha_1"), metaData.getSerializedGroupSearchSyntaxVersion());
+
+        change.inverted().apply();
+        assertEquals(Optional.empty(), metaData.getSerializedGroupSearchSyntaxVersion());
+    }
+
     /// The tree the library holds must not be the one the change kept, or the next edit would
     /// rewrite what undoing it restores.
     @Test
