@@ -211,19 +211,11 @@ public abstract class NativeDesktop {
     /// @throws IOException if the default file browser cannot be opened
     public void openFolderAndSelectFile(Path fileLink, DialogService dialogService) throws IOException {
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-        boolean useCustomFileBrowser = externalApplicationsPreferences.useCustomFileBrowser();
-        if (!useCustomFileBrowser) {
-            openFolderAndSelectFileWithDefaultFileBrowser(fileLink);
-            return;
-        }
-        String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-        List<String> command = externalApplicationsPreferences.getCustomFileBrowserCommand();
-        if (command.isEmpty() || command.getFirst().isBlank()) {
-            LoggerFactory.getLogger(NativeDesktop.class).info("No custom file browser command defined");
-            openFolderAndSelectFileWithDefaultFileBrowser(fileLink);
-            return;
-        }
-        executeCommand(command, absolutePath, dialogService);
+        startCustomOrDefault(externalApplicationsPreferences.useCustomFileBrowser(),
+                externalApplicationsPreferences.getCustomFileBrowserCommand(),
+                fileLink.toAbsolutePath().getParent(),
+                () -> openFolderAndSelectFileWithDefaultFileBrowser(fileLink),
+                dialogService);
     }
 
     /// Opens a new console: in the given directory itself, or, given a file, in the file's
@@ -234,19 +226,35 @@ public abstract class NativeDesktop {
     public void openConsole(Path fileOrDirectory, DialogService dialogService) throws IOException {
         Path absolute = fileOrDirectory.toAbsolutePath();
         Path directory = Files.isDirectory(absolute) ? absolute : absolute.getParent();
+        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        startCustomOrDefault(externalApplicationsPreferences.useCustomTerminal(),
+                externalApplicationsPreferences.getCustomTerminalCommand(),
+                directory,
+                () -> openConsoleWithDefaultTerminal(directory),
+                dialogService);
+    }
 
-        boolean useCustomTerminal = preferences.getExternalApplicationsPreferences().useCustomTerminal();
-        if (!useCustomTerminal) {
-            openConsoleWithDefaultTerminal(directory);
+    @FunctionalInterface
+    private interface DefaultProgram {
+        void start() throws IOException;
+    }
+
+    /// Starts the custom program if it is enabled and defined, otherwise the default program of the OS.
+    private static void startCustomOrDefault(boolean useCustomProgram,
+                                             List<String> customCommand,
+                                             Path directory,
+                                             DefaultProgram defaultProgram,
+                                             DialogService dialogService) throws IOException {
+        if (!useCustomProgram) {
+            defaultProgram.start();
             return;
         }
-        List<String> command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
-        if (command.isEmpty() || command.getFirst().isBlank()) {
-            openConsoleWithDefaultTerminal(directory);
-            LoggerFactory.getLogger(NativeDesktop.class).info("Preference for custom terminal is empty. Using default terminal.");
+        if (customCommand.isEmpty() || customCommand.getFirst().isBlank()) {
+            LoggerFactory.getLogger(NativeDesktop.class).info("No custom command defined, using the default program");
+            defaultProgram.start();
             return;
         }
-        executeCommand(command, directory.toString(), dialogService);
+        executeCommand(customCommand, directory.toString(), dialogService);
     }
 
     private static void executeCommand(List<String> command, String absolutePath, DialogService dialogService) {
