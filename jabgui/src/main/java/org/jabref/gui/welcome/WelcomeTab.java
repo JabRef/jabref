@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
@@ -280,7 +282,12 @@ public class WelcomeTab extends Tab {
         updateWelcomeRecentLibraries();
         fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
 
-        return createVBoxContainer(header, recentLibrariesBox);
+        VBox recentBox = createVBoxContainer(header, recentLibrariesBox);
+        // Without recent libraries the section has nothing to offer, so it is hidden and takes no space
+        BooleanBinding hasRecentLibraries = Bindings.isNotEmpty(fileHistoryMenu.getItems());
+        recentBox.visibleProperty().bind(hasRecentLibraries);
+        recentBox.managedProperty().bind(hasRecentLibraries);
+        return recentBox;
     }
 
     private Hyperlink createActionLink(String text, Runnable action) {
@@ -310,14 +317,13 @@ public class WelcomeTab extends Tab {
     }
 
     private void updateWelcomeRecentLibraries() {
+        recentLibrariesBox.getChildren().clear();
+        fileHistoryMenu.disableProperty().unbind();
+        fileHistoryMenu.setDisable(fileHistoryMenu.getItems().isEmpty());
         if (fileHistoryMenu.getItems().isEmpty()) {
-            displayNoRecentLibrariesMessage();
             return;
         }
-        recentLibrariesBox.getChildren().clear();
         recentLibrariesBox.getStyleClass().addAll("align-top-left");
-        fileHistoryMenu.disableProperty().unbind();
-        fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
             // Shortened to whatever the column offers. Character-wise, not word-wise: a path has
@@ -329,15 +335,6 @@ public class WelcomeTab extends Tab {
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
-    }
-
-    private void displayNoRecentLibrariesMessage() {
-        recentLibrariesBox.getChildren().clear();
-        Label noRecentLibrariesLabel = new Label(Localization.lang("No recent libraries"));
-        noRecentLibrariesLabel.getStyleClass().addAll("h4", "text-accent");
-        recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);
-        fileHistoryMenu.disableProperty().unbind();
-        fileHistoryMenu.setDisable(true);
     }
 
     private VBox createCommunityBox() {

@@ -63,6 +63,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We shortened read-status and priority menu labels and made read and low-priority icons easier to distinguish. [#17691](https://github.com/JabRef/jabref/pull/17691)
 - We hide the "Move deleted files to trash" preference on platforms without a trash. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
+- We hid the "Recent" section of the Welcome tab when there are no recent libraries. [#17418](https://github.com/JabRef/jabref/pull/17418)
 
 ### Fixed
 
