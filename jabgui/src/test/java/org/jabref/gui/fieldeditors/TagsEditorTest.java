@@ -6,6 +6,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
@@ -32,7 +33,9 @@ import static org.mockito.Mockito.mock;
 class TagsEditorTest extends JavaFxTest {
 
     private final ListProperty<Keyword> tags = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Keyword> orderPreservingTags = new SimpleListProperty<>(FXCollections.observableArrayList());
     private TestTagsEditor editor;
+    private TestTagsEditor orderPreservingEditor;
 
     @Override
     public void start(Stage stage) {
@@ -43,7 +46,11 @@ class TagsEditorTest extends JavaFxTest {
         editor = new TestTagsEditor();
         editor.initialize(tags);
 
-        stage.setScene(new Scene(editor));
+        orderPreservingEditor = new TestTagsEditor();
+        orderPreservingEditor.initialize(orderPreservingTags);
+        orderPreservingEditor.disableTagSorting();
+
+        stage.setScene(new Scene(new VBox(editor, orderPreservingEditor)));
         stage.show();
     }
 
@@ -75,6 +82,17 @@ class TagsEditorTest extends JavaFxTest {
         interact((Runnable) tags::get);
 
         assertEquals(List.of(new Keyword("Alpha"), new Keyword("Gamma")), editor.getTags());
+    }
+
+    @Test
+    void keepsOrderWhenTagSortingIsDisabled() {
+        interact(() -> orderPreservingTags.setAll(List.of(new Keyword("Alpha"), new Keyword("Beta"))));
+        interact((Runnable) orderPreservingTags::get);
+
+        interact(() -> orderPreservingTags.setAll(List.of(new Keyword("Zulu"), new Keyword("Gamma"))));
+        interact((Runnable) orderPreservingTags::get);
+
+        assertEquals(List.of(new Keyword("Zulu"), new Keyword("Gamma")), orderPreservingEditor.getTags());
     }
 
     private static class TestTagsEditor extends TagsEditor {

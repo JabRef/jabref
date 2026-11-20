@@ -11,7 +11,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 public class MergedFieldCell extends ThreeWayMergeCell {
-    private static final String DEFAULT_STYLE_CLASS = "merged-field";
+    static final String DEFAULT_STYLE_CLASS = "merged-field";
 
     private final StyleClassedTextArea textArea = new StyleClassedTextArea();
 

@@ -11,6 +11,8 @@ import org.jabref.gui.mergeentries.threewaymerge.FieldRowViewModel.Selection;
 import org.jabref.gui.mergeentries.threewaymerge.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.threewaymerge.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.threewaymerge.cell.MergedFieldCell;
+import org.jabref.gui.mergeentries.threewaymerge.cell.MergedGroupsCell;
+import org.jabref.gui.mergeentries.threewaymerge.cell.ThreeWayMergeCell;
 import org.jabref.gui.mergeentries.threewaymerge.cell.sidebuttons.ToggleMergeUnmergeButton;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.UnifiedDiffHighlighter;
@@ -21,6 +23,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
+import org.jabref.model.entry.field.StandardField;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -37,7 +40,7 @@ public class FieldRowView {
     private final FieldNameCell fieldNameCell;
     private final FieldValueCell leftValueCell;
     private final FieldValueCell rightValueCell;
-    private final MergedFieldCell mergedValueCell;
+    private final ThreeWayMergeCell mergedValueCell;
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
@@ -49,7 +52,7 @@ public class FieldRowView {
         fieldNameCell = new FieldNameCell(FieldTextMapper.getDisplayName(field), rowIndex);
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences, stateManager);
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences, stateManager);
-        mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
+        mergedValueCell = createMergedValueCell(field, rowIndex, preferences, stateManager);
 
         // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
         // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
@@ -119,6 +122,13 @@ public class FieldRowView {
         });
     }
 
+    private ThreeWayMergeCell createMergedValueCell(Field field, int rowIndex, GuiPreferences preferences, StateManager stateManager) {
+        if (field == StandardField.GROUPS) {
+            return new MergedGroupsCell(viewModel.getMergedFieldValue(), rowIndex, preferences, stateManager);
+        }
+        return new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
+    }
+
     public void selectLeftValue() {
         viewModel.selectLeftValue();
     }
@@ -151,7 +161,7 @@ public class FieldRowView {
         return rightValueCell;
     }
 
-    public MergedFieldCell getMergedValueCell() {
+    public ThreeWayMergeCell getMergedValueCell() {
         return mergedValueCell;
     }
 
