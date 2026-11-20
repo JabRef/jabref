@@ -3,7 +3,6 @@ package org.jabref.logic.bst;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,7 +12,6 @@ import org.jabref.logic.bst.util.BstPurifier;
 import org.jabref.logic.bst.util.BstTextPrefixer;
 import org.jabref.logic.bst.util.BstWidthCalculator;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
@@ -55,7 +53,7 @@ public class BstFunctions {
         this.strings = bstVMContext.strings();
         this.integers = bstVMContext.integers();
         this.functions = bstVMContext.functions();
-        this.preamble = Optional.of(bstVMContext.bibDatabase()).flatMap(BibDatabase::getPreamble).orElse("");
+        this.preamble = bstVMContext.preamble();
         this.stack = bstVMContext.stack();
 
         this.bbl = bbl;
