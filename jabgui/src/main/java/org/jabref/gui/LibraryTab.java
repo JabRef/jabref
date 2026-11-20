@@ -959,7 +959,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private void showDiffDialog(BibDatabaseContext savedDatabase) {
-        List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
+        List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, entryTypesManager, null);
         dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
                 Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
     }
@@ -1166,6 +1166,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 taskExecutor,
                 dialogService,
                 preferences,
+                entryTypesManager,
                 getUndoManager(),
                 stateManager,
                 this));

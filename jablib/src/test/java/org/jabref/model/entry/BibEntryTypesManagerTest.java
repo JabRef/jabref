@@ -134,6 +134,28 @@ class BibEntryTypesManagerTest {
         assertEquals(List.of(newCustomType), entryTypesManager.getAllCustomTypes(mode));
     }
 
+    @ParameterizedTest
+    @EnumSource(BibDatabaseMode.class)
+    void replaceCustomOrModifiedTypesTakesTypesOfSource(BibDatabaseMode mode) {
+        entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
+        BibEntryTypesManager source = new BibEntryTypesManager();
+        source.addCustomOrModifiedType(newCustomType, mode);
+
+        entryTypesManager.replaceCustomOrModifiedTypes(source);
+
+        assertEquals(List.of(newCustomType), List.copyOf(entryTypesManager.getAllCustomizedTypes(mode)));
+    }
+
+    @ParameterizedTest
+    @EnumSource(BibDatabaseMode.class)
+    void replaceCustomOrModifiedTypesWithoutCustomizationRestoresStandardType(BibDatabaseMode mode) {
+        entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
+
+        entryTypesManager.replaceCustomOrModifiedTypes(new BibEntryTypesManager());
+
+        assertEquals(Optional.of(getStandardArticleType(mode)), entryTypesManager.enrich(StandardEntryType.Article, mode));
+    }
+
     @Test
     void registerBibEntryTypeDoesNotAffectOtherMode() {
         entryTypesManager.addCustomOrModifiedType(newCustomType, BibDatabaseMode.BIBTEX);

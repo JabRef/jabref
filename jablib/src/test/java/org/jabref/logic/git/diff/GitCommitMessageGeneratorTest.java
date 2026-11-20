@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -106,7 +107,8 @@ public class GitCommitMessageGeneratorTest {
 
         Optional<String> message = GitCommitMessageGenerator.generate(
                 new BibDatabaseContext(new BibDatabase(List.of(article("Smith2024", "Smith", "Git basics")))),
-                new BibDatabaseContext(workingTreeDatabase));
+                new BibDatabaseContext(workingTreeDatabase),
+                new BibEntryTypesManager());
 
         assertEquals(Optional.empty(), message);
     }
@@ -141,7 +143,8 @@ public class GitCommitMessageGeneratorTest {
     private static Optional<String> generate(List<BibEntry> headEntries, List<BibEntry> workingTreeEntries) {
         return GitCommitMessageGenerator.generate(
                 new BibDatabaseContext(new BibDatabase(headEntries)),
-                new BibDatabaseContext(new BibDatabase(workingTreeEntries)));
+                new BibDatabaseContext(new BibDatabase(workingTreeEntries)),
+                new BibEntryTypesManager());
     }
 
     private static BibEntry article(String citationKey, String author, String title) {

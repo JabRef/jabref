@@ -28,6 +28,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -49,6 +50,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final ImportFormatPreferences importFormatPreferences;
+    private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
 
     private final StringProperty commitMessage = new SimpleStringProperty("");
@@ -62,12 +64,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             TaskExecutor taskExecutor,
             GitHandlerRegistry gitHandlerRegistry,
             ImportFormatPreferences importFormatPreferences,
+            BibEntryTypesManager entryTypesManager,
             FileUpdateMonitor fileUpdateMonitor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.importFormatPreferences = importFormatPreferences;
+        this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
         this.commitMessageValidator = new FunctionBasedValidator<>(
@@ -308,7 +312,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private Optional<String> generateCommitMessage() throws JabRefException, IOException {
         DiffDatabases diffDatabases = computeDiffDatabases();
-        return GitCommitMessageGenerator.generate(diffDatabases.headDatabase(), diffDatabases.workingTreeDatabase());
+        return GitCommitMessageGenerator.generate(diffDatabases.headDatabase(), diffDatabases.workingTreeDatabase(), entryTypesManager);
     }
 
     /// Set the generated git commit messages

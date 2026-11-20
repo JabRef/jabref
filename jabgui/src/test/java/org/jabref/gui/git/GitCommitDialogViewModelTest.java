@@ -12,6 +12,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.eclipse.jgit.api.Git;
@@ -59,6 +60,7 @@ class GitCommitDialogViewModelTest {
                 new CurrentThreadTaskExecutor(),
                 gitHandlerRegistry,
                 importFormatPreferences,
+                mock(BibEntryTypesManager.class),
                 new DummyFileUpdateMonitor());
     }
 
