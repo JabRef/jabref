@@ -7,6 +7,7 @@ import javafx.application.HostServices;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.Directories;
 
@@ -47,7 +48,7 @@ public class DefaultDesktop extends NativeDesktop {
 
     @Override
     protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
-        throw new IOException("No default terminal is known for this operating system");
+        throw new IOException(Localization.lang("Could not detect a terminal. Please define a custom terminal in the preferences."));
     }
 
     @Override
