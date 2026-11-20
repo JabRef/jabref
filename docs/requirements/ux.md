@@ -326,6 +326,7 @@ Needs: impl, utest
 `req~ux.groups.suggested-marking-groups~1`
 
 "Add JabRef suggested groups" adds the group "Marking and grading" with one group per special field (rank, relevance, quality, print status, priority, read status) and below it one group per value of the field.
+The "Print status" group contains "Printed" and "Not printed". Its name must differ from "Printed" because group names are unique within a library.
 For a field with a single value, such as relevance, a second group holds the entries without that value, including the entries without the field ([#16147](https://github.com/JabRef/jabref/issues/16147)).
 
 Needs: impl, utest

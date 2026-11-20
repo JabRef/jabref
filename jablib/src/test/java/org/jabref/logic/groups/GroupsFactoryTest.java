@@ -21,6 +21,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @NullMarked
 class GroupsFactoryTest {
@@ -52,7 +54,7 @@ class GroupsFactoryTest {
         library.getDatabase().insertEntries(List.of(exact, similar, absent));
         GroupTreeNode marking = GroupsFactory.createMarkingAndGradingGroups();
         SearchGroup leaf = (SearchGroup) marking.getChildren().get(parentIndex).getChildren().get(leafIndex).getGroup();
-        InMemoryLibrarySearcher searcher = new InMemoryLibrarySearcher(library, BibEntryPreferences.getDefault());
+        InMemoryLibrarySearcher searcher = createSearcher(library);
 
         assertEquals(negative ? Set.of(similar, absent) : Set.of(exact), Set.copyOf(searcher.getMatches(leaf.getSearchQuery())));
         SearchGroup parent = (SearchGroup) marking.getChildren().get(parentIndex).getGroup();
@@ -69,9 +71,15 @@ class GroupsFactoryTest {
         library.getDatabase().insertEntries(marked);
         library.getDatabase().insertEntry(new BibEntry());
         SearchGroup marking = (SearchGroup) GroupsFactory.createMarkingAndGradingGroups().getGroup();
-        InMemoryLibrarySearcher searcher = new InMemoryLibrarySearcher(library, BibEntryPreferences.getDefault());
+        InMemoryLibrarySearcher searcher = createSearcher(library);
 
         assertEquals(Set.copyOf(marked), Set.copyOf(searcher.getMatches(marking.getSearchQuery())));
+    }
+
+    private InMemoryLibrarySearcher createSearcher(BibDatabaseContext library) {
+        BibEntryPreferences preferences = mock(BibEntryPreferences.class);
+        when(preferences.getKeywordSeparator()).thenReturn(',');
+        return new InMemoryLibrarySearcher(library, preferences);
     }
 
     /// Like the expressions of the marking and grading groups, these are stored in libraries and identify the groups there

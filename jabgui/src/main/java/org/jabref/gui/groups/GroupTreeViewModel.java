@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -236,7 +237,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             selectedGroups.setAll(restoredSelection.isEmpty() ? List.of(newRoot) : restoredSelection);
             List<GroupTreeNode> restoredNodes = selectedGroups.stream().map(GroupNodeViewModel::getGroupNode).toList();
             // Storing an unchanged selection again would make the entry table recompute the group matches
-            if (!stateManager.getSelectedGroups(database).equals(restoredNodes)) {
+            List<GroupTreeNode> storedNodes = stateManager.getSelectedGroups(database);
+            if (storedNodes.size() != restoredNodes.size()
+                    || IntStream.range(0, storedNodes.size()).anyMatch(i -> storedNodes.get(i) != restoredNodes.get(i))) {
                 stateManager.setSelectedGroups(database, restoredNodes);
             }
         } finally {

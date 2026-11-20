@@ -71,9 +71,11 @@ import org.mockito.MockedConstruction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -720,10 +722,10 @@ class GroupTreeViewModelTest {
     @Test
         // [utest->req~ux.groups.shared-update-preserves-selection~1]
     void sharedDatabaseGroupUpdatePreservesSelection() {
-        GroupTreeNode selectedGroup = setUpLibraryWithGroup(databaseContext, "A");
+        setUpLibraryWithGroup(databaseContext, "A");
         var storedSelection = stateManager.getSelectedGroups(databaseContext);
         GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
-        updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode updatedGroup = updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
         updatedRoot.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
 
         groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
@@ -733,8 +735,8 @@ class GroupTreeViewModelTest {
         JavaFxExtension.invokeAndWait(() -> {
         });
 
-        assertEquals(List.of(selectedGroup), storedSelection);
-        assertEquals(List.of("A"), selectedGroupNodes().stream().map(GroupTreeNode::getName).toList());
+        assertSame(updatedGroup, storedSelection.getFirst());
+        assertSame(updatedGroup, selectedGroupNodes().getFirst());
         verify(stateManager, never()).clearSelectedGroups(databaseContext);
     }
 
@@ -767,6 +769,10 @@ class GroupTreeViewModelTest {
             storedSelection.clear();
             return null;
         }).when(stateManager).clearSelectedGroups(library);
+        doAnswer(invocation -> {
+            storedSelection.setAll(invocation.<List<GroupTreeNode>>getArgument(1));
+            return null;
+        }).when(stateManager).setSelectedGroups(eq(library), any());
         // the root is attached last otherwise refresh will overlap with stubbing
         // the second invokeAndWait() waits for the refresh queued by setGroups to finish
         JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));
