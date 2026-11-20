@@ -355,6 +355,19 @@ class XmpUtilWriterTest {
         assertEquals(List.of(Optional.of(original)), reimported.stream().map(entry -> entry.getField(field)).toList());
     }
 
+    @Test
+    void reimportOfMultipleEntriesRestoresLatexOnlyForFirstEntry() throws IOException, TransformerException {
+        BibEntry latexEditor = new BibEntry().withField(StandardField.EDITOR, "M{\\\"u}ller");
+        BibEntry plainEditor = new BibEntry().withField(StandardField.EDITOR, "Müller");
+        Path pdf = createDefaultFile("multiple.pdf", tempDir);
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdf, List.of(latexEditor, plainEditor), new BibDatabase());
+
+        List<BibEntry> reimported = new XmpUtilReader().readXmp(pdf, xmpPreferences);
+
+        assertEquals(List.of(Optional.of("M{\\\"u}ller"), Optional.of("Müller")),
+                reimported.stream().map(entry -> entry.getField(StandardField.EDITOR)).toList());
+    }
+
     private static Stream<Field> latexFieldsStoredAsBibtexInDocumentInformation() {
         return Stream.of("editor", "publisher", "coverage", "rights", "source").map(FieldFactory::parseField);
     }

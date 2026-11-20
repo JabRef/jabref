@@ -83,8 +83,11 @@ public class XmpUtilReader {
                 if (dcSchema != null) {
                     DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
                     dcExtractor.extractBibtexEntry().ifPresent(dublinCoreEntry -> {
+                        // The document information is written from the first entry only, so it belongs to the first Dublin Core entry.
                         // Restore before adding: modifying an entry already in the LinkedHashSet would change its hash code
-                        documentInformationEntry.ifPresent(entry -> restoreLatexFromDocumentInformation(dublinCoreEntry, entry));
+                        if (result.isEmpty()) {
+                            documentInformationEntry.ifPresent(entry -> restoreLatexFromDocumentInformation(dublinCoreEntry, entry));
+                        }
                         result.add(dublinCoreEntry);
                     });
                 }
