@@ -36,8 +36,8 @@ class ProcessLauncherTest {
     }
 
     @Test
-    void outputIsDiscardedWithoutConsumer() throws IOException {
-        ProcessLauncher.startDetached(processBuilder, null);
+    void outputIsDiscarded() throws IOException {
+        ProcessLauncher.startDiscardingOutput(processBuilder);
 
         verify(processBuilder).redirectOutput(ProcessBuilder.Redirect.DISCARD);
         verify(processBuilder).redirectError(ProcessBuilder.Redirect.DISCARD);
@@ -45,12 +45,12 @@ class ProcessLauncherTest {
     }
 
     @Test
-    void outputAndErrorOutputAreForwardedToConsumer() throws IOException, InterruptedException {
+    void outputAndErrorOutputAreForwarded() throws IOException, InterruptedException {
         when(process.getInputStream()).thenReturn(new ByteArrayInputStream("first\nsecond\n".getBytes(StandardCharsets.UTF_8)));
         List<String> lines = new CopyOnWriteArrayList<>();
         CountDownLatch allLinesRead = new CountDownLatch(2);
 
-        ProcessLauncher.startDetached(processBuilder, line -> {
+        ProcessLauncher.startForwardingOutput(processBuilder, line -> {
             lines.add(line);
             allLinesRead.countDown();
         });

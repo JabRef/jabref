@@ -8,7 +8,6 @@ import org.jabref.logic.util.StreamGobbler;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,26 +32,35 @@ public class ProcessLauncher {
         String program = command.isEmpty() ? "" : command.getFirst();
         // The arguments are not logged: they may carry mail contents or login URLs.
         LOGGER.debug("Starting {} with {} argument(s)", program, Math.max(0, command.size() - 1));
-        startDetached(processBuilder, LOGGER.isDebugEnabled() ? line -> LOGGER.debug("{}: {}", program, line) : null);
+        if (LOGGER.isDebugEnabled()) {
+            startForwardingOutput(processBuilder, line -> LOGGER.debug("{}: {}", program, line));
+        } else {
+            startDiscardingOutput(processBuilder);
+        }
     }
 
-    /// @param outputConsumer receives stdout and stderr line by line; `null` discards them
     @VisibleForTesting
-    static void startDetached(ProcessBuilder processBuilder, @Nullable Consumer<String> outputConsumer) throws IOException {
-        if (outputConsumer == null) {
-            processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-            processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-        } else {
-            processBuilder.redirectErrorStream(true);
-        }
+    static void startDiscardingOutput(ProcessBuilder processBuilder) throws IOException {
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
+        startWithoutInput(processBuilder);
+    }
+
+    /// @param outputConsumer receives stdout and stderr line by line
+    @VisibleForTesting
+    static void startForwardingOutput(ProcessBuilder processBuilder, Consumer<String> outputConsumer) throws IOException {
+        processBuilder.redirectErrorStream(true);
+        Process process = startWithoutInput(processBuilder);
+        // A virtual thread does not keep the JVM alive, so a long-running program does not delay JabRef's shutdown,
+        // unlike a reader on HeadlessExecutorService, which is awaited on shutdown.
+        Thread.ofVirtual()
+              .name("program output")
+              .start(new StreamGobbler(process.getInputStream(), outputConsumer));
+    }
+
+    private static Process startWithoutInput(ProcessBuilder processBuilder) throws IOException {
         Process process = processBuilder.start();
         process.getOutputStream().close();
-        if (outputConsumer != null) {
-            // A virtual thread does not keep the JVM alive, so a long-running program does not delay JabRef's shutdown,
-            // unlike a reader on HeadlessExecutorService, which is awaited on shutdown.
-            Thread.ofVirtual()
-                  .name("program output")
-                  .start(new StreamGobbler(process.getInputStream(), outputConsumer));
-        }
+        return process;
     }
 }
