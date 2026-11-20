@@ -45,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added checkboxes to enable or disable individual journal abbreviation lists without removing them. [#12468](https://github.com/JabRef/jabref/issues/12468)
 - We added support for resolving BibLaTeX `xdata` field references in entry previews. [#10865](https://github.com/JabRef/jabref/issues/10865)
 - We added an option to automatically merge changes made to the library file outside JabRef into the open library. [#8431](https://github.com/JabRef/jabref/issues/8431)
+- We added merging of conflicted copies left by sync clients, per library or as a global default (off by default). [#16827](https://github.com/JabRef/jabref/pull/16827)
 
 ### Changed
 
