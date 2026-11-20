@@ -582,7 +582,7 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    // [utest->req~logic.undo.group-operations-recorded~1]
+        // [utest->req~logic.undo.group-operations-recorded~1]
     void addingSuggestedGroupsIsOneUndoStep() {
         databaseContext.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
         groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
@@ -742,7 +742,7 @@ class GroupTreeViewModelTest {
 
     /// A change below the selected group gives it a node that no longer equals the old one
     @Test
-        // [utest->req~ux.groups.shared-update-preserves-selection~1]
+    // [utest->req~ux.groups.shared-update-preserves-selection~1]
     void sharedDatabaseGroupUpdatePreservesSelectionOfChangedGroup() {
         setUpLibraryWithGroup(databaseContext, "A");
         GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
