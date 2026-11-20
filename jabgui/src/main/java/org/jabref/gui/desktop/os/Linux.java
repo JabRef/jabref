@@ -90,28 +90,49 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) throws IOException {
-        String desktopSession = System.getenv("DESKTOP_SESSION");
+    protected void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException {
+        List<String> command = fileManagerCommand(Linux::isOnPath, desktopName(), file);
+        LoggerFactory.getLogger(Linux.class).debug("Opening folder and selecting file using {}", String.join(" ", command));
+        ProcessLauncher.startDetached(new ProcessBuilder(command));
+    }
 
-        String absoluteFilePath = filePath.toAbsolutePath().toString();
-        String[] cmd = {"xdg-open", filePath.getParent().toString()}; // default is the folder of the file
+    /// The file manager of the desktop environment selects the file.
+    /// Without a known one, `xdg-open` opens the folder of the file.
+    ///
+    /// @param desktop the lower-case names of the desktop environment
+    @VisibleForTesting
+    static List<String> fileManagerCommand(Predicate<String> isOnPath, String desktop, Path file) {
+        return desktopFileManagers(desktop).stream()
+                                           .filter(isOnPath)
+                                           .findFirst()
+                                           .map(name -> selectFileCommand(name, file.toString()))
+                                           .orElseGet(() -> List.of("xdg-open", file.getParent().toString()));
+    }
 
-        if (desktopSession != null) {
-            desktopSession = desktopSession.toLowerCase(Locale.ROOT);
-            if (desktopSession.contains("gnome")) {
-                cmd = new String[] {"nautilus", "--select", absoluteFilePath};
-            } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
-                cmd = new String[] {"dolphin", "--select", absoluteFilePath};
-            } else if (desktopSession.contains("mate")) {
-                cmd = new String[] {"caja", "--select", absoluteFilePath};
-            } else if (desktopSession.contains("cinnamon")) {
-                cmd = new String[] {"nemo", absoluteFilePath}; // Although nemo is based on nautilus it does not support --select, it directly highlights the file
-            } else if (desktopSession.contains("xfce")) {
-                cmd = new String[] {"thunar", absoluteFilePath};
-            }
+    private static List<String> selectFileCommand(String fileManager, String file) {
+        return switch (fileManager) {
+            // Nemo is based on Nautilus but does not support --select; like Thunar, it selects a file given as argument
+            case "nemo",
+                 "thunar" ->
+                    List.of(fileManager, file);
+            default ->
+                    List.of(fileManager, "--select", file);
+        };
+    }
+
+    private static List<String> desktopFileManagers(String desktop) {
+        if (desktop.contains("gnome")) {
+            return List.of("nautilus");
+        } else if (desktop.contains("kde") || desktop.contains("plasma")) {
+            return List.of("dolphin");
+        } else if (desktop.contains("mate")) {
+            return List.of("caja");
+        } else if (desktop.contains("cinnamon")) {
+            return List.of("nemo");
+        } else if (desktop.contains("xfce")) {
+            return List.of("thunar");
         }
-        LoggerFactory.getLogger(Linux.class).debug("Opening folder and selecting file using {}", String.join(" ", cmd));
-        ProcessLauncher.startDetached(new ProcessBuilder(cmd));
+        return List.of();
     }
 
     @Override

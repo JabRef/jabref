@@ -87,6 +87,31 @@ class LinuxTest {
                 Linux.defaultTerminalCommand(Optional.empty(), _ -> false, " ", "gnome", "/home/user"));
     }
 
+    // Ubuntu's session is named "ubuntu", so only XDG_CURRENT_DESKTOP ("ubuntu:GNOME") names the desktop environment
+    @Test
+    void fileManagerOfTheDesktopEnvironmentSelectsTheFile() {
+        assertEquals(List.of("nautilus", "--select", "/home/user/paper.pdf"),
+                Linux.fileManagerCommand(_ -> true, "ubuntu:gnome:ubuntu", Path.of("/home/user/paper.pdf")));
+    }
+
+    @Test
+    void nemoSelectsTheFileWithoutOption() {
+        assertEquals(List.of("nemo", "/home/user/paper.pdf"),
+                Linux.fileManagerCommand(_ -> true, "x-cinnamon:cinnamon", Path.of("/home/user/paper.pdf")));
+    }
+
+    @Test
+    void missingFileManagerOpensTheFolder() {
+        assertEquals(List.of("xdg-open", "/home/user"),
+                Linux.fileManagerCommand(_ -> false, "kde:plasma", Path.of("/home/user/paper.pdf")));
+    }
+
+    @Test
+    void unknownDesktopEnvironmentOpensTheFolder() {
+        assertEquals(List.of("xdg-open", "/home/user"),
+                Linux.fileManagerCommand(_ -> true, "sway", Path.of("/home/user/paper.pdf")));
+    }
+
     @Test
     void applicationCommandKeepsExecutablePathWithSpaces() throws IOException {
         Path viewer = Files.createFile(Files.createDirectory(tempDir.resolve("My Viewer")).resolve("viewer"));
