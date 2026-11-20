@@ -10,6 +10,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class OpenConsoleAction extends SimpleCommand {
                 NativeDesktop.openConsole(path, preferences, dialogService);
             } catch (IOException e) {
                 LOGGER.info("Could not open console", e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Open terminal here"), Optional.ofNullable(e.getMessage()).orElse(""), e);
             }
         });
     }

@@ -5,7 +5,6 @@ import java.nio.file.Path;
 
 import javafx.application.HostServices;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.os.ProcessLauncher;
@@ -45,8 +44,8 @@ public class OSX extends NativeDesktop {
     }
 
     @Override
-    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        ProcessLauncher.startDetached(new ProcessBuilder("open", "-a", "Terminal", absolutePath));
+    protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
+        ProcessLauncher.startDetached(new ProcessBuilder("/usr/bin/open", "-a", "Terminal", directory.toString()));
     }
 
     @Override

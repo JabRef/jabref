@@ -6,7 +6,6 @@ import java.util.List;
 
 import javafx.application.HostServices;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.os.ProcessLauncher;
@@ -88,7 +87,7 @@ public class Windows extends NativeDesktop {
     }
 
     @Override
-    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        ProcessLauncher.startDetached(new ProcessBuilder("cmd.exe", "/c", "start").directory(Path.of(absolutePath).toFile()));
+    protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
+        ProcessLauncher.startDetached(new ProcessBuilder("cmd.exe", "/c", "start").directory(directory.toFile()));
     }
 }

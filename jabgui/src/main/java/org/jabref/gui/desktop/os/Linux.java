@@ -12,7 +12,6 @@ import java.util.Optional;
 import javafx.application.HostServices;
 
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -108,13 +107,13 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
+    protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
         Optional<String> emulatorName = terminalEmulatorName(Path.of(ETC_ALTERNATIVES_X_TERMINAL_EMULATOR));
         if (emulatorName.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not detect terminal automatically using '%0'. Please define a custom terminal in the preferences.", ETC_ALTERNATIVES_X_TERMINAL_EMULATOR));
-            return;
+            throw new IOException(Localization.lang("Could not detect terminal automatically using '%0'. Please define a custom terminal in the preferences.", ETC_ALTERNATIVES_X_TERMINAL_EMULATOR));
         }
 
+        String absolutePath = directory.toString();
         String[] cmd = switch (emulatorName.orElseThrow()) {
             case String name when name.contains("gnome") ->
                     new String[] {"gnome-terminal", "--working-directory", absolutePath};
@@ -129,7 +128,7 @@ public class Linux extends NativeDesktop {
 
         LoggerFactory.getLogger(Linux.class).debug("Opening terminal using {}", String.join(" ", cmd));
 
-        ProcessLauncher.startDetached(new ProcessBuilder(cmd).directory(Path.of(absolutePath).toFile()));
+        ProcessLauncher.startDetached(new ProcessBuilder(cmd).directory(directory.toFile()));
     }
 
     /// Returns the file name of the program the Debian alternatives link points to, e.g. `gnome-terminal.wrapper`.

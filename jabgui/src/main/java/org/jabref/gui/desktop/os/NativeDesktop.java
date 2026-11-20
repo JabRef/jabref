@@ -230,22 +230,23 @@ public abstract class NativeDesktop {
     /// parent directory.
     ///
     /// @param fileOrDirectory Location the console should be opened at.
+    /// @throws IOException if the default terminal cannot be started
     public void openConsole(Path fileOrDirectory, DialogService dialogService) throws IOException {
         Path absolute = fileOrDirectory.toAbsolutePath();
-        String absolutePath = Files.isDirectory(absolute) ? absolute.toString() : absolute.getParent().toString();
+        Path directory = Files.isDirectory(absolute) ? absolute : absolute.getParent();
 
         boolean useCustomTerminal = preferences.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {
-            openConsoleWithDefaultTerminal(absolutePath, dialogService);
+            openConsoleWithDefaultTerminal(directory);
             return;
         }
         List<String> command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
         if (command.isEmpty() || command.getFirst().isBlank()) {
-            openConsoleWithDefaultTerminal(absolutePath, dialogService);
+            openConsoleWithDefaultTerminal(directory);
             LoggerFactory.getLogger(NativeDesktop.class).info("Preference for custom terminal is empty. Using default terminal.");
             return;
         }
-        executeCommand(command, absolutePath, dialogService);
+        executeCommand(command, directory.toString(), dialogService);
     }
 
     private static void executeCommand(List<String> command, String absolutePath, DialogService dialogService) {
@@ -463,7 +464,8 @@ public abstract class NativeDesktop {
 
     protected abstract void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException;
 
-    protected abstract void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException;
+    /// @throws IOException if no terminal could be started; its message is shown to the user
+    protected abstract void openConsoleWithDefaultTerminal(Path directory) throws IOException;
 
     /// Returns the path to the system's applications folder.
     ///

@@ -5,14 +5,12 @@ import java.nio.file.Path;
 
 import javafx.application.HostServices;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.Directories;
 
 import org.jspecify.annotations.NullMarked;
-import org.slf4j.LoggerFactory;
 
 /// This class contains some default implementations (if OS is neither linux, windows or osx) file directories and file/application open handling methods.
 ///
@@ -48,8 +46,8 @@ public class DefaultDesktop extends NativeDesktop {
     }
 
     @Override
-    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        LoggerFactory.getLogger(DefaultDesktop.class).error("This feature is not supported by your Operating System.");
+    protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
+        throw new IOException("No default terminal is known for this operating system");
     }
 
     @Override
