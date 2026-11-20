@@ -6,19 +6,26 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.languageserver.util.LspParserHandler;
 import org.jabref.languageserver.util.LspRangeUtil;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.gson.JsonArray;
 import org.eclipse.lsp4j.DocumentLink;
+import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 public abstract class DefinitionProvider {
+
+    private static final Pattern MARKDOWN_SPECIAL_CHARACTERS = Pattern.compile("[\\\\`*_\\[\\]<>#~|]");
 
     protected final LspParserHandler parserHandler;
 
@@ -41,6 +48,33 @@ public abstract class DefinitionProvider {
             }
         }
         return List.of();
+    }
+
+    // [impl->req~jabls.hover.citation-key~1]
+    public Optional<Hover> provideHover(String content, Position position) {
+        return getCitationKeyAtPosition(content, position).flatMap(citationKey -> {
+            String entries = parserHandler.searchForEntryByCitationKey(citationKey).values().stream()
+                                          .flatMap(List::stream)
+                                          .map(entry -> formatForHover(citationKey, entry))
+                                          .collect(Collectors.joining("\n\n---\n\n"));
+            if (entries.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(new Hover(new MarkupContent(MarkupKind.MARKDOWN, entries)));
+        });
+    }
+
+    private static String formatForHover(String citationKey, BibEntry entry) {
+        StringBuilder result = new StringBuilder("**").append(escapeMarkdown(citationKey)).append("**");
+        entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).ifPresent(author -> result.append("\n\n").append(escapeMarkdown(author)));
+        entry.getFieldOrAliasLatexFree(StandardField.TITLE).ifPresent(title -> result.append("\n\n*").append(escapeMarkdown(title)).append('*'));
+        entry.getFieldOrAliasLatexFree(StandardField.YEAR).ifPresent(year -> result.append(" (").append(escapeMarkdown(year)).append(')'));
+        return result.toString();
+    }
+
+    /// Entry data is shown literally, not interpreted as Markdown (emphasis, links, images, HTML)
+    private static String escapeMarkdown(String text) {
+        return MARKDOWN_SPECIAL_CHARACTERS.matcher(text).replaceAll("\\\\$0");
     }
 
     public List<DocumentLink> provideDocumentLinks(String fileUri, String content) {
@@ -92,7 +126,7 @@ public abstract class DefinitionProvider {
         }
 
         for (KeyBounds kb : findCitationKeys(content)) {
-            if (caret >= kb.start() && caret <= kb.end()) {
+            if (caret >= kb.start() && caret < kb.end()) {
                 return Optional.of(kb.key());
             }
         }
