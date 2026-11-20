@@ -51,6 +51,43 @@ class LinuxTest {
     }
 
     @Test
+    void defaultTerminalPrefersTheAlternativesLink() {
+        assertEquals(Optional.of(List.of("gnome-terminal", "--working-directory", "/home/user")),
+                Linux.defaultTerminalCommand(Optional.of("gnome-terminal.wrapper"), _ -> true, "xterm", "kde", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalUsesXdgTerminalExecWithoutAlternativesLink() {
+        assertEquals(Optional.of(List.of("xdg-terminal-exec")),
+                Linux.defaultTerminalCommand(Optional.empty(), "xdg-terminal-exec"::equals, "xterm", "kde", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalUsesTerminalVariableWithoutXdgTerminalExec() {
+        assertEquals(Optional.of(List.of("alacritty")),
+                Linux.defaultTerminalCommand(Optional.empty(), _ -> false, "alacritty", "kde", "/home/user"));
+    }
+
+    // Fedora and Nobara with KDE have no alternatives link, see https://github.com/JabRef/jabref/pull/17752#issuecomment-6945624391
+    @Test
+    void defaultTerminalUsesTheTerminalOfTheDesktopEnvironment() {
+        assertEquals(Optional.of(List.of("konsole", "--workdir", "/home/user")),
+                Linux.defaultTerminalCommand(Optional.empty(), "konsole"::equals, null, "kde:plasma", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalOfGnomeIsTheNewestInstalledOne() {
+        assertEquals(Optional.of(List.of("kgx", "--working-directory=/home/user")),
+                Linux.defaultTerminalCommand(Optional.empty(), program -> List.of("kgx", "gnome-terminal").contains(program), null, "gnome", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalIsEmptyWithoutAnyCandidate() {
+        assertEquals(Optional.empty(),
+                Linux.defaultTerminalCommand(Optional.empty(), _ -> false, " ", "gnome", "/home/user"));
+    }
+
+    @Test
     void applicationCommandKeepsExecutablePathWithSpaces() throws IOException {
         Path viewer = Files.createFile(Files.createDirectory(tempDir.resolve("My Viewer")).resolve("viewer"));
         Files.setPosixFilePermissions(viewer, EnumSet.allOf(PosixFilePermission.class));

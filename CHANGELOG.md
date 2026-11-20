@@ -163,6 +163,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue on Windows where linked files with very long paths opened the file explorer, not the file. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where opening the backup folder from the backup dialog failed when a custom file browser was set. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
 - We fixed an issue where a file link was removed although the file could not be deleted or moved to the trash. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
+- We fixed an issue where "Open terminal here" failed on Linux distributions without `/etc/alternatives/x-terminal-emulator`. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
 
