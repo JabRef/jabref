@@ -1,5 +1,5 @@
 TY  - JOUR
-\begin{author}\format[FormatChars,RisAuthors(AU)]{\author}\end{author}
+\begin{author}\format[RisAuthors(AU)]{\author}\end{author}
 \begin{title}T1  - \format[FormatChars]{\title}\end{title}
 \begin{journal}JO  - \format[FormatChars]{\journal}\end{journal}
 \begin{year}Y1  - \format[FormatChars]{\year}\end{year}\begin{month}/\format[FormatChars,RisMonth]{\month}\end{month}

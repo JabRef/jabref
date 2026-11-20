@@ -1,5 +1,7 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Collectors;
+
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.logic.os.OS;
 import org.jabref.model.entry.AuthorList;
@@ -8,22 +10,21 @@ public class RisAuthors implements ParamLayoutFormatter {
 
     private String arg = "";
 
+    /// Formats each author as a separate RIS line, e.g. `AU  - Smith, John`.
+    ///
+    /// The authors are parsed before any LaTeX conversion so that brace-protected
+    /// organization names such as `{Research and Development Institute}` stay a single author.
     @Override
-    public String format(String s) {
-        if (s == null) {
+    public String format(String fieldText) {
+        if (fieldText == null) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
-        String[] authors = AuthorList.fixAuthorLastNameFirst(s).split(" and ");
-        for (int i = 0; i < authors.length; i++) {
-            sb.append(arg);
-            sb.append("  - ");
-            sb.append(authors[i]);
-            if (i < authors.length - 1) {
-                sb.append(OS.NEWLINE);
-            }
-        }
-        return sb.toString();
+        return AuthorList.parse(fieldText)
+                         .latexFree()
+                         .getAuthors()
+                         .stream()
+                         .map(author -> arg + "  - " + author.getFamilyGiven(false))
+                         .collect(Collectors.joining(OS.NEWLINE));
     }
 
     @Override
