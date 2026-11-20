@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -87,10 +88,10 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     Collections.addAll(openCommand, Arrays.copyOfRange(commands, 1, commands.length));
                 }
                 processBuilder.command(openCommand);
-                processBuilder.start();
+                ProcessLauncher.startDetached(processBuilder);
             } else {
                 processBuilder.command(commands);
-                processBuilder.start();
+                ProcessLauncher.startDetached(processBuilder);
             }
         } catch (IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
@@ -181,7 +182,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         ProcessBuilder processBuilder = new ProcessBuilder();
         try {
             processBuilder.command(command);
-            processBuilder.start();
+            ProcessLauncher.startDetached(processBuilder);
         } catch (IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;

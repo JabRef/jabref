@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
@@ -136,7 +137,7 @@ public class PushToVim extends AbstractPushToApplication {
                         command[2],
                         command[3]);
             }
-            processBuilder.start();
+            ProcessLauncher.startDetached(processBuilder);
         } catch (IOException e) {
             LOGGER.warn("Problem pushing to Vim.", e);
             couldNotCall = true;

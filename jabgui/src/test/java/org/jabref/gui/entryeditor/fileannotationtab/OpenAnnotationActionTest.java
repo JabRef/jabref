@@ -1,7 +1,7 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,8 +59,7 @@ class OpenAnnotationActionTest {
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(pdfType));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
-        when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
-        when(process.getErrorStream()).thenReturn(InputStream.nullInputStream());
+        when(process.getOutputStream()).thenReturn(OutputStream.nullOutputStream());
         when(processBuilder.start()).thenReturn(process);
     }
 
@@ -77,14 +76,13 @@ class OpenAnnotationActionTest {
                 SUMATRA.toString(), "-reuse-instance", "-page", "7", PDF_FILE.toString()));
     }
 
-    /// Both streams of the reader have to be read, otherwise it blocks as soon as an unread pipe
-    /// fills up with the warnings Qt and GTK readers write.
+    /// Qt and GTK readers write warnings to their streams; unread pipes would block them once full.
     @Test
-    void bothStreamsOfTheReaderAreRead() {
+    void outputOfTheReaderIsDiscarded() {
         action().openAtAnnotation(PDF_FILE, annotationOnPage(PAGE), processBuilder);
 
-        verify(process).getInputStream();
-        verify(process).getErrorStream();
+        verify(processBuilder).redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        verify(processBuilder).redirectError(ProcessBuilder.Redirect.DISCARD);
     }
 
     @Test
