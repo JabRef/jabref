@@ -28,9 +28,9 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
-    api(platform("com.konghq:unirest-java-bom:4.11.8"))
+    api(platform("com.konghq:unirest-java-bom:4.11.10"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.23.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.24.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.7.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
@@ -54,7 +54,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.14.1")
+    api("com.dlsc.gemsfx:gemsfx:4.16.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.6.1")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -66,7 +66,7 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    api("com.google.errorprone:error_prone_core:2.52.0")
+    api("com.google.errorprone:error_prone_core:2.53.0")
     api("com.google.guava:guava:33.8.0-jre")
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
@@ -88,7 +88,7 @@ dependencies.constraints {
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("one.jpro:jmemorybuddy:0.6.0")
     api("de.saxsys:mvvmfx:1.8.0")
-    api("de.undercouch:citeproc-java:3.5.2")
+    api("de.undercouch:citeproc-java:3.5.3")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
@@ -117,7 +117,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.22.0")
     api("org.apache.commons:commons-text:1.15.0")
-    api("org.apache.httpcomponents.core5:httpcore5:5.4.4")
+    api("org.apache.httpcomponents.core5:httpcore5:5.5")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.5")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
@@ -130,7 +130,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.87")
-    api("org.controlsfx:controlsfx:11.2.6")
+    api("org.controlsfx:controlsfx:11.2.7")
     api("org.eclipse.jgit:org.eclipse.jgit:7.8.1.202611041320-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.8.1.202611041320-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:7.8.1.202611041320-r")
