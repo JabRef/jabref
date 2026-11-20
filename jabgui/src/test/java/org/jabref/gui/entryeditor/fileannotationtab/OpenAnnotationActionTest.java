@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -47,6 +48,7 @@ class OpenAnnotationActionTest {
     private final StateManager stateManager = mock(StateManager.class);
     private final ProcessBuilder processBuilder = mock(ProcessBuilder.class);
     private final Process process = mock(Process.class);
+    private final OutputStream stdin = mock(OutputStream.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
@@ -59,7 +61,8 @@ class OpenAnnotationActionTest {
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(pdfType));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
-        when(process.getOutputStream()).thenReturn(OutputStream.nullOutputStream());
+        when(process.getOutputStream()).thenReturn(stdin);
+        when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
         when(processBuilder.start()).thenReturn(process);
     }
 
@@ -76,13 +79,12 @@ class OpenAnnotationActionTest {
                 SUMATRA.toString(), "-reuse-instance", "-page", "7", PDF_FILE.toString()));
     }
 
-    /// Qt and GTK readers write warnings to their streams; unread pipes would block them once full.
+    /// The reader is started detached, so that no pipe to it stays open
     @Test
-    void outputOfTheReaderIsDiscarded() {
+    void readerIsStartedDetached() throws IOException {
         action().openAtAnnotation(PDF_FILE, annotationOnPage(PAGE), processBuilder);
 
-        verify(processBuilder).redirectOutput(ProcessBuilder.Redirect.DISCARD);
-        verify(processBuilder).redirectError(ProcessBuilder.Redirect.DISCARD);
+        verify(stdin).close();
     }
 
     @Test

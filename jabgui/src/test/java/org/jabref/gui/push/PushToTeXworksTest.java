@@ -1,6 +1,7 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,7 @@ class PushToTeXworksTest {
         Process process = mock(Process.class);
         when(processBuilder.start()).thenReturn(process);
         when(process.getOutputStream()).thenReturn(OutputStream.nullOutputStream());
+        when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
 
         String testKey = "TestKey";
         if (OS.OS_X) {

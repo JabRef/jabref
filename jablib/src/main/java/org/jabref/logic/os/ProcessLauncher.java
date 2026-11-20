@@ -2,8 +2,13 @@ package org.jabref.logic.os;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
+import org.jabref.logic.util.StreamGobbler;
+
+import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,19 +23,36 @@ public class ProcessLauncher {
     private ProcessLauncher() {
     }
 
-    /// Starts a program that never gets input and whose output is not needed.
+    /// Starts a program that never gets input and whose output JabRef does not need.
     ///
-    /// Its output is discarded and its stdin is closed: no pipe stays open until garbage collection,
-    /// no program blocks on a full pipe, and no thread reads from a long-running program, which would delay JabRef's shutdown.
+    /// Its stdin is closed. Its output goes to the debug log when debug logging is enabled, as many programs report problems only there;
+    /// otherwise it is discarded. Either way, no pipe stays open until garbage collection and no program blocks on a full pipe.
     /// The process is neither waited for nor closed, as [Process#close()] waits for its termination.
     public static void startDetached(ProcessBuilder processBuilder) throws IOException {
-        // The program's error output is discarded, so this is the only trace of a failing launch.
-        // The arguments are not logged: they may carry mail contents or login URLs.
         List<String> command = processBuilder.command();
-        LOGGER.debug("Starting {} with {} argument(s)", command.isEmpty() ? "" : command.getFirst(), Math.max(0, command.size() - 1));
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
+        String program = command.isEmpty() ? "" : command.getFirst();
+        // The arguments are not logged: they may carry mail contents or login URLs.
+        LOGGER.debug("Starting {} with {} argument(s)", program, Math.max(0, command.size() - 1));
+        startDetached(processBuilder, LOGGER.isDebugEnabled() ? line -> LOGGER.debug("{}: {}", program, line) : null);
+    }
+
+    /// @param outputConsumer receives stdout and stderr line by line; `null` discards them
+    @VisibleForTesting
+    static void startDetached(ProcessBuilder processBuilder, @Nullable Consumer<String> outputConsumer) throws IOException {
+        if (outputConsumer == null) {
+            processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+            processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
+        } else {
+            processBuilder.redirectErrorStream(true);
+        }
         Process process = processBuilder.start();
         process.getOutputStream().close();
+        if (outputConsumer != null) {
+            // A virtual thread does not keep the JVM alive, so a long-running program does not delay JabRef's shutdown,
+            // unlike a reader on HeadlessExecutorService, which is awaited on shutdown.
+            Thread.ofVirtual()
+                  .name("program output")
+                  .start(new StreamGobbler(process.getInputStream(), outputConsumer));
+        }
     }
 }
