@@ -47,6 +47,14 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Reveal the file being reviewed during backup recovery
+`req~jabgui.autosaveandbackup.reveal-reviewed-file~1`
+
+Choosing **On disk** in a backup comparison must reveal the backup used for that comparison in the file manager.
+The file manager selects the backup where the platform supports file selection.
+
+Needs: impl, utest
+
 ## Backup must batch field edits into scheduled writes
 `req~jabgui.autosaveandbackup.backup-every-edit~1`
 

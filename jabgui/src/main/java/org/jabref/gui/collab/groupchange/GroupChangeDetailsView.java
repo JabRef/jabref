@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Priority;
@@ -22,22 +23,26 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
 
-    public GroupChangeDetailsView(GroupChange groupChange) {
+    public GroupChangeDetailsView(GroupChange groupChange, Labeled onDisk) {
         this(groupChange,
                 Localization.lang("%0. Accepting the change replaces the complete groups tree with the externally modified groups tree.", groupChange.getName()),
                 Localization.lang("In JabRef"),
-                Localization.lang("On disk"),
+                onDisk,
                 DiffHighlighter.BasicDiffMethod.CHARS);
     }
 
     public GroupChangeDetailsView(GroupChange groupChange, String labelValue, String leftLabelText, String rightLabelText, DiffHighlighter.BasicDiffMethod diffMethod) {
+        this(groupChange, labelValue, leftLabelText, new Label(rightLabelText), diffMethod);
+    }
+
+    private GroupChangeDetailsView(GroupChange groupChange, String labelValue, String leftLabelText, Labeled onDisk, DiffHighlighter.BasicDiffMethod diffMethod) {
         Label label = new Label(labelValue);
         label.setWrapText(true);
 
         SplitPane diffPane = createGroupDiffSplitPane(
                 Optional.ofNullable(groupChange.getGroupDiff().getOriginalGroupRoot()),
                 Optional.ofNullable(groupChange.getGroupDiff().getNewGroupRoot()),
-                leftLabelText, rightLabelText, diffMethod);
+                leftLabelText, onDisk, diffMethod);
         VBox container = new VBox(12, label, diffPane);
         VBox.setVgrow(diffPane, Priority.ALWAYS);
         setAllAnchorsAndAttachChild(container);
@@ -46,7 +51,7 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
     /// Creates a split pane showing differences in groups tree structure.
     ///
     /// @return Configured SplitPane showing groups differences
-    public static SplitPane createGroupDiffSplitPane(Optional<GroupTreeNode> originalGroups, Optional<GroupTreeNode> newGroups, String leftLabelText, String rightLabelText, DiffHighlighter.BasicDiffMethod diffMethod) {
+    public static SplitPane createGroupDiffSplitPane(Optional<GroupTreeNode> originalGroups, Optional<GroupTreeNode> newGroups, String leftLabelText, Labeled onDisk, DiffHighlighter.BasicDiffMethod diffMethod) {
         StyleClassedTextArea jabrefTextArea = createConfiguredTextArea();
         StyleClassedTextArea diskTextArea = createConfiguredTextArea();
 
@@ -68,7 +73,6 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
 
         Label inJabRef = new Label(leftLabelText);
         inJabRef.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
-        Label onDisk = new Label(rightLabelText);
         onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         VBox leftContainer = new VBox(4, inJabRef, leftScrollPane);

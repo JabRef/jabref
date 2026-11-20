@@ -2,6 +2,7 @@ package org.jabref.gui.collab.entrychange;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
@@ -28,7 +29,8 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   GuiPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   PreviewViewer previewViewer,
-                                  TaskExecutor taskExecutor) {
+                                  TaskExecutor taskExecutor,
+                                  Labeled onDisk) {
         this(
                 oldEntry,
                 newEntry,
@@ -40,7 +42,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                 previewViewer,
                 taskExecutor,
                 Localization.lang("In JabRef"),
-                Localization.lang("On disk")
+                onDisk
         );
     }
 
@@ -54,10 +56,9 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   PreviewViewer previewViewer,
                                   TaskExecutor taskExecutor,
                                   String leftLabelText,
-                                  String rightLabelText) {
+                                  Labeled onDisk) {
         Label inJabRef = new Label(leftLabelText);
         inJabRef.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
-        Label onDisk = new Label(rightLabelText);
         onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         // we need a copy here as we otherwise would set the same entry twice

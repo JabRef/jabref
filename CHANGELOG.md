@@ -42,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added <kbd>Ctrl</kbd> + <kbd>C</kbd> copy support for selected entries in the global search results window. [#17310](https://github.com/JabRef/jabref/issues/17310)
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
+- We added a link to reveal the backup file from the review dialog. [#17686](https://github.com/JabRef/jabref/issues/17686)
 - We added checkboxes to enable or disable individual journal abbreviation lists without removing them. [#12468](https://github.com/JabRef/jabref/issues/12468)
 
 ### Changed

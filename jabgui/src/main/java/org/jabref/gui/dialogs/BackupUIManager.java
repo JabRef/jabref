@@ -170,7 +170,7 @@ public class BackupUIManager {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
-                        originalDatabase, Localization.lang("Review backup")
+                        originalDatabase, Localization.lang("Review backup"), Optional.of(backupPath)
                 );
                 Optional<Boolean> allChangesResolved = showForLibrary(tabContainer, stateManager, originalPath,
                         () -> dialogService.showCustomDialogAndWait(reviewBackupDialog));
