@@ -158,6 +158,8 @@ public class WelcomeTab extends Tab {
 
         VBox rightColumn = createRightColumn();
         GridPane.setHgrow(rightColumn, Priority.ALWAYS);
+        GridPane.setHgrow(quickSettings, Priority.ALWAYS);
+        GridPane.setHgrow(walkthroughs, Priority.ALWAYS);
 
         WalkthroughUtils.DebouncedRunnable updater = WalkthroughUtils.debounced(() -> updateColumnsLayout(grid, leftColumn, rightColumn, grid.getWidth()));
 
@@ -204,22 +206,53 @@ public class WelcomeTab extends Tab {
         grid.getColumnConstraints().clear();
 
         boolean scrollNeeded = false;
-        double threshold = 48 * workspacePreferences.getMainFontSize();
-        if (availableWidth < threshold) {
-            grid.getStyleClass().add("compact");
+        double compactThreshold = 48 * workspacePreferences.getMainFontSize();
+        double wideThreshold = 72 * workspacePreferences.getMainFontSize();
+
+        if (availableWidth >= wideThreshold) {
+            grid.getStyleClass().remove("compact");
+            rightColumn.getChildren().clear();
+
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setPercentWidth(100.0 / 3.0);
+            ColumnConstraints col2 = new ColumnConstraints();
+            col2.setPercentWidth(100.0 / 3.0);
+            ColumnConstraints col3 = new ColumnConstraints();
+            col3.setPercentWidth(100.0 / 3.0);
+            grid.getColumnConstraints().addAll(col1, col2, col3);
+
+            grid.add(leftColumn, 0, 0);
+            grid.add(quickSettings, 1, 0);
+            grid.add(walkthroughs, 2, 0);
+        } else if (availableWidth >= compactThreshold) {
+            grid.getStyleClass().remove("compact");
+            if (!rightColumn.getChildren().contains(quickSettings)) {
+                rightColumn.getChildren().setAll(quickSettings, walkthroughs);
+            }
+
+            ColumnConstraints half1 = new ColumnConstraints();
+            half1.setPercentWidth(50);
+            ColumnConstraints half2 = new ColumnConstraints();
+            half2.setPercentWidth(50);
+            grid.getColumnConstraints().addAll(half1, half2);
+
+            grid.add(leftColumn, 0, 0);
+            grid.add(rightColumn, 1, 0);
+        } else {
+            if (!grid.getStyleClass().contains("compact")) {
+                grid.getStyleClass().add("compact");
+            }
+            if (!rightColumn.getChildren().contains(quickSettings)) {
+                rightColumn.getChildren().setAll(quickSettings, walkthroughs);
+            }
+
             ColumnConstraints single = new ColumnConstraints();
             single.setPercentWidth(100);
             grid.getColumnConstraints().add(single);
+
             grid.add(leftColumn, 0, 0);
             grid.add(rightColumn, 0, 1);
             scrollNeeded = true;
-        } else {
-            grid.getStyleClass().remove("compact");
-            ColumnConstraints half = new ColumnConstraints();
-            half.setPercentWidth(50);
-            grid.getColumnConstraints().addAll(half, half);
-            grid.add(leftColumn, 0, 0);
-            grid.add(rightColumn, 1, 0);
         }
 
         if (!scrollNeeded) {
