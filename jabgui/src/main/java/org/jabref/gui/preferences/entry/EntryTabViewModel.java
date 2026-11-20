@@ -85,7 +85,7 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
         fieldPreferences.setResolveStrings(resolveStringsProperty.getValue());
         fieldPreferences.setResolvableFields(resolvableTagsFieldProperty.getValue());
-        fieldPreferences.setNonWrappableFields(resolvableTagsFieldProperty.getValue());
+        fieldPreferences.setNonWrappableFields(nonWrappableTagsFieldProperty.getValue());
 
         ownerPreferences.setUseOwner(markOwnerProperty.getValue());
         ownerPreferences.setDefaultOwner(markOwnerNameProperty.getValue());
