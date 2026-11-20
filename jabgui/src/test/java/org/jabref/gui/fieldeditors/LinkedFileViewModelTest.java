@@ -39,6 +39,8 @@ import org.jabref.model.entry.LinkedFile;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.sun.net.httpserver.HttpServer;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +66,7 @@ import static org.mockito.Mockito.when;
 
 // Need to run on JavaFX thread since {@link org.jabref.gui.linkedfile.DeleteFileAction.execute} creates a DialogPane
 @ExtendWith(JavaFxExtension.class)
+@NullMarked
 class LinkedFileViewModelTest {
 
     private Path tempFile;
@@ -77,7 +80,7 @@ class LinkedFileViewModelTest {
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final NativeDesktop nativeDesktop = mock(NativeDesktop.class);
     private CookieManager cookieManager;
-    private HttpServer httpServer;
+    private @Nullable HttpServer httpServer;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws IOException {

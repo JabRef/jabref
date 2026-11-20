@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 /// Covers the paths through a configured reader. The document viewer branch is left to manual testing.
 @DisabledOnOs(value = OS.MAC, disabledReason = "No reader can be told a page on macOS, so no command line is built")
+@NullMarked
 class OpenAnnotationActionTest {
 
     private static final Path PDF_FILE = Path.of("C:/My Library/some paper.pdf");

@@ -14,9 +14,11 @@ import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class PushToVim extends AbstractPushToApplication {
 
     public static final PushApplications APPLICATION = PushApplications.VIM;

@@ -13,13 +13,16 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class OpenConsoleAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenConsoleAction.class);
-    private final Supplier<BibDatabaseContext> databaseContext;
+    private final Supplier<@Nullable BibDatabaseContext> databaseContext;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
@@ -28,7 +31,7 @@ public class OpenConsoleAction extends SimpleCommand {
     /// or defaults to the active database. Use
     /// [#OpenConsoleAction(StateManager, GuiPreferences, DialogService)] if not supplying
     /// another database.
-    public OpenConsoleAction(Supplier<BibDatabaseContext> databaseContext, StateManager stateManager, GuiPreferences preferences, DialogService dialogService) {
+    public OpenConsoleAction(Supplier<@Nullable BibDatabaseContext> databaseContext, StateManager stateManager, GuiPreferences preferences, DialogService dialogService) {
         this.databaseContext = databaseContext;
         this.stateManager = stateManager;
         this.preferences = preferences;
