@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
 - We added checkboxes to enable or disable individual journal abbreviation lists without removing them. [#12468](https://github.com/JabRef/jabref/issues/12468)
+- We added support for resolving BibLaTeX `xdata` field references in entry previews. [#10865](https://github.com/JabRef/jabref/issues/10865)
 - We added restoring of the library tab and entry that were selected when JabRef was closed. [#16911](https://github.com/JabRef/jabref/pull/16911)
 
 ### Changed
@@ -152,6 +153,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 - We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
+- We fixed the issue where a missing comma after a BibTeX citation key led to a wrong key. [#17549](https://github.com/JabRef/jabref/issues/17549)
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
 - We fixed JabKit BibTeX conversion losing string definitions and preambles, including when overwriting the input file. [#17409](https://github.com/JabRef/jabref/issues/17409)
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
