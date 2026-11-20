@@ -125,6 +125,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed API key validation when saving a new or edited key. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
+- We fixed subgroups disappearing after adding them from the "All entries" context menu in a new library. [#17764](https://github.com/JabRef/jabref/issues/17764)
 - We fixed an issue where group selections were lost when changing library tabs. [#1104](https://github.com/JabRef/jabref/issues/1104)
 - We fixed obsolete group assignments remaining after changing an explicit group's grouping method. [#8824](https://github.com/JabRef/jabref/issues/8824)
 - We fixed an issue where the AI chat tab still said "Unable to chat" after attaching a file. [#17157](https://github.com/JabRef/jabref/pull/17157)
