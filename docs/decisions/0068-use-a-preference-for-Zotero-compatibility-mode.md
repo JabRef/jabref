@@ -1,12 +1,12 @@
 ---
 nav_order: 68
 parent: Decision Records
-status: partially superseded by ADR-0083
+status: partially superseded by ADR-0084
 ---
 
 # Use a Preference to Handle Zotero Reference Marks
 
-[ADR-0083](0083-canonical-writer-citations.md) replaces the legacy JabRef mark encoding described below, not the explicit Zotero compatibility preference or the next-insertion conversion policy.
+[ADR-0084](0084-canonical-writer-citations.md) replaces the legacy JabRef mark encoding described below, not the explicit Zotero compatibility preference or the next-insertion conversion policy.
 The decision below is a historical record; its `CID_n` encoding is no longer supported.
 
 In the current integration, a format mismatch triggers conversion only on the next CSL citation insertion, after the existing "Reference mark format" / "Converting references to selected format" warning.
@@ -19,7 +19,7 @@ The citation sidecar retains native modifier JSON for restoration on conversion 
 Conversion changes citation marks only, not bibliographies.
 With synchronization disabled, all bibliography section names, text, and properties stay unchanged; with synchronization enabled, normal updates affect only the target mode's managed bibliography, leaving other-format sections alone.
 No bibliography renaming, consolidation, sidecar, or rejection based on bibliography settings is part of citation conversion.
-See [ADR-0083's conversion policy](0083-canonical-writer-citations.md) for citation metadata preservation, the root-undo requirement, rollback limits, and the possible loss of pre-existing redo history.
+See [ADR-0084's conversion policy](0084-canonical-writer-citations.md) for citation metadata preservation, the root-undo requirement, rollback limits, and the possible loss of pre-existing redo history.
 
 ## Context and Problem Statement
 

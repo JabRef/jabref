@@ -80,7 +80,7 @@ Starting the write transaction can clear pre-existing redo history even when rol
 Ordinary updates retain raw style-property setters and do not gain this rollback behavior.
 The original conversion trigger and modifier compatibility remain: modifiers do not block conversion, and any native author suppression maps to the group's in-text citation type rather than adding full native rendering semantics.
 Only citation marks are converted; normal bibliography synchronization is unchanged, leaving every bibliography section untouched when disabled and updating only the target mode's managed bibliography when enabled.
-See [canonical write preparation](overview.md#canonical-insert-and-refresh) and the [conversion policy](../../decisions/0083-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
+See [canonical write preparation](overview.md#canonical-insert-and-refresh) and the [conversion policy](../../decisions/0084-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
 
 ## Block screen refresh
 

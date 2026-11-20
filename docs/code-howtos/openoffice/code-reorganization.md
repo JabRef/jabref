@@ -6,7 +6,7 @@ grand_parent: Code Howtos
 # Current package layout and ownership
 
 The Writer integration separates GUI actions, citation rendering, persistent citation state, and low-level UNO access.
-Use this guide to locate the code responsible for a change; the [architecture overview](overview.md), [ADR-0083](../../decisions/0083-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) define the behavior and compatibility contract.
+Use this guide to locate the code responsible for a change; the [architecture overview](overview.md), [ADR-0084](../../decisions/0084-canonical-writer-citations.md), and [requirements](../../requirements/openoffice.md) define the behavior and compatibility contract.
 
 ![Current Writer citation integration layers](writer-citation-layers.svg)
 
@@ -90,7 +90,7 @@ Ordering precedes controller locking because visual ordering needs to move Write
 `ZoteroCitationStrategy` owns native Zotero storage, ordering, validation, and write policy separately from canonical storage, while using the same `CslRenderer`.
 `ZoteroCitationLinker` prepares URI-link changes without modifying the document, and `ZoteroDocumentPreferences` handles native style preferences.
 Conversion changes citation marks only: normal synchronization leaves all bibliographies unchanged when disabled and updates only the target mode's managed bibliography when enabled.
-For conversion preparation, property undo, and rollback limits, see the [overview](overview.md#compatibility-boundary) and [ADR-0083](../../decisions/0083-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
+For conversion preparation, property undo, and rollback limits, see the [overview](overview.md#compatibility-boundary) and [ADR-0084](../../decisions/0084-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
 
 ## Canonical identity and storage
 

@@ -11,4 +11,4 @@ For new ADRs, please use [adr-template.md](adr-template.md) as basis.
 More information on MADR is available at <https://adr.github.io/madr/>.
 General information about architectural decision records is available at <https://adr.github.io/>.
 
-- [ADR-0083: Use canonical Writer citation marks across style families](0083-canonical-writer-citations.md)
+- [ADR-0084: Use canonical Writer citation marks across style families](0084-canonical-writer-citations.md)

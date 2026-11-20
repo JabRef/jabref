@@ -115,7 +115,7 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 
 ### Current implementation
 
-The conversion decision remains in use within the shared citation engine described in [ADR-0083](0083-canonical-writer-citations.md).
+The conversion decision remains in use within the shared citation engine described in [ADR-0084](0084-canonical-writer-citations.md).
 `BstRenderer` resolves the whole cited set through `CitationKeyResolution` and executes `BstVM.render` for that set.
 `BstCitationFormatter.parseBibliography` separates bibliography keys, optional labels, and LaTeX entry bodies.
 Requested bibliography bodies pass through one batched `PandocLatexConverter.latexToHtml` call, then `BSTFormatUtils.convertPandocHtmlToOOText`, before becoming `OOText` in a `RenderResult`.
