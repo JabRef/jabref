@@ -1,6 +1,7 @@
 package org.jabref.model.entry.identifier;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,31 @@ class ISBNTest {
     @Test
     void isIsbn13Incorrect() {
         assertFalse(new ISBN("0-123456-47-9").isIsbn13());
+    }
+
+    static Stream<Arguments> asIsbn13() {
+        return Stream.of(
+                Arguments.of("0-596-52068-9", "9780596520687"),
+                Arguments.of("0-13-162959-X", "9780131629592"),
+                Arguments.of("0-13-162959-x", "9780131629592"),
+                Arguments.of("0-9752298-0-X", "9780975229804"),
+                // New check digit is 0
+                Arguments.of("0-306-40601-2", "9780306406010"),
+                Arguments.of("978-1-56619-909-4", "9781566199094"),
+                Arguments.of("979-8-6024-0545-3", "9798602405453")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void asIsbn13(String input, String expected) {
+        assertEquals(Optional.of(new ISBN(expected)), new ISBN(input).asIsbn13());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"0-596-52068-0", "978-0-596-52068-0", "0-12B456-47-9"})
+    void asIsbn13ReturnsEmptyForInvalidIsbn(String input) {
+        assertEquals(Optional.empty(), new ISBN(input).asIsbn13());
     }
 
     private static List<String> findAllInTextAsStrings(String text) {
@@ -161,5 +187,29 @@ class ISBNTest {
     })
     void findAllInTextFindsNothing(String text) {
         assertEquals(List.of(), findAllInTextAsStrings(text));
+    }
+
+    static Stream<Arguments> findInText() {
+        return Stream.of(
+                Arguments.of("", Optional.empty()),
+                Arguments.of("ISBN 978-0-596-52068-7", Optional.of(new ISBN("9780596520687"))),
+                // A single ISBN-10 is returned as ISBN-13
+                Arguments.of("ISBN 0-596-52068-9", Optional.of(new ISBN("9780596520687"))),
+                // ISBN-13 and ISBN-10 of the same book, in both orders
+                Arguments.of("ISBN 978-0-596-52068-7\nISBN 0-596-52068-9", Optional.of(new ISBN("9780596520687"))),
+                Arguments.of("ISBN 0-596-52068-9\nISBN 978-0-596-52068-7", Optional.of(new ISBN("9780596520687"))),
+                Arguments.of("ISBN 978-0-596-52068-7, 9780596520687", Optional.of(new ISBN("9780596520687"))),
+                Arguments.of("ISBN 979-8-6024-0545-3", Optional.of(new ISBN("9798602405453"))),
+                // Different books
+                Arguments.of("ISBN 978-0-596-52068-7\nISBN 978-0-13-468599-1", Optional.empty()),
+                Arguments.of("ISBN 978-0-596-52068-7\nISBN 978-0-13-468599-1\nISBN 0-596-52068-9", Optional.empty()),
+                Arguments.of("ISBN 0-596-52068-9, 0-13-468599-7", Optional.empty())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void findInText(String text, Optional<ISBN> expected) {
+        assertEquals(expected, ISBN.findInText(text));
     }
 }

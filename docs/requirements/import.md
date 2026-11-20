@@ -187,4 +187,18 @@ See [JabRef issue #16332](https://github.com/JabRef/jabref/issues/16332).
 
 Needs: impl, utest
 
+## PDF book imports must extract publication metadata from supported citations in the PDF content
+`req~import.pdf.book-citation-publication~1`
+
+When a book PDF contains a supported bibliographic citation, extract the publisher and year from its publication area. Leave both fields unset if the publication information is missing or ambiguous. If the citation lists multiple publishers, leave the publisher unset in the metadata extracted from the PDF. See [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874).
+
+Needs: impl, utest
+
+## PDF book imports must resolve ISBN ambiguity when several ISBNs were found in the text
+`req~import.pdf.book-isbn-resolution~1`
+
+Equivalent ISBN-10 and ISBN-13 forms count as one candidate. If the multiple valid ISBNs are found, merged PDF import selects one only when lookup results and extracted book metadata identify a unique match and the other options are ruled out. Otherwise, keep any extracted book metadata, leave the ISBN unset, and show a warning.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

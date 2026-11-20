@@ -117,6 +117,46 @@ class BibliographicPageDetectorTest {
         assertEquals(Optional.empty(), BibliographicPageDetector.findBibliographicPage(List.of(references)));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r", "\u0085", "\u2028", "\u2029"})
+    void rejectsReferenceHeadingAfterRunningHeader(String lineBreak) {
+        String page = "Journal of Examples, page 12" + lineBreak + "References" + lineBreak
+                + "Knuth, D. E. The Art of Computer Programming. Addison-Wesley Publishing, 1997. ISBN 978-0-201-89683-1";
+
+        assertEquals(Optional.empty(), BibliographicPageDetector.findBibliographicPage(List.of(page)));
+    }
+
+    @Test
+    void acceptsImprintWithReferenceWordsInOrdinaryText() {
+        String page = ENGLISH_COPYRIGHT_PAGE + "This book includes references and a bibliography.\n";
+
+        assertEquals(Optional.of(page), BibliographicPageDetector.findBibliographicPage(List.of(page)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\u2028"})
+    void acceptsReferenceWordAsWrappedCitationTitle(String lineBreak) {
+        String page = "УДК 82" + lineBreak + "Коваль О. П." + lineBreak + "Література" + lineBreak
+                + "/" + lineBreak + "О. П. Коваль. — Харків : Ранок, 2010." + lineBreak
+                + "ISBN 978-966-08-0000-7";
+
+        assertEquals(Optional.of(page), BibliographicPageDetector.findBibliographicPage(List.of(page)));
+    }
+
+    @Test
+    void rejectsReferenceHeadingOutsideLocatedCitation() {
+        String page = """
+                References
+                Коваль О. П.
+                Література
+                /
+                О. П. Коваль. — Харків : Видавництво Ранок, 2010.
+                ISBN 978-966-08-0000-7
+                """;
+
+        assertEquals(Optional.empty(), BibliographicPageDetector.findBibliographicPage(List.of(page)));
+    }
+
     @Test
     void rejectsPublisherCatalogue() {
         String catalogue = """

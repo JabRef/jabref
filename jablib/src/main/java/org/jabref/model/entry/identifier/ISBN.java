@@ -70,6 +70,26 @@ public class ISBN implements Identifier {
         }
     }
 
+    /// Finds the ISBN of the book described by free text, such as the text of a book's copyright page.
+    ///
+    /// An ISBN-10 and the ISBN-13 of the same book count as one identifier, which is returned as ISBN-13.
+    /// If the text contains no ISBN or more than one different identifier, none is returned.
+    public static Optional<ISBN> findInText(String text) {
+        return selectSingleBook(findAllInText(text));
+    }
+
+    private static Optional<ISBN> selectSingleBook(List<ISBN> candidates) {
+        List<ISBN> isbn13s = candidates.stream()
+                                       .map(ISBN::asIsbn13)
+                                       .flatMap(Optional::stream)
+                                       .distinct()
+                                       .toList();
+        if (isbn13s.size() == 1) {
+            return Optional.of(isbn13s.getFirst());
+        }
+        return Optional.empty();
+    }
+
     /// Finds valid ISBNs in free text, such as the text of a book's copyright page.
     ///
     /// ISBN-13s are returned before ISBN-10s, each group in order of appearance, without duplicates.
@@ -197,6 +217,28 @@ public class ISBN implements Identifier {
 
     public boolean isValid() {
         return isValidFormat() && isValidChecksum();
+    }
+
+    /// Returns the ISBN-13 form of this ISBN, so that an ISBN-10 and its ISBN-13 can be compared.
+    /// An ISBN-13 is returned as is. Empty if this ISBN is not valid.
+    public Optional<ISBN> asIsbn13() {
+        if (!isValid()) {
+            return Optional.empty();
+        }
+        if (isbnString.length() == 13) {
+            return Optional.of(this);
+        }
+        String first12Digits = "978" + isbnString.substring(0, 9);
+        return Optional.of(new ISBN(first12Digits + isbn13CheckDigit(first12Digits)));
+    }
+
+    /// The digits are weighted 1, 3, 1, 3, ... and summed. The check digit brings the sum up to a multiple of 10.
+    private static int isbn13CheckDigit(String first12Digits) {
+        int sum = 0;
+        for (int pos = 0; pos < 12; pos++) {
+            sum += (first12Digits.charAt(pos) - '0') * ((pos % 2) == 0 ? 1 : 3);
+        }
+        return (10 - (sum % 10)) % 10;
     }
 
     @Override
