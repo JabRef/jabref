@@ -48,7 +48,7 @@ jobs:
         if: >
           (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
           (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref')
-        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: koppor
@@ -69,7 +69,7 @@ jobs:
           versionSpec: "6.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
+        uses: gittools/actions/gitversion/execute@220647997b450f3e9364b6cf6a357197f17d924b # v4.7.2
       - name: Build and push
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:

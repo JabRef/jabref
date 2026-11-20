@@ -3,7 +3,9 @@ package org.jabref.gui.frame;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
@@ -19,6 +21,7 @@ import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -43,6 +46,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingDispatcher;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SearchShortcutTarget;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
@@ -73,6 +77,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -96,6 +101,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
+    private static final Map<KeyBinding, EntryType> NEW_ENTRY_KEY_BINDINGS = Map.of(
+            KeyBinding.NEW_ARTICLE, StandardEntryType.Article,
+            KeyBinding.NEW_BOOK, StandardEntryType.Book,
+            KeyBinding.NEW_INBOOK, StandardEntryType.InBook,
+            KeyBinding.NEW_INPROCEEDINGS, StandardEntryType.InProceedings,
+            KeyBinding.NEW_MASTERSTHESIS, StandardEntryType.MastersThesis,
+            KeyBinding.NEW_PHDTHESIS, StandardEntryType.PhdThesis,
+            KeyBinding.NEW_PROCEEDINGS, StandardEntryType.Proceedings,
+            KeyBinding.NEW_TECHREPORT, StandardEntryType.TechReport,
+            KeyBinding.NEW_UNPUBLISHED, StandardEntryType.Unpublished);
+
     private final GuiPreferences preferences;
     private final AiService aiService;
     private final GlobalSearchBar globalSearchBar;
@@ -114,11 +130,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final OAuthSessionRegistry oAuthSessionRegistry;
+    private final NativeDesktop nativeDesktop;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final SplitPane horizontalSplit = new SplitPane();
     private final SidePane sidePane;
+    private final ScrollPane sidePaneScroll = new ScrollPane();
     private final SplitPane verticalSplit = new SplitPane();
     private final TabPane tabbedPane = new TabPane();
     private final EntryEditor entryEditor;
@@ -139,7 +157,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        TaskExecutor taskExecutor,
                        GitHandlerRegistry gitHandlerRegistry,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       OAuthSessionRegistry oAuthSessionRegistry) {
+                       OAuthSessionRegistry oAuthSessionRegistry,
+                       NativeDesktop nativeDesktop) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -152,6 +171,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.oAuthSessionRegistry = oAuthSessionRegistry;
+        this.nativeDesktop = nativeDesktop;
 
         setId("frame");
 
@@ -199,7 +219,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                nativeDesktop);
 
         this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
@@ -262,7 +283,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryEditor,
                 gitHandlerRegistry,
                 journalAbbreviationRepository,
-                oAuthSessionRegistry
+                oAuthSessionRegistry,
+                nativeDesktop
         );
 
         VBox head = new VBox(0, mainMenu, mainToolBar);
@@ -275,7 +297,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         horizontalSplit.getItems().addAll(verticalSplit);
         horizontalSplit.setOrientation(Orientation.HORIZONTAL);
 
-        SplitPane.setResizableWithParent(sidePane, false);
+        sidePaneScroll.setContent(sidePane);
+        sidePaneScroll.setFitToWidth(true);
+        sidePaneScroll.setFitToHeight(true);
+        sidePaneScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        sidePaneScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        sidePaneScroll.getStyleClass().add("side-pane-scroll");
+
+        SplitPane.setResizableWithParent(sidePaneScroll, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
         updateSidePane();
@@ -285,11 +314,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
             unsubscribeHorizontalDivider();
-            horizontalSplit.getItems().remove(sidePane);
+            horizontalSplit.getItems().remove(sidePaneScroll);
         } else {
-            if (!horizontalSplit.getItems().contains(sidePane)) {
+            if (!horizontalSplit.getItems().contains(sidePaneScroll)) {
                 horizontalSplit.setVisible(false);
-                horizontalSplit.getItems().addFirst(sidePane);
+                horizontalSplit.getItems().addFirst(sidePaneScroll);
                 Platform.runLater(() -> {
                     updateHorizontalDividerPosition();
                     horizontalSplit.setVisible(true);
@@ -371,95 +400,56 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initKeyBindings() {
+        KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(preferences.getKeyBindingRepository())
+                .on(KeyBinding.FOCUS_ENTRY_TABLE, () -> getCurrentLibraryTab().getMainTable().requestFocus())
+                .on(KeyBinding.FOCUS_GROUP_LIST, () -> sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus())
+                .on(KeyBinding.NEXT_LIBRARY, () -> tabbedPane.getSelectionModel().selectNext())
+                .on(KeyBinding.PREVIOUS_LIBRARY, () -> tabbedPane.getSelectionModel().selectPrevious())
+                .onWithoutConsuming(KeyBinding.OPEN_GLOBAL_SEARCH_DIALOG, globalSearchBar::openGlobalSearchDialog)
+                .onConditionally(KeyBinding.BACK, () -> navigateHistory(LibraryTab::back))
+                .onConditionally(KeyBinding.FORWARD, () -> navigateHistory(LibraryTab::forward))
+                // Handled here so that it also fires when the keyboard focus is outside the entry editor
+                .onConditionally(KeyBinding.JUMP_TO_FIELD, this::jumpToField)
+                .on(KeyBinding.CLOSE_DATABASE, () -> {
+                    if (getCurrentLibraryTab() == null) {
+                        closeSelectedNonLibraryTab(tabbedPane);
+                    } else {
+                        new CloseDatabaseAction(this, stateManager).execute();
+                    }
+                });
+        NEW_ENTRY_KEY_BINDINGS.forEach((keyBinding, entryType) -> keyBindingDispatcher.onWithoutConsuming(keyBinding,
+                () -> new NewEntryAction(entryType, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute()));
+
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            // Check search before the switch, which only sees the first matching key binding.
+            // Check search before the dispatcher, which only sees the first matching key binding.
             if (handleSearchKeyBinding(event, preferences.getKeyBindingRepository(), globalSearchBar::requestFocus)) {
                 return;
             }
-            Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case FOCUS_ENTRY_TABLE:
-                        getCurrentLibraryTab().getMainTable().requestFocus();
-                        event.consume();
-                        break;
-                    case FOCUS_GROUP_LIST:
-                        sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
-                        event.consume();
-                        break;
-                    case NEXT_LIBRARY:
-                        tabbedPane.getSelectionModel().selectNext();
-                        event.consume();
-                        break;
-                    case PREVIOUS_LIBRARY:
-                        tabbedPane.getSelectionModel().selectPrevious();
-                        event.consume();
-                        break;
-                    case OPEN_GLOBAL_SEARCH_DIALOG:
-                        globalSearchBar.openGlobalSearchDialog();
-                        break;
-                    case NEW_ARTICLE:
-                        new NewEntryAction(StandardEntryType.Article, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_BOOK:
-                        new NewEntryAction(StandardEntryType.Book, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_INBOOK:
-                        new NewEntryAction(StandardEntryType.InBook, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_MASTERSTHESIS:
-                        new NewEntryAction(StandardEntryType.MastersThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_PHDTHESIS:
-                        new NewEntryAction(StandardEntryType.PhdThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_PROCEEDINGS:
-                        new NewEntryAction(StandardEntryType.Proceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_TECHREPORT:
-                        new NewEntryAction(StandardEntryType.TechReport, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_UNPUBLISHED:
-                        new NewEntryAction(StandardEntryType.Unpublished, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case NEW_INPROCEEDINGS:
-                        new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
-                        break;
-                    case BACK:
-                        if (!(getScene().getFocusOwner() instanceof TextInputControl)
-                                && !(getScene().getFocusOwner() instanceof CodeArea)) {
-                            Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::back);
-                            event.consume();
-                        }
-                        break;
-                    case FORWARD:
-                        if (!(getScene().getFocusOwner() instanceof TextInputControl)
-                                && !(getScene().getFocusOwner() instanceof CodeArea)) {
-                            Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
-                            event.consume();
-                        }
-                        break;
-                    case JUMP_TO_FIELD:
-                        // Handled here so that it also fires when the keyboard focus is outside the entry editor
-                        if (!stateManager.getSelectedEntries().isEmpty()) {
-                            // Jumping to a field is only meaningful with a visible editor, so open it if it is closed
-                            stateManager.getEditorShowing().set(true);
-                            entryEditor.openJumpToFieldDialog();
-                            event.consume();
-                        }
-                        break;
-                    case CLOSE_DATABASE:
-                        if (getCurrentLibraryTab() == null) {
-                            closeSelectedNonLibraryTab(tabbedPane);
-                        } else {
-                            new CloseDatabaseAction(this, stateManager).execute();
-                        }
-                        event.consume();
-                        break;
-                    default:
-                }
-            }
+            keyBindingDispatcher.handle(event);
         });
+    }
+
+    /// History navigation keys are left to text inputs, where they move the caret.
+    ///
+    /// @return whether the navigation was performed
+    private boolean navigateHistory(Consumer<LibraryTab> navigation) {
+        Node focusOwner = getScene().getFocusOwner();
+        if (focusOwner instanceof TextInputControl || focusOwner instanceof CodeArea) {
+            return false;
+        }
+        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(navigation);
+        return true;
+    }
+
+    /// @return whether the jump to field dialog was opened
+    private boolean jumpToField() {
+        if (stateManager.getSelectedEntries().isEmpty()) {
+            return false;
+        }
+        // Jumping to a field is only meaningful with a visible editor, so open it if it is closed
+        stateManager.getEditorShowing().set(true);
+        entryEditor.openJumpToFieldDialog();
+        return true;
     }
 
     private void initBindings() {
