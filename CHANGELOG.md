@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
 - We added checkboxes to enable or disable individual journal abbreviation lists without removing them. [#12468](https://github.com/JabRef/jabref/issues/12468)
+- We added support for resolving BibLaTeX `xdata` field references in entry previews. [#10865](https://github.com/JabRef/jabref/issues/10865)
 
 ### Changed
 
