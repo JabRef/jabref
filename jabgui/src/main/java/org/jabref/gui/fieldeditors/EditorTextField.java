@@ -6,11 +6,16 @@ import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
+import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.shape.Rectangle;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
@@ -19,6 +24,9 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jspecify.annotations.NonNull;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
+
+    // Extra pixels added to the text clip so the caret and last glyph are not cut off
+    private static final double CLIP_EXTRA_WIDTH = 2.0;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -42,6 +50,25 @@ public class EditorTextField extends TextField implements Initializable, Context
         HBox.setHgrow(this, Priority.ALWAYS);
 
         ClipBoardManager.addX11Support(this);
+    }
+
+    /**
+     * Workaround for JabRef #14318: TextFieldSkin clips the text to the content area,
+     * which cuts off the caret and the last character at the end of long text.
+     */
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new TextFieldSkin(this) {
+            @Override
+            protected void layoutChildren(double x, double y, double w, double h) {
+                super.layoutChildren(x, y, w, h);
+                for (Node child : getChildren()) {
+                    if (child instanceof Group group && group.getClip() instanceof Rectangle clip) {
+                        clip.setWidth(w + CLIP_EXTRA_WIDTH);
+                    }
+                }
+            }
+        };
     }
 
     @Override
