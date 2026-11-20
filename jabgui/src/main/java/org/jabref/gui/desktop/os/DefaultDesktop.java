@@ -42,7 +42,7 @@ public class DefaultDesktop extends NativeDesktop {
 
     @Override
     protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) {
-        showDocument(filePath.toAbsolutePath().getParent().toUri().toString());
+        showDocument(filePath.getParent().toUri().toString());
     }
 
     @Override

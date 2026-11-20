@@ -139,20 +139,9 @@ public abstract class NativeDesktop {
         switch (field) {
             case URL ->
                     openBrowser(link);
-            case PS -> {
-                try {
-                    openFile(link, PS.getName());
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
-                }
-            }
-            case PDF -> {
-                try {
-                    openFile(link, PDF.getName());
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
-                }
-            }
+            case PS,
+                 PDF ->
+                    openFile(link, field.getName());
             case null,
                  default ->
                     LoggerFactory.getLogger(NativeDesktop.class).info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
@@ -208,11 +197,12 @@ public abstract class NativeDesktop {
     /// @param fileLink the location of the file
     /// @throws IOException if the default file browser cannot be opened
     public void openFolderAndSelectFile(Path fileLink, DialogService dialogService) throws IOException {
+        Path file = fileLink.toAbsolutePath();
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         startCustomOrDefault(externalApplicationsPreferences.useCustomFileBrowser(),
                 externalApplicationsPreferences.getCustomFileBrowserCommand(),
-                fileLink.toAbsolutePath().getParent(),
-                () -> openFolderAndSelectFileWithDefaultFileBrowser(fileLink),
+                file.getParent(),
+                () -> openFolderAndSelectFileWithDefaultFileBrowser(file),
                 dialogService);
     }
 
@@ -459,8 +449,10 @@ public abstract class NativeDesktop {
     /// `application` is never empty.
     protected abstract void openFileWithCustomApplication(String filePath, String application) throws IOException;
 
+    /// @param file an absolute path
     protected abstract void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException;
 
+    /// @param directory an absolute path
     /// @throws IOException if no terminal could be started; its message is shown to the user
     protected abstract void openConsoleWithDefaultTerminal(Path directory) throws IOException;
 
