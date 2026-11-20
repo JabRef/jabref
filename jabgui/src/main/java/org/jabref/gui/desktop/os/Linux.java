@@ -17,6 +17,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.HeadlessExecutorService;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -47,7 +48,7 @@ public class Linux extends NativeDesktop {
             } catch (IllegalArgumentException _) {
                 LoggerFactory.getLogger(Linux.class).debug("Fail back to xdg-open");
                 try {
-                    startProcess(new ProcessBuilder("xdg-open", filePath));
+                    ProcessLauncher.startDetached(new ProcessBuilder("xdg-open", filePath));
                 } catch (IOException e2) {
                     LoggerFactory.getLogger(Linux.class).warn("Open operation not successful: ", e2);
                 }
@@ -59,14 +60,14 @@ public class Linux extends NativeDesktop {
 
     @Override
     protected void openUrlWithSystemHandler(String url) throws IOException {
-        startProcess(new ProcessBuilder("xdg-open", url));
+        ProcessLauncher.startDetached(new ProcessBuilder("xdg-open", url));
     }
 
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
         List<String> command = new ArrayList<>(applicationCommand(application));
         command.add(filePath);
-        startProcess(new ProcessBuilder(command));
+        ProcessLauncher.startDetached(new ProcessBuilder(command));
     }
 
     /// The configured application is either the path of an executable, which may contain spaces,
@@ -103,7 +104,7 @@ public class Linux extends NativeDesktop {
             }
         }
         LoggerFactory.getLogger(Linux.class).debug("Opening folder and selecting file using {}", String.join(" ", cmd));
-        startProcess(new ProcessBuilder(cmd));
+        ProcessLauncher.startDetached(new ProcessBuilder(cmd));
     }
 
     @Override
@@ -128,7 +129,7 @@ public class Linux extends NativeDesktop {
 
         LoggerFactory.getLogger(Linux.class).debug("Opening terminal using {}", String.join(" ", cmd));
 
-        startProcess(new ProcessBuilder(cmd).directory(Path.of(absolutePath).toFile()));
+        ProcessLauncher.startDetached(new ProcessBuilder(cmd).directory(Path.of(absolutePath).toFile()));
     }
 
     /// Returns the file name of the program the Debian alternatives link points to, e.g. `gnome-terminal.wrapper`.

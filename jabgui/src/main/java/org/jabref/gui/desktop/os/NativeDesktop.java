@@ -27,6 +27,7 @@ import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
@@ -254,25 +255,11 @@ public abstract class NativeDesktop {
         dialogService.notify(Localization.lang("Executing command \"%0\"...", String.join(" ", subcommands)));
 
         try {
-            startProcess(new ProcessBuilder(subcommands).directory(Path.of(absolutePath).toFile()));
+            ProcessLauncher.startDetached(new ProcessBuilder(subcommands).directory(Path.of(absolutePath).toFile()));
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", String.join(" ", subcommands)));
         }
-    }
-
-    /// Starts a program that runs independently of JabRef.
-    /// Its output is discarded and its stdin is closed, as it never gets input: no pipe stays open until garbage collection,
-    /// and no thread reads from a long-running program, which would delay JabRef's shutdown.
-    protected static void startProcess(ProcessBuilder processBuilder) throws IOException {
-        // The program's error output is discarded, so this is the only trace of a failing launch.
-        // The arguments are not logged: they may carry mail contents or login URLs.
-        List<String> command = processBuilder.command();
-        LoggerFactory.getLogger(NativeDesktop.class).debug("Starting {} with {} argument(s)", command.getFirst(), command.size() - 1);
-        Process process = processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                                        .redirectError(ProcessBuilder.Redirect.DISCARD)
-                                        .start();
-        process.getOutputStream().close();
     }
 
     /// Opens the given URL using the system browser

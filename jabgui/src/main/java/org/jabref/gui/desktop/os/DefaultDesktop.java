@@ -8,6 +8,7 @@ import javafx.application.HostServices;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.Directories;
 
 import org.jspecify.annotations.NullMarked;
@@ -38,7 +39,7 @@ public class DefaultDesktop extends NativeDesktop {
 
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
-        startProcess(new ProcessBuilder(application, filePath));
+        ProcessLauncher.startDetached(new ProcessBuilder(application, filePath));
     }
 
     @Override
