@@ -141,8 +141,10 @@ public class ImportCommand extends SimpleCommand {
         // while no library is currently open.
         if (importMethod == ImportMethod.AS_NEW || tab == null) {
             task.onSuccess(parserResult -> {
-                    tabContainer.addTab(parserResult.getDatabaseContext(), true);
-                    dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
+                    if (parserResult.getDatabase().hasEntries() || (!parserResult.hasWarnings() && !parserResult.isInvalid())) {
+                        tabContainer.addTab(parserResult.getDatabaseContext(), true);
+                        dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
+                    }
                 })
                 .onFailure(ex -> {
                     LOGGER.error("Error importing", ex);
@@ -172,6 +174,7 @@ public class ImportCommand extends SimpleCommand {
         );
 
         List<ImportFormatReader.ImportResult> imports = new ArrayList<>();
+        boolean errorReported = false;
 
         // We import all files and collect their results
         for (Path filename : files) {
@@ -185,7 +188,11 @@ public class ImportCommand extends SimpleCommand {
                         dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
                     });
                     // This import method never throws an IOException
-                    imports.add(importFormatReader.importWithAutoDetection(filename));
+                    ImportFormatReader.ImportResult importResult = importFormatReader.importWithAutoDetection(filename);
+                    if (checkParserResult(filename, importResult.parserResult())) {
+                        errorReported = true;
+                    }
+                    imports.add(importResult);
                 } else {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter) || (importer.get() instanceof PdfMergeMetadataImporter))
@@ -196,9 +203,13 @@ public class ImportCommand extends SimpleCommand {
                     });
                     // Specific importer
                     ParserResult pr = importer.get().importDatabase(filename);
+                    if (checkParserResult(filename, pr)) {
+                        errorReported = true;
+                    }
                     imports.add(new ImportFormatReader.ImportResult(importer.get().getName(), pr));
                 }
             } catch (ImportException ex) {
+                errorReported = true;
                 UiTaskExecutor.runAndWaitInJavaFXThread(
                         () -> dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
@@ -209,14 +220,37 @@ public class ImportCommand extends SimpleCommand {
         }
 
         if (imports.isEmpty()) {
-            UiTaskExecutor.runAndWaitInJavaFXThread(
-                    () -> dialogService.showWarningDialogAndWait(
-                            Localization.lang("Import error"),
-                            Localization.lang("No entries found. Please make sure you are using the correct import filter.")));
+            if (!errorReported) {
+                UiTaskExecutor.runAndWaitInJavaFXThread(
+                        () -> dialogService.showWarningDialogAndWait(
+                                Localization.lang("Import error"),
+                                Localization.lang("No entries found. Please make sure you are using the correct import filter.")));
+            }
 
             return new ParserResult();
         }
 
         return ImportResultsMerger.mergeImportResults(imports, preferences.getBibEntryPreferences().getKeywordSeparator(), preferences.getOwnerPreferences(), preferences.getTimestampPreferences());
+    }
+
+    private boolean checkParserResult(Path filename, ParserResult parserResult) {
+        if (parserResult.isInvalid()) {
+            UiTaskExecutor.runAndWaitInJavaFXThread(
+                    () -> dialogService.showErrorDialogAndWait(
+                            Localization.lang("Import error"),
+                            Localization.lang("Error opening file '%0'", filename.getFileName().toString())
+                                    + "\n\n"
+                                    + parserResult.getErrorMessage()));
+            return true;
+        } else if (parserResult.hasWarnings()) {
+            UiTaskExecutor.runAndWaitInJavaFXThread(
+                    () -> dialogService.showWarningDialogAndWait(
+                            Localization.lang("Import error"),
+                            Localization.lang("Please check your library file for wrong syntax.")
+                                    + "\n\n"
+                                    + parserResult.getErrorMessage()));
+            return true;
+        }
+        return false;
     }
 }
