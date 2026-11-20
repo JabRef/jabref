@@ -15,17 +15,20 @@ public class LibraryPreferences {
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
     private final BooleanProperty alwaysReformatOnSave;
     private final BooleanProperty autoSave;
+    private final BooleanProperty synchronizeWithFile;
     private final BooleanProperty addImportedEntries;
     private final StringProperty addImportedEntriesGroupName;
 
     public LibraryPreferences(BibDatabaseMode defaultBibDatabaseMode,
                               boolean alwaysReformatOnSave,
                               boolean autoSave,
+                              boolean synchronizeWithFile,
                               boolean addImportedEntries,
                               String addImportedEntriesGroupName) {
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.autoSave = new SimpleBooleanProperty(autoSave);
+        this.synchronizeWithFile = new SimpleBooleanProperty(synchronizeWithFile);
         this.addImportedEntries = new SimpleBooleanProperty(addImportedEntries);
         this.addImportedEntriesGroupName = new SimpleStringProperty(addImportedEntriesGroupName);
     }
@@ -35,6 +38,7 @@ public class LibraryPreferences {
                 BibDatabaseMode.BIBTEX,
                 false,                                // alwaysReformatOnSave
                 false,                                // autoSave
+                false,                                // synchronizeWithFile
                 false,                                // addImportedEntries
                 Localization.lang("Imported entries") // addImportedEntriesGroupName
         );
@@ -78,6 +82,19 @@ public class LibraryPreferences {
 
     public void setAutoSave(boolean shouldAutoSave) {
         this.autoSave.set(shouldAutoSave);
+    }
+
+    /// The default for libraries that do not decide it themselves (see `MetaData.getSynchronizeWithFile`)
+    public boolean shouldSynchronizeWithFile() {
+        return synchronizeWithFile.get();
+    }
+
+    public BooleanProperty synchronizeWithFileProperty() {
+        return synchronizeWithFile;
+    }
+
+    public void setSynchronizeWithFile(boolean synchronizeWithFile) {
+        this.synchronizeWithFile.set(synchronizeWithFile);
     }
 
     public boolean shouldAddImportedEntries() {

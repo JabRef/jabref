@@ -92,6 +92,9 @@ import org.slf4j.LoggerFactory;
 /// value on, and says so, rather than overwriting the newer value
 /// ([org.jabref.model.undo.BibChange#apply]); and the pulled change marks the library as needing a
 /// save, because it arrives as [org.jabref.model.entry.event.EntriesEventSource#SHARED].
+///
+/// A local `.bib` file changed by another program is handled differently: by a three-way comparison with the
+/// library as it last matched the file, see [org.jabref.logic.sync.LibraryBaseline].
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);

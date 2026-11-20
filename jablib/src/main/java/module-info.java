@@ -39,6 +39,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.notifications;
     exports org.jabref.logic.util;
     exports org.jabref.logic.util.io;
+    exports org.jabref.logic.sync;
     exports org.jabref.logic.xmp;
     exports org.jabref.model.database;
     exports org.jabref.model.entry;
