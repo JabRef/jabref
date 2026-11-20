@@ -16,7 +16,6 @@ import javafx.util.Duration;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Notifications;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -40,7 +39,6 @@ import org.jabref.model.entry.identifier.Identifier;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
-import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.LoggerFactory;
 
@@ -323,23 +321,14 @@ public abstract class NativeDesktop {
         try {
             if (!launchBrowser(url)) {
                 // A failure would go unnoticed, so the link stays reachable for a while
-                dialogService.notify(new UnconfirmedBrowserLaunchNotification(url, dialogService, clipBoardManager));
+                dialogService.notify(new LinkNotification(
+                        Localization.lang("Opening link in the browser"),
+                        Localization.lang("If no browser opened, copy the link and open it manually."),
+                        url, dialogService, clipBoardManager, OnClickBehaviour.REMOVE)
+                        .withAutoClose(Duration.seconds(10)));
             }
         } catch (IOException exception) {
             showManualOpenPopup(url, dialogService, exception);
-        }
-    }
-
-    private static final class UnconfirmedBrowserLaunchNotification extends Notifications.UiNotification {
-        UnconfirmedBrowserLaunchNotification(String url, DialogService dialogService, ClipBoardManager clipBoardManager) {
-            super(Localization.lang("Opening link in the browser"),
-                    Localization.lang("If no browser opened, copy the link and open it manually."));
-            withAutoClose(Duration.seconds(10));
-            getActions().add(new NotificationAction<>(Localization.lang("Copy link"), _ -> {
-                clipBoardManager.setContent(url);
-                dialogService.notify(Localization.lang("The link has been copied to the clipboard."));
-                return OnClickBehaviour.REMOVE;
-            }));
         }
     }
 
