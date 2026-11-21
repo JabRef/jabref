@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// Similar tests are available in [org.jabref.model.entry.AuthorListTest]
 class AuthorListParserTest {
@@ -117,7 +118,7 @@ class AuthorListParserTest {
         AuthorList authors = parser.parse(input);
 
         assertEquals(families, authors.getAuthors().stream().map(author -> author.getFamilyName().orElse("")).toList());
-        assertEquals(true, authors.hasValidExtendedNames());
+        assertTrue(authors.hasValidExtendedNames());
         assertEquals(authors, parser.parse(authors.getAsBibtex()));
     }
 
