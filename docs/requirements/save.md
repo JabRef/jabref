@@ -127,4 +127,12 @@ Needs: impl, utest
 Normalization preserves name attributes, name-list options, and quotes protecting individual name parts. If an extended name has malformed syntax or repeats an attribute, normalization preserves the field as entered.
 
 Needs: impl, utest
+
+### Citation key generation must normalize extended names to readable name parts
+`req~save.citation-keys.normalize-extended-names~1`
+
+The `normalize_names` modifier in a citation key pattern uses the names without their BibLaTeX attribute labels. Saving and reopening the entry preserves the generated key and the original name field.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

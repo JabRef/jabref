@@ -9,6 +9,8 @@ import org.jspecify.annotations.NonNull;
 /// Formatter normalizing a list of person names to the BibTeX format.
 public class NormalizeNamesFormatter extends Formatter {
 
+    public static final String KEY = "normalize_names";
+
     @Override
     public String getName() {
         return Localization.lang("Normalize names of persons");
@@ -16,7 +18,7 @@ public class NormalizeNamesFormatter extends Formatter {
 
     @Override
     public String getKey() {
-        return "normalize_names";
+        return KEY;
     }
 
     @Override

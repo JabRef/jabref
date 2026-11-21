@@ -1,16 +1,23 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -105,6 +112,26 @@ class CitationKeyGeneratorTest {
                         new SimpleObjectProperty<>(','));
 
         return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
+    }
+
+    // [utest->req~save.citation-keys.normalize-extended-names~1]
+    @ParameterizedTest
+    @CsvSource({
+            "'family=Hasselt', '[author:normalize_names]', Hasselt",
+            "'given=Hado, family=Hasselt', '[author:normalize_names]', HasseltHado",
+            "'given=Hado, family=Hasselt', '[author:lower:normalize_names:upper]', HASSELTHADO"
+    })
+    void normalizedAuthorKeysSurviveSaveAndReparse(String author, String pattern, String expectedKey) throws Exception {
+        BibEntry entry = createABibEntryAuthor(author);
+        entry.withCitationKey(generateKey(entry, pattern)).withChanged(true);
+        var output = new StringWriter();
+        var writer = new BibEntryWriter(new FieldWriter(new FieldPreferences(true, List.of(), List.of())), new BibEntryTypesManager());
+
+        writer.write(entry, new BibWriter(output, "\n"), BibDatabaseMode.BIBLATEX);
+
+        BibEntry reloaded = BibtexParser.singleFromString(output.toString(), importFormatPreferences).orElseThrow();
+        assertEquals(Optional.of(expectedKey), reloaded.getCitationKey());
+        assertEquals(Optional.of(author), reloaded.getField(StandardField.AUTHOR));
     }
 
     @Test
