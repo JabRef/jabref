@@ -38,7 +38,9 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -54,6 +56,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -61,6 +64,64 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
 class MainTableDataModelTest {
+
+    @Test
+    void nameBindingIsReusedAndUpdatesWhenSourceChangesWithoutChangingDisplay() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            BibEntry entry = new BibEntry().withField(StandardField.EDITOR, "family=Doe, given=Jane");
+            BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
+            var binding = row.getNameFields(FieldFactory.parseOrFields("author/editor"));
+
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals("family=Doe, given=Jane", binding.getValue().source());
+
+            entry.setField(StandardField.AUTHOR, "family=Doe, given=Janet");
+
+            assertSame(binding, row.getNameFields(FieldFactory.parseOrFields("author/editor")));
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals("family=Doe, given=Janet", binding.getValue().source());
+        });
+    }
+
+    @Test
+    void reusedNameBindingResolvesUpdatedStringMacroForSorting() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            BibtexString author = new BibtexString("author", "Jane Doe");
+            context.getDatabase().addString(author);
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "#author#");
+            BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
+            var binding = row.getNameFields(FieldFactory.parseOrFields("author"));
+
+            assertEquals("Jane Doe", binding.getValue().source());
+
+            author.setContent("Jane Roe");
+
+            assertEquals("Jane Roe", binding.getValue().source());
+        });
+    }
+
+    @Test
+    void reusedNameBindingResolvesUpdatedXDataForSorting() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            BibEntry parent = new BibEntry().withCitationKey("names").withField(StandardField.AUTHOR, "Jane Doe");
+            context.getDatabase().insertEntries(parent);
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            BibEntry entry = new BibEntry().withField(StandardField.XDATA, "names");
+            BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
+            var binding = row.getNameFields(FieldFactory.parseOrFields("author"));
+
+            assertEquals("Jane Doe", binding.getValue().source());
+
+            parent.setField(StandardField.AUTHOR, "Jane Roe");
+
+            assertEquals("Jane Roe", binding.getValue().source());
+        });
+    }
 
     @Test
     void additionToObservableMapTriggersUpdate() {

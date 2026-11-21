@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -22,6 +23,7 @@ import javafx.beans.value.ObservableValue;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -36,12 +38,26 @@ import org.jabref.model.groups.GroupTreeNode;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 public class BibEntryTableViewModel {
+    @NullMarked
+    public record NameValue(String display, String localSource, Optional<Supplier<String>> sharedSource) {
+        public String source() {
+            return sharedSource.map(Supplier::get).orElse(localSource);
+        }
+
+        @Override
+        public String toString() {
+            return display;
+        }
+    }
+
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     @Nullable private Map<OrFields, ObservableValue<String>> fieldValues;
+    @Nullable private Map<OrFields, ObservableValue<NameValue>> nameValues;
     @Nullable private Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues;
     private final BibDatabaseContext bibDatabaseContext;
     private boolean hasFullTextResults;
@@ -152,6 +168,27 @@ public class BibEntryTableViewModel {
                 getFieldValueDependencies());
         getFieldValues().put(fields, value);
         return value;
+    }
+
+    public ObservableValue<NameValue> getNameFields(OrFields fields) {
+        assert Platform.isFxApplicationThread();
+        if (nameValues == null) {
+            nameValues = new HashMap<>();
+        }
+        return nameValues.computeIfAbsent(fields, key -> Bindings.createObjectBinding(
+                () -> createNameValue(key), getFieldValueDependencies()));
+    }
+
+    private NameValue createNameValue(OrFields fields) {
+        String display = fieldValueFormatter.getValue().formatFieldsValues(fields, entry);
+        Supplier<String> resolveSource = () -> entry.getResolvedFieldOrAlias(fields, bibDatabaseContext.getDatabase()).orElse("");
+        // Inherited fields and string macros can change independently of this row's observables.
+        if (entry.hasField(StandardField.XDATA) || entry.hasField(StandardField.CROSSREF)
+                || fields.getFields().stream().map(entry::getFieldOrAlias).flatMap(Optional::stream)
+                         .anyMatch(value -> value.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL) >= 0)) {
+            return new NameValue(display, "", Optional.of(resolveSource));
+        }
+        return new NameValue(display, resolveSource.get(), Optional.empty());
     }
 
     private Map<OrFields, ObservableValue<String>> getFieldValues() {
