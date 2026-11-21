@@ -909,17 +909,17 @@ class BibDatabaseWriterTest {
         metaData.setSaveOrder(saveOrder);
 
         BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "A")
+                .withField(StandardField.AUTHOR, "Smith, John")
                 .withField(StandardField.YEAR, "2010")
                 .withChanged(true);
 
         BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "A")
+                .withField(StandardField.AUTHOR, "Smith, Jane")
                 .withField(StandardField.YEAR, "2000")
                 .withChanged(true);
 
         BibEntry thirdEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "B")
+                .withField(StandardField.AUTHOR, "Taylor, Beatrice")
                 .withField(StandardField.YEAR, "2000")
                 .withChanged(true);
 
@@ -928,15 +928,15 @@ class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(bibtexContext, database.getEntries());
 
         assertEquals("@Article{," + OS.NEWLINE +
-                        "  author = {A}," + OS.NEWLINE +
+                        "  author = {Smith, John}," + OS.NEWLINE +
                         "  year   = {2010}," + OS.NEWLINE +
                         "}" + OS.NEWLINE + OS.NEWLINE +
                         "@Article{," + OS.NEWLINE +
-                        "  author = {A}," + OS.NEWLINE +
+                        "  author = {Smith, Jane}," + OS.NEWLINE +
                         "  year   = {2000}," + OS.NEWLINE +
                         "}" + OS.NEWLINE + OS.NEWLINE +
                         "@Article{," + OS.NEWLINE +
-                        "  author = {B}," + OS.NEWLINE +
+                        "  author = {Taylor, Beatrice}," + OS.NEWLINE +
                         "  year   = {2000}," + OS.NEWLINE +
                         "}" + OS.NEWLINE + OS.NEWLINE +
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +

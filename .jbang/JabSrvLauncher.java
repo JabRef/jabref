@@ -27,8 +27,8 @@
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.23
 //DEPS com.github.ben-manes.caffeine:caffeine:3.3.1
 //DEPS com.google.guava:guava:33.8.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.11.5
-//DEPS de.undercouch:citeproc-java:3.5.2
+//DEPS com.konghq:unirest-modules-gson:4.11.10
+//DEPS de.undercouch:citeproc-java:3.5.3
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
