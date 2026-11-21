@@ -1,5 +1,8 @@
 package org.jabref.gui.push;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +16,7 @@ import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -23,6 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@NullMarked
 class PushToTeXworksTest {
 
     private static final String TEXWORKS_CLIENT_PATH = "/usr/bin/texworks";
@@ -72,8 +77,12 @@ class PushToTeXworksTest {
 
     /// Check for the actual command and path with path is run.
     @Test
-    void pushEntries() {
+    void pushEntries() throws IOException {
         ProcessBuilder processBuilder = mock(ProcessBuilder.class);
+        Process process = mock(Process.class);
+        when(processBuilder.start()).thenReturn(process);
+        when(process.getOutputStream()).thenReturn(OutputStream.nullOutputStream());
+        when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
 
         String testKey = "TestKey";
         if (OS.OS_X) {

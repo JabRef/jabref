@@ -51,6 +51,68 @@ class LinuxTest {
     }
 
     @Test
+    void defaultTerminalPrefersTheAlternativesLink() {
+        assertEquals(Optional.of(List.of("gnome-terminal", "--working-directory", "/home/user")),
+                Linux.defaultTerminalCommand(Optional.of("gnome-terminal.wrapper"), _ -> true, "xterm", "kde", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalUsesXdgTerminalExecWithoutAlternativesLink() {
+        assertEquals(Optional.of(List.of("xdg-terminal-exec")),
+                Linux.defaultTerminalCommand(Optional.empty(), "xdg-terminal-exec"::equals, "xterm", "kde", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalUsesTerminalVariableWithoutXdgTerminalExec() {
+        assertEquals(Optional.of(List.of("alacritty")),
+                Linux.defaultTerminalCommand(Optional.empty(), _ -> false, "alacritty", "kde", "/home/user"));
+    }
+
+    // Fedora and Nobara with KDE have no alternatives link, see https://github.com/JabRef/jabref/pull/17752#issuecomment-6945624391
+    @Test
+    void defaultTerminalUsesTheTerminalOfTheDesktopEnvironment() {
+        assertEquals(Optional.of(List.of("konsole", "--workdir", "/home/user")),
+                Linux.defaultTerminalCommand(Optional.empty(), "konsole"::equals, null, "kde:plasma", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalOfGnomeIsTheNewestInstalledOne() {
+        assertEquals(Optional.of(List.of("kgx", "--working-directory=/home/user")),
+                Linux.defaultTerminalCommand(Optional.empty(), program -> List.of("kgx", "gnome-terminal").contains(program), null, "gnome", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalIsEmptyWithoutAnyCandidate() {
+        assertEquals(Optional.empty(),
+                Linux.defaultTerminalCommand(Optional.empty(), _ -> false, " ", "gnome", "/home/user"));
+    }
+
+    // Ubuntu's session is named "ubuntu", so only XDG_CURRENT_DESKTOP ("ubuntu:GNOME") names the desktop environment
+    @Test
+    void fileManagerOfTheDesktopEnvironmentSelectsTheFile() {
+        assertEquals(List.of("nautilus", "--select", "/home/user/paper.pdf"),
+                Linux.fileManagerCommand(_ -> true, "ubuntu:gnome:ubuntu", Path.of("/home/user/paper.pdf")));
+    }
+
+    @Test
+    void nemoSelectsTheFileWithoutOption() {
+        assertEquals(List.of("nemo", "/home/user/paper.pdf"),
+                Linux.fileManagerCommand(_ -> true, "x-cinnamon:cinnamon", Path.of("/home/user/paper.pdf")));
+    }
+
+    @Test
+    void missingFileManagerOpensTheFolder() {
+        assertEquals(List.of("xdg-open", "/home/user"),
+                Linux.fileManagerCommand(_ -> false, "kde:plasma", Path.of("/home/user/paper.pdf")));
+    }
+
+    @Test
+    void unknownDesktopEnvironmentOpensTheFolder() {
+        assertEquals(List.of("xdg-open", "/home/user"),
+                Linux.fileManagerCommand(_ -> true, "sway", Path.of("/home/user/paper.pdf")));
+    }
+
+    @Test
     void applicationCommandKeepsExecutablePathWithSpaces() throws IOException {
         Path viewer = Files.createFile(Files.createDirectory(tempDir.resolve("My Viewer")).resolve("viewer"));
         Files.setPosixFilePermissions(viewer, EnumSet.allOf(PosixFilePermission.class));

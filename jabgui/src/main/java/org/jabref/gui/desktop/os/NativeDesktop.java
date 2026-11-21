@@ -16,7 +16,6 @@ import javafx.util.Duration;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Notifications;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -27,6 +26,7 @@ import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
@@ -39,7 +39,6 @@ import org.jabref.model.entry.identifier.Identifier;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
-import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.LoggerFactory;
 
@@ -140,20 +139,9 @@ public abstract class NativeDesktop {
         switch (field) {
             case URL ->
                     openBrowser(link);
-            case PS -> {
-                try {
-                    openFile(link, PS.getName());
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
-                }
-            }
-            case PDF -> {
-                try {
-                    openFile(link, PDF.getName());
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
-                }
-            }
+            case PS,
+                 PDF ->
+                    openFile(link, field.getName());
             case null,
                  default ->
                     LoggerFactory.getLogger(NativeDesktop.class).info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
@@ -209,42 +197,52 @@ public abstract class NativeDesktop {
     /// @param fileLink the location of the file
     /// @throws IOException if the default file browser cannot be opened
     public void openFolderAndSelectFile(Path fileLink, DialogService dialogService) throws IOException {
+        Path file = fileLink.toAbsolutePath();
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-        boolean useCustomFileBrowser = externalApplicationsPreferences.useCustomFileBrowser();
-        if (!useCustomFileBrowser) {
-            openFolderAndSelectFileWithDefaultFileBrowser(fileLink);
-            return;
-        }
-        String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-        List<String> command = externalApplicationsPreferences.getCustomFileBrowserCommand();
-        if (command.isEmpty() || command.getFirst().isBlank()) {
-            LoggerFactory.getLogger(NativeDesktop.class).info("No custom file browser command defined");
-            openFolderAndSelectFileWithDefaultFileBrowser(fileLink);
-            return;
-        }
-        executeCommand(command, absolutePath, dialogService);
+        startCustomOrDefault(externalApplicationsPreferences.useCustomFileBrowser(),
+                externalApplicationsPreferences.getCustomFileBrowserCommand(),
+                file.getParent(),
+                () -> openFolderAndSelectFileWithDefaultFileBrowser(file),
+                dialogService);
     }
 
     /// Opens a new console: in the given directory itself, or, given a file, in the file's
     /// parent directory.
     ///
     /// @param fileOrDirectory Location the console should be opened at.
+    /// @throws IOException if the default terminal cannot be started
     public void openConsole(Path fileOrDirectory, DialogService dialogService) throws IOException {
         Path absolute = fileOrDirectory.toAbsolutePath();
-        String absolutePath = Files.isDirectory(absolute) ? absolute.toString() : absolute.getParent().toString();
+        Path directory = Files.isDirectory(absolute) ? absolute : absolute.getParent();
+        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        startCustomOrDefault(externalApplicationsPreferences.useCustomTerminal(),
+                externalApplicationsPreferences.getCustomTerminalCommand(),
+                directory,
+                () -> openConsoleWithDefaultTerminal(directory),
+                dialogService);
+    }
 
-        boolean useCustomTerminal = preferences.getExternalApplicationsPreferences().useCustomTerminal();
-        if (!useCustomTerminal) {
-            openConsoleWithDefaultTerminal(absolutePath, dialogService);
+    @FunctionalInterface
+    private interface DefaultProgram {
+        void start() throws IOException;
+    }
+
+    /// Starts the custom program if it is enabled and defined, otherwise the default program of the OS.
+    private static void startCustomOrDefault(boolean useCustomProgram,
+                                             List<String> customCommand,
+                                             Path directory,
+                                             DefaultProgram defaultProgram,
+                                             DialogService dialogService) throws IOException {
+        if (!useCustomProgram) {
+            defaultProgram.start();
             return;
         }
-        List<String> command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
-        if (command.isEmpty() || command.getFirst().isBlank()) {
-            openConsoleWithDefaultTerminal(absolutePath, dialogService);
-            LoggerFactory.getLogger(NativeDesktop.class).info("Preference for custom terminal is empty. Using default terminal.");
+        if (customCommand.isEmpty() || customCommand.getFirst().isBlank()) {
+            LoggerFactory.getLogger(NativeDesktop.class).info("No custom command defined, using the default program");
+            defaultProgram.start();
             return;
         }
-        executeCommand(command, absolutePath, dialogService);
+        executeCommand(customCommand, directory.toString(), dialogService);
     }
 
     private static void executeCommand(List<String> command, String absolutePath, DialogService dialogService) {
@@ -254,25 +252,11 @@ public abstract class NativeDesktop {
         dialogService.notify(Localization.lang("Executing command \"%0\"...", String.join(" ", subcommands)));
 
         try {
-            startProcess(new ProcessBuilder(subcommands).directory(Path.of(absolutePath).toFile()));
+            ProcessLauncher.startDetached(new ProcessBuilder(subcommands).directory(Path.of(absolutePath).toFile()));
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", String.join(" ", subcommands)));
         }
-    }
-
-    /// Starts a program that runs independently of JabRef.
-    /// Its output is discarded and its stdin is closed, as it never gets input: no pipe stays open until garbage collection,
-    /// and no thread reads from a long-running program, which would delay JabRef's shutdown.
-    protected static void startProcess(ProcessBuilder processBuilder) throws IOException {
-        // The program's error output is discarded, so this is the only trace of a failing launch.
-        // The arguments are not logged: they may carry mail contents or login URLs.
-        List<String> command = processBuilder.command();
-        LoggerFactory.getLogger(NativeDesktop.class).debug("Starting {} with {} argument(s)", command.getFirst(), command.size() - 1);
-        Process process = processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD)
-                                        .redirectError(ProcessBuilder.Redirect.DISCARD)
-                                        .start();
-        process.getOutputStream().close();
     }
 
     /// Opens the given URL using the system browser
@@ -327,23 +311,14 @@ public abstract class NativeDesktop {
         try {
             if (!launchBrowser(url)) {
                 // A failure would go unnoticed, so the link stays reachable for a while
-                dialogService.notify(new UnconfirmedBrowserLaunchNotification(url, dialogService, clipBoardManager));
+                dialogService.notify(new LinkNotification(
+                        Localization.lang("Opening link in the browser"),
+                        Localization.lang("If no browser opened, copy the link and open it manually."),
+                        url, dialogService, clipBoardManager, OnClickBehaviour.REMOVE)
+                        .withAutoClose(Duration.seconds(10)));
             }
         } catch (IOException exception) {
             showManualOpenPopup(url, dialogService, exception);
-        }
-    }
-
-    private static final class UnconfirmedBrowserLaunchNotification extends Notifications.UiNotification {
-        UnconfirmedBrowserLaunchNotification(String url, DialogService dialogService, ClipBoardManager clipBoardManager) {
-            super(Localization.lang("Opening link in the browser"),
-                    Localization.lang("If no browser opened, copy the link and open it manually."));
-            withAutoClose(Duration.seconds(10));
-            getActions().add(new NotificationAction<>(Localization.lang("Copy link"), _ -> {
-                clipBoardManager.setContent(url);
-                dialogService.notify(Localization.lang("The link has been copied to the clipboard."));
-                return OnClickBehaviour.REMOVE;
-            }));
         }
     }
 
@@ -474,9 +449,12 @@ public abstract class NativeDesktop {
     /// `application` is never empty.
     protected abstract void openFileWithCustomApplication(String filePath, String application) throws IOException;
 
+    /// @param file an absolute path
     protected abstract void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException;
 
-    protected abstract void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException;
+    /// @param directory an absolute path
+    /// @throws IOException if no terminal could be started; its message is shown to the user
+    protected abstract void openConsoleWithDefaultTerminal(Path directory) throws IOException;
 
     /// Returns the path to the system's applications folder.
     ///
@@ -485,12 +463,12 @@ public abstract class NativeDesktop {
 
     /// Moves the given file to the trash.
     ///
+    /// @throws IOException                   if the file could not be moved; it then stays where it is
     /// @throws UnsupportedOperationException if the current platform does not support the [Desktop.Action#MOVE_TO_TRASH] action
     /// @see Desktop#moveToTrash(java.io.File)
-    public void moveToTrash(Path path) {
-        boolean success = Desktop.getDesktop().moveToTrash(path.toFile());
-        if (!success) {
-            LoggerFactory.getLogger(NativeDesktop.class).warn("Could not move to trash. File {} is kept.", path);
+    public void moveToTrash(Path path) throws IOException {
+        if (!Desktop.getDesktop().moveToTrash(path.toFile())) {
+            throw new IOException("The desktop refused to move " + path + " to the trash");
         }
     }
 

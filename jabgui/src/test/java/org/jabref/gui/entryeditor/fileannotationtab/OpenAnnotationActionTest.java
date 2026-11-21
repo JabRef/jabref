@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 /// Covers the paths through a configured reader. The document viewer branch is left to manual testing.
 @DisabledOnOs(value = OS.MAC, disabledReason = "No reader can be told a page on macOS, so no command line is built")
+@NullMarked
 class OpenAnnotationActionTest {
 
     private static final Path PDF_FILE = Path.of("C:/My Library/some paper.pdf");
@@ -47,6 +50,7 @@ class OpenAnnotationActionTest {
     private final StateManager stateManager = mock(StateManager.class);
     private final ProcessBuilder processBuilder = mock(ProcessBuilder.class);
     private final Process process = mock(Process.class);
+    private final OutputStream stdin = mock(OutputStream.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
@@ -59,8 +63,8 @@ class OpenAnnotationActionTest {
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(pdfType));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
+        when(process.getOutputStream()).thenReturn(stdin);
         when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
-        when(process.getErrorStream()).thenReturn(InputStream.nullInputStream());
         when(processBuilder.start()).thenReturn(process);
     }
 
@@ -77,14 +81,12 @@ class OpenAnnotationActionTest {
                 SUMATRA.toString(), "-reuse-instance", "-page", "7", PDF_FILE.toString()));
     }
 
-    /// Both streams of the reader have to be read, otherwise it blocks as soon as an unread pipe
-    /// fills up with the warnings Qt and GTK readers write.
+    /// The reader is started detached, so that no pipe to it stays open
     @Test
-    void bothStreamsOfTheReaderAreRead() {
+    void readerIsStartedDetached() throws IOException {
         action().openAtAnnotation(PDF_FILE, annotationOnPage(PAGE), processBuilder);
 
-        verify(process).getInputStream();
-        verify(process).getErrorStream();
+        verify(stdin).close();
     }
 
     @Test
