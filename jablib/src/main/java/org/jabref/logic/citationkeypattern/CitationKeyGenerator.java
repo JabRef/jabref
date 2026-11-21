@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.util.strings.Transliteration;
 import org.jabref.model.FieldChange;
@@ -255,7 +256,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             List<String> modifiers = fieldParts.subList(1, fieldParts.size());
             String expandedPattern = getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database);
             // Name normalization needs the separators and braces to recognize extended name parts.
-            if (!modifiers.contains(NormalizeNamesFormatter.KEY)) {
+            if (!modifiers.contains(NormalizeNamesFormatter.KEY) || !AuthorListParser.containsExtendedName(expandedPattern)) {
                 expandedPattern = removeUnwantedCharacters(expandedPattern, unwantedCharacters);
             }
             if (!modifiers.isEmpty()) {

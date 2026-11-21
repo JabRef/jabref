@@ -98,6 +98,10 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
+        return generateKey(entry, pattern, database, DEFAULT_UNWANTED_CHARACTERS);
+    }
+
+    private static String generateKey(BibEntry entry, String pattern, BibDatabase database, String unwantedCharacters) {
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences =
                 new CitationKeyPatternPreferences(true,
@@ -107,7 +111,7 @@ class CitationKeyGeneratorTest {
                         CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                         "",
                         "",
-                        DEFAULT_UNWANTED_CHARACTERS,
+                        unwantedCharacters,
                         keyPattern,
                         new SimpleObjectProperty<>(','));
 
@@ -132,6 +136,22 @@ class CitationKeyGeneratorTest {
         BibEntry reloaded = BibtexParser.singleFromString(output.toString(), importFormatPreferences).orElseThrow();
         assertEquals(Optional.of(expectedKey), reloaded.getCitationKey());
         assertEquals(Optional.of(author), reloaded.getField(StandardField.AUTHOR));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "John Smith, SmithJohn",
+            "'Smith, John', JohnSmith",
+            "'{Research and Development}', ResearchandDevelopment"
+    })
+    void normalizeNamesKeepsConventionalKeyCleanUp(String name, String expectedKey) {
+        assertEquals(expectedKey, generateKey(createABibEntryAuthor(name), "[author:normalize_names]"));
+    }
+
+    @Test
+    void normalizeNamesKeepsUserDefinedUnwantedCharactersForConventionalKeys() {
+        BibEntry entry = createABibEntryAuthor("John Smith");
+        assertEquals("JohnSmith", generateKey(entry, "[author:normalize_names]", new BibDatabase(), DEFAULT_UNWANTED_CHARACTERS + " "));
     }
 
     @Test
