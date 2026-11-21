@@ -20,8 +20,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Pair;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -56,6 +58,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -95,6 +98,7 @@ public class JabRefGUI extends Application {
     private static ThemeManager themeManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static NativeDesktop nativeDesktop;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
 
     private static DialogService dialogService;
@@ -143,7 +147,8 @@ public class JabRefGUI extends Application {
                     taskExecutor,
                     gitHandlerRegistry,
                     journalAbbreviationRepository,
-                    oAuthSessionRegistry);
+                    oAuthSessionRegistry,
+                    nativeDesktop);
 
             openWindow();
 
@@ -249,11 +254,11 @@ public class JabRefGUI extends Application {
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
 
-        stateManager.getRunningBackgroundTasks().addListener((ListChangeListener<? super Task<?>>) change -> {
+        stateManager.getRunningBackgroundTasksPairs().addListener((ListChangeListener<? super Pair<BackgroundTask<?>, Task<?>>>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    for (Task<?> task : change.getAddedSubList()) {
-                        dialogService.notify(new Notifications.TaskNotification(task));
+                    for (Pair<BackgroundTask<?>, Task<?>> pair : change.getAddedSubList()) {
+                        dialogService.notify(new Notifications.TaskNotification(pair.getValue(), pair.getKey()));
                     }
                 }
             }
@@ -261,6 +266,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+
+        JabRefGUI.nativeDesktop = NativeDesktop.create(getHostServices(), preferences, clipBoardManager);
+        Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
@@ -389,6 +397,8 @@ public class JabRefGUI extends Application {
 
         LOGGER.debug("installing CSS");
         themeManager.updateCssOnScene(scene);
+
+        TextInputKeyBindings.registerSecondaryWindows(mainStage, preferences.getKeyBindingRepository());
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

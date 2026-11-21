@@ -1,5 +1,9 @@
 package org.jabref.gui.keyboard;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -12,6 +16,7 @@ import jfx.incubator.scene.control.richtext.TextPos;
 
 public class CodeAreaKeyBindings {
 
+    // [impl->req~macos.text-editing-shortcuts~1]
     // [impl->req~ux.text-editing.visual-line-navigation~1]
     public static void call(CodeArea codeArea, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         handleMacCursorMovementShortcuts(codeArea, event);
@@ -20,6 +25,22 @@ public class CodeAreaKeyBindings {
         }
 
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
+            if (!codeArea.isEditable() && switch (binding) {
+                case EDITOR_DELETE,
+                     EDITOR_INSERT_LINE_AFTER,
+                     EDITOR_TRANSPOSE_CHARACTERS,
+                     EDITOR_CAPITALIZE,
+                     EDITOR_LOWERCASE,
+                     EDITOR_UPPERCASE,
+                     EDITOR_KILL_LINE,
+                     EDITOR_KILL_WORD,
+                     EDITOR_KILL_WORD_BACKWARD ->
+                        true;
+                default ->
+                        false;
+            }) {
+                return;
+            }
             switch (binding) {
                 case EDITOR_DELETE -> {
                     codeArea.delete();
@@ -117,8 +138,50 @@ public class CodeAreaKeyBindings {
                     codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
+                // EDITOR_CENTER_CARET is not handled: the incubator CodeArea has no public API to scroll the viewport, see https://github.com/JabRef/jabref/issues/17771
+                case EDITOR_INSERT_LINE_AFTER -> {
+                    insertLineAfterCaret(codeArea);
+                    event.consume();
+                }
+                case EDITOR_TRANSPOSE_CHARACTERS -> {
+                    if (!codeArea.hasNonEmptySelection() && transposeCharacters(codeArea)) {
+                        event.consume();
+                    }
+                }
             }
         });
+    }
+
+    /// macOS Ctrl+O: inserts a line break at the caret without moving the caret,
+    /// so the caret stays at the end of the first part of the split line.
+    static void insertLineAfterCaret(CodeArea codeArea) {
+        TextPos caret = codeArea.getCaretPosition();
+        if (caret == null || !codeArea.isEditable()) {
+            return;
+        }
+        codeArea.replaceText(caret, caret, "\n");
+        codeArea.select(caret);
+    }
+
+    static boolean transposeCharacters(CodeArea codeArea) {
+        if (!codeArea.isEditable()) {
+            return false;
+        }
+        String text = IntStream.range(0, codeArea.getParagraphCount())
+                               .mapToObj(codeArea::getPlainText)
+                               .collect(Collectors.joining("\n"));
+        Optional<int[]> offsets = TextInputKeyBindings.transposeOffsets(text, textPosToOffset(codeArea, codeArea.getCaretPosition()));
+        if (offsets.isEmpty()) {
+            return false;
+        }
+        int[] range = offsets.orElseThrow();
+        String replacement = text.substring(range[1], range[2]) + text.substring(range[0], range[1]);
+        codeArea.replaceText(
+                offsetToTextPos(codeArea, range[0]),
+                offsetToTextPos(codeArea, range[2]),
+                replacement);
+        codeArea.select(offsetToTextPos(codeArea, range[2]));
+        return true;
     }
 
     private static void handleMacCursorMovementShortcuts(CodeArea codeArea, KeyEvent event) {

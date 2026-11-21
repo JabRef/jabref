@@ -2,7 +2,7 @@
   "name": "jabref",
   "private": true,
   "devDependencies": {
-    "textlint": "^15.7.1",
+    "textlint": "^16.0.0",
     "textlint-rule-common-misspellings": "^1.0.1",
     "textlint-rule-terminology": "^5.2.16",
     "textlint-rule-write-good": "^2.0.0"
