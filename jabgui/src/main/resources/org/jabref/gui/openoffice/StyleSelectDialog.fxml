@@ -48,7 +48,7 @@
                         </VBox>
                     </VBox>
                 </Tab>
-                <Tab fx:id="jStyleTab" text="Jstyles">
+                <Tab fx:id="jStyleTab" text="JStyles">
                     <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                         <padding>
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
@@ -59,7 +59,7 @@
                             </padding>
                             <Label text="%Available" styleClass="h4,padding-top-12"/>
                             <HBox HBox.hgrow="ALWAYS" />
-                            <Hyperlink text="%Get more Jstyles" onAction="#openJStylesWebsite"/>
+                            <Hyperlink text="%Get more JStyles" onAction="#openJStylesWebsite"/>
                             <Button fx:id="addJStyleButton" text="%Add .jstyle file" onAction="#addJStyleFile"/>
                         </HBox>
                         <TableView fx:id="jStylesTable" VBox.vgrow="ALWAYS" prefHeight="350.0">

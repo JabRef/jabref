@@ -174,7 +174,7 @@ public class StyleSelectDialogViewModel {
         Tab currentTab = getSelectedTab();
         if (currentTab != null) {
             String tabText = currentTab.getText();
-            if ("Jstyles".equalsIgnoreCase(tabText)) {
+            if ("JStyles".equals(tabText)) {
                 if (selectedJStyle.get() != null) {
                     return selectedJStyle.get().getJStyle();
                 }
