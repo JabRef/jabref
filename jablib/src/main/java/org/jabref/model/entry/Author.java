@@ -82,8 +82,8 @@ public class Author {
         this.extendedNameParts = Map.copyOf(extendedNameParts);
         this.extendedNameSource = extendedNameSource;
         this.nameUsePrefix = extendedNameParts.containsKey("useprefix")
-                ? getExtendedNameValue("useprefix").flatMap(Author::parseUsePrefix)
-                : Optional.empty();
+                             ? getExtendedNameValue("useprefix").flatMap(Author::parseUsePrefix)
+                             : Optional.empty();
         this.listUsePrefix = listUsePrefix;
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
