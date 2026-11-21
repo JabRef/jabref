@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -91,6 +92,41 @@ class AuthorListParserTest {
         Author author = parser.parse("\"family={Robert and Sons, Inc.}\"").getAuthor(0);
 
         assertEquals(Optional.of("{Robert and Sons, Inc.}"), author.getFamilyName());
+    }
+
+    // https://github.com/plk/biblatex/blob/dev/doc/latex/biblatex/biblatex.tex#L3399-L3445
+    private static Stream<Arguments> biblatexManualNames() {
+        return Stream.of(
+                Arguments.of("given=Hans, family=Harman and given=Simon, prefix=de, family=Beumont",
+                        List.of("Harman", "Beumont")),
+                Arguments.of("given=Jean, prefix=de la, prefix-i=d, family=Rousse", List.of("Rousse")),
+                Arguments.of("given={Jean Pierre Simon}, given-i=JPS", List.of("")),
+                Arguments.of("given={Jean Pierre}", List.of("")),
+                Arguments.of("\"family={Robert and Sons, Inc.}\"", List.of("{Robert and Sons, Inc.}")),
+                Arguments.of("Hans Harman and given=Simon, prefix=de, family=Beumont", List.of("Harman", "Beumont")),
+                Arguments.of("nosortothers=true and Hans Harman and given=Simon, family=Beumont, prefix=de, useprefix=true",
+                        List.of("Harman", "Beumont")),
+                Arguments.of("id=person1, given=Simon, family=Beumont", List.of("Beumont")),
+                Arguments.of("id=person1, given=Simone, family=Beumont", List.of("Beumont")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("biblatexManualNames")
+    void parsesBiblatexManualExamples(String input, List<String> families) {
+        AuthorList authors = parser.parse(input);
+
+        assertEquals(families, authors.getAuthors().stream().map(author -> author.getFamilyName().orElse("")).toList());
+        assertEquals(true, authors.hasValidExtendedNames());
+        assertEquals(authors, parser.parse(authors.getAsBibtex()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"family=Smith   Jones", "family=Smith\nJones", "\"family=Smith and Jones\""})
+    void keepsProtectedFamilyTogether(String input) {
+        AuthorList authors = parser.parse(input);
+
+        assertEquals(1, authors.getNumberOfAuthors());
+        assertEquals(input, authors.getAsBibtex());
     }
 
     @Test

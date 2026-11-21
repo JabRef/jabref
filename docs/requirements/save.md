@@ -114,10 +114,17 @@ Escaped LaTeX special characters (`\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `\\`
 
 Needs: impl, utest
 
-### Preserve extended name parts on save
+### JabRef must preserve extended name parts on save
 `req~save.names.preserve-extended-parts~1`
 
-When saving, JabRef keeps BibLaTeX extended name format attributes (e.g., `family=`, `given=`, `prefix=`, `useprefix=`) unchanged.
+BibLaTeX extended name attributes include keys such as `family=`, `given=`, `prefix=`, and `useprefix=`.
 
-Needs: impl
+Needs: impl, utest
+
+### Name normalization must preserve BibLaTeX extended name data
+`req~save.names.normalize-extended-parts~1`
+
+Normalization preserves name attributes, name-list options, and quotes protecting individual name parts. If an extended name has malformed syntax or repeats an attribute, normalization preserves the field as entered.
+
+Needs: impl, utest
 <!-- markdownlint-disable-file MD022 -->

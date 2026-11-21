@@ -345,7 +345,7 @@ Needs: impl, utest
 ### Display names in extended format
 `req~ui.names.display-extended~1`
 
-The main table displays names given in BibLaTeX extended name format in readable form (e.g., "Jane Doe" rather than the raw key-value string "Reader=...").
+The main table displays the name `Jane Doe` for the BibLaTeX extended name `family=Doe, given=Jane`.
 
 Needs: impl
 

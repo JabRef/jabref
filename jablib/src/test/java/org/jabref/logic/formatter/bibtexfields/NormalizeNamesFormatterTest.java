@@ -107,6 +107,27 @@ class NormalizeNamesFormatterTest {
         assertEquals(normalized, formatter.format(normalized));
     }
 
+    // [utest->req~save.names.normalize-extended-parts~1]
+    @Test
+    void normalizationPreservesQuotedPartInMixedName() {
+        String input = "\"family={Robert and Sons, Inc.}\", given=Jane and Arthur Guez";
+        String normalized = formatter.format(input);
+
+        assertEquals("\"family={Robert and Sons, Inc.}\", given=Jane and Guez, Arthur", normalized);
+        assertEquals("Robert and Sons, Inc.", AuthorList.parse(normalized).getAuthor(0).getFamilyName().orElseThrow());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Arthur Guez and family=Doe, given=Jane, Jr.",
+            "family=Doe, given=Jane, GIVEN=Janet",
+            "family=Doe, given=\"Jane",
+            "family={Doe, given=Jane"
+    })
+    void normalizationPreservesMalformedExtendedFields(String input) {
+        assertEquals(input, formatter.format(input));
+    }
+
     @Test
     void normalizationKeepsDisplayFormattingSeparateFromStorage() {
         String input = "family=Hasselt, given=Hado P., prefix=van, useprefix=false and Arthur Guez";

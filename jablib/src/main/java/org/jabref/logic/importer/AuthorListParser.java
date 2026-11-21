@@ -49,7 +49,13 @@ public class AuthorListParser {
 
     private static final Pattern COMMA_SEPARATOR = Pattern.compile("\\s*+,\\s*+");
 
-    private static final Pattern EXTENDED_NAME_START = Pattern.compile("\\s*\"?(?:given|family|prefix|suffix)(?:-i)?\\s*=", Pattern.CASE_INSENSITIVE);
+    private static final String EXTENDED_NAME_KEY = "[\\p{L}][\\p{L}\\p{N}_-]*";
+    private static final Pattern EXTENDED_NAME_START = Pattern.compile("\\p{javaWhitespace}*\"?" + EXTENDED_NAME_KEY + "\\p{javaWhitespace}*=");
+    private static final Pattern EXTENDED_NAME_IN_LIST = Pattern.compile("(?i)(?:^|;|\\p{javaWhitespace}+and\\p{javaWhitespace}+)" + EXTENDED_NAME_START.pattern());
+    private static final Pattern EXTENDED_NAME_PART = Pattern.compile("(" + EXTENDED_NAME_KEY + ")\\s*=\\s*(.*)", Pattern.DOTALL);
+    private static final Pattern NAME_LIST_OPTION = Pattern.compile(
+            "(?i)(?:nohashothers|nosortothers|useprefix)\\s*=\\s*(?:true|false|0|1)(?=\\s+and\\s+)");
+    private static final Pattern AND_SEPARATOR = Pattern.compile("(?i)and(?=\\p{javaWhitespace}|$)");
 
     /// the raw bibtex author/editor field
     private String original;
@@ -64,6 +70,7 @@ public class AuthorListParser {
     private char tokenTerm;
     /// true if upper-case token, false if lower-case
     private boolean tokenCase;
+    private boolean malformedExtendedName;
 
     /// Builds a new array of strings with stringbuilder. Regarding to the name affixes.
     ///
@@ -96,7 +103,14 @@ public class AuthorListParser {
     private record SimpleNormalFormResult(String authors, boolean andOthersPresent) {
     }
 
-    private static SimpleNormalFormResult getSimpleNormalForm(String listOfNames) {
+    private static boolean containsExtendedName(String listOfNames) {
+        return listOfNames.indexOf('=') >= 0 && EXTENDED_NAME_IN_LIST.matcher(listOfNames).find();
+    }
+
+    private static SimpleNormalFormResult getSimpleNormalForm(String listOfNames, boolean containsExtendedSyntax) {
+        if (containsExtendedSyntax) {
+            return new SimpleNormalFormResult(listOfNames.strip(), false);
+        }
         listOfNames = listOfNames.replace(" -", "-").trim();
         if (!listOfNames.contains(",") && (MULTIPLE_SPACE_PATTERN.matcher(listOfNames).find() || listOfNames.contains("\n"))) {
             listOfNames = NEW_LINE_PATTERN.matcher(listOfNames).replaceAll(" and ");
@@ -135,7 +149,7 @@ public class AuthorListParser {
     ///
     /// @return Optional.empty if there was no normalization.
     public static Optional<String> normalizeSimply(String listOfNames) {
-        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);
+        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames, containsExtendedName(listOfNames));
         String result = simpleNormalForm.authors;
         if (simpleNormalForm.andOthersPresent) {
             result += " and others";
@@ -152,7 +166,9 @@ public class AuthorListParser {
     /// @param listOfNames the String containing the person names to be parsed
     /// @return a parsed list of persons
     public AuthorList parse(@NonNull String listOfNames) {
-        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);
+        String source = listOfNames;
+        boolean containsExtendedSyntax = containsExtendedName(source);
+        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames, containsExtendedSyntax);
         listOfNames = simpleNormalForm.authors;
         boolean andOthersPresent = simpleNormalForm.andOthersPresent;
 
@@ -163,7 +179,7 @@ public class AuthorListParser {
         final boolean authorsContainSemicolon = listOfNames.contains(";");
         final boolean authorsContainTwoOrMoreCommas = (listOfNames.length() - listOfNames.replace(",", "").length()) >= 2;
         if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas
-                && !EXTENDED_NAME_START.matcher(listOfNames).lookingAt()) {
+                && !containsExtendedSyntax) {
             List<String> arrayNameList = Arrays.asList(listOfNames.split(","));
 
             // Delete spaces for correct case identification
@@ -205,11 +221,21 @@ public class AuthorListParser {
         original = listOfNames;
         tokenStart = 0;
         tokenEnd = 0;
+        malformedExtendedName = false;
+        String listOption = "";
+        if (containsExtendedSyntax) {
+            Matcher option = NAME_LIST_OPTION.matcher(original);
+            if (option.lookingAt()) {
+                listOption = option.group();
+                tokenEnd = option.end();
+                getToken();
+            }
+        }
 
         // Parse author by author
         List<Author> authors = new ArrayList<>(5); // 5 seems to be reasonable initial size
         while (tokenStart < original.length()) {
-            if (EXTENDED_NAME_START.matcher(original).region(tokenEnd, original.length()).lookingAt()) {
+            if (containsExtendedSyntax && EXTENDED_NAME_START.matcher(original).region(tokenEnd, original.length()).lookingAt()) {
                 authors.add(getExtendedAuthor());
             } else {
                 getAuthor().ifPresent(authors::add);
@@ -220,38 +246,47 @@ public class AuthorListParser {
             authors.add(Author.OTHERS);
         }
 
-        return AuthorList.of(authors);
+        return AuthorList.of(authors, listOption, malformedExtendedName ? Optional.of(source) : Optional.empty());
     }
 
     private Author getExtendedAuthor() {
         int nameStart = tokenEnd;
-        Token token;
-        // @formatter:off
-        do {
-            // @formatter:on
-            token = getToken();
-        } while (token != Token.AND && token != Token.EOF);
-        int nameEnd = token == Token.AND ? tokenStart : original.length();
-
-        String name = original.substring(nameStart, nameEnd).trim();
-        if (name.length() >= 2 && name.startsWith("\"") && name.endsWith("\"")) {
-            name = name.substring(1, name.length() - 1);
-        }
-        Map<String, String> parts = new HashMap<>();
-        int partStart = 0;
+        int partStart = nameStart;
         int bracesLevel = 0;
-        for (int i = 0; i < name.length(); i++) {
-            char character = name.charAt(i);
-            if (character == '{') {
+        boolean quoted = false;
+        Map<String, String> parts = new HashMap<>();
+        Matcher separator = AND_SEPARATOR.matcher(original);
+        for (; tokenEnd < original.length(); tokenEnd++) {
+            char character = original.charAt(tokenEnd);
+            if (character == '\\' && tokenEnd + 1 < original.length()) {
+                tokenEnd++;
+            } else if (character == '{') {
                 bracesLevel++;
             } else if (character == '}') {
-                bracesLevel--;
-            } else if (character == ',' && bracesLevel == 0) {
-                addExtendedNamePart(parts, name.substring(partStart, i));
-                partStart = i + 1;
+                if (bracesLevel == 0) {
+                    malformedExtendedName = true;
+                } else {
+                    bracesLevel--;
+                }
+            } else if (bracesLevel == 0) {
+                if (character == '"') {
+                    quoted = !quoted;
+                } else if (!quoted) {
+                    if (character == ',') {
+                        addExtendedNamePart(parts, original.substring(partStart, tokenEnd));
+                        partStart = tokenEnd + 1;
+                    } else if (character == ';' || ((character == 'a' || character == 'A')
+                            && tokenEnd > nameStart && Character.isWhitespace(original.charAt(tokenEnd - 1))
+                            && separator.region(tokenEnd, original.length()).lookingAt())) {
+                        break;
+                    }
+                }
             }
         }
-        addExtendedNamePart(parts, name.substring(partStart));
+        malformedExtendedName |= quoted || bracesLevel != 0;
+        addExtendedNamePart(parts, original.substring(partStart, tokenEnd));
+        String sourceName = original.substring(nameStart, tokenEnd).strip();
+        getToken();
 
         String given = parts.getOrDefault("given", "");
         String givenAbbreviated = parts.getOrDefault("given-i", "");
@@ -261,16 +296,23 @@ public class AuthorListParser {
         }
 
         return new Author(given, givenAbbreviated, parts.getOrDefault("prefix", ""),
-                parts.getOrDefault("family", ""), parts.getOrDefault("suffix", ""), parts);
+                parts.getOrDefault("family", ""), parts.getOrDefault("suffix", ""), parts, Optional.of(sourceName));
     }
 
-    private static void addExtendedNamePart(Map<String, String> parts, String part) {
-        int equalsPosition = part.indexOf('=');
-        if (equalsPosition > 0) {
-            String key = part.substring(0, equalsPosition).trim().toLowerCase(Locale.ROOT);
-            String value = part.substring(equalsPosition + 1).trim();
-            parts.put(key, value);
+    private void addExtendedNamePart(Map<String, String> parts, String part) {
+        String assignment = part.strip();
+        if (assignment.length() >= 2 && assignment.startsWith("\"") && assignment.endsWith("\"")) {
+            assignment = assignment.substring(1, assignment.length() - 1);
         }
+        Matcher matcher = EXTENDED_NAME_PART.matcher(assignment);
+        if (matcher.matches()) {
+            String key = matcher.group(1).toLowerCase(Locale.ROOT);
+            if (!parts.containsKey(key)) {
+                parts.put(key, matcher.group(2).strip());
+                return;
+            }
+        }
+        malformedExtendedName = true;
     }
 
     /// Handle cases names in order Firstname Lastname, separated by `","` and a final `", and "`

@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
@@ -21,8 +22,6 @@ import org.jabref.model.metadata.SaveOrder;
 public class FieldComparator implements Comparator<BibEntry> {
 
     private static final Collator COLLATOR = getCollator();
-
-    private final NameComparator nameComparator = new NameComparator();
 
     enum FieldType {
         NAME, TYPE, YEAR, MONTH, OTHER
@@ -73,7 +72,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private Optional<String> getFieldValue(BibEntry entry) {
         return fields.getFields().stream()
-                     .map(field -> fieldType == FieldType.NAME ? entry.getFieldOrAlias(field) : entry.getFieldOrAliasLatexFree(field))
+                     .map(field -> fieldType == FieldType.NAME ? entry.getField(field) : entry.getFieldOrAliasLatexFree(field))
                      .flatMap(Optional::stream)
                      .findFirst();
     }
@@ -103,7 +102,9 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         // Now we know that both f1 and f2 are != null
         if (fieldType == FieldType.NAME) {
-            return nameComparator.compare(f1, f2) * multiplier;
+            // Keep the save order for conventional names, including ties on given-name initials.
+            f1 = AuthorList.fixAuthorForAlphabetization(f1);
+            f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
             int f1year;
             try {

@@ -42,6 +42,7 @@ public class Author {
     private final String familyName;
     private final String nameSuffix;
     private final Map<String, String> extendedNameParts;
+    private final Optional<String> extendedNameSource;
     private Author latexFreeAuthor;
 
     /// Creates the Author object. If any part of the name is absent, `null` must be passed; otherwise other methods may return erroneous results.
@@ -62,7 +63,14 @@ public class Author {
     public Author(@Nullable String givenName, @Nullable String givenNameAbbreviated,
                   @Nullable String namePrefix, @Nullable String familyName, @Nullable String nameSuffix,
                   @NonNull Map<String, String> extendedNameParts) {
+        this(givenName, givenNameAbbreviated, namePrefix, familyName, nameSuffix, extendedNameParts, Optional.empty());
+    }
+
+    public Author(@Nullable String givenName, @Nullable String givenNameAbbreviated,
+                  @Nullable String namePrefix, @Nullable String familyName, @Nullable String nameSuffix,
+                  @NonNull Map<String, String> extendedNameParts, @NonNull Optional<String> extendedNameSource) {
         this.extendedNameParts = Map.copyOf(extendedNameParts);
+        this.extendedNameSource = extendedNameSource;
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
         if (!StringUtil.isBlank(givenName)) {
@@ -259,13 +267,15 @@ public class Author {
 
     /// Serializes a name without discarding BibLaTeX options, explicit initials or protected values.
     /// Display formatters should continue to use [#getFamilyGiven(boolean)] or [#getGivenFamily(boolean)].
-    // [impl->req~save.names.preserve-extended-parts~1]
     public @NonNull String getAsBibtex() {
+        return extendedNameSource.orElseGet(this::formatBibtex);
+    }
+
+    private @NonNull String formatBibtex() {
         if (extendedNameParts.isEmpty()) {
             return getFamilyGiven(false);
         }
-        // Put a name part first so a subsequent parse recognizes the extended syntax even
-        // when an unknown option sorts before all of the standard parts.
+        // Keep the standard parts together when there is no source spelling to preserve.
         return extendedNameParts.entrySet().stream()
                                 .sorted(Comparator.comparing((Map.Entry<String, String> part) -> !EXTENDED_NAME_KEYS.contains(part.getKey()))
                                                   .thenComparing(Map.Entry::getKey))
@@ -426,7 +436,11 @@ public class Author {
     /// @return "Last, Jr, F." as described above or "" if all these parts are empty.
     public String getNameForAlphabetization() {
         StringBuilder res = new StringBuilder();
-        getFamilyName().ifPresent(res::append);
+        if (getUsePrefix().orElse(false)) {
+            res.append(getFullFamilyNameForDisplay());
+        } else {
+            getFamilyName().ifPresent(res::append);
+        }
         getNameSuffix().ifPresent(jr -> res.append(", ").append(jr));
         getGivenNameAbbreviated().ifPresent(firstA -> res.append(", ").append(firstA));
         while ((!res.isEmpty()) && (res.charAt(0) == '{')) {
@@ -443,7 +457,7 @@ public class Author {
             String von = getNamePrefix().map(LatexToUnicodeAdapter::format).orElse(null);
             String last = getFamilyName().map(LatexToUnicodeAdapter::format).orElse(null);
             String jr = getNameSuffix().map(LatexToUnicodeAdapter::format).orElse(null);
-            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr, extendedNameParts);
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr, extendedNameParts, extendedNameSource);
             latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;
         }
         return latexFreeAuthor;

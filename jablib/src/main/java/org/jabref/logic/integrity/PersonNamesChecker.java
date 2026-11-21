@@ -41,7 +41,8 @@ public class PersonNamesChecker implements ValueChecker {
         }
 
         // Check format with brackets first to support protected institutional authors
-        if (isStandardFormat(normalizedValue)) {
+        if ((bibMode == BibDatabaseMode.BIBLATEX && AuthorList.parse(normalizedValue).hasValidExtendedNames())
+                || isStandardFormat(normalizedValue)) {
             return Optional.empty();
         }
 

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,11 +54,16 @@ class BibEntryWriterTest {
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
     }
 
-    // Tests for normalization operations and bib extended name form.
-    @Test
-    void normalizedExtendedNamesSurviveWriteAndRead() throws Exception {
-        String names = "family=Hasselt, given=Hado P., prefix=van, useprefix=false and "
-                + "family=Ree, given=Michiel, prefix=van der, useprefix=true and Guez, Arthur";
+    // [utest->req~save.names.preserve-extended-parts~1]
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "family=Hasselt, given=Hado P., prefix=van, useprefix=false and "
+                    + "family=Ree, given=Michiel, prefix=van der, useprefix=true and Guez, Arthur",
+            "id=person1, given=Simon, family=Beumont",
+            "\"family={Robert and Sons, Inc.}\"",
+            "nosortothers=true and Hans Harman and given=Simon, family=Beumont, prefix=de, useprefix=true"
+    })
+    void normalizedExtendedNamesSurviveWriteAndRead(String names) throws Exception {
         String normalized = new NormalizeNamesFormatter().format(names);
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Hasselt2016")

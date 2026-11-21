@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -126,6 +127,8 @@ public class AuthorList implements Iterable<Author> {
                                                                           .build();
 
     private final List<Author> authors;
+    private final String listOption;
+    private final Optional<String> malformedSource;
     @Nullable private AuthorList latexFreeAuthors;
 
     /// Creates a new list of authors.
@@ -135,11 +138,21 @@ public class AuthorList implements Iterable<Author> {
     ///
     /// @param authors the list of authors which should underlie this instance
     private AuthorList(@NonNull List<Author> authors) {
+        this(authors, "", Optional.empty());
+    }
+
+    private AuthorList(List<Author> authors, String listOption, Optional<String> malformedSource) {
         this.authors = authors;
+        this.listOption = listOption;
+        this.malformedSource = malformedSource;
     }
 
     public static AuthorList of(List<Author> authors) {
         return new AuthorList(List.copyOf(authors));
+    }
+
+    public static AuthorList of(List<Author> authors, String listOption, Optional<String> malformedSource) {
+        return new AuthorList(List.copyOf(authors), listOption, malformedSource);
     }
 
     public static AuthorList of(Author... authors) {
@@ -278,7 +291,7 @@ public class AuthorList implements Iterable<Author> {
         if (latexFreeAuthors == null) {
             latexFreeAuthors = new AuthorList(authors.stream()
                                                      .map(Author::latexFree)
-                                                     .toList());
+                                                     .toList(), listOption, malformedSource);
             latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;
         }
         return latexFreeAuthors;
@@ -365,8 +378,18 @@ public class AuthorList implements Iterable<Author> {
     }
 
     /// Returns the author field for storage, preserving extended BibLaTeX name parts per author.
+    // [impl->req~save.names.normalize-extended-parts~1]
     public String getAsBibtex() {
-        return authors.stream().map(Author::getAsBibtex).collect(Collectors.joining(" and "));
+        return malformedSource.orElseGet(() -> {
+            String names = authors.stream().map(Author::getAsBibtex).collect(Collectors.joining(" and "));
+            return listOption.isEmpty() ? names : listOption + " and " + names;
+        });
+    }
+
+    public boolean hasValidExtendedNames() {
+        return malformedSource.isEmpty()
+                && (!listOption.isEmpty() || authors.stream().anyMatch(author -> !author.getExtendedNameParts().isEmpty()))
+                && authors.stream().noneMatch(author -> author.getInvalidUsePrefix().isPresent());
     }
 
     /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].
@@ -420,12 +443,12 @@ public class AuthorList implements Iterable<Author> {
             return false;
         }
 
-        return this.authors.equals(a.authors);
+        return authors.equals(a.authors) && listOption.equals(a.listOption) && malformedSource.equals(a.malformedSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authors);
+        return Objects.hash(authors, listOption, malformedSource);
     }
 
     /// Returns the list of authors separated by "and"s with first names before last name; first names are not abbreviated.

@@ -35,6 +35,16 @@ class FieldComparatorTest {
     }
 
     @Test
+    void conventionalAndExtendedNamesWithSameFamilyAndInitialTie() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry conventional = new BibEntry().withField(StandardField.AUTHOR, "Smith, John");
+        BibEntry extended = new BibEntry().withField(StandardField.AUTHOR, "family=Smith, given=Jane");
+
+        assertEquals(0, comparator.compare(conventional, extended));
+        assertEquals(0, comparator.compare(extended, conventional));
+    }
+
+    @Test
     void nameSortingUsesEditorWhenAuthorIsMissing() {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), false);
         BibEntry edited = new BibEntry().withField(StandardField.EDITOR, "family=Hasselt, prefix=van, useprefix=true");
