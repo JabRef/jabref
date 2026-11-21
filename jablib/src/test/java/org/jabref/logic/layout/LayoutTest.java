@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -35,16 +36,20 @@ class LayoutTest {
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
     }
 
-    private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry) throws IOException {
+    private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry, BibDatabase database) throws IOException {
         Reader layoutReader = Reader.of(layout.replace("__NEWLINE__", "\n"));
 
         return new LayoutHelper(layoutReader, fileDirForDatabase, layoutFormatterPreferences, abbreviationRepository)
                 .getLayoutFromText()
-                .doLayout(entry, null);
+                .doLayout(entry, database);
+    }
+
+    private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry) throws IOException {
+        return layout(layout, fileDirForDatabase, entry, null);
     }
 
     private String layout(String layout, BibEntry entry) throws IOException {
-        return layout(layout, List.of(), entry);
+        return layout(layout, List.of(), entry, null);
     }
 
     @Test
@@ -191,5 +196,23 @@ class LayoutTest {
         String layoutText = layout("\\author: \\author \\author+an", entry);
 
         assertEquals("Joe Doe and Mary Jane: Joe Doe and Mary Jane 1:corresponding,2:highlight", layoutText);
+    }
+
+    @Test
+    void xdataFieldsAreResolved() throws IOException {
+        BibEntry xdata = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("CAT")
+                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                .withField(StandardField.ADDRESS, "Reading, MA")
+                .withField(StandardField.SERIES, "Computers and Typesetting");
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("Knuth")
+                .withField(StandardField.TITLE, "The TeX Book")
+                .withField(StandardField.XDATA, "CAT");
+        BibDatabase database = new BibDatabase(List.of(xdata, book));
+
+        String layoutText = layout("\\title\\begin{publisher}, \\publisher\\end{publisher} (\\address, \\series)", List.of(), book, database);
+
+        assertEquals("The TeX Book, Addison-Wesley (Reading, MA, Computers and Typesetting)", layoutText);
     }
 }
