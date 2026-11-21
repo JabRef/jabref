@@ -494,6 +494,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private final Preferences preferencesNode;
     private final boolean resetsGlobalStores;
+    private boolean replayingImportedPreferences;
     private boolean resettingIsolatedNode;
 
     /// Cache variables
@@ -1253,10 +1254,21 @@ public class JabRefCliPreferences implements CliPreferences {
 
         initializeAll();
 
-        allBindings.forEach(binding -> binding.importFromStore().run());
+        // [impl->req~keyring.api-key-import~1]
+        replayingImportedPreferences = true;
+        try {
+            allBindings.forEach(binding -> binding.importFromStore().run());
 
-        // CiteDrive preferences are not registered in allBindings (the token lives in the keyring), so reload them explicitly.
-        getCiteDrivePreferences().setAll(getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault()));
+            // CiteDrive preferences are not registered in allBindings (the token lives in the keyring), so reload them explicitly.
+            getCiteDrivePreferences().setAll(getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault()));
+        } finally {
+            replayingImportedPreferences = false;
+        }
+
+        // The XML supplies metadata only. Keep the local bundle when persistence is enabled.
+        if (!getImporterPreferences().shouldPersistCustomKeys() && hasKey(FETCHER_CUSTOM_KEY_NAMES)) {
+            clearCustomFetcherKeys();
+        }
     }
 
     /// Instantiates every preference group so its bindings are registered in [#allBindings] before a bulk reset/import
@@ -2685,8 +2697,6 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(importerPreferences.importWorkingDirectoryProperty(), IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory(),
                 Path::toString, Path::of);
         bindBoolean(importerPreferences.warnAboutDuplicatesOnImportProperty(), IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport());
-        // persistCustomKeys must be bound before apiKeys: loading the keys re-persists them and reads this flag to
-        // decide whether to write the keyring, so the flag has to be in place first.
         bindBoolean(importerPreferences.persistCustomKeysProperty(), FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys());
         bindSet(importerPreferences.getApiKeys(), FETCHER_CUSTOM_KEY_NAMES, defaultValues.getApiKeys(),
                 _ -> storeFetcherKeys(importerPreferences),
@@ -2834,6 +2844,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void storeFetcherKeys(ImporterPreferences preferences) {
+        if (replayingImportedPreferences) {
+            return;
+        }
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         Map<String, String> keys = new HashMap<>();

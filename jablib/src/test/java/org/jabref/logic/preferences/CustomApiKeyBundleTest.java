@@ -1,5 +1,6 @@
 package org.jabref.logic.preferences;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.ImporterPreferences;
 
 import com.github.javakeyring.Keyring;
@@ -17,12 +19,14 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
@@ -172,6 +176,56 @@ class CustomApiKeyBundleTest {
         assertEquals(Map.of(List.of("org.jabref.apikeys.bundle", "keys"), "{\"Fetcher\":\"key\"}"), secrets);
         assertEquals(List.of("Fetcher"), preferences.getStringList("fetcherCustomKeyBundleNames"));
         assertEquals("", preferences.get("fetcherCustomKeys", ""));
+    }
+
+    @Test
+    void importEnablingPersistenceLoadsSavedKeysWithImportedMetadata(@TempDir Path tempDir) throws JabRefException, PasswordAccessException {
+        // [utest->req~keyring.api-key-import~1]
+        Path exported = tempDir.resolve("preferences.xml");
+        configure(List.of("Imported"));
+        preferences.putStringList("fetcherCustomKeyUses", List.of("false"));
+        preferences.putStringList("fetcherCustomKeyBundleNames", List.of("Imported"));
+        preferences.exportPreferences(exported);
+        Map<List<String>, String> savedBundle = Map.of(List.of("org.jabref.apikeys.bundle", "keys"), "{\"Imported\":\"saved-key\"}");
+        secrets.putAll(savedBundle);
+
+        configure(List.of("Previous"));
+        preferences.putBoolean("fetcherCustomKeyPersist", false);
+        ImporterPreferences importer = preferences.getImporterPreferences();
+
+        preferences.importPreferences(exported);
+
+        assertTrue(importer.shouldPersistCustomKeys());
+        assertEquals(Set.of(new FetcherApiKey("Imported", false, "saved-key")), importer.getApiKeys());
+        assertEquals(List.of("Imported"), preferences.getStringList("fetcherCustomKeyNames"));
+        assertEquals(List.of("false"), preferences.getStringList("fetcherCustomKeyUses"));
+        assertEquals(savedBundle, secrets);
+        verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+        verify(keyring, never()).deletePassword(anyString(), anyString());
+    }
+
+    @Test
+    void importDisablingPersistenceClearsSavedKeysAndKeepsImportedMetadata(@TempDir Path tempDir) throws JabRefException, PasswordAccessException {
+        // [utest->req~keyring.api-key-import~1]
+        Path exported = tempDir.resolve("preferences.xml");
+        configure(List.of("Imported"));
+        preferences.putBoolean("fetcherCustomKeyPersist", false);
+        preferences.exportPreferences(exported);
+
+        configure(List.of("Previous"));
+        preferences.putStringList("fetcherCustomKeyBundleNames", List.of("Previous"));
+        secrets.put(List.of("org.jabref.apikeys.bundle", "keys"), "{\"Previous\":\"saved-key\"}");
+        ImporterPreferences importer = preferences.getImporterPreferences();
+
+        preferences.importPreferences(exported);
+
+        assertFalse(importer.shouldPersistCustomKeys());
+        assertEquals(Set.of(new FetcherApiKey("Imported", true, "")), importer.getApiKeys());
+        assertEquals(List.of("Imported"), preferences.getStringList("fetcherCustomKeyNames"));
+        assertEquals(List.of("true"), preferences.getStringList("fetcherCustomKeyUses"));
+        assertEquals(List.of(), preferences.getStringList("fetcherCustomKeyBundleNames"));
+        assertEquals(Map.of(), secrets);
+        verify(keyring).deletePassword("org.jabref.apikeys.bundle", "keys");
     }
 
     @Test

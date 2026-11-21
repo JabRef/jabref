@@ -41,4 +41,13 @@ Migration can still require one approval per existing protected item.
 
 Needs: impl, utest
 
+## Preference imports must load custom API keys before applying persistence changes
+`req~keyring.api-key-import~1`
+
+An import with persistence enabled loads keys from the local bundle using the imported fetcher metadata.
+Replaying the metadata leaves an existing bundle intact.
+If the imported settings disable persistence, the local keys are cleared after replay.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
