@@ -27,8 +27,10 @@ public class NameComparator implements Comparator<String> {
     // an instance can be reused by multiple sort operations.
     @Override
     public synchronized int compare(String left, String right) {
-        AuthorList leftAuthors = AuthorList.parse(left).latexFree();
-        AuthorList rightAuthors = AuthorList.parse(right).latexFree();
+        return compareNames(AuthorList.parse(left).latexFree(), AuthorList.parse(right).latexFree());
+    }
+
+    public synchronized int compareNames(AuthorList leftAuthors, AuthorList rightAuthors) {
         int commonAuthors = Math.min(leftAuthors.getNumberOfAuthors(), rightAuthors.getNumberOfAuthors());
         for (int index = 0; index < commonAuthors; index++) {
             int result = compareAuthor(leftAuthors.getAuthor(index), rightAuthors.getAuthor(index));

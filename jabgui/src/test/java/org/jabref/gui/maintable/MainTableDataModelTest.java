@@ -23,8 +23,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.control.TableView;
 
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.maintable.columns.NameColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
@@ -86,7 +88,7 @@ class MainTableDataModelTest {
     }
 
     @Test
-    void reusedNameBindingResolvesUpdatedStringMacroForSorting() {
+    void reusedNameBindingRefreshesDisplayAndSortOrderAfterStringMacroEdit() {
         JavaFxExtension.invokeAndWait(() -> {
             BibDatabaseContext context = new BibDatabaseContext();
             BibtexString author = new BibtexString("author", "Jane Doe");
@@ -94,18 +96,27 @@ class MainTableDataModelTest {
             var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
             BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "#author#");
             BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
-            var binding = row.getNameFields(FieldFactory.parseOrFields("author"));
+            NameColumn column = createNameColumn("author");
+            BibEntryTableViewModel reference = new BibEntryTableViewModel(
+                    new BibEntry().withField(StandardField.AUTHOR, "Jane Miller"), context, formatter);
+            var binding = column.getCellObservableValue(row);
+            List<String> displayChanges = new ArrayList<>();
+            binding.addListener((_, _, value) -> displayChanges.add(value.display()));
 
-            assertEquals("Jane Doe", binding.getValue().source());
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals(-1, Integer.signum(column.getComparator().compare(binding.getValue(), column.getCellData(reference))));
 
             author.setContent("Jane Roe");
 
+            assertEquals(1, Integer.signum(column.getComparator().compare(column.getCellData(row), column.getCellData(reference))));
+            assertEquals(List.of("Roe"), displayChanges);
+            assertEquals("Roe", binding.getValue().display());
             assertEquals("Jane Roe", binding.getValue().source());
         });
     }
 
     @Test
-    void reusedNameBindingResolvesUpdatedXDataForSorting() {
+    void reusedNameBindingRefreshesDisplayAndSortOrderAfterXDataEdit() {
         JavaFxExtension.invokeAndWait(() -> {
             BibDatabaseContext context = new BibDatabaseContext();
             BibEntry parent = new BibEntry().withCitationKey("names").withField(StandardField.AUTHOR, "Jane Doe");
@@ -113,14 +124,51 @@ class MainTableDataModelTest {
             var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
             BibEntry entry = new BibEntry().withField(StandardField.XDATA, "names");
             BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
-            var binding = row.getNameFields(FieldFactory.parseOrFields("author"));
+            NameColumn column = createNameColumn("author");
+            BibEntryTableViewModel reference = new BibEntryTableViewModel(
+                    new BibEntry().withField(StandardField.AUTHOR, "Jane Miller"), context, formatter);
+            var binding = column.getCellObservableValue(row);
+            List<String> displayChanges = new ArrayList<>();
+            binding.addListener((_, _, value) -> displayChanges.add(value.display()));
 
-            assertEquals("Jane Doe", binding.getValue().source());
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals(-1, Integer.signum(column.getComparator().compare(binding.getValue(), column.getCellData(reference))));
 
             parent.setField(StandardField.AUTHOR, "Jane Roe");
 
+            assertEquals(1, Integer.signum(column.getComparator().compare(column.getCellData(row), column.getCellData(reference))));
+            assertEquals(List.of("Roe"), displayChanges);
+            assertEquals("Roe", binding.getValue().display());
             assertEquals("Jane Roe", binding.getValue().source());
         });
+    }
+
+    @Test
+    void authorTitleColumnSortsByFamilyNameOrFullTitle() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            NameColumn column = createNameColumn("author/title");
+            var rows = List.of(
+                                   new BibEntry().withField(StandardField.TITLE, "Machine Intelligence"),
+                                   new BibEntry().withField(StandardField.AUTHOR, "Nash, John"),
+                                   new BibEntry().withField(StandardField.TITLE, "Library Services"),
+                                   new BibEntry().withField(StandardField.AUTHOR, "Smith, Ann"))
+                           .stream()
+                           .map(entry -> new BibEntryTableViewModel(entry, context, formatter));
+
+            var sorted = rows.map(column::getCellData).sorted(column.getComparator()).map(BibEntryTableViewModel.NameValue::display).toList();
+
+            assertEquals(List.of("Library Services", "Machine Intelligence", "Nash", "Smith"), sorted);
+        });
+    }
+
+    private static NameColumn createNameColumn(String qualifier) {
+        TableView<BibEntryTableViewModel> table = new TableView<>();
+        NameColumn column = new NameColumn(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, qualifier),
+                mock(MainTableTooltip.class));
+        table.getColumns().add(column);
+        return column;
     }
 
     @Test

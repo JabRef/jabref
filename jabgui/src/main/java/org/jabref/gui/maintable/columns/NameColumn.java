@@ -23,7 +23,7 @@ public class NameColumn extends MainTableColumn<NameValue> {
         setText(getDisplayName());
         setCellValueFactory(param -> param.getValue().getNameFields(fields));
         NameComparator comparator = new NameComparator();
-        setComparator((left, right) -> comparator.compare(left.source(), right.source()));
+        setComparator((left, right) -> comparator.compareNames(left.sortNames(), right.sortNames()));
         new ValueTableCellFactory<BibEntryTableViewModel, NameValue>()
                 .withText(NameValue::display)
                 .graphicTooltip((entry, value) -> tooltip.createTooltip(
