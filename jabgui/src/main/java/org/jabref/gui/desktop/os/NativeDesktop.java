@@ -468,7 +468,7 @@ public abstract class NativeDesktop {
     /// @see Desktop#moveToTrash(java.io.File)
     public void moveToTrash(Path path) throws IOException {
         if (!Desktop.getDesktop().moveToTrash(path.toFile())) {
-            throw new IOException("The desktop refused to move " + path + " to the trash");
+            throw new IOException(Localization.lang("The desktop refused to move '%0' to the trash.", path.toString()));
         }
     }
 
