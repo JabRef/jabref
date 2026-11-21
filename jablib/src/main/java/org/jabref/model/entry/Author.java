@@ -246,18 +246,6 @@ public class Author {
         return getExtendedNameValue("given-i");
     }
 
-    public @NonNull Optional<String> getExplicitFamilyNameInitials() {
-        return getExtendedNameValue("family-i");
-    }
-
-    public @NonNull Optional<String> getExplicitNamePrefixInitials() {
-        return getExtendedNameValue("prefix-i");
-    }
-
-    public @NonNull Optional<String> getExplicitNameSuffixInitials() {
-        return getExtendedNameValue("suffix-i");
-    }
-
     private Optional<String> getExtendedNameValue(String key) {
         return Optional.ofNullable(extendedNameParts.get(key))
                        .map(String::strip)

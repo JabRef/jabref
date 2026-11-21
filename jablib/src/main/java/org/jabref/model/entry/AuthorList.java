@@ -380,16 +380,25 @@ public class AuthorList implements Iterable<Author> {
     /// Returns the author field for storage, preserving extended BibLaTeX name parts per author.
     // [impl->req~save.names.normalize-extended-parts~1]
     public String getAsBibtex() {
-        return malformedSource.orElseGet(() -> {
-            String names = authors.stream().map(Author::getAsBibtex).collect(Collectors.joining(" and "));
-            return listOption.isEmpty() ? names : listOption + " and " + names;
-        });
+        return malformedSource.orElseGet(() -> joinForStorage(Author::getAsBibtex));
+    }
+
+    private String joinForStorage(Function<Author, String> formatName) {
+        String names = authors.stream().map(formatName).collect(Collectors.joining(" and "));
+        return listOption.isEmpty() ? names : listOption + " and " + names;
     }
 
     public boolean hasValidExtendedNames() {
         return malformedSource.isEmpty()
                 && (!listOption.isEmpty() || authors.stream().anyMatch(author -> !author.getExtendedNameParts().isEmpty()))
                 && authors.stream().noneMatch(author -> author.getInvalidUsePrefix().isPresent());
+    }
+
+    public boolean matchesExtendedNameFormat(String input) {
+        return hasValidExtendedNames()
+                && (getAsBibtex().equals(input)
+                || joinForStorage(author -> author.getExtendedNameParts().isEmpty()
+                                            ? author.getGivenFamily(false) : author.getAsBibtex()).equals(input));
     }
 
     /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].

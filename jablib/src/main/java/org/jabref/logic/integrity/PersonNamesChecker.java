@@ -18,6 +18,8 @@ public class PersonNamesChecker implements ValueChecker {
     // Unicode-aware to stay consistent with AuthorListParser, which splits tokens on Character.isWhitespace
     private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.UNICODE_CHARACTER_CLASS);
 
+    private static final Pattern OTHERS_SUFFIX = Pattern.compile("(?i)(?<= and )others$");
+
     private final BibDatabaseMode bibMode;
 
     public PersonNamesChecker(BibDatabaseContext databaseContext) {
@@ -41,7 +43,7 @@ public class PersonNamesChecker implements ValueChecker {
         }
 
         // Check format with brackets first to support protected institutional authors
-        if ((bibMode == BibDatabaseMode.BIBLATEX && AuthorList.parse(normalizedValue).hasValidExtendedNames())
+        if ((bibMode == BibDatabaseMode.BIBLATEX && AuthorList.parse(normalizedValue).matchesExtendedNameFormat(OTHERS_SUFFIX.matcher(normalizedValue).replaceFirst("others")))
                 || isStandardFormat(normalizedValue)) {
             return Optional.empty();
         }

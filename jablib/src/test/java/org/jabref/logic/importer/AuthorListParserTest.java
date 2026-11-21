@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /// Similar tests are available in [org.jabref.model.entry.AuthorListTest]
 class AuthorListParserTest {
@@ -127,6 +128,16 @@ class AuthorListParserTest {
 
         assertEquals(1, authors.getNumberOfAuthors());
         assertEquals(input, authors.getAsBibtex());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"family=Smith and others", "family=Smith and Others", "family=Smith and\tOTHERS"})
+    void extendedListRecognizesFinalOthersMarker(String input) {
+        AuthorList authors = parser.parse(input);
+
+        assertEquals(1, authors.getNamedAuthors().size());
+        assertSame(Author.OTHERS, authors.getAuthor(1));
+        assertEquals("family=Smith and others", authors.getAsBibtex());
     }
 
     @Test

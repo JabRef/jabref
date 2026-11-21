@@ -55,6 +55,7 @@ public class AuthorListParser {
     private static final Pattern EXTENDED_NAME_PART = Pattern.compile("(" + EXTENDED_NAME_KEY + ")\\s*=\\s*(.*)", Pattern.DOTALL);
     private static final Pattern NAME_LIST_OPTION = Pattern.compile(
             "(?i)(?:nohashothers|nosortothers|useprefix)\\s*=\\s*(?:true|false|0|1)(?=\\s+and\\s+)");
+    private static final Pattern FINAL_OTHERS = Pattern.compile("(?i)\\p{javaWhitespace}*others$");
     private static final Pattern AND_SEPARATOR = Pattern.compile("(?i)and(?=\\p{javaWhitespace}|$)");
 
     /// the raw bibtex author/editor field
@@ -237,6 +238,10 @@ public class AuthorListParser {
         while (tokenStart < original.length()) {
             if (containsExtendedSyntax && EXTENDED_NAME_START.matcher(original).region(tokenEnd, original.length()).lookingAt()) {
                 authors.add(getExtendedAuthor());
+            } else if (containsExtendedSyntax && !authors.isEmpty()
+                    && FINAL_OTHERS.matcher(original).region(tokenEnd, original.length()).matches()) {
+                authors.add(Author.OTHERS);
+                break;
             } else {
                 getAuthor().ifPresent(authors::add);
             }

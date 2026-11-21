@@ -28,9 +28,6 @@ class AuthorTest {
         Author author = new Author("Hado P.", "H. P.", "van", "Hasselt", "Junior", parts);
 
         assertEquals(Optional.of("HP"), author.getExplicitGivenNameInitials());
-        assertEquals(Optional.of("H"), author.getExplicitFamilyNameInitials());
-        assertEquals(Optional.of("v."), author.getExplicitNamePrefixInitials());
-        assertEquals(Optional.of("Jr"), author.getExplicitNameSuffixInitials());
         assertEquals(parts, author.getExtendedNameParts());
         assertEquals(Optional.of("H. P."), author.getGivenNameAbbreviated());
     }
@@ -42,9 +39,6 @@ class AuthorTest {
                 Map.of("family", "Hasselt", "given-i", "{}"));
 
         assertEquals(Optional.empty(), conventional.getExplicitGivenNameInitials());
-        assertEquals(Optional.empty(), conventional.getExplicitFamilyNameInitials());
-        assertEquals(Optional.empty(), conventional.getExplicitNamePrefixInitials());
-        assertEquals(Optional.empty(), conventional.getExplicitNameSuffixInitials());
         assertEquals(Optional.of(""), extended.getExplicitGivenNameInitials());
     }
 

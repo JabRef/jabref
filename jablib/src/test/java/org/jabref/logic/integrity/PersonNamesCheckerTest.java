@@ -82,6 +82,8 @@ class PersonNamesCheckerTest {
     @ValueSource(strings = {
             "id=person1, given=Simon, family=Beumont",
             "Hans Harman and given=Simon, prefix=de, family=Beumont",
+            "Harman, Hans and given=Simon, prefix=de, family=Beumont",
+            "family=Doe and Others",
             "\"family={Robert and Sons, Inc.}\", given=Jane"
     })
     void validExtendedNamesAreAcceptedInBiblatex(String input) {
@@ -93,7 +95,10 @@ class PersonNamesCheckerTest {
     @ValueSource(strings = {
             "family=Doe, given=Jane, Jr.",
             "family=Doe, given=Jane, given=Janet",
-            "family=Doe, useprefix=maybe"
+            "family=Doe, useprefix=maybe",
+            "family=Doe and Jane Doe and and John Smith",
+            "family=Doe and Smith,John",
+            "family=Doe and Jane Doe and Smith, John"
     })
     void invalidExtendedNamesAreReported(String input) {
         assertEquals(Optional.of("Names are not in the standard biblatex format."), checkerb.checkValue(input));
