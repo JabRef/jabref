@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -64,7 +63,6 @@ class OpenAnnotationActionTest {
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
         when(process.getOutputStream()).thenReturn(stdin);
-        when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
         when(processBuilder.start()).thenReturn(process);
     }
 
