@@ -18,6 +18,10 @@ class AuthorExtendedDisplayTest {
     @CsvSource(delimiter = '|', textBlock = """
             false | Hasselt     | Hasselt, Hado P. van     | Hasselt, HP van
             true  | van Hasselt | van Hasselt, Hado P.     | van Hasselt, HP
+            True  | van Hasselt | van Hasselt, Hado P.     | van Hasselt, HP
+            1     | van Hasselt | van Hasselt, Hado P.     | van Hasselt, HP
+            FALSE | Hasselt     | Hasselt, Hado P. van     | Hasselt, HP van
+            0     | Hasselt     | Hasselt, Hado P. van     | Hasselt, HP van
             """)
     void prefixOptionControlsFamilyAndInvertedViews(String option, String family, String inverted, String abbreviated) {
         Author author = AuthorList.parse("family=Hasselt, given=Hado P., given-i=HP, prefix=van, useprefix=" + option).getAuthor(0);
@@ -79,6 +83,17 @@ class AuthorExtendedDisplayTest {
         assertEquals("Hasselt and van der Ree", authors.getAsLastNames(false));
         assertEquals("Hasselt and van der Ree", authors.getAsNatbib());
         assertEquals("Hasselt et al.", AuthorList.parse(authors.getAsBibtex() + " and Guez, Arthur").getAsNatbib());
+    }
+
+    @Test
+    void listPrefixDefaultAppliesToBothNameFormatsAndPreservesStorage() {
+        String input = "useprefix=0 and family=Hasselt, prefix=van and van Ree, Ria and family=Finch, prefix=de, useprefix=True and others";
+        AuthorList authors = AuthorList.parse(input);
+
+        assertEquals("Hasselt, Ree, de Finch and others", authors.getAsLastNames(false));
+        assertEquals("Ree, Ria van", authors.getAuthor(1).getFamilyGiven(false));
+        assertEquals("Hasselt, Ree, de Finch and others", authors.latexFree().getAsLastNames(false));
+        assertEquals(input, authors.getAsBibtex());
     }
 
     @Test

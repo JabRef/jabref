@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,6 +44,8 @@ public class Author {
     private final String nameSuffix;
     private final Map<String, String> extendedNameParts;
     private final Optional<String> extendedNameSource;
+    private final Optional<Boolean> nameUsePrefix;
+    private final Optional<Boolean> listUsePrefix;
     private Author latexFreeAuthor;
 
     /// Creates the Author object. If any part of the name is absent, `null` must be passed; otherwise other methods may return erroneous results.
@@ -69,8 +72,19 @@ public class Author {
     public Author(@Nullable String givenName, @Nullable String givenNameAbbreviated,
                   @Nullable String namePrefix, @Nullable String familyName, @Nullable String nameSuffix,
                   @NonNull Map<String, String> extendedNameParts, @NonNull Optional<String> extendedNameSource) {
+        this(givenName, givenNameAbbreviated, namePrefix, familyName, nameSuffix, extendedNameParts, extendedNameSource, Optional.empty());
+    }
+
+    private Author(@Nullable String givenName, @Nullable String givenNameAbbreviated,
+                   @Nullable String namePrefix, @Nullable String familyName, @Nullable String nameSuffix,
+                   @NonNull Map<String, String> extendedNameParts, @NonNull Optional<String> extendedNameSource,
+                   @NonNull Optional<Boolean> listUsePrefix) {
         this.extendedNameParts = Map.copyOf(extendedNameParts);
         this.extendedNameSource = extendedNameSource;
+        this.nameUsePrefix = extendedNameParts.containsKey("useprefix")
+                ? getExtendedNameValue("useprefix").flatMap(Author::parseUsePrefix)
+                : Optional.empty();
+        this.listUsePrefix = listUsePrefix;
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
         if (!StringUtil.isBlank(givenName)) {
@@ -104,6 +118,23 @@ public class Author {
         } else {
             this.nameSuffix = null;
         }
+    }
+
+    private Author(Author author, Optional<Boolean> listUsePrefix) {
+        this.givenName = author.givenName;
+        this.givenNameAbbreviated = author.givenNameAbbreviated;
+        this.namePrefix = author.namePrefix;
+        this.familyName = author.familyName;
+        this.nameSuffix = author.nameSuffix;
+        this.extendedNameParts = author.extendedNameParts;
+        this.extendedNameSource = author.extendedNameSource;
+        this.nameUsePrefix = author.nameUsePrefix;
+        this.listUsePrefix = listUsePrefix;
+    }
+
+    /// Applies the list option as a default while preserving the name's original storage representation.
+    public Author withListUsePrefix(Optional<Boolean> usePrefix) {
+        return equals(OTHERS) ? this : new Author(this, usePrefix);
     }
 
     public static String addDotIfAbbreviation(String name) {
@@ -192,7 +223,7 @@ public class Author {
 
     @Override
     public int hashCode() {
-        return Objects.hash(givenNameAbbreviated, givenName, nameSuffix, familyName, namePrefix, extendedNameParts);
+        return Objects.hash(givenNameAbbreviated, givenName, nameSuffix, familyName, namePrefix, extendedNameParts, listUsePrefix);
     }
 
     /// Compare this object with the given one.
@@ -210,7 +241,8 @@ public class Author {
                     && Objects.equals(namePrefix, that.namePrefix)
                     && Objects.equals(familyName, that.familyName)
                     && Objects.equals(nameSuffix, that.nameSuffix)
-                    && extendedNameParts.equals(that.extendedNameParts);
+                    && extendedNameParts.equals(that.extendedNameParts)
+                    && listUsePrefix.equals(that.listUsePrefix);
         }
 
         return false;
@@ -221,24 +253,28 @@ public class Author {
         return extendedNameParts;
     }
 
-    /// Returns the explicit name-level option, without applying entry or application defaults.
-    /// Absent or invalid values return empty; [#getInvalidUsePrefix()] distinguishes invalid input.
-    /// The original value is retained in [#getExtendedNameParts()] for storage.
+    /// Returns the name-level prefix option, falling back to the name-list option.
     public @NonNull Optional<Boolean> getUsePrefix() {
-        return getExtendedNameValue("useprefix").flatMap(value -> switch (value) {
-            case "true" ->
+        return nameUsePrefix.isPresent() ? nameUsePrefix : listUsePrefix;
+    }
+
+    private static Optional<Boolean> parseUsePrefix(String value) {
+        return switch (value.toLowerCase(Locale.ROOT)) {
+            case "true",
+                 "1" ->
                     Optional.of(true);
-            case "false" ->
+            case "false",
+                 "0" ->
                     Optional.of(false);
             default ->
                     Optional.empty();
-        });
+        };
     }
 
     /// Returns the original invalid value so validation can report it without losing source data.
     public @NonNull Optional<String> getInvalidUsePrefix() {
         return Optional.ofNullable(extendedNameParts.get("useprefix"))
-                       .filter(_ -> getUsePrefix().isEmpty());
+                       .filter(_ -> nameUsePrefix.isEmpty());
     }
 
     /// Returns explicitly supplied initials, without generating initials or changing punctuation.
@@ -261,7 +297,7 @@ public class Author {
 
     private @NonNull String formatBibtex() {
         if (extendedNameParts.isEmpty()) {
-            return getFamilyGiven(false);
+            return getConventionalFamilyGiven(false);
         }
         // Keep the standard parts together when there is no source spelling to preserve.
         return extendedNameParts.entrySet().stream()
@@ -357,7 +393,7 @@ public class Author {
     /// @param abbr `true` - abbreviate first name, `false` - do not abbreviate
     /// @return 'von Last, Jr., First' (if `abbr==false`) or 'von Last, Jr., F.' (if `abbr==true`)
     public String getFamilyGiven(boolean abbr) {
-        if (!extendedNameParts.isEmpty()) {
+        if (!extendedNameParts.isEmpty() || listUsePrefix.isPresent()) {
             StringJoiner result = new StringJoiner(", ");
             String family = getFamilyNameForDisplay();
             if (!family.isEmpty()) {
@@ -373,6 +409,10 @@ public class Author {
             }
             return result.toString();
         }
+        return getConventionalFamilyGiven(abbr);
+    }
+
+    private String getConventionalFamilyGiven(boolean abbr) {
         StringBuilder res = new StringBuilder(getNamePrefixAndFamilyName());
         getNameSuffix().ifPresent(jr -> res.append(", ").append(jr));
         if (abbr) {
@@ -445,7 +485,7 @@ public class Author {
             String von = getNamePrefix().map(LatexToUnicodeAdapter::format).orElse(null);
             String last = getFamilyName().map(LatexToUnicodeAdapter::format).orElse(null);
             String jr = getNameSuffix().map(LatexToUnicodeAdapter::format).orElse(null);
-            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr, extendedNameParts, extendedNameSource);
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr, extendedNameParts, extendedNameSource, listUsePrefix);
             latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;
         }
         return latexFreeAuthor;

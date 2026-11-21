@@ -54,7 +54,7 @@ public class AuthorListParser {
     private static final Pattern EXTENDED_NAME_IN_LIST = Pattern.compile("(?i)(?:^|;|\\p{javaWhitespace}+and\\p{javaWhitespace}+)" + EXTENDED_NAME_START.pattern());
     private static final Pattern EXTENDED_NAME_PART = Pattern.compile("(" + EXTENDED_NAME_KEY + ")\\s*=\\s*(.*)", Pattern.DOTALL);
     private static final Pattern NAME_LIST_OPTION = Pattern.compile(
-            "(?i)(?:nohashothers|nosortothers|useprefix)\\s*=\\s*(?:true|false|0|1)(?=\\s+and\\s+)");
+            "(?i)(nohashothers|nosortothers|useprefix)\\s*=\\s*(true|false|0|1)(?=\\s+and\\s+)");
     private static final Pattern FINAL_OTHERS = Pattern.compile("(?i)\\p{javaWhitespace}*others$");
     private static final Pattern AND_SEPARATOR = Pattern.compile("(?i)and(?=\\p{javaWhitespace}|$)");
 
@@ -104,7 +104,7 @@ public class AuthorListParser {
     private record SimpleNormalFormResult(String authors, boolean andOthersPresent) {
     }
 
-    private static boolean containsExtendedName(String listOfNames) {
+    public static boolean containsExtendedName(String listOfNames) {
         return listOfNames.indexOf('=') >= 0 && EXTENDED_NAME_IN_LIST.matcher(listOfNames).find();
     }
 
@@ -224,10 +224,15 @@ public class AuthorListParser {
         tokenEnd = 0;
         malformedExtendedName = false;
         String listOption = "";
+        Optional<Boolean> listUsePrefix = Optional.empty();
         if (containsExtendedSyntax) {
             Matcher option = NAME_LIST_OPTION.matcher(original);
             if (option.lookingAt()) {
                 listOption = option.group();
+                if ("useprefix".equalsIgnoreCase(option.group(1))) {
+                    String value = option.group(2);
+                    listUsePrefix = Optional.of("true".equalsIgnoreCase(value) || "1".equals(value));
+                }
                 tokenEnd = option.end();
                 getToken();
             }
@@ -251,6 +256,10 @@ public class AuthorListParser {
             authors.add(Author.OTHERS);
         }
 
+        listUsePrefix.ifPresent(value -> {
+            Optional<Boolean> inheritedPrefix = Optional.of(value);
+            authors.replaceAll(author -> author.withListUsePrefix(inheritedPrefix));
+        });
         return AuthorList.of(authors, listOption, malformedExtendedName ? Optional.of(source) : Optional.empty());
     }
 

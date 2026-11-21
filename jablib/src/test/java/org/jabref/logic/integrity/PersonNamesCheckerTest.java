@@ -84,6 +84,9 @@ class PersonNamesCheckerTest {
             "Hans Harman and given=Simon, prefix=de, family=Beumont",
             "Harman, Hans and given=Simon, prefix=de, family=Beumont",
             "family=Doe and Others",
+            "family=Hasselt, prefix=van, useprefix=1",
+            "family=Hasselt, prefix=van, useprefix=True",
+            "useprefix=0 and van Hasselt, Hado and family=Doe",
             "\"family={Robert and Sons, Inc.}\", given=Jane"
     })
     void validExtendedNamesAreAcceptedInBiblatex(String input) {
@@ -96,6 +99,7 @@ class PersonNamesCheckerTest {
             "family=Doe, given=Jane, Jr.",
             "family=Doe, given=Jane, given=Janet",
             "family=Doe, useprefix=maybe",
+            "useprefix=true and family=Doe, useprefix=maybe",
             "family=Doe and Jane Doe and and John Smith",
             "family=Doe and Smith,John",
             "family=Doe and Jane Doe and Smith, John"

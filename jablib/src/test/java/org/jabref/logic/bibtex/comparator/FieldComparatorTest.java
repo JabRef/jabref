@@ -45,6 +45,18 @@ class FieldComparatorTest {
     }
 
     @Test
+    void saveOrderHonorsListPrefixDefaultAndIndividualOverride() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        String name = "useprefix=1 and family=Hasselt, prefix=van";
+        BibEntry inheritedPrefix = new BibEntry().withField(StandardField.AUTHOR, name);
+        BibEntry excludedPrefix = new BibEntry().withField(StandardField.AUTHOR, name + ", useprefix=FALSE");
+        BibEntry middle = new BibEntry().withField(StandardField.AUTHOR, "Miller, Max");
+
+        assertEquals(1, Integer.signum(comparator.compare(inheritedPrefix, middle)));
+        assertEquals(-1, Integer.signum(comparator.compare(excludedPrefix, middle)));
+    }
+
+    @Test
     void nameSortingUsesEditorWhenAuthorIsMissing() {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), false);
         BibEntry edited = new BibEntry().withField(StandardField.EDITOR, "family=Hasselt, prefix=van, useprefix=true");

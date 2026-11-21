@@ -21,6 +21,16 @@ class NameComparatorTest {
     }
 
     @Test
+    void listPrefixDefaultAppliesToSortingUnlessTheAuthorOverridesIt() {
+        String name = "useprefix=True and family=Hasselt, prefix=van";
+        String overridden = name + ", useprefix=0";
+
+        assertEquals(1, Integer.signum(comparator.compare(name, "Miller, Max")));
+        assertEquals(-1, Integer.signum(comparator.compare(overridden, "Miller, Max")));
+        assertEquals(1, Integer.signum(comparator.compare("useprefix=1 and van Hasselt, Hado", "Miller, Max")));
+    }
+
+    @Test
     void equivalentConventionalAndExtendedNamesCompareEqually() {
         assertEquals(0, comparator.compare("Hasselt, Hado P.", "given=Hado P., family=Hasselt"));
     }
