@@ -48,14 +48,18 @@
                         </VBox>
                     </VBox>
                 </Tab>
-                <Tab fx:id="jStyleTab" text="JStyles">
+                <Tab fx:id="jStyleTab" text="Jstyles">
                     <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                         <padding>
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                         </padding>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <padding>
+                                <Insets top="4.0" bottom="8.0"/>
+                            </padding>
                             <Label text="%Available" styleClass="h4,padding-top-12"/>
                             <HBox HBox.hgrow="ALWAYS" />
+                            <Hyperlink text="%Get more Jstyles" onAction="#openJStylesWebsite"/>
                             <Button fx:id="addJStyleButton" text="%Add .jstyle file" onAction="#addJStyleFile"/>
                         </HBox>
                         <TableView fx:id="jStylesTable" VBox.vgrow="ALWAYS" prefHeight="350.0">
@@ -73,9 +77,6 @@
                             <Label text="%Preview" styleClass="h4,padding-top-12"/>
                             <VBox fx:id="jStylePreviewBox" prefHeight="200.0" prefWidth="665.0"/>
                         </VBox>
-                        <HBox alignment="CENTER_RIGHT">
-                            <Hyperlink text="%Get more Jstyles" onAction="#openJStylesWebsite"/>
-                        </HBox>
                     </VBox>
                 </Tab>
                 <Tab fx:id="bstStyleTab" text="BST Styles">
