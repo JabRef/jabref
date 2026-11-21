@@ -91,7 +91,7 @@ public class Linux extends NativeDesktop {
 
     @Override
     protected void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException {
-        List<String> command = fileManagerCommand(Linux::isOnPath, desktopName(), file);
+        List<String> command = fileManagerCommand(Linux::isInstalled, desktopName(), file);
         LoggerFactory.getLogger(Linux.class).debug("Opening folder and selecting file using {}", String.join(" ", command));
         ProcessLauncher.startDetached(new ProcessBuilder(command));
     }
@@ -101,9 +101,9 @@ public class Linux extends NativeDesktop {
     ///
     /// @param desktop the lower-case names of the desktop environment
     @VisibleForTesting
-    static List<String> fileManagerCommand(Predicate<String> isOnPath, String desktop, Path file) {
+    static List<String> fileManagerCommand(Predicate<String> isInstalled, String desktop, Path file) {
         return desktopFileManagers(desktop).stream()
-                                           .filter(isOnPath)
+                                           .filter(isInstalled)
                                            .findFirst()
                                            .map(name -> selectFileCommand(name, file.toString()))
                                            .orElseGet(() -> List.of("xdg-open", file.getParent().toString()));
@@ -139,7 +139,7 @@ public class Linux extends NativeDesktop {
     protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
         List<String> command = defaultTerminalCommand(
                 terminalEmulatorName(Path.of(ETC_ALTERNATIVES_X_TERMINAL_EMULATOR)),
-                Linux::isOnPath,
+                Linux::isInstalled,
                 System.getenv("TERMINAL"),
                 desktopName(),
                 directory.toString())
@@ -160,15 +160,18 @@ public class Linux extends NativeDesktop {
     /// @param desktop          the lower-case names of the desktop environment
     @VisibleForTesting
     static Optional<List<String>> defaultTerminalCommand(Optional<String> alternativesName,
-                                                         Predicate<String> isOnPath,
+                                                         Predicate<String> isInstalled,
                                                          @Nullable String terminalVariable,
                                                          String desktop,
                                                          String directory) {
         return alternativesName.map(name -> terminalCommand(name, directory))
-                               .or(() -> Optional.of(XDG_TERMINAL_EXEC).filter(isOnPath).map(List::of))
-                               .or(() -> Optional.ofNullable(terminalVariable).filter(StringUtil::isNotBlank).map(List::of))
+                               .or(() -> Optional.of(XDG_TERMINAL_EXEC).filter(isInstalled).map(List::of))
+                               .or(() -> Optional.ofNullable(terminalVariable)
+                                                 .filter(StringUtil::isNotBlank)
+                                                 .map(Linux::applicationCommand)
+                                                 .filter(command -> isInstalled.test(command.getFirst())))
                                .or(() -> desktopTerminals(desktop).stream()
-                                                                  .filter(isOnPath)
+                                                                  .filter(isInstalled)
                                                                   .findFirst()
                                                                   .map(name -> terminalCommand(name, directory)));
     }
@@ -208,7 +211,11 @@ public class Linux extends NativeDesktop {
                      .toLowerCase(Locale.ROOT);
     }
 
-    private static boolean isOnPath(String program) {
+    /// @param program a program name, looked up on the `PATH`, or an absolute path
+    private static boolean isInstalled(String program) {
+        if (Path.of(program).isAbsolute()) {
+            return Files.isExecutable(Path.of(program));
+        }
         return Stream.ofNullable(System.getenv("PATH"))
                      .flatMap(path -> Arrays.stream(path.split(File.pathSeparator)))
                      .filter(StringUtil::isNotBlank)

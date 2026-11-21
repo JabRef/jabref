@@ -65,7 +65,19 @@ class LinuxTest {
     @Test
     void defaultTerminalUsesTerminalVariableWithoutXdgTerminalExec() {
         assertEquals(Optional.of(List.of("alacritty")),
-                Linux.defaultTerminalCommand(Optional.empty(), _ -> false, "alacritty", "kde", "/home/user"));
+                Linux.defaultTerminalCommand(Optional.empty(), "alacritty"::equals, "alacritty", "kde", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalSplitsArgumentsOfTerminalVariable() {
+        assertEquals(Optional.of(List.of("alacritty", "--class", "jabref")),
+                Linux.defaultTerminalCommand(Optional.empty(), "alacritty"::equals, "alacritty --class jabref", "kde", "/home/user"));
+    }
+
+    @Test
+    void defaultTerminalSkipsTerminalVariableNamingMissingProgram() {
+        assertEquals(Optional.of(List.of("konsole", "--workdir", "/home/user")),
+                Linux.defaultTerminalCommand(Optional.empty(), "konsole"::equals, "alacritty", "kde", "/home/user"));
     }
 
     // Fedora and Nobara with KDE have no alternatives link, see https://github.com/JabRef/jabref/pull/17752#issuecomment-6945624391
