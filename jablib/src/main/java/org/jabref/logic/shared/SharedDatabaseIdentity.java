@@ -3,6 +3,7 @@ package org.jabref.logic.shared;
 import java.util.Locale;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 // [impl->req~shared-database.single-tab~1]
 @NullMarked
@@ -20,7 +21,8 @@ public record SharedDatabaseIdentity(DBMSType type, String host, int port, Strin
         return new SharedDatabaseIdentity(properties.getType(), normalizeHost(properties.getHost()), properties.getPort(), properties.getDatabase());
     }
 
-    private static String normalizeHost(String host) {
-        return host.toLowerCase(Locale.ROOT);
+    /// Remembered connection settings may lack the host; that must not make two identities incomparable.
+    private static String normalizeHost(@Nullable String host) {
+        return (host == null) ? "" : host.toLowerCase(Locale.ROOT);
     }
 }

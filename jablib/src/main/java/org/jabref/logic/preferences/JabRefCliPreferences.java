@@ -3,8 +3,10 @@ package org.jabref.logic.preferences;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -125,7 +127,6 @@ import org.jabref.model.search.SearchFlags;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.tobiasdiez.easybind.EasyBind;
@@ -316,6 +317,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FILES_IMPORT_NAMEPATTERN = "importFileNamePattern";
     private static final String FILES_IMPORT_DIRPATTERN = "importFileDirPattern";
     private static final String FILES_DOWNLOAD_LINKED = "downloadLinkedFiles";
+    private static final String IMPORT_DIALOG_DOWNLOAD_LINKED_FILES = "importDialogDownloadLinkedFiles";
     private static final String FILES_FULLTEXT_INDEX = "fulltextIndexLinkedFiles";
     private static final String FILES_WORKING_DIRECTORY = "workingDirectory";
 
@@ -364,6 +366,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
 
     // Abbreviation preferences
+    private static final String DISABLED_EXTERNAL_JOURNAL_LISTS = "disabledExternalJournalLists";
+    private static final String USE_BUILT_IN_JOURNAL_LIST = "useBuiltInJournalList";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
     private static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
@@ -410,6 +414,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
     private static final String AI_GEMINI_API_BASE_URL = "aiGeminiApiBaseUrl";
     private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
+    private static final String AI_ENABLE_DEBUG_PROVIDER = "aiEnableDebugProvider";
     private static final String AI_SUMMARIZATOR_KIND = "aiSummarizatorKind";
     private static final String AI_TOKEN_ESTIMATOR_KIND = "aiTokenEstimatorKind";
     private static final String AI_TEMPERATURE = "aiTemperature";
@@ -482,10 +487,13 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
-    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
     // The only instance of this class:
     private static JabRefCliPreferences singleton;
+
+    private final Preferences preferencesNode;
+    private final boolean resetsGlobalStores;
+    private boolean resettingIsolatedNode;
 
     /// Cache variables
     private LibraryPreferences libraryPreferences;
@@ -515,6 +523,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private AiPreferences aiPreferences;
     private OcrPreferences ocrPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+    private @Nullable SharedDatabasePreferences sharedDatabasePreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private GitPreferences gitPreferences;
 
@@ -524,20 +533,33 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Identifies a single secret in the system keyring by its `service` and `account`.
-    private record KeyringSlot(String service, String account) {
-        static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref", "proxy");
-        static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref", "github");
+    ///
+    /// The secret is stored as plain text under `service`. Older versions stored it encrypted with [Password] under
+    /// `legacyService` (same `account`); such values are migrated when they are read.
+    ///
+    /// See [ADR 0081](https://devdocs.jabref.org/decisions/0081-store-keyring-secrets-without-application-encryption.html) for why no extra encryption is used.
+    private record KeyringSlot(String service, String account, String legacyService) {
+        // [impl->adr~keyring.no-application-encryption~1]
+        static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref.proxy", "proxy", "org.jabref");
+        static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref.github", "github", "org.jabref");
 
         /// Slot holding a custom API key for the fetcher with the given name.
         static KeyringSlot customApiKey(String fetcherName) {
-            return new KeyringSlot("org.jabref.customapikeys", fetcherName);
+            return new KeyringSlot("org.jabref.apikeys", fetcherName, "org.jabref.customapikeys");
         }
     }
 
-    /// @implNote The constructor was made public because dependency injection via constructor
-    /// required widespread refactoring, currently we are using reflection in some formatters
-    /// to gain access
     public JabRefCliPreferences() {
+        this(Preferences.userRoot().node("/org/jabref"), true);
+    }
+
+    public JabRefCliPreferences(Preferences preferencesNode) {
+        this(preferencesNode, false);
+    }
+
+    private JabRefCliPreferences(Preferences preferencesNode, boolean resetsGlobalStores) {
+        this.preferencesNode = preferencesNode;
+        this.resetsGlobalStores = resetsGlobalStores;
         try {
             Path preferencesPath = Path.of("jabref.xml");
             if (Files.exists(preferencesPath)) {
@@ -579,11 +601,30 @@ public class JabRefCliPreferences implements CliPreferences {
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
             // list needs to be mutable in observable preferences
-            // keep consistency with Splitter#splitToList
             return new ArrayList<>();
         }
 
-        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
+        List<String> result = new ArrayList<>();
+        StringBuilder element = new StringBuilder();
+        for (int i = 0; i < toConvert.length(); i++) {
+            char character = toConvert.charAt(i);
+            if (character == '\\' && i + 1 < toConvert.length()) {
+                char next = toConvert.charAt(i + 1);
+                if (next == '\\' || next == STRINGLIST_DELIMITER) {
+                    element.append(next);
+                    i++;
+                    continue;
+                }
+            }
+            if (character == STRINGLIST_DELIMITER) {
+                result.add(element.toString());
+                element.setLength(0);
+            } else {
+                element.append(character);
+            }
+        }
+        result.add(element.toString());
+        return result;
     }
     // endregion
 
@@ -594,47 +635,47 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param key The key to check.
     /// @return true if the key is set, false otherwise.
     public boolean hasKey(String key) {
-        return PREFS_NODE.get(key, null) != null;
+        return preferencesNode.get(key, null) != null;
     }
 
     public String get(String key, String def) {
-        return PREFS_NODE.get(key, def);
+        return preferencesNode.get(key, def);
     }
 
     public boolean getBoolean(String key, boolean def) {
-        return PREFS_NODE.getBoolean(key, def);
+        return preferencesNode.getBoolean(key, def);
     }
 
     public int getInt(String key, int def) {
-        return PREFS_NODE.getInt(key, def);
+        return preferencesNode.getInt(key, def);
     }
 
     public double getDouble(String key, double def) {
-        return PREFS_NODE.getDouble(key, def);
+        return preferencesNode.getDouble(key, def);
     }
 
     public void put(String key, String value) {
-        PREFS_NODE.put(key, value);
+        preferencesNode.put(key, value);
     }
 
     public void putBoolean(String key, boolean value) {
-        PREFS_NODE.putBoolean(key, value);
+        preferencesNode.putBoolean(key, value);
     }
 
     public void putInt(String key, int value) {
-        PREFS_NODE.putInt(key, value);
+        preferencesNode.putInt(key, value);
     }
 
     public void putInt(String key, Number value) {
-        PREFS_NODE.putInt(key, value.intValue());
+        preferencesNode.putInt(key, value.intValue());
     }
 
     public void putDouble(String key, double value) {
-        PREFS_NODE.putDouble(key, value);
+        preferencesNode.putDouble(key, value);
     }
 
     protected void remove(String key) {
-        PREFS_NODE.remove(key);
+        preferencesNode.remove(key);
     }
 
     /// Puts a list of strings into the Preferences, by linking its elements with a
@@ -694,7 +735,7 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
         try {
-            PREFS_NODE.flush();
+            preferencesNode.flush();
         } catch (BackingStoreException ex) {
             LOGGER.warn("Cannot communicate with backing store", ex);
         }
@@ -959,29 +1000,82 @@ public class JabRefCliPreferences implements CliPreferences {
                        .filter(StringUtil::isNotBlank);
     }
 
-    /// Reads and decrypts the secrets at the given slots in a single keyring session. On a successful open the result
-    /// holds an entry for **every** requested slot — the decrypted secret, or "" when that slot is empty. Returns an
+    /// Reads the secrets at the given slots in a single keyring session. On a successful open the result
+    /// holds an entry for **every** requested slot — the secret, or "" when that slot is empty. Returns an
     /// empty map if the keyring cannot be opened, so callers tell failure from "all slots empty" by size
     /// (`result.size() == slots.size()` iff the open succeeded; an empty `slots` is a no-op).
     private Map<KeyringSlot, String> readKeyring(List<KeyringSlot> slots) {
+        if (resettingIsolatedNode) {
+            return Map.of();
+        }
         Map<KeyringSlot, String> result = new HashMap<>();
         try (Keyring keyring = Keyring.create()) {
             for (KeyringSlot slot : slots) {
-                try {
-                    result.put(slot, new Password(
-                            keyring.getPassword(slot.service(), slot.account()),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .decrypt());
-                } catch (PasswordAccessException _) {
-                    LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
-                    result.put(slot, "");
-                }
+                result.put(slot, readSecret(keyring, slot));
             }
         } catch (Exception ex) {
             LOGGER.warn("Could not open keyring", ex);
             return Map.of();
         }
         return result;
+    }
+
+    /// Reads the plain-text secret of a slot, migrating a legacy encrypted value first if needed. Returns "" when
+    /// nothing is stored.
+    private String readSecret(Keyring keyring, KeyringSlot slot) {
+        try {
+            return keyring.getPassword(slot.service(), slot.account());
+        } catch (PasswordAccessException _) {
+            return migrateLegacySecret(keyring, slot);
+        }
+    }
+
+    /// Moves a secret stored encrypted by older JabRef versions to the slot's current location as plain text.
+    ///
+    /// The legacy entry is removed only after the new one was written, so a failed write is retried on the next read.
+    /// A legacy value that cannot be decrypted (e.g., because the owner or the host name changed) is discarded.
+    ///
+    /// @return the decrypted secret, or "" if there is no legacy value or it cannot be decrypted
+    private String migrateLegacySecret(Keyring keyring, KeyringSlot slot) {
+        // [impl->req~keyring.legacy-migration~1]
+        String encrypted;
+        try {
+            encrypted = keyring.getPassword(slot.legacyService(), slot.account());
+        } catch (PasswordAccessException _) {
+            LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
+            return "";
+        }
+
+        String secret;
+        try {
+            secret = new Password(encrypted, getInternalPreferences().getUserHostInfo().getUserHostString()).decrypt();
+        } catch (GeneralSecurityException | UnsupportedEncodingException | IllegalArgumentException e) {
+            LOGGER.warn("Could not decrypt the stored secret for {}/{}. It is discarded and has to be entered again.", slot.legacyService(), slot.account(), e);
+            deleteFromKeyring(keyring, slot.legacyService(), slot.account());
+            return "";
+        }
+
+        try {
+            keyring.setPassword(slot.service(), slot.account(), secret);
+        } catch (PasswordAccessException e) {
+            LOGGER.warn("Could not move the secret for {}/{} to {}", slot.legacyService(), slot.account(), slot.service(), e);
+            return secret;
+        }
+        deleteFromKeyring(keyring, slot.legacyService(), slot.account());
+        return secret;
+    }
+
+    /// Deletes an entry from the keyring.
+    ///
+    /// @return `false` if deletion could not be confirmed
+    private static boolean deleteFromKeyring(Keyring keyring, String service, String account) {
+        try {
+            keyring.deletePassword(service, account);
+            return true;
+        } catch (PasswordAccessException e) {
+            LOGGER.debug("Could not delete keyring entry for {}/{}", service, account, e);
+            return false;
+        }
     }
 
     /// Writes (or, for a blank secret, clears) a single slot.
@@ -991,22 +1085,26 @@ public class JabRefCliPreferences implements CliPreferences {
         writeKeyring(single);
     }
 
-    /// Encrypts and writes each secret to its slot in a single keyring session. A blank secret clears its slot.
+    /// Writes each secret as plain text to its slot in a single keyring session. A blank secret clears its slot.
+    /// In both cases, a legacy encrypted value of the slot is removed, so that it cannot be migrated later.
     private void writeKeyring(Map<KeyringSlot, String> secrets) {
+        if (resettingIsolatedNode) {
+            return;
+        }
+        // [impl->req~keyring.plain-text-storage~1]
+        // [impl->req~keyring.legacy-migration~1]
         try (Keyring keyring = Keyring.create()) {
             for (Map.Entry<KeyringSlot, String> entry : secrets.entrySet()) {
                 KeyringSlot slot = entry.getKey();
-                if (StringUtil.isBlank(entry.getValue())) {
-                    try {
-                        keyring.deletePassword(slot.service(), slot.account());
-                    } catch (PasswordAccessException _) {
-                        // already absent, nothing to clear
-                    }
+                if (StringUtil.isNotBlank(entry.getValue())) {
+                    keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
+                    deleteFromKeyring(keyring, slot.legacyService(), slot.account());
                 } else {
-                    keyring.setPassword(slot.service(), slot.account(), new Password(
-                            entry.getValue().trim(),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
+                    // A nonempty blank value suppresses migration and works with keyrings that reject empty values.
+                    keyring.setPassword(slot.service(), slot.account(), " ");
+                    if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
+                        deleteFromKeyring(keyring, slot.service(), slot.account());
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -1083,7 +1181,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public void exportPreferences(Path path) throws JabRefException {
         LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(path)) {
-            PREFS_NODE.exportSubtree(os);
+            preferencesNode.exportSubtree(os);
         } catch (BackingStoreException
                  | IOException ex) {
             throw new JabRefException(
@@ -1098,13 +1196,29 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
     @Override
     public void clear() throws BackingStoreException {
+        boolean wasResettingIsolatedNode = resettingIsolatedNode;
+        resettingIsolatedNode = !resetsGlobalStores;
+        try {
+            if (resetsGlobalStores) {
+                clearGlobalStores();
+            }
+            clearPreferencesNode();
+        } finally {
+            resettingIsolatedNode = wasResettingIsolatedNode;
+        }
+    }
+
+    private void clearGlobalStores() throws BackingStoreException {
+        clearTruststoreFromCustomCertificates();
+        clearCustomFetcherKeys();
+        getSharedDatabasePreferences().clearAllConnections();
+    }
+
+    private void clearPreferencesNode() throws BackingStoreException {
         clearAllBibEntryTypes();
         removeDeclinedCustomEntryTypes();
         clearCitationKeyPatterns();
-        clearTruststoreFromCustomCertificates();
-        clearCustomFetcherKeys();
-        PREFS_NODE.clear();
-        new SharedDatabasePreferences().clear();
+        preferencesNode.clear();
 
         initializeAll();
 
@@ -1183,14 +1297,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void removeDeclinedCustomEntryTypes() {
         try {
-            PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
+            preferencesNode.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
         } catch (BackingStoreException e) {
             LOGGER.info("Clearing declined custom entry types failed.", e);
         }
-    }
-
-    protected Path getDefaultPath() {
-        return Path.of("/");
     }
 
     protected Language getLanguage() {
@@ -1211,6 +1321,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
                 getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
         );
+
+        abbreviationPreferences.setUseBuiltInJournalList(getBoolean(USE_BUILT_IN_JOURNAL_LIST, true));
+        bindBoolean(abbreviationPreferences.useBuiltInJournalListProperty(), USE_BUILT_IN_JOURNAL_LIST, true);
+
+        abbreviationPreferences.setDisabledExternalJournalLists(convertStringToList(get(DISABLED_EXTERNAL_JOURNAL_LISTS,
+                convertListToString(defaultValues.getDisabledExternalJournalLists()))));
+        bindCustomList(abbreviationPreferences.getDisabledExternalJournalLists(), DISABLED_EXTERNAL_JOURNAL_LISTS, defaultValues.getDisabledExternalJournalLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
 
         bindCustomList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
@@ -1366,7 +1484,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @Override
     public Set<String> getDeclinedCustomEntryTypes() {
         try {
-            return Set.of(PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).keys());
+            return Set.of(preferencesNode.node(DECLINED_CUSTOM_ENTRY_TYPES).keys());
         } catch (BackingStoreException e) {
             LOGGER.info("Reading declined custom entry types failed.", e);
             return Set.of();
@@ -1376,7 +1494,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Stores each fingerprint as a key without a value: a key is limited to 80 characters, a value to 8192.
     @Override
     public void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes) {
-        Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
+        Preferences node = preferencesNode.node(DECLINED_CUSTOM_ENTRY_TYPES);
         declinedEntryTypes.forEach(declined -> node.put(declined, ""));
         try {
             node.flush();
@@ -1385,16 +1503,16 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+    private Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
-               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
-               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
+               ? preferencesNode.node(CUSTOMIZED_BIBTEX_TYPES)
+               : preferencesNode.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
-    private static Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
+    private Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
-               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES_V2)
-               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
+               ? preferencesNode.node(CUSTOMIZED_BIBTEX_TYPES_V2)
+               : preferencesNode.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
     }
     // endregion
 
@@ -1695,6 +1813,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// The refresh token lives in the system keyring only: never in the preferences, which can be exported as plain text
     private @Nullable RefreshToken getCiteDriveToken(String apiBaseUrl) {
+        if (resettingIsolatedNode) {
+            return null;
+        }
         try (final Keyring keyring = Keyring.create()) {
             return parseCiteDriveToken(keyring.getPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT), apiBaseUrl);
         } catch (PasswordAccessException _) {
@@ -1707,6 +1828,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// If the keyring is not available, the token is kept in memory only (login needed after restart)
     private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
+        if (resettingIsolatedNode) {
+            return;
+        }
         try (final Keyring keyring = Keyring.create()) {
             if (refreshToken == null) {
                 keyring.deletePassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT);
@@ -1748,7 +1872,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private @NonNull GlobalCitationKeyPatterns getGlobalCitationKeyPattern(CitationKeyPatternPreferences defaults) {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(
                 get(CITATION_KEY_DEFAULT_PATTERN, defaults.getKeyPatterns().getDefaultValue().stringRepresentation()));
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = preferencesNode.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
             for (String key : keys) {
@@ -1773,7 +1897,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         // Store overridden definitions in Preferences.
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = preferencesNode.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1789,7 +1913,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearCitationKeyPatterns() throws BackingStoreException {
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = preferencesNode.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
     }
     // endregion
@@ -1908,14 +2032,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern()),
                 get(FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern()),
                 getBoolean(FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles()),
+                getBoolean(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, defaultValues.shouldImportDialogDownloadLinkedFiles()),
                 getBoolean(FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles()),
                 getPath(FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory()),
                 getBoolean(BACKUP_ENABLED, defaultValues.shouldCreateBackup()),
                 // Backups should sit in the data directory, because a backup file should survive cache cleanups
                 getPath(BACKUP_DIRECTORY, defaultValues.getBackupDirectory()),
                 getBoolean(FILES_CONFIRM_DELETE_LINKED, defaultValues.confirmDeleteLinkedFile()),
-                // Use fallback method in case AWT is not initialized in headless (JabKit) mode
-                getBoolean(FILES_TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
+                getBoolean(FILES_TRASH_INSTEAD_OF_DELETE, defaultValues.moveToTrash()),
                 getBoolean(FILES_ADJUST_FILE_LINKS_ON_TRANSFER, defaultValues.shouldAdjustFileLinksOnTransfer()),
                 getBoolean(FILES_COPY_LINKED_FILES_ON_TRANSFER, defaultValues.shouldCopyLinkedFilesOnTransfer()),
                 getBoolean(FILES_MOVE_LINKED_FILES_ON_TRANSFER, defaultValues.shouldMoveLinkedFilesOnTransfer()),
@@ -1924,34 +2048,28 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaultValues.shouldOpenFileExplorerInFileDirectory()),
                 getBoolean(FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaultValues.shouldOpenFileExplorerInLastUsedDirectory()));
 
-        // mainFileDirectory defaults to getDefaultPath(), which the GUI overrides to a meaningful location.
-        bindPath(filePreferences.mainFileDirectoryProperty(), FILES_MAIN_DIRECTORY, getDefaultPath());
+        bindPath(filePreferences.mainFileDirectoryProperty(), FILES_MAIN_DIRECTORY, defaultValues.mainFileDirectoryProperty().get());
         bindBoolean(filePreferences.storeFilesRelativeToBibFileProperty(), FILES_STORE_RELATIVE_TO_BIB, defaultValues.shouldStoreFilesRelativeToBibFile());
         bindBoolean(filePreferences.autoRenameFilesOnChangeProperty(), FILES_AUTO_RENAME_ON_CHANGE, defaultValues.shouldAutoRenameFilesOnChange());
         bindString(filePreferences.fileNamePatternProperty(), FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern());
         bindString(filePreferences.fileDirectoryPatternProperty(), FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern());
         bindBoolean(filePreferences.downloadLinkedFilesProperty(), FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles());
+        bindBoolean(filePreferences.importDialogDownloadLinkedFilesProperty(), IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, defaultValues.shouldImportDialogDownloadLinkedFiles());
         bindBoolean(filePreferences.fulltextIndexLinkedFilesProperty(), FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles());
         bindPath(filePreferences.workingDirectoryProperty(), FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory());
         bindBoolean(filePreferences.createBackupProperty(), BACKUP_ENABLED, defaultValues.shouldCreateBackup());
         bindPath(filePreferences.backupDirectoryProperty(), BACKUP_DIRECTORY, defaultValues.getBackupDirectory());
         bindBoolean(filePreferences.confirmDeleteLinkedFileProperty(), FILES_CONFIRM_DELETE_LINKED, defaultValues.confirmDeleteLinkedFile());
-        // moveToTrash falls back to moveToTrashSupported(), which the GUI overrides when AWT is initialized.
-        bindBoolean(filePreferences.moveToTrashProperty(), FILES_TRASH_INSTEAD_OF_DELETE, moveToTrashSupported());
+        bindBoolean(filePreferences.moveToTrashProperty(), FILES_TRASH_INSTEAD_OF_DELETE, defaultValues.moveToTrash());
         bindBoolean(filePreferences.adjustFileLinksOnTransferProperty(), FILES_ADJUST_FILE_LINKS_ON_TRANSFER, defaultValues.shouldAdjustFileLinksOnTransfer());
         bindBoolean(filePreferences.copyLinkedFilesOnTransferProperty(), FILES_COPY_LINKED_FILES_ON_TRANSFER, defaultValues.shouldCopyLinkedFilesOnTransfer());
         bindBoolean(filePreferences.moveLinkedFilesOnTransferPropertyProperty(), FILES_MOVE_LINKED_FILES_ON_TRANSFER, defaultValues.shouldMoveLinkedFilesOnTransfer());
         bindBoolean(filePreferences.shouldKeepDownloadUrlProperty(), FILES_KEEP_DOWNLOAD_URL, defaultValues.shouldKeepDownloadUrl());
-        // lastUsedDirectory defaults to getDefaultPath(), which the GUI overrides to a meaningful location.
-        bindPath(filePreferences.lastUsedDirectoryProperty(), FILES_LAST_USED_DIRECTORY, getDefaultPath());
+        bindPath(filePreferences.lastUsedDirectoryProperty(), FILES_LAST_USED_DIRECTORY, defaultValues.getLastUsedDirectory());
         bindBoolean(filePreferences.openFileExplorerInFileDirectoryProperty(), FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaultValues.shouldOpenFileExplorerInFileDirectory());
         bindBoolean(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaultValues.shouldOpenFileExplorerInLastUsedDirectory());
 
         return filePreferences;
-    }
-
-    protected boolean moveToTrashSupported() {
-        return false;
     }
     // endregion
 
@@ -2222,6 +2340,15 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return lastFilesOpenedPreferences;
     }
+
+    /// Kept in its own preferences node rather than bound to keys of this one, see [SharedDatabasePreferences]
+    @Override
+    public SharedDatabasePreferences getSharedDatabasePreferences() {
+        if (sharedDatabasePreferences == null) {
+            sharedDatabasePreferences = new SharedDatabasePreferences();
+        }
+        return sharedDatabasePreferences;
+    }
     // endregion
 
     // region AiPreferences
@@ -2249,6 +2376,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(AI_MISTRAL_AI_API_BASE_URL, defaultValues.getMistralAiApiBaseUrl()),
                 get(AI_GEMINI_API_BASE_URL, defaultValues.getGeminiApiBaseUrl()),
                 get(AI_HUGGING_FACE_API_BASE_URL, defaultValues.getHuggingFaceApiBaseUrl()),
+                getBoolean(AI_ENABLE_DEBUG_PROVIDER, defaultValues.getEnableAiDebugProvider()),
                 SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind().name())),
                 TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind().name())),
                 get(AI_EMBEDDING_MODEL, defaultValues.embeddingModelProperty().get()),
@@ -2288,6 +2416,8 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(aiPreferences.mistralAiApiBaseUrlProperty(), AI_MISTRAL_AI_API_BASE_URL, defaultValues.getMistralAiApiBaseUrl());
         bindString(aiPreferences.geminiApiBaseUrlProperty(), AI_GEMINI_API_BASE_URL, defaultValues.getGeminiApiBaseUrl());
         bindString(aiPreferences.huggingFaceApiBaseUrlProperty(), AI_HUGGING_FACE_API_BASE_URL, defaultValues.getHuggingFaceApiBaseUrl());
+
+        bindBoolean(aiPreferences.enableAiDebugProviderProperty(), AI_ENABLE_DEBUG_PROVIDER, defaultValues.getEnableAiDebugProvider());
 
         bindObject(aiPreferences.summarizatorKindProperty(), AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind(), SummarizatorKind::name, SummarizatorKind::safeValueOf);
         bindObject(aiPreferences.tokenEstimatorKindProperty(), AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind(), TokenEstimatorKind::name, TokenEstimatorKind::safeValueOf);
@@ -2637,9 +2767,9 @@ public class JabRefCliPreferences implements CliPreferences {
         Map<KeyringSlot, String> keys = new HashMap<>();
 
         for (FetcherApiKey apiKey : defaults.getApiKeys()) {
-            names.add(apiKey.getName());
+            names.add(apiKey.name());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
+            keys.put(KeyringSlot.customApiKey(apiKey.name()), apiKey.key());
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);

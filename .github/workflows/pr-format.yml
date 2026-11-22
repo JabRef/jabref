@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   check_title_format:
-    name: PR title must not contain "issue <number>"
+    name: PR title describes the change
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -30,8 +30,15 @@ jobs:
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
           echo "Title: $TITLE"
 
-          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+|fix(es|ed)? ?(for ?)?#[0-9]+'; then
+          # Matches "issue 123", "issue-123", "issue_#123", "Fix for #123", "fix-for-issue-123", "Resolves #123", ...
+          if echo "$TITLE" | grep -Eiq 'issue[-_ ]?#?[0-9]+|(fix(es|ed)?|resolve[sd]?|close[sd]?)[-_ ]?(for[-_ ]?)?#[0-9]+'; then
             echo "❌ Title references an issue number instead of describing the change — not allowed."
+            exit 1
+          fi
+
+          # A title without any whitespace is a single word or a branch name (e.g., "fix-for-issue-123") — not a description
+          if ! echo "$TITLE" | grep -q '[[:space:]]'; then
+            echo "❌ Title looks like a branch name or a single word instead of describing the change — not allowed."
             exit 1
           fi
 
@@ -42,7 +49,7 @@ jobs:
 
   no-html-comments:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -75,15 +82,10 @@ jobs:
 
   mandatory-checks-section-exists:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
+      !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) &&
       !(
-        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
-        (
-          startsWith(github.event.pull_request.title, '[Bot] ') ||
-          startsWith(github.event.pull_request.title, 'Bump ') ||
-          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
-          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
-        )
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot')
       )
     name: Mandatory Checklist present
     runs-on: ubuntu-slim
@@ -107,7 +109,7 @@ jobs:
 
   checklist-checked:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -147,6 +149,57 @@ jobs:
           fi
 
           echo "✅ All checkboxes are present and in the correct format."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+  license-checked:
+    if: >
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
+      !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot')
+      )
+    name: MIT license confirmed
+    runs-on: ubuntu-slim
+    steps:
+      - name: Check that the MIT license checkbox is ticked
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+
+          if ! CHECKLIST=$(printf '%s\n' "$BODY" | awk '
+            /^### Checklist[[:space:]]*$/ { found = 1; in_checklist = 1; next }
+            /^#+ / { in_checklist = 0 }
+            in_checklist { print }
+            END { if (!found) exit 1 }
+          '); then
+            echo "❌ The Checklist section is missing."
+            exit 1
+          fi
+
+          LICENSE_LINES=$(printf '%s\n' "$CHECKLIST" | grep -E "^- \[.\] I own the copyright of the code submitted and I license it under the \[MIT license\]" || true)
+
+          if [ -n "$LICENSE_LINES" ]; then
+            LICENSE_COUNT=$(printf '%s\n' "$LICENSE_LINES" | wc -l | tr -d '[:space:]')
+          else
+            LICENSE_COUNT=0
+          fi
+
+          if [ "$LICENSE_COUNT" -ne 1 ]; then
+            echo "❌ Expected exactly one MIT license checkbox, found $LICENSE_COUNT."
+            exit 1
+          fi
+
+          echo "Found license line: $LICENSE_LINES"
+
+          if ! printf '%s\n' "$LICENSE_LINES" | grep -q "^- \[x\] "; then
+            echo "❌ The MIT license checkbox must be ticked ([x]). We cannot accept code without the permission to license it under MIT."
+            exit 1
+          fi
+
+          echo "✅ MIT license confirmed."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}

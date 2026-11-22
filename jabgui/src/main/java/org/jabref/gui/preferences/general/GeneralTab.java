@@ -88,7 +88,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                 .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser)
                                 .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
                                 .field(Localization.lang("Size"), buildFontSizeSpinner(),
-                                        size -> size.validate(viewModel.fontSizeValidationStatus())),
+                                        size -> size.validate(viewModel.fontSizeValidationStatus()))
+                                .checkbox(Localization.lang("Taller rows in lists and tables (long text wraps)"), viewModel.wrapMainTableTextProperty()),
                         appearance -> appearance.help(URLs.CUSTOM_THEME_DOC))
 
                 .section(Localization.lang("User interface"), userInterface -> userInterface
@@ -97,7 +98,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                         .checkbox(Localization.lang("Show confirmation dialog when deleting entries"), viewModel.confirmDeleteProperty())
                         .checkbox(Localization.lang("Ask whether to include cross-references when copying to another library"), viewModel.shouldAskForIncludingCrossReferences())
                         .checkbox(Localization.lang("Hide tab bar when single library is present"), viewModel.confirmHideTabBarProperty())
-                        .checkbox(Localization.lang("Do not show donation prompt again"), viewModel.donationNeverShowProperty())
                         .checkbox(Localization.lang("Experimental search (Postgres)"), viewModel.usePostgresSearchProperty()))
 
                 .section(Localization.lang("Single instance"), singleInstance -> singleInstance

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.openoffice.ZoteroCitationMarkParser.ParsedEntry;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -103,6 +104,71 @@ class ZoteroCitationMarkParserTest {
         BibEntry entry = entries.getFirst();
 
         assertEquals(Optional.of("Smith2020"), entry.getCitationKey());
+    }
+
+    @Test
+    void parseCslCitationJsonForImportWithIdentityLeavesZoteroItemWithoutCitationKey() {
+        List<ParsedEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity(JOURNAL_ARTICLE_CSL_JSON);
+        ParsedEntry parsedEntry = entries.getFirst();
+
+        assertEquals(Optional.empty(), parsedEntry.entry().getCitationKey());
+        assertEquals(Optional.of("id:Zotero-587"), parsedEntry.itemIdentity());
+    }
+
+    @Test
+    void parseCslCitationJsonForImportWithIdentityReturnsEmptyForNullRoot() {
+        assertEquals(List.of(), ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity("null"));
+    }
+
+    @Test
+    void parseCslCitationJsonForImportWithIdentityKeepsJabRefUriCitationKey() {
+        List<ParsedEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity("""
+                {
+                  "citationItems": [
+                    {
+                      "id": 587,
+                      "uris": [
+                        "http://zotero.org/users/123/items/ABCD1234",
+                        "http://www.jabref.org/Smith2020"
+                      ],
+                      "itemData": {
+                        "type": "article-journal",
+                        "title": "Reference mark compatibility"
+                      }
+                    }
+                  ]
+                }
+                """);
+        ParsedEntry parsedEntry = entries.getFirst();
+
+        assertEquals(Optional.of("Smith2020"), parsedEntry.entry().getCitationKey());
+        assertEquals(Optional.of("uri:http://zotero.org/users/123/items/ABCD1234"), parsedEntry.itemIdentity());
+    }
+
+    @Test
+    void parseCslCitationJsonForImportWithIdentityKeepsCitationKeyOfItemData() {
+        List<ParsedEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity("""
+                {
+                  "citationItems": [
+                    {
+                      "id": 587,
+                      "uris": [
+                        "http://zotero.org/users/123/items/ABCD1234"
+                      ],
+                      "itemData": {
+                        "id": 587,
+                        "type": "article-journal",
+                        "citation-key": "Doe2026",
+                        "title": "Reference mark compatibility"
+                      }
+                    }
+                  ]
+                }
+                """);
+        ParsedEntry parsedEntry = entries.getFirst();
+
+        assertEquals(Optional.of("Doe2026"), parsedEntry.entry().getCitationKey());
+        assertEquals(Optional.of("uri:http://zotero.org/users/123/items/ABCD1234"), parsedEntry.itemIdentity());
     }
 
     @ParameterizedTest

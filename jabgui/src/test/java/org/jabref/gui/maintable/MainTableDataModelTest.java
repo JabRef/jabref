@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -22,8 +23,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.control.TableView;
 
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.maintable.columns.NameColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
@@ -37,7 +40,9 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -53,6 +58,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -60,6 +66,110 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
 class MainTableDataModelTest {
+
+    @Test
+    void nameBindingIsReusedAndUpdatesWhenSourceChangesWithoutChangingDisplay() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            BibEntry entry = new BibEntry().withField(StandardField.EDITOR, "family=Doe, given=Jane");
+            BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
+            var binding = row.getNameFields(FieldFactory.parseOrFields("author/editor"));
+
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals("family=Doe, given=Jane", binding.getValue().source());
+
+            entry.setField(StandardField.AUTHOR, "family=Doe, given=Janet");
+
+            assertSame(binding, row.getNameFields(FieldFactory.parseOrFields("author/editor")));
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals("family=Doe, given=Janet", binding.getValue().source());
+        });
+    }
+
+    @Test
+    void reusedNameBindingRefreshesDisplayAndSortOrderAfterStringMacroEdit() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            BibtexString author = new BibtexString("author", "Jane Doe");
+            context.getDatabase().addString(author);
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "#author#");
+            BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
+            NameColumn column = createNameColumn("author");
+            BibEntryTableViewModel reference = new BibEntryTableViewModel(
+                    new BibEntry().withField(StandardField.AUTHOR, "Jane Miller"), context, formatter);
+            var binding = column.getCellObservableValue(row);
+            List<String> displayChanges = new ArrayList<>();
+            binding.addListener((_, _, value) -> displayChanges.add(value.display()));
+
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals(-1, Integer.signum(column.getComparator().compare(binding.getValue(), column.getCellData(reference))));
+
+            author.setContent("Jane Roe");
+
+            assertEquals(1, Integer.signum(column.getComparator().compare(column.getCellData(row), column.getCellData(reference))));
+            assertEquals(List.of("Roe"), displayChanges);
+            assertEquals("Roe", binding.getValue().display());
+            assertEquals("Jane Roe", binding.getValue().source());
+        });
+    }
+
+    @Test
+    void reusedNameBindingRefreshesDisplayAndSortOrderAfterXDataEdit() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            BibEntry parent = new BibEntry().withCitationKey("names").withField(StandardField.AUTHOR, "Jane Doe");
+            context.getDatabase().insertEntries(parent);
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            BibEntry entry = new BibEntry().withField(StandardField.XDATA, "names");
+            BibEntryTableViewModel row = new BibEntryTableViewModel(entry, context, formatter);
+            NameColumn column = createNameColumn("author");
+            BibEntryTableViewModel reference = new BibEntryTableViewModel(
+                    new BibEntry().withField(StandardField.AUTHOR, "Jane Miller"), context, formatter);
+            var binding = column.getCellObservableValue(row);
+            List<String> displayChanges = new ArrayList<>();
+            binding.addListener((_, _, value) -> displayChanges.add(value.display()));
+
+            assertEquals("Doe", binding.getValue().display());
+            assertEquals(-1, Integer.signum(column.getComparator().compare(binding.getValue(), column.getCellData(reference))));
+
+            parent.setField(StandardField.AUTHOR, "Jane Roe");
+
+            assertEquals(1, Integer.signum(column.getComparator().compare(column.getCellData(row), column.getCellData(reference))));
+            assertEquals(List.of("Roe"), displayChanges);
+            assertEquals("Roe", binding.getValue().display());
+            assertEquals("Jane Roe", binding.getValue().source());
+        });
+    }
+
+    @Test
+    void authorTitleColumnSortsByFamilyNameOrFullTitle() {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            var formatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(NameDisplayPreferences.getDefault(), context));
+            NameColumn column = createNameColumn("author/title");
+            var rows = List.of(
+                                   new BibEntry().withField(StandardField.TITLE, "Machine Intelligence"),
+                                   new BibEntry().withField(StandardField.AUTHOR, "Nash, John"),
+                                   new BibEntry().withField(StandardField.TITLE, "Library Services"),
+                                   new BibEntry().withField(StandardField.AUTHOR, "Smith, Ann"))
+                           .stream()
+                           .map(entry -> new BibEntryTableViewModel(entry, context, formatter));
+
+            var sorted = rows.map(column::getCellData).sorted(column.getComparator()).map(BibEntryTableViewModel.NameValue::display).toList();
+
+            assertEquals(List.of("Library Services", "Machine Intelligence", "Nash", "Smith"), sorted);
+        });
+    }
+
+    private static NameColumn createNameColumn(String qualifier) {
+        TableView<BibEntryTableViewModel> table = new TableView<>();
+        NameColumn column = new NameColumn(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, qualifier),
+                mock(MainTableTooltip.class));
+        table.getColumns().add(column);
+        return column;
+    }
 
     @Test
     void additionToObservableMapTriggersUpdate() {
@@ -163,6 +273,51 @@ class MainTableDataModelTest {
             assertFalse(vmB.isVisibleBySearch());
             assertEquals(0, resultSize.get());
         });
+    }
+
+    @Test
+    void searchResultsVersionBumpsOncePerAppliedQueryAndNotAfterUnbind() throws Exception {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.getDatabase().insertEntries(List.of(new BibEntry().withCitationKey("A").withField(StandardField.AUTHOR, "Alice")));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FLOAT, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        SearchContext searchContext = new SearchContext(
+                new SimpleBooleanProperty(false),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')));
+
+        // Tasks are collected instead of run, so that a search can be completed after the model was unbound
+        List<BackgroundTask<?>> pendingTasks = new ArrayList<>();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        when(taskExecutor.execute(any())).thenAnswer(invocation -> {
+            pendingTasks.add(invocation.getArgument(0));
+            return null;
+        });
+
+        OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                searchContext,
+                new SimpleListProperty<>(FXCollections.observableArrayList()),
+                searchQueryProperty,
+                new SimpleIntegerProperty());
+        int initialVersion = model.searchResultsVersionProperty().get();
+
+        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
+        executeTask(pendingTasks.removeLast());
+        assertEquals(initialVersion + 1, model.searchResultsVersionProperty().get());
+
+        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Bob")));
+        model.unbind();
+        executeTask(pendingTasks.removeLast());
+        assertEquals(initialVersion + 1, model.searchResultsVersionProperty().get());
     }
 
     @Test
@@ -494,8 +649,10 @@ class MainTableDataModelTest {
     private static <V> void executeTask(BackgroundTask<V> task) throws Exception {
         V result = task.call();
 
-        if (task.getOnSuccess() != null) {
-            task.getOnSuccess().accept(result);
+        Consumer<V> onSuccess = task.getOnSuccess();
+        if (onSuccess != null) {
+            // BackgroundTask invokes completion callbacks on the JavaFX thread in production.
+            JavaFxExtension.invokeAndWait(() -> onSuccess.accept(result));
         }
     }
 }

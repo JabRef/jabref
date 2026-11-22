@@ -3,7 +3,6 @@ package org.jabref.logic.bst;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,7 +12,6 @@ import org.jabref.logic.bst.util.BstPurifier;
 import org.jabref.logic.bst.util.BstTextPrefixer;
 import org.jabref.logic.bst.util.BstWidthCalculator;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
@@ -55,7 +53,7 @@ public class BstFunctions {
         this.strings = bstVMContext.strings();
         this.integers = bstVMContext.integers();
         this.functions = bstVMContext.functions();
-        this.preamble = Optional.of(bstVMContext.bibDatabase()).flatMap(BibDatabase::getPreamble).orElse("");
+        this.preamble = bstVMContext.preamble();
         this.stack = bstVMContext.stack();
 
         this.bbl = bbl;
@@ -282,7 +280,7 @@ public class BstFunctions {
 
         if (m.find()) {
             StringBuilder sb = new StringBuilder();
-            m.appendReplacement(sb, m.group(1));
+            m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1)));
             sb.append('.');
             String group2 = m.group(2);
             if (group2 != null) {
@@ -658,6 +656,11 @@ public class BstFunctions {
         Object o1 = stack.pop();
         Object o2 = stack.pop();
         Object o3 = stack.pop();
+
+        if ((o1 instanceof Integer) && (o2 instanceof Integer) && (o3 == null)) {
+            stack.push("");
+            return;
+        }
 
         if (!((o1 instanceof Integer length) && (o2 instanceof Integer start) && (o3 instanceof String string))) {
             throw new BstVMException("Expecting two integers and a string for substring$ (line %d)".formatted(ctx.start.getLine()));

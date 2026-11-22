@@ -68,7 +68,7 @@ class CiteDriveOAuthTest {
 
         CiteDrivePreferences citeDrivePreferences = CiteDrivePreferences.getDefault();
 
-        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, uri -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, page -> NativeDesktop.openBrowserShowPopup(page.uri().toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
 
         Optional<AccessToken> actual = citeDriveOAuthService.authorizeInteractive().get();
         assertTrue(actual.isPresent());
@@ -88,7 +88,7 @@ class CiteDriveOAuthTest {
 
         CiteDrivePreferences citeDrivePreferences = CiteDrivePreferences.getDefault();
 
-        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, uri -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, page -> NativeDesktop.openBrowserShowPopup(page.uri().toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
 
         Optional<AccessToken> actual = citeDriveOAuthService.authorizeInteractive().get();
         assertTrue(actual.isPresent());
@@ -131,7 +131,7 @@ class CiteDriveOAuthTest {
 
         CiteDrivePreferences citeDrivePreferences = CiteDrivePreferences.getDefault();
 
-        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, uri -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
+        CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, page -> NativeDesktop.openBrowserShowPopup(page.uri().toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
 
         Optional<AccessToken> actual = citeDriveOAuthService.getAccessToken().get();
         assertTrue(actual.isPresent());

@@ -51,6 +51,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -452,7 +453,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
     /// @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
     /// successfully, does not exist in the first place, or the user choose to remove it)
     public boolean delete() {
-        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this));
+        // ToDo: Looked up instead of injected via constructor (ADR 0055): this class has more than 30 construction sites
+        NativeDesktop nativeDesktop = Injector.instantiateModelOrService(NativeDesktop.class);
+        DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this), nativeDesktop);
         deleteFileAction.execute();
         return deleteFileAction.isSuccess();
     }
@@ -501,6 +504,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void download(boolean keepHtmlLink, Map<String, String> headers, UndoManager undoManager) {
+        download(keepHtmlLink, headers, undoManager, linkedFile.getLink());
+    }
+
+    public void downloadReplacing(String linkToReplace, Map<String, String> headers, UndoManager undoManager) {
+        download(false, headers, undoManager, linkToReplace);
+    }
+
+    private void download(boolean keepHtmlLink, Map<String, String> headers, UndoManager undoManager, String linkToReplace) {
         LOGGER.info("Downloading file from {}", linkedFile.getSourceUrl());
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
@@ -517,7 +528,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 taskExecutor,
                 "",
                 keepHtmlLink,
-                undoManager);
+                undoManager,
+                linkToReplace);
         downloadLinkedFileAction.setDownloadHeaders(headers);
         downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
