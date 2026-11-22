@@ -162,6 +162,7 @@ public class BibEntryWriter {
     /// @param out   the target of the write
     /// @param field the field
     /// @throws IOException In case of an IO error
+    // [impl->req~save.names.preserve-extended-parts~1]
     private void writeField(BibEntry entry, BibWriter out, Field field, int indent) throws IOException {
         try {
             entry.getField(field)

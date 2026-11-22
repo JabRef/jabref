@@ -40,12 +40,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Delete" and "Retry" to the context menu of AI chat messages and made user messages retryable. [#17151](https://github.com/JabRef/jabref/pull/17151)
 - We added a list of saved connections to the "Connect to shared database" dialog. [#12948](https://github.com/JabRef/jabref/issues/12948)
 - We added <kbd>Ctrl</kbd> + <kbd>C</kbd> copy support for selected entries in the global search results window. [#17310](https://github.com/JabRef/jabref/issues/17310)
+- We added support for displaying and sorting BibLaTeX extended names. [#4558](https://github.com/JabRef/jabref/issues/4558)
 - We added a hint showing the effective file directory to empty directory fields in the library properties. [#17572](https://github.com/JabRef/jabref/issues/17572)
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
+- We added checkboxes to enable or disable individual journal abbreviation lists without removing them. [#12468](https://github.com/JabRef/jabref/issues/12468)
+- We added support for resolving BibLaTeX `xdata` field references in entry previews. [#10865](https://github.com/JabRef/jabref/issues/10865)
 
 ### Changed
 
-- We changed the groups field in the merge entries dialog to show groups as tags. [#15109](https://github.com/JabRef/jabref/issues/15109)
+- We combined the add and review actions in the citations tab into one button and arranged entry buttons compactly. [#17847](https://github.com/JabRef/jabref/issues/17847)
 - We improved OCR failure messages to show the executed command and diagnostic output. [#16679](https://github.com/JabRef/jabref/issues/16679)
 - We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
@@ -63,6 +66,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We shortened read-status and priority menu labels and made read and low-priority icons easier to distinguish. [#17691](https://github.com/JabRef/jabref/pull/17691)
 - We hide the "Move deleted files to trash" preference on platforms without a trash. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
+- We changed the groups field in the merge entries dialog to show groups as tags. [#15109](https://github.com/JabRef/jabref/issues/15109)
 
 ### Fixed
 
@@ -151,6 +155,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 - We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
+- We fixed the issue where a missing comma after a BibTeX citation key led to a wrong key. [#17549](https://github.com/JabRef/jabref/issues/17549)
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)
 - We fixed JabKit BibTeX conversion losing string definitions and preambles, including when overwriting the input file. [#17409](https://github.com/JabRef/jabref/issues/17409)
 - We fixed an issue where the preferences search did not scroll to its first match. [#17012](https://github.com/JabRef/jabref/pull/17012)
