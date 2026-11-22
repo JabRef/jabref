@@ -56,7 +56,6 @@ class RisAuthorsTest {
         assertEquals("A2  - Smith, John", formatter.format("John Smith"));
     }
 
-
     @Test
     void multilineOrganizationNameIsPreserved() {
         assertEquals("AU  - World Health Organization",
