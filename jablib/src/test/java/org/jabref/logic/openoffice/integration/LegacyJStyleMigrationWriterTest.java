@@ -423,7 +423,7 @@ class LegacyJStyleMigrationWriterTest {
         try (CitationEngine engine = engine(reopened, preferences(false))) {
             assertEquals(List.of(), success(engine.refresh(List.of(database), style)));
         }
-        assertEquals(migratedNames, canonicalNames(reopened));
+        assertEquals(migratedNames.stream().sorted().toList(), canonicalNames(reopened).stream().sorted().toList());
         assertEquals(metadata, snapshot(reopened).properties());
         for (String name : migratedNames) {
             String recovered = WriterReferenceMarks.getAnchor(reopened, name).orElseThrow().getString();

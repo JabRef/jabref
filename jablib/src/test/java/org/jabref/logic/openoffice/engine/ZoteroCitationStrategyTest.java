@@ -469,7 +469,7 @@ class ZoteroCitationStrategyTest {
             ArgumentCaptor<String> names = ArgumentCaptor.forClass(String.class);
             verify(ranges, times("refresh".equals(operation) ? 1 : 2)).create(eq(document), eq(context), names.capture(), eq(cursor), eq(false), eq(false), eq(BoundaryPolicy.TEMPORARY));
             String linkedName = names.getAllValues().stream()
-                                     .filter(name -> ZoteroReferenceMark.parse(name).orElseThrow().uniqueId().equals("RNDabcdefghij"))
+                                     .filter(name -> "RNDabcdefghij".equals(ZoteroReferenceMark.parse(name).orElseThrow().uniqueId()))
                                      .findFirst().orElseThrow();
             JsonObject expected = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(nativeName)).getAsJsonObject();
             expected.getAsJsonArray("citationItems").get(0).getAsJsonObject().getAsJsonArray("uris").add("http://www.jabref.org/a");

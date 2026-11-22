@@ -305,7 +305,7 @@ class CitationFormatConversionWriterTest {
         assertEquals(CitationType.AUTHORYEAR_PAR, converted.citationType());
         assertNotEquals("RNDnative1234", converted.uniqueId());
         assertEquals(List.of(Optional.empty()), new MarkStore().readCitationGroupFromDocumentOrThrow(document, canonicalName)
-                                                             .citationsInStorageOrder.stream().map(citation -> citation.getPageInfo()).toList());
+                .citationsInStorageOrder.stream().map(citation -> citation.getPageInfo()).toList());
         assertNoConversionArchive(document);
         Map<String, String> canonicalMarks = snapshot(document).marks();
         XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("native-in-canonical.odt"));
@@ -317,7 +317,7 @@ class CitationFormatConversionWriterTest {
         BibDatabase currentLibrary = new BibDatabase(List.of(
                 database.getEntryByCitationKey("alpha").orElseThrow(), database.getEntryByCitationKey("beta").orElseThrow(),
                 new BibEntry(database.getEntryByCitationKey("native").orElseThrow()).withField(StandardField.TITLE, "Current library title")
-                                                                                 .withField(StandardField.YEAR, "2026")));
+                                                                                    .withField(StandardField.YEAR, "2026")));
         try (CitationEngine engine = engine(reopened, preferences(true))) {
             insertAndAssertUndoRedo(engine, reopened, "beta", currentLibrary);
             assertFalse(success(engine.requiresFormatConversion(style())));
@@ -566,7 +566,7 @@ class CitationFormatConversionWriterTest {
             assertEquals(42, snapshot(document).properties().get(obsolete));
             assertEquals("not JSON", snapshot(document).properties().get("JabRef_citation_conversion:unrelated"));
             assertEquals(Set.of(obsolete, "JabRef_citation_conversion:unrelated"), Set.copyOf(UnoUserDefinedProperty.getListOfNames(document).stream()
-                                                                                                               .filter(name -> name.startsWith("JabRef_citation_conversion:")).toList()));
+                                                                                                                    .filter(name -> name.startsWith("JabRef_citation_conversion:")).toList()));
         }
     }
 
