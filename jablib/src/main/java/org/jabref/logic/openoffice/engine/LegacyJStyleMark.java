@@ -26,13 +26,20 @@ record LegacyJStyleMark(List<String> citationKeys, CitationType citationType) {
         List<String> keys = List.of(matcher.group(2).split(",", -1));
         JabRefMarkCodec.validate(keys, "legacy");
         CitationType type = switch (matcher.group(1)) {
-            case "1" -> CitationType.AUTHORYEAR_PAR;
-            case "2" -> CitationType.AUTHORYEAR_INTEXT;
-            case "3" -> CitationType.INVISIBLE_CIT;
-            case "4" -> CitationType.AUTHORYEAR_NOPAR;
-            case "5" -> CitationType.AUTHOR_ONLY;
-            case "6" -> CitationType.YEAR_ONLY;
-            default -> throw new JabRefMarkCodecException(JabRefMarkCodecException.Reason.INVALID_MARK_NAME, "Unknown legacy JStyle citation type");
+            case "1" ->
+                    CitationType.AUTHORYEAR_PAR;
+            case "2" ->
+                    CitationType.AUTHORYEAR_INTEXT;
+            case "3" ->
+                    CitationType.INVISIBLE_CIT;
+            case "4" ->
+                    CitationType.AUTHORYEAR_NOPAR;
+            case "5" ->
+                    CitationType.AUTHOR_ONLY;
+            case "6" ->
+                    CitationType.YEAR_ONLY;
+            default ->
+                    throw new JabRefMarkCodecException(JabRefMarkCodecException.Reason.INVALID_MARK_NAME, "Unknown legacy JStyle citation type");
         };
         return new LegacyJStyleMark(keys, type);
     }

@@ -171,6 +171,7 @@ Unit tests mirror the GUI, engine, storage, style, and Writer infrastructure pac
 `JStyleTestHelper` supports JStyle formatting tests; `JabRefCliPreferencesTest` checks preference serialization and style persistence.
 
 Real-Writer acceptance tests live in `jablib/src/test/java/org/jabref/logic/openoffice/integration/`, with storage acceptance coverage in `engine/storage`.
-The [testing guide](../testing.md#libreoffice-writer-integration-tests) and [fixture README](https://github.com/JabRef/jabref/blob/main/jablib/src/test/resources/org/jabref/logic/openoffice/integration/README.md) describe the safety gate, minimum invocation counts, and saved artifacts.
+The [testing guide](../testing.md#libreoffice-writer-integration-tests) describes the safety gate, minimum invocation counts, and saved artifacts.
+Fixture details are in `jablib/src/test/resources/org/jabref/logic/openoffice/integration/README.md`.
 For older design evidence, see the [historical problems page](problems.md).
 For repository orientation, see [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).

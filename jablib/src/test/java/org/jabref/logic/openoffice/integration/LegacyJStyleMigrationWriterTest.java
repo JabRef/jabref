@@ -99,7 +99,7 @@ import static org.mockito.Mockito.when;
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("Localization.lang")
 @Timeout(value = 180, unit = TimeUnit.SECONDS)
-// [utest->req~openoffice.legacy-jstyle-migration~1]
+        // [utest->req~openoffice.legacy-jstyle-migration~1]
 class LegacyJStyleMigrationWriterTest {
     private static final String CID = "JABREF_unknown CID_7 ignored NORMAL";
     private static final List<String> GROUP_KEYS = List.of("beta", "alpha", "beta");

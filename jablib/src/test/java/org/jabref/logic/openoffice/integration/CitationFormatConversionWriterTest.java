@@ -291,8 +291,8 @@ class CitationFormatConversionWriterTest {
             insertAndAssertUndoRedo(engine, reopened, "beta");
         }
         String restored = managedNames(reopened, true).stream()
-                .filter(name -> citationId.equals(JsonParser.parseString(ZoteroReferenceMark.getCSLJson(name)).getAsJsonObject().get("citationID").getAsString()))
-                .findFirst().orElseThrow();
+                                                      .filter(name -> citationId.equals(JsonParser.parseString(ZoteroReferenceMark.getCSLJson(name)).getAsJsonObject().get("citationID").getAsString()))
+                                                      .findFirst().orElseThrow();
         assertEquals(linkedName, restored);
         assertEquals(expected, JsonParser.parseString(ZoteroReferenceMark.getCSLJson(restored)));
         Map<String, String> restoredSnapshots = conversionSnapshots(reopened);

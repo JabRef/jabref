@@ -56,13 +56,14 @@ These tests do not replace the pure renderer/parity tests or the separate 300-ci
 
 ## Zotero acceptance coverage
 
-`ZoteroWriterTest` requires at least 25 real-Writer invocations through the public linker and `CitationEngine` in Zotero-compatible mode:
+`ZoteroWriterTest` requires at least 25 real-Writer invocations covering the public linker, native citation operations, and style-family selection:
 
 - A unique native duplicate gains a JabRef URI without losing the native URI, JSON metadata, mark text, or citation identity; later insertion reuses that native URI.
 - Ambiguous duplicate candidates remain unlinked and export as unresolved rather than selecting an arbitrary library entry.
 - Normal and in-text marks remain independent through refresh, fresh engine connections, export, and save/reopen; native JSON determines the type, not empty or zero-width mark text.
 - Zotero-mode refresh leaves canonical and legacy CID/JStyle marks, `JR_bib`, and JabRef-specific document properties untouched.
-- Non-CSL styles, invisible and partial citation types, page info, and group edits are rejected for native insertion or editing without changing document contents.
+- JStyle and BST use canonical storage even when the saved Zotero preference is enabled; native citations and the saved preference are preserved.
+- Invisible and partial citation types, page info, and group edits are rejected for native insertion or editing without changing document contents.
 
 The tests parse the stored Zotero JSON to assert URI arrays, suppress-author flags, metadata, and stable names instead of treating successful rendering alone as sufficient.
 

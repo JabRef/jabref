@@ -185,9 +185,12 @@ class OpenOfficeCitationControllerTest {
     @CsvSource({"csl, false", "csl, true", "jstyle, false", "jstyle, true", "bst, false", "bst, true"})
     void insertionWarnsBeforeMutationWhenFormatConversionIsRequired(String family, boolean zoteroMode) {
         OOStyle style = switch (family) {
-            case "jstyle" -> mock(JStyle.class);
-            case "bst" -> mock(BstStyle.class);
-            default -> mock(CitationStyle.class);
+            case "jstyle" ->
+                    mock(JStyle.class);
+            case "bst" ->
+                    mock(BstStyle.class);
+            default ->
+                    mock(CitationStyle.class);
         };
         when(preferences.getCurrentStyle()).thenReturn(style);
         when(preferences.getZoteroCompatibilityMode()).thenReturn(zoteroMode);

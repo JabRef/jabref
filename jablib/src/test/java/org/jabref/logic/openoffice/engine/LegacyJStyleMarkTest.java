@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @NullMarked
-// [utest->req~openoffice.legacy-jstyle-migration~1]
+        // [utest->req~openoffice.legacy-jstyle-migration~1]
 class LegacyJStyleMarkTest {
 
     @ParameterizedTest

@@ -29,6 +29,8 @@ import org.jabref.logic.openoffice.backend.WriterReferenceMark.BoundaryPolicy;
 import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
 import org.jabref.logic.openoffice.engine.CitationEngine;
 import org.jabref.logic.openoffice.engine.CitedEntryExporter;
+import org.jabref.logic.openoffice.engine.JabRefMarkCodec;
+import org.jabref.logic.openoffice.engine.RendererFactory;
 import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.Reason;
 import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StrategyException;
 import org.jabref.logic.openoffice.style.BstStyle;
@@ -536,23 +538,33 @@ class ZoteroWriterTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"jstyle", "bst"})
-    void nonCslStylesAreRejectedByTheRealEngineWithoutDocumentMutation(String family) throws Exception {
+    void nonCslStylesUseCanonicalStorageAndPreserveNativeCitationsAndTheSavedMode(String family) throws Exception {
         XTextDocument document = office.newDocument();
         appendMark(document, nativeMarkName(), "[native]");
-        DocumentSnapshot before = snapshot(document);
-        OOStyle unsupported = "bst".equals(family) ? BstStyle.loadExternal(resource("title-only.bst"))
-                                                   : new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
-        try (CitationEngine engine = engine(document)) {
-            assertFalse(success(engine.requiresFormatConversion(unsupported)));
-            assertEquals(Set.of(), engine.capabilities(unsupported).supportedTypes());
-            assertFalse(engine.capabilities(unsupported).hasBibliography());
-            assertFalse(engine.capabilities(unsupported).supportsGroupEditing());
-            assertFalse(engine.capabilities(unsupported).supportsPageInfo());
-            assertReason(Reason.UNSUPPORTED_STYLE, engine.refresh(List.of(database()), unsupported));
-            assertEquals(before, snapshot(document));
-            assertReason(Reason.UNSUPPORTED_STYLE, engine.insert(List.of(nativeEntry("native")), List.of(database()), unsupported,
-                    CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true));
-            assertEquals(before, snapshot(document));
+        Map<String, String> nativeMarks = zoteroMarks(document);
+        OOStyle selectedStyle = "bst".equals(family) ? BstStyle.loadExternal(resource("title-only.bst"))
+                                                     : new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
+        OpenOfficePreferences preferences = OpenOfficePreferences.getDefault();
+        preferences.setZoteroCompatibilityMode(true);
+        preferences.setCurrentStyle(selectedStyle);
+        Optional.ofNullable(System.getenv("PANDOC_EXECUTABLE")).ifPresent(preferences::setPandocPath);
+        BibEntryTypesManager entryTypes = new BibEntryTypesManager();
+        BibDatabase database = database();
+        try (CitationEngine engine = new CitationEngine(document, office.context(), preferences, entryTypes)) {
+            assertFalse(success(engine.requiresFormatConversion(selectedStyle)));
+            assertEquals(new RendererFactory(entryTypes, preferences.getPandocPath()).create(selectedStyle).capabilities(),
+                    engine.capabilities(selectedStyle));
+            assertEquals(List.of(), success(engine.refresh(List.of(database), selectedStyle)));
+            assertEquals(nativeMarks, zoteroMarks(document));
+            assertEquals(List.of(), success(engine.insert(List.of(database.getEntryByCitationKey("alpha").orElseThrow()), List.of(database), selectedStyle,
+                    CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true)));
+
+            List<String> canonicalMarks = marks(document).keySet().stream().filter(JabRefMarkCodec::isCanonicalMarkName).toList();
+            assertEquals(1, canonicalMarks.size());
+            assertEquals(List.of("alpha"), JabRefMarkCodec.decode(canonicalMarks.getFirst()).citationKeys());
+            assertEquals(List.of("alpha"), exportedKeys(success(engine.exportCited(List.of(database)))));
+            assertEquals(nativeMarks, zoteroMarks(document));
+            assertTrue(preferences.getZoteroCompatibilityMode());
         }
     }
 

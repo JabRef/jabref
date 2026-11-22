@@ -186,7 +186,7 @@ final class CitationFormatConverter {
             complete.add(new PlannedCitation(citation.group(), citation.oldName(), citation.anchor(), name, metadata));
         }
         Map<String, Optional<String>> styleProperties = style instanceof CitationStyle csl
-                                                       ? ZoteroDocumentPreferences.prepareCitationStyle(document, csl) : Map.of();
+                                                        ? ZoteroDocumentPreferences.prepareCitationStyle(document, csl) : Map.of();
         Map<String, Optional<String>> propertyChanges = propertyChanges(complete, styleProperties, targetZotero, style);
         try {
             UndoableDocumentProperties.preflight(document, propertyChanges);
@@ -229,7 +229,7 @@ final class CitationFormatConverter {
                     throw invalidMetadata();
                 }
                 XTextRange anchor = WriterReferenceMarks.getAnchor(document, name)
-                                                       .orElseThrow(() -> new WriterDocumentAccessException("Missing legacy JStyle citation range"));
+                                                        .orElseThrow(() -> new WriterDocumentAccessException("Missing legacy JStyle citation range"));
                 result.add(new PlannedCitation(group, name, anchor, "", Optional.empty()));
             } else if (includeZotero && ZoteroReferenceMark.isZoteroReferenceMarkName(name)) {
                 ZoteroReferenceMark mark = ZoteroReferenceMark.parse(name).orElseThrow(CitationFormatConverter::invalidMetadata);
@@ -302,10 +302,14 @@ final class CitationFormatConverter {
         }
         changes.putAll(styles);
         String styleState = switch (style) {
-            case CitationStyle csl -> DocumentStyleStore.Family.CSL.name() + "\n" + csl.getStyleId();
-            case JStyle jStyle -> DocumentStyleStore.Family.JSTYLE.name() + "\n" + jStyle.getPath();
-            case BstStyle bst -> DocumentStyleStore.Family.BST.name() + "\n" + bst.getPath();
-            default -> throw new ConversionException("Unsupported citation style", Localization.lang("Cannot generate citation based on selected citation style."));
+            case CitationStyle csl ->
+                    DocumentStyleStore.Family.CSL.name() + "\n" + csl.getStyleId();
+            case JStyle jStyle ->
+                    DocumentStyleStore.Family.JSTYLE.name() + "\n" + jStyle.getPath();
+            case BstStyle bst ->
+                    DocumentStyleStore.Family.BST.name() + "\n" + bst.getPath();
+            default ->
+                    throw new ConversionException("Unsupported citation style", Localization.lang("Cannot generate citation based on selected citation style."));
         };
         changes.put(DocumentStyleStore.PROPERTY_NAME, Optional.of(styleState));
         return changes;
