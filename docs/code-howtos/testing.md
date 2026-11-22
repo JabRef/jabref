@@ -268,28 +268,28 @@ $env:PANDOC_EXECUTABLE = 'C:\Program Files\Pandoc\pandoc.exe'
 The tests start an isolated headless Writer with a temporary user profile and a loopback-only UNO listener, not an existing office session or the developer's preferences.
 Human-readable golden `.fodt` documents and native Zotero JSON fixtures live under `jablib/src/test/resources/org/jabref/logic/openoffice/integration`.
 The suite exercises canonical JStyle, CSL, and BST citations, cross-family save/reopen round trips, all six stored types, stable identities, per-citation page information, numbering, bibliography ordering, invisible citations, footnotes, tables, repeated superscript refresh, and restored change recording.
-The canonical mark grammar is `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`; the former uid-before-type order is not a fallback format.
-Legacy `JR_cite*` and `CID_n` fixtures remain persistence oracles for operations that do not trigger migration; canonical reading and export must not interpret legacy marks as canonical citations.
-For supported legacy JStyle `JR_cite` marks, migration checks must cover the next insertion with JStyle/BST or with CSL and the saved Zotero setting off, including mixed legacy/canonical documents and the existing warning before mutation.
+The canonical mark grammar is `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`; the uid-before-type order is not a fallback format.
+Legacy `JR_cite*` and `CID_n` fixtures are persistence oracles for operations that do not trigger migration; canonical reading and export must not interpret legacy marks as canonical citations.
+For supported legacy JStyle `JR_cite` marks, migration checks must cover the next insertion with JStyle/BST or with CSL and the saved Zotero setting off, including mixed legacy/canonical documents and the format-conversion warning before mutation.
 Check all six numeric types, storage-order keys, fresh stable identities, transfer of the whole-mark-named page property to the last storage-order citation's canonical slot, and canonical invisible boundaries.
-The combined legacy, canonical, and pending set must render once before writes; rendering failure must leave the document unchanged, and application failure must use the existing conversion rollback.
+The combined legacy, canonical, and pending set must render once before writes; rendering failure must leave the document unchanged, and application failure must use conversion rollback.
 Undo must restore legacy marks and page properties; redo must restore the prepared canonical identities and page slots.
 Connecting, refreshing, exporting, style selection, and native Zotero insertion/conversion must leave legacy JStyle marks unchanged; `CID_n` must remain unmanaged in every mode.
 Rendering failures, including missing Pandoc for BST, must leave preparation targets unchanged.
 
-`CitationFormatConversionWriterTest` covers current canonical ↔ native Zotero conversion on the next CSL citation insertion, with the existing warning, not on preference changes, refresh, or export.
+`CitationFormatConversionWriterTest` covers canonical ↔ native Zotero conversion on the next CSL citation insertion, with the format-conversion warning, not on preference changes, refresh, or export.
 Conversion changes citation marks only: with synchronization disabled, all bibliography section names, text, and properties remain unchanged; with synchronization enabled, normal handling updates or creates only the target mode's managed bibliography and leaves other-format sections alone.
 There is no bibliography conversion, renaming, consolidation, sidecar, or rejection based on bibliography settings.
 Citation round trips preserve all six canonical types, uids, storage-order keys, every page-info slot, and supported native JSON through save/reopen while the metadata association remains valid.
-Native modifier fixtures check successful conversion with the existing group-level citation-type mapping and native JSON restoration through save/reopen, not full locator or modifier rendering support.
+Native modifier fixtures check successful conversion with the group-level citation-type mapping and native JSON restoration through save/reopen, not full locator or modifier rendering support.
 Unsuitable custom properties, unresolved sources, protected ranges, pending deletions, and stale associated conversion metadata are rejected before actual conversion.
 Stale conversion metadata must not block ordinary native Zotero insertion or refresh.
 
-Storage, `ConversionMetadataTest`, `DocumentWriteSessionTest`, and GUI/controller tests complement the real-Writer suite with codec/property checks, the existing warning order, and owned conversion rollback.
-The older GUI already had undo contexts for insertion including conversion, refresh, merge, and separate; new custom-property deltas and automatic conversion-failure rollback are distinct additions.
+Storage, `ConversionMetadataTest`, `DocumentWriteSessionTest`, and GUI/controller tests complement the real-Writer suite with codec/property checks, warning order, and owned conversion rollback.
+Insertion (including conversion), refresh, merge, and separate use undo contexts; custom-property undo deltas and automatic conversion-failure rollback are separate mechanisms.
 Conversion rollback requires an available, unlocked undo manager and a root context of its own, closes and verifies that context before undoing an ordinary application failure, and never undoes an earlier user action.
 Starting the transaction can clear pre-existing redo history even if rollback restores document state; disconnects, lost ownership, or failed rollback have a distinct recovery error, not a universal recovery guarantee.
-Ordinary applied-style and Zotero preference writes remain raw and are not made undoable by those conversion-specific deltas.
+Ordinary applied-style and Zotero preference writes use properties directly and are not made undoable by those conversion-specific deltas.
 
 Saved documents and office process logs are in `jablib/build/writer-integration`; standard JUnit XML results are in `jablib/build/test-results/libreOfficeTest` and the HTML report is in `jablib/build/reports/tests/libreOfficeTest`.
 The task executes instead of restoring cached test results; ordinary `:jablib:test` excludes the `LibreOfficeTest` tag.

@@ -52,7 +52,6 @@ Comparing a body range directly with a range in a footnote or table cell does no
 `DocumentOrder` therefore partitions ranges by their original `XText` before sorting them textually through `RangeSort` and `UnoTextRange`.
 Those helpers require the container to provide `XTextRangeCompare`; partitioning does not add comparison support to a container that lacks it.
 This shared algorithm is used for canonical JabRef citations with JStyle, CSL, and BST styles.
-Zotero mode has its own storage and ordering strategy; do not assume this algorithm defines that mode's behavior.
 
 ## Canonical numbering order
 
@@ -105,7 +104,7 @@ The first-page-relative coordinates are interpreted in the displayed layout, not
 - With pages displayed side by side, a citation on the right-hand page can sort before a lower citation on the left-hand page.
 - Floating frames and captions do not have a universally correct position in the reading sequence; their anchors and displayed positions can differ.
 
-Sharing the JStyle ordering algorithm with CSL and BST does not fix these limitations.
+These limitations apply to JStyle, CSL, and BST.
 Avoid describing this as correct multi-column ordering or as a guarantee for arbitrary tables and frames.
 Golden-document tests establish the tested layouts, not every possible Writer layout.
 

@@ -39,9 +39,9 @@ UNO access and range sorting belong to `logic`, not to the pure model packages.
 ## GUI gateway and document connection
 
 `OpenOfficePanel` gathers selected entries and libraries, prepares the selected style, and enables actions according to `StyleCapabilities` through `OpenOfficeActionAvailability`.
-`OpenOfficeCitationController` delegates insertion, refresh, merge/separate, citation editing, and cited-entry import/export to `CitationEngine`; it presents errors, unresolved-key warnings, and the existing format-conversion warning.
+`OpenOfficeCitationController` delegates insertion, refresh, merge/separate, citation editing, and cited-entry import/export to `CitationEngine`; it presents errors, unresolved-key warnings, and the format-conversion warning.
 GUI controller instances are named `citationController`.
-Document mutation, renderer dispatch, write-session handling, and Zotero strategy selection belong to the engine rather than the controller.
+Document mutation, renderer dispatch, write-session handling, and citation strategy selection belong to the engine rather than the controller.
 
 `OpenOfficeDocumentConnection` bootstraps office access and selects an open Writer document.
 Its static `disposeAllBridges()` operation globally disposes client-side UNO bridges without closing Writer documents or the office application.
@@ -72,12 +72,12 @@ It is an action-local facade, not a document subtype or immutable snapshot; its 
 
 Preparation reads and validates the document, establishes citation order, and renders the proposed cited set before document mutation.
 `CitationGroupEditor` prepares merge/separate replacements and applies structural citation changes inside the caller's write session.
-`CitationFormatConverter` prepares conversion between current canonical and native Zotero citation marks on the next CSL insertion.
+`CitationFormatConverter` prepares conversion between canonical and native Zotero citation marks on the next CSL insertion.
 `ConversionMetadata` preserves the associated citation state for conversion round trips.
 The conversion preparation path also handles one-way migration of supported legacy JStyle `JR_cite` marks on the next insertion outside effective native Zotero mode: always for JStyle/BST, and for CSL with the saved compatibility setting off.
 It prepares all legacy groups with existing canonical groups and the pending citation, renders once before writes, and reuses the existing rollback-capable conversion transaction.
 `PreparedInsertion.applyCitations` replaces marks and their metadata without bibliography-style validation or bibliography writes; `CitationEngine` separately handles normal insertion's optional bibliography synchronization.
-Canonical storage reading remains separate from legacy detection; `CID_n` stays unmanaged, and insertion or conversion targeting native Zotero format initially leaves `JR_cite` marks unchanged.
+Canonical storage reading is separate from legacy detection; `CID_n` is unmanaged, and insertion or conversion targeting native Zotero format leaves `JR_cite` marks unchanged.
 
 `RendererFactory` selects `JStyleRenderer`, `CslRenderer`, or `BstRenderer` through `CitationRenderer`.
 A `RenderRequest` supplies groups in document order, libraries, and options; `RenderResult` contains formatted markers, requested bibliography paragraphs, and unresolved keys.
@@ -92,6 +92,7 @@ Ordering precedes controller locking because visual ordering needs to move Write
 
 `ZoteroCitationStrategy` owns native Zotero storage, ordering, validation, and write policy separately from canonical storage, while using the same `CslRenderer`.
 `ZoteroCitationLinker` prepares URI-link changes without modifying the document, and `ZoteroDocumentPreferences` handles native style preferences.
+Native document-preference writes use raw property APIs; conversion registers undo deltas for its prepared changes.
 Conversion changes citation marks only: normal synchronization leaves all bibliographies unchanged when disabled and updates only the target mode's managed bibliography when enabled.
 For conversion preparation, property undo, and rollback limits, see the [overview](overview.md#compatibility-boundary) and [ADR-0084](../../decisions/0084-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
 
@@ -104,9 +105,9 @@ Derived citation numbers and rendered text do not belong to that identity.
 
 `MarkStore` reads canonical identities and per-citation page information, indexed by storage order.
 `CitationMarkerWriter` writes prepared `OOText` inside existing marks and keeps a bounded, connection-local formatted-output baseline rather than a persistent rendering cache.
-`DocumentStyleStore` records the last successfully applied style family and identifier independently of Zotero preferences.
+`DocumentStyleStore` records the last successfully applied style family and identifier.
 `UndoableDocumentProperties` registers custom-property undo deltas for page information and citation conversion metadata.
-Ordinary applied-style and Zotero preference writes remain raw; conversion additionally prepares its style-property deltas for undo.
+Ordinary applied-style writes use properties directly without undo deltas; conversion prepares its style-property deltas for undo.
 The [storage contract](overview.md#what-is-stored-in-a-document) describes the exact mark grammar and property keys.
 
 ## Citation model and JStyle processing
@@ -135,7 +136,7 @@ These types contain no live UNO ranges.
 
 `OOStyle` is the common selectable-style interface for `JStyle`, `CitationStyle`, and `BstStyle`.
 `BstStyle.getBstVM()` exposes its cached parsed program rather than creating a new VM.
-BST whole-cited-set rendering and citation labels belong to `BstRenderer` and `BstCitationFormatter`; Pandoc conversion helpers remain in `logic.openoffice.bst`.
+BST whole-cited-set rendering and citation labels belong to `BstRenderer` and `BstCitationFormatter`; Pandoc conversion helpers are in `logic.openoffice.bst`.
 `CSLFormatUtils` adapts CSL-generated markup rather than selecting a renderer or managing document citations.
 
 ## Writer infrastructure and ordering

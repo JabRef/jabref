@@ -7,7 +7,7 @@ grand_parent: Code Howtos
 
 This page records the earlier error-handling design; its examples are historical, not the current citation-engine API.
 The current panel delegates through its `citationController` (`OpenOfficeCitationController`), while engine actions use an action-local `documentCitations` (`DocumentCitations`) facade.
-See the [current overview](../overview.md) for citation-only conversion, normal bibliography synchronization, and the distinction between existing undo contexts and new property undo/rollback.
+See the [current overview](../overview.md) for citation-only conversion, normal bibliography synchronization, undo grouping, property undo, and automatic rollback.
 
 ## Context
 

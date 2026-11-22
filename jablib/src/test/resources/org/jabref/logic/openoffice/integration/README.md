@@ -3,7 +3,7 @@
 Run `./gradlew :jablib:libreOfficeTest` from the repository root with real LibreOffice Writer and Pandoc installed.
 Set `LIBREOFFICE_EXECUTABLE` and `PANDOC_EXECUTABLE` to executable paths when necessary.
 Neither dependency is mocked, and an unavailable executable fails the task rather than skipping tests.
-When running the whole OpenOffice unit-test group, also put the Pandoc directory on the process-local `PATH`: the older `BstPipelineTest` invokes `pandoc` by name rather than reading `PANDOC_EXECUTABLE`.
+When running the whole OpenOffice unit-test group, also put the Pandoc directory on the process-local `PATH`: `BstPipelineTest` invokes `pandoc` by name rather than reading `PANDOC_EXECUTABLE`.
 For architecture orientation, see [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).
 
 ## Golden documents
@@ -21,7 +21,8 @@ Assertions compare semantic document contents rather than ZIP bytes or Writer-ge
 | `legacy-csl-empty-citation.fodt` | Legacy `JABREF_* CID_n ... EMPTY` | Zero-length citation between surrounding words |
 | `legacy-bst.fodt` | Legacy `JABREF_* CID_n` | Numeric body, footnote, and table citations |
 
-The legacy fixtures are retained deliberately: Writer must preserve them on save/reopen, but the canonical engine must ignore them rather than silently read or migrate them.
+The legacy fixtures check that Writer preserves their contents on save/reopen and that canonical reads, refresh, and export do not manage them.
+Supported legacy JStyle marks migrate on the next canonical insertion, not during those read, refresh, or export operations.
 Canonical assertions check both boundary characters explicitly before inspecting the inner text; they do not remove arbitrary invisible characters to hide a mismatch.
 `superscript.csl` is a small local numeric CSL style with superscript citations and a title-only bibliography.
 It exercises the same superscript rendering behavior used by Nature and AMA without coupling expected text to upstream style changes.
@@ -93,10 +94,10 @@ It requires each of the following unit-suite reports and minimum invocation coun
 
 The real-Pandoc `BstPipelineTest` needs Pandoc on `PATH`.
 Every OpenOffice unit report is checked for skips, errors, and failures, not only these eight named suites.
-The tagged Writer task additionally requires at least 48 invocations from `CitationFormatConversionWriterTest` for current canonical/native citation conversion.
+The tagged Writer task additionally requires at least 48 invocations from `CitationFormatConversionWriterTest` for canonical/native citation conversion.
 Conversion preserves canonical identities, storage-order keys, all six types, and every page-info slot in the document sidecar through save/reopen.
 In Zotero mode, converted `EMPTY` and canonical-only partial types use the normal visible citation fallback; converting back restores the canonical state, including invisible rendering for `EMPTY`.
-Canonical JabRef invisible citations remain unchanged.
+Canonical CSL rendering identifies invisible citations by their stored citation type.
 These are separate required reports, so discovering unrelated tagged tests cannot mask a missing engine, Zotero, entity-contract, storage, or conversion suite.
 
 ## Isolation and CI enforcement
@@ -119,6 +120,6 @@ Repository administrators must make **Required Writer integration** a required b
 2. Make a minimal semantic edit to the hand-authored XML; do not replace it with a full Writer-generated export.
 3. Update explicit expected contents only when the intended behavior actually changes.
 4. Run the dedicated task and inspect both the JUnit report and saved `.odt` artifacts.
-5. Keep legacy fixtures as rejection/persistence oracles, not as migration inputs.
+5. Keep legacy fixtures as read/refresh/export rejection and persistence oracles; `LegacyJStyleMigrationWriterTest` constructs its own migration inputs.
 
 <!-- markdownlint-disable-file MD041 -->
