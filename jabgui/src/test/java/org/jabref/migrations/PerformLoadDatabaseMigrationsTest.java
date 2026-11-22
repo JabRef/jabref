@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.ref.Reference;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,7 +31,9 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.search.SearchFlags;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
@@ -138,7 +141,8 @@ class PerformLoadDatabaseMigrationsTest {
     void savedAndReopenedLibraryDoesNotNeedAnotherMigration() throws IOException {
         BibEntry entry = new BibEntry().withCitationKey("Entry")
                                        .withField(StandardField.GROUPS, "Existing")
-                                       .withField(StandardField.KEYWORDS, "topic; printed; prio1")
+                                       .withField(StandardField.KEYWORDS, "topic; printed; prio1; rank3")
+                                       .withField(SpecialField.PRIORITY, "prio2")
                                        .withField(InternalField.MARKED_INTERNAL, "[Owner:6]");
         ParserResult result = new ParserResult(List.of(entry));
         result.getMetaData().setKeywordSeparator(';');
@@ -146,6 +150,8 @@ class PerformLoadDatabaseMigrationsTest {
         ExplicitGroup legacyGroup = new ExplicitGroup("Legacy", GroupHierarchyType.INDEPENDENT, ';');
         legacyGroup.addLegacyEntryKey("Entry");
         root.addSubgroup(legacyGroup);
+        SearchGroup searchGroup = new SearchGroup("Owner:6", GroupHierarchyType.INDEPENDENT, "author = Smith", EnumSet.noneOf(SearchFlags.class));
+        root.addSubgroup(searchGroup);
         result.getMetaData().setGroups(root);
 
         PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, allMigrations(';'));
@@ -164,8 +170,15 @@ class PerformLoadDatabaseMigrationsTest {
 
         assertFalse(reopened.getChangedOnMigration());
         assertEquals(Optional.of(';'), reopened.getMetaData().getKeywordSeparator());
-        assertEquals(Optional.of("Existing; Legacy; Owner:6"), reopened.getDatabase().getEntries().getFirst().getField(StandardField.GROUPS));
-        assertEquals(Optional.of("topic"), reopened.getDatabase().getEntries().getFirst().getField(StandardField.KEYWORDS));
+        BibEntry reopenedEntry = reopened.getDatabase().getEntries().getFirst();
+        GroupTreeNode reopenedRoot = reopened.getMetaData().getGroups().orElseThrow();
+        assertEquals(searchGroup, reopenedRoot.findGroupByName("Owner:6").orElseThrow().getGroup());
+        assertEquals(Optional.of("Existing; Legacy; Owner:6 (2)"), reopenedEntry.getField(StandardField.GROUPS));
+        assertTrue(reopenedRoot.findGroupByName("Owner:6 (2)").orElseThrow().getGroup().contains(reopenedEntry));
+        assertEquals(Optional.empty(), reopenedEntry.getField(InternalField.MARKED_INTERNAL));
+        assertEquals(Optional.of("topic; prio1"), reopenedEntry.getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of("prio2"), reopenedEntry.getField(SpecialField.PRIORITY));
+        assertEquals(Optional.of("rank3"), reopenedEntry.getField(SpecialField.RANKING));
         assertFalse(new ConvertLegacyExplicitGroups().isMigrationNecessary(reopened));
         assertFalse(new ConvertMarkingToGroups(';').isMigrationNecessary(reopened));
         assertFalse(new SpecialFieldsToSeparateFields(';').isMigrationNecessary(reopened));
