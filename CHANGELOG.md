@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added an integrity check for unescaped `%` characters in LaTeX fields. [#8712](https://github.com/JabRef/jabref/issues/8712)
 - We added the ability to import citations from a LibreOffice document into the current JabRef library. [#16516](https://github.com/JabRef/jabref/issues/16516)
 - We added native macOS text-editing shortcuts, such as <kbd>Ctrl</kbd> + <kbd>A</kbd>, to text fields and the BibTeX source editor. [#16529](https://github.com/JabRef/jabref/issues/16529)
 - We added an option to enable AI provider debugging in expert settings for testing AI features without external API calls. [#17607](https://github.com/JabRef/jabref/pull/17607)
