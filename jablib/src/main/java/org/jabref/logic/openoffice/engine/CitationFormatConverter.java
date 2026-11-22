@@ -62,9 +62,9 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
 
-/// A next-insertion transaction, not a mode listener or a refresh migration. Prepare reads both
-/// supported formats, resolves all keys and renders the complete result once, without changing UNO
-/// state. Apply only consumes that plan, inside the engine's existing document session.
+/// Prepares insertion-triggered conversion of canonical, native, or legacy JStyle citations.
+/// Rendering finishes before document mutation; only legacy JStyle migration permits unresolved keys.
+/// Application consumes the prepared plan inside the engine's document write session.
 @NullMarked
 final class CitationFormatConverter {
     private final XTextDocument document;

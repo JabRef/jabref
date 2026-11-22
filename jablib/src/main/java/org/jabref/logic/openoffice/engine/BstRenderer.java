@@ -32,9 +32,9 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Labels and entry bodies come from one BST execution over the whole cited set. Bibliography
-/// bodies are converted in one pandoc process, rather than rerendering each entry in isolation,
-/// which would lose set-wide disambiguation and start hundreds of external processes.
+/// BST-dependent labels and bodies come from one execution over the cited set, preserving set-wide
+/// disambiguation. Requested bibliography bodies use one Pandoc process rather than one per entry.
+/// Author–year citations without a bibliography require neither BST execution nor Pandoc.
 @NullMarked
 public final class BstRenderer implements CitationRenderer {
 

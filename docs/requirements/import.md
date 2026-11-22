@@ -157,6 +157,7 @@ Needs: impl, utest
 `feat~import.libreoffice.cited-entries~1`
 
 When a LibreOffice document contains native Zotero-compatible reference marks, the user can import their embedded bibliographic entries into the library active when the action starts.
+The panel offers this action with a CSL style selected and Zotero compatibility enabled; the collection API is independent of that setting.
 Canonical JabRef and legacy marks are ignored; collection is read-only and does not modify the document or trigger citation-format conversion.
 Each citation's collection identity is its native item URI, otherwise its explicit citation key, otherwise its numeric Zotero item ID.
 Only citations sharing that collection identity are deduplicated, retaining the first collected position and bibliographic data; a later explicit document key is retained when the first citation under that identity was keyless.

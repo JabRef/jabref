@@ -51,7 +51,8 @@ Comparing a body range directly with a range in a footnote or table cell does no
 
 `DocumentOrder` therefore partitions ranges by their original `XText` before sorting them textually through `RangeSort` and `UnoTextRange`.
 Those helpers require the container to provide `XTextRangeCompare`; partitioning does not add comparison support to a container that lacks it.
-This shared algorithm is used for canonical JabRef citations with JStyle, CSL, and BST styles.
+Ordinary canonical insertion, refresh, and group editing use `DocumentOrder` with JStyle, CSL, and BST styles.
+Native Zotero ordering and next-insertion conversion have separate ordering implementations in `ZoteroCitationStrategy` and `CitationFormatConverter`; do not assume they share `DocumentOrder`'s fallback behavior.
 
 ## Canonical numbering order
 
@@ -59,7 +60,7 @@ This shared algorithm is used for canonical JabRef citations with JStyle, CSL, a
 
 1. Read each canonical group's Writer range from `MarkStore`.
 2. Partition by the original `XText` and sort within each partition.
-3. Assign `indexInPosition` from that textual order.
+3. Assign `indexInPosition` within each original partition from that textual order.
 4. For ranges inside footnotes, substitute the corresponding body footnote-mark range.
 5. When an unlocked functional view cursor is available, obtain visual positions and sort top-to-bottom, then left-to-right, then by `indexInPosition`.
 6. Otherwise, use textual ordering within the mapped text-container partitions and log a warning.
@@ -68,7 +69,7 @@ Mapping a footnote citation to its body anchor counts it where the footnote is r
 The substitution changes only the ranges used for sorting; it does not move the citations out of the footnote.
 Several citations in one footnote then share an anchor, so `RangeSortable.getIndexInPosition()` preserves their order within that footnote.
 Without this tie-breaker, the mapped positions cannot distinguish those citations and their numbering can lose the original footnote order.
-`DocumentOrder.withInsertion` includes an in-memory pending group in this process before its reference mark is created.
+`DocumentOrder.withInsertion` adds an in-memory pending group at the insertion cursor's end, then repartitions and sorts the unmapped ranges before assigning indexes and mapping footnotes.
 This lets insertion render the whole cited set before changing existing document content.
 
 ### View cursor acquisition and screen refresh
@@ -84,9 +85,10 @@ Obtaining a view cursor does not guarantee that it can move to citation ranges:
 - With an image or frame selected, a view cursor may be unavailable or nonfunctional for text navigation.
 - `RestorableTextViewCursor.get` retains the original text position or selection and checks whether the cursor supports text access.
   For a non-text selection, it can temporarily select the start of the document through `UnoSelection` and [XSelectionSupplier] to obtain a usable text view cursor.
-  Navigation can still fail later; `DocumentOrder` catches visual-sort failures and uses the textual fallback.
+  Navigation can still fail later; `DocumentOrder` catches UNO runtime and Java `IllegalStateException` failures from visual sorting and uses the textual fallback.
 
-After sorting, `RestorableTextViewCursor.restore` attempts to restore the original text position or object selection.
+After visual sorting, `RestorableTextViewCursor.restore` attempts to restore the original text position or object selection.
+Restoration itself can fail; the fallback is not a guarantee of recovery from every cursor or connection failure.
 Restoration does not make cursor movement invisible: moving the view cursor with screen refresh enabled can cause user-visible scrolling and flashing.
 
 The view cursor cannot perform this work while document controllers are locked through [XModel.lockControllers()][XModel].
@@ -118,20 +120,23 @@ The warning matters: falling back avoids an invalid cross-container comparison b
 ## Group editing order and protected footnotes
 
 Group editing does not use mapped footnote anchors as replacement edit ranges.
-Merge scans unmapped textual order within text containers through `DocumentOrder.withinTextContainers`, not visual numbering order.
+`CitationGroupEditor` scans unmapped textual order through `DocumentCitations.getCitationGroupsSortedWithinPartitions(document, false)`, which delegates to `DocumentOrder.withinTextContainers`, not visual numbering order.
 Merge considers NORMAL groups only, with no intervening nonblank text or paragraph break, and never combines citations from different text containers.
 Several citations in one footnote remain distinct ranges for this adjacency check.
 Using mapped visual positions instead would lose the information needed to identify consecutive groups and could miss mergeable pairs or examine the wrong pairs.
 Separate also acts on NORMAL groups and preserves each citation's page info in storage order.
+The engine separately establishes global order for rendering the proposed merged or separated groups before applying their original, unmapped replacement ranges.
 
-Footnote body anchors are protected ranges whenever the footnote contains a managed citation.
-Canonical overlap checks include those anchors so inserting or rewriting a body citation cannot erase a footnote that owns citations.
+For citations directly in a footnote's `XText`, canonical protection checks include its body anchor.
+This is not a recursive search through nested text containers inside a footnote.
+The overlap checks reject body citation edits that would cover those anchors and erase their citations.
 These protection checks are separate from mapping footnotes for numbering.
 
 ## Verification
 
 `WriterIntegrationTest` exercises canonical citations in the body, a footnote, and a table, including save/reopen and style-family changes.
-`CanonicalStorageWriterTest` checks footnote-anchor ordering/protection and measures insertion/writing plus visual ordering for about 300 citations.
+`CanonicalStorageWriterTest.documentOrderMapsFootnoteCitationsAndProtectsTheirBodyAnchor` checks footnote-anchor ordering with the textual fallback and protects the body anchor.
+Its `benchmarkThreeHundredCanonicalInsertionsAndVisualOrdering` test measures storage insertion/writing and visual ordering for 300 body citations, checks their order, and verifies an unchanged write pass.
 Those checks do not establish a latency budget for the complete renderer pipeline or correct numbering in multi-column layouts.
 For execution requirements and saved Writer artifacts, see [Writer integration testing](../testing.md#libreoffice-writer-integration-tests).
 For the current packages containing these implementation classes, see the [package layout and ownership guide](code-reorganization.md).

@@ -56,9 +56,9 @@ public class DocumentCitations {
         this.citationGroups = markStore.readAll(doc);
     }
 
-    /// Return citation groups in visual order within (but not across) XText partitions.
-    ///
-    /// This is (1) sufficient for combineCiteMarkers which looks for consecutive XTextRanges within each XText, (2) not confused by multicolumn layout or multipage display.
+    /// Orders citation groups textually within their text containers. With footnote mapping enabled,
+    /// footnote ranges use body anchors and textual fallback ordering.
+    /// Group merging uses unmapped ranges to find consecutive groups within each container.
     public List<CitationGroup>
     getCitationGroupsSortedWithinPartitions(XTextDocument doc, boolean mapFootnotesToFootnoteMarks)
             throws WriterDocumentAccessException, WrappedTargetException {

@@ -4,9 +4,13 @@ grand_parent: Code Howtos
 ---
 # Alternatives to using OOResult and OOVoidResult in OpenOfficeCitationController
 
-The alternatives and code sketches below are historical, not current implementation instructions.
-Current GUI and core facade instances are named `citationController` and `documentCitations`; the latter has type `DocumentCitations`, formerly `CitationDocument` in these sketches.
-See the [current overview](../overview.md) for active APIs; the historical examples and evidence links below are retained.
+The alternatives and code sketches below are historical research, not current implementation instructions or proposals awaiting adoption.
+They intentionally retain `CitationDocument`, `getFrontend`, incomplete Java, and the then-current exception-policy discussion; do not treat those snippets as compilable current examples.
+
+Today `OpenOfficePanel` delegates through `citationController` (`OpenOfficeCitationController`) to `CitationEngine`.
+Canonical engine actions use a fresh `documentCitations` (`DocumentCitations`) facade, while `OOError` stays at the GUI boundary and core results carry `JabRefException`.
+See the [error-handling introduction](index.md) for current source locations and the [overview](../overview.md) for active action and recovery contracts.
+The historical examples and evidence links below are retained.
 
 (Talk about ADRs prompted me to think about alternatives to what I used.)
 

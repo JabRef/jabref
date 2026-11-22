@@ -5,6 +5,9 @@ parent: Decision Records
 
 # Use Pandoc to Convert BST Output for the LibreOffice Integration
 
+The Context, Options, and original confirmation plan record the decision at introduction.
+BST is now supported; [Current implementation](#current-implementation) describes the shared engine introduced in [ADR-0084](0084-canonical-writer-citations.md).
+
 ## Context and Problem Statement
 
 JabRef's [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration) supports [CSL styles](https://citationstyles.org/) and [JStyles](https://jstyles.jabref.org/), but not [BST](https://text2bib.org/bsts) (BibTeX style) files, although many publishers still distribute only `.bst`.
@@ -50,6 +53,8 @@ The dependency is optional, so it adds no weight for users who do not use BST.
 * Neutral, because Pandoc's output still requires stripping the `\providecommand` preamble emitted by styles such as `IEEEtran.bst`; this is done by keeping only the text following the last `\bibitem`
 
 ### Confirmation
+
+The original confirmation plan was:
 
 * A standalone pipeline test renders a `BibEntry` through a real `.bst`, pipes it through Pandoc, and asserts the resulting `OOText` contains the expected `<i>` markup with decoded entities.
 * The feature is disabled in the UI when `PandocLatexConverter.isAvailable()` returns `false`, mirroring the OCR feature's behaviour; verified by a test with an invalid configured path.
@@ -116,13 +121,22 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 ### Current implementation
 
 The conversion decision remains in use within the shared citation engine described in [ADR-0084](0084-canonical-writer-citations.md).
-`BstRenderer` resolves the whole cited set through `CitationKeyResolution` and executes `BstVM.render` for that set.
-`BstCitationFormatter.parseBibliography` separates bibliography keys, optional labels, and LaTeX entry bodies.
-Requested bibliography bodies pass through one batched `PandocLatexConverter.latexToHtml` call, then `BSTFormatUtils.convertPandocHtmlToOOText`, before becoming `OOText` in a `RenderResult`.
+`BstRenderer` implements `CitationRenderer` and resolves the cited set through `CitationKeyResolution`.
+Author-year citation-only rendering uses JabRef's fixed formatter without executing BST or invoking Pandoc.
+Numeric and style-defined citations still need BST output for ordering or labels, even without a bibliography.
+When BST output is needed, `BstVM.render` runs once over the resolved cited set, unless it is empty.
+`BstCitationFormatter.parseBibliography` separates keys, optional labels, and entry bodies at each `\bibitem`, excluding the leading preamble and bibliography environment.
+For a requested, nonempty bibliography, bodies pass through `BSTFormatUtils.normalizeLegacyForPandoc`, one batched `PandocLatexConverter.latexToHtml` call, and `BSTFormatUtils.convertPandocHtmlToOOText`, before becoming `OOText` in a `RenderResult`.
+Citation-only rendering never invokes Pandoc.
 `CitationMarkerWriter` and `OOTextWriter` apply prepared output during the engine's write phase, not while rendering.
 
 The original implementation reused numbering from `CSLReferenceMarkManager` and proposed an analogous `BSTReferenceMarkManager`.
 Those managers are no longer active classes: `BstRenderer` derives numbering from the resolved cited set and BST bibliography order through `CitationNumbering.bibliographyOrder`.
+Unlike the original UI guard proposed above, the style dialog shows a warning for a blank Pandoc path but does not disable BST selection or probe availability on opening.
+`PandocLatexConverter.autoDetect` probes platform-specific candidates, including `pandoc` on `PATH` and a detected Windows installation path; users can override the stored path.
+When bibliography conversion actually needs Pandoc, executable failures become `PandocRenderException` with installation and path guidance before Writer mutation.
+`BstRendererTest` covers batched conversion, citation-only gating, and missing-executable errors; `PandocLatexConverterTest` covers platform-specific detection candidates.
+
 The current [package layout and ownership guide](../code-howtos/openoffice/code-reorganization.md) identifies the rendering, storage, and Writer infrastructure boundaries.
 
 The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
@@ -137,9 +151,10 @@ The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
 | `{\&}`             | `&amp;`                            | `&` (decoded by `transformHTML`) | `&`                   |
 | paragraph text     | `<p>…</p>`                         | unwrapped                        | no spurious break     |
 
-Only the third column is JabRef's own code: three tag renames plus unwrapping Pandoc's paragraph wrapper.
-Everything in the LaTeX -> HTML step - brace nesting, ligatures, quote forms, tilde handling, entity escaping - is Pandoc's, and is the work that would otherwise have to be written and maintained in Java.
-`\emph` is semantic rather than literal in LaTeX (it flips to upright inside already-italic text), which is why `.bst` files use it for journal and book titles; in a bibliography entry it always resolves to italic.
+JabRef normalizes legacy LaTeX switches before Pandoc, then maps HTML emphasis and styled spans, removes inline-math emphasis and wrappers, unwraps outer paragraphs, and applies `BSTFormatUtils.transformHTML` for cleanup and entity decoding.
+The table shows representative mappings, not every normalization; the current BST path does not delegate to `CSLFormatUtils.transformHTML` as originally proposed.
+Pandoc still owns general LaTeX parsing, including brace nesting, ligatures, quote forms, tilde handling, and entity escaping.
+`\emph` is semantic rather than literal in LaTeX (it flips to upright inside already-italic text), which is why `.bst` files use it for journal and book titles; the table illustrates ordinary, non-nested emphasis.
 
 Changing `BstVM` to emit HTML instead of LaTeX was examined and is not viable: the markup originates in string literals inside the `.bst` programs themselves, which the virtual machine only concatenates, so there is nothing at the VM level to reinterpret. It is therefore not listed as an option.
 

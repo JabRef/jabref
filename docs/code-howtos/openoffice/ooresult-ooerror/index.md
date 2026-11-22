@@ -5,23 +5,33 @@ grand_parent: Code Howtos
 ---
 # About OOError, OOResult, and OOVoidResult
 
-This page records the earlier error-handling design; its examples are historical, not the current citation-engine API.
-The current panel delegates through its `citationController` (`OpenOfficeCitationController`), while engine actions use an action-local `documentCitations` (`DocumentCitations`) facade.
-See the [current overview](../overview.md) for citation-only conversion, normal bibliography synchronization, undo grouping, property undo, and automatic rollback.
+This page records historical error-handling research, including the questions and API sketches below; it is not a current API reference.
+`OOResult` and `OOVoidResult` are still used, but the action boundary has changed:
 
-## Context
+* `OpenOfficePanel` delegates through `citationController` (`OpenOfficeCitationController`) in `jabgui/src/main/java/org/jabref/gui/openoffice/`.
+* The controller calls the document-bound `CitationEngine` in `jablib/src/main/java/org/jabref/logic/openoffice/engine/` and maps core errors to GUI `OOError` dialogs.
+* Canonical engine actions create a fresh `documentCitations` (`DocumentCitations`) facade in `logic.openoffice.frontend`; it is not the GUI entry point or a persistent document cache.
+* The result types live in `jablib/src/main/java/org/jabref/model/openoffice/util/`.
 
-### Relieve GUI panel code
+Returning an error does not itself undo writes.
+Ordinary write sessions group undo actions; only the owned conversion transaction adds automatic rollback, subject to undo-manager and connection limits.
+See the [current overview](../overview.md#canonical-insert-and-refresh) and [undo and recovery boundaries](../problems.md#current-undo-and-recovery-boundaries).
+
+## Historical design notes
+
+### Context
+
+#### Relieve GUI panel code
 
 On the question of where should we catch exceptions in relation to GUI code it was suggested (Jonatan Asketorp in [this thread](https://github.com/koppor/jabref/pull/496#discussion_r629695493), "most of them (all?) should be handled latest in the ViewModel.") that catching them early could help simplifying the higher levels.
 
-### Same messages in different contexts
+#### Same messages in different contexts
 
 Some types of exceptions are caught in _different GUI actions_, often resulting in basically the same error dialog, possibly only differing in the indicated context (which GUI action).
 
 Problems found during _precondition checking_ (for example: do we have a connection to a document) and error conditions (for example: lost connection to a document during an action) can overlap.
 
-### OpenOfficeCitationController as a precondition and exception handling layer
+#### OpenOfficeCitationController as a precondition and exception handling layer
 
 Since most of the code originally in `OOBibBase` was moved to `logic` and almost all GUI actions go through `OpenOfficeCitationController`, it seemed a good location to collect precondition checking and exception handling code.
 

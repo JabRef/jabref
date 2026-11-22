@@ -6,7 +6,9 @@ parent: Requirements
 ## Canonical Writer citations must remain reusable across JStyle, CSL, and BST styles
 `req~openoffice.cross-family-citations~1`
 
-With Zotero compatibility mode disabled, a document containing canonical JabRef citations can change style families through a refresh.
+Outside effective native Zotero mode, a document containing canonical JabRef citations can change style families through a refresh.
+Native mode is effective only when a CSL style is selected and the saved Zotero compatibility flag is enabled.
+JStyle and BST always use canonical mode without clearing that flag; returning to CSL restores the saved choice.
 Citation keys, mark identities, stored citation types, and per-citation page information survive the change, including save/reopen between changes.
 A style can approximate an unsupported stored citation type without replacing that type; returning to the original family restores its presentation.
 
@@ -37,7 +39,7 @@ UNO does not guarantee sorted name enumeration, so the first returned recognized
 Legacy `JR_cite*` marks participate only in the separate one-way JStyle migration below; conversion targeting native Zotero format leaves them unchanged.
 Legacy `CID_n` marks remain unmanaged and unchanged.
 
-Once conversion is triggered, the existing group-reading and preparation path applies.
+After detection triggers conversion, preparation reads citation groups and validates the proposed write.
 The converted groups, pending citation, and any target-mode bibliography requested by normal synchronization are rendered once before document mutation.
 Native-to-canonical conversion and native generation require resolved sources; only legacy-only canonical migration permits unresolved entries as specified below.
 Preparation failures, including invalid metadata, required but unresolved sources, protected ranges, unsuitable custom-property types or attributes, and rendering failures, leave marks, properties, text, and undo history unchanged.
@@ -51,7 +53,10 @@ Global disconnects, lost ownership, and failed rollbacks produce a distinct reco
 Ordinary updates retain raw style-property setters outside the conversion-specific undo contract.
 
 A persistent per-document citation sidecar preserves canonical uids, storage-order keys, all six stored citation types, every page-info slot, and supported native Zotero citation JSON, identifiers, URIs, and harmless unknown metadata across conversion and save/reopen.
-Sidecar lookup uses one index per action, not a persistent cache; parsing, identity, freshness, and property-safety checks remain required.
+Native sidecar lookup builds one index per action when needed, not a persistent cache; canonical lookup reads the property directly by uid.
+Strict native conversion reads reject corrupt records, ambiguous identity/suffix matches, and stale associated snapshots.
+Ordinary native URI-link planning is tolerant: only an exact, unambiguous snapshot may follow a planned rename; corrupt or stale records remain untouched.
+Parsing, key-layout, identity, freshness, and property-safety checks remain required.
 Canonical `EMPTY` and canonical-only partial types render as normal visible citations in Zotero mode; page information remains stored but is not rendered.
 Converting back restores the canonical uid, storage-order keys, stored type, and every page-info slot from the sidecar, including invisible rendering for `EMPTY`.
 Native modifiers do not block conversion; their JSON remains in the citation sidecar and is restored when converting back to native format.
@@ -73,10 +78,11 @@ Use the fresh first-recognized-name detection policy above, including after reco
 Connecting, refreshing, exporting, selecting a style, or changing the compatibility preference alone does not migrate legacy marks.
 Insertion or conversion targeting native Zotero format leaves `JR_cite` marks unchanged; `CID_n` remains unmanaged in every mode.
 
-After detection selects migration, the existing preparation path handles citation groups and the pending citation.
+Migration preparation reads legacy groups and includes the pending citation.
 Mixed-source conversion is unsupported.
 Legacy-only canonical migration permits unresolved entries with ordinary unresolved-key placeholders and the successful-insertion warning.
 Opening the missing libraries and refreshing restores resolved output without reinserting citations.
+Supported names have the form `JR_cite<digits>_<type>_<comma-separated keys>`, with an optional empty digit sequence and type `1` through `6`; keys must satisfy canonical validation.
 Map legacy numeric types `1` through `6` to `NORMAL`, `IN_TEXT`, `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_ONLY`, respectively.
 Preserve storage-order keys and assign each migrated group a fresh stable uid.
 Move the legacy page property, whose name is the whole legacy mark name, to `JabRef_page_info:<uid>:<lastStorageIndex>`, belonging to the group's last citation in storage order.
@@ -146,7 +152,7 @@ Needs: impl, utest
 ## Canonical citation merge or separation must be undoable in one complete step
 `req~openoffice.single-step-group-undo~1`
 
-With Zotero compatibility mode disabled and an available, unlocked Writer undo manager, each merge or separation uses one undo context for structural replacements, their final formatted output, and page-info property changes.
+Outside effective native Zotero mode and with an available, unlocked Writer undo manager, each supported merge or separation uses one undo context for structural replacements, their final formatted output, and page-info property changes.
 Undo restores the original citation-group identities and per-citation page information; redo restores the edited groups and their page information.
 The proposed post-edit groups and bibliography are rendered before document mutation, so a rendering failure leaves marks, properties, text, and undo history unchanged.
 Only explicit refresh performs a global orphan page-info sweep; merge, separation, insertion, and conversion still remove properties belonging to replaced or removed citations immediately.

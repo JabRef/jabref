@@ -34,7 +34,7 @@ public class CitedEntryCollector {
 
     /// Collects the entries cited by the Zotero-compatible reference marks of a document.
     ///
-    /// Citations with the same identity are collected once, in first-citation order and with their first bibliographic data.
+    /// Citations with the same identity are collected once, in supplied mark order and with their first bibliographic data.
     /// Native Zotero URIs take precedence over explicit citation keys, which take precedence over item ids.
     /// Key-only citations stay separate from native Zotero items, even when their citation keys match.
     /// An entry keeps the citation key that its reference mark names (the key in its JabRef URI or its `citation-key`),

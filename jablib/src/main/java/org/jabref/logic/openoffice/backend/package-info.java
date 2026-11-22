@@ -1,7 +1,8 @@
 /// Concrete UNO-backed Writer reference marks.
-/// [WriterReferenceMark] safely replaces one mark's text; [WriterReferenceMarks] creates, finds,
-/// and lists marks without interpreting citation names. Callers explicitly choose persistent
-/// boundaries for canonical citations or temporary boundaries for native Zotero citations.
+/// [WriterReferenceMark] manages one mark's range and replacement boundaries;
+/// [ReferenceMarkTextWriter] writes formatted text through [org.jabref.logic.openoffice.uno.OOTextWriter].
+/// [WriterReferenceMarks] creates, finds, and lists marks without interpreting citation names.
+/// Callers explicitly choose persistent boundaries for canonical citations or temporary boundaries for native Zotero citations.
 /// [WriterTextContext] reads surrounding text for citation management.
 /// Canonical citation identities and page information belong to
 /// [org.jabref.logic.openoffice.engine.storage.MarkStore].

@@ -741,9 +741,9 @@ public final class JStyle implements Comparable<JStyle>, OOStyle {
                 nonUniqueCitationMarkerHandling);
     }
 
-    /// Add setLocaleNone and optionally setCharStyle(CitationCharacterFormat) around
-    /// citationText.  Called in fillCitationMarkInCursor, so these are
-    /// also applied to "Unresolved()" entries and numeric styles.
+    /// Wraps `citationText` with locale suppression and optional citation character formatting.
+    /// [org.jabref.logic.openoffice.engine.JStyleRenderer] applies this during rendering,
+    /// including to unresolved markers and numeric citations.
     public OOText decorateCitationMarker(OOText citationText) {
         JStyle style = this;
         OOText citationText2 = OOFormat.setLocaleNone(citationText);
