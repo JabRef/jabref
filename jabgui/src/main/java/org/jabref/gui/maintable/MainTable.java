@@ -252,7 +252,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Platform.runLater(this::sortAndRevealEditedEntry);
             }
         });
-            editorShowingSubscription = EasyBind.subscribe(stateManager.getEditorShowing(), showing -> {
+        editorShowingSubscription = EasyBind.subscribe(stateManager.getEditorShowing(), showing -> {
             if (!showing) {
                 sortAndRevealEditedEntry();
             }
