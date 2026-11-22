@@ -10,8 +10,8 @@ Needs: impl
 
 ## Context and Problem Statement
 
-macOS grants application access separately for each keychain item.
-Storing every fetcher's API key separately produces repeated dialogs that display the same service name.
+Across macOS, Linux, and Windows, storing each fetcher's custom API key in a separate keyring item requires one password read per saved key.
+On macOS, the keychain grants application access separately for each item, so loading saved keys can produce repeated dialogs with the same service name.
 Users can mistake the sequence for a permission loop.
 
 How can JabRef load saved custom API keys with one keyring read across supported operating systems?

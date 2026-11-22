@@ -24,8 +24,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -38,6 +40,7 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BackgroundTask;
@@ -77,24 +80,29 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final ImportFormatPreferences importFormatPreferences;
     private final LibraryPreferences libraryPreferences;
     private final TaskExecutor taskExecutor;
+    private final CliPreferences preferences;
+    private final DialogService dialogService;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
-    public WebSearchTabViewModel(ImporterPreferences importerPreferences,
+    public WebSearchTabViewModel(CliPreferences preferences,
                                  GrobidPreferences grobidPreferences,
                                  DOIPreferences doiPreferences,
                                  FilePreferences filePreferences,
                                  ImportFormatPreferences importFormatPreferences,
                                  LibraryPreferences libraryPreferences,
                                  ReadOnlyBooleanProperty refAiEnabled,
-                                 TaskExecutor taskExecutor) {
-        this.importerPreferences = importerPreferences;
+                                 TaskExecutor taskExecutor,
+                                 DialogService dialogService) {
+        this.preferences = preferences;
+        this.importerPreferences = preferences.getImporterPreferences();
         this.grobidPreferences = grobidPreferences;
         this.doiPreferences = doiPreferences;
         this.filePreferences = filePreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.libraryPreferences = libraryPreferences;
         this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
 
         this.refAiEnabled = refAiEnabled;
 
@@ -263,11 +271,16 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         Set<FetcherApiKey> newApiKeys = apikeyPersistAvailableProperty.get() ? apiKeysToStore : Set.of();
         boolean persistChanged = importerPreferences.shouldPersistCustomKeys() != apikeyPersistProperty.get();
-        // Each set change rewrites the whole keyring, which is slow, so only replace the keys when something changed
         if (persistChanged || !Objects.equals(importerPreferences.getApiKeys(), newApiKeys)) {
-            importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
-            importerPreferences.getApiKeys().clear();
-            importerPreferences.getApiKeys().addAll(newApiKeys);
+            try {
+                if (apikeyPersistProperty.get()) {
+                    preferences.saveFetcherApiKeys(newApiKeys);
+                } else {
+                    preferences.useSessionFetcherApiKeys(newApiKeys);
+                }
+            } catch (JabRefException ex) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Could not update saved custom API keys"));
+            }
         }
 
         // Save custom URL templates to preferences

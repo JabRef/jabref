@@ -14,6 +14,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.ImporterPreferences;
 
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.KeyringStorageType;
 import com.github.javakeyring.PasswordAccessException;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.AfterEach;
@@ -21,11 +22,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
@@ -49,10 +53,16 @@ class CustomApiKeyBundleTest {
 
     @BeforeEach
     void setUp() throws PasswordAccessException {
+        when(keyring.getKeyringStorageType()).thenReturn(KeyringStorageType.OSX_KEYCHAIN);
         when(keyring.getPassword(anyString(), anyString())).thenAnswer(invocation -> {
-            List<String> slot = List.of(invocation.getArgument(0), invocation.getArgument(1));
+            String service = invocation.getArgument(0);
+            String account = invocation.getArgument(1);
+            List<String> slot = List.of(service, account);
             if (!secrets.containsKey(slot)) {
-                throw new PasswordAccessException("Not found");
+                String missingMessage = keyring.getKeyringStorageType() == KeyringStorageType.WINDOWS_CREDENTIAL_STORE
+                                        ? "Error code 1168"
+                                        : "No stored credentials match " + service + " account: " + account;
+                throw new PasswordAccessException(missingMessage);
             }
             return secrets.get(slot);
         });
@@ -145,6 +155,46 @@ class CustomApiKeyBundleTest {
         assertFalse(preferences.hasKey("fetcherCustomKeyBundleNames"));
     }
 
+    @ParameterizedTest
+    @EnumSource(names = {"OSX_KEYCHAIN", "GNOME_KEYRING", "WINDOWS_CREDENTIAL_STORE"})
+    void deniedIndividualReadDefersMigrationUntilTheNextLoad(KeyringStorageType backend) throws PasswordAccessException {
+        configure(List.of("Readable", "Denied", "Missing"));
+        when(keyring.getKeyringStorageType()).thenReturn(backend);
+        List<String> readableSlot = List.of("org.jabref.apikeys", "Readable");
+        List<String> deniedSlot = List.of("org.jabref.apikeys", "Denied");
+        secrets.put(readableSlot, "KeyA");
+        secrets.put(deniedSlot, "KeyB");
+        Mockito.doThrow(new PasswordAccessException("Failed to get credential. Authorization failed"))
+               .doReturn("KeyB")
+               .when(keyring).getPassword("org.jabref.apikeys", "Denied");
+
+        assertEquals(Set.of(
+                new FetcherApiKey("Readable", true, "KeyA"),
+                new FetcherApiKey("Denied", true, ""),
+                new FetcherApiKey("Missing", true, "")), preferences.getImporterPreferences().getApiKeys());
+        assertEquals(Map.of(readableSlot, "KeyA", deniedSlot, "KeyB"), secrets);
+        assertFalse(preferences.hasKey("fetcherCustomKeyBundleNames"));
+
+        assertEquals(Set.of(
+                new FetcherApiKey("Readable", true, "KeyA"),
+                new FetcherApiKey("Denied", true, "KeyB"),
+                new FetcherApiKey("Missing", true, "")), new JabRefCliPreferences(node).getImporterPreferences().getApiKeys());
+        assertEquals(List.of("Denied", "Readable"), preferences.getStringList("fetcherCustomKeyBundleNames"));
+    }
+
+    @Test
+    void ambiguousKWalletReadPreservesIndividualKeysAndLeavesMigrationPending() throws PasswordAccessException {
+        configure(List.of("Fetcher"));
+        List<String> individualSlot = List.of("org.jabref.apikeys", "Fetcher");
+        secrets.put(individualSlot, "Key");
+        when(keyring.getKeyringStorageType()).thenReturn(KeyringStorageType.KWALLET);
+        doThrow(new PasswordAccessException("Password is not in wallet")).when(keyring).getPassword("org.jabref.apikeys.bundle", "keys");
+
+        assertEquals(Set.of(new FetcherApiKey("Fetcher", true, "Key")), preferences.getImporterPreferences().getApiKeys());
+        assertEquals(Map.of(individualSlot, "Key"), secrets);
+        assertFalse(preferences.hasKey("fetcherCustomKeyBundleNames"));
+    }
+
     @Test
     void deniedBundleReadDoesNotFallBackToIndividualEntries() throws PasswordAccessException {
         configure(List.of("Fetcher"));
@@ -179,17 +229,37 @@ class CustomApiKeyBundleTest {
     }
 
     @Test
+    void failedSaveKeepsPreviousKeysAndPreferences() throws JabRefException, PasswordAccessException {
+        Set<FetcherApiKey> savedKeys = Set.of(new FetcherApiKey("Previous", true, "saved-key"));
+        preferences.saveFetcherApiKeys(savedKeys);
+        clearInvocations(keyring);
+        doThrow(new PasswordAccessException("Denied")).when(keyring)
+                                                      .setPassword(Mockito.eq("org.jabref.apikeys.bundle"), Mockito.eq("keys"), anyString());
+
+        Set<FetcherApiKey> replacementKeys = Set.of(
+                new FetcherApiKey("Previous", false, "changed-key"),
+                new FetcherApiKey("New", true, "new-key"));
+        assertThrows(JabRefException.class, () -> preferences.saveFetcherApiKeys(replacementKeys));
+
+        assertEquals(savedKeys, preferences.getImporterPreferences().getApiKeys());
+        assertEquals(savedKeys, new JabRefCliPreferences(node).getImporterPreferences().getApiKeys());
+        assertEquals(List.of("Previous"), preferences.getStringList("fetcherCustomKeyBundleNames"));
+        verify(keyring, never()).deletePassword(anyString(), anyString());
+    }
+
+    @Test
     void importEnablingPersistenceLoadsSavedKeysWithImportedMetadata(@TempDir Path tempDir) throws JabRefException, PasswordAccessException {
         // [utest->req~keyring.api-key-import~1]
         Path exported = tempDir.resolve("preferences.xml");
         configure(List.of("Imported"));
         preferences.putStringList("fetcherCustomKeyUses", List.of("false"));
-        preferences.putStringList("fetcherCustomKeyBundleNames", List.of("Imported"));
+        preferences.putStringList("fetcherCustomKeyBundleNames", List.of());
         preferences.exportPreferences(exported);
         Map<List<String>, String> savedBundle = Map.of(List.of("org.jabref.apikeys.bundle", "keys"), "{\"Imported\":\"saved-key\"}");
         secrets.putAll(savedBundle);
 
         configure(List.of("Previous"));
+        preferences.putStringList("fetcherCustomKeyBundleNames", List.of("Imported"));
         preferences.putBoolean("fetcherCustomKeyPersist", false);
         ImporterPreferences importer = preferences.getImporterPreferences();
 
@@ -210,6 +280,7 @@ class CustomApiKeyBundleTest {
         Path exported = tempDir.resolve("preferences.xml");
         configure(List.of("Imported"));
         preferences.putBoolean("fetcherCustomKeyPersist", false);
+        preferences.putStringList("fetcherCustomKeyBundleNames", List.of());
         preferences.exportPreferences(exported);
 
         configure(List.of("Previous"));

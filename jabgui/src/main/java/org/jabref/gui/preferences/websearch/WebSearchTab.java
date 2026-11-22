@@ -51,14 +51,15 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     /// @param workingAiPreferences the dialog-scoped working copy edited by the AI tab; this tab observes its master switch to offer or hide the LLM citation parser
     public WebSearchTab(AiPreferences workingAiPreferences) {
         this.viewModel = new WebSearchTabViewModel(
-                preferences.getImporterPreferences(),
+                preferences,
                 preferences.getGrobidPreferences(),
                 preferences.getDOIPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getLibraryPreferences(),
                 workingAiPreferences.aiFeaturesEnabledCurrentlyProperty(),
-                taskExecutor);
+                taskExecutor,
+                dialogService);
         buildView();
     }
 

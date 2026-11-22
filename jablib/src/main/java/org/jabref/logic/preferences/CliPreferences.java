@@ -102,6 +102,12 @@ public interface CliPreferences {
 
     ImporterPreferences getImporterPreferences();
 
+    /// Saves the complete custom API-key configuration to the keyring and preferences.
+    void saveFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException;
+
+    /// Clears saved custom API keys and makes the supplied keys available for this session.
+    void useSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException;
+
     GrobidPreferences getGrobidPreferences();
 
     XmpPreferences getXmpPreferences();

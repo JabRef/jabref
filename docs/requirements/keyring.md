@@ -37,6 +37,7 @@ Saved custom API keys share one keyring item, so loading them requires one passw
 Normal preferences record only which keys are stored; startup must skip the keyring when no keys are stored or persistence is disabled.
 Blank keys and built-in defaults must not be stored as custom secrets.
 Existing separate entries must be preserved until their values have been written successfully to the shared item.
+If a keyring lookup cannot confirm whether an entry is missing, the migration must leave the separate entries intact and retry on a later load.
 Migration can still require one approval per existing protected item.
 
 Needs: impl, utest
