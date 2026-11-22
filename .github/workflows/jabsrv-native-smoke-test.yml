@@ -65,7 +65,7 @@ jobs:
       # cannot compile JavaFX's Glass toolkit). AWT native libs still aren't bundled, so CAYW
       # detects headless defensively at runtime.
       - name: Set up Liberica NIK (native-image with AWT + JavaFX support)
-        uses: graalvm/setup-graalvm@27b360dbb857524eaf0b4c4cef364d38e5b4f173 # v1.6.7
+        uses: graalvm/setup-graalvm@60e76998d25690099182b796e99b8804da582d90 # v1.6.10
         with:
           distribution: 'liberica'
           java-package: 'jdk+fx'

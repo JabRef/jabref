@@ -115,7 +115,7 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
             LOGGER.warn("Auto-detection of pandoc path failed", exception);
             dialogService.notify(
                     Localization.lang("Auto-detection of pandoc path failed"));
-        });
+        }).failureShownByCaller(true);
 
         taskExecutor.execute(task);
     }

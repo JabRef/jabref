@@ -49,6 +49,10 @@ void convertsToUpperCamelCase(String input, String expected) {
 }
 ```
 
+## Profiling test memory
+
+See [Profiling Gradle test memory with JFR](profiling-gradle-tests.md) for test-worker recordings, allocation analysis, live heap capture, and VisualVM retention analysis.
+
 ## Legacy library migration profiling
 
 Generate a deterministic 100,000-entry migration fixture from the repository root:
@@ -209,6 +213,12 @@ Fetcher tests can be run locally by executing the Gradle task `externalServicesT
 ```
 
 Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `externalServicesTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > externalServicesTest`).
+
+### RTF formatter tests
+
+`RTFCharsTest` covers LaTeX highlighting and character conversion for RTF exports.
+The highlighting tests include commands ending at the field boundary, both without a brace group and with a missing closing brace.
+These inputs must preserve the available text without reading past the end of the field.
 
 ### Converter integration tests
 
