@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,20 +28,58 @@ public class ZoteroCitationMarkParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZoteroCitationMarkParser.class);
 
+    @NullMarked
+    private enum CitationKeyPolicy {
+        ALLOW_ZOTERO_FALLBACK,
+        EXPLICIT_ONLY;
+
+        private Optional<String> getCitationKey(ZoteroCitationData.CitationItemData citationItem) {
+            return switch (this) {
+                case ALLOW_ZOTERO_FALLBACK ->
+                        ZoteroReferenceMark.getCitationKey(citationItem);
+                case EXPLICIT_ONLY ->
+                        ZoteroReferenceMark.getExplicitCitationKey(citationItem);
+            };
+        }
+    }
+
     private ZoteroCitationMarkParser() {
     }
 
     public static List<BibEntry> parseCslCitationJson(String cslJson) {
+        return parseCslCitationJson(cslJson, CitationKeyPolicy.ALLOW_ZOTERO_FALLBACK).stream()
+                                                                                     .map(ParsedEntry::entry)
+                                                                                     .toList();
+    }
+
+    /// Parses citation JSON for import while retaining each Zotero item's identity for deduplication.
+    /// The item identity is separate from the entry's citation key and is never assigned to that key.
+    public static List<ParsedEntry> parseCslCitationJsonForImportWithIdentity(String cslJson) {
+        return parseCslCitationJson(cslJson, CitationKeyPolicy.EXPLICIT_ONLY);
+    }
+
+    /// A parsed entry and its independent Zotero item identity, when the mark contains one.
+    @NullMarked
+    public record ParsedEntry(BibEntry entry, Optional<String> itemIdentity) {
+    }
+
+    private static List<ParsedEntry> parseCslCitationJson(String cslJson, CitationKeyPolicy citationKeyPolicy) {
         if (StringUtil.isBlank(cslJson)) {
             return List.of();
         }
 
         try {
             ZoteroCitationData citationData = GSON.fromJson(cslJson, ZoteroCitationData.class);
-            List<BibEntry> entries = new ArrayList<>();
-            List<ZoteroCitationData.CitationItemData> citationItemDataList = Optional.ofNullable(citationData.citationItems).orElse(List.of());
+            List<ParsedEntry> entries = new ArrayList<>();
+            List<ZoteroCitationData.CitationItemData> citationItemDataList = Optional.ofNullable(citationData)
+                                                                                     .map(data -> Optional.ofNullable(data.citationItems)
+                                                                                                          .orElse(List.of()))
+                                                                                     .orElse(List.of());
             for (ZoteroCitationData.CitationItemData citationItem : citationItemDataList) {
-                toBibEntry(citationItem).ifPresent(entries::add);
+                Optional.ofNullable(citationItem)
+                        .flatMap(item -> toBibEntry(item, citationKeyPolicy)
+                                .map(entry -> new ParsedEntry(entry, ZoteroReferenceMark.getItemIdentity(item))))
+                        .ifPresent(entries::add);
             }
 
             return entries;
@@ -85,10 +124,15 @@ public class ZoteroCitationMarkParser {
     }
 
     public static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem) {
-        return toBibEntry(citationItem.itemData)
-                .map(entry -> ZoteroReferenceMark.getCitationKey(citationItem)
-                                                 .map(entry::withCitationKey)
-                                                 .orElse(entry));
+        return toBibEntry(citationItem, CitationKeyPolicy.ALLOW_ZOTERO_FALLBACK);
+    }
+
+    private static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem, CitationKeyPolicy citationKeyPolicy) {
+        return Optional.ofNullable(citationItem.itemData)
+                       .flatMap(itemData -> toBibEntry(itemData)
+                               .map(entry -> citationKeyPolicy.getCitationKey(citationItem)
+                                                              .map(entry::withCitationKey)
+                                                              .orElse(entry)));
     }
 
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.ItemData itemData) {

@@ -72,14 +72,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private Optional<String> getFieldValue(BibEntry entry) {
         return fields.getFields().stream()
-                     .map(entry::getFieldOrAliasLatexFree)
-                     .flatMap(Optional::stream)
-                     .findFirst();
-    }
-
-    private Optional<String> getFieldValueRaw(BibEntry entry) {
-        return fields.getFields().stream()
-                     .map(entry::getField)
+                     .map(field -> fieldType == FieldType.NAME ? entry.getField(field) : entry.getFieldOrAliasLatexFree(field))
                      .flatMap(Optional::stream)
                      .findFirst();
     }
@@ -93,13 +86,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             // Sort by type.
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
-        } else if (fieldType == FieldType.NAME) {
-            // Authors must be fetched as input by the user
-            // (latexFree strips { and }, which define tokenization and hence alphabetization)
-            // This breaks sorting if letters with umlauts and similar symbols are not entered
-            // directly but makes tokenization work correctly.
-            f1 = getFieldValueRaw(e1).orElse(null);
-            f2 = getFieldValueRaw(e2).orElse(null);
         } else {
             f1 = getFieldValue(e1).orElse(null);
             f2 = getFieldValue(e2).orElse(null);
@@ -116,8 +102,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         // Now we know that both f1 and f2 are != null
         if (fieldType == FieldType.NAME) {
-            // If the author is a single token enclosed in braces, the trailing braces are not
-            // trimmed, even though this technically may affect sorting.
+            // Keep the save order for conventional names, including ties on given-name initials.
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
