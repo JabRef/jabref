@@ -229,6 +229,26 @@ class CustomApiKeyBundleTest {
     }
 
     @Test
+    void preparedSavePublishesSettingsOnlyAfterTheKeyringWrite() throws JabRefException, PasswordAccessException {
+        Set<FetcherApiKey> savedKeys = Set.of(new FetcherApiKey("Previous", true, "saved-key"));
+        preferences.saveFetcherApiKeys(savedKeys);
+        clearInvocations(keyring);
+
+        Set<FetcherApiKey> updatedKeys = Set.of(new FetcherApiKey("Updated", false, "new-key"));
+        CliPreferences.FetcherApiKeySave save = preferences.prepareSavedFetcherApiKeys(updatedKeys);
+        verifyNoInteractions(keyring);
+
+        Runnable commit = save.writeKeyring();
+        verify(keyring).setPassword("org.jabref.apikeys.bundle", "keys", "{\"Updated\":\"new-key\"}");
+        assertEquals(savedKeys, preferences.getImporterPreferences().getApiKeys());
+        assertEquals(List.of("Previous"), preferences.getStringList("fetcherCustomKeyBundleNames"));
+
+        commit.run();
+        assertEquals(updatedKeys, preferences.getImporterPreferences().getApiKeys());
+        assertEquals(List.of("Updated"), preferences.getStringList("fetcherCustomKeyBundleNames"));
+    }
+
+    @Test
     void failedSaveKeepsPreviousKeysAndPreferences() throws JabRefException, PasswordAccessException {
         Set<FetcherApiKey> savedKeys = Set.of(new FetcherApiKey("Previous", true, "saved-key"));
         preferences.saveFetcherApiKeys(savedKeys);

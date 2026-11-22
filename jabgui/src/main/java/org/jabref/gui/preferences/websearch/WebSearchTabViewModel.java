@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -24,10 +25,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -81,7 +80,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final TaskExecutor taskExecutor;
     private final CliPreferences preferences;
-    private final DialogService dialogService;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
@@ -92,8 +90,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                  ImportFormatPreferences importFormatPreferences,
                                  LibraryPreferences libraryPreferences,
                                  ReadOnlyBooleanProperty refAiEnabled,
-                                 TaskExecutor taskExecutor,
-                                 DialogService dialogService) {
+                                 TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.importerPreferences = preferences.getImporterPreferences();
         this.grobidPreferences = grobidPreferences;
@@ -102,7 +99,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.importFormatPreferences = importFormatPreferences;
         this.libraryPreferences = libraryPreferences;
         this.taskExecutor = taskExecutor;
-        this.dialogService = dialogService;
 
         this.refAiEnabled = refAiEnabled;
 
@@ -264,6 +260,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                         .map(FetcherViewModel::getName)
                         .toList());
 
+        Map<String, String> templates = searchEngines.stream()
+                                                     .collect(Collectors.toMap(SearchEngineItem::getName, SearchEngineItem::getUrlTemplate));
+        importerPreferences.setSearchEngineUrlTemplates(templates);
+    }
+
+    public Optional<CliPreferences.FetcherApiKeySave> prepareApiKeySave() {
         Set<FetcherApiKey> apiKeysToStore = fetchers.stream()
                                                     .filter(FetcherViewModel::isCustomizable)
                                                     .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
@@ -271,25 +273,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         Set<FetcherApiKey> newApiKeys = apikeyPersistAvailableProperty.get() ? apiKeysToStore : Set.of();
         boolean persistChanged = importerPreferences.shouldPersistCustomKeys() != apikeyPersistProperty.get();
-        if (persistChanged || !Objects.equals(importerPreferences.getApiKeys(), newApiKeys)) {
-            try {
-                if (apikeyPersistProperty.get()) {
-                    preferences.saveFetcherApiKeys(newApiKeys);
-                } else {
-                    preferences.useSessionFetcherApiKeys(newApiKeys);
-                }
-            } catch (JabRefException ex) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Could not update saved custom API keys"));
-            }
+        if (!persistChanged && Objects.equals(importerPreferences.getApiKeys(), newApiKeys)) {
+            return Optional.empty();
         }
-
-        // Save custom URL templates to preferences
-        Map<String, String> templates = searchEngines.stream()
-                                                     .collect(Collectors.toMap(
-                                                             SearchEngineItem::getName,
-                                                             SearchEngineItem::getUrlTemplate
-                                                     ));
-        importerPreferences.setSearchEngineUrlTemplates(templates);
+        return Optional.of(apikeyPersistProperty.get()
+                           ? preferences.prepareSavedFetcherApiKeys(newApiKeys)
+                           : preferences.prepareSessionFetcherApiKeys(newApiKeys));
     }
 
     public BooleanProperty enableWebSearchProperty() {

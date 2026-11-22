@@ -141,6 +141,8 @@ Further rules:
   An empty name list or disabled persistence prevents keyring reads at startup.
   An absent name list identifies installations that still need migration from separate keyring items.
   Web Search saves the complete key set in one operation and commits preference metadata only after the keyring operation succeeds.
+  The Preferences dialog runs the API-key operation and the final backing-store flush in background tasks.
+  The JavaFX thread applies the API-key settings after the keyring write succeeds.
   Preference imports preserve the local bundle's name list.
   See [ADR 0084](../decisions/0084-bundle-custom-api-keys.md).
 

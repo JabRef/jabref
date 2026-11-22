@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -45,7 +47,10 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -60,24 +65,29 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     /// concern (import/export/reset) and is therefore a footer toggle of the dialog itself,
     /// loaded in [#setValues()] and stored in [#storeAllSettings()] alongside the tabs.
     private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
+    private final ReadOnlyBooleanWrapper saving = new ReadOnlyBooleanWrapper();
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final TaskExecutor taskExecutor;
+    private final WebSearchTab webSearchTab;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
-    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
+    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.taskExecutor = taskExecutor;
 
         // Dialog-scoped working copy of the AI preferences: the AI tab edits it and flushes it to
         // the live preferences on save; the web search tab observes its master switch meanwhile.
         AiPreferences workingAiPreferences = AiPreferences.copyOf(preferences.getAiPreferences());
+        webSearchTab = new WebSearchTab(workingAiPreferences);
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(workingAiPreferences),
+                webSearchTab,
                 new AiTab(workingAiPreferences),
                 new EntryTab(),
                 new TableTab(),
@@ -138,16 +148,15 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                     .ifPresent(exportFile -> {
+                     .ifPresent(exportFile -> storeAllSettings(() -> {
                          try {
-                             storeAllSettings();
                              preferences.exportPreferences(exportFile);
                              preferences.getInternalPreferences().setLastPreferencesExportPath(exportFile);
                          } catch (JabRefException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);
                          }
-                     });
+                     }));
     }
 
     public void showPreferences() {
@@ -186,21 +195,67 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         return true;
     }
 
-    /// @return true if the settings were valid and have been stored
-    public boolean storeAllSettings() {
-        if (!validSettings()) {
-            return false;
+    public ReadOnlyBooleanProperty savingProperty() {
+        return saving.getReadOnlyProperty();
+    }
+
+    /// Calls `onSaved` on the JavaFX thread after valid settings have been stored.
+    public void storeAllSettings(Runnable onSaved) {
+        if (saving.get() || !validSettings()) {
+            return;
         }
 
-        // Store settings
-        preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
+        Optional<CliPreferences.FetcherApiKeySave> keySave = webSearchTab.prepareApiKeySave();
+        saving.set(true);
+        keySave.ifPresentOrElse(
+                save -> BackgroundTask.<Runnable>wrap(save::writeKeyring)
+                                      .onSuccess(commit -> {
+                                          try {
+                                              commit.run();
+                                          } catch (RuntimeException ex) {
+                                              saving.set(false);
+                                              throw ex;
+                                          }
+                                          storeTabsAndFlush(onSaved);
+                                      })
+                                      .onFailure(ex -> {
+                                          saving.set(false);
+                                          LOGGER.warn("Could not update saved custom API keys", ex);
+                                          dialogService.showErrorDialogAndWait(Localization.lang("Could not update saved custom API keys"));
+                                      })
+                                      .executeWith(taskExecutor),
+                () -> storeTabsAndFlush(onSaved));
+    }
+
+    private void storeTabsAndFlush(Runnable onSaved) {
         List<String> restartWarnings = new ArrayList<>();
-        for (PreferencesTab tab : preferenceTabs) {
-            tab.storeSettings();
-            restartWarnings.addAll(tab.getRestartWarnings());
+        try {
+            preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
+            for (PreferencesTab tab : preferenceTabs) {
+                tab.storeSettings();
+                restartWarnings.addAll(tab.getRestartWarnings());
+            }
+            BackgroundTask.wrap(preferences.prepareFlush())
+                          .onSuccess(_ -> {
+                              try {
+                                  finishSave(restartWarnings);
+                              } finally {
+                                  saving.set(false);
+                              }
+                              onSaved.run();
+                          })
+                          .onFailure(ex -> {
+                              saving.set(false);
+                              dialogService.showErrorDialogAndWait(Localization.lang("Save"), ex);
+                          })
+                          .executeWith(taskExecutor);
+        } catch (RuntimeException ex) {
+            saving.set(false);
+            throw ex;
         }
-        preferences.flush();
+    }
 
+    private void finishSave(List<String> restartWarnings) {
         if (!restartWarnings.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Restart required"),
                     String.join(",\n", restartWarnings)
@@ -210,7 +265,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
         dialogService.notify(Localization.lang("Preferences recorded."));
-        return true;
     }
 
     /// Inserts the preference values into the Properties of the ViewModel

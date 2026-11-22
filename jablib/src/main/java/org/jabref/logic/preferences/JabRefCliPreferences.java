@@ -708,7 +708,17 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Calling this method will write all preferences into the preference store.
     @Override
     public void flush() {
-        if (getInternalPreferences().isMemoryStickMode()) {
+        prepareFlush().run();
+    }
+
+    @Override
+    public Runnable prepareFlush() {
+        boolean memoryStickMode = getInternalPreferences().isMemoryStickMode();
+        return () -> flush(memoryStickMode);
+    }
+
+    private void flush(boolean memoryStickMode) {
+        if (memoryStickMode) {
             try {
                 exportPreferences(Path.of("jabref.xml"));
             } catch (JabRefException e) {
@@ -2693,32 +2703,46 @@ public class JabRefCliPreferences implements CliPreferences {
             return;
         }
         try {
-            storeFetcherKeys(preferences.getApiKeys(), preferences.shouldPersistCustomKeys());
-        } catch (PasswordAccessException ex) {
+            prepareFetcherKeyStorage(preferences.getApiKeys(), preferences.shouldPersistCustomKeys()).writeKeyring().run();
+        } catch (JabRefException ex) {
             LOGGER.warn("Could not update saved custom API keys", ex);
         }
     }
 
     @Override
     public void saveFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException {
-        applyFetcherApiKeys(apiKeys, true);
+        prepareSavedFetcherApiKeys(apiKeys).writeKeyring().run();
     }
 
     @Override
     public void useSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException {
-        applyFetcherApiKeys(apiKeys, false);
+        prepareSessionFetcherApiKeys(apiKeys).writeKeyring().run();
     }
 
-    private void applyFetcherApiKeys(Set<FetcherApiKey> apiKeys, boolean persist) throws JabRefException {
+    @Override
+    public FetcherApiKeySave prepareSavedFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
+        return prepareFetcherApiKeySave(apiKeys, true);
+    }
+
+    @Override
+    public FetcherApiKeySave prepareSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
+        return prepareFetcherApiKeySave(apiKeys, false);
+    }
+
+    private FetcherApiKeySave prepareFetcherApiKeySave(Set<FetcherApiKey> apiKeys, boolean persist) {
         Set<FetcherApiKey> requestedKeys = Set.copyOf(apiKeys);
         ImporterPreferences preferences = getImporterPreferences();
-        try {
-            storeFetcherKeys(requestedKeys, persist);
-        } catch (PasswordAccessException ex) {
-            LOGGER.warn("Could not update saved custom API keys", ex);
-            throw new JabRefException("Could not update saved custom API keys", ex);
-        }
+        FetcherApiKeySave save = prepareFetcherKeyStorage(requestedKeys, persist);
+        return () -> {
+            Runnable updateMetadata = save.writeKeyring();
+            return () -> {
+                updateMetadata.run();
+                applyFetcherApiKeys(preferences, requestedKeys, persist);
+            };
+        };
+    }
 
+    private void applyFetcherApiKeys(ImporterPreferences preferences, Set<FetcherApiKey> requestedKeys, boolean persist) {
         updatingFetcherKeys = true;
         try {
             preferences.setPersistCustomKeys(persist);
@@ -2728,7 +2752,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private void storeFetcherKeys(Set<FetcherApiKey> apiKeys, boolean persist) throws PasswordAccessException {
+    private FetcherApiKeySave prepareFetcherKeyStorage(Set<FetcherApiKey> apiKeys, boolean persist) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         Map<String, String> keys = new HashMap<>();
@@ -2741,13 +2765,27 @@ public class JabRefCliPreferences implements CliPreferences {
                 keys.put(apiKey.name(), apiKey.key().trim());
             }
         }
-        if (persist) {
-            storeFetcherKeyBundle(keys);
-        } else {
-            removeSavedFetcherKeys();
-        }
-        putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
-        putStringList(FETCHER_CUSTOM_KEY_USES, uses);
+        Map<String, String> bundle = persist ? Map.copyOf(keys) : Map.of();
+        boolean hasBundleMetadata = hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES);
+        boolean mayHaveSavedKeys = hasBundleMetadata ? !getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty() : hasKey(FETCHER_CUSTOM_KEY_NAMES);
+        List<String> legacyEntries = !persist && !hasBundleMetadata ? getStringList(FETCHER_CUSTOM_KEY_NAMES) : List.of();
+        KeyringUtil keyring = keyring();
+        return () -> {
+            try {
+                if (!bundle.isEmpty() || ((persist || hasBundleMetadata) && mayHaveSavedKeys)) {
+                    keyring.writeFetcherKeyBundle(bundle);
+                } else {
+                    keyring.clearIndividualFetcherKeys(legacyEntries);
+                }
+            } catch (PasswordAccessException ex) {
+                throw new JabRefException("Could not update saved custom API keys", ex);
+            }
+            return () -> {
+                putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, bundle.keySet().stream().sorted().toList());
+                putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
+                putStringList(FETCHER_CUSTOM_KEY_USES, uses);
+            };
+        };
     }
 
     private void clearCustomFetcherKeys() {

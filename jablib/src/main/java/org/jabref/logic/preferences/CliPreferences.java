@@ -39,12 +39,17 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import org.jspecify.annotations.NullMarked;
+
 public interface CliPreferences {
     void clear() throws BackingStoreException;
 
     void deleteKey(String key) throws IllegalArgumentException;
 
     void flush();
+
+    /// Captures the current storage options for a background flush.
+    Runnable prepareFlush();
 
     void exportPreferences(Path file) throws JabRefException;
 
@@ -107,6 +112,19 @@ public interface CliPreferences {
 
     /// Clears saved custom API keys and makes the supplied keys available for this session.
     void useSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException;
+
+    /// Captures the settings for a background keyring write.
+    FetcherApiKeySave prepareSavedFetcherApiKeys(Set<FetcherApiKey> apiKeys);
+
+    /// Captures the settings for clearing saved keys on a background thread.
+    FetcherApiKeySave prepareSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys);
+
+    @FunctionalInterface
+    @NullMarked
+    interface FetcherApiKeySave {
+        /// Performs the keyring operation and returns the update for the preference-owning thread.
+        Runnable writeKeyring() throws JabRefException;
+    }
 
     GrobidPreferences getGrobidPreferences();
 

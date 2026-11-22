@@ -29,6 +29,7 @@ import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> {
@@ -58,9 +59,12 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 preferences.getImportFormatPreferences(),
                 preferences.getLibraryPreferences(),
                 workingAiPreferences.aiFeaturesEnabledCurrentlyProperty(),
-                taskExecutor,
-                dialogService);
+                taskExecutor);
         buildView();
+    }
+
+    public Optional<CliPreferences.FetcherApiKeySave> prepareApiKeySave() {
+        return viewModel.prepareApiKeySave();
     }
 
     @Override
