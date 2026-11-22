@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -52,6 +53,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
+import org.jspecify.annotations.NullMarked;
 
 public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
@@ -65,6 +67,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private final JStyleLoader jStyleLoader;
     private final BstStyleLoader bstStyleLoader;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final PreviewViewerFactory previewViewerFactory;
 
     @FXML private Tab cslStyleTab;
     @FXML private Tab jStyleTab;
@@ -112,6 +115,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @Inject private BibEntryTypesManager bibEntryTypesManager;
 
     private StyleSelectDialogViewModel viewModel;
+    private PreviewViewer bstPreviewViewer;
+    private PreviewViewer cslPreviewViewer;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
 
@@ -121,6 +126,15 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                                  JStyleLoader jStyleLoader,
                                  BstStyleLoader bstStyleLoader,
                                  JournalAbbreviationRepository journalAbbreviationRepository) {
+        this(cslStyleLoader, jStyleLoader, bstStyleLoader, journalAbbreviationRepository, PreviewViewer::new);
+    }
+
+    StyleSelectDialogView(CSLStyleLoader cslStyleLoader,
+                          JStyleLoader jStyleLoader,
+                          BstStyleLoader bstStyleLoader,
+                          JournalAbbreviationRepository journalAbbreviationRepository,
+                          PreviewViewerFactory previewViewerFactory) {
+        this.previewViewerFactory = previewViewerFactory;
         this.cslStyleLoader = cslStyleLoader;
         this.jStyleLoader = jStyleLoader;
         this.bstStyleLoader = bstStyleLoader;
@@ -160,6 +174,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
         tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.setSelectedTab(newValue));
 
+        setupLazyPreview(cslStyleTab, viewModel.selectedCslLayoutProperty(), this::updateCslPreview);
+        setupLazyPreview(jStyleTab, viewModel.selectedJStyleProperty(), this::updateJStylePreview);
+        setupLazyPreview(bstStyleTab, viewModel.selectedBstStyleProperty(), this::updateBstPreview);
+
         updateCurrentStyleLabel();
         addCslButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
@@ -196,10 +214,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             viewModel.setAvailableCslLayoutsFilter(newValue);
             updateCslStylesTable();
         });
-
-        PreviewViewer cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
-        EasyBind.subscribe(viewModel.selectedCslLayoutProperty(), cslPreviewViewer::setLayout);
-        cslPreviewBox.getChildren().add(cslPreviewViewer);
 
         viewModel.getAvailableCslLayouts().addListener((ListChangeListener<CitationStylePreviewLayout>) c -> {
             updateCslStylesTable();
@@ -242,18 +256,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         addJStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
-        // JStyle previews
-        previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
-        jStylePreviewBox.getChildren().add(previewArticle);
-
-        previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
-        jStylePreviewBox.getChildren().add(previewBook);
-
-        EasyBind.subscribe(viewModel.selectedJStyleProperty(), style -> Optional.ofNullable(style).ifPresentOrElse(selected -> {
-            jStylesTable.getSelectionModel().select(selected);
-            previewArticle.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Article)));
-            previewBook.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Book)));
-        }, () -> jStylesTable.getSelectionModel().clearSelection()));
+        EasyBind.subscribe(viewModel.selectedJStyleProperty(), style -> Optional.ofNullable(style).ifPresentOrElse(
+                selected -> jStylesTable.getSelectionModel().select(selected),
+                () -> jStylesTable.getSelectionModel().clearSelection()));
     }
 
     private <T> ValueTableCellFactory<T, Boolean> createDeleteCellFactory(Consumer<T> deleteStyle) {
@@ -272,8 +277,51 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"));
     }
 
+    private void setupLazyPreview(Tab tab, ObservableValue<?> selection, Runnable updatePreview) {
+        Runnable updateIfActive = () -> {
+            if (tab.isSelected()) {
+                updatePreview.run();
+            }
+        };
+        selection.addListener((_, _, _) -> updateIfActive.run());
+        tab.selectedProperty().addListener((_, _, _) -> updateIfActive.run());
+        updateIfActive.run();
+    }
+
+    private void updateCslPreview() {
+        Optional.ofNullable(viewModel.selectedCslLayoutProperty().get()).ifPresent(layout -> {
+            if (cslPreviewBox.getChildren().isEmpty()) {
+                cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+                cslPreviewBox.getChildren().add(cslPreviewViewer);
+            }
+            cslPreviewViewer.setLayout(layout);
+        });
+    }
+
+    private void updateJStylePreview() {
+        Optional.ofNullable(viewModel.selectedJStyleProperty().get()).ifPresent(selected -> {
+            if (jStylePreviewBox.getChildren().isEmpty()) {
+                previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
+                previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
+                jStylePreviewBox.getChildren().addAll(previewArticle, previewBook);
+            }
+            previewArticle.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Article)));
+            previewBook.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Book)));
+        });
+    }
+
+    private void updateBstPreview() {
+        Optional.ofNullable(viewModel.selectedBstStyleProperty().get()).ifPresent(selected -> {
+            if (bstPreviewBox.getChildren().isEmpty()) {
+                bstPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+                bstPreviewBox.getChildren().add(bstPreviewViewer);
+            }
+            bstPreviewViewer.setLayout(BstPreviewLayout.of(selected.getBstStyle()));
+        });
+    }
+
     private PreviewViewer initializePreviewViewer(BibEntry entry) {
-        PreviewViewer viewer = new PreviewViewer(dialogService, preferences, taskExecutor);
+        PreviewViewer viewer = previewViewerFactory.create(dialogService, preferences, taskExecutor);
         viewer.setDatabaseContext(new BibDatabaseContext());
         viewer.setEntry(entry);
         return viewer;
@@ -361,16 +409,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         bstStylesTable.setItems(viewModel.bstStylesProperty());
         addBstStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
-        // Preview - updates whenever the selected BST style changes
-        PreviewViewer bstPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
-        bstPreviewBox.getChildren().add(bstPreviewViewer);
+        EasyBind.subscribe(viewModel.selectedBstStyleProperty(), style -> Optional.ofNullable(style).ifPresentOrElse(
+                selected -> bstStylesTable.getSelectionModel().select(selected),
+                () -> bstStylesTable.getSelectionModel().clearSelection()));
 
-        EasyBind.subscribe(viewModel.selectedBstStyleProperty(), style -> Optional.ofNullable(style).ifPresentOrElse(selected -> {
-            bstStylesTable.getSelectionModel().select(selected);
-            bstPreviewViewer.setLayout(BstPreviewLayout.of(selected.getBstStyle()));
-        }, () -> bstStylesTable.getSelectionModel().clearSelection()));
-
-        // Select the first style if nothing is selected yet (so preview is not blank on open)
+        // Select the first style if nothing is selected yet
         if (viewModel.selectedBstStyleProperty().get() == null && !bstStylesTable.getItems().isEmpty()) {
             bstStylesTable.getSelectionModel().selectFirst();
         }
@@ -406,6 +449,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML
     private void addBstStyleFile() {
         viewModel.addBstStyleFile();
+    }
+
+    @NullMarked
+    @FunctionalInterface
+    interface PreviewViewerFactory {
+        PreviewViewer create(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor);
     }
 
     /// When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.

@@ -72,10 +72,17 @@ It is an action-local facade, not a document subtype or immutable snapshot; its 
 
 Preparation reads and validates the document, establishes citation order, and renders the proposed cited set before document mutation.
 `CitationGroupEditor` prepares merge/separate replacements and applies structural citation changes inside the caller's write session.
-`CitationFormatConverter` prepares conversion between canonical and native Zotero citation marks on the next CSL insertion.
-`ConversionMetadata` preserves the associated citation state for conversion round trips.
+`CitationEngine.requiresFormatConversion` reads fresh Writer reference-mark names on each insertion, including after reconnecting, and decides solely from the first recognized name.
+Recognized formats are canonical `JABREF_<keys> <TYPE> <uid>`, supported legacy `JR_cite` names, and native Zotero citation names; unrelated marks and unsupported `CID_n` marks are skipped.
+Detection does not scan for later mismatching formats; no recognized name means no conversion.
+Conversion is supported for homogeneous source documents; mixed-source conversion and mixed-format repair are unsupported.
+UNO name enumeration is not guaranteed sorted or in physical document order; enumeration order is immaterial for homogeneous documents.
+When detection triggers canonical/native Zotero conversion on CSL insertion, `CitationFormatConverter` uses its existing group-reading and preparation path.
+`ConversionMetadata` preserves the associated citation state for conversion round trips, using one action-local sidecar index without a persistent lookup cache or relaxed validation.
 The conversion preparation path also handles one-way migration of supported legacy JStyle `JR_cite` marks on the next insertion outside effective native Zotero mode: always for JStyle/BST, and for CSL with the saved compatibility setting off.
-It prepares all legacy groups with existing canonical groups and the pending citation, renders once before writes, and reuses the existing rollback-capable conversion transaction.
+When detection selects migration, preparation renders once before writes and uses the rollback-capable conversion transaction.
+Legacy-only canonical migration permits unresolved entries with ordinary placeholders and the insertion warning; native-to-canonical conversion and native generation still require resolved sources.
+JStyle/BST insertion does not convert native Zotero input.
 `PreparedInsertion.applyCitations` replaces marks and their metadata without bibliography-style validation or bibliography writes; `CitationEngine` separately handles normal insertion's optional bibliography synchronization.
 Canonical storage reading is separate from legacy detection; `CID_n` is unmanaged, and insertion or conversion targeting native Zotero format leaves `JR_cite` marks unchanged.
 
@@ -91,8 +98,10 @@ Ordering precedes controller locking because visual ordering needs to move Write
 `BibliographySection` manages bibliography sections; `CitedEntryExporter` resolves cited keys into a library without accessing Writer.
 
 `ZoteroCitationStrategy` owns native Zotero storage, ordering, validation, and write policy separately from canonical storage, while using the same `CslRenderer`.
-`ZoteroCitationLinker` prepares URI-link changes without modifying the document, and `ZoteroDocumentPreferences` handles native style preferences.
-Native document-preference writes use raw property APIs; conversion registers undo deltas for its prepared changes.
+`ZoteroCitationLinker` prepares URI-link changes without modifying the document and skips linking an empty native citation set.
+Flattened entries and native item IDs are prepared only for native output.
+`ZoteroDocumentPreferences` updates `ZOTERO_PREF` only for native-mode insertion/refresh, with undo deltas for conversion targeting native mode.
+Canonical CSL operations and conversions leave that XML untouched while still recording JabRef's applied style.
 Conversion changes citation marks only: normal synchronization leaves all bibliographies unchanged when disabled and updates only the target mode's managed bibliography when enabled.
 For conversion preparation, property undo, and rollback limits, see the [overview](overview.md#compatibility-boundary) and [ADR-0084](../../decisions/0084-canonical-writer-citations.md#conversion-on-the-next-csl-citation-insertion).
 
@@ -104,6 +113,7 @@ Derived citation numbers and rendered text do not belong to that identity.
 `CitationIds` generates new identities without constraining how existing opaque identifiers are read.
 
 `MarkStore` reads canonical identities and per-citation page information, indexed by storage order.
+Only explicit refresh performs a global orphan page-info sweep; properties for replaced or removed citations are still removed immediately.
 `CitationMarkerWriter` writes prepared `OOText` inside existing marks and keeps a bounded, connection-local formatted-output baseline rather than a persistent rendering cache.
 `DocumentStyleStore` records the last successfully applied style family and identifier.
 `UndoableDocumentProperties` registers custom-property undo deltas for page information and citation conversion metadata.
@@ -131,12 +141,14 @@ These types contain no live UNO ranges.
 - `createCitationMarker(...)` and `getNormalizedCitationMarker(...)` delegate author-year and partial-type formatting to `JStyleCitationFormatter`.
 
 `JStyleRenderer` invokes the processor and uses `JStyleBibliographyFormatter.formatBibliographyEntry` for requested bibliography paragraphs before returning a `RenderResult`.
+JStyle bibliography paragraph styles are validated only when bibliography output is requested.
 `OOPreFormatter` converts LaTeX to Unicode and `OOText` tags for layout output.
 `OOText` and `OOFormat` describe that output; only the logic-layer `OOTextWriter` interprets it into Writer text.
 
 `OOStyle` is the common selectable-style interface for `JStyle`, `CitationStyle`, and `BstStyle`.
 `BstStyle.getBstVM()` exposes its cached parsed program rather than creating a new VM.
 BST whole-cited-set rendering and citation labels belong to `BstRenderer` and `BstCitationFormatter`; Pandoc conversion helpers are in `logic.openoffice.bst`.
+`AUTHOR_YEAR` notation without requested bibliography output skips BST execution; other notations retain program-derived labels and ordering.
 `CSLFormatUtils` adapts CSL-generated markup rather than selecting a renderer or managing document citations.
 
 ## Writer infrastructure and ordering

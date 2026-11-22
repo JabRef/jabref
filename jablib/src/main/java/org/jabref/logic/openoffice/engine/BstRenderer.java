@@ -67,23 +67,26 @@ public final class BstRenderer implements CitationRenderer {
     public RenderResult render(RenderRequest request) throws RenderException {
         CitationKeyResolution data = new CitationKeyResolution(request);
         try {
-            List<BibEntry> entries = data.flattenedEntries();
-            ConvertToBibtexCleanup cleanup = new ConvertToBibtexCleanup();
-            entries.forEach(cleanup::cleanup);
-            List<BibItem> items = entries.isEmpty() ? List.of() : BstCitationFormatter.parseBibliography(new BstVM(style.getSource()).render(entries, new BibDatabase(entries)));
             Map<String, BibItem> byKey = new LinkedHashMap<>();
-            items.forEach(item -> byKey.putIfAbsent(item.key(), item));
-            for (String key : data.resolvedKeys()) {
-                if (!byKey.containsKey(key)) {
-                    throw new RenderException("The BST style omitted cited entry " + key);
+            Map<String, Integer> numbers = Map.of();
+            if (request.options().includeBibliography() || request.options().bstCitationFormat() != BstCitationFormat.AUTHOR_YEAR) {
+                List<BibEntry> entries = data.flattenedEntries();
+                ConvertToBibtexCleanup cleanup = new ConvertToBibtexCleanup();
+                entries.forEach(cleanup::cleanup);
+                List<BibItem> items = entries.isEmpty() ? List.of() : BstCitationFormatter.parseBibliography(new BstVM(style.getSource()).render(entries, new BibDatabase(entries)));
+                items.forEach(item -> byKey.putIfAbsent(item.key(), item));
+                for (String key : data.resolvedKeys()) {
+                    if (!byKey.containsKey(key)) {
+                        throw new RenderException("The BST style omitted cited entry " + key);
+                    }
+                    if (request.options().bstCitationFormat() == BstCitationFormat.STYLE_DEFINED) {
+                        label(byKey.get(key));
+                    }
                 }
-                if (request.options().bstCitationFormat() == BstCitationFormat.STYLE_DEFINED) {
-                    label(byKey.get(key));
-                }
+                List<String> order = style.hasSortCommand() || request.options().bstCitationFormat() != BstCitationFormat.NUMERIC
+                                     ? items.stream().map(BibItem::key).toList() : List.of();
+                numbers = CitationNumbering.bibliographyOrder(data.resolvedKeys(), order);
             }
-            List<String> order = style.hasSortCommand() || request.options().bstCitationFormat() != BstCitationFormat.NUMERIC
-                                 ? items.stream().map(BibItem::key).toList() : List.of();
-            Map<String, Integer> numbers = CitationNumbering.bibliographyOrder(data.resolvedKeys(), order);
             Map<CitationGroupId, OOText> markers = new LinkedHashMap<>();
             for (CitationGroup group : request.groupsInDocumentOrder()) {
                 String text = switch (request.options().bstCitationFormat()) {

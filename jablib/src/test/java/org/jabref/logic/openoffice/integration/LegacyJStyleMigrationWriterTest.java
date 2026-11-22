@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,6 +17,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.backend.ReferenceMarkTextWriter;
 import org.jabref.logic.openoffice.backend.WriterReferenceMark;
@@ -52,7 +54,9 @@ import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.util.OOResult;
 
+import com.sun.star.beans.PropertyAttribute;
 import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.document.XDocumentPropertiesSupplier;
 import com.sun.star.document.XUndoManager;
@@ -146,7 +150,8 @@ class LegacyJStyleMigrationWriterTest {
         String repeated = "JR_cite42_1_beta,alpha,beta";
         legacyTypes.put(repeated, CitationType.AUTHORYEAR_PAR);
         appendMark(document, repeated, "Repeated group without page information");
-        String canonical = createCanonical(document);
+        String singleKeyLegacy = "JR_cite88_1_alpha";
+        appendLegacy(document, singleKeyLegacy, "Single-key legacy citation", "p. 88");
         appendLegacy(document, CID, "Unsupported CID text", "Untouched CID metadata");
         OpenOfficePreferences preferences = preferences(savedZoteroMode);
         OOStyle style = style(family);
@@ -174,7 +179,7 @@ class LegacyJStyleMigrationWriterTest {
                 assertEquals(List.of(), success(engine.insert(List.of(database.getEntryByCitationKey("gamma").orElseThrow()), List.of(database), style,
                         CitationType.AUTHORYEAR_PAR, "p. 90", position, true)));
             }
-            assertEquals(1, renders.size(), "Render the complete migrated, canonical and pending citation set once");
+            assertEquals(1, renders.size(), "Render the complete migrated and pending citation set once");
             assertEquals(9, renders.getFirst().groupsInDocumentOrder().size());
             assertEquals(List.of(GROUP_KEYS, GROUP_KEYS, GROUP_KEYS, GROUP_KEYS, GROUP_KEYS, GROUP_KEYS, GROUP_KEYS, List.of("alpha"), List.of("gamma")),
                     renders.getFirst().groupsInDocumentOrder().stream()
@@ -200,7 +205,6 @@ class LegacyJStyleMigrationWriterTest {
                 assertEquals(GROUP_KEYS, data.citationKeys());
                 assertEquals(legacyTypes.get(oldName), data.citationType());
                 assertFalse(data.uniqueId().isBlank());
-                assertNotEquals("stable_current", data.uniqueId());
                 assertNotEquals(oldName, data.uniqueId());
                 assertNotEquals("42", data.uniqueId());
                 List<Optional<String>> pages = List.of(Optional.empty(), Optional.empty(), index < 6 ? Optional.of("p. " + (index + 1)) : Optional.empty());
@@ -208,7 +212,11 @@ class LegacyJStyleMigrationWriterTest {
                 assertFalse(WriterReferenceMarks.getListOfNames(document).contains(oldName));
                 assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(document, oldName));
             }
-            assertGroup(document, canonical, List.of("alpha"), CitationType.AUTHORYEAR_PAR, List.of(Optional.of("p. 88")));
+            String singleKeyMigrated = names.stream().filter(name -> decode(name).citationKeys().equals(List.of("alpha"))).findFirst().orElseThrow();
+            migratedNames.put(singleKeyLegacy, singleKeyMigrated);
+            assertFalse(WriterReferenceMarks.getListOfNames(document).contains(singleKeyLegacy));
+            assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(document, singleKeyLegacy));
+            assertGroup(document, singleKeyMigrated, List.of("alpha"), CitationType.AUTHORYEAR_PAR, List.of(Optional.of("p. 88")));
             String pending = names.stream().filter(name -> decode(name).citationKeys().equals(List.of("gamma"))).findFirst().orElseThrow();
             assertGroup(document, pending, List.of("gamma"), CitationType.AUTHORYEAR_PAR, List.of(Optional.of("p. 90")));
             assertEquals("Unsupported CID text", WriterReferenceMarks.getAnchor(document, CID).orElseThrow().getString());
@@ -244,7 +252,6 @@ class LegacyJStyleMigrationWriterTest {
             assertEquals(data.uniqueId(), new MarkStore().readCitationGroupFromDocumentOrThrow(reopened, name).groupId.citationGroupIdAsString());
             assertBoundaries(reopened, name, data.citationType());
         }
-        assertTrue(canonicalNames(reopened).contains(canonical));
         assertEquals(10, canonicalNames(reopened).size());
     }
 
@@ -298,31 +305,25 @@ class LegacyJStyleMigrationWriterTest {
     }
 
     @Test
-    void nativeCslInsertionLeavesLegacyTextAndMetadataUntilNextCanonicalInsertion() throws Exception {
+    void nativeCslInsertionLeavesLegacyTextAndMetadataWithoutDirectConversion() throws Exception {
         XTextDocument document = office.newDocument();
         String legacy = "JR_cite0_2_beta,alpha";
         appendLegacy(document, legacy, "Legacy in-text citation", "pp. 7–9");
         appendLegacy(document, CID, "CID text", "CID metadata");
         OpenOfficePreferences preferences = preferences(true);
         OOStyle style = style("csl");
+        // Keep non-undoable native preference creation outside the citation Undo assertion.
+        assertTrue(ZoteroDocumentPreferences.writeCitationStyle(document, (CitationStyle) style));
         try (CitationEngine engine = engine(document, preferences)) {
             assertFalse(success(engine.requiresFormatConversion(style)));
+            XUndoManager undo = UnoUndo.getXUndoManager(document).orElseThrow();
+            undo.clear();
+            Snapshot before = snapshot(document);
             insert(engine, style, end(document), false);
             assertEquals("Legacy in-text citation", WriterReferenceMarks.getAnchor(document, legacy).orElseThrow().getString());
             assertEquals(Optional.of("pp. 7–9"), UnoUserDefinedProperty.getStringValue(document, legacy));
             assertEquals(List.of(), canonicalNames(document));
             assertEquals(1, nativeNames(document).size());
-            preferences.setZoteroCompatibilityMode(false);
-            assertTrue(success(engine.requiresFormatConversion(style)));
-            XUndoManager undo = UnoUndo.getXUndoManager(document).orElseThrow();
-            undo.clear();
-            Snapshot before = snapshot(document);
-            insert(engine, style, end(document), false);
-            assertEquals(List.of(), nativeNames(document));
-            assertFalse(WriterReferenceMarks.getListOfNames(document).contains(legacy));
-            assertEquals(3, canonicalNames(document).size());
-            String migrated = canonicalNames(document).stream().filter(name -> decode(name).citationKeys().equals(List.of("beta", "alpha"))).findFirst().orElseThrow();
-            assertGroup(document, migrated, List.of("beta", "alpha"), CitationType.AUTHORYEAR_INTEXT, List.of(Optional.empty(), Optional.of("pp. 7–9")));
             assertEquals("CID text", WriterReferenceMarks.getAnchor(document, CID).orElseThrow().getString());
             assertEquals(Optional.of("CID metadata"), UnoUserDefinedProperty.getStringValue(document, CID));
             Snapshot after = snapshot(document);
@@ -336,32 +337,142 @@ class LegacyJStyleMigrationWriterTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    void jstyleMigrationLeavesNativeZoteroMarksAndPropertiesUntouched(boolean savedZoteroMode) throws Exception {
+    void jstyleInsertionLeavesNativeZoteroMarksAndPropertiesUntouched(boolean savedZoteroMode) throws Exception {
         XTextDocument document = office.newDocument();
         String nativeName = ZoteroReferenceMark.PREFIX + Files.readString(resource("zotero-native.json")).strip() + " RNDnative1234";
         appendMark(document, nativeName, "Native text must not be rendered by JStyle");
         UnoUserDefinedProperty.setStringProperty(document, "ZOTERO_PREF_1", "Native preferences must stay unchanged");
-        appendLegacy(document, "JR_cite12_1_beta,alpha", "Old JStyle text", "p. 5");
         try (CitationEngine engine = engine(document, preferences(savedZoteroMode))) {
             OOStyle style = style("jstyle");
-            assertTrue(success(engine.requiresFormatConversion(style)));
+            assertFalse(success(engine.requiresFormatConversion(style)));
             insert(engine, style, end(document), false);
             assertFalse(success(engine.requiresFormatConversion(style)));
         }
         assertEquals(List.of(nativeName), nativeNames(document));
         assertEquals("Native text must not be rendered by JStyle", WriterReferenceMarks.getAnchor(document, nativeName).orElseThrow().getString());
         assertEquals(Optional.of("Native preferences must stay unchanged"), UnoUserDefinedProperty.getStringValue(document, "ZOTERO_PREF_1"));
-        assertEquals(2, canonicalNames(document).size());
+        assertEquals(1, canonicalNames(document).size());
     }
 
     @ParameterizedTest
-    @CsvSource({"jstyle, missing", "csl, missing", "jstyle, render", "csl, render",
-            "jstyle, protected-source", "csl, protected-source", "jstyle, protected-cursor", "csl, protected-cursor"})
-    void unresolvedKeysRenderFailuresAndProtectedRangesLeaveNoWritesOrUndo(String family, String failure) throws Exception {
+    @ValueSource(strings = {"jstyle", "csl"})
+    void missingLibraryMigrationReturnsUnresolvedKeysAndRefreshRestoresOutputWithoutChangingMetadata(String family) throws Exception {
+        XTextDocument document = office.newDocument();
+        String legacy = "JR_cite3_1_beta,alpha,beta";
+        String inText = "JR_cite4_2_beta";
+        appendLegacy(document, legacy, "Original legacy group", "pp. 11–13");
+        appendLegacy(document, inText, "Original in-text citation", "p. 19");
+        BibDatabase available = new BibDatabase(List.of(database.getEntryByCitationKey("alpha").orElseThrow(), database.getEntryByCitationKey("gamma").orElseThrow()));
+        OOStyle style = style(family);
+        XUndoManager undo = UnoUndo.getXUndoManager(document).orElseThrow();
+        undo.clear();
+        Map<String, String> unresolvedText;
+        List<String> migratedNames;
+        try (CitationEngine engine = engine(document, preferences(false))) {
+            assertTrue(success(engine.requiresFormatConversion(style)));
+            XTextCursor cursor = end(document);
+            Snapshot before = snapshot(document);
+            assertEquals(List.of("beta"), success(engine.insert(List.of(available.getEntryByCitationKey("gamma").orElseThrow()), List.of(available), style,
+                    CitationType.AUTHORYEAR_PAR, "p. 23", cursor, true)));
+            assertFalse(success(engine.requiresFormatConversion(style)));
+            migratedNames = canonicalNames(document);
+            assertEquals(3, migratedNames.size());
+            assertEquals(Set.of(GROUP_KEYS, List.of("beta"), List.of("gamma")),
+                    Set.copyOf(migratedNames.stream().map(name -> decode(name).citationKeys()).toList()));
+            assertEquals(List.of(), nativeNames(document));
+            assertFalse(WriterReferenceMarks.getListOfNames(document).contains(legacy));
+            assertFalse(WriterReferenceMarks.getListOfNames(document).contains(inText));
+            assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(document, legacy));
+            assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(document, inText));
+            for (String name : migratedNames) {
+                JabRefMarkData data = decode(name);
+                assertFalse(data.uniqueId().isBlank());
+                if (data.citationKeys().equals(GROUP_KEYS)) {
+                    assertGroup(document, name, GROUP_KEYS, CitationType.AUTHORYEAR_PAR,
+                            List.of(Optional.empty(), Optional.empty(), Optional.of("pp. 11–13")));
+                } else if (data.citationKeys().equals(List.of("beta"))) {
+                    assertGroup(document, name, List.of("beta"), CitationType.AUTHORYEAR_INTEXT, List.of(Optional.of("p. 19")));
+                } else {
+                    assertGroup(document, name, List.of("gamma"), CitationType.AUTHORYEAR_PAR, List.of(Optional.of("p. 23")));
+                }
+                if (data.citationKeys().contains("beta")) {
+                    assertTrue(WriterReferenceMarks.getAnchor(document, name).orElseThrow().getString().contains("Unresolved(beta)"));
+                }
+            }
+            Snapshot migrated = snapshot(document);
+            unresolvedText = migrated.marks();
+            assertEquals(1, undo.getAllUndoActionTitles().length);
+            undo.undo();
+            assertEquals(before, snapshot(document));
+            undo.redo();
+            assertEquals(migrated, snapshot(document));
+        }
+        XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("missing-library-" + family + ".odt"));
+        assertEquals(unresolvedText, snapshot(reopened).marks());
+        Map<String, Object> metadata = snapshot(reopened).properties();
+        try (CitationEngine engine = engine(reopened, preferences(false))) {
+            assertEquals(List.of(), success(engine.refresh(List.of(database), style)));
+        }
+        assertEquals(migratedNames, canonicalNames(reopened));
+        assertEquals(metadata, snapshot(reopened).properties());
+        for (String name : migratedNames) {
+            String recovered = WriterReferenceMarks.getAnchor(reopened, name).orElseThrow().getString();
+            assertBoundaries(reopened, name, decode(name).citationType());
+            assertFalse(recovered.contains("Unresolved("));
+            if (decode(name).citationKeys().contains("beta")) {
+                assertNotEquals(unresolvedText.get(name), recovered);
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"malformed", "readonly", "nonstring"})
+    void cslLegacyMigrationIgnoresUnusableNativePreferences(String kind) throws Exception {
         XTextDocument document = office.newDocument();
         String legacy = "JR_cite3_1_beta,alpha";
         appendLegacy(document, legacy, "Original legacy text", "p. 11");
-        createCanonical(document);
+        XPropertyContainer properties = UnoUserDefinedProperty.getPropertyContainer(document).orElseThrow();
+        short attributes = PropertyAttribute.REMOVEABLE;
+        if ("readonly".equals(kind)) {
+            attributes |= PropertyAttribute.READONLY;
+        }
+        Object value = switch (kind) {
+            case "nonstring" ->
+                    42;
+            case "readonly" ->
+                    "<data data-version=\"3\"><style id=\"untouched-native-style\"/>";
+            default ->
+                    "Not native preference XML";
+        };
+        properties.addProperty("ZOTERO_PREF_1", attributes, value);
+        properties.addProperty("ZOTERO_PREF_2", PropertyAttribute.REMOVEABLE, "</data>");
+        Snapshot before = snapshot(document);
+        CitationStyle style = (CitationStyle) style("csl");
+        try (CitationEngine engine = engine(document, preferences(false));
+             MockedStatic<ZoteroDocumentPreferences> nativePreferences = mockStatic(ZoteroDocumentPreferences.class, invocation ->
+                     fail("Canonical migration must not access native preferences: " + invocation.getMethod().getName()))) {
+            assertTrue(success(engine.requiresFormatConversion(style)));
+            insert(engine, style, end(document), false);
+            assertFalse(success(engine.requiresFormatConversion(style)));
+            nativePreferences.verifyNoInteractions();
+        }
+        assertEquals(2, canonicalNames(document).size());
+        assertFalse(WriterReferenceMarks.getListOfNames(document).contains(legacy));
+        String migrated = canonicalNames(document).stream().filter(name -> decode(name).citationKeys().equals(List.of("beta", "alpha"))).findFirst().orElseThrow();
+        assertGroup(document, migrated, List.of("beta", "alpha"), CitationType.AUTHORYEAR_PAR, List.of(Optional.empty(), Optional.of("p. 11")));
+        assertEquals(before.properties().get("ZOTERO_PREF_1"), snapshot(document).properties().get("ZOTERO_PREF_1"));
+        assertEquals(before.properties().get("ZOTERO_PREF_2"), snapshot(document).properties().get("ZOTERO_PREF_2"));
+        assertEquals(Optional.of(new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, style.getStyleId())), new DocumentStyleStore().read(document));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"jstyle, render", "csl, render",
+            "jstyle, protected-source", "csl, protected-source", "jstyle, protected-cursor", "csl, protected-cursor"})
+    void renderFailuresAndProtectedRangesLeaveNoWritesOrUndo(String family, String failure) throws Exception {
+        XTextDocument document = office.newDocument();
+        String legacy = "JR_cite3_1_beta,alpha";
+        appendLegacy(document, legacy, "Original legacy text", "p. 11");
+        appendLegacy(document, "JR_cite88_1_alpha", "Single-key legacy citation", "p. 88");
         OOStyle style = style(family);
         XTextCursor cursor = end(document);
         if (failure.startsWith("protected")) {
@@ -381,9 +492,6 @@ class LegacyJStyleMigrationWriterTest {
         if ("render".equals(failure)) {
             style = failingStyle(family);
         }
-        List<BibDatabase> sources = "missing".equals(failure)
-                                    ? List.of(new BibDatabase(List.of(database.getEntryByCitationKey("alpha").orElseThrow(), database.getEntryByCitationKey("gamma").orElseThrow())))
-                                    : List.of(database);
         XUndoManager undo = UnoUndo.getXUndoManager(document).orElseThrow();
         undo.clear();
         UnoRedlines.setRecordChanges(document, true);
@@ -402,7 +510,7 @@ class LegacyJStyleMigrationWriterTest {
              })) {
             assertTrue(success(engine.requiresFormatConversion(style)));
             Snapshot before = snapshot(document);
-            assertTrue(engine.insert(List.of(database.getEntryByCitationKey("gamma").orElseThrow()), sources, style,
+            assertTrue(engine.insert(List.of(database.getEntryByCitationKey("gamma").orElseThrow()), List.of(database), style,
                     CitationType.AUTHORYEAR_PAR, "", cursor, true).isError());
             assertEquals(before, snapshot(document));
             assertEquals(0, undo.getAllUndoActionTitles().length);
@@ -417,7 +525,7 @@ class LegacyJStyleMigrationWriterTest {
         XTextDocument document = office.newDocument();
         String legacy = "JR_cite9_1_beta,alpha";
         appendLegacy(document, legacy, "Original legacy text", "pp. 3–5");
-        createCanonical(document);
+        appendLegacy(document, "JR_cite88_1_alpha", "Single-key legacy citation", "p. 88");
         UnoUserDefinedProperty.setStringProperty(document, DocumentStyleStore.PROPERTY_NAME, "JSTYLE\noriginal style");
         UnoRedlines.setRecordChanges(document, true);
         Snapshot before = snapshot(document);
@@ -467,11 +575,6 @@ class LegacyJStyleMigrationWriterTest {
             result.markers().forEach((id, text) -> renderedMarkers.put(id.citationGroupIdAsString(), text));
             return result;
         });
-    }
-
-    private String createCanonical(XTextDocument document) throws Exception {
-        return new MarkStore().createCitationGroup(document, office.context(), List.of("alpha"), List.of(Optional.of(OOText.fromString("p. 88"))),
-                CitationType.AUTHORYEAR_PAR, separatedEnd(document), false, false, "stable_current").getReferenceMarkNameForLinking().orElseThrow();
     }
 
     private static void assertGroup(XTextDocument document, String name, List<String> keys, CitationType type, List<Optional<String>> pages) throws Exception {

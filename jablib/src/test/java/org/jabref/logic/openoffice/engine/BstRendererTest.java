@@ -19,6 +19,8 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.jabref.logic.openoffice.engine.RendererTestData.SIMPLE_BST;
 import static org.jabref.logic.openoffice.engine.RendererTestData.entry;
@@ -134,6 +136,62 @@ class BstRendererTest {
         RenderResult result = new BstRenderer(style(SIMPLE_BST), pandoc).render(request);
 
         assertEquals(List.of(), result.bibliography());
+        verifyNoInteractions(pandoc);
+    }
+
+    @Test
+    void authorYearCitationOnlySkipsBstSourceButBibliographyStillRequiresIt() throws RenderException {
+        BstStyle style = mock(BstStyle.class);
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        BstRenderer renderer = new BstRenderer(style, pandoc);
+        RenderRequest original = request(List.of(group("g", CitationType.AUTHORYEAR_PAR, "a", "missing")), List.of(entry("a", "A")));
+        RenderRequest citationOnly = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(BstCitationFormat.AUTHOR_YEAR, false, "", "", "", false));
+
+        RenderResult result = renderer.render(citationOnly);
+
+        assertEquals(List.of("(Smith, 2020; Unresolved(missing))"), markers(citationOnly, result));
+        assertEquals(List.of("missing"), result.unresolvedKeys());
+        assertEquals(List.of(), result.bibliography());
+        verifyNoInteractions(style, pandoc);
+
+        IllegalArgumentException failure = new IllegalArgumentException("BST source unavailable");
+        when(style.getSource()).thenThrow(failure);
+        RenderException error = assertThrows(RenderException.class, () -> renderer.render(withFormat(original, BstCitationFormat.AUTHOR_YEAR)));
+
+        assertSame(failure, error.getCause());
+        verify(style).getSource();
+        verifyNoInteractions(pandoc);
+    }
+
+    @Test
+    void numericCitationOnlyStillUsesBstSortOrder() throws IOException, RenderException {
+        String sorted = SIMPLE_BST.replace("READ", "FUNCTION {sorter} { title 'sort.key$ := }\nREAD\nITERATE {sorter}\nSORT");
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        RenderRequest original = request(List.of(group("z", CitationType.AUTHORYEAR_PAR, "z"), group("a", CitationType.AUTHORYEAR_PAR, "a")),
+                List.of(entry("z", "Zebra"), entry("a", "Alpha")));
+        RenderRequest citationOnly = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(BstCitationFormat.NUMERIC, false, "", "", "", false));
+
+        RenderResult result = new BstRenderer(style(sorted), pandoc).render(citationOnly);
+
+        assertEquals(List.of("[2]", "[1]"), markers(citationOnly, result));
+        assertEquals(List.of(), result.bibliography());
+        verifyNoInteractions(pandoc);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = BstCitationFormat.class, names = {"NUMERIC", "STYLE_DEFINED"})
+    void citationOnlyStillRejectsOmittedBstItemsForOutputDependentFormats(BstCitationFormat format) throws IOException {
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        BstStyle style = style("ENTRY { title } {} {}\nREAD\n");
+        RenderRequest original = request(List.of(group("g", CitationType.AUTHORYEAR_PAR, "a")), List.of(entry("a", "A")));
+        RenderRequest citationOnly = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(format, false, "", "", "", false));
+
+        RenderException error = assertThrows(RenderException.class, () -> new BstRenderer(style, pandoc).render(citationOnly));
+
+        assertEquals("The BST style omitted cited entry a", error.getMessage());
         verifyNoInteractions(pandoc);
     }
 

@@ -61,8 +61,12 @@ final class CitationKeyResolution {
     /// Resolve against each entry's own library before combining libraries, including inherited fields
     /// and strings. This avoids losing crossrefs or resolving a string using another library's value.
     List<BibEntry> flattenedEntries() throws RenderException {
+        return flattenedEntries(resolvedKeys());
+    }
+
+    List<BibEntry> flattenedEntries(List<String> keys) throws RenderException {
         List<BibEntry> result = new ArrayList<>();
-        for (String key : resolvedKeys()) {
+        for (String key : keys) {
             CitationLookupResult source = resolved(key);
             BibEntry copy = new BibEntry(source.entry).withCitationKey(key);
             SequencedSet<Field> fields = new LinkedHashSet<>(List.of(StandardField.values()));

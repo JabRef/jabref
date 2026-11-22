@@ -73,7 +73,8 @@ The older GUI already used undo contexts for citation insertion including mark c
 What those contexts did not restore was custom document-property state, as the old Manage citations comment explicitly noted for page information.
 The canonical integration now registers custom undo actions through `UndoableDocumentProperties` for per-citation page-info properties.
 Merge and Separate combine structural edits, final formatted output, and page-info changes in one undo context.
-Next-CSL-insertion format conversion also includes its citation sidecar and prepared applied-style and Zotero preference properties in one owned root undo context.
+Next-CSL-insertion format conversion also includes its citation sidecar and prepared applied-style properties in one owned root undo context, with Zotero preference deltas only when targeting native mode.
+Canonical CSL operations and conversions leave `ZOTERO_PREF` XML untouched; native-mode insertion or refresh updates it.
 The conversion-failure rollback described below is new recovery behavior to prevent partial citation corruption after ordinary application failures.
 `DocumentWriteSession.writeWithRollback` requires unlocked undo support, rejects nesting, and rolls back ordinary application failures only after closing and verifying ownership of that context.
 Starting the write transaction can clear pre-existing redo history even when rollback restores the document; disconnects, lost ownership, and rollback failures require a distinct recovery error rather than an unconditional rollback claim.

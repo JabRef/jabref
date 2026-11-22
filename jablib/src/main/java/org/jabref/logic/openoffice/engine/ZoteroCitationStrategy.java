@@ -329,6 +329,9 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
     }
 
     LinkPlan planLinks(List<StoredCitation> citations, List<BibDatabase> databases) {
+        if (citations.isEmpty()) {
+            return new LinkPlan(List.of(), Map.of());
+        }
         List<BibEntry> entries = databases.stream()
                                           .flatMap(database -> database.getEntries().stream().map(entry -> database.resolveForStrings(entry, false)))
                                           .distinct().toList();
@@ -401,11 +404,14 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
 
     private Map<String, ConversionMetadata> prepareMetadataLinks(List<StoredCitation> citations) throws com.sun.star.uno.Exception {
         Map<String, ConversionMetadata> updates = new LinkedHashMap<>();
-        for (StoredCitation citation : citations) {
-            if (!citation.originalName().equals(citation.mark().name())) {
-                ConversionMetadata.prepareRelink(document, citation.originalName(), citation.mark().name())
-                                  .ifPresent(metadata -> updates.put(citation.originalName(), metadata));
-            }
+        List<StoredCitation> renamed = citations.stream().filter(citation -> !citation.originalName().equals(citation.mark().name())).toList();
+        if (renamed.isEmpty()) {
+            return updates;
+        }
+        ConversionMetadata.Index metadataIndex = ConversionMetadata.readIndex(document);
+        for (StoredCitation citation : renamed) {
+            metadataIndex.prepareRelink(document, citation.originalName(), citation.mark().name())
+                         .ifPresent(metadata -> updates.put(citation.originalName(), metadata));
         }
         return updates;
     }

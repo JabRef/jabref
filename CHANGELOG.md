@@ -76,7 +76,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed error messages when updating LibreOffice/OpenOffice citations to explain protected areas, missing entries or styles, and Pandoc failures. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice integration to preserve citations and bibliographies when formatting generation fails, and attempt recovery after failed citation conversions. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice style switching to remember the Zotero compatibility setting for CSL without affecting JStyle or BST. [#17673](https://github.com/JabRef/jabref/pull/17673)
-- We changed LibreOffice/OpenOffice citation insertion outside Zotero mode to migrate supported legacy JStyle citations, preserving citation types and page information. [#14962](https://github.com/JabRef/jabref/issues/14962)
+- We changed LibreOffice/OpenOffice citation insertion outside Zotero mode to migrate legacy JStyle citations even when cited libraries are closed. [#14962](https://github.com/JabRef/jabref/issues/14962)
 - We changed removing LibreOffice/OpenOffice citation styles to request confirmation, retain unrelated style selections, and leave style files untouched. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice bibliography refresh to remove outdated references and extra blank paragraphs only for the selected JabRef/Zotero citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
@@ -189,6 +189,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed numbering and reference labels becoming inconsistent between citations and bibliographies when using BST styles in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed literal text being interpreted as formatting in LibreOffice/OpenOffice bibliography headings and in citation keys for JStyle styles. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed incorrect numeric bibliography formatting in LibreOffice/OpenOffice when JStyle styles display citation keys instead of citation numbers. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed missing bibliography paragraph styles blocking JStyle citation insertion in LibreOffice/OpenOffice when bibliography synchronization is disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed LibreOffice/OpenOffice citation updates modifying citations marked for deletion through Track Changes after change recording was disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed edits to selected JStyle files not taking effect when inserting or refreshing citations in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
 

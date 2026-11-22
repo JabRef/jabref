@@ -22,7 +22,7 @@ Assertions compare semantic document contents rather than ZIP bytes or Writer-ge
 | `legacy-bst.fodt` | Legacy `JABREF_* CID_n` | Numeric body, footnote, and table citations |
 
 The legacy fixtures check that Writer preserves their contents on save/reopen and that canonical reads, refresh, and export do not manage them.
-Supported legacy JStyle marks migrate on the next canonical insertion, not during those read, refresh, or export operations.
+Homogeneous supported legacy JStyle input migrates on the next canonical insertion when the first recognized reference-mark name returned by Writer identifies that format, not during those read, refresh, or export operations.
 Canonical assertions check both boundary characters explicitly before inspecting the inner text; they do not remove arbitrary invisible characters to hide a mismatch.
 `superscript.csl` is a small local numeric CSL style with superscript citations and a title-only bibliography.
 It exercises the same superscript rendering behavior used by Nature and AMA without coupling expected text to upstream style changes.
@@ -75,6 +75,22 @@ The tests parse the stored Zotero JSON to assert URI arrays, suppress-author fla
 - Trailing text after the last formatting tag is decoded exactly once; escaped literal tags are never tokenized again.
 - CSL and BST bibliography headings preserve literal ampersands, HTML-looking text, and entity-looking text without introducing character formatting.
 - BST author-year citations and CSL numeric in-text prefixes display accented authors and ampersands rather than their HTML encodings.
+
+## Conversion detection policy
+
+Supported source documents use one homogeneous citation format: canonical `JABREF_<keys> <TYPE> <uid>`, supported legacy JStyle `JR_cite` names, or native Zotero citation names.
+Mixed-source conversion is unsupported; no mixed-format repair is promised.
+On each insertion, detection uses fresh reference-mark names returned by Writer, including after reconnecting, and decides solely from the first recognized name.
+It skips unrelated reference marks and unsupported `CID_n` marks without scanning for later mismatching formats; no recognized name means no conversion.
+UNO name enumeration is not guaranteed sorted or in physical document order; enumeration order is immaterial for homogeneous documents.
+Native Zotero mode does not migrate legacy JStyle input, and JStyle/BST insertion does not convert native Zotero input.
+
+Once detection triggers conversion, existing group reading and preparation remain unchanged, with one render of the proposed citation set before writes.
+The citation metadata, identity, rendering, Undo/Redo, and owned rollback contracts remain part of conversion acceptance.
+For legacy migration, check all six type mappings, storage-order keys, stable prepared uids, page-property transfer to the last storage-order slot, invisible boundaries, and save/reopen.
+Undo restores legacy marks and page properties; redo restores the same prepared canonical identities and page slots.
+Preparation failures leave document state and undo history unchanged; ordinary application failures use the owned root-context rollback without undoing earlier user actions.
+Starting the transaction may clear pre-existing redo history; disconnects, lost ownership, or failed rollback produce a distinct recovery error rather than a universal recovery guarantee.
 
 ## Storage regression gate
 

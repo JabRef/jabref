@@ -27,22 +27,31 @@ Needs: impl, utest
 ## The next CSL citation insertion must convert managed citations to the selected compatibility format
 `req~openoffice.next-citation-format-conversion~1`
 
-When current canonical JabRef or native Zotero citations differ from the selected Zotero compatibility mode, the next CSL citation insertion shows the existing "Reference mark format" / "Converting references to selected format" warning before converting them to that mode's format.
+When the first recognized citation reference-mark name returned by Writer identifies canonical JabRef or native Zotero format that differs from the selected Zotero compatibility mode, the next CSL citation insertion shows the existing "Reference mark format" / "Converting references to selected format" warning before conversion.
 Opening a document, toggling the preference, selecting a style, refreshing, exporting cited entries, and inserting with JStyle or BST do not trigger canonical ↔ native Zotero conversion.
-Detection rereads document marks, including after reconnecting, rather than depending on preference-change history.
+On each insertion, detection reads fresh reference-mark names, including after reconnecting, and uses only the first recognized name, skipping unrelated marks and unsupported `CID_n` marks.
+Recognized formats are canonical `JABREF_<keys> <TYPE> <uid>`, supported legacy `JR_cite` names, and native Zotero citation names.
+It does not scan for later mismatching formats; no recognized name means no conversion.
+Conversion is supported for homogeneous source documents; mixed-source conversion and mixed-format repair are unsupported.
+UNO does not guarantee sorted name enumeration, so the first returned recognized name is not necessarily first in physical document order; enumeration order is immaterial for homogeneous documents.
 Legacy `JR_cite*` marks participate only in the separate one-way JStyle migration below; conversion targeting native Zotero format leaves them unchanged.
-Legacy `CID_n` marks remain unmanaged and unchanged, including in mixed-format documents.
+Legacy `CID_n` marks remain unmanaged and unchanged.
 
-The combined converted and pending citations and any target-mode bibliography requested by normal synchronization are rendered once before document mutation.
-Preparation failures, including invalid metadata, unresolved sources, protected ranges, unsuitable custom-property types or attributes, and rendering failures, leave marks, properties, text, and undo history unchanged.
+Once conversion is triggered, the existing group-reading and preparation path applies.
+The converted groups, pending citation, and any target-mode bibliography requested by normal synchronization are rendered once before document mutation.
+Native-to-canonical conversion and native generation require resolved sources; only legacy-only canonical migration permits unresolved entries as specified below.
+Preparation failures, including invalid metadata, required but unresolved sources, protected ranges, unsuitable custom-property types or attributes, and rendering failures, leave marks, properties, text, and undo history unchanged.
 Conversion requires an available, unlocked Writer undo manager and its own root undo context; nesting inside another undo operation is rejected before document writes.
-Successful conversion and insertion form one Undo/Redo step covering identities, formatted text, any normally synchronized target-mode bibliography, page-info properties, citation conversion metadata, and prepared applied-style and Zotero preference properties.
+Successful conversion and insertion form one Undo/Redo step covering identities, formatted text, any normally synchronized target-mode bibliography, page-info properties, citation conversion metadata, and prepared applied-style properties.
+Only conversion targeting native mode prepares Zotero preference changes; canonical CSL operations and conversions leave `ZOTERO_PREF` XML untouched while still updating JabRef's applied style.
+Native-mode insertion or refresh updates those native preferences.
 An ordinary application failure is rolled back only after closing and verifying ownership of that context, without undoing earlier user actions.
 Beginning the write transaction can clear pre-existing redo history even when document state is subsequently restored by rollback.
 Global disconnects, lost ownership, and failed rollbacks produce a distinct recovery error; this is not a universal rollback guarantee.
 Ordinary updates retain raw style-property setters outside the conversion-specific undo contract.
 
 A persistent per-document citation sidecar preserves canonical uids, storage-order keys, all six stored citation types, every page-info slot, and supported native Zotero citation JSON, identifiers, URIs, and harmless unknown metadata across conversion and save/reopen.
+Sidecar lookup uses one index per action, not a persistent cache; parsing, identity, freshness, and property-safety checks remain required.
 Canonical `EMPTY` and canonical-only partial types render as normal visible citations in Zotero mode; page information remains stored but is not rendered.
 Converting back restores the canonical uid, storage-order keys, stored type, and every page-info slot from the sidecar, including invisible rendering for `EMPTY`.
 Native modifiers do not block conversion; their JSON remains in the citation sidecar and is restored when converting back to native format.
@@ -59,12 +68,15 @@ Needs: impl, utest
 ## The next citation insertion outside native Zotero mode must migrate supported legacy JStyle citations to canonical marks
 `req~openoffice.legacy-jstyle-migration~1`
 
-On the next insertion, detect supported legacy `JR_cite` marks when the effective mode is canonical: always for JStyle and BST, and for CSL when the saved Zotero compatibility setting is off.
-Reread the document marks, including after reconnecting, and show the existing "Reference mark format" / "Converting references to selected format" warning before mutation.
+On the next insertion, migrate a homogeneous supported legacy JStyle document when the first recognized reference-mark name returned by Writer identifies `JR_cite` format and the effective mode is canonical: always for JStyle and BST, and for CSL when the saved Zotero compatibility setting is off.
+Use the fresh first-recognized-name detection policy above, including after reconnecting, and show the existing "Reference mark format" / "Converting references to selected format" warning before mutation.
 Connecting, refreshing, exporting, selecting a style, or changing the compatibility preference alone does not migrate legacy marks.
-Insertion or conversion targeting native Zotero format initially leaves `JR_cite` marks unchanged; `CID_n` remains unmanaged in every mode.
+Insertion or conversion targeting native Zotero format leaves `JR_cite` marks unchanged; `CID_n` remains unmanaged in every mode.
 
-Prepare all supported legacy groups together with existing canonical groups, any native groups being converted to canonical format, and the pending citation.
+After detection selects migration, the existing preparation path handles citation groups and the pending citation.
+Mixed-source conversion is unsupported.
+Legacy-only canonical migration permits unresolved entries with ordinary unresolved-key placeholders and the successful-insertion warning.
+Opening the missing libraries and refreshing restores resolved output without reinserting citations.
 Map legacy numeric types `1` through `6` to `NORMAL`, `IN_TEXT`, `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_ONLY`, respectively.
 Preserve storage-order keys and assign each migrated group a fresh stable uid.
 Move the legacy page property, whose name is the whole legacy mark name, to `JabRef_page_info:<uid>:<lastStorageIndex>`, belonging to the group's last citation in storage order.
@@ -126,7 +138,7 @@ Needs: impl, utest
 `req~openoffice.insertion-unresolved-warning~1`
 
 After successful insertion, the controller shows an "Unresolved citations" warning listing every unresolved key returned by the engine and advising the user to open the corresponding libraries and refresh.
-This applies with bibliography synchronization enabled or disabled, since insertion always refreshes citation markers.
+This applies with bibliography synchronization enabled or disabled, including legacy-only canonical migration, since insertion always refreshes citation markers.
 An empty unresolved-key list produces no warning; an insertion failure retains its error dialog rather than reporting success.
 
 Needs: impl, utest
@@ -137,7 +149,8 @@ Needs: impl, utest
 With Zotero compatibility mode disabled and an available, unlocked Writer undo manager, each merge or separation uses one undo context for structural replacements, their final formatted output, and page-info property changes.
 Undo restores the original citation-group identities and per-citation page information; redo restores the edited groups and their page information.
 The proposed post-edit groups and bibliography are rendered before document mutation, so a rendering failure leaves marks, properties, text, and undo history unchanged.
-This group-edit undo contract does not cover raw applied-style or Zotero preference property writes in ordinary updates; the conversion-specific contract above includes its prepared property deltas.
+Only explicit refresh performs a global orphan page-info sweep; merge, separation, insertion, and conversion still remove properties belonging to replaced or removed citations immediately.
+This group-edit undo contract does not cover raw applied-style property writes in ordinary updates; the conversion-specific contract above includes its prepared property deltas.
 
 Needs: impl, utest
 

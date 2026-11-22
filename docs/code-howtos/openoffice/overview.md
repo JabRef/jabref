@@ -59,12 +59,13 @@ flowchart TD
     Render -->|Failure| Error[Return without document mutation]
     Render -->|Success| Session[DocumentWriteSession write phase]
     Session --> Apply[Apply prepared markers and optional bibliography]
-    Apply --> State[Store applied style and clean orphan page info]
+    Apply --> State[Store applied style]
+    State --> Cleanup[Explicit refresh only: sweep orphan page info]
 ```
 
 Each canonical action reconstructs citation groups from the document rather than relying on a cached key/number manager.
 Insertion prepares a pending group in memory so validation, ordering, and rendering finish before creating its mark.
-JStyle document-style preconditions are checked during preparation.
+JStyle bibliography paragraph styles are validated during preparation only when bibliography output is requested.
 Protected-range checks include citations, bibliography sections, pending deletions, and body footnote anchors whose footnotes contain citations.
 Ordering occurs before controller locking because Writer's view cursor cannot move while controllers are locked.
 
@@ -163,6 +164,7 @@ JabRef_page_info:<uid>:<storageIndex>
 The zero-based index addresses the key in storage order, so renderer sorting cannot transfer page information to another citation.
 Merge and Separate preserve each storage slot rather than concatenate all information into a last-citation value.
 Cite special and Manage citations edit their designated slot without dropping the other slots.
+Only explicit refresh sweeps all orphan page-info properties; insertion, merge, separation, and conversion still remove properties for citations they replace or remove.
 Document custom properties do not travel with citation text copied to another document.
 
 `JabRef_document_style` stores the applied family and identifier: a path for JStyle/BST or a CSL style identifier.
@@ -184,7 +186,8 @@ Citation and bibliography mark names have an `RND` suffix followed by ten random
 The JSON `citationID` and the `RND` suffix are separate identifiers; neither is a cited source's item ID.
 Stored JSON `citationID` values can have other lengths and are not regenerated during reading.
 Generated decimal item-ID collision checks use bounded decimal-string validation, not arbitrary-precision number parsing of foreign identifiers.
-CSL operations write document preferences such as `ZOTERO_PREF` through raw property setters; conversion records its prepared property changes for undo.
+Only native-mode insertion and refresh update `ZOTERO_PREF` XML through raw property setters; conversion targeting native mode records its prepared preference changes for undo.
+Canonical CSL operations and conversions targeting canonical format leave that XML untouched while still updating JabRef's applied-style identity.
 Native bibliographies are handled by the citation strategy, not migrated between formats.
 
 ## Rendering, numbering, and style changes
@@ -203,7 +206,8 @@ Page information and the no-parentheses choice are disabled for CSL; the canonic
 A render pass considers the entire cited set rather than storing a number beside each key.
 Numeric CSL styles use citeproc's cluster updates and bibliography order rather than patching digits in existing text.
 JStyle supports first-appearance and bibliography-sort numbering; author-year disambiguation follows the relevant cited-set order.
-BST styles obtain labels and ordering from the rendered bibliography program output.
+BST styles obtain labels and ordering from the rendered bibliography program output, except that `AUTHOR_YEAR` notation without requested bibliography output skips BST execution.
+Other BST notations retain their program-derived labels and ordering.
 Missing canonical sources remain represented by unresolved-key placeholders rather than silently losing their stored keys.
 The [ordering guide](order-of-appearance.md) describes footnote mapping and the documented limitations of visual ordering, including multi-column and side-by-side layouts.
 Shared ordering is not a guarantee of correct reading order for every layout.
@@ -249,6 +253,7 @@ Choosing another family does not turn manual CSL inference into a JStyle/BST heu
 
 The style dialogs share the external-file picker and private removal helpers.
 Parsers, caches, previews, and edit behavior are family-specific.
+Inactive style-family tabs defer preview generation until activated.
 Removing an external style is guarded by confirmation; cancellation and failures must not apply the successful-removal transition, and successful removal repairs row selection.
 Removal forgets the configured style entry rather than deleting the user's style file.
 
@@ -259,15 +264,24 @@ Until supported JStyle marks are migrated on insertion, their text remains visib
 `CID_n` remains unmanaged and is not a migration input; maintaining unsupported legacy citations requires a compatible older JabRef version or manual replacement.
 Keep a copy before changing which JabRef version manages an existing document.
 
+Supported source documents use one homogeneous citation format: canonical `JABREF_<keys> <TYPE> <uid>`, supported legacy JStyle `JR_cite` names, or native Zotero citation names.
+Mixed-source conversion is unsupported; no mixed-format repair is promised.
+On each insertion, `CitationEngine.requiresFormatConversion` reads fresh reference-mark names from Writer, including after reconnecting, and uses only the first recognized name.
+It skips unrelated marks and unsupported `CID_n` marks, does not scan for later mismatching formats, and requires no conversion if no recognized name exists.
+UNO does not guarantee sorted name enumeration or physical document order; enumeration order is immaterial for homogeneous documents.
+This name-only decision leaves the existing conversion group-reading and preparation path unchanged.
+
 ### One-way legacy JStyle migration on insertion
 
-The next insertion outside effective native Zotero mode detects supported legacy `JR_cite` marks, including after reconnecting.
+The next insertion outside effective native Zotero mode migrates a homogeneous legacy JStyle document when fresh detection selects a supported `JR_cite` name as the first recognized name returned by Writer.
 JStyle and BST always use canonical mode, even if the saved CSL Zotero setting is on; CSL uses canonical mode when that setting is off.
 Before mutation, the controller shows the "Reference mark format" / "Converting references to selected format" warning.
 Connecting, refreshing, exporting, selecting a style, or changing the preference alone does not migrate marks.
 Insertion or conversion targeting native Zotero format leaves legacy JStyle marks unchanged.
 
-Preparation combines all supported legacy groups, existing canonical groups, any native groups being converted to canonical format, and the pending citation.
+After detection selects migration, the existing preparation path handles citation groups and the pending citation.
+Mixed-source conversion is unsupported.
+Legacy-only migration permits unresolved entries, using ordinary canonical placeholders and the successful-insertion warning; opening the missing libraries and refreshing restores resolved output.
 Legacy numeric types `1` through `6` map respectively to `NORMAL`, `IN_TEXT`, `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_ONLY`.
 Each migrated group receives a fresh stable uid and retains its keys in storage order.
 The legacy page property is named by the whole legacy mark; its value moves to the last citation's canonical `JabRef_page_info:<uid>:<storageIndex>` slot in storage order.
@@ -284,18 +298,21 @@ After migration, ordinary canonical refresh, style-family changes, and export-ci
 ### Current canonical ↔ native Zotero conversion
 
 Changing the compatibility preference alone does not modify the document.
-On the **next CSL citation insertion**, `CitationEngine.requiresFormatConversion` rereads current marks, including after reconnecting, and detects current-format citations that do not match the selected mode.
+On the **next CSL citation insertion**, the fresh first-recognized-name decision requires conversion when that name identifies canonical or native Zotero format that differs from the selected compatibility mode.
 The controller shows the warning titled "Reference mark format" with the message "Converting references to selected format" before insertion mutates the document.
 Opening, toggling, selecting a style, refreshing, exporting cited entries, and JStyle/BST insertions do not trigger canonical ↔ native Zotero conversion.
-This bidirectional conversion concerns current canonical and native Zotero marks; the one-way legacy JStyle migration above can join preparation when targeting canonical format.
+This bidirectional conversion concerns homogeneous canonical or native Zotero source documents; supported legacy JStyle input follows the separate one-way migration above.
 Conversion targeting native Zotero format does not migrate `JR_cite*`, and `CID_n` never participates.
 
-`CitationFormatConverter` prepares existing and pending citations, source linking, replacement identities, optional normally synchronized target bibliography output, and style-property deltas.
+Once detection triggers conversion, `CitationFormatConverter` prepares citations, source linking when needed, replacement identities, optional normally synchronized target bibliography output, and style-property deltas.
+Flattened entry data and native item-ID preparation are limited to native output; an empty native citation set skips source linking.
 Required custom-property types, writability, and removability are preflighted before mutation.
 One render supplies final markers and any requested bibliography output; application does not render again.
-Invalid metadata, unresolved sources, unsuitable properties, protected ranges, and rendering failures stop preparation before document writes or undo-history changes.
+Native-to-canonical conversion and native generation require resolved sources; the unresolved-entry allowance applies only to legacy-only canonical migration.
+Invalid metadata, required but unresolved sources, unsuitable properties, protected ranges, and rendering failures stop preparation before document writes or undo-history changes.
 
 `ConversionMetadata` stores a document-local citation sidecar under `JabRef_citation_conversion:<uid>`.
+Sidecars are indexed once per action without a persistent lookup cache; parsing, identity, freshness, and property-safety checks remain in force.
 It preserves the canonical uid, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, including URI links, opaque identifiers, and harmless unknown metadata, while the association remains valid through conversion and save/reopen.
 Canonical `EMPTY` and canonical-only partial types use the normal visible citation fallback in Zotero mode; page information remains stored but is not rendered.
 Converting back restores the canonical uid, storage-order keys, stored type, and page information from the sidecar, including invisible rendering for `EMPTY`.

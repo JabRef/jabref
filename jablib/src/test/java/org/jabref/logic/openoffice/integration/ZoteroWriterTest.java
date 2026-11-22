@@ -436,11 +436,10 @@ class ZoteroWriterTest {
     }
 
     @Test
-    void nextZoteroInsertionConvertsCanonicalButStillIgnoresLegacyMarks() throws Exception {
+    void nextZoteroInsertionConvertsCanonicalButStillIgnoresUnsupportedCidMarks() throws Exception {
         XTextDocument document = office.newDocument();
         appendMark(document, CANONICAL, "\u200b[canonical]\u200b");
         appendMark(document, LEGACY_CID, "[old CID]");
-        appendMark(document, LEGACY_JSTYLE, "[old JStyle]");
         XTextCursor cursor = document.getText().createTextCursor();
         cursor.gotoEnd(false);
         cursor.setString("\n");
@@ -452,6 +451,7 @@ class ZoteroWriterTest {
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_page_info:stableIgnored:0", "p. 99");
         BibDatabase database = database();
         try (CitationEngine engine = engine(document)) {
+            assertTrue(success(engine.requiresFormatConversion(style())));
             assertEquals(List.of(), success(engine.insert(List.of(database.getEntryByCitationKey("alpha").orElseThrow()), List.of(database),
                     style(), CitationType.AUTHORYEAR_PAR, "", document.getText().createTextCursor(), true)));
             assertEquals(List.of(), success(engine.refresh(List.of(database), style())));
@@ -512,12 +512,12 @@ class ZoteroWriterTest {
         assertEquals(before, snapshot(document));
     }
 
-    @Test
-    void refreshAloneStillLeavesCanonicalAndLegacyMarksAndJabRefStateUntouched() throws Exception {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void refreshAloneStillLeavesUniformSourceMarksAndJabRefStateUntouched(boolean canonicalSource) throws Exception {
         XTextDocument document = office.newDocument();
-        appendMark(document, CANONICAL, "\u200b[canonical]\u200b");
+        appendMark(document, canonicalSource ? CANONICAL : LEGACY_JSTYLE, canonicalSource ? "\u200b[canonical]\u200b" : "[old JStyle]");
         appendMark(document, LEGACY_CID, "[old CID]");
-        appendMark(document, LEGACY_JSTYLE, "[old JStyle]");
         XTextCursor cursor = document.getText().createTextCursor();
         cursor.gotoEnd(false);
         cursor.setString("\n");
@@ -528,10 +528,10 @@ class ZoteroWriterTest {
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_page_info:stableIgnored:0", "p. 99");
         Map<String, String> ignored = marks(document);
         try (CitationEngine engine = engine(document)) {
-            assertTrue(success(engine.requiresFormatConversion(style())));
+            assertEquals(canonicalSource, success(engine.requiresFormatConversion(style())));
             success(engine.refresh(List.of(database()), style()));
             assertEquals(List.of(), exportedKeys(success(engine.exportCited(List.of(database())))));
-            assertTrue(success(engine.requiresFormatConversion(style())));
+            assertEquals(canonicalSource, success(engine.requiresFormatConversion(style())));
         }
         assertIgnoredContent(document, ignored);
     }

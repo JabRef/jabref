@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
 import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
 import org.jabref.logic.openoffice.engine.storage.DocumentStyleStore;
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
@@ -46,7 +45,7 @@ public final class UpdatePipeline {
     public RenderResult render(OOStyle style, List<CitationGroup> groups, List<BibDatabase> databases, boolean includeBibliography)
             throws RenderException, WrappedTargetException {
         CitationRenderer renderer = renderers.create(style);
-        checkPreconditions(style);
+        checkPreconditions(style, includeBibliography);
         RenderOptions options = new RenderOptions(preferences.getBstCitationFormat(),
                 includeBibliography && renderer.capabilities().hasBibliography(),
                 style instanceof JStyle ? "" : preferences.getCslBibliographyTitle(),
@@ -55,10 +54,12 @@ public final class UpdatePipeline {
         return renderer.render(new RenderRequest(groups, databases, options));
     }
 
-    private void checkPreconditions(OOStyle style) throws WrappedTargetException, RenderException {
+    private void checkPreconditions(OOStyle style, boolean includeBibliography) throws WrappedTargetException, RenderException {
         if (style instanceof JStyle jStyle) {
-            checkParagraphStyle(jStyle.getReferenceParagraphFormat());
-            checkParagraphStyle(jStyle.getReferenceHeaderParagraphFormat());
+            if (includeBibliography) {
+                checkParagraphStyle(jStyle.getReferenceParagraphFormat());
+                checkParagraphStyle(jStyle.getReferenceHeaderParagraphFormat());
+            }
             if (jStyle.isFormatCitations() && !jStyle.getCitationCharacterFormat().isEmpty()
                     && UnoStyle.getCharacterStyle(document, jStyle.getCitationCharacterFormat()).isEmpty()) {
                 throw MissingWriterStyleException.character(jStyle.getCitationCharacterFormat());
@@ -89,11 +90,7 @@ public final class UpdatePipeline {
             default ->
                     throw new WriterOperationException("Unsupported citation style");
         };
-        if (style instanceof CitationStyle csl && !ZoteroDocumentPreferences.writeCitationStyle(document, csl)) {
-            throw new WriterOperationException("Could not update document CSL preferences");
-        }
         states.store(document, state);
-        store.removeOrphanPageInfos(document);
         if (result.refreshCitedOnPages()) {
             UnoCrossRef.refresh(document);
         }

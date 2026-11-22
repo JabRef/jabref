@@ -13,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.CitedEntryCollector;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.ZoteroCitationLinker;
+import org.jabref.logic.openoffice.ZoteroCitationLinker.LinkPlan;
 import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.backend.WriterReferenceMark;
@@ -21,12 +22,14 @@ import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
 import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.Reason;
 import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StoredCitation;
 import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StrategyException;
+import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.uno.OOTextWriter;
 import org.jabref.logic.openoffice.uno.UnoDispatch;
 import org.jabref.logic.openoffice.uno.UnoRedlines;
+import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
 import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -72,6 +75,7 @@ import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -450,11 +454,61 @@ class ZoteroCitationStrategyTest {
         try (MockedStatic<ConversionMetadata> metadata = mockStatic(ConversionMetadata.class);
              MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
              MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class)) {
-            metadata.when(() -> ConversionMetadata.prepareRelink(eq(document), eq(nativeName), anyString()))
+            metadata.when(() -> ConversionMetadata.readIndex(document))
                     .thenThrow(new WrappedTargetException("Cannot read citation conversion properties"));
             OOResult<List<String>, JabRefException> result = "refresh".equals(operation) ? strategy().refresh(List.of(database), style())
                                                                                          : strategy().insert(List.of(entry), List.of(database), style(), CitationType.AUTHORYEAR_PAR, "", cursor, false);
             assertEquals(Reason.DOCUMENT_FAILURE, assertInstanceOf(StrategyException.class, result.getError()).reason());
+            writer.verifyNoInteractions();
+            documentPreferences.verifyNoInteractions();
+            verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
+            verify(text, never()).removeTextContent(any());
+        }
+    }
+
+    @Test
+    void emptyLinkPlanDoesNotReadOrResolveLibraryEntries() {
+        BibDatabase database = mock(BibDatabase.class);
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class)) {
+            assertEquals(new LinkPlan(List.of(), Map.of()), strategy().planLinks(List.of(), List.of(database)));
+            verifyNoInteractions(database);
+            linker.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void multipleNativeRelinksReadSidecarsOncePerActionAndRereadOnTheNextAction() throws Exception {
+        String firstName = ZOTERO.replace(",\"http://www.jabref.org/a\"", "")
+                                 .replace("\"title\":\"A\"", "\"title\":\"A\",\"DOI\":\"10.123/native\"");
+        String secondName = firstName.replace("citation1", "citation2").replace("RNDabcdefghij", "RNDsecond1234");
+        when(ranges.names(document)).thenReturn(List.of(firstName, secondName));
+        when(ranges.find(document, firstName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        WriterReferenceMark secondRange = mock(WriterReferenceMark.class);
+        XTextRange secondAnchor = span(6, 9);
+        when(secondRange.getMarkRange(document)).thenReturn(Optional.of(secondAnchor));
+        when(ranges.find(document, secondName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(secondRange));
+        ConversionMetadata first = new ConversionMetadata("JABREF_a NORMAL first_uid", List.of(""), firstName);
+        ConversionMetadata second = new ConversionMetadata("JABREF_a NORMAL second_uid", List.of(""), secondName);
+        String firstProperty = ConversionMetadata.PREFIX + "first_uid";
+        String secondProperty = ConversionMetadata.PREFIX + "second_uid";
+        BibDatabase database = new BibDatabase(List.of(entry("a", "A").withField(StandardField.DOI, "10.123/native")));
+        CitationStyle invalid = new CitationStyle("invalid.csl", "invalid", "in-text", "Invalid", "", true, false, false, false, "not XML", false);
+        try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
+             MockedStatic<UndoableDocumentProperties> undoable = mockStatic(UndoableDocumentProperties.class);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class)) {
+            properties.when(() -> UnoUserDefinedProperty.getListOfNames(document)).thenReturn(List.of(firstProperty, secondProperty));
+            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, firstProperty)).thenReturn(Optional.of(first.encode()));
+            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, secondProperty)).thenReturn(Optional.of(second.encode()));
+            ZoteroCitationStrategy strategy = strategy();
+            for (int action = 0; action < 2; action++) {
+                assertEquals(Reason.DOCUMENT_FAILURE, assertInstanceOf(StrategyException.class, strategy.refresh(List.of(database), invalid).getError()).reason());
+            }
+            properties.verify(() -> UnoUserDefinedProperty.getListOfNames(document), times(2));
+            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, firstProperty), times(2));
+            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, secondProperty), times(2));
+            undoable.verify(() -> UndoableDocumentProperties.preflight(eq(document), argThat(changes -> changes.containsKey(firstProperty))), times(2));
+            undoable.verify(() -> UndoableDocumentProperties.preflight(eq(document), argThat(changes -> changes.containsKey(secondProperty))), times(2));
             writer.verifyNoInteractions();
             documentPreferences.verifyNoInteractions();
             verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));

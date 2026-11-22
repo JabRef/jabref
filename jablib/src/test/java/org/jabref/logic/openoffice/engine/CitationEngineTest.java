@@ -20,6 +20,7 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.XComponentContext;
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -120,6 +121,23 @@ class CitationEngineTest {
             marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(List.of("JR_cite_1_alpha"));
 
             assertEquals(!zoteroMode, engine.requiresFormatConversion(preferences.getCurrentStyle()).get());
+        }
+    }
+
+    @Test
+    void cslConversionUsesTheFirstRecognizedCitationAndRechecksTheSavedMode() {
+        OOStyle style = CSLStyleLoader.getDefaultStyle();
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document))
+                 .thenReturn(List.of("JABREF_beta NORMAL stable", "JR_cite_1_alpha"));
+
+            preferences.setZoteroCompatibilityMode(false);
+            assertFalse(engine.requiresFormatConversion(style).get());
+            preferences.setZoteroCompatibilityMode(true);
+            assertTrue(engine.requiresFormatConversion(style).get());
+            preferences.setZoteroCompatibilityMode(false);
+            assertFalse(engine.requiresFormatConversion(style).get());
         }
     }
 

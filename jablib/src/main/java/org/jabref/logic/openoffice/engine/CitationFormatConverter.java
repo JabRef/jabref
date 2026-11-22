@@ -83,8 +83,21 @@ final class CitationFormatConverter {
         this.zotero = zotero;
     }
 
-    static boolean required(List<String> names, boolean targetZotero) {
-        return names.stream().anyMatch(targetZotero ? JabRefMarkCodec::isCanonicalMarkName : ZoteroReferenceMark::isZoteroReferenceMarkName);
+    static boolean required(List<String> names, OOStyle style, boolean zoteroMode) {
+        boolean targetZotero = style instanceof CitationStyle && zoteroMode;
+        return names.stream()
+                    .filter(name -> JabRefMarkCodec.isCanonicalMarkName(name)
+                            || LegacyJStyleMark.isLegacyMarkName(name)
+                            || ZoteroReferenceMark.isZoteroReferenceMarkName(name))
+                    .findFirst()
+                    .map(name -> {
+                        if (targetZotero) {
+                            return JabRefMarkCodec.isCanonicalMarkName(name);
+                        }
+                        return LegacyJStyleMark.isLegacyMarkName(name)
+                                || (style instanceof CitationStyle && ZoteroReferenceMark.isZoteroReferenceMarkName(name));
+                    })
+                    .orElse(false);
     }
 
     PreparedInsertion prepare(List<BibEntry> entries, List<BibDatabase> databases, OOStyle style,
@@ -113,6 +126,7 @@ final class CitationFormatConverter {
         selected.add(new BibDatabase(entries.stream().map(BibEntry::new).toList()));
         ReadPlan source = read(selected, style instanceof CitationStyle, !targetZotero);
         List<PlannedCitation> citations = source.citations();
+        boolean legacyMigration = !targetZotero && citations.stream().findFirst().map(citation -> LegacyJStyleMark.isLegacyMarkName(citation.oldName())).orElse(false);
         zotero.validateRanges(citations.stream().map(citation -> new RangeForOverlapCheck<>(citation.anchor(), citation.oldName(),
                         RangeForOverlapCheck.REFERENCE_MARK_KIND, citation.oldName())).toList(), Optional.of(cursor),
                 rebuildBibliography ? Set.of(targetZotero ? ZoteroCitationStrategy.BIBLIOGRAPHY_PREFIX : BibliographySection.NAME) : Set.of());
@@ -139,13 +153,13 @@ final class CitationFormatConverter {
                 preferences.getCslBibliographyBodyFormat(), !targetZotero && preferences.getAlwaysAddCitedOnPages());
         RenderRequest request = new RenderRequest(citations.stream().map(PlannedCitation::group).toList(), selected, options);
         CitationKeyResolution resolved = new CitationKeyResolution(request);
-        if (!resolved.unresolvedKeys().isEmpty()) {
+        if (!legacyMigration && !resolved.unresolvedKeys().isEmpty()) {
             throw new ConversionException("Conversion has unresolved keys: " + resolved.unresolvedKeys(),
                     Localization.lang("Cannot convert citations because these citation keys could not be resolved: %0. Select the matching libraries and try again.", String.join(", ", resolved.unresolvedKeys())));
         }
-        BibDatabase flattened = new BibDatabase(resolved.flattenedEntries());
+        Optional<BibDatabaseContext> nativeSources = targetZotero ? Optional.of(prepareNativeSources(citations, resolved)) : Optional.empty();
         Map<String, String> uris = source.uris();
-        Set<String> usedItemIds = usedItemIds(citations);
+        Set<String> usedItemIds = targetZotero ? usedItemIds(citations) : Set.of();
         List<PlannedCitation> complete = new ArrayList<>();
         int itemId = 1;
         Set<String> plannedNames = new HashSet<>();
@@ -163,13 +177,14 @@ final class CitationFormatConverter {
                         name = ZoteroReferenceMark.updateCitationType(name, citation.group().citationType);
                     }
                 } else {
+                    BibDatabaseContext sources = nativeSources.orElseThrow();
                     List<BibEntry> groupEntries = new ArrayList<>();
                     for (String key : groupKeys) {
-                        groupEntries.add(flattened.getEntryByCitationKey(key).orElseThrow());
+                        groupEntries.add(sources.getDatabase().getEntryByCitationKey(key).orElseThrow());
                     }
                     itemId = reserveItemIds(usedItemIds, itemId, groupKeys.size());
                     name = ZoteroReferenceMark.buildReferenceMark(groupEntries, groupKeys, itemId,
-                            citation.group().citationType, new BibDatabaseContext(flattened), entryTypes, uris).name();
+                            citation.group().citationType, sources, entryTypes, uris).name();
                 }
                 if (!citation.oldName().isEmpty() && (JabRefMarkCodec.isCanonicalMarkName(citation.oldName()) || metadata.isPresent())) {
                     metadata = Optional.of(ConversionMetadata.capture(citation.group(), name));
@@ -185,7 +200,7 @@ final class CitationFormatConverter {
             }
             complete.add(new PlannedCitation(citation.group(), citation.oldName(), citation.anchor(), name, metadata));
         }
-        Map<String, Optional<String>> styleProperties = style instanceof CitationStyle csl
+        Map<String, Optional<String>> styleProperties = targetZotero && style instanceof CitationStyle csl
                                                         ? ZoteroDocumentPreferences.prepareCitationStyle(document, csl) : Map.of();
         Map<String, Optional<String>> propertyChanges = propertyChanges(complete, styleProperties, targetZotero, style);
         try {
@@ -204,6 +219,14 @@ final class CitationFormatConverter {
         }
         return new PreparedInsertion(List.copyOf(complete), rendered, targetZotero,
                 Collections.unmodifiableMap(new LinkedHashMap<>(propertyChanges)));
+    }
+
+    private static BibDatabaseContext prepareNativeSources(List<PlannedCitation> citations, CitationKeyResolution resolved) throws RenderException {
+        List<String> keys = citations.stream()
+                                     .filter(citation -> citation.metadata().isEmpty() && !ZoteroReferenceMark.isZoteroReferenceMarkName(citation.newName()))
+                                     .flatMap(citation -> citation.group().citationsInStorageOrder.stream().map(Citation::getCitationKey))
+                                     .distinct().toList();
+        return new BibDatabaseContext(new BibDatabase(resolved.flattenedEntries(keys)));
     }
 
     // [impl->req~openoffice.zotero-conversion-modifier-compatibility~1]
@@ -245,10 +268,14 @@ final class CitationFormatConverter {
             return new ReadPlan(result, Map.of());
         }
         List<ZoteroCitationStrategy.StoredCitation> original = zotero.read();
+        if (original.isEmpty()) {
+            return new ReadPlan(result, Map.of());
+        }
+        ConversionMetadata.Index metadataIndex = ConversionMetadata.readIndex(document);
         LinkPlan links = zotero.planLinks(original, selected);
         List<ZoteroCitationStrategy.StoredCitation> linked = ZoteroCitationStrategy.prepareLinks(original, links);
         for (ZoteroCitationStrategy.StoredCitation citation : linked) {
-            Optional<ConversionMetadata> metadata = ConversionMetadata.forZotero(document, citation.originalName());
+            Optional<ConversionMetadata> metadata = metadataIndex.forZotero(citation.originalName());
             CitationGroup group;
             if (metadata.isPresent()) {
                 group = metadata.orElseThrow().group();

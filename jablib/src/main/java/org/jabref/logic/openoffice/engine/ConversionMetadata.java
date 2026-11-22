@@ -1,9 +1,12 @@
 package org.jabref.logic.openoffice.engine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
@@ -117,30 +120,7 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
     }
 
     static Optional<ConversionMetadata> forZotero(XTextDocument document, String name) throws WrappedTargetException, RenderException {
-        Optional<ConversionMetadata> found = Optional.empty();
-        String suffix = ZoteroReferenceMark.parse(name).orElseThrow(CitationFormatConverter::invalidMetadata).uniqueId();
-        String citationIdentity = identity(name);
-        for (String property : UnoUserDefinedProperty.getListOfNames(document)) {
-            if (!property.startsWith(PREFIX)) {
-                continue;
-            }
-            ConversionMetadata metadata = decode(UnoUserDefinedProperty.getStringValue(document, property).orElseThrow());
-            try {
-                if (!property.equals(PREFIX + JabRefMarkCodec.decode(metadata.canonicalName()).uniqueId())) {
-                    throw CitationFormatConverter.invalidMetadata();
-                }
-            } catch (JabRefMarkCodecException exception) {
-                throw CitationFormatConverter.invalidMetadata(exception);
-            }
-            if (identity(metadata.zoteroName()).equals(citationIdentity)
-                    || (!suffix.isBlank() && ZoteroReferenceMark.parse(metadata.zoteroName()).orElseThrow().uniqueId().equals(suffix))) {
-                if (found.isPresent() || !metadata.zoteroName().equals(name)) {
-                    throw CitationFormatConverter.invalidMetadata();
-                }
-                found = Optional.of(metadata);
-            }
-        }
-        return found;
+        return readIndex(document).forZotero(name);
     }
 
     static String identity(String name) throws RenderException {
@@ -160,42 +140,89 @@ record ConversionMetadata(String canonicalName, List<String> pageInfos, String z
     /// Native edits do not require conversion state. Only an exact, unambiguous snapshot may follow
     /// our planned URI rename; stale or corrupt state must remain untouched for strict conversion reads.
     static Optional<ConversionMetadata> prepareRelink(XTextDocument document, String before, String after) throws com.sun.star.uno.Exception {
-        Optional<Map.Entry<String, ConversionMetadata>> fresh = Optional.empty();
+        return readIndex(document).prepareRelink(document, before, after);
+    }
+
+    /// Read once per action, before looking up native citations. Invalid records are retained as a
+    /// strict-read failure, but do not prevent tolerant URI-link planning for other exact snapshots.
+    static Index readIndex(XTextDocument document) throws WrappedTargetException {
+        Index index = new Index();
         for (String property : UnoUserDefinedProperty.getListOfNames(document)) {
             if (!property.startsWith(PREFIX)) {
                 continue;
             }
             Optional<String> value = UnoUserDefinedProperty.getStringValue(document, property);
-            if (value.isEmpty()) {
-                continue;
-            }
             try {
-                ConversionMetadata metadata = decode(value.orElseThrow());
-                if (!metadata.zoteroName().equals(before) || !property.equals(PREFIX + JabRefMarkCodec.decode(metadata.canonicalName()).uniqueId())) {
-                    continue;
+                ConversionMetadata metadata = decode(value.orElseThrow(CitationFormatConverter::invalidMetadata));
+                if (!property.equals(PREFIX + JabRefMarkCodec.decode(metadata.canonicalName()).uniqueId())) {
+                    throw CitationFormatConverter.invalidMetadata();
                 }
-                if (fresh.isPresent()) {
-                    return Optional.empty();
+                String citationIdentity = identity(metadata.zoteroName());
+                String suffix = ZoteroReferenceMark.parse(metadata.zoteroName()).orElseThrow().uniqueId();
+                index.byIdentity.computeIfAbsent(citationIdentity, _ -> new ArrayList<>()).add(metadata);
+                if (!suffix.isBlank()) {
+                    index.bySuffix.computeIfAbsent(suffix, _ -> new ArrayList<>()).add(metadata);
                 }
-                fresh = Optional.of(Map.entry(property, metadata));
+                index.byExactName.computeIfAbsent(metadata.zoteroName(), _ -> new ArrayList<>()).add(metadata);
             } catch (RenderException | JabRefMarkCodecException exception) {
-                LOGGER.debug("Ignoring invalid conversion metadata during native URI-link planning: {}", property, exception);
+                index.invalid = Optional.of(CitationFormatConverter.invalidMetadata(exception));
+                LOGGER.debug("Invalid conversion metadata excluded from native URI-link planning: {}", property, exception);
             }
         }
-        if (fresh.isEmpty()) {
-            return Optional.empty();
+        return index;
+    }
+
+    @NullMarked
+    static final class Index {
+        private final Map<String, List<ConversionMetadata>> byIdentity = new HashMap<>();
+        private final Map<String, List<ConversionMetadata>> bySuffix = new HashMap<>();
+        private final Map<String, List<ConversionMetadata>> byExactName = new HashMap<>();
+        private Optional<RenderException> invalid = Optional.empty();
+
+        private Index() {
         }
-        Map.Entry<String, ConversionMetadata> source = fresh.orElseThrow();
-        ConversionMetadata metadata = source.getValue();
-        ConversionMetadata updated = new ConversionMetadata(metadata.canonicalName(), metadata.pageInfos(), after);
-        try {
-            decode(updated.encode());
-        } catch (RenderException exception) {
-            LOGGER.debug("Native URI linking cannot preserve the stored conversion key layout", exception);
-            return Optional.empty();
+
+        Optional<ConversionMetadata> forZotero(String name) throws RenderException {
+            if (invalid.isPresent()) {
+                throw invalid.orElseThrow();
+            }
+            String suffix = ZoteroReferenceMark.parse(name).orElseThrow(CitationFormatConverter::invalidMetadata).uniqueId();
+            Set<ConversionMetadata> matches = new HashSet<>(byIdentity.getOrDefault(identity(name), List.of()));
+            if (!suffix.isBlank()) {
+                matches.addAll(bySuffix.getOrDefault(suffix, List.of()));
+            }
+            if (matches.isEmpty()) {
+                return Optional.empty();
+            }
+            if (matches.size() != 1) {
+                throw CitationFormatConverter.invalidMetadata();
+            }
+            ConversionMetadata metadata = matches.iterator().next();
+            if (!metadata.zoteroName().equals(name)) {
+                throw CitationFormatConverter.invalidMetadata();
+            }
+            return Optional.of(metadata);
         }
-        UndoableDocumentProperties.preflight(document, Map.of(source.getKey(), Optional.of(updated.encode())));
-        return Optional.of(updated);
+
+        Optional<ConversionMetadata> prepareRelink(XTextDocument document, String before, String after) throws com.sun.star.uno.Exception {
+            List<ConversionMetadata> matches = byExactName.getOrDefault(before, List.of());
+            if (matches.size() != 1) {
+                return Optional.empty();
+            }
+            ConversionMetadata metadata = matches.getFirst();
+            ConversionMetadata updated = new ConversionMetadata(metadata.canonicalName(), metadata.pageInfos(), after);
+            String encoded = updated.encode();
+            String property;
+            try {
+                decode(encoded);
+                property = PREFIX + JabRefMarkCodec.decode(metadata.canonicalName()).uniqueId();
+            } catch (RenderException | JabRefMarkCodecException exception) {
+                LOGGER.debug("Native URI linking cannot preserve the stored conversion key layout", exception);
+                return Optional.empty();
+            }
+            UndoableDocumentProperties.preflight(document, Map.of(property, Optional.of(encoded)));
+            return Optional.of(updated);
+        }
     }
 
     void store(XTextDocument document) throws com.sun.star.uno.Exception, JabRefMarkCodecException {

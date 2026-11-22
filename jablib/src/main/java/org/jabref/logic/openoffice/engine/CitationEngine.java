@@ -101,7 +101,7 @@ public final class CitationEngine implements AutoCloseable {
         return style instanceof CitationStyle && preferences.getZoteroCompatibilityMode();
     }
 
-    /// Fresh, read-only detection of native-format mismatches and legacy JStyle marks.
+    /// Uses the first recognized citation name to detect conversion in uniform-format documents.
     /// Neither refresh nor export invokes the insertion-only conversion transaction.
     // [impl->req~openoffice.next-citation-format-conversion~1,req~openoffice.legacy-jstyle-migration~1]
     public OOResult<Boolean, JabRefException> requiresFormatConversion(OOStyle style) {
@@ -109,10 +109,8 @@ public final class CitationEngine implements AutoCloseable {
             return OOResult.error(unavailable());
         }
         try {
-            List<String> names = WriterReferenceMarks.getListOfNames(document);
-            boolean legacyMigration = !usesZoteroCitations(style) && names.stream().anyMatch(LegacyJStyleMark::isLegacyMarkName);
-            return OOResult.ok(legacyMigration || (style instanceof CitationStyle
-                    && CitationFormatConverter.required(names, preferences.getZoteroCompatibilityMode())));
+            return OOResult.ok(CitationFormatConverter.required(WriterReferenceMarks.getListOfNames(document), style,
+                    preferences.getZoteroCompatibilityMode()));
         } catch (WriterDocumentAccessException | com.sun.star.uno.RuntimeException exception) {
             return OOResult.error(failure(Localization.lang("Problem collecting citations"), exception));
         }
@@ -248,6 +246,7 @@ public final class CitationEngine implements AutoCloseable {
             return writeSession(Localization.lang("Refresh bibliography"), () -> {
                 try {
                     pipeline.apply(style, documentCitations.markStore, groups, result, true);
+                    documentCitations.markStore.removeOrphanPageInfos(document);
                     return OOResult.ok(result.unresolvedKeys());
                 } catch (com.sun.star.uno.Exception | WriterOperationException | WriterDocumentAccessException | RenderException exception) {
                     writer.clear();

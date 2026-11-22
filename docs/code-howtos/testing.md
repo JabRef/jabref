@@ -270,26 +270,43 @@ Human-readable golden `.fodt` documents and native Zotero JSON fixtures live und
 The suite exercises canonical JStyle, CSL, and BST citations, cross-family save/reopen round trips, all six stored types, stable identities, per-citation page information, numbering, bibliography ordering, invisible citations, footnotes, tables, repeated superscript refresh, and restored change recording.
 The canonical mark grammar is `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`; the uid-before-type order is not a fallback format.
 Legacy `JR_cite*` and `CID_n` fixtures are persistence oracles for operations that do not trigger migration; canonical reading and export must not interpret legacy marks as canonical citations.
-For supported legacy JStyle `JR_cite` marks, migration checks must cover the next insertion with JStyle/BST or with CSL and the saved Zotero setting off, including mixed legacy/canonical documents and the format-conversion warning before mutation.
+Detection checks must use fresh reference-mark names on each insertion, including after reconnecting, and decide solely from the first recognized name returned by Writer.
+Recognized formats are canonical `JABREF_<keys> <TYPE> <uid>`, supported legacy `JR_cite` names, and native Zotero citation names; skip unrelated marks and unsupported `CID_n` marks.
+Do not scan for later mismatching formats; no recognized name means no conversion.
+Conversion acceptance covers homogeneous source documents; mixed-source conversion and mixed-format repair are unsupported.
+UNO name enumeration is not guaranteed sorted or in physical document order; enumeration order is immaterial for homogeneous documents.
+For homogeneous supported legacy JStyle input selected by that detection, migration checks must cover the next insertion with JStyle/BST or with CSL and the saved Zotero setting off, and the format-conversion warning before mutation.
 Check all six numeric types, storage-order keys, fresh stable identities, transfer of the whole-mark-named page property to the last storage-order citation's canonical slot, and canonical invisible boundaries.
-The combined legacy, canonical, and pending set must render once before writes; rendering failure must leave the document unchanged, and application failure must use conversion rollback.
+After detection selects migration, the existing preparation path must render the proposed citation set once before writes; rendering failure must leave the document unchanged, and application failure must use conversion rollback.
+Legacy-only canonical migration must accept unresolved entries with ordinary placeholders and the successful-insertion warning; opening missing libraries and refreshing restores resolved output.
 Undo must restore legacy marks and page properties; redo must restore the prepared canonical identities and page slots.
 Connecting, refreshing, exporting, style selection, and native Zotero insertion/conversion must leave legacy JStyle marks unchanged; `CID_n` must remain unmanaged in every mode.
-Rendering failures, including missing Pandoc for BST, must leave preparation targets unchanged.
+Rendering failures must leave preparation targets unchanged, including missing Pandoc when BST output requires it.
+BST `AUTHOR_YEAR` without requested bibliography output skips BST execution; other notations retain program-derived labels and ordering.
+JStyle bibliography paragraph validation applies only when bibliography output is requested.
+Only explicit refresh sweeps all orphan page-info properties; other actions still remove properties for citations they replace or remove.
+Inactive style-family tabs defer previews until activated.
 
-`CitationFormatConversionWriterTest` covers canonical ↔ native Zotero conversion on the next CSL citation insertion, with the format-conversion warning, not on preference changes, refresh, or export.
+`CitationFormatConversionWriterTest` covers homogeneous canonical ↔ native Zotero conversion on the next CSL citation insertion, with the format-conversion warning, not on preference changes, refresh, or export.
+JStyle/BST insertion must not convert native Zotero input; native Zotero mode must not migrate legacy JStyle input.
+The name-only detection decision leaves existing conversion group reading and preparation unchanged.
 Conversion changes citation marks only: with synchronization disabled, all bibliography section names, text, and properties remain unchanged; with synchronization enabled, normal handling updates or creates only the target mode's managed bibliography and leaves other-format sections alone.
 There is no bibliography conversion, renaming, consolidation, sidecar, or rejection based on bibliography settings.
 Citation round trips preserve all six canonical types, uids, storage-order keys, every page-info slot, and supported native JSON through save/reopen while the metadata association remains valid.
 Native modifier fixtures check successful conversion with the group-level citation-type mapping and native JSON restoration through save/reopen, not full locator or modifier rendering support.
-Unsuitable custom properties, unresolved sources, protected ranges, pending deletions, and stale associated conversion metadata are rejected before actual conversion.
+Unsuitable custom properties, protected ranges, pending deletions, and stale associated conversion metadata are rejected before actual conversion.
+Native-to-canonical conversion and native generation still reject unresolved sources.
+Canonical output skips native-only flattening and item-ID preparation; an empty native citation set skips source linking.
+Sidecars are indexed once per action without a persistent lookup cache, retaining parsing, identity, freshness, and property-safety checks.
 Stale conversion metadata must not block ordinary native Zotero insertion or refresh.
 
 Storage, `ConversionMetadataTest`, `DocumentWriteSessionTest`, and GUI/controller tests complement the real-Writer suite with codec/property checks, warning order, and owned conversion rollback.
 Insertion (including conversion), refresh, merge, and separate use undo contexts; custom-property undo deltas and automatic conversion-failure rollback are separate mechanisms.
 Conversion rollback requires an available, unlocked undo manager and a root context of its own, closes and verifies that context before undoing an ordinary application failure, and never undoes an earlier user action.
 Starting the transaction can clear pre-existing redo history even if rollback restores document state; disconnects, lost ownership, or failed rollback have a distinct recovery error, not a universal recovery guarantee.
-Ordinary applied-style and Zotero preference writes use properties directly and are not made undoable by those conversion-specific deltas.
+Canonical CSL operations and conversions targeting canonical format must leave `ZOTERO_PREF` XML untouched while still updating JabRef's applied style.
+Native-mode insertion/refresh updates native preferences; conversion targeting native mode includes prepared preference deltas in Undo/Redo and retains native round-trip metadata.
+Ordinary applied-style and native preference writes use properties directly and are not made undoable by those conversion-specific deltas.
 
 Saved documents and office process logs are in `jablib/build/writer-integration`; standard JUnit XML results are in `jablib/build/test-results/libreOfficeTest` and the HTML report is in `jablib/build/reports/tests/libreOfficeTest`.
 The task executes instead of restoring cached test results; ordinary `:jablib:test` excludes the `LibreOfficeTest` tag.

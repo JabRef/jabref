@@ -343,6 +343,29 @@ class CanonicalStorageWriterTest {
                 MarkStore.pageInfoProperty(documentCitations.markStore.getMarkData(group).orElseThrow().uniqueId(), 0)));
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void orphanPageInfosSurviveInsertionUntilExplicitRefresh(boolean rebuildBibliography) throws Exception {
+        XTextDocument document = office.newDocument();
+        BibDatabase database = database();
+        String orphanProperty = MarkStore.pageInfoProperty("orphan", 0);
+        UnoUserDefinedProperty.setStringProperty(document, orphanProperty, "p. 99");
+        XTextCursor cursor = document.getText().createTextCursor();
+        try (CitationEngine engine = engine(document)) {
+            assertEquals(List.of(), engine.insert(database.getEntries(), List.of(database), numericStyle(), CitationType.AUTHORYEAR_PAR,
+                    "p. 5", cursor, rebuildBibliography).get());
+            assertEquals(Optional.of("p. 99"), UnoUserDefinedProperty.getStringValue(document, orphanProperty));
+            CitationGroup inserted = new DocumentCitations(document).citationGroups.getCitationGroupsUnordered().getFirst();
+            assertEquals(List.of(Optional.empty(), info("p. 5")), pageInfos(inserted));
+
+            assertEquals(List.of(), engine.refresh(List.of(database), numericStyle()).get());
+
+            assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(document, orphanProperty));
+            assertEquals(List.of(Optional.empty(), info("p. 5")), pageInfos(
+                    new DocumentCitations(document).citationGroups.getCitationGroupsUnordered().getFirst()));
+        }
+    }
+
     @Test
     void benchmarkThreeHundredCanonicalInsertionsAndVisualOrdering() throws Exception {
         XTextDocument document = office.newDocument();

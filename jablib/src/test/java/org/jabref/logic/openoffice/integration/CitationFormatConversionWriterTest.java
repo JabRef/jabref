@@ -161,7 +161,12 @@ class CitationFormatConversionWriterTest {
             assertEquals(before.sections(), snapshot(document).sections());
             assertTrue(UnoRedlines.getRecordChanges(document));
             assertFalse(document.hasControllersLocked());
-            assertEquals(Optional.of(style().getStyleId()), ZoteroDocumentPreferences.findCitationStyle(document, List.of(style())).map(CitationStyle::getStyleId));
+            assertEquals(Optional.of(new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, style().getStyleId())), new DocumentStyleStore().read(document));
+            if (targetZotero) {
+                assertEquals(Optional.of(style().getStyleId()), ZoteroDocumentPreferences.findCitationStyle(document, List.of(style())).map(CitationStyle::getStyleId));
+            } else {
+                assertEquals(nativePreferenceProperties(before), nativePreferenceProperties(snapshot(document)));
+            }
             Snapshot after = snapshot(document);
             assertEquals(1, undo.getAllUndoActionTitles().length);
             undo.undo();
@@ -370,19 +375,19 @@ class CitationFormatConversionWriterTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void mixedFormatsMergeCitedSetWhileUnsupportedCidMarksStayUnmanaged(boolean targetZotero) throws Exception {
+    void uniformSourceConversionPreservesCitedSetWhileUnsupportedCidMarksStayUnmanaged(boolean targetZotero) throws Exception {
         XTextDocument document = office.newDocument();
-        new MarkStore().createCitationGroup(document, office.context(), List.of("beta"), List.of(Optional.empty()),
-                CitationType.AUTHORYEAR_PAR, separatedEnd(document), false, false, "mixed_uid");
-        String nativeName = ZoteroReferenceMark.PREFIX + Files.readString(resource("zotero-native.json")).strip() + " RNDnative1234";
-        XTextCursor end = separatedEnd(document);
-        end.setString("[native]");
-        WriterReferenceMarks.create(new NamedTextContentPlacement(document, nativeName, end, true));
+        OpenOfficePreferences preferences = preferences(!targetZotero);
         String legacy = "JABREF_legacyUnknown CID_7 ignored NORMAL";
-        end = separatedEnd(document);
-        end.setString("Leave this unsupported CID citation alone");
-        WriterReferenceMarks.create(new NamedTextContentPlacement(document, legacy, end, true));
-        try (CitationEngine engine = engine(document, preferences(targetZotero))) {
+        try (CitationEngine engine = engine(document, preferences)) {
+            insert(engine, document, "beta", false);
+            insert(engine, document, "native", false);
+            XTextCursor end = separatedEnd(document);
+            end.setString("Leave this unsupported CID citation alone");
+            WriterReferenceMarks.create(new NamedTextContentPlacement(document, legacy, end, true));
+            assertEquals(2, managedNames(document, !targetZotero).size());
+            assertEquals(List.of(), managedNames(document, targetZotero));
+            preferences.setZoteroCompatibilityMode(targetZotero);
             assertTrue(success(engine.requiresFormatConversion(style())));
             insert(engine, document, "alpha", false);
             assertEquals(3, managedNames(document, targetZotero).size());
@@ -391,6 +396,46 @@ class CitationFormatConversionWriterTest {
             assertEquals(List.of("alpha", "beta", "native"), exported.database().getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).sorted().toList());
             assertEquals(List.of(), exported.unresolvedKeys());
             assertEquals("Leave this unsupported CID citation alone", WriterReferenceMarks.getAnchor(document, legacy).orElseThrow().getString());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"native", "legacy"})
+    void conversionDetectionUsesWritersFirstRecognizedNameWithoutAssumingDocumentOrder(String laterFormat) throws Exception {
+        XTextDocument document = office.newDocument();
+        String unrelated = "AAA_unrelated";
+        String unsupported = "JABREF_aaa CID_7 ignored NORMAL";
+        for (String name : List.of(unrelated, unsupported)) {
+            XTextCursor cursor = separatedEnd(document);
+            cursor.setString("Unmanaged text");
+            WriterReferenceMarks.create(new NamedTextContentPlacement(document, name, cursor, true));
+        }
+        String canonical = new MarkStore().createCitationGroup(document, office.context(), List.of("beta"), List.of(Optional.empty()),
+                CitationType.AUTHORYEAR_PAR, separatedEnd(document), false, false, "detection_uid").getReferenceMarkNameForLinking().orElseThrow();
+        String later = "native".equals(laterFormat)
+                       ? ZoteroReferenceMark.PREFIX + Files.readString(resource("zotero-native.json")).strip() + " RNDnative1234"
+                       : "JR_cite_1_beta";
+        XTextCursor cursor = separatedEnd(document);
+        cursor.setString("Later different citation format");
+        WriterReferenceMarks.create(new NamedTextContentPlacement(document, later, cursor, true));
+        List<String> names = WriterReferenceMarks.getListOfNames(document);
+        List<String> recognized = names.stream()
+                                       .filter(name -> JabRefMarkCodec.isCanonicalMarkName(name) || "JR_cite_1_beta".equals(name)
+                                               || ZoteroReferenceMark.isZoteroReferenceMarkName(name))
+                                       .toList();
+        assertEquals(Set.of(canonical, later), Set.copyOf(recognized));
+        boolean nativeMode = !JabRefMarkCodec.isCanonicalMarkName(recognized.getFirst());
+        XUndoManager undo = UnoUndo.getXUndoManager(document).orElseThrow();
+        undo.clear();
+        OpenOfficePreferences preferences = preferences(nativeMode);
+        try (CitationEngine engine = engine(document, preferences)) {
+            Snapshot before = snapshot(document);
+            assertFalse(success(engine.requiresFormatConversion(style())));
+            assertEquals(before, snapshot(document));
+            preferences.setZoteroCompatibilityMode(!nativeMode);
+            assertTrue(success(engine.requiresFormatConversion(style())));
+            assertEquals(before, snapshot(document));
+            assertEquals(0, undo.getAllUndoActionTitles().length);
         }
     }
 
@@ -730,7 +775,6 @@ class CitationFormatConversionWriterTest {
         XTextDocument document = office.newDocument();
         OpenOfficePreferences preferences = preferences(false);
         try (CitationEngine engine = engine(document, preferences)) {
-            insert(engine, document, "alpha", false);
             JsonObject nativeJson = JsonParser.parseString(Files.readString(resource("zotero-native.json"))).getAsJsonObject();
             JsonObject nativeItem = nativeJson.getAsJsonArray("citationItems").get(0).getAsJsonObject();
             nativeItem.addProperty("id", foreignId);
@@ -738,6 +782,10 @@ class CitationFormatConversionWriterTest {
             XTextCursor end = separatedEnd(document);
             end.setString("[native]");
             WriterReferenceMarks.create(new NamedTextContentPlacement(document, ZoteroReferenceMark.PREFIX + nativeJson + " RNDnative1234", end, true));
+            assertTrue(success(engine.requiresFormatConversion(style())));
+            insert(engine, document, "alpha", false);
+            assertEquals(List.of(), managedNames(document, true));
+            assertEquals(2, managedNames(document, false).size());
             preferences.setZoteroCompatibilityMode(true);
             insert(engine, document, "beta", false);
             Set<String> allocated = new HashSet<>();
@@ -887,13 +935,81 @@ class CitationFormatConversionWriterTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"numeric-style", "readonly-style", "nonremovable-page", "numeric-metadata"})
-    void propertyTypesWritabilityAndRemovabilityAreCheckedBeforeConversion(String kind) throws Exception {
+    @ValueSource(strings = {"malformed", "readonly", "nonstring"})
+    void canonicalConversionIgnoresUnusableNativePreferences(String kind) throws Exception {
+        XTextDocument document = office.newDocument();
+        OpenOfficePreferences preferences = preferences(true);
+        try (CitationEngine engine = engine(document, preferences)) {
+            insert(engine, document, "alpha", false);
+            String originalPreferenceChunk = UnoUserDefinedProperty.getStringValue(document, "ZOTERO_PREF_1").orElseThrow();
+            UnoUserDefinedProperty.removeIfExists(document, "ZOTERO_PREF_1");
+            XPropertyContainer properties = UnoUserDefinedProperty.getPropertyContainer(document).orElseThrow();
+            short attributes = PropertyAttribute.REMOVEABLE;
+            if ("readonly".equals(kind)) {
+                attributes |= PropertyAttribute.READONLY;
+            }
+            Object value = switch (kind) {
+                case "nonstring" ->
+                        42;
+                case "readonly" ->
+                        originalPreferenceChunk;
+                default ->
+                        "Not native preference XML";
+            };
+            properties.addProperty("ZOTERO_PREF_1", attributes, value);
+            Map<String, Object> nativePreferencesBefore = nativePreferenceProperties(snapshot(document));
+            preferences.setZoteroCompatibilityMode(false);
+            try (MockedStatic<ZoteroDocumentPreferences> nativePreferences = mockStatic(ZoteroDocumentPreferences.class, invocation ->
+                    fail("Canonical conversion must not access native preferences: " + invocation.getMethod().getName()))) {
+                assertTrue(success(engine.requiresFormatConversion(style())));
+                insertAndAssertUndoRedo(engine, document, "beta");
+                assertFalse(success(engine.requiresFormatConversion(style())));
+                nativePreferences.verifyNoInteractions();
+            }
+            assertEquals(List.of(), managedNames(document, true));
+            assertEquals(2, managedNames(document, false).size());
+            assertEquals(nativePreferencesBefore, nativePreferenceProperties(snapshot(document)));
+            assertEquals(Optional.of(new DocumentStyleStore.State(DocumentStyleStore.Family.CSL, style().getStyleId())), new DocumentStyleStore().read(document));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"malformed", "readonly", "nonstring"})
+    void nativeTargetStillValidatesNativePreferencesBeforeConversion(String kind) throws Exception {
         XTextDocument document = office.newDocument();
         OpenOfficePreferences preferences = preferences(false);
         try (CitationEngine engine = engine(document, preferences)) {
             insert(engine, document, "alpha", false);
-            String uid = JabRefMarkCodec.decode(managedNames(document, false).getFirst()).uniqueId();
+            XPropertyContainer properties = UnoUserDefinedProperty.getPropertyContainer(document).orElseThrow();
+            short attributes = PropertyAttribute.REMOVEABLE;
+            if ("readonly".equals(kind)) {
+                attributes |= PropertyAttribute.READONLY;
+            }
+            Object value = switch (kind) {
+                case "nonstring" ->
+                        42;
+                case "readonly" ->
+                        "<data data-version=\"3\"><style id=\"untouched-native-style\"/></data>";
+                default ->
+                        "Not native preference XML";
+            };
+            properties.addProperty("ZOTERO_PREF_1", attributes, value);
+            preferences.setZoteroCompatibilityMode(true);
+            assertTrue(success(engine.requiresFormatConversion(style())));
+            assertRejectedWithoutMutation(engine, document);
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({"numeric-style, true", "readonly-style, true", "nonremovable-page, true", "numeric-metadata, true",
+            "numeric-style, false", "readonly-style, false"})
+    void propertyTypesWritabilityAndRemovabilityAreCheckedBeforeConversion(String kind, boolean targetZotero) throws Exception {
+        XTextDocument document = office.newDocument();
+        OpenOfficePreferences preferences = preferences(!targetZotero);
+        try (CitationEngine engine = engine(document, preferences)) {
+            insert(engine, document, "alpha", false);
+            String name = managedNames(document, !targetZotero).getFirst();
+            String uid = targetZotero ? JabRefMarkCodec.decode(name).uniqueId() : ZoteroReferenceMark.parse(name).orElseThrow().uniqueId();
             String property = switch (kind) {
                 case "nonremovable-page" ->
                         MarkStore.pageInfoProperty(uid, 0);
@@ -909,7 +1025,7 @@ class CitationFormatConversionWriterTest {
                 attributes |= PropertyAttribute.READONLY;
             }
             container.addProperty(property, attributes, kind.startsWith("numeric") ? 42 : "original value");
-            preferences.setZoteroCompatibilityMode(true);
+            preferences.setZoteroCompatibilityMode(targetZotero);
             assertRejectedWithoutMutation(engine, document);
         }
     }
@@ -1055,6 +1171,16 @@ class CitationFormatConversionWriterTest {
 
     private static List<String> bibliographyNames(XTextDocument document) throws Exception {
         return Arrays.stream(UnoTextSection.getNameAccess(document).getElementNames()).filter(name -> "JR_bib".equals(name) || name.startsWith("ZOTERO_BIBL ")).toList();
+    }
+
+    private static Map<String, Object> nativePreferenceProperties(Snapshot snapshot) {
+        Map<String, Object> properties = new LinkedHashMap<>();
+        snapshot.properties().forEach((name, value) -> {
+            if (name.startsWith("ZOTERO_PREF") || name.startsWith("CSL_PREF")) {
+                properties.put(name, value);
+            }
+        });
+        return properties;
     }
 
     private static Snapshot snapshot(XTextDocument document) throws Exception {
