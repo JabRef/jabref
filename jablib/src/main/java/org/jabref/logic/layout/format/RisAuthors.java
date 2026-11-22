@@ -19,7 +19,9 @@ public class RisAuthors implements ParamLayoutFormatter {
         if (fieldText == null) {
             return "";
         }
-        return AuthorList.parse(fieldText)
+        // BibTeX treats line breaks and repeated whitespace as a single space
+        String normalizedFieldText = fieldText.replaceAll("\\s+", " ").trim();
+        return AuthorList.parse(normalizedFieldText)
                          .latexFree()
                          .getAuthors()
                          .stream()

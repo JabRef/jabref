@@ -55,4 +55,17 @@ class RisAuthorsTest {
         formatter.setArgument("A2");
         assertEquals("A2  - Smith, John", formatter.format("John Smith"));
     }
+
+
+    @Test
+    void multilineOrganizationNameIsPreserved() {
+        assertEquals("AU  - World Health Organization",
+                formatter.format("{World Health\n    Organization}"));
+    }
+
+    @Test
+    void multilineAuthorListIsSplitCorrectly() {
+        assertEquals("AU  - World Health Organization" + OS.NEWLINE + "AU  - Smith, John",
+                formatter.format("{World Health Organization}\n    and John Smith"));
+    }
 }
