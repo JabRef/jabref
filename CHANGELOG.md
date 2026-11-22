@@ -45,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added Markdown publication exports with recent papers, grouped sections, and DOI, URL, and PDF links. [#12729](https://github.com/JabRef/jabref/issues/12729)
 - We added checkboxes to enable or disable individual journal abbreviation lists without removing them. [#12468](https://github.com/JabRef/jabref/issues/12468)
 - We added support for resolving BibLaTeX `xdata` field references in entry previews. [#10865](https://github.com/JabRef/jabref/issues/10865)
+- Added a "Get more JStyles" link in the OpenOffice style selection dialog. [#17882](https://github.com/JabRef/jabref/issues/17882)
 - We added importing cited entries from Zotero-compatible LibreOffice documents into the current library. [#16516](https://github.com/JabRef/jabref/issues/16516)
 - We added switching JStyle/CSL/BST citation styles without reinserting LibreOffice/OpenOffice citations, preserving citation types and page information outside Zotero compatibility mode. [#14962](https://github.com/JabRef/jabref/issues/14962)
 - We added in-text citations for numeric JStyle and BST styles in LibreOffice/OpenOffice, pairing author names with citation markers. [#17673](https://github.com/JabRef/jabref/pull/17673)
@@ -54,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We combined the add and review actions in the citations tab into one button and arranged entry buttons compactly. [#17847](https://github.com/JabRef/jabref/issues/17847)
 - We improved OCR failure messages to show the executed command and diagnostic output. [#16679](https://github.com/JabRef/jabref/issues/16679)
 - We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
@@ -184,6 +186,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening the backup folder from the backup dialog failed when a custom file browser was set. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
+- We fixed an issue where the RIS importer overwrote the journal issue number (`IS`) with the accession number (`AN`). [#17817](https://github.com/JabRef/jabref/issues/17817)
 - We fixed LibreOffice/OpenOffice citations losing their normal, in-text, or invisible form when refreshed using CSL styles outside Zotero compatibility mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed citation page information being lost, misplaced, or not cleared when editing LibreOffice/OpenOffice citations or undoing citation edits. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed CSL in-text citations with missing dates or authors and protected formatted citations from malformed markup in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)

@@ -350,6 +350,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         viewModel.addJStyleFile();
     }
 
+    @FXML
+    private void openJStylesWebsite() {
+        viewModel.openJStylesWebsite();
+    }
+
     private void setupBstStylesTab() {
         OpenOfficePreferences openOfficePreferences =
                 preferences.getOpenOfficePreferences(journalAbbreviationRepository);
