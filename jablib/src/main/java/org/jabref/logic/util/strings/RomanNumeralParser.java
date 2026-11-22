@@ -18,7 +18,7 @@ public class RomanNumeralParser {
             'D', 500,
             'M', 1000);
 
-    public static Optional<Integer> parse(String romanText){
+    public static Optional<Integer> parse(String romanText) {
         //Normalize the roman number
         if (romanText == null) {
             return Optional.empty();
@@ -33,19 +33,18 @@ public class RomanNumeralParser {
         if (RomanNumeralParser.isValid(normalizedRomanText)) {
 
             int len = normalizedRomanText.length();
-            int result =0;
+            int result = 0;
 
-            for (int i = 0; i < len;i++) {
+            for (int i = 0; i < len; i++) {
 
                 char ch1 = normalizedRomanText.charAt(i);
                 int value = ROMAN_VALUES.get(ch1);
                 int next;
-                if (i+1 == len) {
-                    next=0;
-                }
-                else{
+                if (i + 1 == len) {
+                    next = 0;
+                } else {
                     char ch2 = normalizedRomanText.charAt(i + 1);
-                    next= ROMAN_VALUES.get(ch2);
+                    next = ROMAN_VALUES.get(ch2);
                 }
 
                 if (value < next) {
@@ -56,27 +55,22 @@ public class RomanNumeralParser {
             }
 
             return Optional.of(result);
-        }
-        else {
+        } else {
             return Optional.empty();
         }
-
     }
 
-
     // Compile the regex
-    private static final Pattern ROMAN_PATTERN  = Pattern.compile("M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})");
+    private static final Pattern ROMAN_PATTERN = Pattern.compile("M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})");
 
-    public static boolean isValid(String str)
-    {
+    public static boolean isValid(String str) {
         if (str == null) {
             return false;
         }
 
-        Matcher m = ROMAN_PATTERN .matcher(str);
+        Matcher m = ROMAN_PATTERN.matcher(str);
 
         // Return if the str matched the REGEX
         return m.matches();
     }
-
 }
