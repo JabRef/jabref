@@ -364,7 +364,7 @@ class ConversionMetadataTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("cslConversionCases")
     void cslConversionDependsOnlyOnTheFirstRecognizedCitation(String description, List<String> names,
-                                                            boolean nativeConversionRequired, boolean canonicalConversionRequired) {
+                                                              boolean nativeConversionRequired, boolean canonicalConversionRequired) {
         OOStyle style = CSLStyleLoader.getDefaultStyle();
 
         assertEquals(nativeConversionRequired, CitationFormatConverter.required(names, style, true));
@@ -391,7 +391,7 @@ class ConversionMetadataTest {
     @ParameterizedTest
     @MethodSource("nonCslConversionCases")
     void nonCslConversionOnlyMigratesAFirstRecognizedJrCitationRegardlessOfSavedMode(OOStyle style, boolean zoteroMode,
-                                                                                List<String> names, boolean expected) {
+                                                                                     List<String> names, boolean expected) {
         assertEquals(expected, CitationFormatConverter.required(names, style, zoteroMode));
     }
 
