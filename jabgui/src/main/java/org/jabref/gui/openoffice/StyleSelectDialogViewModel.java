@@ -499,6 +499,14 @@ public class StyleSelectDialogViewModel {
         });
     }
 
+    public void openJStylesWebsite() {
+        try {
+            NativeDesktop.openBrowser("https://jstyles.jabref.org/", externalApplicationsPreferences);
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
+        }
+    }
+
     public void editJStyle() {
         JStyle jStyle = selectedJStyle.getValue().getJStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", externalApplicationsPreferences);
