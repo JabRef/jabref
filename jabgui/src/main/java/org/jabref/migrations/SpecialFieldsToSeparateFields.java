@@ -61,25 +61,26 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
         KeywordList keywords = entry.getKeywords(keywordDelimiter);
         return possibleKeywordsToMigrate.stream()
                                         .filter(keyword -> !AMBIGUOUS_KEYWORDS.contains(keyword.get()))
-                                        .anyMatch(keywords::contains);
+                                        .filter(keywords::contains)
+                                        .anyMatch(keyword -> canMoveKeyword(entry, keyword));
     }
 
     private void migrateEntry(BibEntry entry) {
         KeywordList keywords = entry.getKeywords(keywordDelimiter);
         KeywordList migratedKeywords = new KeywordList();
         for (Keyword keyword : possibleKeywordsToMigrate) {
-            if (!keywords.contains(keyword) || !migrationTable.containsKey(keyword.get())) {
-                continue;
+            if (keywords.contains(keyword) && canMoveKeyword(entry, keyword)) {
+                entry.setField(migrationTable.get(keyword.get()), keyword.get());
+                migratedKeywords.add(keyword);
             }
-            SpecialField field = migrationTable.get(keyword.get());
-            if (entry.getField(field).filter(value -> !value.equals(keyword.get())).isPresent()) {
-                // A different value in the special field is not overwritten; the keyword stays so that nothing is lost
-                continue;
-            }
-            entry.setField(field, keyword.get());
-            migratedKeywords.add(keyword);
         }
         entry.removeKeywords(migratedKeywords, keywordDelimiter);
+    }
+
+    private boolean canMoveKeyword(BibEntry entry, Keyword keyword) {
+        String value = keyword.get();
+        return migrationTable.containsKey(value)
+                && entry.getField(migrationTable.get(value)).filter(existing -> !existing.equals(value)).isEmpty();
     }
 
     /// Mapping of special field values (contained in the keywords) to their corresponding special field

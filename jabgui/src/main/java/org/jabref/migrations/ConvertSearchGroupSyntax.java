@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.SearchQueryConversion;
@@ -45,6 +46,11 @@ public class ConvertSearchGroupSyntax implements PostOpenMigration {
     }
 
     @Override
+    public boolean modifiesEntries() {
+        return false;
+    }
+
+    @Override
     public void performMigration(ParserResult parserResult, List<BibEntry> entries) {
         parserResult.getMetaData().getGroups().ifPresent(this::migrateGroups);
         parserResult.getMetaData().setGroupSearchSyntaxVersion(VERSION_6_0_ALPHA_1);
@@ -68,11 +74,12 @@ public class ConvertSearchGroupSyntax implements PostOpenMigration {
     }
 
     private void askForNewSearchExpression(SearchGroup searchGroup) {
-        Optional<String> newSearchExpression = dialogService.showInputDialogWithDefaultAndWait(
-                Localization.lang("Search group migration failed"),
-                Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.",
-                        searchGroup.getName()),
-                searchGroup.getSearchExpression());
-        newSearchExpression.ifPresent(searchGroup::setSearchExpression);
+        Optional.ofNullable(UiTaskExecutor.runInJavaFXThread(() -> dialogService.showInputDialogWithDefaultAndWait(
+                        Localization.lang("Search group migration failed"),
+                        Localization.lang("The search group '%0' could not be migrated. Please enter the new search expression.",
+                                searchGroup.getName()),
+                        searchGroup.getSearchExpression())))
+                .flatMap(expression -> expression)
+                .ifPresent(searchGroup::setSearchExpression);
     }
 }

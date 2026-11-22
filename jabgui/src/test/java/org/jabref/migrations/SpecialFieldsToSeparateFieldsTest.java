@@ -75,9 +75,13 @@ class SpecialFieldsToSeparateFieldsTest {
                                           .withField(SpecialField.RANKING, "rank2")
                                           .withField(StandardField.KEYWORDS, "prio1");
 
-        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
+        ParserResult result = new ParserResult(List.of(entry));
+        SpecialFieldsToSeparateFields migration = new SpecialFieldsToSeparateFields(',');
+        assertTrue(migration.isMigrationNecessary(result));
+        migration.performMigration(result);
 
         assertEquals(expected, entry);
+        assertFalse(migration.isMigrationNecessary(result));
     }
 
     @Test

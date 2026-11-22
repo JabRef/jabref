@@ -1,5 +1,6 @@
 package org.jabref.migrations;
 
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +62,23 @@ class ConvertMarkingToGroupsTest {
                     .addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
         assertEquals(Optional.of(rootExpected), parserResult.getMetaData().getGroups());
         assertEquals(Optional.of("Nicolas:6"), entry.getField(StandardField.GROUPS));
+    }
+
+    @Test
+    void searchGroupWithSameNameDoesNotConsumeMarking() {
+        BibEntry entry = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
+        ParserResult parserResult = new ParserResult(Set.of(entry));
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        SearchGroup searchGroup = new SearchGroup("Nicolas:6", GroupHierarchyType.INDEPENDENT, "author = harrer", EnumSet.noneOf(SearchFlags.class));
+        root.addSubgroup(searchGroup);
+        parserResult.getMetaData().setGroups(root);
+
+        new ConvertMarkingToGroups(',').performMigration(parserResult);
+
+        assertEquals(searchGroup, root.findGroupByName("Nicolas:6").orElseThrow().getGroup());
+        assertEquals(Optional.of("Nicolas:6 (2)"), entry.getField(StandardField.GROUPS));
+        assertTrue(root.findGroupByName("Nicolas:6 (2)").orElseThrow().getGroup().contains(entry));
+        assertEquals(Optional.empty(), entry.getField(InternalField.MARKED_INTERNAL));
     }
 
     @Test

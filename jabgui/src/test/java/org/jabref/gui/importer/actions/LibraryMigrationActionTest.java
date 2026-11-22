@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ButtonType;
@@ -117,7 +118,7 @@ class LibraryMigrationActionTest {
     }
 
     @Test
-    void migrateRunsSelectedAndRemembersDeselected() {
+    void migrateRunsSelectedAndRemembersDeselected() throws Exception {
         BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         BibEntry prioritized = new BibEntry().withField(StandardField.KEYWORDS, "prio1");
         ParserResult parserResult = parserResultNeedingAllMigrations(marked, prioritized);
@@ -133,7 +134,7 @@ class LibraryMigrationActionTest {
     }
 
     @Test
-    void migrateBatchesChangesAndRestoresEntryObservation() {
+    void migrateBatchesChangesAndRestoresEntryObservation() throws Exception {
         BibEntry entry = new BibEntry().withCitationKey("Entry")
                                        .withField(InternalField.MARKED_INTERNAL, "[Owner:6]")
                                        .withField(StandardField.KEYWORDS, "topic, prio1");
@@ -166,7 +167,7 @@ class LibraryMigrationActionTest {
     }
 
     @Test
-    void keepAsIsRunsOnlyMandatoryMigrations() {
+    void keepAsIsRunsOnlyMandatoryMigrations() throws Exception {
         BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         BibEntry prioritized = new BibEntry().withField(StandardField.KEYWORDS, "prio1");
         ParserResult parserResult = parserResultNeedingAllMigrations(marked, prioritized);
@@ -182,7 +183,7 @@ class LibraryMigrationActionTest {
     }
 
     @Test
-    void unnecessaryMigrationHasNoCheckBoxAndIsNotRemembered() {
+    void unnecessaryMigrationHasNoCheckBoxAndIsNotRemembered() throws Exception {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         ParserResult parserResult = new ParserResult(Set.of(marked));
@@ -195,7 +196,7 @@ class LibraryMigrationActionTest {
     }
 
     @Test
-    void mandatoryMigrationAloneOffersNoChoice() {
+    void mandatoryMigrationAloneOffersNoChoice() throws Exception {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
         parserResult.getMetaData().setGroupsInLegacyFormat(true);
@@ -221,6 +222,7 @@ class LibraryMigrationActionTest {
     /// Simulates the user: deselects the check box at `deselectedIndex` (order: markings, special fields; the legacy groups conversion is marked "always" instead), then closes the dialog
     private void answerDialog(boolean migrate, int expectedCheckBoxes, int deselectedIndex) {
         when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenAnswer(invocation -> {
+            assertTrue(Platform.isFxApplicationThread());
             DialogPane pane = invocation.getArgument(1);
             List<CheckBox> checkBoxes = ((VBox) pane.getContent()).getChildren().stream()
                                                                   .filter(GridPane.class::isInstance)

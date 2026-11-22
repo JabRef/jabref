@@ -26,6 +26,10 @@ public interface PostOpenMigration {
         return true;
     }
 
+    default boolean modifiesEntries() {
+        return true;
+    }
+
     default void performMigration(ParserResult parserResult) {
         performMigration(parserResult, parserResult.getDatabase().getEntries());
     }

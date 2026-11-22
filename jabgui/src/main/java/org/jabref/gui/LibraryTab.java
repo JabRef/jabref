@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -54,6 +55,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.git.GitDiffDialogView;
 import org.jabref.gui.git.GitPullScheduler;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.importer.actions.LibraryMigrationAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -481,7 +483,42 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
+        LibraryMigrationAction migration = new LibraryMigrationAction();
+        if (result.getDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
+            // A connected shared library already has synchronization listeners.
+            try {
+                migration.performAction(result, dialogService, preferences);
+            } catch (ExecutionException | InterruptedException e) {
+                BackgroundTask.wrap(() -> closeSharedDatabase(result.getDatabaseContext())).executeWith(taskExecutor);
+                onMigrationFailed(e);
+                return;
+            }
+            if (closed) {
+                BackgroundTask.wrap(() -> closeSharedDatabase(result.getDatabaseContext())).executeWith(taskExecutor);
+                return;
+            }
+            finishDatabaseLoading(result);
+            return;
+        }
+
+        BackgroundTask<ParserResult> migrationTask = BackgroundTask.wrap(() -> {
+            migration.performAction(result, dialogService, preferences);
+            return result;
+        });
+        setDataLoadingTask(migrationTask);
+        migrationTask.onSuccess(this::finishDatabaseLoading)
+                     .onFailure(this::onMigrationFailed)
+                     .executeWith(taskExecutor);
+    }
+
+    private void finishDatabaseLoading(ParserResult result) {
+        if (closed) {
+            return;
+        }
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
+        if (closed) {
+            return;
+        }
         setDatabaseContext(result.getDatabaseContext());
         if (result.getChangedOnMigration()) {
             // Rewritten while loading, so there is no step to undo it with. After the context is
@@ -496,6 +533,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
+    }
+
+    private void onMigrationFailed(Exception exception) {
+        LOGGER.error("Library migration failed", exception);
+        closeWhileLoading();
+        dialogService.showErrorDialogAndWait(Localization.lang("Open library error"), exception);
     }
 
     public void createSearchContext() {

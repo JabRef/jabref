@@ -59,6 +59,21 @@ public class UiTaskExecutor implements TaskExecutor {
         }
     }
 
+    public static <V> V callAndWaitInJavaFXThread(Callable<V> callable) throws ExecutionException, InterruptedException {
+        FutureTask<V> task = new FutureTask<>(callable);
+        if (Platform.isFxApplicationThread()) {
+            task.run();
+        } else {
+            Platform.runLater(task);
+        }
+        try {
+            return task.get();
+        } catch (InterruptedException e) {
+            task.cancel(false);
+            throw e;
+        }
+    }
+
     /// Runs the specified [Runnable] on the JavaFX application thread and waits for completion.
     ///
     /// @param action the [Runnable] to run

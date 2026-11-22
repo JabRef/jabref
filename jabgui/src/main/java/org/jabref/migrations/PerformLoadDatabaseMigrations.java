@@ -18,18 +18,27 @@ public class PerformLoadDatabaseMigrations {
             return;
         }
 
-        // Before the library is attached to the GUI, detach the extractor-backed entries list so each migrated
-        // field does not trigger a scan of the whole library. Reinsert the same entries to rebuild its indices.
+        List<PostOpenMigration> entryMigrations = necessaryMigrations.stream().filter(PostOpenMigration::modifiesEntries).toList();
+        if (!entryMigrations.isEmpty()) {
+            migrateEntries(parserResult, entryMigrations);
+        }
+        necessaryMigrations.stream()
+                           .filter(migration -> !migration.modifiesEntries())
+                           .forEach(migration -> migration.performMigration(parserResult, List.of()));
+        parserResult.setChangedOnMigration(true);
+    }
+
+    private static void migrateEntries(ParserResult parserResult, List<PostOpenMigration> migrations) {
+        // Detach the extractor-backed list to avoid scanning the whole library for each migrated field.
         BibDatabase database = parserResult.getDatabase();
         List<BibEntry> entries = database.getEntriesSnapshot();
         database.removeEntries(entries);
         try {
-            for (PostOpenMigration migration : necessaryMigrations) {
+            for (PostOpenMigration migration : migrations) {
                 migration.performMigration(parserResult, entries);
             }
         } finally {
             database.insertEntries(entries);
         }
-        parserResult.setChangedOnMigration(true);
     }
 }

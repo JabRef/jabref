@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import javafx.geometry.HPos;
@@ -22,6 +23,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -39,16 +41,28 @@ import org.jspecify.annotations.NullMarked;
 /// The [PostOpenMigration]s are listed in a table, so the user sees what JabRef is about to rewrite.
 /// Conversions whose old format is still written get a check box to keep the old data.
 @NullMarked
-public class LibraryMigrationAction implements GUIPostOpenAction {
-
-    @Override
-    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        return !getNecessaryMigrations(parserResult, dialogService, preferences).isEmpty();
-    }
+public class LibraryMigrationAction {
 
     /// [impl->req~import.legacy-library-migration~1]
-    @Override
-    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences)
+            throws ExecutionException, InterruptedException {
+        Map<PostOpenMigration, Boolean> applicability = new LinkedHashMap<>();
+        getOfferedMigrations(parserResult, dialogService, preferences).stream()
+                                                                      .sorted(Comparator.comparing(migration -> !migration.isOptional()))
+                                                                      .forEach(migration -> applicability.put(migration, migration.isMigrationNecessary(parserResult)));
+        if (!applicability.containsValue(true)) {
+            return;
+        }
+
+        MigrationChoices choices = UiTaskExecutor.callAndWaitInJavaFXThread(() -> chooseMigrations(parserResult, dialogService, applicability));
+        applyChoices(parserResult, choices);
+    }
+
+    private record MigrationChoices(List<PostOpenMigration> selected, List<String> skipped) {
+    }
+
+    private MigrationChoices chooseMigrations(ParserResult parserResult, DialogService dialogService,
+                                              Map<PostOpenMigration, Boolean> applicability) {
         List<PostOpenMigration> mandatoryMigrations = new ArrayList<>();
         Map<PostOpenMigration, CheckBox> checkBoxes = new LinkedHashMap<>();
 
@@ -61,14 +75,11 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         performColumn.setMinWidth(Region.USE_PREF_SIZE);
         table.getColumnConstraints().addAll(descriptionColumn, performColumn);
         table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
-        // The conversions the user can decide on come first
-        List<PostOpenMigration> migrations = getOfferedMigrations(parserResult, dialogService, preferences).stream()
-                                                                                                           .sorted(Comparator.comparing(migration -> !migration.isOptional()))
-                                                                                                           .toList();
-        for (PostOpenMigration migration : migrations) {
+        for (Map.Entry<PostOpenMigration, Boolean> row : applicability.entrySet()) {
+            PostOpenMigration migration = row.getKey();
             Label description = wrappingLabel(migration.getDescription());
             Node perform;
-            if (!migration.isMigrationNecessary(parserResult)) {
+            if (!row.getValue()) {
                 // Listed nevertheless, so the user sees that the library was checked for this format
                 perform = new Label(Localization.lang("(n/a)"));
                 description.getStyleClass().add("text-muted");
@@ -118,9 +129,13 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
                 skippedMigrations.add(migration.getId());
             }
         }
-        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(parserResult, selectedMigrations);
+        return new MigrationChoices(selectedMigrations, skippedMigrations);
+    }
+
+    private void applyChoices(ParserResult parserResult, MigrationChoices choices) {
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(parserResult, choices.selected());
         // The declined conversions are part of the library, so the choice survives a reopen
-        parserResult.getMetaData().setSkippedMigrations(skippedMigrations);
+        parserResult.getMetaData().setSkippedMigrations(choices.skipped());
         parserResult.setChangedOnMigration(true);
     }
 
