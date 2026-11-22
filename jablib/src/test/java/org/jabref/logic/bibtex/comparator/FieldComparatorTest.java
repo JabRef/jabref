@@ -19,6 +19,53 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldComparatorTest {
     @Test
+    void extendedNamesSortByTheirExplicitPrefixOption() {
+        for (StandardField field : new StandardField[] {StandardField.AUTHOR, StandardField.EDITOR}) {
+            BibEntry withoutPrefix = new BibEntry().withField(field, "family=Hasselt, given=Hado P., prefix=van, useprefix=false");
+            BibEntry withPrefix = new BibEntry().withField(field, "family=Hasselt, given=Hado P., prefix=van, useprefix=true");
+            BibEntry middle = new BibEntry().withField(field, "Miller, Max");
+            FieldComparator ascending = new FieldComparator(field);
+            FieldComparator descending = new FieldComparator(new OrFields(field), true);
+
+            assertEquals(-1, Integer.signum(ascending.compare(withoutPrefix, middle)));
+            assertEquals(1, Integer.signum(ascending.compare(withPrefix, middle)));
+            assertEquals(1, Integer.signum(descending.compare(withoutPrefix, middle)));
+            assertEquals(-1, Integer.signum(descending.compare(withPrefix, middle)));
+        }
+    }
+
+    @Test
+    void conventionalAndExtendedNamesWithSameFamilyAndInitialTie() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry conventional = new BibEntry().withField(StandardField.AUTHOR, "Smith, John");
+        BibEntry extended = new BibEntry().withField(StandardField.AUTHOR, "family=Smith, given=Jane");
+
+        assertEquals(0, comparator.compare(conventional, extended));
+        assertEquals(0, comparator.compare(extended, conventional));
+    }
+
+    @Test
+    void saveOrderHonorsListPrefixDefaultAndIndividualOverride() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        String name = "useprefix=1 and family=Hasselt, prefix=van";
+        BibEntry inheritedPrefix = new BibEntry().withField(StandardField.AUTHOR, name);
+        BibEntry excludedPrefix = new BibEntry().withField(StandardField.AUTHOR, name + ", useprefix=FALSE");
+        BibEntry middle = new BibEntry().withField(StandardField.AUTHOR, "Miller, Max");
+
+        assertEquals(1, Integer.signum(comparator.compare(inheritedPrefix, middle)));
+        assertEquals(-1, Integer.signum(comparator.compare(excludedPrefix, middle)));
+    }
+
+    @Test
+    void nameSortingUsesEditorWhenAuthorIsMissing() {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), false);
+        BibEntry edited = new BibEntry().withField(StandardField.EDITOR, "family=Hasselt, prefix=van, useprefix=true");
+        BibEntry authored = new BibEntry().withField(StandardField.AUTHOR, "Miller, Max");
+
+        assertEquals(1, Integer.signum(comparator.compare(edited, authored)));
+    }
+
+    @Test
     void compareMonthFieldIdentity() {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);
         BibEntry equal = new BibEntry()

@@ -7,8 +7,10 @@ import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
+import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,18 @@ class ChatModelFactoryTest {
         try (ChatModel model = ChatModelFactory.create(provider, "model", "key", 0.7, provider.getApiUrl(), 4096, TokenEstimatorKind.AVERAGE)) {
             assertEquals("model", model.getName());
         }
+    }
+
+    @Test
+    void langChainChatLoadsObservabilityProvidersOnModulePath() {
+        var model = new dev.langchain4j.model.chat.ChatModel() {
+            @Override
+            public ChatResponse doChat(ChatRequest request) {
+                return ChatResponse.builder().aiMessage(AiMessage.from("OK")).build();
+            }
+        };
+
+        assertEquals("OK", model.chat(List.of(UserMessage.from("Reply with OK."))).aiMessage().text());
     }
 
     @Test
