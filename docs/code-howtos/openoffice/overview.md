@@ -253,7 +253,7 @@ Choosing another family does not turn manual CSL inference into a JStyle/BST heu
 
 The style dialogs share the external-file picker and private removal helpers.
 Parsers, caches, previews, and edit behavior are family-specific.
-Inactive style-family tabs defer preview generation until activated.
+Each non-null style selection loads its preview when the dialog opens or the selection changes, regardless of the active tab.
 Removing an external style is guarded by confirmation; cancellation and failures must not apply the successful-removal transition, and successful removal repairs row selection.
 Removal forgets the configured style entry rather than deleting the user's style file.
 

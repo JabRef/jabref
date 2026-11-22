@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -117,10 +116,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer bstPreviewViewer;
     private PreviewViewer cslPreviewViewer;
-    private PreviewViewer previewArticle;
-    private PreviewViewer previewBook;
-
-    /// ViewModel for the CitationStyle entries in the TableView
+    private PreviewViewer jStyleArticlePreviewViewer;
+    private PreviewViewer jStyleBookPreviewViewer;
 
     public StyleSelectDialogView(CSLStyleLoader cslStyleLoader,
                                  JStyleLoader jStyleLoader,
@@ -174,9 +171,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
         tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.setSelectedTab(newValue));
 
-        setupLazyPreview(cslStyleTab, viewModel.selectedCslLayoutProperty(), this::updateCslPreview);
-        setupLazyPreview(jStyleTab, viewModel.selectedJStyleProperty(), this::updateJStylePreview);
-        setupLazyPreview(bstStyleTab, viewModel.selectedBstStyleProperty(), this::updateBstPreview);
+        EasyBind.subscribe(viewModel.selectedCslLayoutProperty(), _ -> updateCslPreview());
+        EasyBind.subscribe(viewModel.selectedJStyleProperty(), _ -> updateJStylePreview());
+        EasyBind.subscribe(viewModel.selectedBstStyleProperty(), _ -> updateBstPreview());
 
         updateCurrentStyleLabel();
         addCslButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
@@ -277,17 +274,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"));
     }
 
-    private void setupLazyPreview(Tab tab, ObservableValue<?> selection, Runnable updatePreview) {
-        Runnable updateIfActive = () -> {
-            if (tab.isSelected()) {
-                updatePreview.run();
-            }
-        };
-        selection.addListener((_, _, _) -> updateIfActive.run());
-        tab.selectedProperty().addListener((_, _, _) -> updateIfActive.run());
-        updateIfActive.run();
-    }
-
     private void updateCslPreview() {
         Optional.ofNullable(viewModel.selectedCslLayoutProperty().get()).ifPresent(layout -> {
             if (cslPreviewBox.getChildren().isEmpty()) {
@@ -301,12 +287,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private void updateJStylePreview() {
         Optional.ofNullable(viewModel.selectedJStyleProperty().get()).ifPresent(selected -> {
             if (jStylePreviewBox.getChildren().isEmpty()) {
-                previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
-                previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
-                jStylePreviewBox.getChildren().addAll(previewArticle, previewBook);
+                jStyleArticlePreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+                jStyleBookPreviewViewer = initializePreviewViewer(TestEntry.getTestEntryBook());
+                jStylePreviewBox.getChildren().addAll(jStyleArticlePreviewViewer, jStyleBookPreviewViewer);
             }
-            previewArticle.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Article)));
-            previewBook.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Book)));
+            jStyleArticlePreviewViewer.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Article)));
+            jStyleBookPreviewViewer.setLayout(new TextBasedPreviewLayout(selected.getJStyle().getReferenceFormat(StandardEntryType.Book)));
         });
     }
 

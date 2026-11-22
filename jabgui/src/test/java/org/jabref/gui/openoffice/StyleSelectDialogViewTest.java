@@ -129,7 +129,7 @@ class StyleSelectDialogViewTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2})
-    void openingOnlyRendersCurrentStyleTabAndPreservesFallbackSelections(int activeFamily) {
+    void openingRendersAllSelectedPreviewsAndPreservesFallbackSelections(int activeFamily) {
         JavaFxExtension.invokeAndWait(() -> {
             StyleSelectDialogView dialog = dialog(activeFamily, 1);
             TabPane tabs = tabs(dialog);
@@ -137,13 +137,10 @@ class StyleSelectDialogViewTest {
             assertEquals(activeFamily, tabs.getSelectionModel().getSelectedIndex());
             for (int family = 0; family < 3; family++) {
                 assertEquals(family == activeFamily ? 1 : 0, table(tabs, family).getSelectionModel().getSelectedIndex());
-                assertEquals(family == activeFamily ? viewerCount(family) : 0, previewBox(tabs, family).getChildren().size());
+                assertEquals(viewerCount(family), previewBox(tabs, family).getChildren().size());
+                assertPreview(tabs, family, family == activeFamily ? 1 : 0);
             }
-            assertEquals(viewerCount(activeFamily), viewers.size());
-            assertPreview(tabs, activeFamily, 1);
-            if (activeFamily != 2) {
-                bstPreviews.verifyNoInteractions();
-            }
+            assertEquals(4, viewers.size());
             verify(openOfficePreferences, never()).setCurrentStyle(any());
             assertEquals(style(activeFamily, 1), dialog.getResultConverter().call(ButtonType.OK));
             verify(openOfficePreferences).setCurrentStyle(style(activeFamily, 1));
@@ -161,7 +158,7 @@ class StyleSelectDialogViewTest {
             table(tabs, family).getSelectionModel().selectLast();
 
             assertPreview(tabs, family, 1);
-            assertEquals(viewerCount(family), viewers.size());
+            assertEquals(4, viewers.size());
             verify(openOfficePreferences, never()).setCurrentStyle(any());
             assertNull(dialog.getResultConverter().call(ButtonType.CANCEL));
             verify(openOfficePreferences, never()).setCurrentStyle(any());
@@ -170,7 +167,7 @@ class StyleSelectDialogViewTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2})
-    void activationRendersLatestHiddenSelectionIncludingAfterRevisitingTab(int family) {
+    void hiddenSelectionUpdatesItsPreviewWithoutWaitingForTabActivation(int family) {
         JavaFxExtension.invokeAndWait(() -> {
             int otherFamily = (family + 1) % 3;
             StyleSelectDialogView dialog = dialog(otherFamily, 0);
@@ -179,26 +176,23 @@ class StyleSelectDialogViewTest {
 
             table(tabs, family).getSelectionModel().selectLast();
 
-            assertEquals(viewerCount(otherFamily), viewers.size());
-            assertNoPreviewUpdates();
-            bstPreviews.verifyNoInteractions();
+            assertEquals(4, viewers.size());
+            assertPreview(tabs, family, 1);
+            clearPreviewInvocations();
 
             tabs.getSelectionModel().select(family);
 
-            assertPreview(tabs, family, 1);
-            assertEquals(viewerCount(otherFamily) + viewerCount(family), viewers.size());
-
+            assertNoPreviewUpdates();
+            bstPreviews.verifyNoInteractions();
             tabs.getSelectionModel().select(otherFamily);
-            clearPreviewInvocations();
             table(tabs, family).getSelectionModel().selectFirst();
 
-            assertNoPreviewUpdates();
-            bstPreviews.verifyNoInteractions();
-
+            assertPreview(tabs, family, 0);
+            clearPreviewInvocations();
             tabs.getSelectionModel().select(family);
 
-            assertPreview(tabs, family, 0);
-            assertEquals(viewerCount(otherFamily) + viewerCount(family), viewers.size());
+            assertNoPreviewUpdates();
+            assertEquals(4, viewers.size());
             assertEquals(style(family, 0), dialog.getResultConverter().call(ButtonType.OK));
             verify(openOfficePreferences).setCurrentStyle(style(family, 0));
         });
@@ -206,7 +200,7 @@ class StyleSelectDialogViewTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1})
-    void delayedCslDiscoveryOnlyRendersWhenCslTabIsActive(int activeFamily) {
+    void delayedCslDiscoveryRendersItsSelectionRegardlessOfActiveTab(int activeFamily) {
         JavaFxExtension.invokeAndWait(() -> {
             TaskExecutor executor = mock(TaskExecutor.class);
             Injector.setModelOrService(TaskExecutor.class, executor);
@@ -220,15 +214,28 @@ class StyleSelectDialogViewTest {
             new CurrentThreadTaskExecutor().execute(discovery.getValue());
 
             assertEquals(2, table(tabs, 0).getItems().size());
-            if (activeFamily == 0) {
-                assertPreview(tabs, 0, 0);
-            } else {
-                assertEquals(0, previewBox(tabs, 0).getChildren().size());
-                assertNoPreviewUpdates();
-                table(tabs, 0).getSelectionModel().selectLast();
-                tabs.getSelectionModel().select(0);
-                assertPreview(tabs, 0, 1);
+            assertPreview(tabs, 0, 0);
+            assertEquals(4, viewers.size());
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    void familyWithoutASelectionDoesNotCreatePreviewViewers(int emptyFamily) {
+        JavaFxExtension.invokeAndWait(() -> {
+            switch (emptyFamily) {
+                case 0 ->
+                        cslDiscovery.when(CSLStyleLoader::getStyles).thenReturn(List.of());
+                case 1 ->
+                        when(jStyleLoader.getStyles()).thenReturn(List.of());
+                default ->
+                        when(bstStyleLoader.getStyles()).thenReturn(List.of());
             }
+            StyleSelectDialogView dialog = dialog((emptyFamily + 1) % 3, 0);
+            TabPane tabs = tabs(dialog);
+
+            assertEquals(List.of(), previewBox(tabs, emptyFamily).getChildren());
+            assertEquals(4 - viewerCount(emptyFamily), viewers.size());
         });
     }
 

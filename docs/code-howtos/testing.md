@@ -285,7 +285,7 @@ Rendering failures must leave preparation targets unchanged, including missing P
 BST `AUTHOR_YEAR` without requested bibliography output skips BST execution; other notations retain program-derived labels and ordering.
 JStyle bibliography paragraph validation applies only when bibliography output is requested.
 Only explicit refresh sweeps all orphan page-info properties; other actions still remove properties for citations they replace or remove.
-Inactive style-family tabs defer previews until activated.
+Style-selection tests verify that non-null selections load previews across all tabs, including when CSL discovery completes after the dialog opens.
 
 `CitationFormatConversionWriterTest` covers homogeneous canonical ↔ native Zotero conversion on the next CSL citation insertion, with the format-conversion warning, not on preference changes, refresh, or export.
 JStyle/BST insertion must not convert native Zotero input; native Zotero mode must not migrate legacy JStyle input.
