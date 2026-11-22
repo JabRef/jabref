@@ -28,7 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
-    api(platform("com.konghq:unirest-java-bom:4.11.9"))
+    api(platform("com.konghq:unirest-java-bom:4.11.10"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.24.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.7.0"))
@@ -88,7 +88,7 @@ dependencies.constraints {
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("one.jpro:jmemorybuddy:0.6.0")
     api("de.saxsys:mvvmfx:1.8.0")
-    api("de.undercouch:citeproc-java:3.5.2")
+    api("de.undercouch:citeproc-java:3.5.3")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
@@ -117,7 +117,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.22.0")
     api("org.apache.commons:commons-text:1.15.0")
-    api("org.apache.httpcomponents.core5:httpcore5:5.4.4")
+    api("org.apache.httpcomponents.core5:httpcore5:5.5")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.5")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
