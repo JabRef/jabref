@@ -157,9 +157,9 @@ public class LibraryMigrationAction {
 
     static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         return determineApplicability(parserResult, dialogService, preferences).entrySet().stream()
-                                     .filter(Map.Entry::getValue)
-                                     .map(Map.Entry::getKey)
-                                     .toList();
+                                                                               .filter(Map.Entry::getValue)
+                                                                               .map(Map.Entry::getKey)
+                                                                               .toList();
     }
 
     /// All migrations except the ones the user declined for this library
