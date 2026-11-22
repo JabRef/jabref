@@ -40,6 +40,7 @@ public class IntegrityCheck {
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
                 new AmpersandChecker(),
+                new PercentChecker(),
                 new LatexIntegrityChecker(),
                 new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository)));
 
