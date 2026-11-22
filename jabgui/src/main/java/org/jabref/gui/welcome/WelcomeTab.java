@@ -214,7 +214,7 @@ public class WelcomeTab extends Tab {
 
         double fontSize = workspacePreferences.getMainFontSize();
         double mediumThreshold = 60 * fontSize;
-        double wideThreshold = 96 * fontSize;
+        double wideThreshold = 105 * fontSize;
 
         boolean scrollNeeded = false;
         if (availableWidth >= wideThreshold) {
@@ -222,7 +222,7 @@ public class WelcomeTab extends Tab {
             leftColumn.getChildren().clear();
             rightColumn.getChildren().clear();
 
-            addPercentColumns(grid, 18, 24, 32, 26);
+            addPercentColumns(grid, 15, 24, 35, 26);
             grid.add(startBox, 0, 0);
             grid.add(recentBox, 1, 0);
             grid.add(quickSettings, 2, 0);
