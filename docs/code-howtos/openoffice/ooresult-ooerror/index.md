@@ -82,7 +82,7 @@ While concentrating on these and on "do not throw exceptions here" ... using a [
 * Conceptually it is a data structure that either holds the result (of a computation) or and error value.
 * It can be considered as an extended `Optional`, that can provide details on "why empty"?
 * It can be considered as an alternative to throwing an exception: we return an `error` instead.
-* Methods throwing checked exceptions cannot be used with for example `List.map`.\
+* Methods throwing checked exceptions cannot be used directly with, for example, `Stream.map`.\
   Methods returning a Result could.
 * `Result` shares the problem (with any other solutions) that in a function several types of errors may occur, but we can only return a single error type. Java solves this using checked exceptions being all descendants of Exception. (Also adds try/catch/catch to select cases based on the exceptions type, and some checking against forgotten cases of checked exception types)
 
@@ -127,7 +127,7 @@ class OOVoidResult<E> {
 }
 ```
 
-with methods on the error side similar to those in `OOError<R,E>`, and `OOVoidResult.ok()` to construct the success case with no data.
+with methods on the error side similar to those in `OOResult<R,E>`, and `OOVoidResult.ok()` to construct the success case with no data.
 
 ### The relation between `Optional<E>` and `OOVoidResult<E>`
 
@@ -159,9 +159,9 @@ The promise of `Result` is that we can avoid throwing exceptions and return erro
 Handling the result needs some code in the caller. If we only needed checks that return only errors (not results), the code could look like this (with possibly more tests listed):
 
 ```java
-OOResult<XTextDocument, OOError> odoc = getXTextDocument();
+OOResult<XTextDocument, OOError> documentResult = getXTextDocument();
 if (testDialog(title,
-               odoc,
+               documentResult,
                styleIsRequired(style),
                selectedBibEntryIsRequired(entries, OOError::noEntriesSelectedForCitation))) {
     return;

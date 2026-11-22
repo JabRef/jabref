@@ -38,7 +38,7 @@ With synchronization disabled, all bibliography section names, text, and propert
 No bibliography renaming, consolidation, or rejection based on bibliography settings is part of citation conversion.
 Only legacy-only canonical migration permits unresolved sources during conversion, using ordinary placeholders and the successful-insertion warning; opening missing libraries and refreshing restores resolved output.
 Native-to-canonical conversion and native generation require resolved sources.
-Canonical operations and conversions leave `ZOTERO_PREF` XML untouched while updating JabRef's applied style; native insertion, refresh, and conversion to native mode update native preferences.
+Operations and conversions targeting canonical mode leave `ZOTERO_PREF` XML untouched while updating JabRef's applied style; native insertion, refresh, and conversion to native mode update native preferences.
 Immediate Writer Undo/Redo and owned rollback can restore the transaction while undo history is available, subject to recovery limits; there is no restoration guarantee after reopening.
 See [ADR-0084's conversion policy](0084-canonical-writer-citations.md) for the data-loss contract, root-undo requirement, rollback limits, and possible loss of pre-existing redo history.
 

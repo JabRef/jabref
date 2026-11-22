@@ -176,8 +176,8 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
         }
     }
 
-    /// Export is read-only. Native Zotero items not yet linked to a selected library remain unresolved,
-    /// as in the previous export path; insert and refresh perform the URI/duplicate linking step.
+    /// Export is read-only. Native Zotero items not yet linked to a selected library remain unresolved;
+    /// insert and refresh perform URI/duplicate linking.
     public OOResult<CitedEntryExporter.ExportResult, JabRefException> exportCited(List<BibDatabase> databases) {
         try {
             requireOpen();

@@ -327,24 +327,14 @@ final class JStyleCitationFormatter {
         }
     }
 
-    /// Produce (Author, year) or "Author (year)" style citation strings.
-    ///
-    /// Here we do not check for duplicate entries: those
-    /// are handled by `getCitationMarker` by
-    /// omitting them from the list.
-    ///
-    /// Unresolved citations recognized by
-    /// entry.getBibEntry() and/or
-    /// entry.getDatabase() returning empty, and
-    /// emitted as "Unresolved${citationKey}".
-    ///
-    /// Neither uniqueLetter nor pageInfo are emitted
-    /// for unresolved citations.
+    /// Formats author–year or partial citations; the caller handles duplicate filtering.
+    /// An empty `getLookupResult()` produces `Unresolved(key)` without a disambiguation letter.
+    /// Page information is retained for unresolved citations when the selected purpose includes it.
     ///
     /// @param purpose            IN_PARENTHESIS and NORMALIZED puts parentheses around the whole, IN_TEXT around each (year,uniqueLetter,pageInfo) part. NORMALIZED omits uniqueLetter and pageInfo,  ignores isFirstAppearanceOfSource (always style.getMaxAuthors, not getMaxAuthorsFirst)
     /// @param entries            The list of CitationMarkerEntry values to process.
-    /// @param startsNewGroup     Should have the same length as `entries`, and contain true for entries starting a new group, false for those that only add a uniqueLetter tothe grouped presentation.
-    /// @param maxAuthorsOverride If not empty, always show this number of authors. Added to allow NORMALIZED to use maxAuthors value that differs from style.getMaxAuthors()
+    /// @param startsNewGroup     Has the same length as `entries`: true starts a group; false only adds a unique letter to the grouped presentation.
+    /// @param maxAuthorsOverride When present, overrides the author limit.
     /// @return The formatted citation.
     private static OOText getAuthorYearParenthesisMarker2(JStyle style,
                                                           AuthorYearMarkerPurpose purpose,

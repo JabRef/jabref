@@ -104,25 +104,17 @@ public class OOTextWriter {
     ///
     /// To limit the damage `TAG_NAME_REGEXP` and `ATTRIBUTE_NAME_REGEXP` explicitly lists the names we care about.
     ///
-    /// Notable changes w.r.t insertOOFormattedTextAtCurrentLocation:
+    /// Supported formatting includes:
     ///
-    /// - new tags:
+    /// - `<span lang="zxx">` to disable spell checking.
+    /// - `<span oo:CharStyleName="CharStylename">` to apply a character style, including `CitationCharacterFormat`.
+    /// - `<p>` to start a paragraph, optionally with `oo:ParaStyleName` to select its paragraph style.
+    /// - `<tt>` to apply the `Example` character style.
+    /// - Self-closing `<oo:referenceToPageNumberOfReferenceMark target="name"/>` to insert a page reference.
     ///
-    /// - `<span lang="zxx">` - earlier was applied from code
-    ///
-    /// - `<span oo:CharStyleName="CharStylename">` - earlier was applied from code, for "CitationCharacterFormat"
-    ///
-    /// - `<p>` start new paragraph - earlier was applied from code
-    ///
-    /// - `<p oo:ParaStyleName="ParStyleName">` : start new paragraph and apply ParStyleName - earlier was applied from code
-    ///
-    /// - `<tt>` - earlier: known, but ignored - now: equivalent to `<span oo:CharStyleName="Example">` - `<oo:referenceToPageNumberOfReferenceMark>` (self-closing)
-    ///
-    /// - closing tags try to properly restore state (in particular, the "not directly set" state) instead of dictating an "off" state. This makes a difference when the value inherited from another level (for example the paragraph) is not the "off" state.
-    ///
-    /// An example: a style with `ReferenceParagraphFormat="JR_bibentry"` Assume JR_bibentry in LibreOffice is a paragraph style that prescribes "bold" font. LAYOUT only prescribes bold around year. Which parts of the bibliography entries should come out as bold?
-    ///
-    /// - The user can format citation marks (it is enough to format their start) and the properties not (everywhere) dictated by the style are preserved (where they are not).
+    /// Closing tags restore the preceding formatting layer, including inherited properties, rather than forcing properties off.
+    /// For example, ending a bold year span in a bold bibliography paragraph restores the paragraph's bold state.
+    /// Properties not overridden by the markup preserve the formatting at the insertion point.
     ///
     /// @param position The cursor giving the insert location. Not modified.
     /// @param ootext   The marked-up text to insert.

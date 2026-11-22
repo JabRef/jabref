@@ -99,7 +99,7 @@ The collection API is independent of the selected compatibility mode; the panel 
 The panel passes the result to the captured tab's normal `ImportHandler`, so changing the active tab does not retarget the import.
 Missing library or document prerequisites are reported before collection.
 
-Collection prefers native item URIs, then explicit document keys, then fallback numeric item IDs.
+Collection prefers native item URIs, then explicit document keys, then fallback item IDs, which need not be numeric.
 Only citations with the same selected identity are deduplicated, preserving the first collected position and bibliographic data; a later explicit key is retained when the first citation with that identity was keyless.
 Key-only and URI-bearing representations remain separate even when their keys match, and both reach the serialized ordinary bibliographic duplicate handler.
 An extra duplicate prompt is safer than dropping a potentially unrelated publication based solely on a shared key.
@@ -162,7 +162,7 @@ JabRef_page_info:<uid>:<storageIndex>
 
 The zero-based index addresses the key in storage order, so renderer sorting cannot transfer page information to another citation.
 Merge and Separate preserve each storage slot rather than concatenate all information into a last-citation value.
-Cite special and Manage citations edit their designated slot without dropping the other slots.
+Cite special and Manage citations set page information for the last citation in storage order without dropping the other slots.
 Only explicit canonical refresh sweeps all orphan page-info properties; operations that replace or remove citations remove their specific properties immediately.
 Document custom properties do not travel with citation text copied to another document.
 
@@ -364,7 +364,9 @@ One-way legacy JStyle → canonical migration preserves storage-order keys, all 
 Ordinary native insertion and refresh preserve existing native JSON while updating links; not every citation operation is lossy.
 
 `CSLFormatUtils.changeToInText` converts plain, single-source author–year citations enclosed in matching parentheses or square brackets, with an optional comma before a four-digit year or `n.d.`.
-Year suffixes are preserved. Forms containing markup or comma-separated author lists, as well as unrecognized forms, are left unchanged to avoid ambiguous splits, so some in-text citations retain the style's normal form.
+For example, `(Smith, 2020a)` becomes `Smith (2020a)`, and `[Smith n.d.-a]` becomes `Smith [n.d.-a]`.
+Lowercase year suffixes and a trailing simple page locator such as `, p. 7` or `, pp. 7–9` are preserved.
+Forms containing markup or comma-separated author lists, as well as unrecognized forms, are left unchanged to avoid ambiguous splits, so some in-text citations retain the style's normal form.
 This is not processor-native support for arbitrary CSL styles.
 
 ## Verification and further reading

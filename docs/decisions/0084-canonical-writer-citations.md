@@ -164,7 +164,7 @@ Insertion, conversion, refresh, merge, and separate group Writer text and mark e
 Writer's undo mechanism does not automatically restore custom document properties.
 `UndoableDocumentProperties` registers custom `XUndoAction` deltas for page information.
 Conversion additionally prepares applied-style deltas and, only when targeting native mode, Zotero preference deltas, applying them through the undo mechanism alongside citation edits.
-Canonical CSL operations and conversions leave `ZOTERO_PREF` XML untouched while still updating JabRef's applied style; native-mode insertion or refresh updates native preferences.
+Operations and conversions targeting canonical mode leave `ZOTERO_PREF` XML untouched while still updating JabRef's applied style; native-mode insertion or refresh updates native preferences.
 Replay uses raw property APIs to avoid registering further undo actions.
 Ordinary applied-style and document-preference writes use raw property APIs and are not covered by these custom undo actions.
 

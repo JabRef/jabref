@@ -53,7 +53,8 @@ Comparing a body range directly with a range in a footnote or table cell does no
 
 `DocumentOrder` therefore partitions ranges by their original `XText` before sorting them textually through `RangeSort` and `UnoTextRange`.
 Those helpers require the container to provide `XTextRangeCompare`; partitioning does not add comparison support to a container that lacks it.
-Ordinary canonical insertion, refresh, and group editing use `DocumentOrder` with JStyle, CSL, and BST styles.
+Ordinary canonical insertion and refresh use `DocumentOrder` with JStyle, CSL, and BST styles.
+JStyle group editing also uses `DocumentOrder`; CSL and BST do not support group editing.
 Native Zotero ordering and next-insertion conversion have separate ordering implementations in `ZoteroCitationStrategy` and `CitationFormatConverter`; do not assume they share `DocumentOrder`'s fallback behavior.
 
 ## Canonical numbering order

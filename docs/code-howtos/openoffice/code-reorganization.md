@@ -61,7 +61,7 @@ The resolver is distinct from the generated CSL catalog produced by `CitationSty
 
 For **Import cited**, the panel captures the active `LibraryTab` before calling `OpenOfficeCitationController.importCited()`, which delegates to the read-only `CitationEngine.importCited()` API.
 `CitedEntryCollector` in `logic.openoffice` collects native Zotero-compatible entry data; canonical and legacy marks are ignored, and collection never triggers document writes or format conversion.
-Deduplication uses the native URI, otherwise the explicit key, otherwise the numeric item ID; key-only and URI-bearing representations remain separate for ordinary bibliographic duplicate handling.
+Deduplication uses the native URI, otherwise the explicit key, otherwise the item ID, which need not be numeric; key-only and URI-bearing representations remain separate for ordinary bibliographic duplicate handling.
 The captured tab's `ImportHandler` owns duplicate decisions, explicit-key conflict warnings, batch key reservations, and library insertion.
 Cited-entry batches serialize the whole per-entry import operation so later duplicate searches see earlier accepted entries; general imports use their normal concurrency and preferences.
 See [cited-entry importing](overview.md#importing-cited-entries) for identity precedence and the separation from export-cited lookup.

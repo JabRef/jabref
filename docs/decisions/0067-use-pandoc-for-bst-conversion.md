@@ -44,13 +44,13 @@ The dependency is optional, so it adds no weight for users who do not use BST.
 
 * Good, because Pandoc's LaTeX parser is mature and battle-tested, and handles `~`, ``` ``...'' ```, `\emph`, `{\&}`, and brace nesting without any parser code owned by JabRef
 * Good, because semantic formatting survives: `\emph{Journal}` becomes `<em>Journal</em>` and ultimately an italic run in LibreOffice
-* Good, because the remaining JabRef code is a small tag rename (`<em>`/`<strong>`/`<span class="smallcaps">`) that then delegates to the existing `CSLFormatUtils.transformHTML`, inheriting entity decoding and `<div>`/`<a>`/`<span>` stripping
+* Good, because `BSTFormatUtils` maps HTML emphasis and small-caps tags and reuses the existing cleanup approach for entity decoding and `<div>`/`<a>`/`<span>` stripping
 * Good, because it follows an established JabRef pattern: `OcrMyPdfEngine` already shells out to an optional external binary with an `isAvailable()` guard and a user-configurable path preference
 * Good, because a bare command name (`pandoc`) is resolved through the OS `PATH`, so no per-user path logic is required; the Windows installer adds `%LOCALAPPDATA%\Pandoc` to the user `PATH`, and the path is additionally auto-detected and stored as a preference with manual override
 * Bad, because BST support requires an installation step that CSL and JStyles do not
 * Bad, because it introduces a process boundary into a citation path: process spawning must be batched (one call per bibliography, not per entry) to avoid noticeable latency
 * Bad, because failures arrive as exit codes and stderr that must be surfaced deliberately; silently returning empty output produces an empty bibliography that is hard to diagnose
-* Neutral, because Pandoc's output still requires stripping the `\providecommand` preamble emitted by styles such as `IEEEtran.bst`; this is done by keeping only the text following the last `\bibitem`
+* Neutral, because the `\providecommand` preamble emitted by styles such as `IEEEtran.bst` must be excluded before Pandoc conversion; `BstCitationFormatter.parseBibliography` extracts each `\bibitem` body without the preamble or bibliography environment
 
 ### Confirmation
 

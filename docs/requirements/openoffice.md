@@ -65,7 +65,7 @@ Native-to-canonical conversion and native generation require resolved sources; o
 Preparation failures, including invalid metadata, required but unresolved sources, protected ranges, unsuitable custom-property types or attributes, and rendering failures, leave marks, properties, text, and undo history unchanged.
 Conversion requires an available, unlocked Writer undo manager and its own root undo context; nesting inside another undo operation is rejected before document writes.
 Successful conversion and insertion form one Undo/Redo step covering identities, formatted text, any normally synchronized target-mode bibliography, page-info changes, and prepared applied-style properties.
-Only conversion targeting native mode prepares Zotero preference changes; canonical CSL operations and conversions leave `ZOTERO_PREF` XML untouched while still updating JabRef's applied style.
+Only conversion targeting native mode prepares Zotero preference changes; operations and conversions targeting canonical mode leave `ZOTERO_PREF` XML untouched while still updating JabRef's applied style.
 Native-mode insertion or refresh updates those native preferences.
 An ordinary application failure is rolled back only after closing and verifying ownership of that context, without undoing earlier user actions.
 Beginning the write transaction can clear pre-existing redo history even when document state is subsequently restored by rollback.

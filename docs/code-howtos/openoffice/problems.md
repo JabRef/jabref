@@ -81,7 +81,7 @@ It would be nice if we could have a backend with better properties. We probably 
 
 The older GUI already used undo contexts for citation insertion including mark conversion, refresh, merge, and separate; the historical notes above do not mean these contexts are new in the canonical integration.
 What those contexts did not restore was custom document-property state, as the old Manage citations comment explicitly noted for page information.
-The canonical integration now registers custom undo actions through `UndoableDocumentProperties` for per-citation page-info properties.
+The canonical integration registers custom undo actions through `UndoableDocumentProperties` for per-citation page-info properties.
 Merge and Separate combine structural edits, final formatted output, and page-info changes in one undo context.
 Next-insertion conversion also includes its prepared citation properties and applied-style properties in one owned root undo context.
 Canonical/native conversion on CSL insertion is lossy; immediate Undo/Redo restores its transaction only while Writer's undo history remains available, with no guarantee after reopen.
