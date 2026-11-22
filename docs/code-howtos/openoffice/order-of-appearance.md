@@ -9,9 +9,11 @@ The canonical Writer integration separates three orders:
 
 - **Storage order** is the key order encoded in a group's reference mark. Page-info property indexes always address this order.
 - **Local order** is a renderer's presentation order inside one group. JStyle uses `MultiCiteChronological` to choose year/author/title or author/year/title ordering, and numeric marker formatting can sort by assigned numbers.
-- **Global order** is the order of citation groups in the document. It contributes to first-appearance numbering and JStyle author-year disambiguation.
+- **Global order** is the order of citation groups in the document. It contributes to first-appearance numbering, JStyle first/repeated author-list rules, and author-year disambiguation.
 
 Sorting for presentation does not rewrite storage order or move page information to a different citation.
+Numeric JStyle in-text groups follow local order and pair each source's author list with its own number and page information, without compressing numbers across sources.
+BST in-text groups preserve storage order in every notation, even when bibliography sorting assigns numbers or labels in a different order.
 Bibliography sorting is a separate renderer decision: first-appearance order is not necessarily the bibliography order.
 See the [overview](overview.md#rendering-numbering-and-style-changes) for the family-specific numbering rules.
 

@@ -14,6 +14,7 @@ import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.CitationGroup;
@@ -131,6 +132,117 @@ class JStyleRendererTest {
         RenderResult result = new JStyleRenderer(style(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH)).render(request);
 
         assertEquals(List.of(List.of("[1]; Unresolved(missing)", "[2]"), List.of("missing")), List.of(markers(request, result), result.unresolvedKeys()));
+    }
+
+    @Test
+    void numericCapabilitiesSupportNarrativeWithoutChangingOtherFallbacksOrStoredTypes() throws IOException, RenderException {
+        List<CitationGroup> groups = Arrays.stream(CitationType.values())
+                                          .map(type -> group(type.name(), type, "a"))
+                                          .toList();
+        RenderRequest request = request(groups, List.of(entry("a", "A")));
+        JStyleRenderer renderer = new JStyleRenderer(style(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH));
+
+        RenderResult result = renderer.render(request);
+
+        assertEquals(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT),
+                renderer.capabilities().supportedTypes());
+        assertEquals(List.of("[1]", "Smith [1]", "", "[1]", "[1]", "[1]"), markers(request, result));
+        assertEquals(List.of(CitationType.values()), groups.stream().map(group -> group.citationType).toList());
+        assertEquals(List.of(Optional.empty()), groups.get(1).citationsInStorageOrder.stream().map(citation -> citation.getNumber()).toList());
+        assertEquals(Optional.empty(), groups.get(1).getCitationMarker());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void numericNarrativeUsesFirstAndRepeatedAuthorLimitsIncludingPriorNormalCitations(boolean priorNormal) throws IOException, RenderException {
+        Path path = tempDir.resolve("numeric-author-limits.jstyle");
+        Files.writeString(path, """
+                NAME
+                Numeric author limits
+                PROPERTIES
+                IsNumberEntries=true
+                IsSortByPosition=true
+                CITATION
+                BracketBefore="["
+                BracketAfter="]"
+                MaxAuthorsFirst=-1
+                MaxAuthors=1
+                AuthorLastSeparatorInText=" and "
+                LAYOUT
+                default=\\title
+                """);
+        CitationGroup firstNarrative = group("first", CitationType.AUTHORYEAR_INTEXT, "edited", "pair");
+        CitationGroup repeated = group("repeat", CitationType.AUTHORYEAR_INTEXT, "edited");
+        List<CitationGroup> groups = priorNormal
+                                     ? List.of(group("normal", CitationType.AUTHORYEAR_PAR, "edited"), firstNarrative, repeated)
+                                     : List.of(firstNarrative, repeated);
+        RenderRequest request = request(groups, List.of(
+                new BibEntry().withCitationKey("edited")
+                              .withField(StandardField.EDITOR, "Alpha, Alice and Beta, Bob and Gamma, Grace")
+                              .withField(StandardField.YEAR, "2024").withField(StandardField.TITLE, "Edited work"),
+                entry("pair", "Earlier work").withField(StandardField.AUTHOR, "Delta, Dan and Epsilon, Eve")));
+        JStyleRenderer renderer = new JStyleRenderer(new JStyle(path,
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS), mock(JournalAbbreviationRepository.class)));
+
+        RenderResult result = renderer.render(request);
+
+        assertEquals(priorNormal
+                     ? List.of("[1]", "Delta and Epsilon [2]; Alpha et al. [1]", "Alpha et al. [1]")
+                     : List.of("Delta and Epsilon [1]; Alpha, Beta and Gamma [2]", "Alpha et al. [2]"), markers(request, result));
+        assertEquals(List.of("edited", "pair"), firstNarrative.citationsInStorageOrder.stream().map(citation -> citation.citationKey).toList());
+        assertEquals(List.of(false, false), firstNarrative.citationsInStorageOrder.stream().map(citation -> citation.getIsFirstAppearanceOfSource()).toList());
+    }
+
+    @Test
+    void numericNarrativeMixedGroupsKeepAuthorsPageSlotsMarkupAndEscapedPlaceholders() throws IOException, RenderException {
+        CitationGroup narrative = group("mixed", CitationType.AUTHORYEAR_INTEXT, "a", "missing<b>&", "b");
+        narrative.citationsInStorageOrder.getFirst().setPageInfo(Optional.of(OOText.fromString("<i>p. 5</i>")));
+        narrative.citationsInStorageOrder.get(1).setPageInfo(Optional.of(OOText.fromString("p. 99")));
+        narrative.citationsInStorageOrder.getLast().setPageInfo(Optional.of(OOText.fromString("p. 7")));
+        RenderRequest request = request(List.of(
+                        group("normal", CitationType.AUTHORYEAR_PAR, "a"),
+                        narrative,
+                        group("missing", CitationType.AUTHORYEAR_INTEXT, "missing<b>&"),
+                        group("repeated", CitationType.AUTHORYEAR_PAR, "b")),
+                List.of(entry("a", "A"), entry("b", "B").withField(StandardField.AUTHOR, "Doe, John").withField(StandardField.YEAR, "2021")));
+        Path path = tempDir.resolve("numeric-narrative.jstyle");
+        Files.writeString(path, """
+                NAME
+                Numeric narrative
+                PROPERTIES
+                IsNumberEntries=true
+                IsSortByPosition=true
+                CITATION
+                BracketBefore="["
+                BracketAfter="]"
+                CitationSeparator=" | "
+                InTextYearSeparator=" :: "
+                PageInfoSeparator=": "
+                CitationGroupMarkupBefore="<b>"
+                CitationGroupMarkupAfter="</b>"
+                FormatCitations=true
+                CitationCharacterFormat="Citation"
+                LAYOUT
+                default=\\title
+                """);
+        JStyleRenderer renderer = new JStyleRenderer(new JStyle(path,
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS), mock(JournalAbbreviationRepository.class)));
+
+        RenderResult result = renderer.render(request);
+
+        assertEquals(List.of(
+                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\">[1]</span></span>",
+                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\"><b>Unresolved(missing&lt;b&gt;&amp;) | Smith :: [1: <i>p. 5</i>] | Doe :: [2: p. 7]</b></span></span>",
+                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\"><b>Unresolved(missing&lt;b&gt;&amp;)</b></span></span>",
+                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\">[2]</span></span>"),
+                request.groupsInDocumentOrder().stream().map(group -> Optional.ofNullable(result.markers().get(group.groupId)).orElseThrow().toString()).toList());
+        assertEquals(List.of("missing<b>&"), result.unresolvedKeys());
+        assertEquals(CitationType.AUTHORYEAR_INTEXT, narrative.citationType);
+        assertEquals(List.of("a", "missing<b>&", "b"), narrative.citationsInStorageOrder.stream().map(citation -> citation.citationKey).toList());
+        assertEquals(List.of(Optional.of(OOText.fromString("<i>p. 5</i>")), Optional.of(OOText.fromString("p. 99")), Optional.of(OOText.fromString("p. 7"))),
+                narrative.citationsInStorageOrder.stream().map(citation -> citation.getPageInfo()).toList());
+        assertEquals(List.of(Optional.empty(), Optional.empty(), Optional.empty()),
+                narrative.citationsInStorageOrder.stream().map(citation -> citation.getLookupResult()).toList());
     }
 
     @Test

@@ -265,6 +265,15 @@ final class JStyleCitationFormatter {
         return AuthorList.parse(authorListAsString);
     }
 
+    static String formatInTextAuthors(JStyle style, CitationMarkerEntry entry) {
+        return entry.getLookupResult()
+                    .map(lookup -> getAuthorList(style, lookup))
+                    .filter(authors -> authors.getNumberOfAuthors() > 0)
+                    .map(authors -> formatAuthorList(style, authors,
+                            calculateNAuthorsToEmit(style, entry), style.getAuthorLastSeparatorInTextWithFallBack()))
+                    .orElse("");
+    }
+
     private enum AuthorYearMarkerPurpose {
         IN_PARENTHESIS,
         IN_TEXT,

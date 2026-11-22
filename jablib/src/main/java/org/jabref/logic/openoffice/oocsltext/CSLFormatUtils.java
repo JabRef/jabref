@@ -47,7 +47,10 @@ public final class CSLFormatUtils {
     private static final String DEFAULT_BIBLIOGRAPHY_BODY_FORMAT = "Text body";
     private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
 
-    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
+    private static final String AUTHOR_DATE_TOKEN = "(?:[0-9]{4}[a-z]*|n\\.d\\.(?:-[a-z]+)?)";
+    private static final Pattern AUTHOR_DATE_TOKEN_PATTERN = Pattern.compile(AUTHOR_DATE_TOKEN);
+    private static final Pattern AUTHOR_DATE_CITATION_PATTERN = Pattern.compile(
+            "(?<author>[^,<>\\[\\]();\\r\\n]+?),? +(?<date>" + AUTHOR_DATE_TOKEN + "(?:, +pp?\\. +[0-9]+(?:[-–][0-9]+)?)?)");
     private static final Pattern MARGIN_PATTERN = Pattern.compile(
             "<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>");
     private static final Pattern DIV_OPEN_TAG = Pattern.compile("<div[^>]*>");
@@ -166,15 +169,31 @@ public final class CSLFormatUtils {
         return authorName + " " + inTextCitation;
     }
 
-    /// Extracts year from a citation having single or multiple entries, for the purpose of using in in-text citations.
+    /// Converts recognized plain, single-source author/date forms to in-text citations.
+    /// Manual conversion is needed because citeproc-java 3.5.3 ignores `author-only` and `suppress-author`;
+    /// processor-native in-text rendering is unavailable in that Java renderer.
+    /// Markup and unfamiliar forms are preserved: moving substrings across tags can corrupt Writer markup.
     ///
     /// @param formattedCitation the citation cleaned up and formatted using [transformHTML][CSLFormatUtils#transformHTML].
+    // [impl->req~openoffice.csl-in-text-citations~1]
     public static String changeToInText(String formattedCitation) {
-        Matcher matcher = YEAR_IN_CITATION_PATTERN.matcher(formattedCitation);
-        if (matcher.find()) {
-            return matcher.group(2) + " " + matcher.group(1) + matcher.group(3);
+        if (formattedCitation.length() < 2) {
+            return formattedCitation;
         }
-        return formattedCitation;
+        char opening = formattedCitation.charAt(0);
+        char closing = formattedCitation.charAt(formattedCitation.length() - 1);
+        if (!((opening == '(' && closing == ')') || (opening == '[' && closing == ']'))) {
+            return formattedCitation;
+        }
+        Matcher matcher = AUTHOR_DATE_CITATION_PATTERN.matcher(formattedCitation.substring(1, formattedCitation.length() - 1));
+        if (!matcher.matches()) {
+            return formattedCitation;
+        }
+        String author = matcher.group("author").stripTrailing();
+        if (author.isBlank() || AUTHOR_DATE_TOKEN_PATTERN.matcher(author).find()) {
+            return formattedCitation;
+        }
+        return author + " " + opening + matcher.group("date") + closing;
     }
 
     /// Generates Author Prefix for an in-text citation

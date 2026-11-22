@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
@@ -13,6 +14,7 @@ import org.jabref.logic.openoffice.bst.PandocLatexConverter;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.openoffice.style.CitationType;
 
 import org.jspecify.annotations.NullMarked;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.jabref.logic.openoffice.engine.RendererTestData.SIMPLE_BST;
@@ -28,6 +31,7 @@ import static org.jabref.logic.openoffice.engine.RendererTestData.group;
 import static org.jabref.logic.openoffice.engine.RendererTestData.markers;
 import static org.jabref.logic.openoffice.engine.RendererTestData.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -40,6 +44,8 @@ import static org.mockito.Mockito.when;
 @NullMarked
 @ResourceLock("Localization.lang")
 class BstRendererTest {
+
+    private static final String LABELED_BST = SIMPLE_BST.replace("\"\\bibitem{\" write$", "\"\\bibitem[\" write$ title write$ \"]{\" write$");
 
     @TempDir
     Path temporaryDirectory;
@@ -230,6 +236,187 @@ class BstRendererTest {
         RenderException error = assertThrows(RenderException.class, () -> new BstRenderer(style(SIMPLE_BST), pandoc).render(request));
 
         assertEquals(Optional.empty(), error.localizedMessage());
+    }
+
+    @Test
+    void advertisesNormalAndNarrativeCitationSupport() throws RenderException {
+        BstRenderer renderer = new BstRenderer(mock(BstStyle.class), mock(PandocLatexConverter.class));
+
+        assertEquals(new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT), true, false, false), renderer.capabilities());
+        assertEquals(CitationType.AUTHORYEAR_INTEXT, renderer.capabilities().coerceForInsert(CitationType.AUTHORYEAR_INTEXT));
+    }
+
+    // [utest->req~openoffice.narrative-citations~1]
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "NUMERIC | [1] | Smith [1]",
+            "AUTHOR_YEAR | (Smith, 2020) | Smith (2020)",
+            "STYLE_DEFINED | [Smi20] | Smith [Smi20]"
+    })
+    void rendersNormalAndNarrativeGroupsPerCitationType(BstCitationFormat format, String normal, String narrative) throws IOException, InterruptedException, RenderException {
+        RenderRequest request = withFormat(request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "a"),
+                group("narrative", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry("a", "Smi20"))), format);
+
+        RenderResult result = new BstRenderer(style(LABELED_BST), echoPandoc()).render(request);
+
+        assertEquals(List.of(normal, narrative), markers(request, result));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "NUMERIC | Doe [2], Unresolved(missing), Smith [1], Doe [2], Roe [3]",
+            "AUTHOR_YEAR | Doe (2021), Unresolved(missing), Smith (2020), Doe (2021), Roe (2022)",
+            "STYLE_DEFINED | Doe [B21], Unresolved(missing), Smith [A20], Doe [B21], Roe [C22]"
+    })
+    void narrativePreservesStorageOrderAndPairsEveryAuthorWithItsMarker(BstCitationFormat format, String expected) throws IOException, InterruptedException, RenderException {
+        String sorted = LABELED_BST.replace("READ", "FUNCTION {sorter} { title 'sort.key$ := }\nREAD\nITERATE {sorter}\nSORT");
+        RenderRequest request = withFormat(request(List.of(group("g", CitationType.AUTHORYEAR_INTEXT, "b", "missing", "a", "b", "c")),
+                List.of(entry("a", "A20"), entry("b", "B21").withField(StandardField.AUTHOR, "Doe, John").withField(StandardField.YEAR, "2021"),
+                        entry("c", "C22").withField(StandardField.AUTHOR, "Roe, Richard").withField(StandardField.YEAR, "2022"))), format);
+
+        RenderResult result = new BstRenderer(style(sorted), echoPandoc()).render(request);
+
+        assertEquals(List.of(expected), markers(request, result));
+        assertEquals(List.of("missing"), result.unresolvedKeys());
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "NUMERIC | ? [1]",
+            "AUTHOR_YEAR | ? (2020)",
+            "STYLE_DEFINED | ? [Smi20]"
+    })
+    void narrativeMissingAuthorsUseExistingQuestionMarkFallback(BstCitationFormat format, String expected) throws IOException, InterruptedException, RenderException {
+        BibEntry entry = new BibEntry().withCitationKey("a").withField(StandardField.TITLE, "Smi20").withField(StandardField.YEAR, "2020");
+        RenderRequest request = withFormat(request(List.of(group("g", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry)), format);
+
+        RenderResult result = new BstRenderer(style(LABELED_BST), echoPandoc()).render(request);
+
+        assertEquals(List.of(expected), markers(request, result));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "NUMERIC | A&amp;B [1]",
+            "AUTHOR_YEAR | A&amp;B (2020)",
+            "STYLE_DEFINED | A&amp;B [Smi&amp;20]"
+    })
+    void narrativeEscapesAuthorsAndStyleDefinedLabels(BstCitationFormat format, String expected) throws IOException, RenderException {
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        RenderRequest original = request(List.of(group("g", CitationType.AUTHORYEAR_INTEXT, "a")),
+                List.of(entry("a", "Smi&20").withField(StandardField.AUTHOR, "A&B, Jane")));
+        RenderRequest request = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(format, false, "", "", "", false));
+
+        RenderResult result = new BstRenderer(style(LABELED_BST), pandoc).render(request);
+
+        assertEquals(List.of(expected), markers(request, result));
+        verifyNoInteractions(pandoc);
+    }
+
+    @ParameterizedTest
+    @EnumSource(BstCitationFormat.class)
+    void unresolvedNarrativeKeysHaveNoAuthorPrefix(BstCitationFormat format) throws IOException, InterruptedException, RenderException {
+        RenderRequest request = withFormat(request(List.of(group("g", CitationType.AUTHORYEAR_INTEXT, "missing&key")), List.of()), format);
+
+        RenderResult result = new BstRenderer(style(LABELED_BST), echoPandoc()).render(request);
+
+        assertEquals(List.of("Unresolved(missing&amp;key)"), markers(request, result));
+        assertEquals(List.of("missing&key"), result.unresolvedKeys());
+    }
+
+    @ParameterizedTest
+    @EnumSource(BstCitationFormat.class)
+    void sameFormatRenderingPreservesStoredInTextType(BstCitationFormat format) throws IOException, InterruptedException, RenderException, JabRefMarkCodecException {
+        String name = "JABREF_a IN_TEXT uid";
+        JabRefMarkData stored = JabRefMarkCodec.decode(name);
+        BstStyle style = style(LABELED_BST);
+        BstRenderer renderer = new BstRenderer(style, echoPandoc());
+        RenderRequest request = withFormat(request(List.of(group(stored.uniqueId(), stored.citationType(), stored.citationKeys().toArray(String[]::new))),
+                List.of(entry("a", "Smi20"))), format);
+
+        RenderResult first = renderer.render(request);
+        RenderResult second = renderer.render(request);
+
+        assertFalse(CitationFormatConverter.required(List.of(name), style, false));
+        assertEquals(markers(request, first), markers(request, second));
+        assertEquals(CitationType.AUTHORYEAR_INTEXT, request.groupsInDocumentOrder().getFirst().citationType);
+        assertEquals(name, JabRefMarkCodec.encode(stored));
+    }
+
+    @Test
+    void authorYearNarrativeWithoutBibliographySkipsBstAndPandoc() throws RenderException {
+        BstStyle style = mock(BstStyle.class);
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        RenderRequest original = request(List.of(group("narrative", CitationType.AUTHORYEAR_INTEXT, "a", "missing"),
+                group("normal", CitationType.AUTHORYEAR_PAR, "a")), List.of(entry("a", "A")));
+        RenderRequest request = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(BstCitationFormat.AUTHOR_YEAR, false, "", "", "", false));
+
+        RenderResult result = new BstRenderer(style, pandoc).render(request);
+
+        assertEquals(List.of("Smith (2020), Unresolved(missing)", "(Smith, 2020)"), markers(request, result));
+        assertEquals(List.of("missing"), result.unresolvedKeys());
+        assertEquals(List.of(), result.bibliography());
+        verifyNoInteractions(style, pandoc);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = BstCitationFormat.class, names = {"NUMERIC", "STYLE_DEFINED"})
+    void narrativeCitationOnlyStillRejectsOmittedBstItems(BstCitationFormat format) throws IOException {
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        RenderRequest original = request(List.of(group("g", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry("a", "A")));
+        RenderRequest request = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(format, false, "", "", "", false));
+        BstRenderer renderer = new BstRenderer(style("ENTRY { title } {} {}\nREAD\n"), pandoc);
+
+        RenderException error = assertThrows(RenderException.class, () -> renderer.render(request));
+
+        assertEquals("The BST style omitted cited entry a", error.getMessage());
+        verifyNoInteractions(pandoc);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = BstCitationFormat.class, names = {"NUMERIC", "STYLE_DEFINED"})
+    void narrativeCitationOnlyStillRequiresBstSource(BstCitationFormat format) {
+        BstStyle style = mock(BstStyle.class);
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        IllegalArgumentException failure = new IllegalArgumentException("BST source unavailable");
+        when(style.getSource()).thenThrow(failure);
+        RenderRequest original = request(List.of(group("g", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry("a", "A")));
+        RenderRequest request = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(format, false, "", "", "", false));
+
+        RenderException error = assertThrows(RenderException.class, () -> new BstRenderer(style, pandoc).render(request));
+
+        assertSame(failure, error.getCause());
+        verify(style).getSource();
+        verifyNoInteractions(pandoc);
+    }
+
+    @Test
+    void narrativeMissingStyleDefinedLabelFailsBeforeConversion() throws IOException {
+        PandocLatexConverter pandoc = mock(PandocLatexConverter.class);
+        RenderRequest original = request(List.of(group("g", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry("a", "A")));
+        RenderRequest request = new RenderRequest(original.groupsInDocumentOrder(), original.databases(),
+                new RenderOptions(BstCitationFormat.STYLE_DEFINED, false, "", "", "", false));
+        BstRenderer renderer = new BstRenderer(style(SIMPLE_BST), pandoc);
+
+        MissingCitationLabelException error = assertThrows(MissingCitationLabelException.class, () -> renderer.render(request));
+
+        assertEquals("a", error.citationKey());
+        verifyNoInteractions(pandoc);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CitationType.class, names = {"INVISIBLE_CIT", "AUTHORYEAR_NOPAR", "AUTHOR_ONLY", "YEAR_ONLY"})
+    void storedUnsupportedTypesStillUseNormalOutput(CitationType type) throws IOException, InterruptedException, RenderException {
+        RenderRequest request = withFormat(request(List.of(group("g", type, "a")), List.of(entry("a", "A"))), BstCitationFormat.AUTHOR_YEAR);
+
+        RenderResult result = new BstRenderer(style(SIMPLE_BST), echoPandoc()).render(request);
+
+        assertEquals(List.of("(Smith, 2020)"), markers(request, result));
+        assertEquals(type, request.groupsInDocumentOrder().getFirst().citationType);
     }
 
     private BstStyle style(String source) throws IOException {

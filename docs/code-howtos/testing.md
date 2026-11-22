@@ -282,6 +282,10 @@ Human-readable golden `.fodt` documents and native Zotero JSON fixtures live und
 There are two package-local `HeadlessLibreOffice` helpers: one in `org.jabref.logic.openoffice.integration` and one in `org.jabref.logic.openoffice.engine.storage`.
 Both own the process and documents, disable macros, and preserve documents and a process log for inspection.
 The suite exercises canonical JStyle, CSL, and BST citations, canonical cross-family style changes with save/reopen, all six stored types, stable identities, per-citation page information, numbering, bibliography ordering, invisible citations, footnotes, tables, repeated superscript refresh, and restored change recording.
+`WriterIntegrationTest.numericNarrativeCitationsRetainTheirTypesAcrossStyleChangesAndReopen` inserts numeric normal and in-text citations with JStyle or BST, then checks marker text and stable identities through CSL/JStyle/BST refresh and save/reopen.
+Pure renderer tests cover numeric JStyle's configured local order, separators, page information, and first/repeated author rules, plus BST in-text output across `NUMERIC`, `AUTHOR_YEAR`, and `STYLE_DEFINED` in storage order.
+`CslRendererTest` checks sorted numeric author/number pairing, interleaved unresolved keys, repeated sources, authors outside superscript markers, and author/editor/key fallbacks.
+It also checks bounded author–year in-text conversion, including no-date and comma-free forms, year suffixes, and unchanged markup or unfamiliar output.
 The canonical mark grammar is `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`; the uid-before-type order is not a fallback format.
 Legacy `JR_cite*` and `CID_n` fixtures are persistence oracles for operations that do not trigger migration; canonical reading and export must not interpret legacy marks as canonical citations.
 
@@ -301,7 +305,7 @@ Legacy-only canonical migration must accept unresolved entries with ordinary pla
 Undo must restore legacy marks and page properties; redo must restore the prepared canonical identities and page slots.
 Connecting, refreshing, exporting, style selection, and native Zotero insertion/conversion must leave legacy JStyle marks unchanged; `CID_n` must remain unmanaged in every mode.
 Rendering failures must leave preparation targets unchanged, including missing Pandoc when BST output requires it.
-BST `AUTHOR_YEAR` without requested bibliography output skips BST execution; other notations retain program-derived labels and ordering.
+BST `AUTHOR_YEAR` without requested bibliography output skips source loading, VM execution, and Pandoc for both normal and in-text groups; other notations retain program-derived labels and ordering.
 JStyle bibliography paragraph validation applies only when bibliography output is requested.
 Only successful explicit canonical refresh sweeps orphan canonical page-info properties globally; other actions still remove properties for citations they replace or remove.
 GUI style-selection tests verify that each non-null selected style eagerly loads its preview even on an inactive tab, including when CSL discovery completes after the dialog opens; loading is not deferred until tab activation.

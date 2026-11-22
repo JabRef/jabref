@@ -39,6 +39,8 @@ It exercises the same superscript rendering behavior used by Nature and AMA with
 - Refresh each family against the canonical golden document; assert body, footnote, table, empty marker, numbering, bibliography order, and exported keys after save/reopen.
 - Insert all six citation types with page infos using JStyle, then switch JStyle → CSL → BST → JStyle, saving and reconnecting at each step.
   Names, types, key storage order, and every page-info property must survive; the final JStyle marker text must match the original exactly.
+- Insert numeric normal and in-text citations with JStyle or BST, then refresh through CSL → JStyle → BST and save/reopen after each switch.
+  Assert per-source author/number output, unchanged canonical identities, and preserved `NORMAL`/`IN_TEXT` types.
 - Insert citations before existing citations for each numeric renderer and assert that both markers and bibliography follow the resulting document order.
 - Reconnect and refresh superscript citations five times to defeat the writer's unchanged-text cache.
   Capture each citation's initial `CharHeight` before any rendering and require that same height after every refresh and save/reopen.

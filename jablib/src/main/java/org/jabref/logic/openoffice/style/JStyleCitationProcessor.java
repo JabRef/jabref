@@ -1,13 +1,17 @@
 package org.jabref.logic.openoffice.style;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.openoffice.style.Citation;
+import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationGroups;
 
 import org.jspecify.annotations.NullMarked;
@@ -47,6 +51,16 @@ public class JStyleCitationProcessor {
             return JStyleCitationProcessor.YEAR_AUTHOR_TITLE_COMPARATOR;
         } else {
             return JStyleCitationProcessor.AUTHOR_YEAR_TITLE_COMPARATOR;
+        }
+    }
+
+    /// Set first-appearance flags in document and local presentation order, regardless of citation type.
+    static void setIsFirstAppearanceOfSourceInCitations(CitationGroups citationGroups) {
+        Set<String> seenBefore = new HashSet<>();
+        for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
+            for (Citation citation : group.getCitationsInLocalOrder()) {
+                citation.setIsFirstAppearanceOfSource(seenBefore.add(citation.citationKey));
+            }
         }
     }
 

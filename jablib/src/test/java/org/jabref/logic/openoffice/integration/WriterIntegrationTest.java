@@ -263,6 +263,40 @@ class WriterIntegrationTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"jstyle", "bst"})
+    // [utest->req~openoffice.narrative-citations~1]
+    void numericNarrativeCitationsRetainTheirTypesAcrossStyleChangesAndReopen(String family) throws Exception {
+        XTextDocument document = office.newDocument();
+        BibDatabase database = database();
+        XTextCursor cursor = document.getText().createTextCursor();
+        try (CitationEngine engine = engine(document)) {
+            assertEquals(List.of(), success(engine.insert(List.of(entry(database, "alpha")), List.of(database), style(family),
+                    CitationType.AUTHORYEAR_PAR, "", cursor, false)));
+            cursor.setString(" | ");
+            cursor.collapseToEnd();
+            assertEquals(List.of(), success(engine.insert(List.of(entry(database, "beta")), List.of(database), style(family),
+                    CitationType.AUTHORYEAR_INTEXT, "", cursor, false)));
+        }
+        Map<String, JabRefMarkData> original = identities(document);
+        assertEquals(CitationType.AUTHORYEAR_PAR, identityForKey(original, "alpha").citationType());
+        assertEquals(CitationType.AUTHORYEAR_INTEXT, identityForKey(original, "beta").citationType());
+        assertEquals(Map.of("alpha", "[1]", "beta", "Beta [2]"), textsByKey(document));
+        for (String targetFamily : List.of("csl", "jstyle", "bst")) {
+            Map<String, String> expected = "csl".equals(targetFamily)
+                                           ? Map.of("alpha", "1", "beta", "Beta 2")
+                                           : Map.of("alpha", "[1]", "beta", "Beta [2]");
+            try (CitationEngine engine = engine(document)) {
+                assertEquals(List.of(), success(engine.refresh(List.of(database), style(targetFamily))));
+            }
+            assertEquals(original, identities(document));
+            assertEquals(expected, textsByKey(document));
+            document = office.saveAndReload(document, temporaryDirectory.resolve("narrative-" + family + "-" + targetFamily + ".odt"));
+            assertEquals(original, identities(document));
+            assertEquals(expected, textsByKey(document));
+        }
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"jstyle", "csl", "bst"})
     void insertionRenumbersExistingMarkersAndBibliographyInDocumentOrder(String family) throws Exception {
         XTextDocument document = office.newDocument();

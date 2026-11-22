@@ -197,6 +197,8 @@ JStyle supports page information and group editing; CSL and BST retain stored pa
 
 Insertion coerces unsupported new types according to capabilities, while rendering an existing canonical citation with another family does not replace its stored type.
 Returning to a supporting family can restore a stored partial citation's presentation.
+`citeproc-java` 3.5.3 exposes `author-only` and `suppress-author` in its data model, but its renderer ignores both; JabRef supplies its own partial-citation formatting and author–year in-text conversion.
+This is a limitation of that Java renderer, not CSL or citeproc-js; `suppress-author` is not equivalent to year-only, and there is no general `suppress-year` switch.
 The canonical CSL renderer supports author-only and year-only choices in Cite special using fixed JabRef formatting.
 Author-only uses short author names, then editor names, then the citation key; year-only uses the resolved year, then a parsed date year, then the citation key.
 Multiple entries retain storage order and repetitions and are joined with semicolons.
@@ -205,7 +207,11 @@ Page information and the no-parentheses choice are disabled for CSL; the canonic
 
 A render pass considers the entire cited set rather than storing a number beside each key.
 Numeric CSL styles use citeproc's cluster updates and bibliography order rather than patching digits in existing text.
+Their in-text prefixes reuse the author/editor/key fallback from author-only citations, keeping each prefix attached to its own citeproc marker.
 JStyle supports first-appearance and bibliography-sort numbering; author-year disambiguation follows the relevant cited-set order.
+Numeric JStyle and BST support in-text citations such as `Smith [1]`; BST author–year and style-defined notations produce `Smith (2020)` and `Smith [Smi20]`.
+Multi-citations pair each author with its own marker, without compressing numbers across authors.
+JStyle reuses its configured author formatting, local order, separators, and page information; BST reuses its own author rules and preserves storage order. CSL retains its citeproc-based rendering.
 BST `AUTHOR_YEAR` notation without requested bibliography output skips BST execution.
 Numeric and style-defined notations require BST execution for numbering, labels, and ordering even without bibliography output.
 Missing canonical sources remain represented by unresolved-key placeholders rather than silently losing their stored keys.
@@ -356,6 +362,10 @@ This is not persistent conversion recovery; there is no restoration guarantee af
 These losses do not apply to canonical JStyle/CSL/BST style changes: UIDs, all six stored types, and page information remain intact, even when the selected renderer hides or approximates them.
 One-way legacy JStyle → canonical migration preserves storage-order keys, all six types, and page information with fresh UIDs.
 Ordinary native insertion and refresh preserve existing native JSON while updating links; not every citation operation is lossy.
+
+`CSLFormatUtils.changeToInText` converts plain, single-source author–year citations enclosed in matching parentheses or square brackets, with an optional comma before a four-digit year or `n.d.`.
+Year suffixes are preserved. Forms containing markup or comma-separated author lists, as well as unrecognized forms, are left unchanged to avoid ambiguous splits, so some in-text citations retain the style's normal form.
+This is not processor-native support for arbitrary CSL styles.
 
 ## Verification and further reading
 

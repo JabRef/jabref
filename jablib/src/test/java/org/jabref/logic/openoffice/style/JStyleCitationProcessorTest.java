@@ -188,6 +188,155 @@ class JStyleCitationProcessorTest {
     }
 
     @Test
+    // [utest->req~openoffice.narrative-citations~1]
+    void numericNormalAndNarrativeGroupsShareNumbersWithoutCompressingAuthors() throws IOException {
+        CitationGroups groups = groupsInOrder(
+                group("normal", CitationType.AUTHORYEAR_PAR, new Citation("smith")),
+                group("narrative", CitationType.AUTHORYEAR_INTEXT, new Citation("smith"), new Citation("doe"), new Citation("brown")),
+                group("normalMerged", CitationType.AUTHORYEAR_PAR, new Citation("smith"), new Citation("doe"), new Citation("brown")));
+        List<BibEntry> entries = List.of(
+                entry("smith", "Smith, Jane", "2020", "A"),
+                entry("doe", "Doe, John", "2021", "B"),
+                entry("brown", "Brown, Bob", "2022", "C"));
+
+        JStyleCitationProcessor.produceCitationMarkers(groups, List.of(new BibDatabase(entries)), numericStyle());
+
+        assertEquals(List.of("[1]", "Smith [1]; Doe [2]; Brown [3]", "[1-3]"), markers(groups));
+        assertEquals(List.of("smith", "doe", "brown"), bibliographyKeys(groups));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void numericNarrativeOmitsAuthorSeparatorAndMarkupWhenAuthorAndEditorAreMissing(boolean authorMarkup) throws IOException {
+        JStyle style = numericStyle();
+        style.getCitProperties().put("InTextYearSeparator", " :: ");
+        style.getCitProperties().put("AuthorsPartMarkupBefore", authorMarkup ? "<b>" : "");
+        style.getCitProperties().put("AuthorsPartMarkupAfter", authorMarkup ? "</b>" : "");
+        BibEntry anonymous = new BibEntry().withCitationKey("anonymous").withField(StandardField.TITLE, "Anonymous work");
+        CitationGroups groups = groupsInOrder(
+                group("normal", CitationType.AUTHORYEAR_PAR, new Citation("anonymous")),
+                group("narrative", CitationType.AUTHORYEAR_INTEXT, new Citation("anonymous")));
+
+        JStyleCitationProcessor.produceCitationMarkers(groups, List.of(new BibDatabase(List.of(anonymous))), style);
+
+        assertEquals(List.of("[1]", "[1]"), markers(groups));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void numericNarrativeKeepsLocalAuthorOrderAndBibliographyNumberAssociation(boolean sortByPosition) throws IOException {
+        JStyle style = numericStyle();
+        style.getProperties().put("IsSortByPosition", sortByPosition);
+        CitationGroup narrative = group("narrative", CitationType.AUTHORYEAR_INTEXT, new Citation("later"), new Citation("earlier"));
+        CitationGroups groups = groupsInOrder(group("first", CitationType.AUTHORYEAR_PAR, new Citation("earlier")), narrative);
+        List<BibEntry> entries = List.of(
+                entry("later", "Alpha, Alice", "2024", "Later"),
+                entry("earlier", "Zebra, Zoe", "2020", "Earlier"));
+
+        JStyleCitationProcessor.produceCitationMarkers(groups, List.of(new BibDatabase(entries)), style);
+
+        assertEquals(sortByPosition ? List.of("[1]", "Zebra [1]; Alpha [2]") : List.of("[2]", "Zebra [2]; Alpha [1]"), markers(groups));
+        assertEquals(sortByPosition ? List.of(Optional.of(2), Optional.of(1)) : List.of(Optional.of(1), Optional.of(2)),
+                narrative.citationsInStorageOrder.stream().map(Citation::getNumber).toList());
+        assertEquals(sortByPosition ? List.of("earlier", "later") : List.of("later", "earlier"), bibliographyKeys(groups));
+        assertEquals(CitationType.AUTHORYEAR_INTEXT, narrative.citationType);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 0, 1, 2})
+    void numericNarrativeKeepsEachPageSlotWithItsAuthorAndNumber(int pageSlot) throws IOException {
+        Citation later = new Citation("later");
+        Citation earlier = new Citation("earlier");
+        if (pageSlot == 0 || pageSlot == 2) {
+            later.setPageInfo(Optional.of(OOText.fromString("<i>p. 9</i>")));
+        }
+        if (pageSlot == 1 || pageSlot == 2) {
+            earlier.setPageInfo(Optional.of(OOText.fromString("p. 3")));
+        }
+        CitationGroups groups = groupsInOrder(group("narrative", CitationType.AUTHORYEAR_INTEXT, later, earlier));
+        List<BibEntry> entries = List.of(
+                entry("later", "Alpha, Alice", "2024", "Later"),
+                entry("earlier", "Zebra, Zoe", "2020", "Earlier"));
+        JStyle style = numericStyle();
+        style.getCitProperties().put("BracketBefore", "<sup>[");
+        style.getCitProperties().put("BracketAfter", "]</sup>");
+        style.getCitProperties().put("PageInfoSeparator", ": ");
+
+        JStyleCitationProcessor.produceCitationMarkers(groups, List.of(new BibDatabase(entries)), style);
+
+        String earlierPage = pageSlot == 1 || pageSlot == 2 ? ": p. 3" : "";
+        String laterPage = pageSlot == 0 || pageSlot == 2 ? ": <i>p. 9</i>" : "";
+        assertEquals(List.of("Zebra <sup>[1" + earlierPage + "]</sup>; Alpha <sup>[2" + laterPage + "]</sup>"), markers(groups));
+    }
+
+    @Test
+    void numericNarrativeUsesResolvedAuthorFieldsAndEditorFallback() throws IOException {
+        BibEntry parent = entry("parent", "{Research and Development}", "2020", "Parent");
+        BibEntry child = new BibEntry().withCitationKey("child").withField(StandardField.CROSSREF, "parent");
+        BibEntry edited = new BibEntry().withCitationKey("edited").withField(StandardField.EDITOR, "von Neumann, John and Doe, Jane")
+                                        .withField(StandardField.YEAR, "2021");
+        CitationGroups groups = groupsInOrder(group("narrative", CitationType.AUTHORYEAR_INTEXT, new Citation("child"), new Citation("edited")));
+
+        JStyleCitationProcessor.produceCitationMarkers(groups, List.of(new BibDatabase(List.of(parent, child, edited))), numericStyle());
+
+        assertEquals(List.of("Research and Development [1]; von Neumann & Doe [2]"), markers(groups));
+    }
+
+    @Test
+    void numericNarrativeReusesCustomAuthorRulesOnFirstAndRepeatedAppearances() throws IOException {
+        JStyle style = numericStyle();
+        style.getCitProperties().put("AuthorField", "editor/author");
+        style.getCitProperties().put("MaxAuthors", 2);
+        style.getCitProperties().put("MaxAuthorsFirst", -1);
+        style.getCitProperties().put("AuthorSeparator", " / ");
+        style.getCitProperties().put("AuthorLastSeparator", " & ");
+        style.getCitProperties().put("AuthorLastSeparatorInText", " plus ");
+        style.getCitProperties().put("OxfordComma", ",");
+        style.getCitProperties().put("EtAlString", " et al.");
+        style.getCitProperties().put("ItalicEtAl", true);
+        style.getCitProperties().put("AuthorsPartMarkupBefore", "<b>");
+        style.getCitProperties().put("AuthorsPartMarkupAfter", "</b>");
+        style.getCitProperties().put("AuthorNamesListMarkupBefore", "<i>");
+        style.getCitProperties().put("AuthorNamesListMarkupAfter", "</i>");
+        style.getCitProperties().put("AuthorNameMarkupBefore", "<u>");
+        style.getCitProperties().put("AuthorNameMarkupAfter", "</u>");
+        style.getCitProperties().put("InTextYearSeparator", " :: ");
+        style.getCitProperties().put("CitationSeparator", " | ");
+        style.getCitProperties().put("CitationGroupMarkupBefore", "<sup>");
+        style.getCitProperties().put("CitationGroupMarkupAfter", "</sup>");
+        BibEntry edited = entry("edited", "Ignored, Author", "2020", "Edited")
+                .withField(StandardField.EDITOR, "Alpha, Alice and Beta, Bob and Gamma, Grace");
+        CitationGroups groups = groupsInOrder(
+                group("first", CitationType.AUTHORYEAR_INTEXT, new Citation("edited"), new Citation("pair")),
+                group("repeat", CitationType.AUTHORYEAR_INTEXT, new Citation("edited")));
+        BibEntry pair = entry("pair", "Delta, Dan and Epsilon, Eve", "2021", "Pair");
+
+        JStyleCitationProcessor.produceCitationMarkers(groups, List.of(new BibDatabase(List.of(edited, pair))), style);
+
+        String abbreviated = "<b><i><u>Alpha</u></i><i> et al.</i></b> :: [1]";
+        assertEquals(List.of(
+                "<sup><b><i><u>Alpha</u> / <u>Beta</u>, plus <u>Gamma</u></i></b> :: [1] | <b><i><u>Delta</u> plus <u>Epsilon</u></i></b> :: [2]</sup>",
+                "<sup>" + abbreviated + "</sup>"), markers(groups));
+    }
+
+    @Test
+    void numericNarrativeKeepsUnresolvedKeysLiteralWithoutConsumingNumbers() throws IOException {
+        JStyle style = numericStyle();
+        style.getCitProperties().put("CitationSeparator", " | ");
+        style.getCitProperties().put("CitationGroupMarkupBefore", "<i>");
+        style.getCitProperties().put("CitationGroupMarkupAfter", "</i>");
+        CitationGroups groups = groupsInOrder(
+                group("missing", CitationType.AUTHORYEAR_INTEXT, new Citation("<b>&amp;")),
+                group("mixed", CitationType.AUTHORYEAR_INTEXT, new Citation("smith"), new Citation("<b>&amp;")),
+                group("normal", CitationType.AUTHORYEAR_PAR, new Citation("smith")));
+
+        JStyleCitationProcessor.produceCitationMarkers(groups, List.of(new BibDatabase(List.of(entry("smith", "Smith, Jane", "2020", "A")))), style);
+
+        assertEquals(List.of("<i>Unresolved(&lt;b&gt;&amp;amp;)</i>", "<i>Unresolved(&lt;b&gt;&amp;amp;) | Smith [1]</i>", "[1]"), markers(groups));
+        assertEquals(List.of("<b>&amp;"), groups.getUnresolvedKeys());
+    }
+
+    @Test
     void authorYearLettersFollowFirstAppearanceRatherThanBibliographySortOrder() throws IOException {
         BibEntry first = entry("first", "Doe, Jane", "2003", "Zebra title");
         BibEntry second = entry("second", "Doe, Jane", "2003", "Alpha title");

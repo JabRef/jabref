@@ -161,6 +161,7 @@ public final class CslRenderer implements CitationRenderer {
         keys.clear();
     }
 
+    // [impl->req~openoffice.csl-in-text-citations~1]
     private Fragment inText(String key, CitationKeyResolution data, Optional<CSL> processor,
                             BibDatabaseContext alphaContext, Map<Integer, String> renderedClusters) throws RenderException {
         if (data.lookup(key).isEmpty()) {
@@ -172,7 +173,7 @@ public final class CslRenderer implements CitationRenderer {
         }
         CitationLookupResult source = data.resolved(key);
         String prefix = style.isNumericStyle()
-                        ? StringEscapeUtils.escapeHtml4(CSLFormatUtils.generateAuthorPrefix(source.entry, new BibDatabaseContext(source.database)))
+                        ? StringEscapeUtils.escapeHtml4(shortAuthor(source).orElse(key)) + " "
                         : "";
         return cluster(processor, List.of(key), prefix, !style.isNumericStyle(), renderedClusters);
     }

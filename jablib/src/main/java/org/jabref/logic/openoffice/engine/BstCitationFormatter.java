@@ -36,8 +36,15 @@ final class BstCitationFormatter {
     }
 
     static String authorYearEntry(BibEntry entry, BibDatabase database) {
-        String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, database).map(String::strip).filter(value -> !value.isEmpty()).orElse("n.d.");
-        return formatShortAuthorList(entry) + ", " + year;
+        return formatShortAuthorList(entry) + ", " + year(entry, database);
+    }
+
+    static String authorYearInTextEntry(BibEntry entry, BibDatabase database) {
+        return formatShortAuthorList(entry) + " (" + year(entry, database) + ")";
+    }
+
+    private static String year(BibEntry entry, BibDatabase database) {
+        return entry.getResolvedFieldOrAlias(StandardField.YEAR, database).map(String::strip).filter(value -> !value.isEmpty()).orElse("n.d.");
     }
 
     static String buildAuthorYearCitation(List<BibEntry> entries, BibDatabaseContext context) {

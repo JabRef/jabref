@@ -41,9 +41,11 @@ public final class JStyleRenderer implements CitationRenderer {
 
     @Override
     public StyleCapabilities capabilities() {
-        Set<CitationType> types = style.isNumberEntries() || style.isCitationKeyCiteMarkers()
+        Set<CitationType> types = style.isCitationKeyCiteMarkers()
                                   ? Set.of(CitationType.AUTHORYEAR_PAR, CitationType.INVISIBLE_CIT)
-                                  : EnumSet.allOf(CitationType.class);
+                                  : style.isNumberEntries()
+                                    ? Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.INVISIBLE_CIT)
+                                    : EnumSet.allOf(CitationType.class);
         return new StyleCapabilities(types, true, true, true);
     }
 
@@ -98,7 +100,9 @@ public final class JStyleRenderer implements CitationRenderer {
     }
 
     private OOText marker(CitationGroup group) throws RenderException {
-        if ((style.isNumberEntries() || style.isCitationKeyCiteMarkers()) && group.citationsInStorageOrder.stream().anyMatch(Citation::isUnresolved)) {
+        boolean numericNarrative = style.isNumberEntries() && group.citationType == CitationType.AUTHORYEAR_INTEXT;
+        if (!numericNarrative && (style.isNumberEntries() || style.isCitationKeyCiteMarkers())
+                && group.citationsInStorageOrder.stream().anyMatch(Citation::isUnresolved)) {
             StringJoiner text = new StringJoiner("; ");
             List<Citation> resolved = group.getCitationsInLocalOrder().stream().filter(citation -> !citation.isUnresolved()).toList();
             if (!resolved.isEmpty()) {

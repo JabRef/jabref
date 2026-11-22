@@ -60,7 +60,7 @@ public final class BstRenderer implements CitationRenderer {
 
     @Override
     public StyleCapabilities capabilities() {
-        return new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR), true, false, false);
+        return new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT), true, false, false);
     }
 
     @Override
@@ -87,16 +87,23 @@ public final class BstRenderer implements CitationRenderer {
                                      ? items.stream().map(BibItem::key).toList() : List.of();
                 numbers = CitationNumbering.bibliographyOrder(data.resolvedKeys(), order);
             }
+            Map<String, String> labels = new LinkedHashMap<>();
+            if (request.options().bstCitationFormat() == BstCitationFormat.STYLE_DEFINED) {
+                byKey.values().forEach(item -> item.label().ifPresent(label -> labels.put(item.key(), label)));
+            }
             Map<CitationGroupId, OOText> markers = new LinkedHashMap<>();
             for (CitationGroup group : request.groupsInDocumentOrder()) {
-                String text = switch (request.options().bstCitationFormat()) {
-                    case NUMERIC ->
-                            numeric(group, numbers, data);
-                    case AUTHOR_YEAR ->
-                            authorYear(group, data);
-                    case STYLE_DEFINED ->
-                            styleDefined(group, byKey, data);
-                };
+                List<String> keys = group.citationsInStorageOrder.stream().map(Citation::getCitationKey).toList();
+                String text = group.citationType == CitationType.AUTHORYEAR_INTEXT
+                              ? inText(keys, request.options().bstCitationFormat(), numbers, labels, data)
+                              : switch (request.options().bstCitationFormat()) {
+                                  case NUMERIC ->
+                                          numeric(keys, numbers, data);
+                                  case AUTHOR_YEAR ->
+                                          authorYear(keys, data);
+                                  case STYLE_DEFINED ->
+                                          styleDefined(keys, labels, data);
+                              };
                 markers.put(group.groupId, OOFormat.setLocaleNone(OOText.fromString(text)));
             }
             List<OOText> bibliography = new ArrayList<>();
@@ -167,28 +174,50 @@ public final class BstRenderer implements CitationRenderer {
         return result;
     }
 
-    private static String numeric(CitationGroup group, Map<String, Integer> numbers, CitationKeyResolution data) {
-        List<String> keys = group.citationsInStorageOrder.stream().map(Citation::getCitationKey).toList();
+    // [impl->req~openoffice.narrative-citations~1]
+    private static String inText(List<String> keys, BstCitationFormat format, Map<String, Integer> numbers,
+                                 Map<String, String> labels, CitationKeyResolution data) throws RenderException {
+        StringJoiner text = new StringJoiner(", ");
+        for (String key : keys) {
+            if (data.lookup(key).isEmpty()) {
+                text.add(CitationKeyResolution.unresolved(key));
+                continue;
+            }
+            CitationLookupResult source = data.resolved(key);
+            text.add(switch (format) {
+                case AUTHOR_YEAR ->
+                        StringEscapeUtils.escapeHtml4(BstCitationFormatter.authorYearInTextEntry(source.entry, source.database));
+                case NUMERIC, STYLE_DEFINED -> {
+                    String author = StringEscapeUtils.escapeHtml4(BstCitationFormatter.formatShortAuthorList(source.entry));
+                    String marker = format == BstCitationFormat.NUMERIC
+                                    ? numeric(List.of(key), numbers, data)
+                                    : BstCitationFormatter.buildStyleDefinedCitationText(List.of(key), labels);
+                    yield author + " " + marker;
+                }
+            });
+        }
+        return text.toString();
+    }
+
+    private static String numeric(List<String> keys, Map<String, Integer> numbers, CitationKeyResolution data) {
         return BstCitationFormatter.buildNumericCitationText(keys, numbers, keys.stream().filter(key -> data.lookup(key).isEmpty()).toList());
     }
 
-    private static String authorYear(CitationGroup group, CitationKeyResolution data) throws RenderException {
+    private static String authorYear(List<String> keys, CitationKeyResolution data) throws RenderException {
         StringJoiner text = new StringJoiner("; ", "(", ")");
-        for (Citation citation : group.citationsInStorageOrder) {
-            if (data.lookup(citation.citationKey).isEmpty()) {
-                text.add(CitationKeyResolution.unresolved(citation.citationKey));
+        for (String key : keys) {
+            if (data.lookup(key).isEmpty()) {
+                text.add(CitationKeyResolution.unresolved(key));
             } else {
-                CitationLookupResult source = data.resolved(citation.citationKey);
+                CitationLookupResult source = data.resolved(key);
                 text.add(StringEscapeUtils.escapeHtml4(BstCitationFormatter.authorYearEntry(source.entry, source.database)));
             }
         }
         return text.toString();
     }
 
-    private static String styleDefined(CitationGroup group, Map<String, BibItem> items, CitationKeyResolution data) throws MissingCitationLabelException {
-        Map<String, String> labels = new LinkedHashMap<>();
-        items.values().forEach(item -> item.label().ifPresent(label -> labels.put(item.key(), label)));
-        return BstCitationFormatter.buildStyleDefinedCitationText(group.citationsInStorageOrder.stream().map(Citation::getCitationKey).toList(), labels, data.unresolvedKeys());
+    private static String styleDefined(List<String> keys, Map<String, String> labels, CitationKeyResolution data) throws MissingCitationLabelException {
+        return BstCitationFormatter.buildStyleDefinedCitationText(keys, labels, data.unresolvedKeys());
     }
 
     private static String label(BibItem item) throws MissingCitationLabelException {

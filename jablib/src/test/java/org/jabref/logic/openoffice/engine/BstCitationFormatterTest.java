@@ -130,6 +130,47 @@ class BstCitationFormatterTest {
     }
 
     @Test
+    void authorYearInTextEntryUsesNatbibAuthorList() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN + " and Roe, Richard and Poe, Peter")
+                .withField(StandardField.YEAR, "2007");
+
+        assertEquals("Doe et al. (2007)", BstCitationFormatter.authorYearInTextEntry(entry, new BibDatabase(List.of(entry))));
+    }
+
+    @Test
+    void authorYearInTextEntryUsesYearFromDateField() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
+                .withField(StandardField.DATE, "2007-05-01");
+
+        assertEquals("Doe (2007)", BstCitationFormatter.authorYearInTextEntry(entry, new BibDatabase(List.of(entry))));
+    }
+
+    @Test
+    void authorYearInTextEntryMissingYearFallsBackToNd() {
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN);
+
+        assertEquals("Doe (n.d.)", BstCitationFormatter.authorYearInTextEntry(entry, new BibDatabase(List.of(entry))));
+    }
+
+    @Test
+    void authorYearInTextEntryBlankYearFallsBackToNd() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
+                .withField(StandardField.YEAR, "   ");
+
+        assertEquals("Doe (n.d.)", BstCitationFormatter.authorYearInTextEntry(entry, new BibDatabase(List.of(entry))));
+    }
+
+    @Test
+    void authorYearInTextEntryMissingAuthorYieldsQuestionMark() {
+        BibEntry entry = new BibEntry().withField(StandardField.YEAR, "2007");
+
+        assertEquals("? (2007)", BstCitationFormatter.authorYearInTextEntry(entry, new BibDatabase(List.of(entry))));
+    }
+
+    @Test
     void buildNumericCitationText_sortsNumbersAscending() {
         assertEquals("[1, 3, 7]", BstCitationFormatter.buildNumericCitationText(
                 List.of("gamma", "alpha", "beta"),

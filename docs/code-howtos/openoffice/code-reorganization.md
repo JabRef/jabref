@@ -138,8 +138,13 @@ These types contain no live UNO ranges.
 `JStyleCitationProcessor.produceCitationMarkers` resolves sources, imposes local order, and dispatches according to the JStyle flags:
 
 - `JStyleCitationKeyMarkers` builds citation-key markers and an unnumbered bibliography; `JStyleCitationKeyFormatter` escapes literal keys while preserving style wrappers.
-- `JStyleNumericMarkers` assigns numbers according to first appearance or bibliography order and produces group markers.
-- `JStyleAuthorYearMarkers` assigns disambiguation letters, records first appearances, and produces author-year markers.
+- `JStyleNumericMarkers` assigns numbers according to first appearance or bibliography order and produces normal or per-source in-text markers.
+- `JStyleAuthorYearMarkers` assigns disambiguation letters and produces author-year markers.
+
+Both numeric and author-year paths use `JStyleCitationProcessor.setIsFirstAppearanceOfSourceInCitations` to track first appearances in document and local order, including prior normal or invisible citations.
+Numeric in-text output uses `JStyleCitationFormatter.formatInTextAuthors` for the configured author limits, separators, and field fallback, then pairs each author list with that source's numeric marker and page information in local order.
+It does not compress numbers across different sources.
+Numeric JStyle supports `NORMAL`, `IN_TEXT`, and `EMPTY`; citation-key mode remains limited to `NORMAL` and `EMPTY`.
 
 `JStyle` exposes the formatting entry points:
 
@@ -155,7 +160,9 @@ JStyle bibliography paragraph styles are validated only when bibliography output
 `OOStyle` is the common selectable-style interface for `JStyle`, `CitationStyle`, and `BstStyle`.
 `BstStyle.getBstVM()` exposes its cached parsed program rather than creating a new VM.
 BST whole-cited-set rendering and citation labels belong to `BstRenderer` and `BstCitationFormatter`; Pandoc conversion helpers are in `logic.openoffice.bst`.
-`AUTHOR_YEAR` notation without requested bibliography output skips BST execution; numeric and style-defined notations require it for numbering, labels, and ordering.
+BST supports `NORMAL` and `IN_TEXT` for all three notations: `NUMERIC`, `AUTHOR_YEAR`, and `STYLE_DEFINED`.
+In-text groups preserve storage order, pairing each source's Natbib-formatted short author list with its number, year, or style-defined label; repeated sources and unresolved placeholders retain their positions.
+For both normal and in-text groups, `AUTHOR_YEAR` without requested bibliography output skips BST source loading, VM execution, and Pandoc; numeric and style-defined notations still require BST execution for numbering, labels, and ordering.
 `CSLFormatUtils` adapts CSL-generated markup rather than selecting a renderer or managing document citations.
 
 ## Writer infrastructure and ordering

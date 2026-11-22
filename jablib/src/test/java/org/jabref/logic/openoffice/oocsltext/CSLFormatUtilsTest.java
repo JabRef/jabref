@@ -543,6 +543,7 @@ class CSLFormatUtilsTest {
     }
 
     /// Tests if a citation (LaTeX "\cite") is converted into an in-text citation (LaTeX "\citet") as expected.
+    // [utest->req~openoffice.csl-in-text-citations~1]
     @ParameterizedTest
     @MethodSource
     void ChangeToInText(String expected, String input) {
@@ -564,9 +565,9 @@ class CSLFormatUtilsTest {
                 Arguments.of("(Williams et al. 19)", "(Williams et al. 19)"),
 
                 // Chicago Style (Author-Date)
-                Arguments.of("(Smith 2020)", "(Smith 2020)"),
-                Arguments.of("(Johnson and Brown 2018)", "(Johnson and Brown 2018)"),
-                Arguments.of("(Williams et al. 2019)", "(Williams et al. 2019)"),
+                Arguments.of("Smith (2020)", "(Smith 2020)"),
+                Arguments.of("Johnson and Brown (2018)", "(Johnson and Brown 2018)"),
+                Arguments.of("Williams et al. (2019)", "(Williams et al. 2019)"),
 
                 // Harvard Style
                 Arguments.of("Smith (2020)", "(Smith, 2020)"),
@@ -583,7 +584,38 @@ class CSLFormatUtilsTest {
 
                 // Nature Style
                 Arguments.of("1", "1"),
-                Arguments.of("1,2", "1,2")
+                Arguments.of("1,2", "1,2"),
+
+                Arguments.of("Smith (n.d.)", "(Smith, n.d.)"),
+                Arguments.of("Smith (n.d.-a)", "(Smith n.d.-a)"),
+                Arguments.of("Smith [2020a]", "[Smith, 2020a]"),
+                Arguments.of("Smith (2020aa)", "(Smith 2020aa)"),
+                Arguments.of("Smith (2020a, p. 7)", "(Smith, 2020a, p. 7)"),
+                Arguments.of("Smith (2020, pp. 7–9)", "(Smith, 2020, pp. 7–9)"),
+                Arguments.of("Smith & Jones (2020)", "(Smith & Jones, 2020)"),
+
+                Arguments.of("", ""),
+                Arguments.of("(", "("),
+                Arguments.of("()", "()"),
+                Arguments.of("( 2020)", "( 2020)"),
+                Arguments.of("(Smith, forthcoming)", "(Smith, forthcoming)"),
+                Arguments.of("(Smith, 2020; Jones, 2021)", "(Smith, 2020; Jones, 2021)"),
+                Arguments.of("(Smith, 2020, Jones, 2021)", "(Smith, 2020, Jones, 2021)"),
+                Arguments.of("(Smith 2020 and Jones 2021)", "(Smith 2020 and Jones 2021)"),
+                Arguments.of("(Smith, 2020, 2021)", "(Smith, 2020, 2021)"),
+                Arguments.of("(Smith, 2020, forthcoming)", "(Smith, 2020, forthcoming)"),
+                Arguments.of("(Smith, n.d., Jones, n.d.)", "(Smith, n.d., Jones, n.d.)"),
+                Arguments.of("(Smith, forthcoming, Jones, 2021)", "(Smith, forthcoming, Jones, 2021)"),
+                Arguments.of("(Smith, Jones, 2020)", "(Smith, Jones, 2020)"),
+                Arguments.of("(Smith, 2020]", "(Smith, 2020]"),
+                Arguments.of("[Smith, 2020)", "[Smith, 2020)"),
+                Arguments.of("Smith, 2020", "Smith, 2020"),
+                Arguments.of("(Smith, 2020) trailing text", "(Smith, 2020) trailing text"),
+                Arguments.of("(Jones (Ed.), 2020)", "(Jones (Ed.), 2020)"),
+                Arguments.of("<i>(Smith, 2020)</i>", "<i>(Smith, 2020)</i>"),
+                Arguments.of("(<i>Smith</i>, 2020)", "(<i>Smith</i>, 2020)"),
+                Arguments.of("(Smith, <b>2020</b>)", "(Smith, <b>2020</b>)"),
+                Arguments.of("(Smith, 2020)<sup>1</sup>", "(Smith, 2020)<sup>1</sup>")
 
         );
     }

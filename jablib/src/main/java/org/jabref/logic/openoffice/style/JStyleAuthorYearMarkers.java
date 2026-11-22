@@ -2,11 +2,9 @@ package org.jabref.logic.openoffice.style;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
@@ -98,24 +96,6 @@ class JStyleAuthorYearMarkers {
      *
      * **************************************/
 
-    /// Set isFirstAppearanceOfSource in each citation.
-    ///
-    /// Preconditions: globalOrder, localOrder
-    private static void setIsFirstAppearanceOfSourceInCitations(CitationGroups citationGroups) {
-        Set<String> seenBefore = new HashSet<>();
-        for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
-            for (Citation cit : group.getCitationsInLocalOrder()) {
-                String currentKey = cit.citationKey;
-                if (!seenBefore.contains(currentKey)) {
-                    cit.setIsFirstAppearanceOfSource(true);
-                    seenBefore.add(currentKey);
-                } else {
-                    cit.setIsFirstAppearanceOfSource(false);
-                }
-            }
-        }
-    }
-
     /// Produce citMarkers for normal
     /// (!isCitationKeyCiteMarkers &amp;&amp; !isNumberEntries) styles.
     ///
@@ -132,7 +112,7 @@ class JStyleAuthorYearMarkers {
         citationGroups.createPlainBibliographySortedByComparator(JStyleCitationProcessor.AUTHOR_YEAR_TITLE_COMPARATOR);
 
         // Mark first appearance of each citationKey
-        setIsFirstAppearanceOfSourceInCitations(citationGroups);
+        JStyleCitationProcessor.setIsFirstAppearanceOfSourceInCitations(citationGroups);
 
         for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
             final NonUniqueCitationMarker strictlyUnique = NonUniqueCitationMarker.THROWS;

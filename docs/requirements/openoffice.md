@@ -16,6 +16,26 @@ Related issue: <https://github.com/JabRef/jabref/issues/14962>.
 
 Needs: impl, utest
 
+## Writer citations must support narrative rendering for numeric JStyle and BST
+`req~openoffice.narrative-citations~1`
+
+Each citation group retains its own normal or narrative type when inserting, refreshing, or changing style families.
+Numeric narratives pair authors with individual numbers; BST also supports author–year and style-defined label narratives.
+Multi-citations keep each author paired with its marker rather than compressing numbers across authors; JStyle uses its configured local order and separators, while BST uses storage order.
+JStyle reuses its author-formatting rules and preserves each citation's page information; BST reuses its existing author rules without requiring changes to `.bst` files.
+
+Needs: impl, utest
+
+## CSL in-text citations must use bounded fallbacks when processor-native forms are unavailable
+`req~openoffice.csl-in-text-citations~1`
+
+Numeric in-text citations use short author names, then editor names, then the citation key, escaping each prefix before pairing it with its marker.
+Author–year in-text conversion accepts plain, single-source forms enclosed in matching parentheses or square brackets, with a four-digit year or `n.d.` and an optional author/date comma.
+Conversion preserves year suffixes. Markup, comma-separated author lists, additional date tokens, and unrecognized forms prevent rewriting, avoiding ambiguous splits.
+Normal citations and stored citation types remain unchanged.
+
+Needs: impl, utest
+
 ## The canonical Writer integration must leave legacy JabRef citations unmanaged outside supported JStyle migration
 `req~openoffice.legacy-marks-unmanaged~1`
 

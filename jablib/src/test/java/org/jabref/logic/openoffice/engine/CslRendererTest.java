@@ -78,6 +78,150 @@ class CslRendererTest {
     }
 
     @Test
+    void numericInTextPairsAuthorsWithSortedNumbersInStorageOrderIncludingRepeats() throws RenderException {
+        RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "z", "a"),
+                        group("narrative", CitationType.AUTHORYEAR_INTEXT, "z", "a", "z"), group("repeat", CitationType.AUTHORYEAR_PAR, "z")),
+                List.of(entry("a", "Alpha"), entry("z", "Zebra").withField(StandardField.AUTHOR, "Doe, John")));
+        RenderResult result = renderer(true, false).render(request);
+
+        assertEquals(List.of("[1, 2]", "Doe [2], Smith [1], Doe [2]", "[2]"), markers(request, result));
+        assertEquals(List.of("<p oo:ParaStyleName=\"Text body\"><span lang=\"zxx\">1. Alpha</span></p>",
+                "<p oo:ParaStyleName=\"Text body\"><span lang=\"zxx\">2. Zebra</span></p>"), result.bibliography().stream().map(text -> text.toString()).toList());
+        assertEquals(List.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.AUTHORYEAR_PAR),
+                request.groupsInDocumentOrder().stream().map(group -> group.citationType).toList());
+    }
+
+    @Test
+    void numericInTextKeepsInterleavedUnresolvedKeysWithoutConsumingNumbers() throws RenderException {
+        RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "a"),
+                        group("narrative", CitationType.AUTHORYEAR_INTEXT, "a", "missing", "b", "missing", "a"),
+                        group("repeat", CitationType.AUTHORYEAR_PAR, "b")),
+                List.of(entry("a", "A"), entry("b", "B").withField(StandardField.AUTHOR, "Doe, John")));
+        RenderResult result = renderer(false, false).render(request);
+
+        assertEquals(List.of("[1]", "Smith [1], Unresolved(missing), Doe [2], Unresolved(missing), Smith [1]", "[2]"), markers(request, result));
+        assertEquals(List.of("missing"), result.unresolvedKeys());
+    }
+
+    @Test
+    void numericInTextKeepsAuthorsOutsideSuperscriptMarkers() throws RenderException {
+        CitationStyle base = numericStyle(true, false);
+        String source = base.getSource().replace(
+                "<layout prefix=\"[\" suffix=\"]\" delimiter=\", \"><text variable=\"citation-number\"/></layout>",
+                "<layout delimiter=\", \"><text variable=\"citation-number\" vertical-align=\"sup\"/></layout>");
+        CitationStyle superscript = new CitationStyle("superscript.csl", "superscript", "in-text", "Numeric superscript", "",
+                true, true, true, false, source, false);
+        RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "z", "a"),
+                        group("narrative", CitationType.AUTHORYEAR_INTEXT, "z", "a"), group("repeat", CitationType.AUTHORYEAR_PAR, "z")),
+                List.of(entry("a", "Alpha"), entry("z", "Zebra").withField(StandardField.AUTHOR, "Doe, John")));
+        RenderResult result = new CslRenderer(superscript, entryTypesManager).render(request);
+
+        assertEquals(List.of("<sup>1</sup>, <sup>2</sup>", "Doe <sup>2</sup>, Smith <sup>1</sup>", "<sup>2</sup>"), markers(request, result));
+    }
+
+    // [utest->req~openoffice.csl-in-text-citations~1]
+    @ParameterizedTest
+    @MethodSource("authorCases")
+    void numericInTextUsesShortAuthorsThenEditorsThenTheKey(BibEntry entry, String expected) throws RenderException {
+        RenderRequest request = request(List.of(group("narrative", CitationType.AUTHORYEAR_INTEXT, "key")), List.of(entry));
+
+        assertEquals(List.of(expected + " [1]"), markers(request, renderer(false, false).render(request)));
+    }
+
+    @Test
+    void numericInTextEscapesTheFallbackKey() throws RenderException {
+        String key = "<key>&";
+        RenderRequest request = request(List.of(group("narrative", CitationType.AUTHORYEAR_INTEXT, key)), List.of(new BibEntry().withCitationKey(key)));
+
+        assertEquals(List.of("&lt;key&gt;&amp; [1]"), markers(request, renderer(false, false).render(request)));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = StandardField.class, names = {"AUTHOR", "EDITOR"})
+    void numericInTextResolvesInheritedAuthorsAndEditorsInTheirOwnLibrary(StandardField field) throws RenderException {
+        BibEntry child = new BibEntry().withCitationKey("child").withField(StandardField.CROSSREF, "parent");
+        BibEntry parent = new BibEntry().withCitationKey("parent").withField(field, "#authors#");
+        BibDatabase library = new BibDatabase(List.of(child, parent));
+        library.setStrings(List.of(new BibtexString("authors", "Jones, Alex and Smith, Jane")));
+        BibDatabase other = new BibDatabase();
+        other.setStrings(List.of(new BibtexString("authors", "Wrong, Author")));
+        RenderRequest request = new RenderRequest(List.of(group("narrative", CitationType.AUTHORYEAR_INTEXT, "child")),
+                List.of(other, library), new RenderOptions(BstCitationFormat.NUMERIC));
+
+        assertEquals(List.of("Jones et al. [1]"), markers(request, renderer(false, false).render(request)));
+        assertEquals(Optional.empty(), child.getField(field));
+        assertEquals(Optional.of("#authors#"), parent.getField(field));
+    }
+
+    // [utest->req~openoffice.csl-in-text-citations~1]
+    @ParameterizedTest
+    @ValueSource(strings = {", ", " "})
+    void authorYearInTextConvertsPlainFormsWithoutChangingStoredTypes(String delimiter) throws RenderException {
+        CitationStyle style = authorYearStyle("""
+                <layout prefix="(" suffix=")" delimiter="; ">
+                  <names variable="author"><name form="short"/></names>
+                  <date variable="issued" prefix="%s"><date-part name="year"/></date>
+                </layout>
+                """.formatted(delimiter));
+        RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "a"),
+                group("repeat", CitationType.AUTHORYEAR_PAR, "a")), List.of(entry("a", "A")));
+
+        assertEquals(List.of("(Smith" + delimiter + "2020)", "Smith (2020)", "(Smith" + delimiter + "2020)"),
+                markers(request, new CslRenderer(style, entryTypesManager).render(request)));
+        assertEquals(List.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT, CitationType.AUTHORYEAR_PAR),
+                request.groupsInDocumentOrder().stream().map(group -> group.citationType).toList());
+    }
+
+    @Test
+    void authorYearInTextConvertsAnExplicitNoDateTerm() throws RenderException {
+        CitationStyle style = authorYearStyle("""
+                <layout prefix="(" suffix=")" delimiter="; ">
+                  <names variable="author"><name form="short"/></names>
+                  <choose>
+                    <if variable="issued"><date variable="issued" prefix=", "><date-part name="year"/></date></if>
+                    <else><text term="no date" form="short" prefix=", "/></else>
+                  </choose>
+                </layout>
+                """);
+        BibEntry entry = new BibEntry().withCitationKey("a").withField(StandardField.AUTHOR, "Smith, Jane");
+        RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry));
+
+        assertEquals(List.of("(Smith, n.d.)", "Smith (n.d.)"), markers(request, new CslRenderer(style, entryTypesManager).render(request)));
+    }
+
+    @Test
+    void authorYearInTextPreservesSquareBracketsAndTheYearSuffix() throws RenderException {
+        CitationStyle style = authorYearStyle("""
+                <layout prefix="[" suffix="]" delimiter="; ">
+                  <names variable="author"><name form="short"/></names>
+                  <date variable="issued" prefix=" "><date-part name="year"/></date><text value="a"/>
+                </layout>
+                """);
+        RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry("a", "A")));
+
+        assertEquals(List.of("[Smith 2020a]", "Smith [2020a]"), markers(request, new CslRenderer(style, entryTypesManager).render(request)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("markedUpAuthorYearLayouts")
+    void authorYearInTextLeavesMarkupContainingFormsUnchanged(String layout, String expected) throws RenderException {
+        RenderRequest request = request(List.of(group("normal", CitationType.AUTHORYEAR_PAR, "a"), group("narrative", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry("a", "A")));
+
+        assertEquals(List.of(expected, expected), markers(request, new CslRenderer(authorYearStyle(layout), entryTypesManager).render(request)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"(Smith, forthcoming)", "(Smith, 2020; Jones, 2021)", "(Smith, 2020, Jones, 2021)", "(Smith 2020 and Jones 2021)",
+            "(Smith, 2020, 2021)", "(Smith, 2020, forthcoming)", "(Smith, n.d., Jones, n.d.)", "(Smith, forthcoming, Jones, 2021)", "(Smith, Jones, 2020)",
+            "(Smith, 2020]", "[Smith, 2020)", "Smith, 2020", "(Smith, 2020"})
+    void authorYearInTextLeavesUnknownMultiSourceAndUnpairedFormsUnchanged(String text) throws RenderException {
+        CitationStyle style = authorYearStyle("<layout><text value=\"" + text + "\"/></layout>");
+        RenderRequest request = request(List.of(group("narrative", CitationType.AUTHORYEAR_INTEXT, "a")), List.of(entry("a", "A")));
+
+        assertEquals(List.of(text), markers(request, new CslRenderer(style, entryTypesManager).render(request)));
+    }
+
+    @Test
     void invisibleCitationsParticipateInSetWideNumbering() throws RenderException {
         RenderRequest request = request(List.of(group("empty", CitationType.INVISIBLE_CIT, "a"), group("normal", CitationType.AUTHORYEAR_PAR, "b")),
                 List.of(entry("a", "A"), entry("b", "B")));
@@ -268,6 +412,9 @@ class CslRendererTest {
                 Arguments.of(new BibEntry().withCitationKey("key").withField(StandardField.AUTHOR, "Smith, Jane and others"), "Smith et al."),
                 Arguments.of(new BibEntry().withCitationKey("key").withField(StandardField.EDITOR, "Jones, Alex and Smith, Jane"), "Jones et al."),
                 Arguments.of(new BibEntry().withCitationKey("key").withField(StandardField.AUTHOR, " ").withField(StandardField.EDITOR, "Jones, Alex"), "Jones"),
+                Arguments.of(new BibEntry().withCitationKey("key").withField(StandardField.AUTHOR, " "), "key"),
+                Arguments.of(new BibEntry().withCitationKey("key").withField(StandardField.AUTHOR, "Smith & Sons, Jane"), "Smith &amp; Sons"),
+                Arguments.of(new BibEntry().withCitationKey("key").withField(StandardField.EDITOR, "Jones & Sons, Alex"), "Jones &amp; Sons"),
                 Arguments.of(new BibEntry().withCitationKey("key"), "key"));
     }
 
@@ -289,19 +436,48 @@ class CslRendererTest {
         return Stream.of(numeric, alpha, authorYearStyle());
     }
 
+    private static Stream<Arguments> markedUpAuthorYearLayouts() {
+        return Stream.of(
+                Arguments.of("""
+                        <layout prefix="(" suffix=")">
+                          <names variable="author" font-style="italic"><name form="short"/></names>
+                          <date variable="issued" prefix=", "><date-part name="year"/></date>
+                        </layout>
+                        """, "(<i>Smith</i>, 2020)"),
+                Arguments.of("""
+                        <layout prefix="(" suffix=")">
+                          <names variable="author"><name form="short"/></names>
+                          <date variable="issued" prefix=", " font-weight="bold"><date-part name="year"/></date>
+                        </layout>
+                        """, "(Smith, <b>2020</b>)"),
+                Arguments.of("""
+                        <layout prefix="(" suffix=")">
+                          <names variable="author"><name form="short"/></names>
+                          <date variable="issued" prefix=", "><date-part name="year"/></date>
+                          <text value="a" vertical-align="sup"/>
+                        </layout>
+                        """, "(Smith, 2020<sup>a</sup>)"));
+    }
+
     private static CitationStyle authorYearStyle() {
+        return authorYearStyle("""
+                <layout prefix="(" suffix=")" delimiter="; ">
+                  <names variable="author"><name form="short"/></names>
+                  <date variable="issued" prefix=", "><date-part name="year"/></date>
+                </layout>
+                """);
+    }
+
+    private static CitationStyle authorYearStyle(String layout) {
         String source = """
                 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text">
                   <info><title>Partial author year</title><id>http://www.zotero.org/styles/partial-author-year</id></info>
                   <citation disambiguate-add-year-suffix="true">
-                    <layout prefix="(" suffix=")" delimiter="; ">
-                      <names variable="author"><name form="short"/></names>
-                      <date variable="issued" prefix=", "><date-part name="year"/></date>
-                    </layout>
+                    %s
                   </citation>
                   <bibliography><layout><text variable="title"/></layout></bibliography>
                 </style>
-                """;
+                """.formatted(layout);
         return new CitationStyle("partial-author-year.csl", "partial-author-year", "in-text", "Partial author year", "",
                 false, true, false, false, source, false);
     }
