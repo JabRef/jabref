@@ -119,7 +119,7 @@ Canonical → native conversion drops the original canonical uid and all per-cit
 Native → canonical conversion generates fresh canonical uids and only normal or narrative types.
 Native JSON locators, labels, prefixes, suffixes, author-only flags, unknown fields, item IDs, and native Zotero URI links are not carried into canonical storage or restored on reverse conversion.
 Native output rebuilds JSON from the JabRef library.
-See the overview's [Limitations](../code-howtos/openoffice/overview.md#limitations) for the loss table.
+See the “Limitations” section in the [overview](../code-howtos/openoffice/overview.md) for the loss table.
 
 Native insertion supports only normal and narrative citations; native JSON determines the type, not empty or zero-width mark text.
 The canonical CSL renderer supports invisible citations independently of native insertion's supported types.
