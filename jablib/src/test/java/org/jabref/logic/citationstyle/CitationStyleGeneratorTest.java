@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -317,6 +318,136 @@ class CitationStyleGeneratorTest {
 
         String actualCitation = CitationStyleGenerator.generateBibliography(List.of(firstEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, bibDatabaseContext, ENTRY_TYPES_MANAGER).getFirst();
         assertEquals(expectedCitation, actualCitation);
+    }
+
+    @Test
+    void handleXDataFields() {
+        BibEntry xdataEntry = new BibEntry(new UnknownEntryType("xdata"))
+                .withCitationKey("CAT")
+                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                .withField(StandardField.ADDRESS, "Reading, MA")
+                .withField(StandardField.SERIES, "Computers and Typesetting");
+
+        BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("Knuth")
+                .withField(StandardField.TITLE, "The TeX Book")
+                .withField(StandardField.YEAR, "1984")
+                .withField(StandardField.AUTHOR, "Knuth, Donald E.")
+                .withField(StandardField.XDATA, "CAT")
+                .withField(StandardField.NUMBER, "1");
+
+        String expectedCitation = "[1]D. E. Knuth, The TeX Book. in Computers and Typesetting. Reading, MA: Addison-Wesley, 1984.\n";
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(xdataEntry, bookEntry)));
+
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+        assertEquals(expectedCitation, CitationStyleGenerator.generateBibliography(List.of(bookEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, bibDatabaseContext, ENTRY_TYPES_MANAGER).getFirst());
+
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+        assertEquals(expectedCitation, CitationStyleGenerator.generateBibliography(List.of(bookEntry), DEFAULT_STYLE, TEXT_OUTPUT_FORMAT, bibDatabaseContext, ENTRY_TYPES_MANAGER).getFirst());
+    }
+
+    static Stream<Arguments> articleXDataCslMapping() {
+        return Stream.of(
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 28.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        List.of(
+                                new BibEntry(StandardEntryType.Article)
+                                        .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                        .withField(StandardField.XDATA, "art-xdata"),
+                                new BibEntry(new UnknownEntryType("xdata"))
+                                        .withCitationKey("art-xdata")
+                                        .withField(StandardField.NUMBER, "28")
+                        ),
+                        "ieee.csl"
+                ),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 28.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        List.of(
+                                new BibEntry(StandardEntryType.Article)
+                                        .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                        .withField(StandardField.ISSUE, "7")
+                                        .withField(StandardField.XDATA, "art-xdata"),
+                                new BibEntry(new UnknownEntryType("xdata"))
+                                        .withCitationKey("art-xdata")
+                                        .withField(StandardField.NUMBER, "28")
+                        ),
+                        "ieee.csl"
+                ),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 7, Art. no. e0270533.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        List.of(
+                                new BibEntry(StandardEntryType.Article)
+                                        .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                        .withField(StandardField.ISSUE, "7")
+                                        .withField(StandardField.XDATA, "art-xdata"),
+                                new BibEntry(new UnknownEntryType("xdata"))
+                                        .withCitationKey("art-xdata")
+                                        .withField(StandardField.EID, "e0270533")
+                        ),
+                        "ieee.csl"
+                ),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 28, Art. no. e0270533.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        List.of(
+                                new BibEntry(StandardEntryType.Article)
+                                        .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                        .withField(StandardField.XDATA, "art-xdata"),
+                                new BibEntry(new UnknownEntryType("xdata"))
+                                        .withCitationKey("art-xdata")
+                                        .withField(StandardField.NUMBER, "28")
+                                        .withField(StandardField.EID, "e0270533")
+                        ),
+                        "ieee.csl"
+                ),
+                Arguments.of(
+                        "[1]F. Last and J. Doe, no. 28.\n",
+                        BibDatabaseMode.BIBTEX,
+                        List.of(
+                                new BibEntry(StandardEntryType.Article)
+                                        .withField(StandardField.AUTHOR, "Last, First and\nDoe, Jane")
+                                        .withField(StandardField.XDATA, "art-xdata"),
+                                new BibEntry(new UnknownEntryType("xdata"))
+                                        .withCitationKey("art-xdata")
+                                        .withField(StandardField.NUMBER, "28")
+                        ),
+                        "ieee.csl"
+                ),
+                Arguments.of(
+                        "Foo, B. (n.d.). issue + number. Bib(La)TeX Journal, (3number).\n",
+                        BibDatabaseMode.BIBTEX,
+                        List.of(
+                                new BibEntry(StandardEntryType.Article)
+                                        .withField(StandardField.AUTHOR, "Foo, Bar")
+                                        .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
+                                        .withField(StandardField.TITLE, "issue + number")
+                                        .withField(StandardField.ISSUE, "9issue")
+                                        .withField(StandardField.XDATA, "art-xdata"),
+                                new BibEntry(new UnknownEntryType("xdata"))
+                                        .withCitationKey("art-xdata")
+                                        .withField(StandardField.NUMBER, "3number")
+                        ),
+                        "apa.csl"
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void articleXDataCslMapping(String expected, BibDatabaseMode mode, List<BibEntry> entries, String cslFileName) {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
+        context.setMode(mode);
+
+        String citation = CitationStyleGenerator.generateBibliography(
+                List.of(entries.getFirst()),
+                CSLStyleUtils.createCitationStyleFromFile(cslFileName).orElseThrow().getSource(),
+                TEXT_OUTPUT_FORMAT,
+                context,
+                ENTRY_TYPES_MANAGER).getFirst();
+        assertEquals(expected, citation);
     }
 
     static Stream<Arguments> cslMapping() {
