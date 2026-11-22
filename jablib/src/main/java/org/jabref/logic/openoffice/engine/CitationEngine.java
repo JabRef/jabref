@@ -21,7 +21,9 @@ import org.jabref.logic.openoffice.frontend.DocumentCitations;
 import org.jabref.logic.openoffice.frontend.DocumentOrder;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.rangesort.RestorableTextViewCursor;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.openoffice.uno.UnoCrossRef;
 import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
 import org.jabref.logic.openoffice.uno.WriterOperationException;
 import org.jabref.model.database.BibDatabase;
@@ -99,18 +101,18 @@ public final class CitationEngine implements AutoCloseable {
         return style instanceof CitationStyle && preferences.getZoteroCompatibilityMode();
     }
 
-    /// Fresh, read-only mismatch detection for the next CSL insertion. Preferences alone do not
-    /// convert anything; neither refresh nor export invokes this insertion transaction.
-    // [impl->req~openoffice.next-citation-format-conversion~1]
+    /// Fresh, read-only detection of native-format mismatches and legacy JStyle marks.
+    /// Neither refresh nor export invokes the insertion-only conversion transaction.
+    // [impl->req~openoffice.next-citation-format-conversion~1,req~openoffice.legacy-jstyle-migration~1]
     public OOResult<Boolean, JabRefException> requiresFormatConversion(OOStyle style) {
         if (closed) {
             return OOResult.error(unavailable());
         }
-        if (!(style instanceof CitationStyle)) {
-            return OOResult.ok(false);
-        }
         try {
-            return OOResult.ok(CitationFormatConverter.required(WriterReferenceMarks.getListOfNames(document), preferences.getZoteroCompatibilityMode()));
+            List<String> names = WriterReferenceMarks.getListOfNames(document);
+            boolean legacyMigration = !usesZoteroCitations(style) && names.stream().anyMatch(LegacyJStyleMark::isLegacyMarkName);
+            return OOResult.ok(legacyMigration || (style instanceof CitationStyle
+                    && CitationFormatConverter.required(names, preferences.getZoteroCompatibilityMode())));
         } catch (WriterDocumentAccessException | com.sun.star.uno.RuntimeException exception) {
             return OOResult.error(failure(Localization.lang("Problem collecting citations"), exception));
         }
@@ -127,8 +129,8 @@ public final class CitationEngine implements AutoCloseable {
         if (conversion.isError()) {
             return OOResult.error(conversion.getError());
         }
-        if (conversion.get() && style instanceof CitationStyle cslStyle) {
-            return insertWithConversion(entries, databases, cslStyle, requestedType, pageInfo, cursor, rebuildBibliography);
+        if (conversion.get()) {
+            return insertWithConversion(entries, databases, style, requestedType, pageInfo, cursor, rebuildBibliography);
         }
         if (usesZoteroCitations(style)) {
             return writeSession(Localization.lang("Insert citation"),
@@ -187,7 +189,7 @@ public final class CitationEngine implements AutoCloseable {
     }
 
     private OOResult<List<String>, JabRefException> insertWithConversion(List<BibEntry> entries, List<BibDatabase> databases,
-                                                                         CitationStyle style, CitationType type, String pageInfo,
+                                                                         OOStyle style, CitationType type, String pageInfo,
                                                                          XTextCursor cursor, boolean rebuildBibliography) {
         try {
             session.requireRollbackSupport();
@@ -195,8 +197,9 @@ public final class CitationEngine implements AutoCloseable {
                     .prepare(entries, databases, style, type, pageInfo, cursor, rebuildBibliography);
             return writeSession(Localization.lang("Insert citation"), () -> {
                 try {
-                    prepared.apply(writer, cursor);
-                    return OOResult.ok(prepared.unresolvedKeys());
+                    prepared.applyCitations(writer, cursor);
+                    synchronizeInsertionBibliography(style, prepared.rendered(), rebuildBibliography);
+                    return OOResult.ok(prepared.rendered().unresolvedKeys());
                 } catch (com.sun.star.uno.Exception | WriterOperationException | WriterDocumentAccessException | JabRefMarkCodecException exception) {
                     writer.clear();
                     return OOResult.error(failure(Localization.lang("Could not insert citation"), exception));
@@ -207,6 +210,20 @@ public final class CitationEngine implements AutoCloseable {
         } catch (com.sun.star.uno.Exception | WriterDocumentAccessException | RenderException | JabRefMarkCodecException | IOException
                  | IllegalArgumentException | IllegalStateException | com.sun.star.uno.RuntimeException exception) {
             return OOResult.error(failure(Localization.lang("Could not insert citation"), exception));
+        }
+    }
+
+    private void synchronizeInsertionBibliography(OOStyle style, RenderResult rendered, boolean requested)
+            throws WriterDocumentAccessException, WriterOperationException, com.sun.star.uno.Exception {
+        if (requested && capabilities(style).hasBibliography()) {
+            if (usesZoteroCitations(style)) {
+                zotero.rebuildBibliography(rendered.bibliography());
+            } else {
+                new BibliographySection().rebuild(document, rendered.bibliography(), style instanceof JStyle);
+            }
+        }
+        if (rendered.refreshCitedOnPages()) {
+            UnoCrossRef.refresh(document);
         }
     }
 

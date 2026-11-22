@@ -424,10 +424,10 @@ class WriterIntegrationTest {
         assertEquals(before, snapshot(document));
     }
 
-    // [utest->req~openoffice.legacy-marks-unmanaged~1]
+    // [utest->req~openoffice.legacy-marks-unmanaged~1,req~openoffice.legacy-jstyle-migration~1]
     @ParameterizedTest
     @ValueSource(strings = {"jstyle", "csl", "bst", "csl-empty"})
-    void engineDoesNotReadExportRewriteOrMigrateLegacyMarks(String family) throws Exception {
+    void connectionExportAndRefreshLeaveLegacyMarksAndMetadataUntouched(String family) throws Exception {
         String fixture = "csl-empty".equals(family) ? "legacy-csl-empty-citation.fodt" : "legacy-" + family + ".fodt";
         XTextDocument document = office.load(resource(fixture));
         Map<String, String> legacy = marks(document);

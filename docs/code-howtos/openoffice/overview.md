@@ -242,19 +242,41 @@ Removal forgets the configured style entry rather than deleting the user's style
 
 ## Compatibility boundary
 
-Legacy JStyle `JR_cite*` marks and legacy CSL/BST marks containing `CID_n` are not canonical citations and are not automatically migrated.
-Their existing text remains visible, but canonical reading, export-cited results, and regenerated bibliographies do not manage them.
-Opening a document, selecting another family, or refreshing does not upgrade those legacy marks.
-Maintaining them requires a compatible older JabRef version or manually replacing them with current canonical citations.
+Legacy JStyle `JR_cite*` marks and legacy CSL/BST marks containing `CID_n` are not canonical citations.
+Until supported JStyle marks are migrated on insertion, their text remains visible but canonical reading, export-cited results, and regenerated bibliographies do not manage them.
+`CID_n` remains unmanaged and is not a migration input; maintaining unsupported legacy citations requires a compatible older JabRef version or manual replacement.
 Keep a copy before changing which JabRef version manages an existing document.
+
+### One-way legacy JStyle migration on insertion
+
+The next insertion outside effective native Zotero mode detects supported legacy `JR_cite` marks, including after reconnecting.
+JStyle and BST always use canonical mode, even if the saved CSL Zotero setting is on; CSL uses canonical mode when that setting is off.
+Before mutation, the controller shows the existing "Reference mark format" / "Converting references to selected format" warning.
+Connecting, refreshing, exporting, selecting a style, or changing the preference alone does not migrate marks.
+Insertion or conversion targeting native Zotero format initially leaves legacy JStyle marks unchanged.
+
+Preparation combines all supported legacy groups, existing canonical groups, any native groups being converted to canonical format, and the pending citation.
+Legacy numeric types `1` through `6` map respectively to `NORMAL`, `IN_TEXT`, `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_ONLY`.
+Each migrated group receives a fresh stable uid and retains its keys in storage order.
+The legacy page property is named by the whole legacy mark; its value moves to the last citation's canonical `JabRef_page_info:<uid>:<storageIndex>` slot in storage order.
+Legacy marks are replaced with canonical marks using invisible boundaries, not retained as an alternative output format.
+
+The combined proposed set and any normally synchronized target bibliography are rendered once before writes, with no second render during application.
+Mark replacement does not validate bibliography paragraph styles or convert bibliography sections.
+The insertion coordinator separately applies optional bibliography output only when synchronization is requested; otherwise a later refresh can generate a bibliography from the migrated marks.
+Migration uses the existing conversion transaction and the preflight, rollback, and recovery limits described below.
+Insertion and migration are one Undo/Redo step, including legacy mark removal, canonical identities, page-property transfer, and prepared conversion properties.
+Undo restores the legacy marks and their page properties; redo restores the same prepared canonical identities.
+After migration, ordinary canonical refresh, style-family changes, and export-cited lookup manage these citations.
 
 ### Current canonical ↔ native Zotero conversion
 
 Changing the compatibility preference alone does not modify the document.
 On the **next CSL citation insertion**, `CitationEngine.requiresFormatConversion` rereads current marks, including after reconnecting, and detects current-format citations that do not match the selected mode.
 The controller shows the existing warning titled "Reference mark format" with the message "Converting references to selected format" before insertion mutates the document.
-Opening, toggling, selecting a style, refreshing, exporting cited entries, and JStyle/BST insertions do not trigger conversion.
-Only current canonical and native Zotero citation marks participate; `JR_cite*` and `CID_n` marks do not.
+Opening, toggling, selecting a style, refreshing, exporting cited entries, and JStyle/BST insertions do not trigger canonical ↔ native Zotero conversion.
+This bidirectional conversion concerns current canonical and native Zotero marks; the one-way legacy JStyle migration above can join preparation when targeting canonical format.
+Conversion targeting native Zotero format does not initially migrate `JR_cite*`, and `CID_n` never participates.
 
 `CitationFormatConverter` prepares existing and pending citations, source linking, replacement identities, optional normally synchronized target bibliography output, and style-property deltas.
 Required custom-property types, writability, and removability are preflighted before mutation.

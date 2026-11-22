@@ -269,7 +269,12 @@ The tests start an isolated headless Writer with a temporary user profile and a 
 Human-readable golden `.fodt` documents and native Zotero JSON fixtures live under `jablib/src/test/resources/org/jabref/logic/openoffice/integration`.
 The suite exercises canonical JStyle, CSL, and BST citations, cross-family save/reopen round trips, all six stored types, stable identities, per-citation page information, numbering, bibliography ordering, invisible citations, footnotes, tables, repeated superscript refresh, and restored change recording.
 The canonical mark grammar is `JABREF_<keys> <TYPE> <uid>`, for example `JABREF_Smith2000 NORMAL group-17`; the former uid-before-type order is not a fallback format.
-Legacy `JR_cite*` and `CID_n` fixtures remain persistence oracles and must not be read, exported, rewritten, or migrated as canonical citations.
+Legacy `JR_cite*` and `CID_n` fixtures remain persistence oracles for operations that do not trigger migration; canonical reading and export must not interpret legacy marks as canonical citations.
+For supported legacy JStyle `JR_cite` marks, migration checks must cover the next insertion with JStyle/BST or with CSL and the saved Zotero setting off, including mixed legacy/canonical documents and the existing warning before mutation.
+Check all six numeric types, storage-order keys, fresh stable identities, transfer of the whole-mark-named page property to the last storage-order citation's canonical slot, and canonical invisible boundaries.
+The combined legacy, canonical, and pending set must render once before writes; rendering failure must leave the document unchanged, and application failure must use the existing conversion rollback.
+Undo must restore legacy marks and page properties; redo must restore the prepared canonical identities and page slots.
+Connecting, refreshing, exporting, style selection, and native Zotero insertion/conversion must leave legacy JStyle marks unchanged; `CID_n` must remain unmanaged in every mode.
 Rendering failures, including missing Pandoc for BST, must leave preparation targets unchanged.
 
 `CitationFormatConversionWriterTest` covers current canonical ↔ native Zotero conversion on the next CSL citation insertion, with the existing warning, not on preference changes, refresh, or export.

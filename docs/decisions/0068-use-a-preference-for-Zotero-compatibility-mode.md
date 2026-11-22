@@ -11,7 +11,10 @@ The decision below is a historical record; its `CID_n` encoding is no longer sup
 
 In the current integration, a format mismatch triggers conversion only on the next CSL citation insertion, after the existing "Reference mark format" / "Converting references to selected format" warning.
 Toggling the preference, opening a document, selecting a style, refreshing, or exporting cited entries does not trigger conversion.
-Conversion is limited to current canonical JabRef marks ↔ supported native Zotero marks; neither `JR_cite*` nor `CID_n` legacy marks are migrated.
+This bidirectional conversion covers current canonical JabRef marks ↔ supported native Zotero marks, not legacy `CID_n` marks.
+Separately, the next insertion outside effective native Zotero mode migrates supported legacy JStyle `JR_cite` marks one-way to canonical format: always for JStyle/BST, and for CSL when the saved compatibility setting is off.
+It uses the same warning and conversion transaction; connecting, refreshing, exporting, and selecting a style do not trigger migration.
+Insertion or conversion targeting native Zotero format initially leaves legacy JStyle marks unchanged.
 The independent document-action framework preserves the old trigger, warning, and native modifier compatibility.
 Native citation locators, labels, prefixes, suffixes, author-only items, and mixed per-item author suppression do not by themselves block conversion, insertion, or refresh.
 Any item with `suppress-author: true` selects the group's existing in-text citation type, including mixed groups.

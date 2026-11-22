@@ -74,7 +74,10 @@ Preparation reads and validates the document, establishes citation order, and re
 `CitationGroupEditor` prepares merge/separate replacements and applies structural citation changes inside the caller's write session.
 `CitationFormatConverter` prepares conversion between current canonical and native Zotero citation marks on the next CSL insertion.
 `ConversionMetadata` preserves the associated citation state for conversion round trips.
-Legacy `JR_cite*` and `CID_n` marks remain unmanaged rather than being conversion inputs.
+The conversion preparation path also handles one-way migration of supported legacy JStyle `JR_cite` marks on the next insertion outside effective native Zotero mode: always for JStyle/BST, and for CSL with the saved compatibility setting off.
+It prepares all legacy groups with existing canonical groups and the pending citation, renders once before writes, and reuses the existing rollback-capable conversion transaction.
+`PreparedInsertion.applyCitations` replaces marks and their metadata without bibliography-style validation or bibliography writes; `CitationEngine` separately handles normal insertion's optional bibliography synchronization.
+Canonical storage reading remains separate from legacy detection; `CID_n` stays unmanaged, and insertion or conversion targeting native Zotero format initially leaves `JR_cite` marks unchanged.
 
 `RendererFactory` selects `JStyleRenderer`, `CslRenderer`, or `BstRenderer` through `CitationRenderer`.
 A `RenderRequest` supplies groups in document order, libraries, and options; `RenderResult` contains formatted markers, requested bibliography paragraphs, and unresolved keys.

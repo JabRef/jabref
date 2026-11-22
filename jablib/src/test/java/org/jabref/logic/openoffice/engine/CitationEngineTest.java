@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
 import org.jabref.logic.openoffice.engine.storage.MarkStore;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -23,7 +24,9 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -48,7 +52,9 @@ class CitationEngineTest {
     @MethodSource("nonCslModes")
     void switchingFamiliesRestoresCslCapabilitiesWithoutChangingTheSavedMode(OOStyle nonCslStyle, boolean zoteroMode) throws RenderException {
         preferences.setZoteroCompatibilityMode(zoteroMode);
-        try (CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(List.of());
             StyleCapabilities cslCapabilities = engine.capabilities(preferences.getCurrentStyle());
             assertEquals(!zoteroMode, cslCapabilities.supportedTypes().contains(CitationType.INVISIBLE_CIT));
 
@@ -72,7 +78,9 @@ class CitationEngineTest {
         try (MockedConstruction<MarkStore> stores = mockConstruction(MarkStore.class,
                 (store, _) -> when(store.readAll(document)).thenThrow(failure));
              MockedConstruction<ZoteroCitationStrategy> strategies = mockConstruction(ZoteroCitationStrategy.class);
+             MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
              CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(List.of());
             assertSame(failure, engine.insert(List.of(new BibEntry().withCitationKey("alpha")), List.of(), style,
                     CitationType.AUTHORYEAR_PAR, "", mock(XTextCursor.class), false).getError().getCause());
             assertSame(failure, engine.refresh(List.of(), style).getError().getCause());
@@ -84,6 +92,34 @@ class CitationEngineTest {
             }
             verifyNoInteractions(strategies.constructed().getFirst());
             assertTrue(preferences.getZoteroCompatibilityMode());
+        }
+    }
+
+    // [utest->req~openoffice.legacy-jstyle-migration~1]
+    @ParameterizedTest
+    @MethodSource("nonCslModes")
+    void nonCslInsertionDetectsLegacyMarksRegardlessOfTheSavedZoteroChoice(OOStyle style, boolean zoteroMode) {
+        preferences.setZoteroCompatibilityMode(zoteroMode);
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document))
+                 .thenReturn(List.of("unrelated", "JABREF_unknown CID_7 old NORMAL", "JR_cite_1_alpha"));
+
+            assertTrue(engine.requiresFormatConversion(style).get());
+            assertEquals(zoteroMode, preferences.getZoteroCompatibilityMode());
+        }
+    }
+
+    // [utest->req~openoffice.legacy-jstyle-migration~1]
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void cslOnlyMigratesLegacyMarksOutsideNativeZoteroMode(boolean zoteroMode) {
+        preferences.setZoteroCompatibilityMode(zoteroMode);
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(List.of("JR_cite_1_alpha"));
+
+            assertEquals(!zoteroMode, engine.requiresFormatConversion(preferences.getCurrentStyle()).get());
         }
     }
 

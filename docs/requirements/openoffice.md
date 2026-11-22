@@ -14,12 +14,12 @@ Related issue: <https://github.com/JabRef/jabref/issues/14962>.
 
 Needs: impl, utest
 
-## The canonical Writer integration must leave legacy JabRef citations unmanaged
+## The canonical Writer integration must leave legacy JabRef citations unmanaged outside supported JStyle migration
 `req~openoffice.legacy-marks-unmanaged~1`
 
 Legacy JStyle marks named `JR_cite*` and legacy CSL/BST marks containing `CID_n` are excluded from managed citations and export-cited results.
-Their existing citation text, mark names, and page-info properties are not converted or rewritten.
-There is no automatic migration to canonical marks.
+Their existing citation text, mark names, and page-info properties are not converted or rewritten except during the insertion-triggered JStyle migration specified below.
+Legacy `CID_n` marks remain unmanaged in every mode.
 Zotero's own mark format belongs to a separate CSL-only compatibility strategy, not to this legacy JabRef format policy.
 
 Needs: impl, utest
@@ -28,9 +28,10 @@ Needs: impl, utest
 `req~openoffice.next-citation-format-conversion~1`
 
 When current canonical JabRef or native Zotero citations differ from the selected Zotero compatibility mode, the next CSL citation insertion shows the existing "Reference mark format" / "Converting references to selected format" warning before converting them to that mode's format.
-Opening a document, toggling the preference, selecting a style, refreshing, exporting cited entries, and inserting with JStyle or BST do not trigger conversion.
+Opening a document, toggling the preference, selecting a style, refreshing, exporting cited entries, and inserting with JStyle or BST do not trigger canonical ↔ native Zotero conversion.
 Detection rereads document marks, including after reconnecting, rather than depending on preference-change history.
-Legacy `JR_cite*` and `CID_n` marks remain unmanaged and unchanged, including in mixed-format documents.
+Legacy `JR_cite*` marks participate only in the separate one-way JStyle migration below; conversion targeting native Zotero format leaves them unchanged.
+Legacy `CID_n` marks remain unmanaged and unchanged, including in mixed-format documents.
 
 The combined converted and pending citations and any target-mode bibliography requested by normal synchronization are rendered once before document mutation.
 Preparation failures, including invalid metadata, unresolved sources, protected ranges, unsuitable custom-property types or attributes, and rendering failures, leave marks, properties, text, and undo history unchanged.
@@ -52,6 +53,30 @@ Replacing both identity fields or deleting the sidecar loses the association; ca
 Conversion changes citation marks only; it does not convert, rename, consolidate, or remove bibliography sections, create a bibliography metadata sidecar, or reject citations based on bibliography settings.
 With synchronization on insertion disabled, every existing bibliography section's name, text, and properties stay unchanged, and no bibliography is created.
 With synchronization enabled and a style that has a bibliography, normal handling updates or creates only the target mode's managed bibliography; other-format sections stay unchanged and may coexist with it.
+
+Needs: impl, utest
+
+## The next citation insertion outside native Zotero mode must migrate supported legacy JStyle citations to canonical marks
+`req~openoffice.legacy-jstyle-migration~1`
+
+On the next insertion, detect supported legacy `JR_cite` marks when the effective mode is canonical: always for JStyle and BST, and for CSL when the saved Zotero compatibility setting is off.
+Reread the document marks, including after reconnecting, and show the existing "Reference mark format" / "Converting references to selected format" warning before mutation.
+Connecting, refreshing, exporting, selecting a style, or changing the compatibility preference alone does not migrate legacy marks.
+Insertion or conversion targeting native Zotero format initially leaves `JR_cite` marks unchanged; `CID_n` remains unmanaged in every mode.
+
+Prepare all supported legacy groups together with existing canonical groups, any native groups being converted to canonical format, and the pending citation.
+Map legacy numeric types `1` through `6` to `NORMAL`, `IN_TEXT`, `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_ONLY`, respectively.
+Preserve storage-order keys and assign each migrated group a fresh stable uid.
+Move the legacy page property, whose name is the whole legacy mark name, to `JabRef_page_info:<uid>:<lastStorageIndex>`, belonging to the group's last citation in storage order.
+Replace legacy marks with canonical marks using invisible boundaries; migration is one-way, not a legacy output format.
+
+Render the combined proposed citation set and any normally synchronized target bibliography once before document writes; application does not render again.
+Use the existing conversion transaction, including preflight checks, root undo ownership, ordinary-failure rollback, and its documented recovery limits.
+Successful insertion and migration form one Undo/Redo step covering citation text, old and new marks, identities, legacy and canonical page properties, prepared conversion properties, and any normally synchronized target bibliography.
+Undo restores the original legacy marks and page properties; redo restores the prepared canonical identities and page slots.
+
+Related issue: <https://github.com/JabRef/jabref/issues/14962>.
+Related pull request: <https://github.com/JabRef/jabref/pull/17673>.
 
 Needs: impl, utest
 

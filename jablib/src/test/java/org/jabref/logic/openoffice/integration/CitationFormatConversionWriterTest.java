@@ -329,7 +329,7 @@ class CitationFormatConversionWriterTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void mixedFormatsMergeCitedSetWhileLegacyMarksStayUnmanaged(boolean targetZotero) throws Exception {
+    void mixedFormatsMergeCitedSetWhileUnsupportedCidMarksStayUnmanaged(boolean targetZotero) throws Exception {
         XTextDocument document = office.newDocument();
         new MarkStore().createCitationGroup(document, office.context(), List.of("beta"), List.of(Optional.empty()),
                 CitationType.AUTHORYEAR_PAR, separatedEnd(document), false, false, "mixed_uid");
@@ -337,9 +337,9 @@ class CitationFormatConversionWriterTest {
         XTextCursor end = separatedEnd(document);
         end.setString("[native]");
         WriterReferenceMarks.create(new NamedTextContentPlacement(document, nativeName, end, true));
-        String legacy = "JR_cite_1_legacyUnknown";
+        String legacy = "JABREF_legacyUnknown CID_7 ignored NORMAL";
         end = separatedEnd(document);
-        end.setString("Leave this legacy citation alone");
+        end.setString("Leave this unsupported CID citation alone");
         WriterReferenceMarks.create(new NamedTextContentPlacement(document, legacy, end, true));
         try (CitationEngine engine = engine(document, preferences(targetZotero))) {
             assertTrue(success(engine.requiresFormatConversion(style())));
@@ -349,7 +349,7 @@ class CitationFormatConversionWriterTest {
             CitedEntryExporter.ExportResult exported = success(engine.exportCited(List.of(database)));
             assertEquals(List.of("alpha", "beta", "native"), exported.database().getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).sorted().toList());
             assertEquals(List.of(), exported.unresolvedKeys());
-            assertEquals("Leave this legacy citation alone", WriterReferenceMarks.getAnchor(document, legacy).orElseThrow().getString());
+            assertEquals("Leave this unsupported CID citation alone", WriterReferenceMarks.getAnchor(document, legacy).orElseThrow().getString());
         }
     }
 

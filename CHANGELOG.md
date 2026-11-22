@@ -76,6 +76,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed error messages when updating LibreOffice/OpenOffice citations to explain protected areas, missing entries or styles, and Pandoc failures. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice integration to preserve citations and bibliographies when formatting generation fails, and attempt recovery after failed citation conversions. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice style switching to remember the Zotero compatibility setting for CSL without affecting JStyle or BST. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed LibreOffice/OpenOffice citation insertion outside Zotero mode to migrate supported legacy JStyle citations, preserving citation types and page information. [#14962](https://github.com/JabRef/jabref/issues/14962)
 - We changed removing LibreOffice/OpenOffice citation styles to request confirmation, retain unrelated style selections, and leave style files untouched. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice bibliography refresh to remove outdated references and extra blank paragraphs only for the selected JabRef/Zotero citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
@@ -195,7 +196,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the "Waiting for AI reply..." notification; the AI chat already shows a progress indicator. [#17145](https://github.com/JabRef/jabref/pull/17145)
 - We temporarily removed the language handling for Docling due to a bug in RapidOCR. [#17674](https://github.com/JabRef/jabref/pull/17674)
-- We removed legacy JabRef citation support from LibreOffice/OpenOffice citation refresh, bibliographies, and cited-entry export; citation text remains without automatic migration. [#14962](https://github.com/JabRef/jabref/issues/14962)
+- We removed direct legacy citation support from LibreOffice/OpenOffice refresh, bibliographies, and cited-entry export; supported JStyle citations migrate on insertion. [#14962](https://github.com/JabRef/jabref/issues/14962)
 
 ## [6.0-beta.1] - 2026-09-21
 
