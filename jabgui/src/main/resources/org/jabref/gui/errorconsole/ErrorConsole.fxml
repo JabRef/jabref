@@ -10,7 +10,7 @@
             fx:controller="org.jabref.gui.errorconsole.ErrorConsoleView"
             id="error-console" styleClass="error-console">
     <content>
-        <ListView fx:id="messagesListView" onKeyPressed="#copySelectedLogEntries" styleClass="padding-0"
+        <ListView fx:id="messagesListView" onKeyPressed="#copySelectedLogEntries" styleClass="padding-0,variable-cell-size"
                   BorderPane.alignment="CENTER"/>
     </content>
     <header>

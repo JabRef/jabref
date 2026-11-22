@@ -503,8 +503,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         keepAssignments,
                         removeAssignments,
                         cancel);
-                boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                        && (group instanceof ExplicitGroup);
+                // [impl->req~groups.edit.remove-obsolete-explicit-assignments~1]
+                boolean removePreviousAssignments = oldGroupDef instanceof ExplicitGroup;
 
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
@@ -639,7 +639,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void removeSubgroups(GroupNodeViewModel group) {
         boolean confirmation = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove subgroups"),
-                Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
+                Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()),
+                // [impl->req~ui.dialogs.confirmation.naming~1]
+                Localization.lang("Remove"));
         if (confirmation) {
             recordTreeChange(Localization.lang("Remove subgroups"), edit -> {
                 for (GroupNodeViewModel child : group.getChildren()) {

@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
@@ -28,7 +29,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseEnterEvent;
     private Function<T, BooleanExpression> toDisableExpression;
     private Function<T, BooleanExpression> toVisibleExpression;
     private BiFunction<S, T, String> toTooltip;
@@ -130,7 +130,8 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         setGraphic(toGraphic.apply(rowItem, item));
                     }
                     if (alignment != null) {
-                        setAlignment(alignment);
+                        // Inline style, because the theme's `-fx-alignment` of table cells would override `setAlignment`
+                        setStyle("-fx-alignment: " + alignment.name().toLowerCase(Locale.ROOT).replace('_', '-'));
                     }
                     if (toTooltip != null) {
                         String tooltipText = toTooltip.apply(rowItem, item);
