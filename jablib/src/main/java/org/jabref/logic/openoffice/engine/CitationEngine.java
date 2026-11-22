@@ -81,18 +81,22 @@ public final class CitationEngine implements AutoCloseable {
     }
 
     public StyleCapabilities capabilities(OOStyle style) {
-        if (closed || (preferences.getZoteroCompatibilityMode() && !(style instanceof CitationStyle))) {
+        if (closed) {
             return NONE;
         }
         try {
             StyleCapabilities capabilities = renderers().create(style).capabilities();
-            return preferences.getZoteroCompatibilityMode()
+            return usesZoteroCitations(style)
                    ? new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT), capabilities.hasBibliography(), false, false)
                    : capabilities;
         } catch (RenderException exception) {
             LOGGER.debug("Cannot determine citation style capabilities", exception);
             return NONE;
         }
+    }
+
+    private boolean usesZoteroCitations(OOStyle style) {
+        return style instanceof CitationStyle && preferences.getZoteroCompatibilityMode();
     }
 
     /// Fresh, read-only mismatch detection for the next CSL insertion. Preferences alone do not
@@ -126,7 +130,7 @@ public final class CitationEngine implements AutoCloseable {
         if (conversion.get() && style instanceof CitationStyle cslStyle) {
             return insertWithConversion(entries, databases, cslStyle, requestedType, pageInfo, cursor, rebuildBibliography);
         }
-        if (preferences.getZoteroCompatibilityMode()) {
+        if (usesZoteroCitations(style)) {
             return writeSession(Localization.lang("Insert citation"),
                     () -> zotero.insert(entries, databases, style, requestedType, pageInfo, cursor, rebuildBibliography));
         }
@@ -211,7 +215,7 @@ public final class CitationEngine implements AutoCloseable {
         if (closed) {
             return OOResult.error(unavailable());
         }
-        if (preferences.getZoteroCompatibilityMode()) {
+        if (usesZoteroCitations(style)) {
             return writeSession(Localization.lang("Refresh bibliography"), () -> zotero.refresh(databases, style));
         }
         try {
@@ -298,7 +302,7 @@ public final class CitationEngine implements AutoCloseable {
         if (closed) {
             return OOResult.error(unavailable());
         }
-        if (preferences.getZoteroCompatibilityMode()) {
+        if (usesZoteroCitations(preferences.getCurrentStyle())) {
             return zotero.exportCited(databases);
         }
         try {

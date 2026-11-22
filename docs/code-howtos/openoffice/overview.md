@@ -7,7 +7,7 @@ grand_parent: Code Howtos
 
 The OpenOffice/LibreOffice panel connects JabRef libraries to a Writer document.
 It inserts citations, refreshes their presentation, generates a bibliography, exports cited entries, and imports entries embedded in Zotero-compatible documents.
-JStyle, CSL, and BST styles share canonical JabRef citations when Zotero compatibility mode is disabled.
+JStyle and BST always use canonical JabRef citations; CSL uses them when Zotero compatibility mode is disabled.
 Zotero compatibility mode uses a separate CSL-only strategy and native Zotero storage.
 
 Open the panel from **View → OpenOffice/LibreOffice**.
@@ -206,6 +206,9 @@ Shared ordering is not a guarantee of correct reading order for every layout.
 ## Style selection and external styles
 
 The panel's Settings menu provides More settings, which opens JabRef preferences with the OpenOffice/LibreOffice tab selected, even without a connected Writer document.
+Zotero compatibility applies only to CSL styles; JStyle and BST always use JabRef citations without requiring a manual mode change.
+Switching to JStyle or BST retains the saved CSL compatibility preference, so returning to CSL uses the previous on/off choice.
+The Zotero preference is disabled for non-CSL styles, and saving other integration settings does not overwrite that choice.
 
 Style registries have explicit family-specific sources.
 The CSL registry uses `CSLStyleLoader::getStyles`, including configured external CSL styles; it does not accidentally restrict the catalog to bundled styles.

@@ -459,7 +459,7 @@ public class OpenOfficePanel {
         unmerge.setDisable(!available.groupEditing());
         manageCitations.setDisable(!available.manageCitations());
         exportCitations.setDisable(!(connected && hasDatabase));
-        importCitations.setDisable(!(connected && hasDatabase && openOfficePreferences.getZoteroCompatibilityMode()));
+        importCitations.setDisable(!(connected && hasDatabase && currentStyle instanceof CitationStyle && openOfficePreferences.getZoteroCompatibilityMode()));
         modifyBibliographyProperties.setDisable(!available.bibliography());
         pageInfoSupported.set(connected && capabilities.supportsPageInfo());
     }
