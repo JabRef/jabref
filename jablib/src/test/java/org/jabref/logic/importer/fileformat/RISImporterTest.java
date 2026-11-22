@@ -32,7 +32,7 @@ class RISImporterTest {
                 TY  - BOOK
                 ED  - Kempf, Ute
                 SN  - ISBN 978-3-932869-19-8
-                TI  - Gender-Effekte. Wie Frauen die Technik von morgen gestalten
+                TI  - Gender effects: how women shape tomorrow's technology
                 VL  - Band 19
                 ER  -
                 """);
