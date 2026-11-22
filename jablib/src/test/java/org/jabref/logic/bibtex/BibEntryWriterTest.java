@@ -9,10 +9,12 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
@@ -29,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +52,31 @@ class BibEntryWriterTest {
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
+    }
+
+    // [utest->req~save.names.preserve-extended-parts~1]
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "family=Hasselt, given=Hado P., prefix=van, useprefix=false and "
+                    + "family=Ree, given=Michiel, prefix=van der, useprefix=true and Guez, Arthur",
+            "id=person1, given=Simon, family=Beumont",
+            "\"family={Robert and Sons, Inc.}\"",
+            "nosortothers=true and Hans Harman and given=Simon, family=Beumont, prefix=de, useprefix=true"
+    })
+    void normalizedExtendedNamesSurviveWriteAndRead(String names) throws Exception {
+        String normalized = new NormalizeNamesFormatter().format(names);
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Hasselt2016")
+                .withField(StandardField.AUTHOR, normalized)
+                .withField(StandardField.EDITOR, normalized)
+                .withChanged(true);
+
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBLATEX);
+        BibEntry reloaded = firstEntryFrom(stringWriter.toString());
+
+        assertEquals(normalized, reloaded.getField(StandardField.AUTHOR).orElseThrow());
+        assertEquals(normalized, reloaded.getField(StandardField.EDITOR).orElseThrow());
+        assertEquals(AuthorList.parse(names), AuthorList.parse(reloaded.getField(StandardField.AUTHOR).orElseThrow()));
     }
 
     @Test

@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -126,6 +127,8 @@ public class AuthorList implements Iterable<Author> {
                                                                           .build();
 
     private final List<Author> authors;
+    private final String listOption;
+    private final Optional<String> malformedSource;
     @Nullable private AuthorList latexFreeAuthors;
 
     /// Creates a new list of authors.
@@ -135,11 +138,21 @@ public class AuthorList implements Iterable<Author> {
     ///
     /// @param authors the list of authors which should underlie this instance
     private AuthorList(@NonNull List<Author> authors) {
+        this(authors, "", Optional.empty());
+    }
+
+    private AuthorList(List<Author> authors, String listOption, Optional<String> malformedSource) {
         this.authors = authors;
+        this.listOption = listOption;
+        this.malformedSource = malformedSource;
     }
 
     public static AuthorList of(List<Author> authors) {
         return new AuthorList(List.copyOf(authors));
+    }
+
+    public static AuthorList of(List<Author> authors, String listOption, Optional<String> malformedSource) {
+        return new AuthorList(List.copyOf(authors), listOption, malformedSource);
     }
 
     public static AuthorList of(Author... authors) {
@@ -278,7 +291,7 @@ public class AuthorList implements Iterable<Author> {
         if (latexFreeAuthors == null) {
             latexFreeAuthors = new AuthorList(authors.stream()
                                                      .map(Author::latexFree)
-                                                     .toList());
+                                                     .toList(), listOption, malformedSource);
             latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;
         }
         return latexFreeAuthors;
@@ -299,15 +312,16 @@ public class AuthorList implements Iterable<Author> {
             case 0 ->
                     "";
             case 1 ->
-                    authors.getFirst().getNamePrefixAndFamilyName();
+                    authors.getFirst().getFamilyNameForDisplay();
             case 2 ->
-                    authors.getFirst().getNamePrefixAndFamilyName() + " and " + authors.get(1).getNamePrefixAndFamilyName();
+                    authors.getFirst().getFamilyNameForDisplay() + " and " + authors.get(1).getFamilyNameForDisplay();
             default ->
-                    authors.getFirst().getNamePrefixAndFamilyName() + " et al.";
+                    authors.getFirst().getFamilyNameForDisplay() + " et al.";
         };
     }
 
     /// Returns the list of authors separated by commas with last name only; If the list consists of two or more authors, "and" is inserted before the last author's name.
+    /// Each author's explicit `useprefix` option controls inclusion of their prefix in the label.
     ///
     ///
     /// -  "John Smith" ==> "Smith"
@@ -320,7 +334,7 @@ public class AuthorList implements Iterable<Author> {
     /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsLastNames(boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), Author::getNamePrefixAndFamilyName, oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), Author::getFamilyNameForDisplay, oxfordComma);
     }
 
     /// Returns the list of authors separated by commas with first names after last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
@@ -361,6 +375,30 @@ public class AuthorList implements Iterable<Author> {
         return getAuthors().stream()
                            .map(author -> author.getFamilyGiven(abbreviate))
                            .collect(Collectors.joining(" and "));
+    }
+
+    /// Returns the author field for storage, preserving extended BibLaTeX name parts per author.
+    // [impl->req~save.names.normalize-extended-parts~1]
+    public String getAsBibtex() {
+        return malformedSource.orElseGet(() -> joinForStorage(Author::getAsBibtex));
+    }
+
+    private String joinForStorage(Function<Author, String> formatName) {
+        String names = authors.stream().map(formatName).collect(Collectors.joining(" and "));
+        return listOption.isEmpty() ? names : listOption + " and " + names;
+    }
+
+    public boolean hasValidExtendedNames() {
+        return malformedSource.isEmpty()
+                && (!listOption.isEmpty() || authors.stream().anyMatch(author -> !author.getExtendedNameParts().isEmpty()))
+                && authors.stream().noneMatch(author -> author.getInvalidUsePrefix().isPresent());
+    }
+
+    public boolean matchesExtendedNameFormat(String input) {
+        return hasValidExtendedNames()
+                && (getAsBibtex().equals(input)
+                || joinForStorage(author -> author.getExtendedNameParts().isEmpty()
+                                            ? author.getGivenFamily(false) : author.getAsBibtex()).equals(input));
     }
 
     /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].
@@ -414,12 +452,12 @@ public class AuthorList implements Iterable<Author> {
             return false;
         }
 
-        return this.authors.equals(a.authors);
+        return authors.equals(a.authors) && listOption.equals(a.listOption) && malformedSource.equals(a.malformedSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authors);
+        return Objects.hash(authors, listOption, malformedSource);
     }
 
     /// Returns the list of authors separated by "and"s with first names before last name; first names are not abbreviated.
