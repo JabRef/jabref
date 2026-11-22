@@ -49,6 +49,10 @@ void convertsToUpperCamelCase(String input, String expected) {
 }
 ```
 
+## Profiling test memory
+
+See [Profiling Gradle test memory with JFR](profiling-gradle-tests.md) for test-worker recordings, allocation analysis, live heap capture, and VisualVM retention analysis.
+
 ## Legacy library migration profiling
 
 Generate a deterministic 100,000-entry migration fixture from the repository root:
