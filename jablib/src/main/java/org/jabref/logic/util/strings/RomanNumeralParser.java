@@ -16,22 +16,21 @@ public class RomanNumeralParser {
             'L', 50,
             'C', 100,
             'D', 500,
-            'M', 1000
-    );
+            'M', 1000);
 
     public static Optional<Integer> parse(String romanText){
         //Normalize the roman number
-        if(romanText == null){
+        if (romanText == null) {
             return Optional.empty();
         }
 
         String normalizedRomanText = romanText.trim().toUpperCase(Locale.ROOT);
-        if (normalizedRomanText.isEmpty()){
+        if (normalizedRomanText.isEmpty()) {
             return Optional.empty();
         }
 
         //Check if the string is valid Roman Number
-        if(RomanNumeralParser.isValid(normalizedRomanText)){
+        if (RomanNumeralParser.isValid(normalizedRomanText)) {
 
             int len = normalizedRomanText.length();
             int result =0;
