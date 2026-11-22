@@ -491,7 +491,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private final boolean resetsGlobalStores;
     private boolean replayingImportedPreferences;
     private boolean resettingIsolatedNode;
-    private boolean updatingFetcherKeys;
+    private final ThreadLocal<Boolean> publishingCredentials = ThreadLocal.withInitial(() -> false);
 
     /// Cache variables
     private LibraryPreferences libraryPreferences;
@@ -979,7 +979,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param shouldPersist gate evaluated on every change; the value is written only while it returns true
     private void bindToKeyring(StringProperty property, KeyringSlot slot, BooleanSupplier shouldPersist) {
         EasyBind.listen(property, (_, _, newValue) -> {
-            if (shouldPersist.getAsBoolean()) {
+            if (!publishingCredentials.get() && shouldPersist.getAsBoolean()) {
                 writeKeyring(slot, newValue);
             }
         });
@@ -1001,6 +1001,58 @@ public class JabRefCliPreferences implements CliPreferences {
             keyring().write(slot, secret);
         } catch (PasswordAccessException ex) {
             LOGGER.warn("Could not update keyring entries", ex);
+        }
+    }
+
+    @Override
+    public Optional<CredentialSave> prepareProxyPasswordSave(String password, CredentialPersistence persistence) {
+        ProxyPreferences proxy = getProxyPreferences();
+        return prepareStringCredentialSave(KeyringSlot.PROXY_PASSWORD, proxy.passwordProperty(),
+                proxy.persistPasswordProperty(), password, persistence);
+    }
+
+    @Override
+    public Optional<CredentialSave> prepareGitHubTokenSave(String token, CredentialPersistence persistence) {
+        GitPreferences git = getGitPreferences();
+        return prepareStringCredentialSave(KeyringSlot.GITHUB_PAT, git.patProperty(),
+                git.rememberPatProperty(), token, persistence);
+    }
+
+    private Optional<CredentialSave> prepareStringCredentialSave(KeyringSlot slot, StringProperty value,
+                                                                 BooleanProperty stored, String secret, CredentialPersistence persistence) {
+        boolean persist = persistence == CredentialPersistence.SAVE;
+        boolean wasPersisted = stored.get();
+        if (persist == wasPersisted && secret.equals(value.get())) {
+            return Optional.empty();
+        }
+        KeyringUtil keyring = keyring();
+        return Optional.of(() -> {
+            if (wasPersisted || (persist && StringUtil.isNotBlank(secret))) {
+                try {
+                    keyring.write(slot, persist ? secret : "");
+                } catch (PasswordAccessException ex) {
+                    throw new JabRefException("Could not update credential in keyring", ex);
+                }
+            }
+            return () -> publishCredentials(() -> {
+                stored.set(persist);
+                value.set(secret);
+            });
+        });
+    }
+
+    /// Applies credential preferences after any required keyring operation.
+    /// Binding callbacks still store ordinary preferences.
+    /// Keyring callbacks on this thread skip the duplicate write during publication.
+    private void publishCredentials(Runnable update) {
+        boolean previouslyPublishing = publishingCredentials.get();
+        publishingCredentials.set(true);
+        try {
+            update.run();
+        } finally {
+            if (!previouslyPublishing) {
+                publishingCredentials.remove();
+            }
         }
     }
 
@@ -1593,7 +1645,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindCustom(proxyPreferences.persistPasswordProperty(), PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword(),
                 (_, _, newValue) -> {
                     putBoolean(PROXY_PERSIST_PASSWORD, newValue);
-                    if (!newValue) {
+                    if (!publishingCredentials.get() && !newValue) {
                         writeKeyring(KeyringSlot.PROXY_PASSWORD, "");
                     }
                 },
@@ -1691,7 +1743,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(citeDrivePreferences.persistRefreshTokenProperty(), (_, _, newValue) -> {
             putBoolean(CITE_DRIVE_PERSIST_TOKEN, newValue);
-            setCiteDriveToken(newValue ? citeDrivePreferences.getRefreshToken() : null);
+            if (!publishingCredentials.get()) {
+                setCiteDriveToken(newValue ? citeDrivePreferences.getRefreshToken() : null);
+            }
         });
 
         EasyBind.listen(citeDrivePreferences.enabledProperty(), (_, _, newValue) -> putBoolean(CITE_DRIVE_ENABLED, newValue));
@@ -1699,12 +1753,48 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(citeDrivePreferences.appBaseUrlProperty(), (_, _, newValue) -> put(CITE_DRIVE_APP_BASE_URL, newValue));
 
         EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
-            if (citeDrivePreferences.shouldPersistRefreshToken()) {
+            if (!publishingCredentials.get() && citeDrivePreferences.shouldPersistRefreshToken()) {
                 setCiteDriveToken(newValue);
             }
         });
 
         return citeDrivePreferences;
+    }
+
+    @Override
+    public Optional<CredentialSave> prepareCiteDriveTokenSave(String apiBaseUrl, CredentialPersistence persistence) {
+        CiteDrivePreferences citeDrive = getCiteDrivePreferences();
+        boolean persist = persistence == CredentialPersistence.SAVE;
+        boolean wasPersisted = citeDrive.shouldPersistRefreshToken();
+        boolean serverChanged = !apiBaseUrl.equals(citeDrive.getApiBaseUrl());
+        if (!serverChanged && persist == wasPersisted) {
+            return Optional.empty();
+        }
+        String token = Optional.ofNullable(citeDrive.getRefreshToken())
+                               .map(refreshToken -> serializeCiteDriveToken(refreshToken, citeDrive.getApiBaseUrl()))
+                               .orElse("");
+        return Optional.of(() -> {
+            try {
+                if (persist && !serverChanged) {
+                    if (!token.isEmpty()) {
+                        KeyringUtil.writeCiteDriveToken(token);
+                    }
+                } else if (wasPersisted) {
+                    KeyringUtil.clearCiteDriveToken();
+                }
+            } catch (PasswordAccessException ex) {
+                if ((persist && !serverChanged) || !token.isEmpty()) {
+                    throw new JabRefException("Could not update CiteDrive token in keyring", ex);
+                }
+                LOGGER.debug("Could not confirm removal of a CiteDrive token without a loaded value", ex);
+            } catch (Exception ex) {
+                throw new JabRefException("Could not update CiteDrive token in keyring", ex);
+            }
+            return () -> publishCredentials(() -> {
+                citeDrive.setPersistRefreshToken(persist);
+                citeDrive.setApiBaseUrl(apiBaseUrl);
+            });
+        });
     }
 
     private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
@@ -2699,7 +2789,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void storeFetcherKeys(ImporterPreferences preferences) {
-        if (replayingImportedPreferences || resettingIsolatedNode || updatingFetcherKeys) {
+        if (replayingImportedPreferences || resettingIsolatedNode || publishingCredentials.get()) {
             return;
         }
         try {
@@ -2720,39 +2810,32 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     @Override
-    public FetcherApiKeySave prepareSavedFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
-        return prepareFetcherApiKeySave(apiKeys, true);
+    public CredentialSave prepareSavedFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
+        return prepareCredentialSave(apiKeys, true);
     }
 
     @Override
-    public FetcherApiKeySave prepareSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
-        return prepareFetcherApiKeySave(apiKeys, false);
+    public CredentialSave prepareSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
+        return prepareCredentialSave(apiKeys, false);
     }
 
-    private FetcherApiKeySave prepareFetcherApiKeySave(Set<FetcherApiKey> apiKeys, boolean persist) {
+    private CredentialSave prepareCredentialSave(Set<FetcherApiKey> apiKeys, boolean persist) {
         Set<FetcherApiKey> requestedKeys = Set.copyOf(apiKeys);
         ImporterPreferences preferences = getImporterPreferences();
-        FetcherApiKeySave save = prepareFetcherKeyStorage(requestedKeys, persist);
+        CredentialSave save = prepareFetcherKeyStorage(requestedKeys, persist);
         return () -> {
             Runnable updateMetadata = save.writeKeyring();
             return () -> {
                 updateMetadata.run();
-                applyFetcherApiKeys(preferences, requestedKeys, persist);
+                publishCredentials(() -> {
+                    preferences.setPersistCustomKeys(persist);
+                    preferences.setApiKeys(requestedKeys);
+                });
             };
         };
     }
 
-    private void applyFetcherApiKeys(ImporterPreferences preferences, Set<FetcherApiKey> requestedKeys, boolean persist) {
-        updatingFetcherKeys = true;
-        try {
-            preferences.setPersistCustomKeys(persist);
-            preferences.setApiKeys(requestedKeys);
-        } finally {
-            updatingFetcherKeys = false;
-        }
-    }
-
-    private FetcherApiKeySave prepareFetcherKeyStorage(Set<FetcherApiKey> apiKeys, boolean persist) {
+    private CredentialSave prepareFetcherKeyStorage(Set<FetcherApiKey> apiKeys, boolean persist) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         Map<String, String> keys = new HashMap<>();
@@ -2984,7 +3067,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindCustom(gitPreferences.rememberPatProperty(), GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat(),
                 (_, _, newValue) -> {
                     putBoolean(GITHUB_REMEMBER_PAT_KEY, newValue);
-                    if (!newValue) {
+                    if (!publishingCredentials.get() && !newValue) {
                         writeKeyring(KeyringSlot.GITHUB_PAT, "");
                     }
                 },

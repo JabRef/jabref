@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.application.HostServices;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -119,8 +120,8 @@ class PreferencesSearchCoverageTest {
                 Named.of("XMP metadata", XmpPrivacyTab::new),
                 Named.of("Custom import formats", CustomImporterTab::new),
                 Named.of("Custom export formats", CustomExporterTab::new),
-                Named.of("Network", NetworkTab::new),
-                Named.of("Web search", () -> new WebSearchTab(AI_PREFERENCES)),
+                Named.of("Network", () -> new NetworkTab(new ReadOnlyBooleanWrapper(true).getReadOnlyProperty())),
+                Named.of("Web search", () -> new WebSearchTab(AI_PREFERENCES, new ReadOnlyBooleanWrapper(true).getReadOnlyProperty())),
                 Named.of("AI", () -> new AiTab(AI_PREFERENCES)));
     }
 

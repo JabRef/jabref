@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.websearch;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -29,7 +30,6 @@ import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> {
@@ -50,7 +50,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     private final Label tableNote = new Label(Localization.lang("( Note: Press return to commit changes in the table! )"));
 
     /// @param workingAiPreferences the dialog-scoped working copy edited by the AI tab; this tab observes its master switch to offer or hide the LLM citation parser
-    public WebSearchTab(AiPreferences workingAiPreferences) {
+    public WebSearchTab(AiPreferences workingAiPreferences, ReadOnlyBooleanProperty keyringAvailable) {
         this.viewModel = new WebSearchTabViewModel(
                 preferences,
                 preferences.getGrobidPreferences(),
@@ -59,12 +59,9 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 preferences.getImportFormatPreferences(),
                 preferences.getLibraryPreferences(),
                 workingAiPreferences.aiFeaturesEnabledCurrentlyProperty(),
-                taskExecutor);
+                taskExecutor,
+                keyringAvailable);
         buildView();
-    }
-
-    public Optional<CliPreferences.FetcherApiKeySave> prepareApiKeySave() {
-        return viewModel.prepareApiKeySave();
     }
 
     @Override

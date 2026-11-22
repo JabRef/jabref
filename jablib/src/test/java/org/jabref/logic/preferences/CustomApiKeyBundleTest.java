@@ -235,7 +235,7 @@ class CustomApiKeyBundleTest {
         clearInvocations(keyring);
 
         Set<FetcherApiKey> updatedKeys = Set.of(new FetcherApiKey("Updated", false, "new-key"));
-        CliPreferences.FetcherApiKeySave save = preferences.prepareSavedFetcherApiKeys(updatedKeys);
+        CliPreferences.CredentialSave save = preferences.prepareSavedFetcherApiKeys(updatedKeys);
         verifyNoInteractions(keyring);
 
         Runnable commit = save.writeKeyring();

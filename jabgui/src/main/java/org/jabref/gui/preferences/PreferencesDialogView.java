@@ -60,6 +60,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         ControlHelper.setAction(saveButton, getDialogPane(), _ -> savePreferencesAndCloseDialog());
         getDialogPane().disableProperty().bind(viewModel.savingProperty());
         Button save = (Button) getDialogPane().lookupButton(saveButton);
+        save.disableProperty().bind(viewModel.checkingKeyringProperty());
         save.textProperty().bind(Bindings.when(viewModel.savingProperty())
                                          .then(Localization.lang("Saving preferences..."))
                                          .otherwise(save.getText()));

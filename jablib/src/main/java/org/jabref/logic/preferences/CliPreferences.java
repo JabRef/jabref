@@ -3,6 +3,7 @@ package org.jabref.logic.preferences;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
@@ -48,7 +49,9 @@ public interface CliPreferences {
 
     void flush();
 
-    /// Captures the current storage options for a background flush.
+    /// Captures the current storage options on the preference-owning thread.
+    ///
+    /// @return the operation that flushes the backing store on a worker thread
     Runnable prepareFlush();
 
     void exportPreferences(Path file) throws JabRefException;
@@ -107,22 +110,66 @@ public interface CliPreferences {
 
     ImporterPreferences getImporterPreferences();
 
-    /// Saves the complete custom API-key configuration to the keyring and preferences.
+    /// Saves the complete custom API-key configuration synchronously.
+    ///
+    /// @throws JabRefException if the keyring rejects the update
     void saveFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException;
 
-    /// Clears saved custom API keys and makes the supplied keys available for this session.
+    /// Clears saved custom API keys synchronously and makes the supplied keys available for this session.
+    ///
+    /// @throws JabRefException if the saved keys could not be cleared
     void useSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException;
 
-    /// Captures the settings for a background keyring write.
-    FetcherApiKeySave prepareSavedFetcherApiKeys(Set<FetcherApiKey> apiKeys);
+    /// Takes a snapshot of the complete API-key configuration for background persistence.
+    ///
+    /// @return the save operation for replacing the current API-key bundle
+    CredentialSave prepareSavedFetcherApiKeys(Set<FetcherApiKey> apiKeys);
 
-    /// Captures the settings for clearing saved keys on a background thread.
-    FetcherApiKeySave prepareSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys);
+    /// Takes a snapshot of API keys to use for this session after clearing any saved keys.
+    ///
+    /// @return the save operation for clearing the saved API keys
+    CredentialSave prepareSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys);
 
+    /// Prepares a change to the proxy password or its persistence on the preference-owning thread.
+    ///
+    /// @param password    the password to use for proxy authentication
+    /// @param persistence whether the password should be available in later sessions
+    /// @return the save operation, or an empty optional if the password and its persistence are unchanged
+    Optional<CredentialSave> prepareProxyPasswordSave(String password, CredentialPersistence persistence);
+
+    /// Prepares a change to the GitHub personal access token or its persistence on the preference-owning thread.
+    ///
+    /// @param token       the personal access token to use for Git authentication
+    /// @param persistence whether the token should be available in later sessions
+    /// @return the save operation, or an empty optional if the token and its persistence are unchanged
+    Optional<CredentialSave> prepareGitHubTokenSave(String token, CredentialPersistence persistence);
+
+    /// Prepares changes to CiteDrive's server or token persistence on the preference-owning thread.
+    /// Changing servers clears any saved token for the previous server and invalidates the current login.
+    ///
+    /// @param apiBaseUrl  the server address to use after saving
+    /// @param persistence whether the token should be available in later sessions
+    /// @return the save operation, or an empty optional if the address and persistence are unchanged
+    Optional<CredentialSave> prepareCiteDriveTokenSave(String apiBaseUrl, CredentialPersistence persistence);
+
+    /// Determines whether a credential is saved for later sessions.
+    @NullMarked
+    enum CredentialPersistence {
+        /// Keep the credential in the system keyring.
+        SAVE,
+        /// Keep the credential in memory for this session and clear any saved copy.
+        SESSION_ONLY
+    }
+
+    /// A prepared credential update. Create it on the thread that owns the preferences.
+    /// Run its keyring phase on a worker and apply the returned operation on the preference-owning thread.
     @FunctionalInterface
     @NullMarked
-    interface FetcherApiKeySave {
-        /// Performs the keyring operation and returns the update for the preference-owning thread.
+    interface CredentialSave {
+        /// Performs any required keyring write or deletion without applying the new preference values.
+        ///
+        /// @return the update to apply once on the preference-owning thread after the operation succeeds
+        /// @throws JabRefException if the keyring update fails
         Runnable writeKeyring() throws JabRefException;
     }
 

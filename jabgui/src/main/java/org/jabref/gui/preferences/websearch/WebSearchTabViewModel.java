@@ -38,7 +38,6 @@ import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
@@ -68,7 +67,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
     private final BooleanProperty apikeyPersistProperty = new SimpleBooleanProperty();
-    private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
+    private final ReadOnlyBooleanProperty apikeyPersistAvailableProperty;
 
     private final ObservableList<SearchEngineItem> searchEngines = FXCollections.observableArrayList();
 
@@ -90,8 +89,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                  ImportFormatPreferences importFormatPreferences,
                                  LibraryPreferences libraryPreferences,
                                  ReadOnlyBooleanProperty refAiEnabled,
-                                 TaskExecutor taskExecutor) {
+                                 TaskExecutor taskExecutor,
+                                 ReadOnlyBooleanProperty keyringAvailable) {
         this.preferences = preferences;
+        this.apikeyPersistAvailableProperty = keyringAvailable;
         this.importerPreferences = preferences.getImporterPreferences();
         this.grobidPreferences = grobidPreferences;
         this.doiPreferences = doiPreferences;
@@ -222,7 +223,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             fetchers.add(fetcherViewModel);
         }
 
-        apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
         apikeyPersistProperty.setValue(importerPreferences.shouldPersistCustomKeys());
 
         // Load custom URL templates from preferences if they exist
@@ -265,13 +265,16 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setSearchEngineUrlTemplates(templates);
     }
 
-    public Optional<CliPreferences.FetcherApiKeySave> prepareApiKeySave() {
-        Set<FetcherApiKey> apiKeysToStore = fetchers.stream()
-                                                    .filter(FetcherViewModel::isCustomizable)
-                                                    .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
-                                                    .collect(Collectors.toSet());
+    @Override
+    public Optional<CliPreferences.CredentialSave> prepareCredentialSave() {
+        if (!apikeyPersistAvailableProperty.get()) {
+            return Optional.empty();
+        }
+        Set<FetcherApiKey> newApiKeys = fetchers.stream()
+                                                .filter(FetcherViewModel::isCustomizable)
+                                                .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
+                                                .collect(Collectors.toSet());
 
-        Set<FetcherApiKey> newApiKeys = apikeyPersistAvailableProperty.get() ? apiKeysToStore : Set.of();
         boolean persistChanged = importerPreferences.shouldPersistCustomKeys() != apikeyPersistProperty.get();
         if (!persistChanged && Objects.equals(importerPreferences.getApiKeys(), newApiKeys)) {
             return Optional.empty();

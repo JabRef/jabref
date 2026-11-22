@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
@@ -47,7 +48,8 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences.CredentialSave;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -66,11 +68,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     /// loaded in [#setValues()] and stored in [#storeAllSettings()] alongside the tabs.
     private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
     private final ReadOnlyBooleanWrapper saving = new ReadOnlyBooleanWrapper();
+    private final ReadOnlyBooleanWrapper checkingKeyring = new ReadOnlyBooleanWrapper(true);
+    private final ReadOnlyBooleanWrapper keyringAvailable = new ReadOnlyBooleanWrapper();
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final WebSearchTab webSearchTab;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
     public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
@@ -81,13 +84,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         // Dialog-scoped working copy of the AI preferences: the AI tab edits it and flushes it to
         // the live preferences on save; the web search tab observes its master switch meanwhile.
         AiPreferences workingAiPreferences = AiPreferences.copyOf(preferences.getAiPreferences());
-        webSearchTab = new WebSearchTab(workingAiPreferences);
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                webSearchTab,
+                new WebSearchTab(workingAiPreferences, keyringAvailable.getReadOnlyProperty()),
                 new AiTab(workingAiPreferences),
                 new EntryTab(),
                 new TableTab(),
@@ -108,10 +110,20 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new XmpPrivacyTab(),
                 new CustomImporterTab(),
                 new CustomExporterTab(),
-                new NetworkTab(),
+                new NetworkTab(keyringAvailable.getReadOnlyProperty()),
                 new ExternalStoragesTab(),
-                new GitTab()
+                new GitTab(keyringAvailable.getReadOnlyProperty())
         );
+        BackgroundTask.wrap(OS::isKeyringAvailable)
+                      .onSuccess(available -> {
+                          keyringAvailable.set(available);
+                          checkingKeyring.set(false);
+                      })
+                      .onFailure(ex -> {
+                          LOGGER.warn("Could not check keyring availability", ex);
+                          checkingKeyring.set(false);
+                      })
+                      .executeWith(taskExecutor);
     }
 
     public ObservableList<PreferencesTab> getPreferenceTabs() {
@@ -141,6 +153,9 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void exportPreferences() {
+        if (checkingKeyring.get()) {
+            return;
+        }
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
@@ -199,32 +214,52 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         return saving.getReadOnlyProperty();
     }
 
-    /// Calls `onSaved` on the JavaFX thread after valid settings have been stored.
+    public ReadOnlyBooleanProperty checkingKeyringProperty() {
+        return checkingKeyring.getReadOnlyProperty();
+    }
+
+    /// Starts a save from the JavaFX thread once settings have passed validation and the keyring check has finished.
+    /// A credential failure leaves the dialog open for retry. Credential changes that already succeeded remain applied.
+    ///
+    /// @param onSaved the callback to run on the JavaFX thread after all settings have been saved and flushed
     public void storeAllSettings(Runnable onSaved) {
-        if (saving.get() || !validSettings()) {
+        if (saving.get() || checkingKeyring.get() || !validSettings()) {
             return;
         }
 
-        Optional<CliPreferences.FetcherApiKeySave> keySave = webSearchTab.prepareApiKeySave();
+        List<CredentialSave> credentialSaves = preferenceTabs.stream()
+                                                             .map(PreferencesTab::prepareCredentialSave)
+                                                             .flatMap(Optional::stream)
+                                                             .toList();
         saving.set(true);
-        keySave.ifPresentOrElse(
-                save -> BackgroundTask.<Runnable>wrap(save::writeKeyring)
-                                      .onSuccess(commit -> {
-                                          try {
-                                              commit.run();
-                                          } catch (RuntimeException ex) {
-                                              saving.set(false);
-                                              throw ex;
-                                          }
-                                          storeTabsAndFlush(onSaved);
-                                      })
-                                      .onFailure(ex -> {
-                                          saving.set(false);
-                                          LOGGER.warn("Could not update saved custom API keys", ex);
-                                          dialogService.showErrorDialogAndWait(Localization.lang("Could not update saved custom API keys"));
-                                      })
-                                      .executeWith(taskExecutor),
-                () -> storeTabsAndFlush(onSaved));
+        saveNextCredential(credentialSaves.iterator(), onSaved);
+    }
+
+    /// Applies each successful credential update on JavaFX before starting the next keyring operation.
+    /// This keeps saved credentials and live preferences aligned if a later operation fails.
+    private void saveNextCredential(Iterator<CredentialSave> saves, Runnable onSaved) {
+        if (!saves.hasNext()) {
+            storeTabsAndFlush(onSaved);
+            return;
+        }
+
+        CredentialSave save = saves.next();
+        BackgroundTask.wrap(save::writeKeyring)
+                      .onSuccess(commit -> {
+                          try {
+                              commit.run();
+                          } catch (RuntimeException ex) {
+                              saving.set(false);
+                              throw ex;
+                          }
+                          saveNextCredential(saves, onSaved);
+                      })
+                      .onFailure(ex -> {
+                          saving.set(false);
+                          LOGGER.warn("Could not update saved credentials", ex);
+                          dialogService.showErrorDialogAndWait(Localization.lang("Could not update saved credentials"));
+                      })
+                      .executeWith(taskExecutor);
     }
 
     private void storeTabsAndFlush(Runnable onSaved) {

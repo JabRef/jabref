@@ -51,7 +51,9 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
@@ -315,21 +317,21 @@ public class JabRefGUI extends Application {
         }
     }
 
+    /// Registers proxy authentication for this session. If the user supplies a password at startup,
+    /// the proxy can authenticate immediately while the worker handles any requested keyring write.
     private void setupProxy() {
-        if (!preferences.getProxyPreferences().shouldUseProxy()) {
+        ProxyPreferences proxy = preferences.getProxyPreferences();
+        if (!proxy.shouldUseProxy()) {
             return;
         }
 
-        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
-            ProxyRegisterer.register(preferences.getProxyPreferences());
+        if (!proxy.shouldUseAuthentication()) {
+            ProxyRegisterer.register(proxy);
             return;
         }
 
-        assert preferences.getProxyPreferences().shouldUseAuthentication();
-
-        if (preferences.getProxyPreferences().shouldPersistPassword()
-                && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
-            ProxyRegisterer.register(preferences.getProxyPreferences());
+        if (proxy.shouldPersistPassword() && StringUtil.isNotBlank(proxy.getPassword())) {
+            ProxyRegisterer.register(proxy);
             return;
         }
 
@@ -338,12 +340,17 @@ public class JabRefGUI extends Application {
                 Localization.lang("Proxy requires password"),
                 Localization.lang("Password"));
 
-        if (password.isPresent()) {
-            preferences.getProxyPreferences().setPassword(password.get());
-            ProxyRegisterer.register(preferences.getProxyPreferences());
-        } else {
-            LOGGER.warn("No proxy password specified");
-        }
+        password.ifPresentOrElse(secret -> {
+            // Authentication can use the entered password immediately, even if the keyring is unavailable.
+            ProxyRegisterer.register(new ProxyPreferences(proxy.shouldUseProxy(), proxy.getHostname(), proxy.getPort(),
+                    proxy.shouldUseAuthentication(), proxy.getUsername(), secret, false));
+            CredentialPersistence persistence = proxy.shouldPersistPassword() ? CredentialPersistence.SAVE : CredentialPersistence.SESSION_ONLY;
+            preferences.prepareProxyPasswordSave(secret, persistence).ifPresent(save ->
+                    BackgroundTask.wrap(save::writeKeyring)
+                                  .onSuccess(Runnable::run)
+                                  .onFailure(ex -> LOGGER.warn("Could not save proxy password in keyring", ex))
+                                  .executeWith(taskExecutor));
+        }, () -> LOGGER.warn("No proxy password specified"));
     }
 
     private void openWindow() {

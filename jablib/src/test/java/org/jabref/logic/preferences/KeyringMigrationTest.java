@@ -1,6 +1,8 @@
 package org.jabref.logic.preferences;
 
 import org.jabref.logic.InternalPreferences;
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 import org.jabref.model.metadata.UserHostInfo;
 
 import com.github.javakeyring.Keyring;
@@ -16,6 +18,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -60,6 +63,44 @@ class KeyringMigrationTest {
             preferences.putBoolean(PROXY_PERSIST_PASSWORD, persistPasswordValue);
         } else {
             preferences.remove(PROXY_PERSIST_PASSWORD);
+        }
+    }
+
+    @Test
+    void preparedProxyChangeWritesOnceBeforePublishing() throws JabRefException, PasswordAccessException {
+        when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(PLAIN_TEXT);
+        try (MockedStatic<Keyring> factory = Mockito.mockStatic(Keyring.class)) {
+            factory.when(Keyring::create).thenReturn(keyring);
+            JabRefCliPreferences preferences = createPreferences(LEGACY_KEY);
+            var proxy = preferences.getProxyPreferences();
+            var save = preferences.prepareProxyPasswordSave("replacement", CredentialPersistence.SAVE).orElseThrow();
+            verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+
+            Runnable commit = save.writeKeyring();
+            assertEquals(PLAIN_TEXT, proxy.getPassword());
+            commit.run();
+
+            assertEquals("replacement", proxy.getPassword());
+            verify(keyring).setPassword(NEW_SERVICE, ACCOUNT, "replacement");
+        }
+    }
+
+    @Test
+    void deniedPreparedGitHubTokenDoesNotPublish() throws PasswordAccessException {
+        doThrow(new PasswordAccessException("Access denied"))
+                .when(keyring).setPassword("org.jabref.github", "github", "replacement");
+        try (MockedStatic<Keyring> factory = Mockito.mockStatic(Keyring.class)) {
+            factory.when(Keyring::create).thenReturn(keyring);
+            JabRefCliPreferences preferences = createPreferences(LEGACY_KEY);
+            var git = preferences.getGitPreferences();
+            String previous = git.getPat();
+            boolean previouslyPersisted = git.getPersistPat();
+
+            var save = preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE).orElseThrow();
+
+            assertThrows(JabRefException.class, save::writeKeyring);
+            assertEquals(previous, git.getPat());
+            assertEquals(previouslyPersisted, git.getPersistPat());
         }
     }
 
