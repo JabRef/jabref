@@ -8,6 +8,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,16 +16,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 @ResourceLock("Localization.lang")
 class PercentCheckerTest {
 
     private final PercentChecker checker = new PercentChecker();
-    private final BibEntry entry = new BibEntry();
 
     @ParameterizedTest
     @MethodSource("provideAcceptedInputs")
     void acceptsAllowedInputs(Field field, String value) {
-        entry.setField(field, value);
+        BibEntry entry = new BibEntry().withField(field, value);
         assertEquals(List.of(), checker.check(entry));
     }
 
@@ -43,7 +44,7 @@ class PercentCheckerTest {
     @ParameterizedTest
     @MethodSource("provideUnacceptedInputs")
     void rejectsDisallowedInputs(String expectedMessage, Field field, String value) {
-        entry.setField(field, value);
+        BibEntry entry = new BibEntry().withField(field, value);
         assertEquals(List.of(new IntegrityMessage(expectedMessage, entry, field)), checker.check(entry));
     }
 

@@ -11,10 +11,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Checks if the BibEntry contains unescaped percent signs (`%`).
 /// This is done in non-verbatim LaTeX fields, similar to [AmpersandChecker].
 ///
 /// The [LatexIntegrityChecker] cannot detect unescaped `%` because SnuggleTeX treats `%` as a LaTeX comment.
+@NullMarked
 public class PercentChecker implements EntryChecker {
     // Matches a '%' preceded by any number of '\'
     private static final Pattern BACKSLASH_PRECEDED_PERCENT = Pattern.compile("\\\\*%");
