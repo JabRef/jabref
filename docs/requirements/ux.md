@@ -342,4 +342,11 @@ See <https://github.com/JabRef/jabref/issues/16529>.
 
 Needs: impl, utest
 
+### Display names in extended format
+`req~ui.names.display-extended~1`
+
+The main table displays the name `Jane Doe` for the BibLaTeX extended name `family=Doe, given=Jane`.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
