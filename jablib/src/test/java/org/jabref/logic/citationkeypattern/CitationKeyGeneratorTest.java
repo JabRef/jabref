@@ -1,5 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -8,12 +9,18 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -95,6 +102,10 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
+        return generateKey(entry, pattern, database, DEFAULT_UNWANTED_CHARACTERS);
+    }
+
+    private static String generateKey(BibEntry entry, String pattern, BibDatabase database, String unwantedCharacters) {
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences =
                 new CitationKeyPatternPreferences(true,
@@ -104,7 +115,7 @@ class CitationKeyGeneratorTest {
                         CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                         "",
                         "",
-                        DEFAULT_UNWANTED_CHARACTERS,
+                        unwantedCharacters,
                         keyPattern,
                         new SimpleObjectProperty<>(','));
 
@@ -326,6 +337,42 @@ class CitationKeyGeneratorTest {
                 new CitationKeyGenerator(context, preferences).generateKey(entry),
                 new CitationKeyGenerator(context, preferences, Set.of()).generateKey(entry),
                 new CitationKeyGenerator(context, preferences, Set.of("beta")).generateKey(entry)));
+    }
+
+    // [utest->req~save.citation-keys.normalize-extended-names~1]
+    @ParameterizedTest
+    @CsvSource({
+            "'family=Hasselt', '[author:normalize_names]', Hasselt",
+            "'given=Hado, family=Hasselt', '[author:normalize_names]', HasseltHado",
+            "'given=Hado, family=Hasselt', '[author:lower:normalize_names:upper]', HASSELTHADO"
+    })
+    void normalizedAuthorKeysSurviveSaveAndReparse(String author, String pattern, String expectedKey) throws Exception {
+        BibEntry entry = createABibEntryAuthor(author);
+        entry.withCitationKey(generateKey(entry, pattern)).withChanged(true);
+        var output = new StringWriter();
+        var writer = new BibEntryWriter(new FieldWriter(new FieldPreferences(true, List.of(), List.of())), new BibEntryTypesManager());
+
+        writer.write(entry, new BibWriter(output, "\n"), BibDatabaseMode.BIBLATEX);
+
+        BibEntry reloaded = BibtexParser.singleFromString(output.toString(), importFormatPreferences).orElseThrow();
+        assertEquals(Optional.of(expectedKey), reloaded.getCitationKey());
+        assertEquals(Optional.of(author), reloaded.getField(StandardField.AUTHOR));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "John Smith, SmithJohn",
+            "'Smith, John', JohnSmith",
+            "'{Research and Development}', ResearchandDevelopment"
+    })
+    void normalizeNamesKeepsConventionalKeyCleanUp(String name, String expectedKey) {
+        assertEquals(expectedKey, generateKey(createABibEntryAuthor(name), "[author:normalize_names]"));
+    }
+
+    @Test
+    void normalizeNamesKeepsUserDefinedUnwantedCharactersForConventionalKeys() {
+        BibEntry entry = createABibEntryAuthor("John Smith");
+        assertEquals("JohnSmith", generateKey(entry, "[author:normalize_names]", new BibDatabase(), DEFAULT_UNWANTED_CHARACTERS + " "));
     }
 
     @Test

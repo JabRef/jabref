@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.util.strings.Transliteration;
 import org.jabref.model.FieldChange;
@@ -268,19 +270,20 @@ public class CitationKeyGenerator extends BracketedPattern {
     ///
     /// @param entry the [BibEntry] that a citation key is generated for
     /// @return a cleaned citation key for the given [BibEntry]
+    // [impl->req~save.citation-keys.normalize-extended-names~1]
     private Function<String, String> expandBracketContent(BibEntry entry) {
         Character keywordDelimiter = keywordSeparator;
 
         return (String bracket) -> {
-            String expandedPattern;
             List<String> fieldParts = parseFieldAndModifiers(bracket);
-
-            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database), unwantedCharacters);
-            // check whether there is a modifier on the end such as
-            // ":lower":
-            if (fieldParts.size() > 1) {
-                // apply modifiers:
-                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(entry));
+            List<String> modifiers = fieldParts.subList(1, fieldParts.size());
+            String expandedPattern = getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database);
+            // Name normalization needs the separators and braces to recognize extended name parts.
+            if (!modifiers.contains(NormalizeNamesFormatter.KEY) || !AuthorListParser.containsExtendedName(expandedPattern)) {
+                expandedPattern = removeUnwantedCharacters(expandedPattern, unwantedCharacters);
+            }
+            if (!modifiers.isEmpty()) {
+                expandedPattern = applyModifiers(expandedPattern, modifiers, 0, expandBracketContent(entry));
             }
             return cleanKey(expandedPattern, unwantedCharacters);
         };
