@@ -8,12 +8,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -22,8 +28,10 @@ import org.jabref.model.event.EventListenerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -44,6 +52,63 @@ class BibDatabaseTest {
         assertEquals(1, database.getEntries().size());
         assertEquals(1, database.getEntryCount());
         assertEquals(entry, database.getEntries().getFirst());
+    }
+
+    @Test
+    void citationKeyLookupReflectsChangesDuringObservableMapNotification() {
+        BibEntry entry = new BibEntry().withCitationKey("old");
+        List<Optional<BibEntry>> observed = new ArrayList<>();
+        entry.getFieldsObservable().addListener((MapChangeListener<Field, String>) change -> {
+            if (change.getKey() == InternalField.KEY_FIELD) {
+                observed.add(database.getEntryByCitationKey("new"));
+                observed.add(database.getEntryByCitationKey("old"));
+            }
+        });
+        database.insertEntry(entry);
+
+        entry.setCitationKey("new");
+
+        assertEquals(List.of(Optional.of(entry), Optional.empty()), observed);
+    }
+
+    @Test
+    void citationKeyLookupObservesConcurrentRenameBeforeFieldEvent() throws Exception {
+        BibEntry entry = new BibEntry().withCitationKey("old");
+        CountDownLatch changed = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        entry.getFieldsObservable().addListener((MapChangeListener<Field, String>) change -> {
+            if (change.getKey() == InternalField.KEY_FIELD) {
+                changed.countDown();
+                assertTrue(assertDoesNotThrow(() -> release.await(5, TimeUnit.SECONDS)));
+            }
+        });
+        database.insertEntry(entry);
+
+        try (var executor = Executors.newSingleThreadExecutor()) {
+            var rename = executor.submit(() -> entry.setCitationKey("new"));
+            try {
+                assertTrue(changed.await(5, TimeUnit.SECONDS));
+                assertEquals(Optional.of(entry), database.getEntryByCitationKey("new"));
+                assertEquals(Optional.empty(), database.getEntryByCitationKey("old"));
+            } finally {
+                release.countDown();
+            }
+            rename.get(5, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test
+    void citationKeyLookupKeepsDatabaseOrderWhenDuplicateKeysChange() {
+        BibEntry first = new BibEntry().withCitationKey("first");
+        BibEntry second = new BibEntry().withCitationKey("shared");
+        database.insertEntries(List.of(second, first));
+        first.setCitationKey("shared");
+        assertSame(first, database.getEntryByCitationKey("shared").orElseThrow());
+
+        database.removeEntry(first);
+        assertSame(second, database.getEntryByCitationKey("shared").orElseThrow());
+        second.clearCitationKey();
+        assertEquals(Optional.empty(), database.getEntryByCitationKey("shared"));
     }
 
     @Test
