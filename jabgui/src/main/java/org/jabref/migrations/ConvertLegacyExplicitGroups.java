@@ -10,6 +10,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NonNull;
 
@@ -43,16 +44,18 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
 
     @Override
     public void performMigration(@NonNull ParserResult parserResult, List<BibEntry> entries) {
-        parserResult.getMetaData().setGroupsInLegacyFormat(false);
-        if (parserResult.getMetaData().getGroups().isEmpty()) {
-            return;
-        }
+        MetaData metaData = parserResult.getMetaData();
+        metaData.getGroups().ifPresentOrElse(root -> {
+            List<ExplicitGroup> groups = getExplicitGroupsWithLegacyKeys(root);
+            if (!groups.isEmpty()) {
+                migrateMemberships(groups, entries);
+            }
+            metaData.markGroupsAsCurrent();
+            metaData.setGroups(root);
+        }, metaData::markGroupsAsCurrent);
+    }
 
-        List<ExplicitGroup> groups = getExplicitGroupsWithLegacyKeys(parserResult.getMetaData().getGroups().orElseThrow());
-        if (groups.isEmpty()) {
-            return;
-        }
-
+    private void migrateMemberships(List<ExplicitGroup> groups, List<BibEntry> entries) {
         Map<String, List<BibEntry>> entriesByCitationKey = new HashMap<>();
         for (BibEntry entry : entries) {
             entry.getCitationKey().ifPresent(key -> entriesByCitationKey.computeIfAbsent(key, _ -> new ArrayList<>()).add(entry));

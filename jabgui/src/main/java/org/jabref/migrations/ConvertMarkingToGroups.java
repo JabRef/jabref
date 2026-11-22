@@ -56,13 +56,15 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
                 GroupTreeNode markingGroup = root.findGroupByName(marking.getKey())
                                                  .filter(node -> node.getGroup() instanceof ExplicitGroup)
+                                                 .filter(node -> node.getGroup().getHierarchicalContext() != GroupHierarchyType.REFINING)
                                                  .orElseGet(() -> {
+                                                     GroupTreeNode destination = markingRoot(root);
                                                      String name = marking.getKey();
                                                      for (int suffix = 2; root.findGroupByName(name).isPresent()
                                                              || (!name.equals(marking.getKey()) && markings.containsKey(name)); suffix++) {
                                                          name = "%s (%d)".formatted(marking.getKey(), suffix);
                                                      }
-                                                     return markingRoot(root).addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INCLUDING, keywordSeparator));
+                                                     return destination.addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INCLUDING, keywordSeparator));
                                                  });
                 markingGroup.addEntriesToGroup(marking.getValue());
             }

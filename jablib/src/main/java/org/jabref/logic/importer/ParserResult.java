@@ -30,6 +30,7 @@ public class ParserResult {
 
     @NonNull private BibDatabase database;
     private MetaData metaData;
+    private Optional<BibDatabaseContext> assignedDatabaseContext = Optional.empty();
     @Nullable private Path file;
     private boolean invalid;
     private boolean changedOnMigration = false;
@@ -87,6 +88,7 @@ public class ParserResult {
 
     public void setMetaData(MetaData md) {
         this.metaData = md;
+        assignedDatabaseContext = Optional.empty();
     }
 
     @NonNull
@@ -95,11 +97,12 @@ public class ParserResult {
     }
 
     public Optional<Path> getPath() {
-        return Optional.ofNullable(file);
+        return assignedDatabaseContext.isPresent() ? assignedDatabaseContext.orElseThrow().getDatabasePath() : Optional.ofNullable(file);
     }
 
     public void setPath(@Nullable Path path) {
         file = path;
+        assignedDatabaseContext.ifPresent(context -> context.setDatabasePath(path));
     }
 
     /// Add a parser warning.
@@ -143,10 +146,11 @@ public class ParserResult {
     }
 
     public BibDatabaseContext getDatabaseContext() {
-        return new BibDatabaseContext(database, metaData, file);
+        return assignedDatabaseContext.orElseGet(() -> new BibDatabaseContext(database, metaData, file));
     }
 
     public void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
+        assignedDatabaseContext = Optional.of(bibDatabaseContext);
         database = bibDatabaseContext.getDatabase();
         metaData = bibDatabaseContext.getMetaData();
         file = bibDatabaseContext.getDatabasePath().orElse(null);

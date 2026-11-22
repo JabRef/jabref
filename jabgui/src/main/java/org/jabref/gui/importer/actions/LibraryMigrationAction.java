@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
@@ -46,16 +47,29 @@ public class LibraryMigrationAction {
     /// [impl->req~import.legacy-library-migration~1]
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences)
             throws ExecutionException, InterruptedException {
-        Map<PostOpenMigration, Boolean> applicability = new LinkedHashMap<>();
-        getOfferedMigrations(parserResult, dialogService, preferences).stream()
-                                                                      .sorted(Comparator.comparing(migration -> !migration.isOptional()))
-                                                                      .forEach(migration -> applicability.put(migration, migration.isMigrationNecessary(parserResult)));
+        if (parserResult.getMetaData().getGroupSearchSyntaxVersion().filter(ConvertSearchGroupSyntax.VERSION_6_0_ALPHA::equals).isPresent()) {
+            UiTaskExecutor.callAndWaitInJavaFXThread(() -> {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Migration of %0", parserResult.getPath().map(Path::toString).orElse("")),
+                        Localization.lang("To recover the search groups in this library, use the backup you made before opening it with JabRef 6.0-alpha."));
+                return Optional.empty();
+            });
+        }
+        Map<PostOpenMigration, Boolean> applicability = determineApplicability(parserResult, dialogService, preferences);
         if (!applicability.containsValue(true)) {
             return;
         }
 
         MigrationChoices choices = UiTaskExecutor.callAndWaitInJavaFXThread(() -> chooseMigrations(parserResult, dialogService, applicability));
         applyChoices(parserResult, choices);
+    }
+
+    private static Map<PostOpenMigration, Boolean> determineApplicability(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+        Map<PostOpenMigration, Boolean> applicability = new LinkedHashMap<>();
+        getOfferedMigrations(parserResult, dialogService, preferences).stream()
+                                                                      .sorted(Comparator.comparing(migration -> !migration.isOptional()))
+                                                                      .forEach(migration -> applicability.put(migration, migration.isMigrationNecessary(parserResult)));
+        return applicability;
     }
 
     private record MigrationChoices(List<PostOpenMigration> selected, List<String> skipped) {
@@ -111,13 +125,13 @@ public class LibraryMigrationAction {
         dialogPane.setContent(content);
 
         ButtonType migrate = new ButtonType(Localization.lang("Migrate"), ButtonBar.ButtonData.OK_DONE);
-        ButtonType keepAsIs = new ButtonType(Localization.lang("Keep as is"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType keepAsIs = new ButtonType(Localization.lang("Keep as is"), ButtonBar.ButtonData.OTHER);
         // Without an optional conversion there is nothing to keep
-        ButtonType[] buttons = checkBoxes.isEmpty() ? new ButtonType[] {migrate} : new ButtonType[] {migrate, keepAsIs};
+        ButtonType[] buttons = checkBoxes.isEmpty() ? new ButtonType[] {migrate} : new ButtonType[] {migrate, keepAsIs, ButtonType.CANCEL};
         String title = Localization.lang("Migration of %0", parserResult.getPath().map(Path::toString).orElse(""));
-        boolean migrateSelected = dialogService.showCustomDialogAndWait(title, dialogPane, buttons)
-                                               .filter(migrate::equals)
-                                               .isPresent();
+        Optional<ButtonType> response = dialogService.showCustomDialogAndWait(title, dialogPane, buttons);
+        boolean migrateSelected = response.filter(migrate::equals).isPresent();
+        boolean keepSelected = response.filter(keepAsIs::equals).isPresent();
 
         List<PostOpenMigration> selectedMigrations = new ArrayList<>(mandatoryMigrations);
         List<String> skippedMigrations = new ArrayList<>(parserResult.getMetaData().getSkippedMigrations());
@@ -125,7 +139,7 @@ public class LibraryMigrationAction {
             PostOpenMigration migration = entry.getKey();
             if (migrateSelected && entry.getValue().isSelected()) {
                 selectedMigrations.add(migration);
-            } else {
+            } else if (migrateSelected || keepSelected) {
                 skippedMigrations.add(migration.getId());
             }
         }
@@ -135,14 +149,17 @@ public class LibraryMigrationAction {
     private void applyChoices(ParserResult parserResult, MigrationChoices choices) {
         PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(parserResult, choices.selected());
         // The declined conversions are part of the library, so the choice survives a reopen
-        parserResult.getMetaData().setSkippedMigrations(choices.skipped());
-        parserResult.setChangedOnMigration(true);
+        if (!parserResult.getMetaData().getSkippedMigrations().equals(choices.skipped())) {
+            parserResult.getMetaData().setSkippedMigrations(choices.skipped());
+            parserResult.setChangedOnMigration(true);
+        }
     }
 
     static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        return getOfferedMigrations(parserResult, dialogService, preferences).stream()
-                                                                             .filter(migration -> migration.isMigrationNecessary(parserResult))
-                                                                             .toList();
+        return determineApplicability(parserResult, dialogService, preferences).entrySet().stream()
+                                     .filter(Map.Entry::getValue)
+                                     .map(Map.Entry::getKey)
+                                     .toList();
     }
 
     /// All migrations except the ones the user declined for this library

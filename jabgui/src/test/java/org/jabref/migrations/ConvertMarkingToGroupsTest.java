@@ -82,6 +82,22 @@ class ConvertMarkingToGroupsTest {
     }
 
     @Test
+    void refiningGroupDoesNotHideConvertedMarking() {
+        BibEntry entry = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Owner:6]");
+        ParserResult parserResult = new ParserResult(Set.of(entry));
+        GroupTreeNode root = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        root.addSubgroup(new ExplicitGroup("Parent", GroupHierarchyType.INDEPENDENT, ','))
+            .addSubgroup(new ExplicitGroup("Owner:6", GroupHierarchyType.REFINING, ','));
+        parserResult.getMetaData().setGroups(root);
+
+        new ConvertMarkingToGroups(',').performMigration(parserResult);
+
+        assertEquals(Optional.of("Owner:6 (2)"), entry.getField(StandardField.GROUPS));
+        assertTrue(root.findGroupByName("Owner:6 (2)").orElseThrow().matches(entry));
+        assertEquals(Optional.empty(), entry.getField(InternalField.MARKED_INTERNAL));
+    }
+
+    @Test
     void blankMarkingIsRemovedWithoutCreatingGroups() {
         BibEntry entry = new BibEntry()
                 .withField(InternalField.MARKED_INTERNAL, " ");

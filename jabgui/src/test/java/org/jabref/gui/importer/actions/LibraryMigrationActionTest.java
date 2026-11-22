@@ -40,6 +40,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /// [utest->req~import.legacy-library-migration~1]
@@ -97,7 +98,7 @@ class LibraryMigrationActionTest {
     void mandatoryMigrationIgnoresStoredSkip() {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
-        parserResult.getMetaData().setGroupsInLegacyFormat(true);
+        parserResult.getMetaData().markGroupsAsLegacy();
         parserResult.getMetaData().setSkippedMigrations(List.of("legacyGroups"));
 
         List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences);
@@ -109,7 +110,7 @@ class LibraryMigrationActionTest {
     void legacyGroupTreeIsDetectedFromMetaData() {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
-        parserResult.getMetaData().setGroupsInLegacyFormat(true);
+        parserResult.getMetaData().markGroupsAsLegacy();
 
         List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, dialogService, preferences);
 
@@ -183,6 +184,32 @@ class LibraryMigrationActionTest {
     }
 
     @Test
+    void dismissalLeavesOptionalMigrationsAvailable() throws Exception {
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
+        ParserResult parserResult = new ParserResult(Set.of(marked));
+        when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenReturn(Optional.of(ButtonType.CANCEL));
+
+        new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
+
+        assertFalse(parserResult.getChangedOnMigration());
+        assertEquals(List.of(), parserResult.getMetaData().getSkippedMigrations());
+        assertEquals(Optional.of("[Nicolas:6]"), marked.getField(InternalField.MARKED_INTERNAL));
+    }
+
+    @Test
+    void warnsForRevertedAlphaSearchSyntax() throws Exception {
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
+        parserResult.getMetaData().setGroupSearchSyntaxVersion(ConvertSearchGroupSyntax.VERSION_6_0_ALPHA);
+
+        new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
+
+        verify(dialogService).showWarningDialogAndWait(anyString(), anyString());
+        assertFalse(parserResult.getChangedOnMigration());
+    }
+
+    @Test
     void unnecessaryMigrationHasNoCheckBoxAndIsNotRemembered() throws Exception {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
@@ -199,7 +226,7 @@ class LibraryMigrationActionTest {
     void mandatoryMigrationAloneOffersNoChoice() throws Exception {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
-        parserResult.getMetaData().setGroupsInLegacyFormat(true);
+        parserResult.getMetaData().markGroupsAsLegacy();
         when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenAnswer(invocation -> {
             // title, pane and a single button
             assertEquals(3, invocation.getArguments().length);
@@ -215,7 +242,7 @@ class LibraryMigrationActionTest {
     private ParserResult parserResultNeedingAllMigrations(BibEntry... entries) {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(entries));
-        parserResult.getMetaData().setGroupsInLegacyFormat(true);
+        parserResult.getMetaData().markGroupsAsLegacy();
         return parserResult;
     }
 
@@ -234,7 +261,8 @@ class LibraryMigrationActionTest {
             if (deselectedIndex >= 0) {
                 checkBoxes.get(deselectedIndex).setSelected(false);
             }
-            return migrate ? Optional.of(invocation.<ButtonType>getArgument(2)) : Optional.empty();
+            ButtonType[] buttons = (ButtonType[]) invocation.getRawArguments()[2];
+            return Optional.of(buttons[migrate ? 0 : 1]);
         });
     }
 }

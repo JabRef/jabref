@@ -160,6 +160,7 @@ public class MetaData {
     /// Removes the group tree, reporting who is behind the change — see
     /// [#setGroups(GroupTreeNode,MetaDataChangeSource)].
     public void clearGroups(MetaDataChangeSource source) {
+        markGroupsAsCurrent();
         groupsRoot.setValue(null);
         eventBus.post(new GroupUpdatedEvent(this));
         postChange(source);
@@ -176,8 +177,12 @@ public class MetaData {
         return groupsInLegacyFormat;
     }
 
-    public void setGroupsInLegacyFormat(boolean groupsInLegacyFormat) {
-        this.groupsInLegacyFormat = groupsInLegacyFormat;
+    public void markGroupsAsLegacy() {
+        groupsInLegacyFormat = true;
+    }
+
+    public void markGroupsAsCurrent() {
+        groupsInLegacyFormat = false;
     }
 
     /// Ids of the library migrations the user declined; they are not offered again when the library is opened.

@@ -22,6 +22,8 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.shared.DatabaseSynchronizer;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.InternalField;
@@ -90,6 +92,34 @@ class PerformLoadDatabaseMigrationsTest {
         // The database only weakly retains this list view, so keep it alive through the observed mutation.
         Reference.reachabilityFence(observedEntries);
         assertEquals(List.of(1), updateSizes);
+    }
+
+    @Test
+    void sharedMigrationChangesFieldsWithoutReplacingEntries() {
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "prio1");
+        ParserResult result = new ParserResult(List.of(entry));
+        BibDatabaseContext context = result.getDatabaseContext();
+        context.convertToSharedDatabase(mock(DatabaseSynchronizer.class));
+        result.setDatabaseContext(context);
+        try {
+            ObservableList<BibEntry> observedEntries = result.getDatabase().getEntries();
+            List<List<BibEntry>> replacements = new ArrayList<>();
+            observedEntries.addListener((ListChangeListener<BibEntry>) change -> {
+                while (change.next()) {
+                    if (change.wasRemoved() || change.wasAdded()) {
+                        replacements.add(List.copyOf(change.getList()));
+                    }
+                }
+            });
+
+            PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, allMigrations(','));
+
+            assertEquals(List.of(), replacements);
+            assertEquals(Optional.of("prio1"), entry.getField(SpecialField.PRIORITY));
+            Reference.reachabilityFence(observedEntries);
+        } finally {
+            context.convertToLocalDatabase();
+        }
     }
 
     @Test
