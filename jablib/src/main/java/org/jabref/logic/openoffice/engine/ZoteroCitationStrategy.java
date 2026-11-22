@@ -463,7 +463,7 @@ public final class ZoteroCitationStrategy implements AutoCloseable {
             XTextCursor end = document.getText().createTextCursor();
             end.gotoEnd(false);
             String name = BIBLIOGRAPHY_PREFIX + "{\"uncited\":[],\"omitted\":[],\"custom\":[]} CSL_BIBLIOGRAPHY RND"
-                    + CitationIds.newId(10);
+                    + CitationIds.newId();
             names.add(UnoTextSection.create(new NamedTextContentPlacement(document, name, end, false)).getName());
         }
         OOText text = OOText.fromString(String.join("", bibliography.stream().map(entry -> entry.toString()).toList()));

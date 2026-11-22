@@ -65,8 +65,9 @@ Per-citation page information is stored under `JabRef_page_info:<uid>:<storageIn
 `CitationGroupEditor` prepares merge/separate identities and replacements, then the engine renders that proposed state before applying it in one write session without a second render.
 Ordering precedes controller locking and retains the [documented visual-ordering limitations](../code-howtos/openoffice/order-of-appearance.md).
 
-`CitationIds` supplies new CUID2 identities with a default length of 24 lowercase alphanumeric characters.
-Zotero wire conventions retain eight characters for new `citationID` values and ten after `RND`; existing foreign identities remain opaque and unchanged.
+`CitationIds` supplies ten-character lowercase alphanumeric CUID2 identities for canonical uids and citation/bibliography suffixes after `RND`.
+Zotero JSON `citationID` values retain eight characters, matching Zotero's own generation convention.
+These generation lengths do not restrict stored identities; existing eight-character, 24-character, and foreign IDs remain opaque and unchanged.
 Generated decimal item-id collision checks use bounded decimal-string validation rather than arbitrary-precision parsing of foreign identifiers.
 The connection-local formatted-output baseline is bounded and is not persisted as document properties.
 

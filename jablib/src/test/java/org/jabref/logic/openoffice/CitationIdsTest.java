@@ -23,26 +23,32 @@ class CitationIdsTest {
     private static final Pattern CUID2 = Pattern.compile("[a-z][a-z0-9]*");
 
     @Test
-    void defaultIdentityHasTwentyFourCharacters() {
-        assertEquals(24, CitationIds.newId().length());
+    void identityHasTenCharacters() {
+        assertEquals(10, CitationIds.newId().length());
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {8, 10, 24})
+    @ValueSource(ints = {8, 10})
     void identityUsesRequestedWireLength(int length) {
         assertEquals(length, CitationIds.newId(length).length());
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {8, 10, 24})
-    void identityUsesCuid2Alphabet(int length) {
-        assertTrue(CUID2.matcher(CitationIds.newId(length)).matches());
+    @ValueSource(strings = {"abcdefgh", "abcdefghij", "abcdefghijklmnopqrstuvwx", "foreign_UID-7"})
+    void storedIdentityRoundTripsWithoutChangingItsLength(String identity) throws JabRefMarkCodecException {
+        JabRefMarkData data = new JabRefMarkData(List.of("key"), identity, CitationType.AUTHORYEAR_PAR);
+
+        assertEquals(data, JabRefMarkCodec.decode(JabRefMarkCodec.encode(data)));
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {8, 10, 24})
-    void separateCallsProduceDistinctIdentities(int length) {
-        assertEquals(100L, IntStream.range(0, 100).mapToObj(_ -> CitationIds.newId(length)).distinct().count());
+    @Test
+    void identityUsesCuid2Alphabet() {
+        assertTrue(CUID2.matcher(CitationIds.newId()).matches());
+    }
+
+    @Test
+    void separateCallsProduceDistinctIdentities() {
+        assertEquals(100L, IntStream.range(0, 100).mapToObj(_ -> CitationIds.newId()).distinct().count());
     }
 
     @Test

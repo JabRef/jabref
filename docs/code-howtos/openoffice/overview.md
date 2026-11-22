@@ -147,9 +147,9 @@ Persistent invisible boundary characters protect short and invisible canonical c
 ### Identifier generation
 
 `CitationIds` is the shared CUID2 generator for new canonical identities and Zotero identities/suffixes.
-Its default is 24 lowercase alphanumeric characters, not a UUID, timestamp, or operation-derived hash.
-New Zotero marks retain the wire-format conventions of eight characters for `citationID` and ten characters after `RND` in citation and bibliography names.
-Foreign identifiers remain opaque and are not regenerated just to match those lengths.
+It generates ten lowercase alphanumeric characters for canonical uids and the random suffix after `RND` in citation and bibliography names.
+Zotero JSON `citationID` values remain eight characters, matching Zotero's own generation convention.
+These are generation policies, not length restrictions on stored citation identities: existing eight-character, 24-character, and foreign identifiers remain opaque and are not regenerated to match them.
 Canonical uids are read as opaque identifiers rather than parsed as a particular generated-id format.
 Generated decimal item-id collision checks use bounded decimal-string validation, not arbitrary-precision number parsing of foreign identifiers.
 Merge and Separate allocate proposed identities once during preparation and retain them through rendering and application.

@@ -381,6 +381,6 @@ public record ZoteroReferenceMark(
     }
 
     static String createRandomSuffix() {
-        return RANDOM_PREFIX.trim() + CitationIds.newId(RANDOM_LENGTH);
+        return RANDOM_PREFIX.trim() + CitationIds.newId();
     }
 }

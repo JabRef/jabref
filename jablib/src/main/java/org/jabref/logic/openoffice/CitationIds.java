@@ -3,8 +3,8 @@ package org.jabref.logic.openoffice;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.jspecify.annotations.NullMarked;
 
-/// Generates new Writer citation identities with CUID2. Reading stored identifiers does not depend
-/// on this generator. Shorter lengths are reserved for Zotero's wire-format fields.
+/// Generates ten-character CUID2 identities for canonical citations and Zotero mark suffixes.
+/// Zotero's JSON citation ID retains its shorter length; stored identities remain opaque.
 @NullMarked
 public final class CitationIds {
 
@@ -12,7 +12,7 @@ public final class CitationIds {
     }
 
     public static String newId() {
-        return newId(24);
+        return newId(10);
     }
 
     public static String newId(int length) {
