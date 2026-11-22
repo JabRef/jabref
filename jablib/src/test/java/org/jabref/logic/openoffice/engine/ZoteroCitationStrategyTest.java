@@ -47,8 +47,8 @@ import com.sun.star.container.XEnumeration;
 import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.document.XRedlinesSupplier;
-import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XText;
+import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
@@ -75,7 +75,6 @@ import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -444,25 +443,43 @@ class ZoteroCitationStrategyTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"insert", "refresh"})
-    void nativeLinkMetadataReadFailureIsReportedBeforeAnyWrites(String operation) throws Exception {
+    void nativeRelinkingPreservesJsonWithoutAccessingConversionProperties(String operation) throws Exception {
         String nativeName = ZOTERO.replace(",\"http://www.jabref.org/a\"", "")
                                   .replace("\"title\":\"A\"", "\"title\":\"A\",\"DOI\":\"10.123/native\"");
         when(ranges.names(document)).thenReturn(List.of(nativeName));
         when(ranges.find(document, nativeName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        XTextContent content = mock(XTextContent.class);
+        XTextRange anchor = span(1, 4);
+        when(content.getAnchor()).thenReturn(anchor);
         BibEntry entry = entry("a", "A").withField(StandardField.DOI, "10.123/native");
         BibDatabase database = new BibDatabase(List.of(entry));
-        try (MockedStatic<ConversionMetadata> metadata = mockStatic(ConversionMetadata.class);
+        CitationStyle style = style();
+        try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
+             MockedStatic<UndoableDocumentProperties> undoable = mockStatic(UndoableDocumentProperties.class);
+             MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
              MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<UnoDispatch> dispatch = mockStatic(UnoDispatch.class);
              MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class)) {
-            metadata.when(() -> ConversionMetadata.readIndex(document))
-                    .thenThrow(new WrappedTargetException("Cannot read citation conversion properties"));
-            OOResult<List<String>, JabRefException> result = "refresh".equals(operation) ? strategy().refresh(List.of(database), style())
-                                                                                         : strategy().insert(List.of(entry), List.of(database), style(), CitationType.AUTHORYEAR_PAR, "", cursor, false);
-            assertEquals(Reason.DOCUMENT_FAILURE, assertInstanceOf(StrategyException.class, result.getError()).reason());
-            writer.verifyNoInteractions();
-            documentPreferences.verifyNoInteractions();
-            verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
-            verify(text, never()).removeTextContent(any());
+            marks.when(() -> WriterReferenceMarks.getAsTextContent(document, nativeName)).thenReturn(Optional.of(content));
+            documentPreferences.when(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style)).thenReturn(true);
+            OOResult<List<String>, JabRefException> result = "refresh".equals(operation) ? strategy().refresh(List.of(database), style)
+                                                                                         : strategy().insert(List.of(entry), List.of(database), style, CitationType.AUTHORYEAR_PAR, "", cursor, false);
+
+            assertEquals(List.of(), result.get());
+            ArgumentCaptor<String> names = ArgumentCaptor.forClass(String.class);
+            verify(ranges, times("refresh".equals(operation) ? 1 : 2)).create(eq(document), eq(context), names.capture(), eq(cursor), eq(false), eq(false), eq(BoundaryPolicy.TEMPORARY));
+            String linkedName = names.getAllValues().stream()
+                                     .filter(name -> ZoteroReferenceMark.parse(name).orElseThrow().uniqueId().equals("RNDabcdefghij"))
+                                     .findFirst().orElseThrow();
+            JsonObject expected = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(nativeName)).getAsJsonObject();
+            expected.getAsJsonArray("citationItems").get(0).getAsJsonObject().getAsJsonArray("uris").add("http://www.jabref.org/a");
+            assertEquals(expected, JsonParser.parseString(ZoteroReferenceMark.getCSLJson(linkedName)));
+            assertEquals(List.of("a"), ZoteroReferenceMark.parse(linkedName).orElseThrow().citationKeys());
+            verify(text).removeTextContent(content);
+            writer.verify(() -> OOTextWriter.write(document, cursor, OOText.fromString("<span lang=\"zxx\">[1]</span>")), times("refresh".equals(operation) ? 1 : 2));
+            documentPreferences.verify(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style));
+            properties.verifyNoInteractions();
+            undoable.verifyNoInteractions();
         }
     }
 
@@ -473,46 +490,6 @@ class ZoteroCitationStrategyTest {
             assertEquals(new LinkPlan(List.of(), Map.of()), strategy().planLinks(List.of(), List.of(database)));
             verifyNoInteractions(database);
             linker.verifyNoInteractions();
-        }
-    }
-
-    @Test
-    void multipleNativeRelinksReadSidecarsOncePerActionAndRereadOnTheNextAction() throws Exception {
-        String firstName = ZOTERO.replace(",\"http://www.jabref.org/a\"", "")
-                                 .replace("\"title\":\"A\"", "\"title\":\"A\",\"DOI\":\"10.123/native\"");
-        String secondName = firstName.replace("citation1", "citation2").replace("RNDabcdefghij", "RNDsecond1234");
-        when(ranges.names(document)).thenReturn(List.of(firstName, secondName));
-        when(ranges.find(document, firstName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
-        WriterReferenceMark secondRange = mock(WriterReferenceMark.class);
-        XTextRange secondAnchor = span(6, 9);
-        when(secondRange.getMarkRange(document)).thenReturn(Optional.of(secondAnchor));
-        when(ranges.find(document, secondName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(secondRange));
-        ConversionMetadata first = new ConversionMetadata("JABREF_a NORMAL first_uid", List.of(""), firstName);
-        ConversionMetadata second = new ConversionMetadata("JABREF_a NORMAL second_uid", List.of(""), secondName);
-        String firstProperty = ConversionMetadata.PREFIX + "first_uid";
-        String secondProperty = ConversionMetadata.PREFIX + "second_uid";
-        BibDatabase database = new BibDatabase(List.of(entry("a", "A").withField(StandardField.DOI, "10.123/native")));
-        CitationStyle invalid = new CitationStyle("invalid.csl", "invalid", "in-text", "Invalid", "", true, false, false, false, "not XML", false);
-        try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
-             MockedStatic<UndoableDocumentProperties> undoable = mockStatic(UndoableDocumentProperties.class);
-             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
-             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class)) {
-            properties.when(() -> UnoUserDefinedProperty.getListOfNames(document)).thenReturn(List.of(firstProperty, secondProperty));
-            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, firstProperty)).thenReturn(Optional.of(first.encode()));
-            properties.when(() -> UnoUserDefinedProperty.getStringValue(document, secondProperty)).thenReturn(Optional.of(second.encode()));
-            ZoteroCitationStrategy strategy = strategy();
-            for (int action = 0; action < 2; action++) {
-                assertEquals(Reason.DOCUMENT_FAILURE, assertInstanceOf(StrategyException.class, strategy.refresh(List.of(database), invalid).getError()).reason());
-            }
-            properties.verify(() -> UnoUserDefinedProperty.getListOfNames(document), times(2));
-            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, firstProperty), times(2));
-            properties.verify(() -> UnoUserDefinedProperty.getStringValue(document, secondProperty), times(2));
-            undoable.verify(() -> UndoableDocumentProperties.preflight(eq(document), argThat(changes -> changes.containsKey(firstProperty))), times(2));
-            undoable.verify(() -> UndoableDocumentProperties.preflight(eq(document), argThat(changes -> changes.containsKey(secondProperty))), times(2));
-            writer.verifyNoInteractions();
-            documentPreferences.verifyNoInteractions();
-            verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
-            verify(text, never()).removeTextContent(any());
         }
     }
 

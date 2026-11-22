@@ -75,7 +75,7 @@ jobs:
               'org.jabref.logic.openoffice.engine.storage.CitationMarkerWriterTest': 5,
               'org.jabref.logic.openoffice.engine.storage.UndoableDocumentPropertiesTest': 8,
               'org.jabref.logic.openoffice.backend.ReferenceMarkTextWriterTest': 19,
-              'org.jabref.logic.openoffice.engine.ConversionMetadataTest': 19,
+              'org.jabref.logic.openoffice.engine.CitationFormatConverterTest': 48,
 
               'org.jabref.logic.openoffice.engine.DocumentWriteSessionTest': 8,
               'org.jabref.logic.openoffice.backend.JabRefMarkCodecCompatibilityTest': 5,

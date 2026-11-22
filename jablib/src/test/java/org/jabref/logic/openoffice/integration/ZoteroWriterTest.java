@@ -280,7 +280,8 @@ class ZoteroWriterTest {
         bibliography.collapseToEnd();
         bibliography.setString("Existing native bibliography");
         UnoTextSection.create(new NamedTextContentPlacement(document, "ZOTERO_BIBL unchanged", bibliography, true));
-        UnoUserDefinedProperty.setStringProperty(document, "JabRef_citation_conversion:unrelated", "not JSON");
+        String obsoleteProperty = "JabRef_citation_conversion:unrelated";
+        UnoUserDefinedProperty.setStringProperty(document, obsoleteProperty, "not JSON");
         UnoUserDefinedProperty.setStringProperty(document, "JabRef_document_style", "CSL\nuntouched");
         UnoRedlines.setRecordChanges(document, true);
         BibEntry entry = nativeEntry("native");
@@ -302,7 +303,8 @@ class ZoteroWriterTest {
             assertEquals(List.of("ZOTERO_BIBL unchanged"), zoteroBibliographies(document));
             String bibliographyText = UnoTextSection.getAnchor(document, "ZOTERO_BIBL unchanged").orElseThrow().getString();
             assertEquals(List.of("1. Native linked title"), bibliographyText.lines().map(String::strip).filter(line -> !line.isEmpty()).toList());
-            assertEquals(Optional.of("not JSON"), UnoUserDefinedProperty.getStringValue(document, "JabRef_citation_conversion:unrelated"));
+            assertEquals(Optional.of("not JSON"), UnoUserDefinedProperty.getStringValue(document, obsoleteProperty));
+            assertEquals(List.of(obsoleteProperty), UnoUserDefinedProperty.getListOfNames(document).stream().filter(property -> property.startsWith("JabRef_citation_conversion:")).toList());
             assertEquals(Optional.of("CSL\nuntouched"), UnoUserDefinedProperty.getStringValue(document, "JabRef_document_style"));
             assertTrue(UnoRedlines.getRecordChanges(document));
             DocumentSnapshot beforeExport = snapshot(document);
@@ -314,11 +316,15 @@ class ZoteroWriterTest {
         Map<String, String> expected = zoteroMarks(document);
         XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("native-modifier-" + operation + "-" + location + "-" + field + ".odt"));
         assertEquals(expected, zoteroMarks(reopened));
+        assertEquals(Optional.of("not JSON"), UnoUserDefinedProperty.getStringValue(reopened, obsoleteProperty));
+        assertEquals(List.of(obsoleteProperty), UnoUserDefinedProperty.getListOfNames(reopened).stream().filter(property -> property.startsWith("JabRef_citation_conversion:")).toList());
         try (CitationEngine engine = engine(reopened)) {
             assertEquals(List.of(), success(engine.refresh(databases, style())));
             assertEquals(expected, zoteroMarks(reopened));
             assertLinkedNativeCitation(reopened, ordinaryName, "[1]");
             assertLinkedNativeCitation(reopened, name, expectedText);
+            assertEquals(Optional.of("not JSON"), UnoUserDefinedProperty.getStringValue(reopened, obsoleteProperty));
+            assertEquals(List.of(obsoleteProperty), UnoUserDefinedProperty.getListOfNames(reopened).stream().filter(property -> property.startsWith("JabRef_citation_conversion:")).toList());
         }
     }
 
@@ -463,8 +469,20 @@ class ZoteroWriterTest {
         assertEquals("Existing JabRef bibliography", UnoTextSection.getAnchor(document, "JR_bib").orElseThrow().getString());
         assertEquals(1, zoteroBibliographies(document).size());
         assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(document, "JabRef_page_info:stableIgnored:0"));
+        assertEquals(2, zoteroMarks(document).size());
+        String converted = zoteroMarks(document).keySet().stream().filter(name -> ZoteroReferenceMark.parse(name).orElseThrow().citationKeys().equals(List.of("ignored"))).findFirst().orElseThrow();
+        assertEquals(CitationType.AUTHORYEAR_PAR, ZoteroReferenceMark.parse(converted).orElseThrow().citationType());
+        assertEquals(8, json(converted).get("citationID").getAsString().length());
+        assertFalse(json(converted).has("properties"));
+        assertFalse(json(converted).getAsJsonArray("citationItems").get(0).getAsJsonObject().has("locator"));
+        assertNoConversionArchive(document);
+        Map<String, String> chosenFormat = zoteroMarks(document);
         XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("zotero-isolation.odt"));
+        assertEquals(chosenFormat, zoteroMarks(reopened));
+        assertNoConversionArchive(reopened);
+        assertEquals(Optional.empty(), UnoUserDefinedProperty.getStringValue(reopened, "JabRef_page_info:stableIgnored:0"));
         try (CitationEngine engine = engine(reopened)) {
+            assertFalse(success(engine.requiresFormatConversion(style())));
             assertEquals(List.of(), success(engine.refresh(List.of(database), style())));
             assertEquals(List.of("alpha", "ignored"), exportedKeys(success(engine.exportCited(List.of(database)))).stream().sorted().toList());
         }
@@ -957,6 +975,10 @@ class ZoteroWriterTest {
         return List.of(properties.getPropertyValue("CharHeight"), properties.getPropertyValue("CharWeight"),
                 properties.getPropertyValue("CharPosture"), properties.getPropertyValue("CharColor"),
                 properties.getPropertyValue("CharEscapement"), properties.getPropertyValue("CharEscapementHeight"), properties.getPropertyValue("CharStyleName"));
+    }
+
+    private static void assertNoConversionArchive(XTextDocument document) throws Exception {
+        assertEquals(List.of(), UnoUserDefinedProperty.getListOfNames(document).stream().filter(name -> name.startsWith("JabRef_citation_conversion:")).toList());
     }
 
     private static DocumentSnapshot snapshot(XTextDocument document) throws Exception {

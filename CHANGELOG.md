@@ -72,7 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We hide the "Move deleted files to trash" preference on platforms without a trash. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
 - We changed inserting LibreOffice/OpenOffice citations to refresh existing citations, follow bibliography synchronization settings, and avoid duplicate spaces around citations. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice warnings after inserting or refreshing citations to list all missing citation keys and suggest opening corresponding libraries. [#17673](https://github.com/JabRef/jabref/pull/17673)
-- We changed LibreOffice/OpenOffice JabRef/Zotero citation conversion to preserve citation types and page information after reopening documents and Undo/Redo. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We changed LibreOffice/OpenOffice JabRef/Zotero citation conversion to retain only target-format data; converting back does not restore discarded information. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed error messages when updating LibreOffice/OpenOffice citations to explain protected areas, missing entries or styles, and Pandoc failures. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice integration to preserve citations and bibliographies when formatting generation fails, and attempt recovery after failed citation conversions. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice style switching to remember the Zotero compatibility setting for CSL without affecting JStyle or BST. [#17673](https://github.com/JabRef/jabref/pull/17673)

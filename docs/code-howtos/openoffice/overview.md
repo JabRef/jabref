@@ -30,7 +30,7 @@ The [requirements](../../requirements/openoffice.md) and [ADR-0084](../../decisi
 | Ordering | `DocumentOrder` | Order within text containers, map footnotes for numbering, and use visual positions when available. |
 | Document writes | `CitationMarkerWriter`, `BibliographySection`, `DocumentWriteSession` | Apply prepared output and manage write-phase undo, locking, and change recording. |
 | Zotero mode | `ZoteroCitationStrategy` | Read and write native Zotero citations with CSL rendering and source linking. |
-| Citation conversion | `CitationFormatConverter`, `ConversionMetadata` | Prepare insertion-triggered citation conversion and legacy JStyle migration; preserve canonical/native round-trip state in sidecars. |
+| Citation conversion | `CitationFormatConverter` | Prepare insertion-triggered, lossy canonical/native conversion and one-way legacy JStyle migration. |
 
 The engine and renderers live in `jablib/src/main/java/org/jabref/logic/openoffice/engine/`; canonical storage is in its `storage` subpackage.
 `DocumentCitations` and `DocumentOrder` are in `logic/openoffice/frontend/`.
@@ -217,7 +217,7 @@ Shared ordering is not a guarantee of correct reading order for every layout.
 Native insertion supports only normal (`AUTHORYEAR_PAR`) and narrative (`AUTHORYEAR_INTEXT`) citations; it does not offer invisible or partial-citation choices.
 Page-info and group editing are disabled in this mode.
 Native JSON determines the normal or narrative type; empty or zero-width mark text does not imply invisibility.
-See the [compatibility boundary](#compatibility-boundary) for modifier handling and metadata preservation.
+See the [compatibility boundary](#compatibility-boundary) for modifier handling and [Limitations](#limitations) for format-conversion losses.
 
 ## Style selection and external styles
 
@@ -310,31 +310,22 @@ One render supplies final markers and any requested bibliography output; applica
 Native-to-canonical conversion and native generation require resolved sources; the unresolved-entry allowance applies only to legacy-only canonical migration.
 Invalid metadata, required but unresolved sources, unsuitable properties, protected ranges, and rendering failures stop preparation before document writes or undo-history changes.
 
-`ConversionMetadata` stores a document-local citation sidecar under `JabRef_citation_conversion:<uid>`.
-Native citation lookups build a sidecar index once per action when needed; canonical lookups read the property directly by UID.
-Neither uses a persistent lookup cache; parsing, identity, freshness, and property-safety checks apply.
-The sidecar preserves the canonical uid, storage-order keys, all six stored types, every page-info slot, and supported native Zotero JSON, including URI links, opaque identifiers, and harmless unknown metadata, while the association remains valid through conversion and save/reopen.
-Canonical `EMPTY` and canonical-only partial types use the normal visible citation fallback in Zotero mode; page information remains stored but is not rendered.
-Converting back restores the canonical uid, storage-order keys, stored type, and page information from the sidecar, including invisible rendering for `EMPTY`.
+Canonical/native conversion is lossy and intended to select the document's final citation format, not provide a lossless round trip; see [Limitations](#limitations).
+Conversion stores only the target format's citation state, with no persistent record of the source format.
+Native output rebuilds citation JSON from the JabRef library.
 Native modifiers are accepted during format conversion, insertion, and refresh.
 When citations are regenerated, locators and affixes are not rendered, author-only is ignored, and any item with `suppress-author: true` selects group-level in-text/narrative rendering, including mixed groups.
-Native JSON remains in native marks or the conversion sidecar, which restores the original modifiers when converting back; retaining metadata is not full modifier rendering support.
+Ordinary native insertion and refresh preserve existing native JSON while updating URI links; this same-format preservation does not extend across canonical/native conversion.
 Export-cited is read-only.
-The sidecar is not a rendered-output cache: opaque native JSON may include Zotero display properties that are preserved rather than used for rendering.
-
-A native citation's `citationID` or mark suffix associates it with its sidecar.
-An externally edited native mark that still matches that association blocks actual conversion rather than restoring stale canonical state.
-This strict freshness check does not block ordinary native Zotero insertion or refresh, which continue using the current native citation without overwriting a stale sidecar.
-Replacing both identity fields or deleting the sidecar loses the association; the former canonical uid, unsupported type, and page information cannot be reconstructed from that native citation alone.
 
 Conversion changes citation marks only.
 With synchronization disabled, all bibliography section names, text, and properties remain unchanged, and no bibliography is created.
 With synchronization enabled and a style that has a bibliography, normal handling updates or creates only the target mode's managed bibliography and leaves other-format sections alone.
-There is no bibliography conversion, renaming, consolidation, cleanup, metadata sidecar, or rejection based on bibliography settings.
+There is no bibliography conversion, renaming, consolidation, cleanup, or rejection based on bibliography settings.
 Pre-existing canonical and Zotero sections may therefore coexist.
 
 Conversion requires an available, unlocked undo manager and cannot join another undo context.
-`DocumentWriteSession.writeWithRollback` owns a root context and sentinel, making successful insertion/conversion one Undo/Redo step for citation edits, page-info and conversion metadata, prepared conversion-style properties, and any normally synchronized target bibliography.
+`DocumentWriteSession.writeWithRollback` owns a root context and sentinel, making successful insertion/conversion one Undo/Redo step for citation edits, page-info changes, prepared conversion-style properties, and any normally synchronized target bibliography.
 On ordinary application failure it closes and verifies ownership of the context before undoing only its own transaction, never an earlier user action.
 Starting the write transaction may clear pre-existing redo history even if rollback restores document state.
 Disconnects, lost ownership, or failed rollback produce a distinct recovery error; complete recovery is not universally guaranteed and a saved copy may be needed.
@@ -343,15 +334,34 @@ Disconnects, lost ownership, or failed rollback produce a distinct recovery erro
 
 Insertion, conversion, refresh, merge, and separate group Writer text and mark edits in undo contexts.
 Writer's undo mechanism does not automatically restore custom document properties.
-`UndoableDocumentProperties` registers custom deltas for page information and citation conversion metadata, with prepared style-property deltas included for conversion.
+`UndoableDocumentProperties` registers custom deltas for page information, with prepared style-property deltas included for conversion.
 Ordinary applied-style and document-preference writes use raw property APIs and are not covered by these custom undo actions.
 Conversion-failure rollback undoes only the failed operation's owned transaction; grouping edits for manual Undo is not sufficient for automatic failure recovery.
+
+## Limitations
+
+Canonical/native conversion is intended for the final citation format, not a lossless round trip.
+This is because of the nature of the storage formats: each represents different citation information.
+Only the target format's state is retained in the converted document.
+
+| Conversion | Information lost |
+| --- | --- |
+| Canonical → native Zotero | Original canonical UID and per-citation page information; `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_ONLY` become normal visible citations. |
+| Native Zotero → canonical | Original native identity; canonical groups receive fresh UIDs and only normal or narrative types. Native JSON locators, labels, prefixes, suffixes, author-only flags, unknown fields, item IDs, and native Zotero URI links are not carried into canonical storage. |
+| Conversion back to the source format | Discarded identities, types, pages, and native JSON are not restored. Native output rebuilds JSON from the JabRef library rather than reproducing the original native citation. |
+
+Immediate Writer Undo/Redo and owned failure rollback can restore the transaction while its undo history is available, subject to the recovery limits above.
+This is not persistent conversion recovery; there is no restoration guarantee after reopening the document.
+
+These losses do not apply to canonical JStyle/CSL/BST style changes: UIDs, all six stored types, and page information remain intact, even when the selected renderer hides or approximates them.
+One-way legacy JStyle → canonical migration preserves storage-order keys, all six types, and page information with fresh UIDs.
+Ordinary native insertion and refresh preserve existing native JSON while updating links; not every citation operation is lossy.
 
 ## Verification and further reading
 
 The [Writer integration testing instructions](../testing.md#libreoffice-writer-integration-tests) describe the required LibreOffice/Pandoc setup, dedicated task, standard test reports, and saved documents/logs.
 Golden documents, cross-family save/reopen, citation-mode conversion, all types/page slots, native JSON, protected ranges, superscripts, tracked changes, and rollback are covered by the relevant Writer and unit-test definitions.
-Native modifier fixtures cover successful conversion with the group-level citation-type mapping and JSON restoration through save/reopen; they do not establish full modifier rendering support.
+Conversion acceptance must check the documented losses, modifier acceptance, group-level citation-type mapping, and immediate transaction Undo/Redo separately from same-format save/reopen preservation; it does not establish full modifier rendering support.
 The [package layout and ownership guide](code-reorganization.md) maps these responsibilities to current source packages and entry points.
 The [problems page](problems.md) is a record of historical design evidence, not the current contract.
 For repository exploration, see [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).

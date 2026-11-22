@@ -84,10 +84,11 @@ What those contexts did not restore was custom document-property state, as the o
 The canonical integration now registers custom undo actions through `UndoableDocumentProperties` for per-citation page-info properties.
 Merge and Separate combine structural edits, final formatted output, and page-info changes in one undo context.
 Next-insertion conversion also includes its prepared citation properties and applied-style properties in one owned root undo context.
-Canonical/native conversion on CSL insertion preserves round-trip citation sidecars; supported legacy JStyle migration on JStyle/BST or non-native CSL insertion transfers legacy page properties to canonical slots.
+Canonical/native conversion on CSL insertion is lossy; immediate Undo/Redo restores its transaction only while Writer's undo history remains available, with no guarantee after reopen.
+Supported legacy JStyle migration on JStyle/BST or non-native CSL insertion preserves keys and all six types with fresh UIDs and transfers legacy page properties to canonical slots.
 Zotero preference deltas are included only when targeting native mode.
 Canonical CSL operations and conversions leave `ZOTERO_PREF` XML untouched; native-mode insertion or refresh updates it.
-The conversion-failure rollback described below is new recovery behavior to prevent partial citation corruption after ordinary application failures.
+Conversion-failure rollback prevents partial citation replacement after ordinary application failures.
 `DocumentWriteSession.writeWithRollback` requires unlocked undo support, rejects nesting, and rolls back ordinary application failures only after closing and verifying ownership of that context.
 Starting the write transaction can clear pre-existing redo history even when rollback restores the document; disconnects, lost ownership, and rollback failures require a distinct recovery error rather than an unconditional rollback claim.
 Ordinary updates retain raw style-property setters and do not gain this rollback behavior.

@@ -12,7 +12,7 @@ Conversion supports homogeneous canonical `JABREF_<keys> <TYPE> <uid>`, supporte
 On each insertion, fresh detection uses only the first recognized reference-mark name returned by Writer, skipping unrelated marks and unsupported `CID_n` marks without scanning for later mismatches; no recognized name means no conversion.
 UNO name enumeration is not guaranteed sorted or in physical document order; enumeration order is immaterial for homogeneous documents.
 After detection triggers conversion, preparation reads the citation groups and renders the proposed set before mutation.
-The overview details [conversion metadata and Undo/rollback limits](overview.md#compatibility-boundary).
+Canonical/native conversion is lossy and intended for the final format, not a lossless round trip; see [Limitations](overview.md#limitations) and [Undo/rollback limits](overview.md#compatibility-boundary).
 Native Zotero mode does not migrate legacy JStyle input, and JStyle/BST insertion does not convert native Zotero input.
 Bibliography synchronization is separate: disabled synchronization leaves all bibliography sections unchanged, while enabled synchronization updates only the target mode's managed bibliography.
 The [package layout and ownership guide](code-reorganization.md) maps the current source packages and entry points.

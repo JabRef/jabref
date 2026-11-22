@@ -80,8 +80,8 @@ Detection does not scan for later mismatching formats; no recognized name means 
 Conversion is supported for homogeneous source documents; mixed-source conversion and mixed-format repair are unsupported.
 UNO name enumeration is not guaranteed sorted or in physical document order; enumeration order is immaterial for homogeneous documents.
 After detection triggers conversion, `CitationFormatConverter` reads citation groups and prepares the proposed write.
-`ConversionMetadata` preserves associated citation state for round trips: native lookups use one action-local sidecar index when needed, while canonical lookups read properties directly by UID.
-Parsing, identity, freshness, and property-safety checks apply; there is no persistent lookup cache.
+Canonical/native conversion retains only the target format's state; identities, unsupported types, page information, and native JSON can be lost as described in [Limitations](overview.md#limitations).
+Native output rebuilds JSON from the JabRef library; no persistent source-format record supports reverse conversion.
 The conversion preparation path also handles one-way migration of supported legacy JStyle `JR_cite` marks on the next insertion outside effective native Zotero mode: always for JStyle/BST, and for CSL with the saved compatibility setting off.
 When detection selects migration, preparation renders once before writes and uses the rollback-capable conversion transaction.
 Among conversion paths, only legacy-only canonical migration permits unresolved entries, using canonical placeholders and the insertion warning; opening the missing libraries and refreshing resolves them.
@@ -104,6 +104,7 @@ Ordering precedes controller locking because visual ordering needs to move Write
 `ZoteroCitationStrategy` owns native Zotero storage, ordering, validation, and write policy separately from canonical storage, while using the same `CslRenderer`.
 Generated native JSON `citationID` values have eight characters; native citation and bibliography mark names append `RND` followed by a ten-character CUID2 value.
 `ZoteroCitationLinker` prepares URI-link changes without modifying the document and skips linking an empty native citation set.
+Ordinary native insertion and refresh preserve existing native JSON while updating links; format conversion does not preserve that JSON in canonical storage.
 Flattened entries for native JSON and native item IDs are prepared only for native output.
 `ZoteroDocumentPreferences` updates `ZOTERO_PREF` only for native-mode insertion/refresh, with undo deltas for conversion targeting native mode.
 Canonical operations and conversions targeting canonical format leave that XML untouched while recording JabRef's applied style.
@@ -122,7 +123,7 @@ Stored canonical UIDs are validated by `JabRefMarkCodec` without requiring the g
 Only explicit canonical refresh performs a global orphan page-info sweep; properties for replaced or removed citations are removed immediately.
 `CitationMarkerWriter` writes prepared `OOText` inside existing marks and keeps a bounded, connection-local formatted-output baseline rather than a persistent rendering cache.
 `DocumentStyleStore` records the last successfully applied style family and identifier.
-`UndoableDocumentProperties` registers custom-property undo deltas for page information and citation conversion metadata.
+`UndoableDocumentProperties` registers custom-property undo deltas for page information.
 Ordinary applied-style writes use properties directly without undo deltas; conversion prepares its style-property deltas for undo.
 The [storage contract](overview.md#what-is-stored-in-a-document) describes the exact mark grammar and property keys.
 

@@ -64,7 +64,7 @@ public final class CslRenderer implements CitationRenderer {
         return render(request, capabilities());
     }
 
-    /// Native Zotero rendering uses normal or in-text citations; other canonical types remain recoverable through conversion metadata.
+    /// Native Zotero rendering uses normal or in-text citations; unsupported canonical types use the normal fallback.
     RenderResult renderNative(RenderRequest request) throws RenderException {
         return render(request, new StyleCapabilities(Set.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT),
                 style.hasBibliography(), false, false));

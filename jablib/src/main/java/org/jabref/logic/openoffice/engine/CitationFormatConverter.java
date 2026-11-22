@@ -46,6 +46,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
+import org.jabref.model.openoffice.style.CitationGroupId;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.style.PageInfo;
 import org.jabref.model.openoffice.util.OOResult;
@@ -134,19 +135,18 @@ final class CitationFormatConverter {
             if (JabRefMarkCodec.isCanonicalMarkName(citation.oldName())) {
                 String raw = citation.anchor().getString();
                 if (!raw.startsWith("\u200b") || !raw.endsWith("\u200b") || raw.length() < 2) {
-                    throw invalidMetadata();
+                    throw invalidReferenceMark();
                 }
             }
         }
 
-        CitationGroup inserted = group(new JabRefMarkData(keys, CitationIds.newId(), renderer.capabilities().coerceForInsert(requestedType)),
-                keys.stream().map(_ -> "").toList());
+        CitationGroup inserted = group(new JabRefMarkData(keys, CitationIds.newId(), renderer.capabilities().coerceForInsert(requestedType)));
         if (!pageInfo.isEmpty()) {
             inserted.citationsInStorageOrder.getLast().setPageInfo(Optional.of(OOText.fromString(pageInfo)));
         }
         XTextCursor position = cursor.getText().createTextCursorByRange(cursor.getEnd());
         position.collapseToEnd();
-        citations.add(new PlannedCitation(inserted, "", position, "", Optional.empty()));
+        citations.add(new PlannedCitation(inserted, "", position, ""));
         citations = order(citations);
         RenderOptions options = new RenderOptions(preferences.getBstCitationFormat(), rebuildBibliography,
                 targetZotero || style instanceof JStyle ? "" : preferences.getCslBibliographyTitle(), preferences.getCslBibliographyHeaderFormat(),
@@ -166,16 +166,9 @@ final class CitationFormatConverter {
         for (PlannedCitation citation : citations) {
             List<String> groupKeys = citation.group().citationsInStorageOrder.stream().map(cited -> cited.citationKey).toList();
             String name;
-            Optional<ConversionMetadata> metadata = citation.metadata();
             if (targetZotero) {
                 if (ZoteroReferenceMark.isZoteroReferenceMarkName(citation.newName())) {
                     name = citation.newName();
-                } else if (metadata.isPresent()) {
-                    ConversionMetadata previous = metadata.orElseThrow();
-                    name = previous.zoteroName();
-                    if (previous.group().citationType != citation.group().citationType) {
-                        name = ZoteroReferenceMark.updateCitationType(name, citation.group().citationType);
-                    }
                 } else {
                     BibDatabaseContext sources = nativeSources.orElseThrow();
                     List<BibEntry> groupEntries = new ArrayList<>();
@@ -186,19 +179,13 @@ final class CitationFormatConverter {
                     name = ZoteroReferenceMark.buildReferenceMark(groupEntries, groupKeys, itemId,
                             citation.group().citationType, sources, entryTypes, uris).name();
                 }
-                if (!citation.oldName().isEmpty() && (JabRefMarkCodec.isCanonicalMarkName(citation.oldName()) || metadata.isPresent())) {
-                    metadata = Optional.of(ConversionMetadata.capture(citation.group(), name));
-                }
             } else {
                 name = JabRefMarkCodec.encode(new JabRefMarkData(groupKeys, citation.group().groupId.citationGroupIdAsString(), citation.group().citationType));
-                if (ZoteroReferenceMark.isZoteroReferenceMarkName(citation.oldName())) {
-                    metadata = Optional.of(ConversionMetadata.capture(citation.group(), citation.newName()));
-                }
             }
             if (!plannedNames.add(name)) {
-                throw invalidMetadata();
+                throw invalidReferenceMark();
             }
-            complete.add(new PlannedCitation(citation.group(), citation.oldName(), citation.anchor(), name, metadata));
+            complete.add(new PlannedCitation(citation.group(), citation.oldName(), citation.anchor(), name));
         }
         Map<String, Optional<String>> styleProperties = targetZotero && style instanceof CitationStyle csl
                                                         ? ZoteroDocumentPreferences.prepareCitationStyle(document, csl) : Map.of();
@@ -223,7 +210,7 @@ final class CitationFormatConverter {
 
     private static BibDatabaseContext prepareNativeSources(List<PlannedCitation> citations, CitationKeyResolution resolved) throws RenderException {
         List<String> keys = citations.stream()
-                                     .filter(citation -> citation.metadata().isEmpty() && !ZoteroReferenceMark.isZoteroReferenceMarkName(citation.newName()))
+                                     .filter(citation -> !ZoteroReferenceMark.isZoteroReferenceMarkName(citation.newName()))
                                      .flatMap(citation -> citation.group().citationsInStorageOrder.stream().map(Citation::getCitationKey))
                                      .distinct().toList();
         return new BibDatabaseContext(new BibDatabase(resolved.flattenedEntries(keys)));
@@ -235,32 +222,26 @@ final class CitationFormatConverter {
         List<PlannedCitation> result = new ArrayList<>();
         MarkStore store = new MarkStore();
         Set<String> ids = new HashSet<>();
-        Set<String> nativeIds = new HashSet<>();
         for (String name : ranges.names(document)) {
             if (JabRefMarkCodec.isCanonicalMarkName(name)) {
                 CitationGroup group = store.readCitationGroupFromDocumentOrThrow(document, name);
                 if (!ids.add(group.groupId.citationGroupIdAsString())) {
-                    throw invalidMetadata();
+                    throw invalidReferenceMark();
                 }
                 WriterReferenceMark mark = store.referenceMark(group);
-
-                Optional<ConversionMetadata> metadata = ConversionMetadata.forCanonical(document, group);
-                result.add(new PlannedCitation(group, name, mark.getMarkRange(document).orElseThrow(), name, metadata));
+                result.add(new PlannedCitation(group, name, mark.getMarkRange(document).orElseThrow(), name));
             } else if (includeLegacy && LegacyJStyleMark.isLegacyMarkName(name)) {
                 CitationGroup group = readLegacyGroup(name);
                 if (!ids.add(group.groupId.citationGroupIdAsString())) {
-                    throw invalidMetadata();
+                    throw invalidReferenceMark();
                 }
                 XTextRange anchor = WriterReferenceMarks.getAnchor(document, name)
                                                         .orElseThrow(() -> new WriterDocumentAccessException("Missing legacy JStyle citation range"));
-                result.add(new PlannedCitation(group, name, anchor, "", Optional.empty()));
+                result.add(new PlannedCitation(group, name, anchor, ""));
             } else if (includeZotero && ZoteroReferenceMark.isZoteroReferenceMarkName(name)) {
-                ZoteroReferenceMark mark = ZoteroReferenceMark.parse(name).orElseThrow(CitationFormatConverter::invalidMetadata);
-                if (!nativeIds.add(ConversionMetadata.identity(name))) {
-                    throw invalidMetadata();
-                }
+                ZoteroReferenceMark mark = ZoteroReferenceMark.parse(name).orElseThrow(CitationFormatConverter::invalidReferenceMark);
                 if (JsonParser.parseString(ZoteroReferenceMark.getCSLJson(name)).getAsJsonObject().getAsJsonArray("citationItems").size() != mark.citationKeys().size()) {
-                    throw invalidMetadata();
+                    throw invalidReferenceMark();
                 }
             }
         }
@@ -271,25 +252,14 @@ final class CitationFormatConverter {
         if (original.isEmpty()) {
             return new ReadPlan(result, Map.of());
         }
-        ConversionMetadata.Index metadataIndex = ConversionMetadata.readIndex(document);
         LinkPlan links = zotero.planLinks(original, selected);
         List<ZoteroCitationStrategy.StoredCitation> linked = ZoteroCitationStrategy.prepareLinks(original, links);
         for (ZoteroCitationStrategy.StoredCitation citation : linked) {
-            Optional<ConversionMetadata> metadata = metadataIndex.forZotero(citation.originalName());
-            CitationGroup group;
-            if (metadata.isPresent()) {
-                group = metadata.orElseThrow().group();
-                if (!group.citationsInStorageOrder.stream().map(cited -> cited.citationKey).toList().equals(citation.mark().citationKeys())) {
-                    throw invalidMetadata();
-                }
-            } else {
-                group = group(new JabRefMarkData(citation.mark().citationKeys(), CitationIds.newId(), citation.group().citationType),
-                        citation.mark().citationKeys().stream().map(_ -> "").toList());
-            }
+            CitationGroup group = group(new JabRefMarkData(citation.mark().citationKeys(), CitationIds.newId(), citation.group().citationType));
             if (!ids.add(group.groupId.citationGroupIdAsString())) {
-                throw invalidMetadata();
+                throw invalidReferenceMark();
             }
-            result.add(new PlannedCitation(group, citation.originalName(), citation.anchor(), citation.mark().name(), metadata));
+            result.add(new PlannedCitation(group, citation.originalName(), citation.anchor(), citation.mark().name()));
         }
         return new ReadPlan(result, links.zoteroUriByCitationKey());
     }
@@ -297,8 +267,7 @@ final class CitationFormatConverter {
     // [impl->req~openoffice.legacy-jstyle-migration~1]
     private CitationGroup readLegacyGroup(String name) throws JabRefMarkCodecException, WrappedTargetException {
         LegacyJStyleMark mark = LegacyJStyleMark.decode(name);
-        CitationGroup group = group(new JabRefMarkData(mark.citationKeys(), CitationIds.newId(), mark.citationType()),
-                mark.citationKeys().stream().map(_ -> "").toList());
+        CitationGroup group = group(new JabRefMarkData(mark.citationKeys(), CitationIds.newId(), mark.citationType()));
         group.citationsInStorageOrder.getLast().setPageInfo(PageInfo.normalizePageInfo(
                 UnoUserDefinedProperty.getStringValue(document, name).map(OOText::fromString)));
         return group;
@@ -311,9 +280,6 @@ final class CitationFormatConverter {
         for (PlannedCitation citation : citations) {
             if (LegacyJStyleMark.isLegacyMarkName(citation.oldName())) {
                 changes.put(citation.oldName(), Optional.empty());
-            }
-            if (citation.metadata().isPresent()) {
-                changes.put(ConversionMetadata.PREFIX + citation.group().groupId.citationGroupIdAsString(), Optional.of(citation.metadata().orElseThrow().encode()));
             }
             if (targetZotero && JabRefMarkCodec.isCanonicalMarkName(citation.oldName())) {
                 JabRefMarkData old = JabRefMarkCodec.decode(citation.oldName());
@@ -345,9 +311,8 @@ final class CitationFormatConverter {
     private static Set<String> usedItemIds(List<PlannedCitation> citations) {
         Set<String> used = new HashSet<>();
         for (PlannedCitation citation : citations) {
-            String nativeName = ZoteroReferenceMark.isZoteroReferenceMarkName(citation.newName()) ? citation.newName()
-                                                                                                  : citation.metadata().map(ConversionMetadata::zoteroName).orElse("");
-            if (nativeName.isEmpty()) {
+            String nativeName = citation.newName();
+            if (!ZoteroReferenceMark.isZoteroReferenceMarkName(nativeName)) {
                 continue;
             }
             for (JsonElement item : JsonParser.parseString(ZoteroReferenceMark.getCSLJson(nativeName)).getAsJsonObject().getAsJsonArray("citationItems")) {
@@ -392,8 +357,9 @@ final class CitationFormatConverter {
     private record ReadPlan(List<PlannedCitation> citations, Map<String, String> uris) {
     }
 
-    private static CitationGroup group(JabRefMarkData data, List<String> pages) throws JabRefMarkCodecException {
-        return new ConversionMetadata(JabRefMarkCodec.encode(data), pages, "").group();
+    private static CitationGroup group(JabRefMarkData data) throws JabRefMarkCodecException {
+        List<Citation> citations = data.citationKeys().stream().map(Citation::new).toList();
+        return new CitationGroup(new CitationGroupId(data.uniqueId()), data.citationType(), citations, Optional.of(JabRefMarkCodec.encode(data)));
     }
 
     private List<PlannedCitation> order(List<PlannedCitation> citations) throws WriterDocumentAccessException {
@@ -428,7 +394,7 @@ final class CitationFormatConverter {
     }
 
     @NullMarked
-    record PlannedCitation(CitationGroup group, String oldName, XTextRange anchor, String newName, Optional<ConversionMetadata> metadata) {
+    record PlannedCitation(CitationGroup group, String oldName, XTextRange anchor, String newName) {
     }
 
     @NullMarked
@@ -499,15 +465,9 @@ final class CitationFormatConverter {
         return moved && !adjacent.getString().isEmpty() && adjacent.getString().isBlank();
     }
 
-    static ConversionException invalidMetadata() {
-        return new ConversionException("Invalid or externally modified citation conversion state",
-                Localization.lang("Cannot convert citations because stored conversion information is invalid or a converted citation was edited outside JabRef. Restore the original citation before converting."));
-    }
-
-    static ConversionException invalidMetadata(Throwable cause) {
-        ConversionException exception = invalidMetadata();
-        exception.initCause(cause);
-        return exception;
+    private static ConversionException invalidReferenceMark() {
+        return new ConversionException("Invalid citation reference mark",
+                Localization.lang("Cannot convert citations because a citation reference mark is invalid. Repair the citation and try again."));
     }
 
     @NullMarked

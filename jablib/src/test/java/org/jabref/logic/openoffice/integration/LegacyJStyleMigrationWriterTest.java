@@ -204,7 +204,7 @@ class LegacyJStyleMigrationWriterTest {
                 JabRefMarkData data = JabRefMarkCodec.decode(name);
                 assertEquals(GROUP_KEYS, data.citationKeys());
                 assertEquals(legacyTypes.get(oldName), data.citationType());
-                assertFalse(data.uniqueId().isBlank());
+                assertEquals(10, data.uniqueId().length());
                 assertNotEquals(oldName, data.uniqueId());
                 assertNotEquals("42", data.uniqueId());
                 List<Optional<String>> pages = List.of(Optional.empty(), Optional.empty(), index < 6 ? Optional.of("p. " + (index + 1)) : Optional.empty());
@@ -227,6 +227,7 @@ class LegacyJStyleMigrationWriterTest {
                 assertEquals(bibliography.indexOf(title), bibliography.lastIndexOf(title));
             }
             assertFalse(success(engine.requiresFormatConversion(style)));
+            assertEquals(List.of(), UnoUserDefinedProperty.getListOfNames(document).stream().filter(name -> name.startsWith("JabRef_citation_conversion:")).toList());
             Snapshot after = snapshot(document);
             assertEquals(1, undo.getAllUndoActionTitles().length);
             undo.undo();
@@ -246,12 +247,21 @@ class LegacyJStyleMigrationWriterTest {
             assertFalse(success(engine.requiresFormatConversion(style)));
             insert(engine, style, end(reopened), false);
         }
-        for (String name : migratedNames.values()) {
+        for (Map.Entry<String, String> migratedName : migratedNames.entrySet()) {
+            String name = migratedName.getValue();
             JabRefMarkData data = JabRefMarkCodec.decode(name);
             assertTrue(canonicalNames(reopened).contains(name));
             assertEquals(data.uniqueId(), new MarkStore().readCitationGroupFromDocumentOrThrow(reopened, name).groupId.citationGroupIdAsString());
+            if (singleKeyLegacy.equals(migratedName.getKey())) {
+                assertGroup(reopened, name, List.of("alpha"), CitationType.AUTHORYEAR_PAR, List.of(Optional.of("p. 88")));
+            } else {
+                int index = new ArrayList<>(legacyTypes.keySet()).indexOf(migratedName.getKey());
+                assertGroup(reopened, name, GROUP_KEYS, Optional.ofNullable(legacyTypes.get(migratedName.getKey())).orElseThrow(),
+                        List.of(Optional.empty(), Optional.empty(), index < 6 ? Optional.of("p. " + (index + 1)) : Optional.empty()));
+            }
             assertBoundaries(reopened, name, data.citationType());
         }
+        assertEquals(List.of(), UnoUserDefinedProperty.getListOfNames(reopened).stream().filter(name -> name.startsWith("JabRef_citation_conversion:")).toList());
         assertEquals(10, canonicalNames(reopened).size());
     }
 

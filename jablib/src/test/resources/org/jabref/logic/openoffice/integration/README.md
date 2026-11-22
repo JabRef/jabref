@@ -90,9 +90,9 @@ Native Zotero mode does not migrate legacy JStyle input, and JStyle/BST insertio
 
 Once detection triggers conversion, preparation still reads and validates the applicable canonical, legacy, and native groups; the name-only decision is not a replacement for those reads.
 The proposed citation set is rendered once before writes.
-The citation metadata, identity, rendering, Undo/Redo, and owned rollback contracts remain part of conversion acceptance.
+Target-format identity, documented data losses, rendering, immediate Undo/Redo, and owned rollback remain part of conversion acceptance.
 `LegacyJStyleMigrationWriterTest` constructs its own legacy marks and checks all six type mappings, storage-order keys, stable prepared uids, page-property transfer to the last storage-order slot, invisible boundaries, and save/reopen.
-Its real-Writer migration cases use JStyle and non-native CSL; BST detection is covered by `ConversionMetadataTest`, not a BST case in this Writer suite.
+Its real-Writer migration cases use JStyle and non-native CSL; `CitationFormatConverterTest` covers BST migration detection.
 It runs in `libreOfficeTest`, but the workflow does not currently require its report by name or assign it a minimum invocation count.
 Legacy-only canonical migration accepts unresolved entries with placeholders and returns unresolved keys for the successful-insertion warning; opening the missing libraries and refreshing restores output without changing identity.
 Native-to-canonical conversion and native generation still require resolved sources.
@@ -106,7 +106,7 @@ CI requires at least 20 invocations from `CanonicalStorageWriterTest` in the sam
 At the engine action boundary, only successful explicit canonical refresh sweeps orphan page-info properties globally; insertion with or without bibliography synchronization must preserve unrelated orphans.
 Actions replacing or removing citations still clean up those citations' own properties.
 The workflow separately runs every OpenOffice unit test using `:jablib:test --tests 'org.jabref.logic.openoffice.*'`.
-It requires the following unit-suite reports and minimum invocation counts; names are relative to `org.jabref.logic.openoffice` under `jablib/src/test/java/`.
+Selected unit-suite report minimums are listed below; names are relative to `org.jabref.logic.openoffice` under `jablib/src/test/java/`.
 
 | Unit suite | Minimum invocations |
 | --- | --- |
@@ -114,22 +114,28 @@ It requires the following unit-suite reports and minimum invocation counts; name
 | `engine.storage.CitationMarkerWriterTest` | 5 |
 | `engine.storage.UndoableDocumentPropertiesTest` | 8 |
 | `backend.ReferenceMarkTextWriterTest` | 19 |
-| `engine.ConversionMetadataTest` | 19 |
+| `engine.CitationFormatConverterTest` | 48 |
 | `engine.DocumentWriteSessionTest` | 8 |
 | `backend.JabRefMarkCodecCompatibilityTest` | 5 |
 | `bst.BstPipelineTest` | 7 |
 
 The real-Pandoc `BstPipelineTest` needs Pandoc on `PATH`; otherwise its Pandoc-dependent tests skip locally, which CI's report guard rejects.
-Every OpenOffice unit report is checked for skips, errors, and failures, not only these eight named suites.
+Every OpenOffice unit report is checked for skips, errors, and failures, not only the suites listed above.
 CI additionally requires at least 48 invocations from `CitationFormatConversionWriterTest` for canonical/native citation conversion.
-Conversion preserves canonical identities, storage-order keys, all six types, and every page-info slot in the document sidecar through save/reopen.
-In Zotero mode, converted `EMPTY` and canonical-only partial types use the normal visible citation fallback; converting back restores the canonical state, including invisible rendering for `EMPTY`.
+Canonical/native conversion is lossy and intended for the final format, not a lossless round trip; see [Limitations](../../../../../../../../../docs/code-howtos/openoffice/overview.md#limitations).
+Acceptance must check that canonical → native drops original UIDs and per-citation page information and maps `EMPTY`, `NOPAR`, `AUTHOR_ONLY`, and `YEAR_ONLY` to normal visible citations.
+Native → canonical must create fresh UIDs and only normal or narrative types, without retaining native JSON locators, labels, prefixes, suffixes, author-only flags, unknown fields, item IDs, or native Zotero URI links.
+Reverse conversion does not restore discarded state; native output rebuilds JSON from the JabRef library.
+Modifier acceptance and group-level author suppression are separate from full modifier rendering support.
+Immediate Writer Undo/Redo and owned rollback restore the transaction while undo history is available, subject to recovery limits; no restoration is guaranteed after reopening.
+Same-format canonical JStyle/CSL/BST style changes still preserve UIDs, all six types, and pages, even when rendering hides them.
+Legacy JStyle → canonical migration preserves keys, all six types, and pages with fresh UIDs.
+Ordinary native insertion and refresh preserve existing native JSON while updating links; their acceptance checks remain separate from conversion losses.
 Canonical CSL rendering identifies invisible citations by their stored citation type.
 Conversion safety checks reject pending deleted ranges touching edited citations, cited footnote anchors, the insertion range, or bibliography ranges selected for synchronization, even if change recording is off.
 Unrelated pending bibliography deletions are preserved when synchronization is off; recording suspension does not accept deletions.
 Canonical CSL output, including conversion targeting canonical format, must leave `ZOTERO_PREF` XML untouched while recording JabRef's applied style.
-Native sidecar lookup uses one action-local `ConversionMetadata.Index`, not a persistent cache; canonical lookups use uid-named properties directly.
-Strict conversion validation remains intact, while stale sidecars do not block ordinary native insertion or refresh.
+Conversion stores only target-format state, with no persistent source-format record.
 
 The five CI-guarded tagged reports are in `integration`, except `engine.storage.CanonicalStorageWriterTest`.
 Discovering unrelated tagged tests cannot mask a missing engine, Zotero, entity-contract, storage, or canonical/native conversion suite.
@@ -157,7 +163,7 @@ The separate unit step uses the corresponding `test/` directories.
 CI uploads all these directories even on failure.
 
 The workflow runs on every pull request and merge-group event, with no path filters, opt-in labels, or allowed failures.
-It requires at least 28 engine, 25 Zotero, 20 canonical storage, six entity-contract, and 48 citation-conversion invocations across five tagged suites, plus the eight named unit suites above, with no skips, errors, or failures.
+It requires at least 28 engine, 25 Zotero, 20 canonical storage, six entity-contract, and 48 citation-conversion invocations across five tagged suites, plus named unit-suite reports, with no skips, errors, or failures.
 These are workflow discovery minimums, not current test counts or upper limits; adding tests does not require changing the guard.
 All discovered tagged and unit reports, including the migration suite when present, are checked for skips, errors, and failures.
 Repository administrators must make **Required Writer integration** a required branch-protection check; YAML alone cannot enforce that setting.
