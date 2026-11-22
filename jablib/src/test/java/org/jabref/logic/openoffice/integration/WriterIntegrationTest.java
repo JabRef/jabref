@@ -264,7 +264,7 @@ class WriterIntegrationTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"jstyle", "bst"})
-    // [utest->req~openoffice.narrative-citations~1]
+        // [utest->req~openoffice.narrative-citations~1]
     void numericNarrativeCitationsRetainTheirTypesAcrossStyleChangesAndReopen(String family) throws Exception {
         XTextDocument document = office.newDocument();
         BibDatabase database = database();

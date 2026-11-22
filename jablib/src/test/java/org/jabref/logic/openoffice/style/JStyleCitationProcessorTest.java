@@ -188,7 +188,7 @@ class JStyleCitationProcessorTest {
     }
 
     @Test
-    // [utest->req~openoffice.narrative-citations~1]
+        // [utest->req~openoffice.narrative-citations~1]
     void numericNormalAndNarrativeGroupsShareNumbersWithoutCompressingAuthors() throws IOException {
         CitationGroups groups = groupsInOrder(
                 group("normal", CitationType.AUTHORYEAR_PAR, new Citation("smith")),

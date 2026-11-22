@@ -137,8 +137,8 @@ class JStyleRendererTest {
     @Test
     void numericCapabilitiesSupportNarrativeWithoutChangingOtherFallbacksOrStoredTypes() throws IOException, RenderException {
         List<CitationGroup> groups = Arrays.stream(CitationType.values())
-                                          .map(type -> group(type.name(), type, "a"))
-                                          .toList();
+                                           .map(type -> group(type.name(), type, "a"))
+                                           .toList();
         RenderRequest request = request(groups, List.of(entry("a", "A")));
         JStyleRenderer renderer = new JStyleRenderer(style(JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH));
 
@@ -231,10 +231,10 @@ class JStyleRendererTest {
         RenderResult result = renderer.render(request);
 
         assertEquals(List.of(
-                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\">[1]</span></span>",
-                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\"><b>Unresolved(missing&lt;b&gt;&amp;) | Smith :: [1: <i>p. 5</i>] | Doe :: [2: p. 7]</b></span></span>",
-                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\"><b>Unresolved(missing&lt;b&gt;&amp;)</b></span></span>",
-                "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\">[2]</span></span>"),
+                        "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\">[1]</span></span>",
+                        "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\"><b>Unresolved(missing&lt;b&gt;&amp;) | Smith :: [1: <i>p. 5</i>] | Doe :: [2: p. 7]</b></span></span>",
+                        "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\"><b>Unresolved(missing&lt;b&gt;&amp;)</b></span></span>",
+                        "<span oo:CharStyleName=\"Citation\"><span lang=\"zxx\">[2]</span></span>"),
                 request.groupsInDocumentOrder().stream().map(group -> Optional.ofNullable(result.markers().get(group.groupId)).orElseThrow().toString()).toList());
         assertEquals(List.of("missing<b>&"), result.unresolvedKeys());
         assertEquals(CitationType.AUTHORYEAR_INTEXT, narrative.citationType);

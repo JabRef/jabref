@@ -97,13 +97,13 @@ public final class BstRenderer implements CitationRenderer {
                 String text = group.citationType == CitationType.AUTHORYEAR_INTEXT
                               ? inText(keys, request.options().bstCitationFormat(), numbers, labels, data)
                               : switch (request.options().bstCitationFormat()) {
-                                  case NUMERIC ->
-                                          numeric(keys, numbers, data);
-                                  case AUTHOR_YEAR ->
-                                          authorYear(keys, data);
-                                  case STYLE_DEFINED ->
-                                          styleDefined(keys, labels, data);
-                              };
+                    case NUMERIC ->
+                            numeric(keys, numbers, data);
+                    case AUTHOR_YEAR ->
+                            authorYear(keys, data);
+                    case STYLE_DEFINED ->
+                            styleDefined(keys, labels, data);
+                };
                 markers.put(group.groupId, OOFormat.setLocaleNone(OOText.fromString(text)));
             }
             List<OOText> bibliography = new ArrayList<>();
@@ -187,7 +187,8 @@ public final class BstRenderer implements CitationRenderer {
             text.add(switch (format) {
                 case AUTHOR_YEAR ->
                         StringEscapeUtils.escapeHtml4(BstCitationFormatter.authorYearInTextEntry(source.entry, source.database));
-                case NUMERIC, STYLE_DEFINED -> {
+                case NUMERIC,
+                     STYLE_DEFINED -> {
                     String author = StringEscapeUtils.escapeHtml4(BstCitationFormatter.formatShortAuthorList(source.entry));
                     String marker = format == BstCitationFormat.NUMERIC
                                     ? numeric(List.of(key), numbers, data)
