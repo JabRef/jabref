@@ -48,6 +48,8 @@ public class DefaultDesktop extends NativeDesktop {
 
     @Override
     protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
+        // No default terminal is known for operating systems other than Windows, macOS and Linux.
+        // The exception lets OpenConsoleAction show the user how to configure a custom terminal.
         throw new IOException(Localization.lang("Could not detect a terminal. Please define a custom terminal in the preferences."));
     }
 
