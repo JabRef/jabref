@@ -137,6 +137,24 @@ class GroupTreeViewModelTest {
     }
 
     @Test
+    void addSubgroupFromPreviousRootPersistsInCurrentTree() {
+        JavaFxExtension.invokeAndWait(() -> {
+            GroupNodeViewModel previousRoot = groupTree.rootGroupProperty().get();
+            databaseContext.getDatabase().insertEntry(new BibEntry());
+            activeDatabase.setValue(Optional.empty());
+            activeDatabase.setValue(Optional.of(databaseContext));
+
+            try (var ignored = mockConstruction(GroupDialogView.class)) {
+                when(dialogService.showCustomDialogAndWait(any(GroupDialogView.class)))
+                        .thenReturn(Optional.of(new ExplicitGroup("a", GroupHierarchyType.INDEPENDENT, ',')));
+                groupTree.addNewSubgroup(previousRoot, GroupDialogHeader.SUBGROUP);
+            }
+        });
+
+        assertEquals(List.of("a"), childNames());
+    }
+
+    @Test
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
         assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
