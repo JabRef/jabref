@@ -76,9 +76,9 @@ class KeyringMigrationTest {
             var save = preferences.prepareProxyPasswordSave("replacement", CredentialPersistence.SAVE).orElseThrow();
             verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
 
-            Runnable commit = save.writeKeyring();
+            var commit = save.writeKeyring();
             assertEquals(PLAIN_TEXT, proxy.getPassword());
-            commit.run();
+            commit.apply();
 
             assertEquals("replacement", proxy.getPassword());
             verify(keyring).setPassword(NEW_SERVICE, ACCOUNT, "replacement");

@@ -500,6 +500,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private TimestampPreferences timestampPreferences;
     private OpenOfficePreferences openOfficePreferences;
     private ImporterPreferences importerPreferences;
+    private Map<String, String> loadedFetcherKeyBundle = Map.of();
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
     private FilePreferences filePreferences;
@@ -1034,10 +1035,10 @@ public class JabRefCliPreferences implements CliPreferences {
                     throw new JabRefException("Could not update credential in keyring", ex);
                 }
             }
-            return () -> publishCredentials(() -> {
+            return CredentialCommit.of(() -> publishCredentials(() -> {
                 stored.set(persist);
                 value.set(secret);
-            });
+            }));
         });
     }
 
@@ -1770,31 +1771,47 @@ public class JabRefCliPreferences implements CliPreferences {
         if (!serverChanged && persist == wasPersisted) {
             return Optional.empty();
         }
-        String token = Optional.ofNullable(citeDrive.getRefreshToken())
-                               .map(refreshToken -> serializeCiteDriveToken(refreshToken, citeDrive.getApiBaseUrl()))
-                               .orElse("");
+        if (persist && !serverChanged) {
+            return Optional.of(prepareCiteDrivePersistence(citeDrive, apiBaseUrl, false));
+        }
+
         return Optional.of(() -> {
-            try {
-                if (persist && !serverChanged) {
-                    if (!token.isEmpty()) {
-                        KeyringUtil.writeCiteDriveToken(token);
-                    }
-                } else if (wasPersisted) {
+            if (wasPersisted) {
+                try {
                     KeyringUtil.clearCiteDriveToken();
+                } catch (Exception ex) {
+                    throw new JabRefException("Could not clear CiteDrive token from keyring", ex);
                 }
-            } catch (PasswordAccessException ex) {
-                if ((persist && !serverChanged) || !token.isEmpty()) {
-                    throw new JabRefException("Could not update CiteDrive token in keyring", ex);
-                }
-                LOGGER.debug("Could not confirm removal of a CiteDrive token without a loaded value", ex);
-            } catch (Exception ex) {
-                throw new JabRefException("Could not update CiteDrive token in keyring", ex);
             }
-            return () -> publishCredentials(() -> {
+            return CredentialCommit.of(() -> publishCredentials(() -> {
                 citeDrive.setPersistRefreshToken(persist);
                 citeDrive.setApiBaseUrl(apiBaseUrl);
-            });
+            }));
         });
+    }
+
+    private CredentialSave prepareCiteDrivePersistence(CiteDrivePreferences citeDrive, String apiBaseUrl, boolean wroteToken) {
+        return () -> {
+            Optional<RefreshToken> token = Optional.ofNullable(citeDrive.getRefreshToken());
+            try {
+                if (token.isPresent()) {
+                    KeyringUtil.writeCiteDriveToken(serializeCiteDriveToken(token.orElseThrow(), apiBaseUrl));
+                } else if (wroteToken) {
+                    KeyringUtil.clearCiteDriveToken();
+                }
+            } catch (Exception ex) {
+                throw new JabRefException("Could not save CiteDrive token in keyring", ex);
+            }
+            return () -> {
+                synchronized (citeDrive) {
+                    if (!token.equals(Optional.ofNullable(citeDrive.getRefreshToken()))) {
+                        return Optional.of(prepareCiteDrivePersistence(citeDrive, apiBaseUrl, token.isPresent()));
+                    }
+                    publishCredentials(() -> citeDrive.setPersistRefreshToken(true));
+                    return Optional.empty();
+                }
+            };
+        };
     }
 
     private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
@@ -2737,6 +2754,7 @@ public class JabRefCliPreferences implements CliPreferences {
         Map<String, String> defaultKeys = defaults.stream().collect(Collectors.toMap(FetcherApiKey::name, FetcherApiKey::key));
         Map<String, String> keys = getBoolean(FETCHER_CUSTOM_KEY_PERSIST, false)
                                    ? getFetcherKeysFromKeyring(names) : Map.of();
+        loadedFetcherKeyBundle = Map.copyOf(keys);
         for (int i = 0; i < names.size(); i++) {
             String name = names.get(i);
             fetcherApiKeys.add(new FetcherApiKey(name, Boolean.parseBoolean(uses.get(i)),
@@ -2793,20 +2811,10 @@ public class JabRefCliPreferences implements CliPreferences {
             return;
         }
         try {
-            prepareFetcherKeyStorage(preferences.getApiKeys(), preferences.shouldPersistCustomKeys()).writeKeyring().run();
+            prepareFetcherKeyStorage(preferences.getApiKeys(), preferences.shouldPersistCustomKeys()).writeKeyring().apply();
         } catch (JabRefException ex) {
             LOGGER.warn("Could not update saved custom API keys", ex);
         }
-    }
-
-    @Override
-    public void saveFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException {
-        prepareSavedFetcherApiKeys(apiKeys).writeKeyring().run();
-    }
-
-    @Override
-    public void useSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException {
-        prepareSessionFetcherApiKeys(apiKeys).writeKeyring().run();
     }
 
     @Override
@@ -2824,14 +2832,14 @@ public class JabRefCliPreferences implements CliPreferences {
         ImporterPreferences preferences = getImporterPreferences();
         CredentialSave save = prepareFetcherKeyStorage(requestedKeys, persist);
         return () -> {
-            Runnable updateMetadata = save.writeKeyring();
-            return () -> {
-                updateMetadata.run();
+            CredentialCommit updateMetadata = save.writeKeyring();
+            return CredentialCommit.of(() -> {
+                updateMetadata.apply();
                 publishCredentials(() -> {
                     preferences.setPersistCustomKeys(persist);
                     preferences.setApiKeys(requestedKeys);
                 });
-            };
+            });
         };
     }
 
@@ -2850,24 +2858,30 @@ public class JabRefCliPreferences implements CliPreferences {
         }
         Map<String, String> bundle = persist ? Map.copyOf(keys) : Map.of();
         boolean hasBundleMetadata = hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES);
-        boolean mayHaveSavedKeys = hasBundleMetadata ? !getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty() : hasKey(FETCHER_CUSTOM_KEY_NAMES);
+        boolean mayHaveSavedKeys = hasBundleMetadata
+                                   ? !getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty()
+                                   : hasKey(FETCHER_CUSTOM_KEY_NAMES) || getBoolean(FETCHER_CUSTOM_KEY_PERSIST, false);
         List<String> legacyEntries = !persist && !hasBundleMetadata ? getStringList(FETCHER_CUSTOM_KEY_NAMES) : List.of();
+        Map<String, String> expectedBundle = loadedFetcherKeyBundle;
+        boolean checkExistingBundle = persist && hasBundleMetadata && mayHaveSavedKeys;
         KeyringUtil keyring = keyring();
         return () -> {
             try {
-                if (!bundle.isEmpty() || ((persist || hasBundleMetadata) && mayHaveSavedKeys)) {
+                if (checkExistingBundle) {
+                    keyring.replaceFetcherKeyBundle(expectedBundle, bundle);
+                } else if (!bundle.isEmpty() || mayHaveSavedKeys) {
                     keyring.writeFetcherKeyBundle(bundle);
-                } else {
-                    keyring.clearIndividualFetcherKeys(legacyEntries);
                 }
+                keyring.clearIndividualFetcherKeys(legacyEntries);
             } catch (PasswordAccessException ex) {
                 throw new JabRefException("Could not update saved custom API keys", ex);
             }
-            return () -> {
+            return CredentialCommit.of(() -> {
+                loadedFetcherKeyBundle = bundle;
                 putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, bundle.keySet().stream().sorted().toList());
                 putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
                 putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-            };
+            });
         };
     }
 
@@ -2880,12 +2894,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void removeSavedFetcherKeys() throws PasswordAccessException {
-        if (hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES)) {
-            storeFetcherKeyBundle(Map.of());
-        } else {
-            keyring().clearIndividualFetcherKeys(getStringList(FETCHER_CUSTOM_KEY_NAMES));
-            putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, List.of());
+        if (!hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES)) {
+            KeyringUtil keyring = keyring();
+            keyring.writeFetcherKeyBundle(Map.of());
+            keyring.clearIndividualFetcherKeys(getStringList(FETCHER_CUSTOM_KEY_NAMES));
+        } else if (!getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty()) {
+            keyring().writeFetcherKeyBundle(Map.of());
         }
+        putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, List.of());
     }
 
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {

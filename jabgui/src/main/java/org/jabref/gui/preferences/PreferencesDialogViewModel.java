@@ -219,7 +219,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /// Starts a save from the JavaFX thread once settings have passed validation and the keyring check has finished.
-    /// A credential failure leaves the dialog open for retry. Credential changes that already succeeded remain applied.
+    /// A credential failure leaves the dialog open for retry after saving ordinary preferences.
+    /// Credential changes that already succeeded remain applied.
     ///
     /// @param onSaved the callback to run on the JavaFX thread after all settings have been saved and flushed
     public void storeAllSettings(Runnable onSaved) {
@@ -239,25 +240,33 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     /// This keeps saved credentials and live preferences aligned if a later operation fails.
     private void saveNextCredential(Iterator<CredentialSave> saves, Runnable onSaved) {
         if (!saves.hasNext()) {
-            storeTabsAndFlush(onSaved);
+            storeTabsAndFlush(() -> {
+                dialogService.notify(Localization.lang("Preferences recorded."));
+                onSaved.run();
+            });
             return;
         }
 
-        CredentialSave save = saves.next();
+        saveCredential(saves.next(), saves, onSaved);
+    }
+
+    private void saveCredential(CredentialSave save, Iterator<CredentialSave> saves, Runnable onSaved) {
         BackgroundTask.wrap(save::writeKeyring)
                       .onSuccess(commit -> {
                           try {
-                              commit.run();
+                              commit.apply().ifPresentOrElse(
+                                      retry -> saveCredential(retry, saves, onSaved),
+                                      () -> saveNextCredential(saves, onSaved));
                           } catch (RuntimeException ex) {
                               saving.set(false);
                               throw ex;
                           }
-                          saveNextCredential(saves, onSaved);
                       })
                       .onFailure(ex -> {
-                          saving.set(false);
                           LOGGER.warn("Could not update saved credentials", ex);
                           dialogService.showErrorDialogAndWait(Localization.lang("Could not update saved credentials"));
+                          storeTabsAndFlush(() -> {
+                          });
                       })
                       .executeWith(taskExecutor);
     }
@@ -299,7 +308,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         }
 
         Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
-        dialogService.notify(Localization.lang("Preferences recorded."));
     }
 
     /// Inserts the preference values into the Properties of the ViewModel

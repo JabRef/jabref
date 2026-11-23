@@ -207,13 +207,41 @@ class CustomApiKeyBundleTest {
     }
 
     @Test
-    void malformedBundleDoesNotOverwriteSecretsOrFallBack() throws PasswordAccessException {
+    void malformedEstablishedBundleDoesNotOverwriteSecretsOrFallBack() throws PasswordAccessException {
         configure(List.of("Fetcher"));
+        preferences.putStringList("fetcherCustomKeyBundleNames", List.of("Fetcher"));
         secrets.put(List.of("org.jabref.apikeys.bundle", "keys"), "{broken");
         preferences.getImporterPreferences();
         assertEquals("{broken", secrets.get(List.of("org.jabref.apikeys.bundle", "keys")));
         verify(keyring, never()).getPassword("org.jabref.apikeys", "Fetcher");
         verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void malformedUncommittedBundleDoesNotHideIndividualKeys() {
+        configure(List.of("Fetcher"));
+        Map<List<String>, String> stored = Map.of(
+                List.of("org.jabref.apikeys.bundle", "keys"), "{broken",
+                List.of("org.jabref.apikeys", "Fetcher"), "Key");
+        secrets.putAll(stored);
+
+        assertEquals(Set.of(new FetcherApiKey("Fetcher", true, "Key")), preferences.getImporterPreferences().getApiKeys());
+        assertEquals(stored, secrets);
+        assertFalse(preferences.hasKey("fetcherCustomKeyBundleNames"));
+    }
+
+    @Test
+    void switchingToSessionOnlyClearsBundleAndIndividualKeysWithoutBundleMetadata() throws JabRefException {
+        configure(List.of("Fetcher"));
+        secrets.put(List.of("org.jabref.apikeys.bundle", "keys"), "{\"Fetcher\":\"Key\"}");
+        secrets.put(List.of("org.jabref.apikeys", "Fetcher"), "Key");
+        Set<FetcherApiKey> keys = preferences.getImporterPreferences().getApiKeys();
+
+        preferences.prepareSessionFetcherApiKeys(keys).writeKeyring().apply();
+
+        assertEquals(Map.of(), secrets);
+        assertEquals(List.of(), preferences.getStringList("fetcherCustomKeyBundleNames"));
+        assertFalse(preferences.getImporterPreferences().shouldPersistCustomKeys());
     }
 
     @Test
@@ -231,19 +259,19 @@ class CustomApiKeyBundleTest {
     @Test
     void preparedSavePublishesSettingsOnlyAfterTheKeyringWrite() throws JabRefException, PasswordAccessException {
         Set<FetcherApiKey> savedKeys = Set.of(new FetcherApiKey("Previous", true, "saved-key"));
-        preferences.saveFetcherApiKeys(savedKeys);
+        preferences.prepareSavedFetcherApiKeys(savedKeys).writeKeyring().apply();
         clearInvocations(keyring);
 
         Set<FetcherApiKey> updatedKeys = Set.of(new FetcherApiKey("Updated", false, "new-key"));
         CliPreferences.CredentialSave save = preferences.prepareSavedFetcherApiKeys(updatedKeys);
         verifyNoInteractions(keyring);
 
-        Runnable commit = save.writeKeyring();
+        var commit = save.writeKeyring();
         verify(keyring).setPassword("org.jabref.apikeys.bundle", "keys", "{\"Updated\":\"new-key\"}");
         assertEquals(savedKeys, preferences.getImporterPreferences().getApiKeys());
         assertEquals(List.of("Previous"), preferences.getStringList("fetcherCustomKeyBundleNames"));
 
-        commit.run();
+        commit.apply();
         assertEquals(updatedKeys, preferences.getImporterPreferences().getApiKeys());
         assertEquals(List.of("Updated"), preferences.getStringList("fetcherCustomKeyBundleNames"));
     }
@@ -251,7 +279,7 @@ class CustomApiKeyBundleTest {
     @Test
     void failedSaveKeepsPreviousKeysAndPreferences() throws JabRefException, PasswordAccessException {
         Set<FetcherApiKey> savedKeys = Set.of(new FetcherApiKey("Previous", true, "saved-key"));
-        preferences.saveFetcherApiKeys(savedKeys);
+        preferences.prepareSavedFetcherApiKeys(savedKeys).writeKeyring().apply();
         clearInvocations(keyring);
         doThrow(new PasswordAccessException("Denied")).when(keyring)
                                                       .setPassword(Mockito.eq("org.jabref.apikeys.bundle"), Mockito.eq("keys"), anyString());
@@ -259,12 +287,28 @@ class CustomApiKeyBundleTest {
         Set<FetcherApiKey> replacementKeys = Set.of(
                 new FetcherApiKey("Previous", false, "changed-key"),
                 new FetcherApiKey("New", true, "new-key"));
-        assertThrows(JabRefException.class, () -> preferences.saveFetcherApiKeys(replacementKeys));
+        assertThrows(JabRefException.class, preferences.prepareSavedFetcherApiKeys(replacementKeys)::writeKeyring);
 
         assertEquals(savedKeys, preferences.getImporterPreferences().getApiKeys());
         assertEquals(savedKeys, new JabRefCliPreferences(node).getImporterPreferences().getApiKeys());
         assertEquals(List.of("Previous"), preferences.getStringList("fetcherCustomKeyBundleNames"));
         verify(keyring, never()).deletePassword(anyString(), anyString());
+    }
+
+    @Test
+    void stalePreferencesCannotOverwriteKeysAddedByAnotherInstance() throws JabRefException {
+        FetcherApiKey firstKey = new FetcherApiKey("First", true, "first-key");
+        preferences.prepareSavedFetcherApiKeys(Set.of(firstKey)).writeKeyring().apply();
+        JabRefCliPreferences otherPreferences = new JabRefCliPreferences(node);
+        Set<FetcherApiKey> originalKeys = otherPreferences.getImporterPreferences().getApiKeys();
+        Set<FetcherApiKey> additionalKeys = Set.of(firstKey, new FetcherApiKey("Second", true, "second-key"));
+        preferences.prepareSavedFetcherApiKeys(additionalKeys).writeKeyring().apply();
+
+        Set<FetcherApiKey> staleEdit = Set.of(new FetcherApiKey("First", true, "changed-key"));
+        assertThrows(JabRefException.class, otherPreferences.prepareSavedFetcherApiKeys(staleEdit)::writeKeyring);
+
+        assertEquals(Set.of(firstKey), originalKeys);
+        assertEquals(additionalKeys, new JabRefCliPreferences(node).getImporterPreferences().getApiKeys());
     }
 
     @Test

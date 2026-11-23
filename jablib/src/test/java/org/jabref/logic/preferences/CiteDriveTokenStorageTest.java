@@ -9,6 +9,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.KeyringStorageType;
 import com.github.javakeyring.PasswordAccessException;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import org.jspecify.annotations.NullMarked;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
@@ -40,13 +43,61 @@ class CiteDriveTokenStorageTest {
             citeDrive.setRefreshToken(token);
             var save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SAVE).orElseThrow();
 
-            Runnable commit = save.writeKeyring();
+            var commit = save.writeKeyring();
             assertEquals(false, citeDrive.shouldPersistRefreshToken());
-            commit.run();
+            commit.apply();
 
             assertEquals(true, citeDrive.shouldPersistRefreshToken());
             verify(keyring).setPassword("org.jabref", "citedrive",
                     JabRefCliPreferences.serializeCiteDriveToken(token, citeDrive.getApiBaseUrl()));
+        } finally {
+            node.removeNode();
+        }
+    }
+
+    @Test
+    void refreshingCiteDriveTokenBeforeCommitRetriesTheKeyringWrite() throws BackingStoreException, JabRefException, PasswordAccessException {
+        Preferences node = Preferences.userRoot().node("/org/jabref-citedrive-test-" + UUID.randomUUID());
+        try (MockedStatic<Keyring> factory = mockStatic(Keyring.class)) {
+            Keyring keyring = mock(Keyring.class);
+            factory.when(Keyring::create).thenReturn(keyring);
+            JabRefCliPreferences preferences = new JabRefCliPreferences(node);
+            preferences.putBoolean("citeDrivePersistToken", false);
+            var citeDrive = preferences.getCiteDrivePreferences();
+            citeDrive.setRefreshToken(new RefreshToken("previous"));
+            var save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SAVE).orElseThrow();
+            var commit = save.writeKeyring();
+
+            RefreshToken refreshed = new RefreshToken("refreshed");
+            citeDrive.setRefreshToken(refreshed);
+            var retry = commit.apply().orElseThrow();
+
+            assertEquals(false, citeDrive.shouldPersistRefreshToken());
+            assertEquals(Optional.empty(), retry.writeKeyring().apply());
+            assertEquals(true, citeDrive.shouldPersistRefreshToken());
+            verify(keyring).setPassword("org.jabref", "citedrive",
+                    JabRefCliPreferences.serializeCiteDriveToken(refreshed, citeDrive.getApiBaseUrl()));
+        } finally {
+            node.removeNode();
+        }
+    }
+
+    @Test
+    void deniedDeletionOfUnreadableCiteDriveTokenLeavesPersistenceEnabled() throws BackingStoreException, PasswordAccessException {
+        Preferences node = Preferences.userRoot().node("/org/jabref-citedrive-test-" + UUID.randomUUID());
+        try (MockedStatic<Keyring> factory = mockStatic(Keyring.class)) {
+            Keyring keyring = mock(Keyring.class);
+            factory.when(Keyring::create).thenReturn(keyring);
+            when(keyring.getKeyringStorageType()).thenReturn(KeyringStorageType.OSX_KEYCHAIN);
+            when(keyring.getPassword("org.jabref", "citedrive")).thenThrow(new PasswordAccessException("Denied"));
+            doThrow(new PasswordAccessException("Denied")).when(keyring).deletePassword("org.jabref", "citedrive");
+            JabRefCliPreferences preferences = new JabRefCliPreferences(node);
+            preferences.putBoolean("citeDrivePersistToken", true);
+            var citeDrive = preferences.getCiteDrivePreferences();
+            var save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SESSION_ONLY).orElseThrow();
+
+            assertThrows(JabRefException.class, save::writeKeyring);
+            assertEquals(true, citeDrive.shouldPersistRefreshToken());
         } finally {
             node.removeNode();
         }
@@ -69,10 +120,10 @@ class CiteDriveTokenStorageTest {
             var citeDrive = preferences.getCiteDrivePreferences();
             var save = preferences.prepareCiteDriveTokenSave(newServer, CredentialPersistence.SAVE).orElseThrow();
 
-            Runnable commit = save.writeKeyring();
+            var commit = save.writeKeyring();
             assertEquals(previousServer, citeDrive.getApiBaseUrl());
             assertEquals(token, citeDrive.getRefreshToken());
-            commit.run();
+            commit.apply();
 
             assertEquals(newServer, citeDrive.getApiBaseUrl());
             assertEquals(Optional.empty(), Optional.ofNullable(citeDrive.getRefreshToken()));

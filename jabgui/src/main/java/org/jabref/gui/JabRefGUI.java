@@ -347,7 +347,7 @@ public class JabRefGUI extends Application {
             CredentialPersistence persistence = proxy.shouldPersistPassword() ? CredentialPersistence.SAVE : CredentialPersistence.SESSION_ONLY;
             preferences.prepareProxyPasswordSave(secret, persistence).ifPresent(save ->
                     BackgroundTask.wrap(save::writeKeyring)
-                                  .onSuccess(Runnable::run)
+                                  .onSuccess(commit -> commit.apply())
                                   .onFailure(ex -> LOGGER.warn("Could not save proxy password in keyring", ex))
                                   .executeWith(taskExecutor));
         }, () -> LOGGER.warn("No proxy password specified"));

@@ -110,16 +110,6 @@ public interface CliPreferences {
 
     ImporterPreferences getImporterPreferences();
 
-    /// Saves the complete custom API-key configuration synchronously.
-    ///
-    /// @throws JabRefException if the keyring rejects the update
-    void saveFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException;
-
-    /// Clears saved custom API keys synchronously and makes the supplied keys available for this session.
-    ///
-    /// @throws JabRefException if the saved keys could not be cleared
-    void useSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) throws JabRefException;
-
     /// Takes a snapshot of the complete API-key configuration for background persistence.
     ///
     /// @return the save operation for replacing the current API-key bundle
@@ -170,7 +160,21 @@ public interface CliPreferences {
         ///
         /// @return the update to apply once on the preference-owning thread after the operation succeeds
         /// @throws JabRefException if the keyring update fails
-        Runnable writeKeyring() throws JabRefException;
+        CredentialCommit writeKeyring() throws JabRefException;
+    }
+
+    /// Applies a credential update on the preference-owning thread, or requests another worker pass.
+    @FunctionalInterface
+    @NullMarked
+    interface CredentialCommit {
+        Optional<CredentialSave> apply();
+
+        static CredentialCommit of(Runnable update) {
+            return () -> {
+                update.run();
+                return Optional.empty();
+            };
+        }
     }
 
     GrobidPreferences getGrobidPreferences();

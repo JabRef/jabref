@@ -141,8 +141,10 @@ Further rules:
   An empty name list or disabled persistence prevents keyring reads at startup.
   An absent name list identifies installations that still need migration from separate keyring items.
   Web Search saves the complete key set in one operation and commits preference metadata only after the keyring operation succeeds.
+  Before replacing an established bundle, Web Search compares it with the loaded keys and rejects a stale update.
   The Preferences dialog checks keyring availability once and saves changed credentials in background tasks.
   The JavaFX thread applies each credential update after its keyring operation succeeds.
+  If a credential update fails, the dialog saves ordinary preferences and stays open so the credential update can be retried.
   The launcher loads credential preferences before JavaFX starts, and the dialog runs its final backing-store flush in a background task.
   Preference imports preserve the local bundle's name list.
   See [ADR 0084](../decisions/0084-bundle-custom-api-keys.md).

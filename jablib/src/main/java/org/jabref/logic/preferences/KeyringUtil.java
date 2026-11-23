@@ -73,11 +73,31 @@ final class KeyringUtil {
     }
 
     Map<String, String> readFetcherKeyBundle() {
-        return read(KeyringSlot.CUSTOM_API_KEYS).map(this::parseFetcherKeys).orElseGet(Map::of);
+        return read(KeyringSlot.CUSTOM_API_KEYS).flatMap(this::parseFetcherKeys).orElseGet(Map::of);
     }
 
     void writeFetcherKeyBundle(Map<String, String> keys) throws PasswordAccessException {
         write(KeyringSlot.CUSTOM_API_KEYS, keys.isEmpty() ? "" : JSONObject.toJSONString(keys));
+    }
+
+    void replaceFetcherKeyBundle(Map<String, String> expected, Map<String, String> keys) throws PasswordAccessException {
+        KeyringSlot slot = KeyringSlot.CUSTOM_API_KEYS;
+        try (Keyring keyring = Keyring.create()) {
+            Optional<Map<String, String>> current = Optional.ofNullable(keyring.getPassword(slot.service(), slot.account()))
+                                                            .flatMap(this::parseFetcherKeys);
+            if (current.isEmpty() || !current.orElseThrow().equals(expected)) {
+                throw new PasswordAccessException("Saved custom API keys changed since they were loaded");
+            }
+            if (keys.isEmpty()) {
+                deleteIfPresent(keyring, slot.service(), slot.account());
+            } else {
+                keyring.setPassword(slot.service(), slot.account(), JSONObject.toJSONString(keys));
+            }
+        } catch (PasswordAccessException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new PasswordAccessException("Could not update the custom API key bundle", ex);
+        }
     }
 
     static String readCiteDriveToken() throws Exception {
@@ -94,7 +114,7 @@ final class KeyringUtil {
 
     static void clearCiteDriveToken() throws Exception {
         try (Keyring keyring = Keyring.create()) {
-            keyring.deletePassword(CITE_DRIVE_SERVICE, CITE_DRIVE_ACCOUNT);
+            deleteIfPresent(keyring, CITE_DRIVE_SERVICE, CITE_DRIVE_ACCOUNT);
         }
     }
 
@@ -181,7 +201,7 @@ final class KeyringUtil {
                     if (StringUtil.isNotBlank(entry.getValue())) {
                         keyring.setPassword(slot.service(), slot.account(), entry.getValue());
                     } else {
-                        keyring.deletePassword(slot.service(), slot.account());
+                        deleteIfPresent(keyring, slot.service(), slot.account());
                     }
                 } else if (StringUtil.isNotBlank(entry.getValue())) {
                     keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
@@ -213,7 +233,11 @@ final class KeyringUtil {
             try {
                 String json = keyring.getPassword(KeyringSlot.CUSTOM_API_KEYS.service(), KeyringSlot.CUSTOM_API_KEYS.account());
                 if (StringUtil.isNotBlank(json)) {
-                    return new FetcherKeyRead(parseFetcherKeys(json), List.of(), false);
+                    Optional<Map<String, String>> bundle = parseFetcherKeys(json);
+                    if (bundle.isPresent()) {
+                        return new FetcherKeyRead(bundle.orElseThrow(), List.of(), false);
+                    }
+                    complete = false;
                 }
             } catch (PasswordAccessException ex) {
                 complete = isKeyringEntryMissing(keyring, KeyringSlot.CUSTOM_API_KEYS.service(), KeyringSlot.CUSTOM_API_KEYS.account(), ex);
@@ -290,6 +314,26 @@ final class KeyringUtil {
         }
     }
 
+    private static void deleteIfPresent(Keyring keyring, String service, String account) throws PasswordAccessException {
+        try {
+            keyring.deletePassword(service, account);
+        } catch (PasswordAccessException deletionFailure) {
+            if (isKeyringEntryMissing(keyring, service, account, deletionFailure)) {
+                return;
+            }
+            // Some backends wrap the missing-entry message when deletion fails.
+            try {
+                keyring.getPassword(service, account);
+            } catch (PasswordAccessException readFailure) {
+                if (isKeyringEntryMissing(keyring, service, account, readFailure)) {
+                    return;
+                }
+                deletionFailure.addSuppressed(readFailure);
+            }
+            throw deletionFailure;
+        }
+    }
+
     private static boolean isKeyringEntryMissing(Keyring keyring, String service, String account, PasswordAccessException failure) {
         KeyringStorageType backend = keyring.getKeyringStorageType();
         // java-keyring 1.0.4 exposes missing entries through these backend-specific messages.
@@ -306,21 +350,21 @@ final class KeyringUtil {
         };
     }
 
-    private Map<String, String> parseFetcherKeys(String json) {
+    private Optional<Map<String, String>> parseFetcherKeys(String json) {
         try {
             Object parsed = new JSONParser(JSONParser.MODE_RFC4627).parse(json);
             if (parsed instanceof Map<?, ?> values && values.entrySet().stream()
                                                             .allMatch(entry -> entry.getKey() instanceof String && entry.getValue() instanceof String)) {
                 Map<String, String> keys = new HashMap<>();
                 values.forEach((name, secret) -> keys.put((String) name, (String) secret));
-                return keys;
+                return Optional.of(keys);
             }
             LOGGER.warn("Invalid custom API key bundle");
         } catch (net.minidev.json.parser.ParseException _) {
             // Parser exceptions can contain secrets from the input.
             LOGGER.warn("Could not parse custom API key bundle");
         }
-        return Map.of();
+        return Optional.empty();
     }
 
     void clearIndividualFetcherKeys(List<String> names) throws PasswordAccessException {
