@@ -147,7 +147,7 @@ Further rules:
   If a credential update fails, the dialog saves ordinary preferences and stays open so the credential update can be retried.
   The launcher loads credential preferences before JavaFX starts, and the dialog runs its final backing-store flush in a background task.
   Preference imports preserve the local bundle's name list.
-  See [ADR 0084](../decisions/0084-bundle-custom-api-keys.md).
+  See [ADR 0085](../decisions/0085-bundle-custom-api-keys.md).
 
 ## Adding a new preference
 
