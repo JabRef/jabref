@@ -61,7 +61,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
 - We now show which web search fetchers have a saved API key. [#16250](https://github.com/JabRef/jabref/issues/16250)
 - We improved the error message shown when Semantic Scholar restricts access to a paper's references. [#17291](https://github.com/JabRef/jabref/issues/17291)
-- We simplified secure credential storage and reduced macOS approval prompts for saved API keys. [#13687](https://github.com/JabRef/jabref/issues/13687)
+- We removed the extra encryption of passwords and API keys in the system keyring; existing values are migrated automatically. [#13687](https://github.com/JabRef/jabref/issues/13687)
 - We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 - We changed the HTTP server to list linked PDF files per entry at `GET /libraries/{id}/entries/{citationKey}/files` instead of `entries/pdffiles`. [#17567](https://github.com/JabRef/jabref/pull/17567)
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
@@ -84,6 +84,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed LibreOffice/OpenOffice bibliography refresh to remove outdated references and extra blank paragraphs only for the selected JabRef/Zotero citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice citation refresh to order citations by document text when citation positions on screen are unavailable. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We simplified secure credential storage and reduced macOS approval prompts for saved API keys. [#13687](https://github.com/JabRef/jabref/issues/13687)
 
 ### Fixed
 
