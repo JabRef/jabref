@@ -31,6 +31,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +103,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
     }
 
     @Override
-    public CompletableFuture<Hover> hover(HoverParams params) {
+    public CompletableFuture<@Nullable Hover> hover(HoverParams params) {
         String fileUri = params.getTextDocument().getUri();
         if (!fileUriToLanguageId.containsKey(fileUri)) {
             return CompletableFuture.completedFuture(null);
