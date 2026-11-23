@@ -11,8 +11,6 @@ import org.jabref.model.openoffice.util.OOListUtil;
 /// A CitationGroup describes a group of citations.
 public class CitationGroup {
 
-    public final OODataModel dataModel;
-
     /*
      * Identifies this citation group.
      */
@@ -52,12 +50,11 @@ public class CitationGroup {
      */
     private Optional<OOText> citationMarker;
 
-    public CitationGroup(OODataModel dataModel,
-                         CitationGroupId groupId,
+    public CitationGroup(CitationGroupId groupId,
                          CitationType citationType,
                          List<Citation> citationsInStorageOrder,
                          Optional<String> referenceMarkNameForLinking) {
-        this.dataModel = dataModel;
+
         this.groupId = groupId;
         this.citationType = citationType;
         this.citationsInStorageOrder = List.copyOf(citationsInStorageOrder);
@@ -77,22 +74,8 @@ public class CitationGroup {
 
     /// Sort citations for presentation within a CitationGroup.
     void imposeLocalOrder(Comparator<BibEntry> entryComparator) {
-        // For JabRef52 the single pageInfo is always in the last-in-localorder citation.
-        // We adjust here accordingly by taking it out and adding it back after sorting.
-        final int last = this.numberOfCitations() - 1;
-        Optional<OOText> lastPageInfo = Optional.empty();
-        if (dataModel == OODataModel.JabRef52) {
-            Citation lastCitation = getCitationsInLocalOrder().get(last);
-            lastPageInfo = lastCitation.getPageInfo();
-            lastCitation.setPageInfo(Optional.empty());
-        }
-
         this.localOrder = OOListUtil.order(citationsInStorageOrder,
                 new CompareCitation(entryComparator, true));
-
-        if (dataModel == OODataModel.JabRef52) {
-            getCitationsInLocalOrder().get(last).setPageInfo(lastPageInfo);
-        }
     }
 
     public List<Integer> getLocalOrder() {

@@ -2,16 +2,10 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.logic.util.StandardFileType;
 
@@ -19,10 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Utility class for handling Citation Style Language (CSL) files.
-/// Contains shared functionality used by both runtime [CSLStyleLoader] and build-time components in `build-support/src/main/java/CitationStyleCatalogGenerator.java`.
+/// Loads runtime styles for [CSLStyleLoader]. Metadata parsing is shared with the standalone catalog generator through [CSLStyleMetadata].
 public final class CSLStyleUtils {
     private static final String STYLES_ROOT = "/csl-styles";
-    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
@@ -35,10 +28,6 @@ public final class CSLStyleUtils {
                             boolean hasBibliography,
                             boolean hasBibliographySortOrder,
                             boolean usesHangingIndent) {
-    }
-
-    static {
-        XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
     }
 
     private CSLStyleUtils() {
@@ -123,94 +112,8 @@ public final class CSLStyleUtils {
     /// @param content  The XML content of the style
     /// @return Optional containing the StyleInfo if valid, empty otherwise
     public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
-        try {
-            XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(Reader.of(content));
-
-            boolean inInfo = false;
-            boolean hasBibliography = false;
-            boolean hasBibliographySortOrder = false;
-            boolean hasCitation = false;
-            boolean usesHangingIndent = false;
-            boolean inBibliography = false;
-            String styleId = "";
-            String styleClass = "";
-            String title = "";
-            boolean isNumericStyle = false;
-            String shortTitle = "";
-
-            while (reader.hasNext()) {
-                int event = reader.next();
-
-                if (event == XMLStreamConstants.START_ELEMENT) {
-                    String elementName = reader.getLocalName();
-
-                    switch (elementName) {
-                        case "style" -> {
-                            styleClass = Optional.ofNullable(reader.getAttributeValue(null, "class")).orElse("");
-                        }
-                        case "bibliography" -> {
-                            hasBibliography = true;
-                            inBibliography = true;
-                            String hangingIndent = reader.getAttributeValue(null, "hanging-indent");
-                            usesHangingIndent = "true".equals(hangingIndent);
-                        }
-                        case "sort" -> {
-                            if (inBibliography) {
-                                hasBibliographySortOrder = true;
-                            }
-                        }
-                        case "citation" ->
-                                hasCitation = true;
-                        case "info" ->
-                                inInfo = true;
-                        case "id" -> {
-                            if (inInfo) {
-                                styleId = reader.getElementText();
-                            }
-                        }
-                        case "title" -> {
-                            if (inInfo) {
-                                title = reader.getElementText();
-                            }
-                        }
-                        case "title-short" -> {
-                            if (inInfo) {
-                                shortTitle = reader.getElementText();
-                            }
-                        }
-                        case "category" -> {
-                            String citationFormat = reader.getAttributeValue(null, "citation-format");
-                            if (citationFormat != null) {
-                                isNumericStyle = "numeric".equals(citationFormat);
-                            }
-                        }
-                    }
-                } else if (event == XMLStreamConstants.END_ELEMENT) {
-                    if ("info".equals(reader.getLocalName())) {
-                        inInfo = false;
-                    } else if ("bibliography".equals(reader.getLocalName())) {
-                        inBibliography = false;
-                    }
-                }
-            }
-
-            if (hasCitation && title != null) {
-                return Optional.of(new StyleInfo(
-                        styleId,
-                        styleClass,
-                        title,
-                        shortTitle,
-                        isNumericStyle,
-                        hasBibliography,
-                        hasBibliographySortOrder,
-                        usesHangingIndent));
-            } else {
-                LOGGER.debug("No valid title or citation found for file {}", filename);
-                return Optional.empty();
-            }
-        } catch (XMLStreamException e) {
-            LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage(), e);
-            return Optional.empty();
-        }
+        return CSLStyleMetadata.parseStyleInfo(filename, content)
+                               .map(info -> new StyleInfo(info.styleId(), info.styleClass(), info.title(), info.shortTitle(),
+                                       info.isNumericStyle(), info.hasBibliography(), info.hasBibliographySortOrder(), info.usesHangingIndent()));
     }
 }
