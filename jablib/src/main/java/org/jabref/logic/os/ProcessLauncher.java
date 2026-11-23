@@ -1,7 +1,7 @@
 package org.jabref.logic.os;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -17,7 +17,7 @@ public class ProcessLauncher {
 
     /// The same device [ProcessBuilder.Redirect#DISCARD] writes to; Java offers no such constant for input
     @VisibleForTesting
-    static final File NULL_DEVICE = new File(OS.WINDOWS ? "NUL" : "/dev/null");
+    static final Path NULL_DEVICE = Path.of(OS.WINDOWS ? "NUL" : "/dev/null");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessLauncher.class);
 
@@ -35,7 +35,7 @@ public class ProcessLauncher {
         // The arguments are not logged: they may carry mail contents or login URLs.
         List<String> command = processBuilder.command();
         LOGGER.debug("Starting {} with {} argument(s)", command.isEmpty() ? "" : command.getFirst(), Math.max(0, command.size() - 1));
-        processBuilder.redirectInput(ProcessBuilder.Redirect.from(NULL_DEVICE));
+        processBuilder.redirectInput(ProcessBuilder.Redirect.from(NULL_DEVICE.toFile()));
         processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
         processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
         processBuilder.start();
