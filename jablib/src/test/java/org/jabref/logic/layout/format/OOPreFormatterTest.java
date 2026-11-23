@@ -1,10 +1,12 @@
-package org.jabref.logic.openoffice.jstyle;
+package org.jabref.logic.layout.format;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class OOPreFormatterTest {
 
     @ParameterizedTest

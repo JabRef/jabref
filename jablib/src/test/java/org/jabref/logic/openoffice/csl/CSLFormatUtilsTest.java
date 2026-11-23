@@ -23,6 +23,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.jabref.logic.openoffice.csl.CSLFormatUtils.generateAlphanumericCitation;
@@ -44,6 +45,18 @@ class CSLFormatUtilsTest {
                          .filter(style -> title.equals(style.getTitle()))
                          .findAny()
                          .orElseThrow(() -> new NoSuchElementException("Missing citation style: " + title));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "false, Text body",
+            "true, Hanging indent"
+    })
+    void cslDefaultBodyFormatPreservesHangingIndentPolicy(boolean usesHangingIndent, String expected) {
+        CitationStyle style = new CitationStyle("test.csl", "test", "in-text", "Test", "Test",
+                false, true, false, usesHangingIndent, "", false);
+
+        assertEquals(expected, CSLFormatUtils.getDefaultBodyFormatForStyle(style));
     }
 
     /// Test to check the transformation of raw, unsupported HTML into OO-ready HTML.

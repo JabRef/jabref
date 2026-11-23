@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Manages the list of available BST styles, mirroring [JStyleLoader].
+/// Manages the list of available BST styles, mirroring [org.jabref.logic.openoffice.jstyle.JStyleLoader].
 ///
 /// Internal styles (IEEEtran, abbrv, APA) are bundled with JabRef and always available.
 /// External styles are user-supplied `.bst` files stored in preferences.

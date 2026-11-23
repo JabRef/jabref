@@ -214,7 +214,7 @@ final class JStyleCitationFormatter {
                                                                        @NonNull BibDatabase database,
                                                                        @NonNull OrFields fields) {
         for (Field field : fields.getFields() /* FieldFactory.parseOrFields(fields)*/) {
-            // NOT LaTeX free, because there is some latextohtml in org.jabref.logic.openoffice.jstyle.OOPreFormatter
+            // NOT LaTeX free, because there is some latextohtml in org.jabref.logic.layout.format.OOPreFormatter
             Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
             final boolean foundSomething = !StringUtil.isBlank(optionalContent);
             if (foundSomething) {
