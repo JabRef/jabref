@@ -47,6 +47,32 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Backup must batch field edits into scheduled writes
+`req~jabgui.autosaveandbackup.backup-every-edit~1`
+
+Typing into a newly added or existing field must mark the library for backup, including single-character changes.
+Keystrokes must only mark a backup as pending; they must not trigger serialization or disk writes.
+The backup timer must batch pending edits into at most one backup write per interval (currently 19 seconds).
+The next scheduled backup must contain the latest field value so recovery can detect and restore unsaved edits after a crash.
+
+Needs: impl, utest
+
+## Backup completion must preserve pending edits made after its snapshot
+`req~jabgui.autosaveandbackup.preserve-pending-edits~1`
+
+A field edit received after a backup captures its snapshot must remain pending for the next scheduled backup, even if the older snapshot is written successfully.
+A failed backup must leave its edits pending for another attempt.
+
+Needs: impl, utest
+
+## Backup writers for a library must execute one at a time
+`req~jabgui.autosaveandbackup.serialized-writes~1`
+
+Scheduled backups and backups requested during shutdown must serialize generation capture, snapshot creation, file commit, and completion acknowledgement.
+A shutdown backup must wait for an in-flight backup before capturing the latest edits, so an older snapshot cannot replace the final backup.
+
+Needs: impl, utest
+
 ## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
@@ -85,6 +111,27 @@ Needs: impl, utest
 `req~save.cleanup.latex-to-unicode-aware-latex.keep-escaped-characters~1`
 
 Escaped LaTeX special characters (`\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `\\`) stay escaped, because the unescaped character has a different meaning in LaTeX.
+
+Needs: impl, utest
+
+### JabRef must preserve extended name parts on save
+`req~save.names.preserve-extended-parts~1`
+
+BibLaTeX extended name attributes include keys such as `family=`, `given=`, `prefix=`, and `useprefix=`.
+
+Needs: impl, utest
+
+### Name normalization must preserve BibLaTeX extended name data
+`req~save.names.normalize-extended-parts~1`
+
+Normalization preserves name attributes, name-list options, and quotes protecting individual name parts. If an extended name has malformed syntax or repeats an attribute, normalization preserves the field as entered.
+
+Needs: impl, utest
+
+### Citation key generation must normalize extended names to readable name parts
+`req~save.citation-keys.normalize-extended-names~1`
+
+The `normalize_names` modifier in a citation key pattern uses the names without their BibLaTeX attribute labels. Saving and reopening the entry preserves the generated key and the original name field.
 
 Needs: impl, utest
 
