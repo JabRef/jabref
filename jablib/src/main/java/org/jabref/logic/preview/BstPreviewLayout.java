@@ -14,9 +14,9 @@ import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
-import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,9 +39,6 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem[{].*[}]");
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
-
-    private static final String SMALL_CAPS_OPEN = "<span style=\"font-variant: small-caps\">";
-    private static final String SPAN_CLOSE = "</span>";
 
     /// Matches a single LaTeX math command wrapped in the `{{$...$}}` form written by some
     /// exporters, e.g. `{{$\Sigma$}}`. Group 1 is the command without its leading backslash
@@ -146,144 +143,19 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
         // Remove some IEEEtran.bst output (resulting from a multiline \\providecommand)
         result = result.replace("#2}}", "");
-        result = convertInlineFormattingToHtml(result);
+        // HTMLChars would turn line breaks into <br>
+        result = new RemoveNewlinesFormatter().format(result);
+        // Before LatexToUnicodeFormatter, which would turn italic and bold into Unicode mathematical letters
+        // (not searchable, read out letter by letter by screen readers)
+        result = new HTMLChars().format(result);
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
         result = result.replace("``", "\"");
         result = result.replace("''", "\"");
         // Final cleanup
-        result = new RemoveNewlinesFormatter().format(result);
         result = new RemoveLatexCommandsFormatter().format(result);
-        result = new RemoveTilde().format(result);
         result = MULTIPLE_SPACES_PATTERN.matcher(result.trim()).replaceAll(" ");
         return result;
-    }
-
-    /// Has to run before `LatexToUnicodeFormatter`, which would turn italic and bold into Unicode mathematical letters
-    /// (not searchable, read out letter by letter by screen readers) and reduce small caps to plain text.
-    /// Both the command form (`\\emph{X}`, used by IEEEtran) and the switch form (`{\\em X}`, used by abbrv) are converted.
-    private static String convertInlineFormattingToHtml(String latex) {
-        String html = replaceCommandWithBalancedArgument(latex, "textsc", SMALL_CAPS_OPEN, SPAN_CLOSE);
-        html = replaceLegacySwitchWithBalancedArgument(html, "sc", SMALL_CAPS_OPEN, SPAN_CLOSE);
-        html = replaceCommandWithBalancedArgument(html, "emph", "<i>", "</i>");
-        html = replaceCommandWithBalancedArgument(html, "textit", "<i>", "</i>");
-        html = replaceLegacySwitchWithBalancedArgument(html, "em", "<i>", "</i>");
-        html = replaceLegacySwitchWithBalancedArgument(html, "it", "<i>", "</i>");
-        html = replaceCommandWithBalancedArgument(html, "textbf", "<b>", "</b>");
-        return replaceLegacySwitchWithBalancedArgument(html, "bf", "<b>", "</b>");
-    }
-
-    private static String replaceCommandWithBalancedArgument(String input, String command, String openTag, String closeTag) {
-        String commandPrefix = "\\" + command;
-        StringBuilder output = new StringBuilder(input.length());
-        int index = 0;
-        while (index < input.length()) {
-            if (!input.startsWith(commandPrefix, index) || isEscaped(input, index)) {
-                output.append(input.charAt(index));
-                index++;
-                continue;
-            }
-
-            int commandEnd = index + commandPrefix.length();
-            if ((commandEnd < input.length()) && Character.isLetter(input.charAt(commandEnd))) {
-                output.append(input.charAt(index));
-                index++;
-                continue;
-            }
-
-            int openingBrace = skipWhitespace(input, commandEnd);
-            if ((openingBrace >= input.length()) || (input.charAt(openingBrace) != '{')) {
-                output.append(input.charAt(index));
-                index++;
-                continue;
-            }
-
-            int contentStart = openingBrace + 1;
-            int groupEnd = findBalancedGroupEnd(input, contentStart);
-            if (groupEnd < 0) {
-                output.append(input, index, input.length());
-                break;
-            }
-
-            output.append(openTag)
-                  .append(input, contentStart, groupEnd)
-                  .append(closeTag);
-            index = groupEnd + 1;
-        }
-        return output.toString();
-    }
-
-    private static String replaceLegacySwitchWithBalancedArgument(String input, String command, String openTag, String closeTag) {
-        String legacyCommandPrefix = "{\\" + command;
-        StringBuilder output = new StringBuilder(input.length());
-        int index = 0;
-        while (index < input.length()) {
-            if (!input.startsWith(legacyCommandPrefix, index)) {
-                output.append(input.charAt(index));
-                index++;
-                continue;
-            }
-
-            int commandEnd = index + legacyCommandPrefix.length();
-            if ((commandEnd < input.length()) && Character.isLetter(input.charAt(commandEnd))) {
-                output.append(input.charAt(index));
-                index++;
-                continue;
-            }
-            if ((commandEnd >= input.length()) || (!Character.isWhitespace(input.charAt(commandEnd)) && (input.charAt(commandEnd) != '}'))) {
-                output.append(input.charAt(index));
-                index++;
-                continue;
-            }
-
-            int contentStart = skipWhitespace(input, commandEnd);
-            int groupEnd = findBalancedGroupEnd(input, contentStart);
-            if (groupEnd < 0) {
-                output.append(input, index, input.length());
-                break;
-            }
-
-            output.append(openTag)
-                  .append(input, contentStart, groupEnd)
-                  .append(closeTag);
-            index = groupEnd + 1;
-        }
-        return output.toString();
-    }
-
-    private static int skipWhitespace(String input, int startIndex) {
-        int index = startIndex;
-        while ((index < input.length()) && Character.isWhitespace(input.charAt(index))) {
-            index++;
-        }
-        return index;
-    }
-
-    private static int findBalancedGroupEnd(String input, int contentStart) {
-        int depth = 0;
-        for (int index = contentStart; index < input.length(); index++) {
-            char currentCharacter = input.charAt(index);
-            if (isEscaped(input, index)) {
-                continue;
-            }
-            if (currentCharacter == '{') {
-                depth++;
-            } else if (currentCharacter == '}') {
-                if (depth == 0) {
-                    return index;
-                }
-                depth--;
-            }
-        }
-        return -1;
-    }
-
-    private static boolean isEscaped(String input, int index) {
-        int backslashCount = 0;
-        for (int pos = index - 1; pos >= 0 && input.charAt(pos) == '\\'; pos--) {
-            backslashCount++;
-        }
-        return (backslashCount % 2) == 1;
     }
 
     /// Replaces `{{$\Cmd$}}` math expressions in all fields of the given entry by the corresponding

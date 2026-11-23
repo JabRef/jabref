@@ -2,6 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
@@ -20,6 +21,9 @@ public class HTMLChars implements ParamLayoutFormatter {
     /// - `&Hey` **Matched**
     private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-zA-Z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
 
+    // Declarations that apply to the rest of the enclosing group instead of taking an argument
+    private static final Set<String> SWITCHES = Set.of("em", "it", "bf", "sc", "scshape");
+
     private boolean keepCurlyBraces = false;
 
     @Override
@@ -31,7 +35,10 @@ public class HTMLChars implements ParamLayoutFormatter {
 
     @Override
     public String format(String inField) {
-        String field = normalizedField(inField);
+        return convert(normalizedField(inField)).replace("~", "&nbsp;"); // Replace any remaining ~ with &nbsp; (non-breaking spaces)
+    }
+
+    private String convert(String field) {
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -50,7 +57,8 @@ public class HTMLChars implements ParamLayoutFormatter {
                     /* Close Command */
                     String command = currentCommand.toString();
                     String result = HTML_CHARS.get(command);
-                    sb.append(Objects.requireNonNullElse(result, command));
+                    // A formatting command without argument formats nothing
+                    sb.append(Objects.requireNonNullElse(result, getHTMLTag(command).isEmpty() ? command : ""));
                 }
                 escaped = true;
                 incommand = true;
@@ -112,13 +120,20 @@ public class HTMLChars implements ParamLayoutFormatter {
                     // command.
                     // If so, handle.
                     String tag = getHTMLTag(command);
+                    // `\textsc {X}` is `\textsc{X}`; switches such as `{\em X}` instead apply to the rest of the group
+                    int nextNonWhitespace = skipWhitespace(field, i);
+                    if (!tag.isEmpty() && Character.isWhitespace(c) && !SWITCHES.contains(command)
+                            && (nextNonWhitespace < field.length()) && (field.charAt(nextNonWhitespace) == '{')) {
+                        i = nextNonWhitespace;
+                        c = '{';
+                    }
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(field, i, true);
                         if (this.keepCurlyBraces && (c == '{' || (c == '}'))) {
                             i++;
                         }
                         i += part.length();
-                        sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
+                        sb.append('<').append(tag).append('>').append(convert(part)).append("</").append(tag.split(" ")[0]).append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
                         i += this.keepCurlyBraces ? argument.length() + 1 : argument.length();
@@ -172,7 +187,7 @@ public class HTMLChars implements ParamLayoutFormatter {
             }
         }
 
-        return sb.toString().replace("~", "&nbsp;"); // Replace any remaining ~ with &nbsp; (non-breaking spaces)
+        return sb.toString();
     }
 
     private String normalizedField(String inField) {
@@ -185,6 +200,14 @@ public class HTMLChars implements ParamLayoutFormatter {
                                   .replaceAll("\\$([^$]*)\\$", this.keepCurlyBraces ? "\\\\{$1\\\\}" : "$1}");
     }
 
+    private static int skipWhitespace(String field, int index) {
+        while ((index < field.length()) && Character.isWhitespace(field.charAt(index))) {
+            index++;
+        }
+        return index;
+    }
+
+    /// Returns the opening tag without angle brackets; its first word is the element name
     private String getHTMLTag(String latexCommand) {
         String result = "";
         switch (latexCommand) {
@@ -202,6 +225,12 @@ public class HTMLChars implements ParamLayoutFormatter {
             case "textbf":
             case "bf":
                 result = "b";
+                break;
+            // Small caps
+            case "textsc":
+            case "sc":
+            case "scshape":
+                result = "span style=\"font-variant: small-caps\"";
                 break;
             // Underline
             case "underline":

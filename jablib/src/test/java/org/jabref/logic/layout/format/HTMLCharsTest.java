@@ -72,7 +72,17 @@ class HTMLCharsTest {
 
                 Arguments.of("<u>hallo</u>", "\\underline{hallo}"),
                 Arguments.of("<s>hallo</s>", "\\sout{hallo}"),
-                Arguments.of("<tt>hallo</tt>", "\\texttt{hallo}")
+                Arguments.of("<tt>hallo</tt>", "\\texttt{hallo}"),
+
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "\\textsc{hallo}"),
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "{\\sc hallo}"),
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "{\\scshape hallo}"),
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "\\textsc {hallo}"),
+
+                Arguments.of("<em>L&oacute;pez</em>", "\\emph{L{\\'o}pez}"),
+                Arguments.of("<em>The TeX Book</em>", "{\\em The {\\TeX} Book}"),
+                Arguments.of("<b>a <i>b</i> c</b>", "\\textbf{a \\textit{b} c}"),
+                Arguments.of("hallo", "\\textsc\\hallo")
         );
     }
 
