@@ -149,6 +149,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Backup found" dialog appeared while another library's tab was selected. [#16919](https://github.com/JabRef/jabref/pull/16919)
 - We fixed custom terminal and file browser commands failing when library directories contain spaces. [#12531](https://github.com/JabRef/jabref/issues/12531)
 - We fixed line navigation and deletion shortcuts in multiline entry fields and the source editor. [#17256](https://github.com/JabRef/jabref/issues/17256)
+- We fixed the rule-based citation parser mistaking words for authors and the volume for pages in author-year references. [#12893](https://github.com/JabRef/jabref/issues/12893)
 - We fixed an issue where the "Get fulltext" button showed no progress during "Search full text documents online". [#17224](https://github.com/JabRef/jabref/pull/17224)
 - We fixed an issue where searching with a full DOI link returned no results. [#17348](https://github.com/JabRef/jabref/issues/17348)
 - We fixed an issue where the side panels were not reachable in small windows. [#17470](https://github.com/JabRef/jabref/issues/17470)
