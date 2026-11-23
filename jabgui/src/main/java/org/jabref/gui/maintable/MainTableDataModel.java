@@ -103,7 +103,7 @@ public class MainTableDataModel {
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
-        entriesFiltered = new FilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
+        entriesFiltered = new FilteredList<>(new RowValueUpdatesList(entriesViewModel), BibEntryTableViewModel::isVisible);
 
         searchQuerySubscription = EasyBind.listen(searchQueryProperty, (_, _, newValue) -> updateSearchMatches(newValue));
         searchDisplayModeSubscription = EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> updateSearchDisplayMode(newValue));

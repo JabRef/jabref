@@ -100,7 +100,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final LibraryTab libraryTab;
     private final StateManager stateManager;
-    private final AtomicReference<BibEntry> entryEditedSinceLastSort = new AtomicReference<>();
+    private final AtomicReference<BibEntry> editedEntryToReveal = new AtomicReference<>();
     private final Subscription editorShowingSubscription;
     private final BibDatabaseContext database;
     private final GuiPreferences preferences;
@@ -246,15 +246,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         model.searchResultsVersionProperty().addListener(_ -> showSearchMatchesIfNoneVisible());
 
         // Editing is finished when the user goes back to the table or closes the entry editor.
-        // The click that moves the focus may also change the selection, so sort only after it is handled.
+        // The click that moves the focus may also change the selection, so reveal the entry only after it is handled.
         focusedProperty().addListener((_, _, focused) -> {
             if (focused) {
-                Platform.runLater(this::sortAndRevealEditedEntry);
+                Platform.runLater(this::revealEditedEntry);
             }
         });
         editorShowingSubscription = EasyBind.subscribe(stateManager.getEditorShowing(), showing -> {
             if (!showing) {
-                sortAndRevealEditedEntry();
+                revealEditedEntry();
             }
         });
 
@@ -410,18 +410,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        // Sorting a large library on every keystroke is too slow, so only remember the entry and sort once the editing is finished
-        entryEditedSinceLastSort.set(event.getBibEntry());
+        // Scrolling on every keystroke would move the view while typing, so only remember the entry and reveal it once the editing is finished
+        editedEntryToReveal.set(event.getBibEntry());
     }
 
-    private void sortAndRevealEditedEntry() {
-        BibEntry editedEntry = entryEditedSinceLastSort.getAndSet(null);
+    private void revealEditedEntry() {
+        BibEntry editedEntry = editedEntryToReveal.getAndSet(null);
         if (editedEntry == null) {
             return;
         }
-        // The sorted list re-sorts as soon as the field changes, before the cached cell values of the entry are updated.
-        // It then sorts with the old value. Sorting again here uses the current value.
-        sort();
         BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
         if (selectedEntry == null || selectedEntry.getEntry() != editedEntry) {
             return;

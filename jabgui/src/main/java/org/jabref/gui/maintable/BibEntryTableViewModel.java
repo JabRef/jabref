@@ -14,8 +14,11 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -69,6 +72,9 @@ public class BibEntryTableViewModel {
     private boolean isMatchedByGroup = true;
     private boolean isVisibleByGroup = true;
     private final ObjectProperty<MatchCategory> matchCategory = new SimpleObjectProperty<>(MatchCategory.MATCHING_SEARCH_AND_GROUPS);
+    // Changes whenever a cached value of this row was invalidated, so that lists can report the row as updated
+    // only after its values changed, not before
+    private final IntegerProperty valuesRevision = new SimpleIntegerProperty(this, "valuesRevision");
     private EasyBinding<List<LinkedFile>> linkedFiles;
     private EasyBinding<Map<Field, String>> linkedIdentifiers;
     private Binding<List<AbstractGroup>> matchedGroups;
@@ -160,15 +166,24 @@ public class BibEntryTableViewModel {
         return value;
     }
 
+    public ReadOnlyIntegerProperty valuesRevisionProperty() {
+        return valuesRevision;
+    }
+
+    private <T extends Observable> T reportChanges(T value) {
+        value.addListener(_ -> valuesRevision.set(valuesRevision.get() + 1));
+        return value;
+    }
+
     public ObservableValue<String> getFields(OrFields fields) {
         ObservableValue<String> value = getFieldValues().get(fields);
         if (value != null) {
             return value;
         }
 
-        value = Bindings.createStringBinding(() ->
+        value = reportChanges(Bindings.createStringBinding(() ->
                         fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
-                getFieldValueDependencies());
+                getFieldValueDependencies()));
         getFieldValues().put(fields, value);
         return value;
     }
@@ -178,8 +193,8 @@ public class BibEntryTableViewModel {
         if (nameValues == null) {
             nameValues = new HashMap<>();
         }
-        ObjectBinding<NameValue> binding = nameValues.computeIfAbsent(fields, key -> Bindings.createObjectBinding(
-                () -> createNameValue(key), getFieldValueDependencies()));
+        ObjectBinding<NameValue> binding = nameValues.computeIfAbsent(fields, key -> reportChanges(Bindings.createObjectBinding(
+                () -> createNameValue(key), getFieldValueDependencies())));
         // An inherited value or macro may have changed without invalidating the row.
         // Refresh the display and sort value together when the table requests the cell.
         if (binding.isValid()) {
