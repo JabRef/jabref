@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +29,7 @@ import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,7 +49,6 @@ class OpenAnnotationActionTest {
     private final StateManager stateManager = mock(StateManager.class);
     private final ProcessBuilder processBuilder = mock(ProcessBuilder.class);
     private final Process process = mock(Process.class);
-    private final OutputStream stdin = mock(OutputStream.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
@@ -62,7 +61,6 @@ class OpenAnnotationActionTest {
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(pdfType));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
-        when(process.getOutputStream()).thenReturn(stdin);
         when(processBuilder.start()).thenReturn(process);
     }
 
@@ -84,7 +82,7 @@ class OpenAnnotationActionTest {
     void readerIsStartedDetached() throws IOException {
         action().openAtAnnotation(PDF_FILE, annotationOnPage(PAGE), processBuilder);
 
-        verify(stdin).close();
+        verify(processBuilder).redirectInput(any(ProcessBuilder.Redirect.class));
     }
 
     @Test
