@@ -15,8 +15,10 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
 
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,5 +71,46 @@ public class HtmlExportFormatTest {
         exportFormat.export(databaseContext, path, entries);
         List<String> lines = Files.readAllLines(path);
         assertEquals("</html>", lines.getLast());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"tablerefs", "tablerefsabsbib"})
+    void htmlTableShowsPageRangesWithJournalOrProceedings(String format, @TempDir Path testFolder) throws IOException {
+        TemplateExporter tableExporter = new TemplateExporter(format,
+                format,
+                format,
+                format,
+                StandardFileType.HTML,
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                SaveOrder.getDefaultSaveOrder());
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("book")
+                .withField(StandardField.PAGES, "345-350");
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("article")
+                .withField(StandardField.JOURNAL, "Test Journal")
+                .withField(StandardField.PAGES, "345-350");
+        BibEntry conferencePaper = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("conference")
+                .withField(StandardField.BOOKTITLE, "Test Proceedings")
+                .withField(StandardField.PAGES, "345-350");
+        BibEntry bothVenues = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("both")
+                .withField(StandardField.JOURNAL, "Test Journal")
+                .withField(StandardField.BOOKTITLE, "Test Proceedings")
+                .withField(StandardField.PAGES, "345-350");
+        BibEntry noPages = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("noPages")
+                .withField(StandardField.JOURNAL, "Test Journal");
+        Path output = testFolder.resolve("table.html");
+
+        tableExporter.export(databaseContext, output, List.of(book, article, conferencePaper, bothVenues, noPages));
+
+        var html = Jsoup.parse(Files.readString(output));
+        assertEquals("", html.select("#book > td:nth-child(4)").text());
+        assertEquals("Test Journal, pp. 345-350", html.select("#article > td:nth-child(4)").text());
+        assertEquals("Test Proceedings, pp. 345-350", html.select("#conference > td:nth-child(4)").text());
+        assertEquals(1, html.select("#both > td:nth-child(4)").text().split("pp\\.", -1).length - 1);
+        assertEquals("Test Journal", html.select("#noPages > td:nth-child(4)").text());
     }
 }
