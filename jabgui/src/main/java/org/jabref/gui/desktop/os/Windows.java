@@ -6,9 +6,9 @@ import java.util.List;
 
 import javafx.application.HostServices;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.Directories;
 
 import org.jspecify.annotations.NullMarked;
@@ -33,12 +33,12 @@ public class Windows extends NativeDesktop {
 
     @Override
     protected void openFileWithDefaultApplication(String filePath) throws IOException {
-        startProcess(new ProcessBuilder(shellOpenCommand(filePath)));
+        ProcessLauncher.startDetached(new ProcessBuilder(shellOpenCommand(filePath)));
     }
 
     @Override
     protected void openUrlWithSystemHandler(String url) throws IOException {
-        startProcess(new ProcessBuilder(shellOpenCommand(url)));
+        ProcessLauncher.startDetached(new ProcessBuilder(shellOpenCommand(url)));
     }
 
     /// Hands a file path or URL to the registered handler of the shell. Paths of [#MAX_PATH] characters
@@ -66,12 +66,12 @@ public class Windows extends NativeDesktop {
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
         // filePath may be a URL; Path.of would throw on query characters and mangle the scheme
-        startProcess(new ProcessBuilder(Path.of(application).toString(), filePath));
+        ProcessLauncher.startDetached(new ProcessBuilder(Path.of(application).toString(), filePath));
     }
 
     @Override
     protected void openFolderAndSelectFileWithDefaultFileBrowser(Path filePath) throws IOException {
-        startProcess(new ProcessBuilder(revealCommand(filePath)));
+        ProcessLauncher.startDetached(new ProcessBuilder(revealCommand(filePath)));
     }
 
     /// Explorer cannot select a file it cannot address: at [#MAX_PATH] characters or more it ignores the
@@ -87,7 +87,7 @@ public class Windows extends NativeDesktop {
     }
 
     @Override
-    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        startProcess(new ProcessBuilder("cmd.exe", "/c", "start").directory(Path.of(absolutePath).toFile()));
+    protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
+        ProcessLauncher.startDetached(new ProcessBuilder("cmd.exe", "/c", "start").directory(directory.toFile()));
     }
 }
