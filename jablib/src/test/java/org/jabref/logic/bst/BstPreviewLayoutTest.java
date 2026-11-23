@@ -106,10 +106,29 @@ class BstPreviewLayoutTest {
                 Arguments.of("\\textsc{L{\\'o}pez", "O.\u00a0Kopp. López."),
                 Arguments.of("{\\sc L{\\'o}pez", "O.\u00a0Kopp. lópez."),
 
+                // Emphasis becomes HTML, not Unicode mathematical italic or bold letters
+                // abbrv lowercases titles, as BibTeX does inside {\\em ...}
+                Arguments.of("On {\\em Drosophila} genetics", "O.\u00a0Kopp. On <i>drosophila</i> genetics."),
+                Arguments.of("On \\emph{Drosophila} genetics", "O.\u00a0Kopp. On <i>Drosophila</i> genetics."),
+                Arguments.of("On \\textit{Drosophila} genetics", "O.\u00a0Kopp. On <i>Drosophila</i> genetics."),
+                Arguments.of("On \\textbf{Drosophila} genetics", "O.\u00a0Kopp. On <b>Drosophila</b> genetics."),
+
                 // Existing superscript and subscript rendering should remain unchanged
                 Arguments.of("Proceedings of the 9\\textsuperscript{th} symposium", "O.\u00a0Kopp. Proceedings of the 9ᵗʰ symposium."),
                 Arguments.of("{H\\textsubscript{2}O}", "O.\u00a0Kopp. H₂O.")
         );
+    }
+
+    @Test
+    void journalEmphasizedByBstIsRenderedItalic() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Karen A. Cooper")
+                .withField(StandardField.TITLE, "Cocoa and health: a decade of research")
+                .withField(StandardField.JOURNAL, "British Journal of Nutrition")
+                .withField(StandardField.YEAR, "2007");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("K.\u00a0A. Cooper. Cocoa and health: a decade of research. <i>British Journal of Nutrition</i>, 2007.", preview);
     }
 
     @Test
@@ -151,7 +170,7 @@ class BstPreviewLayoutTest {
 
         String preview = bstPreviewLayout.generatePreview(book, context);
 
-        assertEquals("D.\u00a0E. Knuth. 𝑇ℎ𝑒 𝐵𝑜𝑜𝑘. Number\u00a01 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
+        assertEquals("D.\u00a0E. Knuth. <i>The Book.</i> Number\u00a01 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
     }
 
     @Test
@@ -175,7 +194,7 @@ class BstPreviewLayoutTest {
 
         String preview = bstPreviewLayout.generatePreview(book, context);
 
-        assertEquals("D.\u00a0E. Knuth. 𝑇ℎ𝑒 𝐵𝑜𝑜𝑘. Number\u00a01 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
+        assertEquals("D.\u00a0E. Knuth. <i>The Book.</i> Number\u00a01 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
     }
 
     private static BibEntry getSliceTheoremPaper() {

@@ -40,14 +40,8 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
 
-    // LaTeX inline formatting → HTML. Italic and bold survive `LatexToUnicodeFormatter`, while
-    // `\textsc{...}` has to be converted earlier because it would otherwise be reduced to plain text.
-    private static final Pattern EMPH_PATTERN = Pattern.compile("\\\\emph\\{([^}]*?)}");
-    private static final Pattern TEXTIT_PATTERN = Pattern.compile("\\\\textit\\{([^}]*?)}");
-    private static final Pattern TEXTBF_PATTERN = Pattern.compile("\\\\textbf\\{([^}]*?)}");
-    private static final Pattern GROUP_EM_PATTERN = Pattern.compile("\\{\\\\em\\s+([^}]*?)}");
-    private static final Pattern GROUP_IT_PATTERN = Pattern.compile("\\{\\\\it\\s+([^}]*?)}");
-    private static final Pattern GROUP_BF_PATTERN = Pattern.compile("\\{\\\\bf\\s+([^}]*?)}");
+    private static final String SMALL_CAPS_OPEN = "<span style=\"font-variant: small-caps\">";
+    private static final String SPAN_CLOSE = "</span>";
 
     /// Matches a single LaTeX math command wrapped in the `{{$...$}}` form written by some
     /// exporters, e.g. `{{$\Sigma$}}`. Group 1 is the command without its leading backslash
@@ -152,19 +146,11 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
         // Remove some IEEEtran.bst output (resulting from a multiline \\providecommand)
         result = result.replace("#2}}", "");
-        result = convertInlineSmallCapsToHtml(result);
+        result = convertInlineFormattingToHtml(result);
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
         result = result.replace("``", "\"");
         result = result.replace("''", "\"");
-        // Convert LaTeX inline formatting to HTML before RemoveLatexCommandsFormatter strips them.
-        // \\emph{X} and {\\em X} forms (IEEEtran uses \\emph, abbrv uses {\\em})
-        result = EMPH_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = TEXTIT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = GROUP_EM_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = GROUP_IT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = TEXTBF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
-        result = GROUP_BF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
         // Final cleanup
         result = new RemoveNewlinesFormatter().format(result);
         result = new RemoveLatexCommandsFormatter().format(result);
@@ -173,12 +159,21 @@ public final class BstPreviewLayout implements PreviewLayout {
         return result;
     }
 
-    private static String convertInlineSmallCapsToHtml(String latex) {
-        String html = replaceCommandWithBalancedArgument(latex, "textsc");
-        return replaceLegacySwitchWithBalancedArgument(html, "sc");
+    /// Has to run before `LatexToUnicodeFormatter`, which would turn italic and bold into Unicode mathematical letters
+    /// (not searchable, read out letter by letter by screen readers) and reduce small caps to plain text.
+    /// Both the command form (`\\emph{X}`, used by IEEEtran) and the switch form (`{\\em X}`, used by abbrv) are converted.
+    private static String convertInlineFormattingToHtml(String latex) {
+        String html = replaceCommandWithBalancedArgument(latex, "textsc", SMALL_CAPS_OPEN, SPAN_CLOSE);
+        html = replaceLegacySwitchWithBalancedArgument(html, "sc", SMALL_CAPS_OPEN, SPAN_CLOSE);
+        html = replaceCommandWithBalancedArgument(html, "emph", "<i>", "</i>");
+        html = replaceCommandWithBalancedArgument(html, "textit", "<i>", "</i>");
+        html = replaceLegacySwitchWithBalancedArgument(html, "em", "<i>", "</i>");
+        html = replaceLegacySwitchWithBalancedArgument(html, "it", "<i>", "</i>");
+        html = replaceCommandWithBalancedArgument(html, "textbf", "<b>", "</b>");
+        return replaceLegacySwitchWithBalancedArgument(html, "bf", "<b>", "</b>");
     }
 
-    private static String replaceCommandWithBalancedArgument(String input, String command) {
+    private static String replaceCommandWithBalancedArgument(String input, String command, String openTag, String closeTag) {
         String commandPrefix = "\\" + command;
         StringBuilder output = new StringBuilder(input.length());
         int index = 0;
@@ -210,15 +205,15 @@ public final class BstPreviewLayout implements PreviewLayout {
                 break;
             }
 
-            output.append("<span style=\"font-variant: small-caps\">")
+            output.append(openTag)
                   .append(input, contentStart, groupEnd)
-                  .append("</span>");
+                  .append(closeTag);
             index = groupEnd + 1;
         }
         return output.toString();
     }
 
-    private static String replaceLegacySwitchWithBalancedArgument(String input, String command) {
+    private static String replaceLegacySwitchWithBalancedArgument(String input, String command, String openTag, String closeTag) {
         String legacyCommandPrefix = "{\\" + command;
         StringBuilder output = new StringBuilder(input.length());
         int index = 0;
@@ -248,9 +243,9 @@ public final class BstPreviewLayout implements PreviewLayout {
                 break;
             }
 
-            output.append("<span style=\"font-variant: small-caps\">")
+            output.append(openTag)
                   .append(input, contentStart, groupEnd)
-                  .append("</span>");
+                  .append(closeTag);
             index = groupEnd + 1;
         }
         return output.toString();
