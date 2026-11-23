@@ -31,7 +31,7 @@ dependencies {
     api(platform("com.konghq:unirest-java-bom:4.11.10"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.24.0"))
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.7.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:19.0.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
     api(platform("org.glassfish.hk2:hk2-bom:4.0.3"))
