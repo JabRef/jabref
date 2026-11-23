@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.integrity.PagesChecker;
@@ -546,6 +547,8 @@ public class BracketedPattern {
                     }
                 }
                 resultingLabel = abbreviateSB.toString();
+            } else if (NormalizeNamesFormatter.KEY.equals(modifier)) {
+                resultingLabel = AuthorList.parse(resultingLabel).getAsLastFirstNamesWithAnd(false);
             } else {
                 Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                 if (formatter.isPresent()) {

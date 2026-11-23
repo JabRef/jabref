@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,6 +22,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.RedoAction;
@@ -92,6 +96,7 @@ class LibraryTabRetentionTest {
         // captures - the very objects this test asserts are gone.
         when(preferences.getSearchPreferences().searchDisplayModeProperty()).thenReturn(new SimpleObjectProperty<>(SearchDisplayMode.FILTER));
         when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getWorkspacePreferences()).thenReturn(WorkspacePreferences.getDefault());
         when(preferences.getFilePreferences().fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(false));
         when(preferences.getMainTablePreferences().resizeColumnsToFitProperty()).thenReturn(new SimpleBooleanProperty(false));
 
@@ -282,5 +287,27 @@ class LibraryTabRetentionTest {
             contexts.forEach(checker::assertCollectable);
             contexts.clear();
         });
+    }
+
+    @Test
+    void closedTabWithRealWorkspacePreferencesIsReleased() throws BackingStoreException {
+        Preferences preferencesNode = Preferences.userRoot().node("/org/jabref-retention-test-" + UUID.randomUUID());
+        try {
+            JabRefGuiPreferences realPreferences = new JabRefGuiPreferences(preferencesNode);
+            when(preferences.getWorkspacePreferences()).thenReturn(realPreferences.getWorkspacePreferences());
+            setUpTabPane();
+
+            @Nullable LibraryTab[] tab = {openTab()};
+            closeTab(tab[0]);
+            releaseMocks();
+
+            JMemoryBuddy.memoryTest(checker -> {
+                checker.setAsReferenced(realPreferences);
+                checker.assertCollectable(tab[0]);
+                tab[0] = null;
+            });
+        } finally {
+            preferencesNode.removeNode();
+        }
     }
 }
