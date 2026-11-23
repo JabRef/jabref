@@ -3,8 +3,10 @@ package org.jabref.gui.preferences;
 import java.util.Locale;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -19,6 +21,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -41,6 +44,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
+    @Inject private TaskExecutor taskExecutor;
 
     private PreferencesDialogViewModel viewModel;
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
@@ -54,6 +58,17 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), _ -> savePreferencesAndCloseDialog());
+        getDialogPane().disableProperty().bind(viewModel.savingProperty());
+        Button save = (Button) getDialogPane().lookupButton(saveButton);
+        save.disableProperty().bind(viewModel.checkingKeyringProperty());
+        save.textProperty().bind(Bindings.when(viewModel.savingProperty())
+                                         .then(Localization.lang("Saving preferences..."))
+                                         .otherwise(save.getText()));
+        setOnCloseRequest(event -> {
+            if (viewModel.savingProperty().get()) {
+                event.consume();
+            }
+        });
 
         // Stop the default button from firing when the user hits enter within the search box
         searchBox.setOnKeyPressed(event -> {
@@ -69,7 +84,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, preferences);
+        viewModel = new PreferencesDialogViewModel(dialogService, preferences, taskExecutor);
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferencesTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
@@ -138,9 +153,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void savePreferencesAndCloseDialog() {
-        if (viewModel.storeAllSettings()) {
-            closeDialog();
-        }
+        viewModel.storeAllSettings(this::closeDialog);
     }
 
     @FXML
