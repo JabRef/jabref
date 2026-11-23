@@ -52,6 +52,8 @@ public class EditorTextField extends TextField implements Initializable, Context
         ClipBoardManager.addX11Support(this);
     }
 
+    /// Workaround for #14318: `TextFieldSkin` clips the text to the content area,
+    /// which cuts off the caret and the last character at the end of long text.
     @Override
     protected Skin<?> createDefaultSkin() {
         return new TextFieldSkin(this) {
