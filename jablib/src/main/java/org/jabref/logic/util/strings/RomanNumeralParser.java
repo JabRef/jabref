@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RomanNumeralParser {
+class RomanNumeralParser {
 
     // Roman Numbers Map
     private static final Map<Character, Integer> ROMAN_VALUES = Map.of(
@@ -18,7 +18,6 @@ public class RomanNumeralParser {
             'D', 500,
             'M', 1000);
     private static final Pattern ROMAN_PATTERN = Pattern.compile("M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})");
-
 
     public static Optional<Integer> parse(String romanText) {
         // Normalize the roman number
