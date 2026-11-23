@@ -49,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We aligned the add/review dropdown in the citations tab and made its focus and hover styling more subtle. [#17892](https://github.com/JabRef/jabref/issues/17892)
 - We combined the add and review actions in the citations tab into one button and arranged entry buttons compactly. [#17847](https://github.com/JabRef/jabref/issues/17847)
 - We improved OCR failure messages to show the executed command and diagnostic output. [#16679](https://github.com/JabRef/jabref/issues/16679)
 - We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
