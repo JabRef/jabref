@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1280" viewBox="0 0 1000 1280" role="img" aria-labelledby="title description">
+  <title id="title">Writer citation integration architecture</title>
+  <desc id="description">The OpenOffice panel and citation controller delegate to CitationEngine in logic.openoffice.engine. JStyle and BST use canonical storage and updates; CSL shares this path with Zotero compatibility disabled. With compatibility enabled, ZoteroCitationStrategy uses separate native storage, ordering, validation, and writes, sharing CslRenderer, the pure model, and Writer infrastructure. CitationFormatConverter converts canonical and native citation marks on the next CSL insertion when formats differ, and migrates supported legacy JR_cite marks on insertion outside native mode. Bibliography formats are not converted. Mixed managed citation formats are unsupported. Package labels below are relative to org.jabref.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#35658d"/>
+    </marker>
+    <marker id="data-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#64748b"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #172b3a; }
+      .title { font-size: 28px; font-weight: 700; }
+      .heading { font-size: 22px; font-weight: 600; }
+      .component { font-size: 20px; font-weight: 600; }
+      .detail { font-size: 17px; }
+      .small { font-size: 15px; }
+      .muted { fill: #475569; }
+      .box { stroke: #8094a7; stroke-width: 1.5; }
+      .flow { fill: none; stroke: #35658d; stroke-width: 2; marker-end: url(#arrow); }
+      .data { fill: none; stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 5 4; marker-end: url(#data-arrow); }
+    </style>
+  </defs>
+
+  <rect width="1000" height="1280" fill="#ffffff"/>
+  <text class="title" x="500" y="37" text-anchor="middle">Writer citation integration</text>
+
+  <rect class="box" x="30" y="66" width="940" height="108" rx="12" fill="#edf5ff"/>
+  <text class="heading" x="500" y="96" text-anchor="middle">GUI · jabgui · gui.openoffice</text>
+  <text class="component" x="500" y="124" text-anchor="middle">OpenOfficePanel</text>
+  <text class="detail" x="500" y="149" text-anchor="middle">OpenOfficeCitationController · OpenOfficeDocumentConnection</text>
+  <path class="flow" d="M 500 174 V 212"/>
+
+  <rect class="box" x="30" y="212" width="940" height="132" rx="12" fill="#e9f3fb"/>
+  <text class="heading" x="500" y="243" text-anchor="middle">CitationEngine · jablib · logic.openoffice.engine</text>
+  <text class="detail" x="500" y="269" text-anchor="middle">Insertion, refresh, group editing, page information, and cited-entry import/export</text>
+  <text class="small" x="500" y="295" text-anchor="middle">CitationFormatConverter: canonical ↔ native on next CSL insertion; JR_cite → canonical on insertion outside native mode</text>
+  <text class="small muted" x="500" y="323" text-anchor="middle">Converts citation marks, not bibliography formats. CitationGroupEditor handles canonical group structure.</text>
+  <path class="flow" d="M 500 344 V 356 H 342 V 370"/>
+  <path class="flow" d="M 500 356 H 828 V 370"/>
+
+  <rect class="box" x="30" y="370" width="625" height="450" rx="12" fill="#f4f8fc"/>
+  <text class="heading" x="50" y="401">Shared canonical engine path</text>
+  <text class="small muted" x="50" y="424">JStyle and BST; CSL with Zotero compatibility disabled</text>
+
+  <rect class="box" x="50" y="437" width="585" height="82" rx="9" fill="#ffffff"/>
+  <text class="component" x="69" y="462">DocumentCitations + DocumentOrder · frontend</text>
+  <text class="small" x="69" y="486">Range checks; containers, footnotes, visual order with textual fallback</text>
+  <text class="small" x="69" y="508">MarkStore · engine.storage: canonical identities and page information</text>
+  <path class="flow" d="M 342 519 V 539"/>
+
+  <rect class="box" x="50" y="539" width="585" height="116" rx="9" fill="#edf8f0"/>
+  <text class="component" x="69" y="569">RendererFactory → CitationRenderer</text>
+  <text class="detail" x="69" y="597">JStyleRenderer · CslRenderer · BstRenderer</text>
+  <text class="small" x="69" y="622">Ordered CitationGroup input → RenderResult containing OOText</text>
+  <text class="small muted" x="69" y="644">Render before mutation; BST bibliography output may require Pandoc</text>
+  <path class="flow" d="M 342 655 V 675"/>
+
+  <rect class="box" x="50" y="675" width="585" height="134" rx="9" fill="#ffffff"/>
+  <text class="component" x="69" y="706">UpdatePipeline + DocumentWriteSession</text>
+  <text class="small" x="69" y="731">engine.storage: CitationMarkerWriter · DocumentStyleStore</text>
+  <text class="small" x="69" y="754">engine: BibliographySection</text>
+  <text class="small" x="69" y="777">Undo context, controller lock, and change-recording suspension</text>
+  <text class="small muted" x="69" y="800">Insertion synchronization controls bibliography updates, not markers</text>
+
+  <rect class="box" x="685" y="370" width="285" height="450" rx="12" fill="#fff5e8"/>
+  <text class="component" x="706" y="402">ZoteroCitationStrategy</text>
+  <text class="small" x="706" y="433">CSL + Zotero compatibility on</text>
+  <text class="detail" x="706" y="475">Separate storage, ordering,</text>
+  <text class="detail" x="706" y="499">validation, and write policy</text>
+  <text class="detail" x="706" y="539">Uses the same CslRenderer</text>
+  <text class="small" x="706" y="579">ZoteroDocumentPreferences</text>
+  <text class="small" x="706" y="601">maintains ZOTERO_PREF</text>
+  <text class="small" x="706" y="649">Shares DocumentWriteSession,</text>
+  <text class="small" x="706" y="672">not the canonical UpdatePipeline</text>
+  <text class="small" x="706" y="704">Generated suffix: RND + 10 chars</text>
+  <text class="small" x="706" y="727">Generated citationID: 8 chars</text>
+  <text class="small muted" x="706" y="760">Own bibliography handling;</text>
+  <text class="small muted" x="706" y="783">no bibliography conversion</text>
+
+  <path class="data" d="M 420 820 V 850"/>
+  <path class="data" d="M 750 820 V 850"/>
+  <rect class="box" x="30" y="850" width="940" height="100" rx="12" fill="#f1f5f9" stroke-dasharray="5 4"/>
+  <text class="heading" x="500" y="881" text-anchor="middle">Shared pure model · model.openoffice.style / ootext · no UNO</text>
+  <text class="detail" x="500" y="909" text-anchor="middle">Citation · CitationGroup · CitationGroupId · CitationGroups · CitedReferences</text>
+  <text class="detail" x="500" y="934" text-anchor="middle">OOText + OOFormat describe formatted output independently of Writer</text>
+
+  <path class="flow" d="M 342 820 V 834 H 16 V 972 H 310 V 994"/>
+  <path class="flow" d="M 828 820 V 834 H 984 V 972 H 690 V 994"/>
+  <rect class="box" x="30" y="994" width="940" height="114" rx="12" fill="#edf5ff"/>
+  <text class="heading" x="500" y="1027" text-anchor="middle">Writer infrastructure · logic.openoffice.backend / uno / rangesort</text>
+  <text class="detail" x="500" y="1056" text-anchor="middle">WriterReferenceMark · WriterReferenceMarks · ReferenceMarkTextWriter</text>
+  <text class="detail" x="500" y="1083" text-anchor="middle">OOTextWriter · Uno* helpers · RangeSort / RangeSortVisual</text>
+  <path class="flow" d="M 500 1108 V 1144"/>
+
+  <rect class="box" x="30" y="1144" width="940" height="74" rx="12" fill="#e8eef3"/>
+  <text class="heading" x="500" y="1177" text-anchor="middle">LibreOffice Writer document</text>
+  <text class="detail" x="500" y="1203" text-anchor="middle">Reference marks · bibliography text sections · custom document properties</text>
+
+  <text class="small muted" x="500" y="1253" text-anchor="middle">Packages relative to org.jabref; canonical subpackages relative to logic.openoffice. Mixed managed formats unsupported.</text>
+  <text class="small muted" x="500" y="1274" text-anchor="middle">Solid arrows: orchestration and UNO access. Dashed arrows: shared model use.</text>
+</svg>

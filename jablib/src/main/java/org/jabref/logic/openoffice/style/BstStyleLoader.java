@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
@@ -44,10 +46,26 @@ public class BstStyleLoader {
         return List.copyOf(all);
     }
 
+    public Optional<BstStyle> loadExternalStyle(Path stylePath) {
+        if (!stylePath.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".bst")) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(BstStyle.loadExternal(stylePath));
+        } catch (IOException e) {
+            LOGGER.warn("Could not load BST style file: {}", stylePath, e);
+            return Optional.empty();
+        }
+    }
+
     /// Adds a user-supplied `.bst` file
-    public void addExternalStyle(BstStyle style) {
+    public boolean addExternalStyle(BstStyle style) {
+        if (style.isInternalStyle() || getStyles().stream().anyMatch(existing -> existing.getName().equals(style.getName()))) {
+            return false;
+        }
         externalStyles.add(style);
         storeExternalStyles();
+        return true;
     }
 
     public boolean removeStyle(BstStyle style) {
