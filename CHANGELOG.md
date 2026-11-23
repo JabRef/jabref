@@ -52,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added approximate author-only and year-only citations through "Cite special" for CSL styles in LibreOffice/OpenOffice, outside Zotero compatibility mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added "Settings → More settings" in the LibreOffice/OpenOffice panel to open JabRef's integration preferences without connecting a document. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added citation refresh in LibreOffice/OpenOffice for CSL styles that do not generate bibliographies. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We added entry details on hover to the JabRef language server, which now also reads `bibliography:` from Markdown front matter. [#17302](https://github.com/JabRef/jabref/pull/17302)
 
 ### Changed
 
@@ -84,6 +85,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed LibreOffice/OpenOffice bibliography refresh to remove outdated references and extra blank paragraphs only for the selected JabRef/Zotero citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice citation refresh to order citations by document text when citation positions on screen are unavailable. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We simplified secure credential storage and reduced macOS approval prompts for saved API keys. [#13687](https://github.com/JabRef/jabref/issues/13687)
 - We changed the main table to keep the entry shown in the entry editor visible when enlarging the entry editor. [#17167](https://github.com/JabRef/jabref/pull/17167)
 
 ### Fixed
@@ -188,6 +190,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where searching for unlinked files failed when `.gitignore` contained a literal opening brace. [#17546](https://github.com/JabRef/jabref/issues/17546)
 - We fixed an issue on Windows where linked files with very long paths opened the file explorer, not the file. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where opening the backup folder from the backup dialog failed when a custom file browser was set. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
+- We fixed an issue where a file link was removed although the file could not be deleted or moved to the trash. [#17885](https://github.com/JabRef/jabref/pull/17885)
+- We fixed an issue where "Open terminal here" failed on Linux distributions without `/etc/alternatives/x-terminal-emulator`. [#17885](https://github.com/JabRef/jabref/pull/17885)
+- We fixed an issue where "Open folder(s)" did not select the file on Ubuntu and other Linux desktops. [#17885](https://github.com/JabRef/jabref/pull/17885)
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where the RIS importer overwrote the journal issue number (`IS`) with the accession number (`AN`). [#17817](https://github.com/JabRef/jabref/issues/17817)
