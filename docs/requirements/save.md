@@ -31,6 +31,15 @@ A failed write must leave the original file untouched and must not leave tempora
 
 Needs: impl, utest
 
+## Template export failures must preserve the destination file
+`req~logic.exporter.preserve-output-on-template-failure~1`
+
+If loading or rendering a required layout fails, an existing destination remains unchanged and a new destination is not created, even if output has already been generated.
+
+See [JabRef/jabref#17423](https://github.com/JabRef/jabref/issues/17423).
+
+Needs: impl, utest
+
 ## Backup system must not overwrite valid backups on write failure
 `req~jabgui.autosaveandbackup.complete-backup~1`
 
@@ -45,6 +54,32 @@ Issue: [#15846](https://github.com/JabRef/jabref/issues/15846)
 
 When a library is opened and the user accepts changes while reviewing its backup, the merge must be recorded in the undo history of the tab that shows the library.
 Then the library is marked as modified and the merge can be undone; otherwise, the restored library looks saved and the restored content is lost when it is closed.
+
+Needs: impl, utest
+
+## Backup must batch field edits into scheduled writes
+`req~jabgui.autosaveandbackup.backup-every-edit~1`
+
+Typing into a newly added or existing field must mark the library for backup, including single-character changes.
+Keystrokes must only mark a backup as pending; they must not trigger serialization or disk writes.
+The backup timer must batch pending edits into at most one backup write per interval (currently 19 seconds).
+The next scheduled backup must contain the latest field value so recovery can detect and restore unsaved edits after a crash.
+
+Needs: impl, utest
+
+## Backup completion must preserve pending edits made after its snapshot
+`req~jabgui.autosaveandbackup.preserve-pending-edits~1`
+
+A field edit received after a backup captures its snapshot must remain pending for the next scheduled backup, even if the older snapshot is written successfully.
+A failed backup must leave its edits pending for another attempt.
+
+Needs: impl, utest
+
+## Backup writers for a library must execute one at a time
+`req~jabgui.autosaveandbackup.serialized-writes~1`
+
+Scheduled backups and backups requested during shutdown must serialize generation capture, snapshot creation, file commit, and completion acknowledgement.
+A shutdown backup must wait for an in-flight backup before capturing the latest edits, so an older snapshot cannot replace the final backup.
 
 Needs: impl, utest
 
@@ -65,6 +100,48 @@ Rewriting a keyword field from an accepted import delimiter to the library's key
 It is part of the default save actions and available in the cleanup dialog, so users see it, can disable it per library, and can run it on demand.
 A field that already uses the library's separator is returned unchanged, including its spacing.
 Cleanups that depend on the keyword separator use the separator declared by the library the entry belongs to and fall back to the global preference when the library declares none.
+
+Needs: impl, utest
+
+## User can convert LaTeX character commands to Unicode-aware LaTeX
+`feat~save.cleanup.latex-to-unicode-aware-latex~1`
+
+The field formatter "LaTeX to Unicode-aware LaTeX" replaces commands that encode a single character, such as `\textcopyright{}` or `\"{o}`, by the Unicode character, because current LaTeX engines read Unicode directly.
+It is available in the cleanup dialog and as a save action.
+Unlike "LaTeX to Unicode", it keeps all other LaTeX code: protective braces, math, formatting commands such as `\emph{...}`, and commands without a single-character Unicode equivalent.
+It preserves LaTeX comments and braces protecting uppercase character commands from BibTeX case changes.
+Math preservation recognizes standard math delimiters and a fixed set of common math environments; custom and unlisted environments are not recognized.
+A command whose conversion would introduce a LaTeX special character (such as `\textbackslash{}`) is kept.
+
+See <https://github.com/JabRef/jabref/issues/8715>.
+
+Needs: impl, utest
+
+## LaTeX to Unicode-aware LaTeX formatter must keep escaped special characters
+`req~save.cleanup.latex-to-unicode-aware-latex.keep-escaped-characters~1`
+
+Escaped LaTeX special characters (`\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `\\`) stay escaped, because the unescaped character has a different meaning in LaTeX.
+
+Needs: impl, utest
+
+### JabRef must preserve extended name parts on save
+`req~save.names.preserve-extended-parts~1`
+
+BibLaTeX extended name attributes include keys such as `family=`, `given=`, `prefix=`, and `useprefix=`.
+
+Needs: impl, utest
+
+### Name normalization must preserve BibLaTeX extended name data
+`req~save.names.normalize-extended-parts~1`
+
+Normalization preserves name attributes, name-list options, and quotes protecting individual name parts. If an extended name has malformed syntax or repeats an attribute, normalization preserves the field as entered.
+
+Needs: impl, utest
+
+### Citation key generation must normalize extended names to readable name parts
+`req~save.citation-keys.normalize-extended-names~1`
+
+The `normalize_names` modifier in a citation key pattern uses the names without their BibLaTeX attribute labels. Saving and reopening the entry preserves the generated key and the original name field.
 
 Needs: impl, utest
 

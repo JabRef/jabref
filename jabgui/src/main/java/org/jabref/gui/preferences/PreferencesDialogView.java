@@ -3,8 +3,10 @@ package org.jabref.gui.preferences;
 import java.util.Locale;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -16,8 +18,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -40,6 +44,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
+    @Inject private TaskExecutor taskExecutor;
 
     private PreferencesDialogViewModel viewModel;
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
@@ -53,6 +58,17 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), _ -> savePreferencesAndCloseDialog());
+        getDialogPane().disableProperty().bind(viewModel.savingProperty());
+        Button save = (Button) getDialogPane().lookupButton(saveButton);
+        save.disableProperty().bind(viewModel.checkingKeyringProperty());
+        save.textProperty().bind(Bindings.when(viewModel.savingProperty())
+                                         .then(Localization.lang("Saving preferences..."))
+                                         .otherwise(save.getText()));
+        setOnCloseRequest(event -> {
+            if (viewModel.savingProperty().get()) {
+                event.consume();
+            }
+        });
 
         // Stop the default button from firing when the user hits enter within the search box
         searchBox.setOnKeyPressed(event -> {
@@ -68,13 +84,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, preferences);
+        viewModel = new PreferencesDialogViewModel(dialogService, preferences, taskExecutor);
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferencesTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
         searchBox.textProperty().addListener((_, _, newText) -> {
-            searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
             preferencesTabList.getSelectionModel().clearSelection();
+            searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
             preferencesTabList.getSelectionModel().selectFirst();
         });
         searchBox.setPromptText(Localization.lang("Search..."));
@@ -90,6 +106,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
             content.getStyleClass().addAll("padding-4", "preferences-tab-content");
+            preferencesContainer.setVvalue(0);
+            searchHandler.firstMatch(tab).ifPresent(this::scrollToSearchMatch);
         });
 
         if (this.preferencesTabToSelectClass != null) {
@@ -111,6 +129,23 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         viewModel.setValues();
     }
 
+    /// Brings the first element matching the search query into view.
+    ///
+    /// The content was attached to the scroll pane just above. A tab shown for the first time has a
+    /// content height of 0 until it is laid out, and [ScrollUtils] then reads that as "fits into the
+    /// viewport" and does not scroll - hence the explicit layout pass.
+    /// [javafx.application.Platform#runLater] is no substitute: measured on this dialog, the queued
+    /// task still runs before the pulse's layout and sees the same height of 0.
+    // [impl->req~ux.preferences.search-scroll~1]
+    private void scrollToSearchMatch(Node match) {
+        if (preferencesContainer.getScene() == null) {
+            return;
+        }
+        preferencesContainer.applyCss();
+        preferencesContainer.layout();
+        ScrollUtils.scrollIntoScrollPane(preferencesContainer, match.localToScene(match.getBoundsInLocal()));
+    }
+
     @FXML
     private void closeDialog() {
         close();
@@ -118,9 +153,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void savePreferencesAndCloseDialog() {
-        if (viewModel.storeAllSettings()) {
-            closeDialog();
-        }
+        viewModel.storeAllSettings(this::closeDialog);
     }
 
     @FXML

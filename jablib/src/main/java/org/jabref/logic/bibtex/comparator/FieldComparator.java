@@ -72,7 +72,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private Optional<String> getFieldValue(BibEntry entry) {
         return fields.getFields().stream()
-                     .map(entry::getFieldOrAliasLatexFree)
+                     .map(field -> fieldType == FieldType.NAME ? entry.getField(field) : entry.getFieldOrAliasLatexFree(field))
                      .flatMap(Optional::stream)
                      .findFirst();
     }
@@ -102,6 +102,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         // Now we know that both f1 and f2 are != null
         if (fieldType == FieldType.NAME) {
+            // Keep the save order for conventional names, including ties on given-name initials.
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {

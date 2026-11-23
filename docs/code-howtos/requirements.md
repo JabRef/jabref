@@ -208,7 +208,7 @@ access token has push access to the configured GitHub repository before
 sharing a library.
 ```
 
-There is no modal verb in the title, and the subject-first structure is missing. The normative content is buried in the paragraph instead of the title.
+The title has no modal verb, and the subject-first structure is missing. The normative content is buried in the paragraph instead of the title.
 
 **Good**:
 

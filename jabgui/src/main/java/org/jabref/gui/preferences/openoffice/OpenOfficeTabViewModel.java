@@ -50,27 +50,20 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
         zoteroCompatibilityModeDisabled = Bindings.createBooleanBinding(
                 () -> !(openOfficePreferences.getCurrentStyle() instanceof CitationStyle),
                 openOfficePreferences.currentStyleProperty());
-        zoteroCompatibilityModeDisabled.addListener((_, _, disabled) -> {
-            if (disabled) {
-                zoteroCompatibilityMode.set(false);
-            }
-        });
     }
 
     @Override
     public void setValues() {
         pandocPath.set(openOfficePreferences.getPandocPath());
-        boolean compatibilityMode = openOfficePreferences.getZoteroCompatibilityMode()
-                && !zoteroCompatibilityModeDisabled.get();
-        zoteroCompatibilityMode.set(compatibilityMode);
+        zoteroCompatibilityMode.set(openOfficePreferences.getZoteroCompatibilityMode());
     }
 
     @Override
     public void storeSettings() {
         openOfficePreferences.setPandocPath(pandocPath.get());
-        boolean compatibilityMode = zoteroCompatibilityMode.get()
-                && !zoteroCompatibilityModeDisabled.get();
-        openOfficePreferences.setZoteroCompatibilityMode(compatibilityMode);
+        if (!zoteroCompatibilityModeDisabled.get()) {
+            openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.get());
+        }
     }
 
     public StringProperty pandocPathProperty() {
@@ -115,7 +108,7 @@ public class OpenOfficeTabViewModel implements PreferenceTabViewModel {
             LOGGER.warn("Auto-detection of pandoc path failed", exception);
             dialogService.notify(
                     Localization.lang("Auto-detection of pandoc path failed"));
-        });
+        }).failureShownByCaller(true);
 
         taskExecutor.execute(task);
     }

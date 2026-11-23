@@ -43,6 +43,7 @@ public class AiGroupChatView extends StackPane {
 
         privacyNotice.visibleProperty().bind(viewModel.enabledProperty().not());
         aiChatView.visibleProperty().bind(viewModel.enabledProperty());
+        aiChatView.disableProperty().bind(viewModel.historyLoadedProperty().not());
 
         aiChatView.chatHistoryProperty().bind(viewModel.chatHistoryProperty());
         aiChatView.entriesProperty().bind(viewModel.entriesProperty());

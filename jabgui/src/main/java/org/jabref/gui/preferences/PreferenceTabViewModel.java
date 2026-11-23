@@ -1,6 +1,9 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.jabref.logic.preferences.CliPreferences.CredentialSave;
 
 public interface PreferenceTabViewModel {
 
@@ -25,6 +28,13 @@ public interface PreferenceTabViewModel {
     /// Preferences dialog. Implementing classes must make sure all
     /// settings presented get stored in PreferencesService.
     void storeSettings();
+
+    /// Captures a credential change on the JavaFX thread before saving the tab's other settings.
+    ///
+    /// @return the prepared save, or an empty optional when there is no credential change
+    default Optional<CredentialSave> prepareCredentialSave() {
+        return Optional.empty();
+    }
 
     /// This method should be called after storing the preferences, to
     /// collect the properties, which require a restart of JabRef to load

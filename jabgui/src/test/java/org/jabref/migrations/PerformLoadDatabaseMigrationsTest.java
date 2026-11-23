@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -33,6 +35,8 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,16 +50,18 @@ import static org.mockito.Mockito.when;
 @ResourceLock("Localization.lang")
 class PerformLoadDatabaseMigrationsTest {
 
-    @Test
-    void migrationBatchesChangesAndRestoresEntryObservation() {
-        List<BibEntry> entries = IntStream.range(0, 1000)
+    @ParameterizedTest
+    @ValueSource(ints = {1, 10, 11, 1000})
+    void migrationBatchesChangesAndRestoresEntryObservation(int entryCount) {
+        List<BibEntry> entries = IntStream.range(0, entryCount)
                                           .mapToObj(index -> new BibEntry().withCitationKey("Entry" + index)
                                                                            .withField(InternalField.MARKED_INTERNAL, "[Owner:6]")
                                                                            .withField(StandardField.KEYWORDS, "topic, printed"))
                                           .toList();
         ParserResult result = new ParserResult(entries);
+        ObservableList<BibEntry> observedEntries = result.getDatabase().getEntries();
         List<Integer> updateSizes = new ArrayList<>();
-        result.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+        observedEntries.addListener((ListChangeListener<BibEntry>) change -> {
             while (change.next()) {
                 if (change.wasUpdated()) {
                     updateSizes.add(change.getTo() - change.getFrom());
@@ -74,6 +80,8 @@ class PerformLoadDatabaseMigrationsTest {
 
         entries.getFirst().setField(StandardField.TITLE, "Changed after migration");
 
+        // The database only weakly retains this list view, so keep it alive through the observed mutation.
+        Reference.reachabilityFence(observedEntries);
         assertEquals(List.of(1), updateSizes);
     }
 
@@ -103,8 +111,9 @@ class PerformLoadDatabaseMigrationsTest {
                                        .withField(StandardField.GROUPS, "Current group");
         ParserResult result = new ParserResult(List.of(entry));
         result.getMetaData().setGroups(GroupTreeNode.fromGroup(new ExplicitGroup("Current group", GroupHierarchyType.INDEPENDENT, ',')));
+        ObservableList<BibEntry> observedEntries = result.getDatabase().getEntries();
         List<Integer> changes = new ArrayList<>();
-        result.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+        observedEntries.addListener((ListChangeListener<BibEntry>) change -> {
             while (change.next()) {
                 changes.add(change.getTo() - change.getFrom());
             }
@@ -112,6 +121,7 @@ class PerformLoadDatabaseMigrationsTest {
 
         PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, ',');
 
+        Reference.reachabilityFence(observedEntries);
         assertEquals(List.of(), changes);
         assertFalse(result.getChangedOnMigration());
         assertFalse(new ConvertLegacyExplicitGroups().isMigrationNecessary(result));

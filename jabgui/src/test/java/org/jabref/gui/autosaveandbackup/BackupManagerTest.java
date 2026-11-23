@@ -7,11 +7,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -19,7 +30,10 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
@@ -28,6 +42,8 @@ import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -143,8 +160,8 @@ class BackupManagerTest {
         assertEquals(emptyBackup, BackupManager.getLatestBackupPath(originalFile, backupDir).orElseThrow());
     }
 
+    /// [utest->req~jabgui.autosaveandbackup.complete-backup~1]
     @Test
-        // [utest->req~jabgui.autosaveandbackup.complete-backup~1]
     void restoringAnEmptyBackupLeavesTheOriginalFileUnchanged(@TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@article{existing}");
@@ -176,6 +193,183 @@ class BackupManagerTest {
         BackupManager.RestoreResult.Failed failure = assertInstanceOf(BackupManager.RestoreResult.Failed.class, result);
         assertEquals(backup, failure.backupPath());
         assertInstanceOf(DirectoryNotEmptyException.class, failure.exception());
+    }
+
+    /// [utest->req~jabgui.autosaveandbackup.backup-every-edit~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"", "A"})
+    void typingIntoNewOrExistingFieldIsBackedUp(String initialValue, @TempDir Path tempDir) throws IOException, ParseException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry").withField(StandardField.EDITOR, initialValue);
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        Path originalFile = tempDir.resolve("library.bib");
+        context.setDatabasePath(originalFile);
+        Files.writeString(originalFile, """
+                @Article{entry,
+                  editor = {%s},
+                }
+                """.formatted(initialValue));
+        Files.setLastModifiedTime(originalFile, FileTime.fromMillis(0));
+
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        Path backupPath = manager.determineBackupPathForNewBackup(backupDir).orElseThrow();
+        String editor = initialValue + "Editor";
+        try {
+            for (int length = initialValue.length() + 1; length <= editor.length(); length++) {
+                String value = editor.substring(0, length);
+                entry.setField(StandardField.EDITOR, value);
+                manager.performBackup(backupPath);
+
+                assertEquals(Optional.of(value), BibtexParser.singleFromString(Files.readString(backupPath), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS))
+                                                             .orElseThrow().getField(StandardField.EDITOR));
+            }
+            assertTrue(BackupManager.backupFileDiffers(originalFile, backupDir));
+            assertEquals(new BackupManager.RestoreResult.Restored(), BackupManager.restoreBackup(originalFile, backupDir));
+            assertEquals(Files.readString(backupPath), Files.readString(originalFile));
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
+    }
+
+    /// [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
+    @Test
+    void editAfterSnapshotIsIncludedInNextBackup(@TempDir Path tempDir) throws IOException, ParseException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        context.setDatabasePath(tempDir.resolve("library.bib"));
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        var fieldPreferences = preferences.getFieldPreferences();
+        // Writer preferences are read after cloning, so this edit cannot be in the first snapshot.
+        when(preferences.getFieldPreferences()).thenAnswer(_ -> {
+            entry.setField(StandardField.EDITOR, "Editor!");
+            return fieldPreferences;
+        }).thenReturn(fieldPreferences);
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        ImportFormatPreferences importPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        Path firstBackup = tempDir.resolve("first.bib");
+        Path nextBackup = tempDir.resolve("next.bib");
+        Path unnecessaryBackup = tempDir.resolve("unnecessary.bib");
+        try {
+            entry.setField(StandardField.EDITOR, "Editor");
+            manager.performBackup(firstBackup);
+            assertEquals(Optional.of("Editor"), BibtexParser.singleFromString(Files.readString(firstBackup), importPreferences)
+                                                            .orElseThrow().getField(StandardField.EDITOR));
+
+            manager.performBackup(nextBackup);
+            assertEquals(Optional.of("Editor!"), BibtexParser.singleFromString(Files.readString(nextBackup), importPreferences)
+                                                             .orElseThrow().getField(StandardField.EDITOR));
+
+            manager.performBackup(unnecessaryBackup);
+            assertFalse(Files.exists(unnecessaryBackup));
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
+    }
+
+    /// [utest->req~jabgui.autosaveandbackup.preserve-pending-edits~1]
+    @Test
+    void failedBackupCommitLeavesEditsPending(@TempDir Path tempDir) throws IOException, ParseException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        context.setDatabasePath(tempDir.resolve("library.bib"));
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        Path failedBackup = Files.createDirectory(tempDir.resolve("failed.bib"));
+        Files.writeString(failedBackup.resolve("existing"), "Keep this file");
+        Path nextBackup = tempDir.resolve("next.bib");
+        try {
+            entry.setField(StandardField.EDITOR, "Editor");
+            manager.performBackup(failedBackup);
+            manager.performBackup(nextBackup);
+
+            assertEquals(Optional.of("Editor"), BibtexParser.singleFromString(Files.readString(nextBackup), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS))
+                                                            .orElseThrow().getField(StandardField.EDITOR));
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
+    }
+
+    /// [utest->req~jabgui.autosaveandbackup.serialized-writes~1]
+    @Test
+    void shutdownWaitsForScheduledBackupBeforeWritingNewestEdit(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("entry");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        Path libraryPath = tempDir.resolve("library.bib");
+        context.setDatabasePath(libraryPath);
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        var fieldPreferences = preferences.getFieldPreferences();
+        CountDownLatch snapshotCaptured = new CountDownLatch(1);
+        CountDownLatch releaseSnapshot = new CountDownLatch(1);
+        AtomicInteger writes = new AtomicInteger();
+        AtomicBoolean overlappingWrites = new AtomicBoolean();
+        when(preferences.getFieldPreferences()).thenAnswer(_ -> {
+            if (writes.incrementAndGet() == 1) {
+                snapshotCaptured.countDown();
+                assertTrue(releaseSnapshot.await(5, TimeUnit.SECONDS));
+            } else {
+                overlappingWrites.set(releaseSnapshot.getCount() > 0);
+            }
+            return fieldPreferences;
+        });
+        CoarseChangeFilter filter = new CoarseChangeFilter(context);
+        BackupManager manager = BackupManager.start(mock(LibraryTab.class), context, filter, new BibEntryTypesManager(), preferences);
+        try (var scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+             var shutdownExecutor = Executors.newSingleThreadExecutor()) {
+            try {
+                entry.setField(StandardField.EDITOR, "Editor");
+                Path backupPath = manager.determineBackupPathForNewBackup(backupDir).orElseThrow();
+                Future<?> scheduledBackup = scheduledExecutor.schedule(() -> manager.performBackup(backupPath), 0, TimeUnit.SECONDS);
+                assertTrue(snapshotCaptured.await(5, TimeUnit.SECONDS));
+                entry.setField(StandardField.EDITOR, "Editor!");
+                CompletableFuture<Thread> shutdownThread = new CompletableFuture<>();
+                Future<?> shutdownBackup = shutdownExecutor.submit(() -> {
+                    shutdownThread.complete(Thread.currentThread());
+                    BackupManager.shutdown(context, backupDir, true);
+                });
+                awaitShutdownBackupAttempt(shutdownBackup, shutdownThread.get(5, TimeUnit.SECONDS));
+                releaseSnapshot.countDown();
+                scheduledBackup.get(5, TimeUnit.SECONDS);
+                shutdownBackup.get(5, TimeUnit.SECONDS);
+
+                Path latestBackup = BackupManager.getLatestBackupPath(libraryPath, backupDir).orElseThrow();
+                assertEquals(Optional.of("Editor!"), BibtexParser.singleFromString(Files.readString(latestBackup), mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS))
+                                                                 .orElseThrow().getField(StandardField.EDITOR));
+                assertFalse(overlappingWrites.get());
+                assertEquals(2, writes.get());
+            } finally {
+                releaseSnapshot.countDown();
+            }
+        } finally {
+            BackupManager.shutdown(context, backupDir, false);
+            filter.shutdown();
+        }
+    }
+
+    private void awaitShutdownBackupAttempt(Future<?> shutdownBackup, Thread shutdownThread) {
+        long startedAt = System.nanoTime();
+        // Release the older writer only once shutdown has finished or is waiting at the backup monitor.
+        while (!shutdownBackup.isDone()) {
+            if (shutdownThread.getState() == Thread.State.BLOCKED
+                    && Arrays.stream(shutdownThread.getStackTrace()).findFirst()
+                             .filter(frame -> frame.getClassName().equals(BackupManager.class.getName()) && "performBackup".equals(frame.getMethodName()))
+                             .isPresent()) {
+                return;
+            }
+            if (System.nanoTime() - startedAt >= TimeUnit.SECONDS.toNanos(5)) {
+                fail("Shutdown did not finish or wait for the in-flight backup");
+            }
+            Thread.yield();
+        }
     }
 
     @Test

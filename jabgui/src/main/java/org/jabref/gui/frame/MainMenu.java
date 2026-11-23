@@ -17,11 +17,15 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
+import org.jabref.gui.citedrive.CiteDriveImportAction;
+import org.jabref.gui.citedrive.CiteDriveLoginAction;
+import org.jabref.gui.citedrive.CiteDrivePushAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.MergeLibraryAction;
 import org.jabref.gui.consistency.ConsistencyCheckAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.EditAction;
@@ -82,6 +86,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
@@ -114,6 +119,8 @@ public class MainMenu extends MenuBar {
     private final PreviewControls previewControls;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
+    private final NativeDesktop nativeDesktop;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -131,7 +138,9 @@ public class MainMenu extends MenuBar {
                     AiService aiService,
                     PreviewControls previewControls,
                     GitHandlerRegistry gitHandlerRegistry,
-                    JournalAbbreviationRepository journalAbbreviationRepository
+                    JournalAbbreviationRepository journalAbbreviationRepository,
+                    OAuthSessionRegistry oAuthSessionRegistry,
+                    NativeDesktop nativeDesktop
     ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
@@ -150,6 +159,8 @@ public class MainMenu extends MenuBar {
         this.previewControls = previewControls;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
+        this.nativeDesktop = nativeDesktop;
 
         createMenu();
     }
@@ -197,6 +208,7 @@ public class MainMenu extends MenuBar {
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
+                citeDriveMenu(factory),
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService))),
                 // endregion
@@ -432,10 +444,20 @@ public class MainMenu extends MenuBar {
                                    GuiPreferences preferences) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor))
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor, nativeDesktop))
         );
 
         return sendMenu;
+    }
+
+    /// CiteDrive is opt-in: without it the menu is not shown at all
+    private Menu citeDriveMenu(ActionFactory factory) {
+        Menu citeDrive = factory.createSubMenu(StandardActions.CITE_DRIVE,
+                factory.createMenuItem(StandardActions.CITE_DRIVE_IMPORT, new CiteDriveImportAction(dialogService, nativeDesktop, preferences)),
+                factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry, nativeDesktop, clipBoardManager)),
+                factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry, nativeDesktop, clipBoardManager)));
+        citeDrive.visibleProperty().bind(preferences.getCiteDrivePreferences().enabledProperty());
+        return citeDrive;
     }
 }

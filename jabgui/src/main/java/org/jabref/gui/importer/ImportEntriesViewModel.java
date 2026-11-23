@@ -63,6 +63,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private ParserResult parserResult = null;
     private final ObservableList<BibEntry> entries;
     private final GuiPreferences preferences;
+    private BooleanProperty downloadLinkedFilesPreference;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
 
@@ -94,6 +95,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.undoManager = undoManager;
         this.preferences = preferences;
+        this.downloadLinkedFilesPreference = preferences.getFilePreferences().importDialogDownloadLinkedFilesProperty();
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -183,6 +185,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return writer.toString();
     }
 
+    public boolean shouldDownloadLinkedFiles() {
+        return downloadLinkedFilesPreference.get();
+    }
+
+    /// Web searches share the import UI, but keep their download choice separate from browser imports.
+    public void useWebSearchDownloadPreference() {
+        downloadLinkedFilesPreference = preferences.getFilePreferences().downloadLinkedFilesProperty();
+    }
+
     /// Called after the user selected the entries to import. Does the real import stuff.
     ///
     /// @param entriesToImport subset of the entries contained in parserResult
@@ -192,8 +203,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     /// @param targetGroup name of a group the imported entries are additionally assigned to. If it is non-blank and no group with that name exists yet, it is created as a top-level explicit group. A blank/null value assigns no group.
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles, @Nullable String targetGroup) {
-        // Remember the selection in the dialog
-        preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
+        // [impl->req~import.dialog.download-linked-files~1]
+        downloadLinkedFilesPreference.set(shouldDownloadFiles);
 
         new DatabaseMerger(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())).mergeStrings(
                 databaseContext.getDatabase(),
@@ -212,6 +223,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
+        if (shouldDownloadFiles) {
+            importHandler.enableLinkedFileDownloads();
+        } else {
+            importHandler.disableLinkedFileDownloads();
+        }
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, selectedDatabaseContext, entriesToImport.size());
         if (StringUtil.isNotBlank(targetGroup)) {
             // Assign the group to the actually imported BibEntry instances (the copies inserted into the

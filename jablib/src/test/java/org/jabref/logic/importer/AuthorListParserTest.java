@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -13,6 +14,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// Similar tests are available in [org.jabref.model.entry.AuthorListTest]
 class AuthorListParserTest {
@@ -37,6 +40,11 @@ class AuthorListParserTest {
                 Arguments.of("{\\OE}rjan Umlauts", new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
                 Arguments.of("{Company Name, LLC}", new Author("", "", null, "{Company Name, LLC}", null)),
                 Arguments.of("{Society of Automotive Engineers}", new Author("", "", null, "{Society of Automotive Engineers}", null)),
+                // No tokenization within braces even with lowercase letters in the beginning of the words
+                // (lowercase letters can be treated as starts of name prefixes, which changes how the author
+                // last name is parsed). This case checks that the parser prioritises {} as token boundaries and
+                // does not get sidetracked by the lowercase letters even in many words.
+                Arguments.of("{society of automotive engineers}", new Author("", "", null, "{society of automotive engineers}", null)),
 
                 // Demonstrate the "von" part parsing of a non-braced name
                 Arguments.of("Society of Automotive Engineers", new Author("Society", "S.", "of", "Automotive Engineers", null))
@@ -47,6 +55,90 @@ class AuthorListParserTest {
     @MethodSource
     void parseSingleAuthorCorrectly(String authorsString, Author authorsParsed) {
         assertEquals(AuthorList.of(authorsParsed), parser.parse(authorsString));
+    }
+
+    @Test
+    void parseBiblatexExtendedNameFollowedByConventionalNames() {
+        AuthorList authors = parser.parse("family=Hasselt, given=Hado P., prefix=van, useprefix=false and Guez, Arthur");
+
+        assertEquals(2, authors.getNumberOfAuthors());
+        assertEquals(Optional.of("Hasselt"), authors.getAuthor(0).getFamilyName());
+        assertEquals(Optional.of("Hado P."), authors.getAuthor(0).getGivenName());
+        assertEquals(Optional.of("van"), authors.getAuthor(0).getNamePrefix());
+        assertEquals(Optional.of("Guez"), authors.getAuthor(1).getFamilyName());
+        assertEquals(Optional.of("Arthur"), authors.getAuthor(1).getGivenName());
+    }
+
+    @Test
+    void parseSingleBiblatexExtendedName() {
+        Author author = parser.parse("given=Jean, prefix=de la, family=Rousse").getAuthor(0);
+
+        assertEquals(Optional.of("Jean"), author.getGivenName());
+        assertEquals(Optional.of("J."), author.getGivenNameAbbreviated());
+        assertEquals(Optional.of("de la"), author.getNamePrefix());
+        assertEquals(Optional.of("Rousse"), author.getFamilyName());
+    }
+
+    @Test
+    void parseConventionalNameFollowedByBiblatexExtendedName() {
+        AuthorList authors = parser.parse("Doe, Jane and given=Simon, family=Beumont");
+
+        assertEquals(2, authors.getNumberOfAuthors());
+        assertEquals(Optional.of("Doe"), authors.getAuthor(0).getFamilyName());
+        assertEquals(Optional.of("Beumont"), authors.getAuthor(1).getFamilyName());
+        assertEquals(Optional.of("Simon"), authors.getAuthor(1).getGivenName());
+    }
+
+    @Test
+    void parseQuotedBiblatexExtendedFamilyContainingComma() {
+        Author author = parser.parse("\"family={Robert and Sons, Inc.}\"").getAuthor(0);
+
+        assertEquals(Optional.of("{Robert and Sons, Inc.}"), author.getFamilyName());
+    }
+
+    // https://github.com/plk/biblatex/blob/dev/doc/latex/biblatex/biblatex.tex#L3399-L3445
+    private static Stream<Arguments> biblatexManualNames() {
+        return Stream.of(
+                Arguments.of("given=Hans, family=Harman and given=Simon, prefix=de, family=Beumont",
+                        List.of("Harman", "Beumont")),
+                Arguments.of("given=Jean, prefix=de la, prefix-i=d, family=Rousse", List.of("Rousse")),
+                Arguments.of("given={Jean Pierre Simon}, given-i=JPS", List.of("")),
+                Arguments.of("given={Jean Pierre}", List.of("")),
+                Arguments.of("\"family={Robert and Sons, Inc.}\"", List.of("{Robert and Sons, Inc.}")),
+                Arguments.of("Hans Harman and given=Simon, prefix=de, family=Beumont", List.of("Harman", "Beumont")),
+                Arguments.of("nosortothers=true and Hans Harman and given=Simon, family=Beumont, prefix=de, useprefix=true",
+                        List.of("Harman", "Beumont")),
+                Arguments.of("id=person1, given=Simon, family=Beumont", List.of("Beumont")),
+                Arguments.of("id=person1, given=Simone, family=Beumont", List.of("Beumont")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("biblatexManualNames")
+    void parsesBiblatexManualExamples(String input, List<String> families) {
+        AuthorList authors = parser.parse(input);
+
+        assertEquals(families, authors.getAuthors().stream().map(author -> author.getFamilyName().orElse("")).toList());
+        assertTrue(authors.hasValidExtendedNames());
+        assertEquals(authors, parser.parse(authors.getAsBibtex()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"family=Smith   Jones", "family=Smith\nJones", "\"family=Smith and Jones\""})
+    void keepsProtectedFamilyTogether(String input) {
+        AuthorList authors = parser.parse(input);
+
+        assertEquals(1, authors.getNumberOfAuthors());
+        assertEquals(input, authors.getAsBibtex());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"family=Smith and others", "family=Smith and Others", "family=Smith and\tOTHERS"})
+    void extendedListRecognizesFinalOthersMarker(String input) {
+        AuthorList authors = parser.parse(input);
+
+        assertEquals(1, authors.getNamedAuthors().size());
+        assertSame(Author.OTHERS, authors.getAuthor(1));
+        assertEquals("family=Smith and others", authors.getAsBibtex());
     }
 
     @Test
