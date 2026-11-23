@@ -72,6 +72,10 @@ final class KeyringUtil {
         writeKeyringEntries(single);
     }
 
+    void clearCredential(KeyringSlot slot) throws PasswordAccessException {
+        writeKeyringEntries(Map.of(slot, ""), true);
+    }
+
     Map<String, String> readFetcherKeyBundle() {
         return read(KeyringSlot.CUSTOM_API_KEYS).flatMap(this::parseFetcherKeys).orElseGet(Map::of);
     }
@@ -186,6 +190,10 @@ final class KeyringUtil {
 
     /// @throws PasswordAccessException if the keyring entries could not be updated
     private void writeKeyringEntries(Map<KeyringSlot, String> secrets) throws PasswordAccessException {
+        writeKeyringEntries(secrets, false);
+    }
+
+    private void writeKeyringEntries(Map<KeyringSlot, String> secrets, boolean confirmRemoval) throws PasswordAccessException {
         Keyring keyring;
         try {
             keyring = Keyring.create();
@@ -209,7 +217,10 @@ final class KeyringUtil {
                 } else {
                     // A nonempty blank value suppresses migration and works with keyrings that reject empty values.
                     keyring.setPassword(slot.service(), slot.account(), " ");
-                    if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
+                    if (confirmRemoval) {
+                        deleteIfPresent(keyring, slot.legacyService(), slot.account());
+                        deleteIfPresent(keyring, slot.service(), slot.account());
+                    } else if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
                         deleteFromKeyring(keyring, slot.service(), slot.account());
                     }
                 }

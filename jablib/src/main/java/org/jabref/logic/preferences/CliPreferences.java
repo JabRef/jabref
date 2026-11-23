@@ -163,6 +163,21 @@ public interface CliPreferences {
         CredentialCommit writeKeyring() throws JabRefException;
     }
 
+    /// A failed keyring operation whose new credential can still be applied for the session.
+    @NullMarked
+    final class CredentialSaveException extends JabRefException {
+        private final Runnable sessionUpdate;
+
+        CredentialSaveException(Throwable cause, Runnable sessionUpdate) {
+            super("Could not update credential in keyring", cause);
+            this.sessionUpdate = sessionUpdate;
+        }
+
+        public void applySessionUpdate() {
+            sessionUpdate.run();
+        }
+    }
+
     /// Applies a credential update on the preference-owning thread, or requests another worker pass.
     @FunctionalInterface
     @NullMarked

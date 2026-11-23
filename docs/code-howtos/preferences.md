@@ -144,7 +144,9 @@ Further rules:
   Before replacing an established bundle, Web Search compares it with the loaded keys and rejects a stale update.
   The Preferences dialog checks keyring availability once and saves changed credentials in background tasks.
   The JavaFX thread applies each credential update after its keyring operation succeeds.
-  If a credential update fails, the dialog saves ordinary preferences and stays open so the credential update can be retried.
+  If a credential update fails, the dialog attempts the remaining updates and saves ordinary preferences before reporting the affected tabs.
+  Proxy password and GitHub token edits take effect for the current session when their keyring update fails.
+  The dialog stays open so failed updates can be retried.
   The launcher loads credential preferences before JavaFX starts, and the dialog runs its final backing-store flush in a background task.
   Preference imports preserve the local bundle's name list.
   See [ADR 0085](../decisions/0085-bundle-custom-api-keys.md).

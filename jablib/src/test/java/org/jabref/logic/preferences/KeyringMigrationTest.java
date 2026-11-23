@@ -1,13 +1,17 @@
 package org.jabref.logic.preferences;
 
+import java.util.Optional;
+
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
+import org.jabref.logic.preferences.CliPreferences.CredentialSaveException;
 import org.jabref.model.metadata.UserHostInfo;
 
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.KeyringStorageType;
 import com.github.javakeyring.PasswordAccessException;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.AfterEach;
@@ -27,6 +31,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,21 +93,73 @@ class KeyringMigrationTest {
     }
 
     @Test
-    void deniedPreparedGitHubTokenDoesNotPublish() throws PasswordAccessException {
+    void deniedGitHubWriteAppliesSessionTokenAndRetriesUnchangedEdit() throws JabRefException, PasswordAccessException {
         doThrow(new PasswordAccessException("Access denied"))
+                .doNothing()
                 .when(keyring).setPassword("org.jabref.github", "github", "replacement");
+        when(keyring.getPassword("org.jabref.github", "github")).thenReturn("previous");
         try (MockedStatic<Keyring> factory = Mockito.mockStatic(Keyring.class)) {
             factory.when(Keyring::create).thenReturn(keyring);
             JabRefCliPreferences preferences = createPreferences(LEGACY_KEY);
-            GitPreferences git = preferences.getGitPreferences();
-            String previous = git.getPat();
-            boolean previouslyPersisted = git.getPersistPat();
+            String rememberPatKey = "githubRememberPat";
+            boolean hadRememberPat = preferences.hasKey(rememberPatKey);
+            boolean previousRememberPat = preferences.getBoolean(rememberPatKey, false);
+            preferences.putBoolean(rememberPatKey, true);
+            try {
+                GitPreferences git = preferences.getGitPreferences();
+                CliPreferences.CredentialSave save = preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE).orElseThrow();
 
-            CliPreferences.CredentialSave save = preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE).orElseThrow();
+                CredentialSaveException failure = assertThrows(CredentialSaveException.class, save::writeKeyring);
+                assertEquals("previous", git.getPat());
+                failure.applySessionUpdate();
 
-            assertThrows(JabRefException.class, save::writeKeyring);
-            assertEquals(previous, git.getPat());
-            assertEquals(previouslyPersisted, git.getPersistPat());
+                assertEquals("replacement", git.getPat());
+                assertEquals(true, git.getPersistPat());
+                verify(keyring).setPassword("org.jabref.github", "github", "replacement");
+
+                preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE).orElseThrow().writeKeyring().apply();
+
+                verify(keyring, times(2)).setPassword("org.jabref.github", "github", "replacement");
+                assertEquals(Optional.empty(), preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE));
+            } finally {
+                if (hadRememberPat) {
+                    preferences.putBoolean(rememberPatKey, previousRememberPat);
+                } else {
+                    preferences.remove(rememberPatKey);
+                }
+            }
+        }
+    }
+
+    @Test
+    void deniedProxyClearAppliesSessionPasswordAndKeepsPersistenceUntilRetry() throws JabRefException, PasswordAccessException {
+        when(keyring.getKeyringStorageType()).thenReturn(KeyringStorageType.OSX_KEYCHAIN);
+        when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(PLAIN_TEXT);
+        when(keyring.getPassword(LEGACY_SERVICE, ACCOUNT)).thenReturn(LEGACY_CIPHERTEXT);
+        doThrow(new PasswordAccessException("Access denied"))
+                .doNothing()
+                .when(keyring).deletePassword(LEGACY_SERVICE, ACCOUNT);
+        try (MockedStatic<Keyring> factory = Mockito.mockStatic(Keyring.class)) {
+            factory.when(Keyring::create).thenReturn(keyring);
+            JabRefCliPreferences preferences = createPreferences(LEGACY_KEY);
+            ProxyPreferences proxy = preferences.getProxyPreferences();
+            CliPreferences.CredentialSave save = preferences.prepareProxyPasswordSave("session", CredentialPersistence.SESSION_ONLY).orElseThrow();
+
+            CredentialSaveException failure = assertThrows(CredentialSaveException.class, save::writeKeyring);
+            assertEquals(PLAIN_TEXT, proxy.getPassword());
+            failure.applySessionUpdate();
+
+            assertEquals("session", proxy.getPassword());
+            assertEquals(true, proxy.shouldPersistPassword());
+            assertEquals(true, preferences.getBoolean(PROXY_PERSIST_PASSWORD, false));
+            verify(keyring, never()).setPassword(NEW_SERVICE, ACCOUNT, "session");
+
+            preferences.prepareProxyPasswordSave("session", CredentialPersistence.SESSION_ONLY).orElseThrow().writeKeyring().apply();
+
+            assertEquals("session", proxy.getPassword());
+            assertEquals(false, proxy.shouldPersistPassword());
+            assertEquals(false, preferences.getBoolean(PROXY_PERSIST_PASSWORD, true));
+            verify(keyring, times(2)).deletePassword(LEGACY_SERVICE, ACCOUNT);
         }
     }
 

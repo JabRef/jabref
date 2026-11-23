@@ -490,6 +490,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private final boolean resetsGlobalStores;
     private boolean replayingImportedPreferences;
     private boolean resettingIsolatedNode;
+    private final Set<KeyringSlot> pendingCredentialSaves = new HashSet<>();
     private final ThreadLocal<Boolean> publishingCredentials = ThreadLocal.withInitial(() -> false);
 
     /// Cache variables
@@ -1022,21 +1023,33 @@ public class JabRefCliPreferences implements CliPreferences {
                                                                  BooleanProperty stored, String secret, CredentialPersistence persistence) {
         boolean persist = persistence == CredentialPersistence.SAVE;
         boolean wasPersisted = stored.get();
-        if (persist == wasPersisted && secret.equals(value.get())) {
+        if (persist == wasPersisted && secret.equals(value.get()) && !pendingCredentialSaves.contains(slot)) {
             return Optional.empty();
         }
         KeyringUtil keyring = keyring();
         return Optional.of(() -> {
             if (wasPersisted || (persist && StringUtil.isNotBlank(secret))) {
                 try {
-                    keyring.write(slot, persist ? secret : "");
+                    if (persist && StringUtil.isNotBlank(secret)) {
+                        keyring.write(slot, secret);
+                    } else {
+                        keyring.clearCredential(slot);
+                    }
                 } catch (PasswordAccessException ex) {
-                    throw new JabRefException("Could not update credential in keyring", ex);
+                    throw new CredentialSaveException(ex, () -> {
+                        if (persist == wasPersisted) {
+                            pendingCredentialSaves.add(slot);
+                        } else {
+                            pendingCredentialSaves.remove(slot);
+                        }
+                        publishCredentials(() -> value.set(secret));
+                    });
                 }
             }
             return CredentialCommit.of(() -> publishCredentials(() -> {
                 stored.set(persist);
                 value.set(secret);
+                pendingCredentialSaves.remove(slot);
             }));
         });
     }

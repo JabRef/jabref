@@ -50,12 +50,14 @@ import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences.CredentialSave;
+import org.jabref.logic.preferences.CliPreferences.CredentialSaveException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,45 +230,56 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        List<CredentialSave> credentialSaves = preferenceTabs.stream()
-                                                             .map(PreferencesTab::prepareCredentialSave)
-                                                             .flatMap(Optional::stream)
-                                                             .toList();
+        List<CredentialUpdate> credentialSaves = preferenceTabs.stream()
+                                                               .flatMap(tab -> tab.prepareCredentialSave().stream()
+                                                                                  .map(save -> new CredentialUpdate(tab.getTabName(), save)))
+                                                               .toList();
         saving.set(true);
-        saveNextCredential(credentialSaves.iterator(), onSaved);
+        saveNextCredential(credentialSaves.iterator(), new ArrayList<>(), onSaved);
     }
 
-    /// Applies each successful credential update on JavaFX before starting the next keyring operation.
-    /// This keeps saved credentials and live preferences aligned if a later operation fails.
-    private void saveNextCredential(Iterator<CredentialSave> saves, Runnable onSaved) {
+    @NullMarked
+    private record CredentialUpdate(String tabName, CredentialSave save) {
+    }
+
+    /// Applies each credential update on JavaFX before starting the next keyring operation.
+    private void saveNextCredential(Iterator<CredentialUpdate> saves, List<String> credentialWarnings, Runnable onSaved) {
         if (!saves.hasNext()) {
             storeTabsAndFlush(() -> {
-                dialogService.notify(Localization.lang("Preferences recorded."));
-                onSaved.run();
+                if (credentialWarnings.isEmpty()) {
+                    dialogService.notify(Localization.lang("Preferences recorded."));
+                    onSaved.run();
+                } else {
+                    dialogService.notify(String.join("\n", credentialWarnings));
+                }
             });
             return;
         }
 
-        saveCredential(saves.next(), saves, onSaved);
+        saveCredential(saves.next(), saves, credentialWarnings, onSaved);
     }
 
-    private void saveCredential(CredentialSave save, Iterator<CredentialSave> saves, Runnable onSaved) {
-        BackgroundTask.wrap(save::writeKeyring)
+    private void saveCredential(CredentialUpdate update, Iterator<CredentialUpdate> saves, List<String> credentialWarnings, Runnable onSaved) {
+        BackgroundTask.wrap(update.save()::writeKeyring)
                       .onSuccess(commit -> {
                           try {
                               commit.apply().ifPresentOrElse(
-                                      retry -> saveCredential(retry, saves, onSaved),
-                                      () -> saveNextCredential(saves, onSaved));
+                                      retry -> saveCredential(new CredentialUpdate(update.tabName(), retry), saves, credentialWarnings, onSaved),
+                                      () -> saveNextCredential(saves, credentialWarnings, onSaved));
                           } catch (RuntimeException ex) {
                               saving.set(false);
                               throw ex;
                           }
                       })
                       .onFailure(ex -> {
-                          LOGGER.warn("Could not update saved credentials", ex);
-                          dialogService.showErrorDialogAndWait(Localization.lang("Could not update saved credentials"));
-                          storeTabsAndFlush(() -> {
-                          });
+                          LOGGER.warn("Could not update saved credentials for {}", update.tabName(), ex);
+                          if (ex instanceof CredentialSaveException credentialFailure) {
+                              credentialFailure.applySessionUpdate();
+                              credentialWarnings.add(Localization.lang("%0: Could not update saved credentials. The changes are available for this session.", update.tabName()));
+                          } else {
+                              credentialWarnings.add(Localization.lang("%0: Could not update saved credentials.", update.tabName()));
+                          }
+                          saveNextCredential(saves, credentialWarnings, onSaved);
                       })
                       .executeWith(taskExecutor);
     }
