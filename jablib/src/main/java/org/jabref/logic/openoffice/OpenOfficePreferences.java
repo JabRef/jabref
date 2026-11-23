@@ -15,7 +15,6 @@ import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
-import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
 import org.jabref.model.openoffice.style.CitationType;
@@ -36,7 +35,6 @@ public class OpenOfficePreferences {
     private final BooleanProperty useAllDatabases;
     private final BooleanProperty syncWhenCiting;
     private final ObservableList<String> externalJStyles;
-    private final StringProperty currentJStyle;
     private final ObjectProperty<OOStyle> currentStyle;
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty cslBibliographyTitle;
@@ -56,7 +54,6 @@ public class OpenOfficePreferences {
                                  boolean useAllDatabases,
                                  boolean syncWhenCiting,
                                  List<String> externalJStyles,
-                                 String currentJStyle,
                                  OOStyle currentStyle,
                                  boolean alwaysAddCitedOnPages,
                                  String cslBibliographyTitle,
@@ -75,7 +72,6 @@ public class OpenOfficePreferences {
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
         this.externalJStyles = FXCollections.observableArrayList(externalJStyles);
-        this.currentJStyle = new SimpleStringProperty(currentJStyle);
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
@@ -100,7 +96,6 @@ public class OpenOfficePreferences {
                 true,                                           // useAllDatabases
                 false,                                          // syncWhenCiting
                 List.of(),                                      // externalJStyles
-                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
                 CSLStyleLoader.getDefaultStyle(),               // currentStyle
                 false,                                          // alwaysAddCitedOnPages
                 "References",                                   // cslBibliographyTitle
@@ -124,10 +119,6 @@ public class OpenOfficePreferences {
 
     public void clearConnectionSettings() {
         this.executablePath.set("");
-    }
-
-    public void clearCurrentJStyle() {
-        this.currentJStyle.set("");
     }
 
     /// path to soffice-file
@@ -176,19 +167,6 @@ public class OpenOfficePreferences {
 
     public void setExternalJStyles(List<String> list) {
         externalJStyles.setAll(list);
-    }
-
-    /// path to the used style file
-    public String getCurrentJStyle() {
-        return currentJStyle.get();
-    }
-
-    public StringProperty currentJStyleProperty() {
-        return currentJStyle;
-    }
-
-    public void setCurrentJStyle(String currentJStyle) {
-        this.currentJStyle.set(currentJStyle);
     }
 
     public OOStyle getCurrentStyle() {
@@ -308,12 +286,6 @@ public class OpenOfficePreferences {
 
     public void setInferCslStyleFromDocument(boolean inferCslStyleFromDocument) {
         this.inferCslStyleFromDocument.set(inferCslStyleFromDocument);
-    }
-
-    public OpenOfficeReferenceMarkFormat getReferenceMarkFormat() {
-        return zoteroCompatibilityMode.get()
-               ? OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE
-               : OpenOfficeReferenceMarkFormat.JABREF_ONLY;
     }
 
     /// List of paths to external BST style files.
