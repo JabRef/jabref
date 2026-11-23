@@ -22,6 +22,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String URL_TAG = "[url_tag]";
     private static final String YEAR_TAG = "[year_tag]";
     private static final String PAGES_TAG = "[pages_tag]";
+    private static final String VOLUME_TAG = "[volume_tag]";
+    private static final Pattern TAG_PATTERN = Pattern.compile("\\[\\w+_tag]");
     private static final String INITIALS_GROUP = "INITIALS";
     private static final String LASTNAME_GROUP = "LASTNAME";
 
@@ -38,12 +40,33 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final Pattern AUTHOR_PATTERN = Pattern.compile(
             "(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+),?\\s(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})" +
                     "\\s*(and|,|\\.)*",
-            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final Pattern AUTHOR_PATTERN_2 = Pattern.compile(
             "(?<" + INITIALS_GROUP + ">(\\p{Lu}\\.\\s){1,2})(?<" + LASTNAME_GROUP + ">\\p{Lu}\\w+)" +
                     "\\s*(and|,|\\.)*",
-            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            Pattern.MULTILINE | Pattern.DOTALL);
+
+    /// Last name of an undotted author, possibly with several words, e.g., `Di Penta` or `Linares-Vásquez`.
+    private static final String UNDOTTED_LASTNAME = "\\p{Lu}[\\p{L}\\p{M}'’´-]*(?:\\s\\p{Lu}[\\p{L}\\p{M}'’´-]*+){0,3}";
+    private static final String UNDOTTED_INITIALS = "\\p{Lu}{1,3}";
+
+    /// One "Lastname IN" author as used by Springer and Vancouver styles, e.g., `Di Penta M` or `German DM`.
+    private static final Pattern UNDOTTED_AUTHOR_PATTERN = Pattern.compile(
+            "(?<" + LASTNAME_GROUP + ">" + UNDOTTED_LASTNAME + ")\\s(?<" + INITIALS_GROUP + ">" + UNDOTTED_INITIALS + ")\\b");
+
+    /// Undotted authors are only accepted as a list at the start of the citation, because elsewhere "Word ABC" is too ambiguous.
+    /// The bounded repetitions keep the regex engine's recursion depth small on long input.
+    private static final Pattern UNDOTTED_AUTHOR_LIST_PATTERN = Pattern.compile(
+            "^\\s*" + UNDOTTED_LASTNAME + "\\s" + UNDOTTED_INITIALS + "\\b" +
+                    "(?:\\s*,\\s*(?:and\\s+|&\\s*)?" + UNDOTTED_LASTNAME + "\\s" + UNDOTTED_INITIALS + "\\b){0,99}" +
+                    "(?:\\s*,?\\s*et al\\.?)?");
+
+    private static final Pattern PARENTHESIZED_YEAR_PATTERN = Pattern.compile("\\((\\d{4})[a-z]?\\)");
+
+    private static final Pattern VOLUME_NUMBER_PATTERN = Pattern.compile("\\b(\\d{1,4})\\s?\\((\\d{1,4})\\)");
+
+    private static final Pattern PAGE_RANGE_PATTERN = Pattern.compile("\\b(\\d+)\\s?[-‐‑–—]+\\s?(\\d+)\\b");
 
     private static final Pattern PAGES_PATTERN = Pattern.compile(
             "(p.)?\\s?\\d+(-\\d+)?",
@@ -53,6 +76,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private List<String> authors;
     private String year;
     private String pages;
+    private String volume;
+    private String number;
     private String title;
     private String doi;
     private boolean isArticle;
@@ -64,6 +89,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         authors = new ArrayList<>();
         year = "";
         pages = "";
+        volume = "";
+        number = "";
         title = "";
         doi = "";
         isArticle = true;
@@ -75,7 +102,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         String inputWithoutUrls = findUrls(inputWithoutDoi);
         String inputWithoutAuthors = findAuthors(inputWithoutUrls);
         String inputWithoutYear = findYear(inputWithoutAuthors);
-        String inputWithoutPages = findPages(inputWithoutYear);
+        String inputWithoutVolume = findVolume(inputWithoutYear);
+        String inputWithoutPages = findPages(inputWithoutVolume);
         String nonParsed = findParts(inputWithoutPages);
         return generateEntity(nonParsed);
     }
@@ -87,6 +115,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         extractedEntity.setField(StandardField.URL, String.join(", ", urls));
         extractedEntity.setField(StandardField.YEAR, year);
         extractedEntity.setField(StandardField.PAGES, pages);
+        extractedEntity.setField(StandardField.VOLUME, volume);
+        extractedEntity.setField(StandardField.NUMBER, number);
         extractedEntity.setField(StandardField.TITLE, title);
         if (!doi.isEmpty()) {
             extractedEntity.setField(StandardField.DOI, doi);
@@ -96,7 +126,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         } else {
             extractedEntity.setField(StandardField.PUBLISHER, journalOrPublisher);
         }
-        extractedEntity.setField(StandardField.COMMENT, input);
+        extractedEntity.setField(StandardField.COMMENT, stripTags(input).replaceAll("^[\\s\\p{Punct}]+$", ""));
         return Optional.of(extractedEntity);
     }
 
@@ -133,11 +163,17 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private String findYear(String input) {
+        Matcher parenthesized = PARENTHESIZED_YEAR_PATTERN.matcher(input);
+        while (parenthesized.find()) {
+            if (isPlausibleYear(parenthesized.group(1))) {
+                year = parenthesized.group(1);
+                return fixSpaces(input.substring(0, parenthesized.start()) + YEAR_TAG + input.substring(parenthesized.end()));
+            }
+        }
         Matcher matcher = YEAR_PATTERN.matcher(input);
         while (matcher.find()) {
             String yearCandidate = input.substring(matcher.start(), matcher.end());
-            int intYearCandidate = Integer.parseInt(yearCandidate);
-            if ((intYearCandidate > 1700) && (intYearCandidate <= Calendar.getInstance().get(Calendar.YEAR))) {
+            if (isPlausibleYear(yearCandidate)) {
                 year = yearCandidate;
                 return fixSpaces(input.replace(year, YEAR_TAG));
             }
@@ -145,9 +181,27 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         return input;
     }
 
+    private static boolean isPlausibleYear(String candidate) {
+        int year = Integer.parseInt(candidate);
+        return (year > 1700) && (year <= Calendar.getInstance().get(Calendar.YEAR));
+    }
+
     private String findAuthors(String input) {
         String currentInput = findAuthorsByPattern(input, AUTHOR_PATTERN);
-        return findAuthorsByPattern(currentInput, AUTHOR_PATTERN_2);
+        currentInput = findAuthorsByPattern(currentInput, AUTHOR_PATTERN_2);
+        if (!authors.isEmpty()) {
+            return currentInput;
+        }
+        Matcher list = UNDOTTED_AUTHOR_LIST_PATTERN.matcher(input);
+        if (!list.find() || list.end() == 0) {
+            return input;
+        }
+        Matcher author = UNDOTTED_AUTHOR_PATTERN.matcher(list.group());
+        while (author.find()) {
+            // "DM" -> "D. M.", so that BibTeX sees two initials instead of one first name
+            authors.add(GenerateAuthor(author.group(LASTNAME_GROUP), author.group(INITIALS_GROUP).replaceAll("\\p{Lu}", "$0. ")));
+        }
+        return fixSpaces(AUTHOR_TAG + " " + input.substring(list.end()));
     }
 
     private String findAuthorsByPattern(String input, Pattern pattern) {
@@ -159,10 +213,25 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private String GenerateAuthor(String lastName, String initials) {
-        return lastName + ", " + initials;
+        return lastName + ", " + initials.trim();
+    }
+
+    private String findVolume(String input) {
+        Matcher matcher = VOLUME_NUMBER_PATTERN.matcher(input);
+        if (!matcher.find()) {
+            return input;
+        }
+        volume = matcher.group(1);
+        number = matcher.group(2);
+        return fixSpaces(input.substring(0, matcher.start()) + VOLUME_TAG + input.substring(matcher.end()));
     }
 
     private String findPages(String input) {
+        Matcher range = PAGE_RANGE_PATTERN.matcher(input);
+        if (range.find()) {
+            pages = range.group(1) + "--" + range.group(2);
+            return fixSpaces(input.substring(0, range.start()) + PAGES_TAG + input.substring(range.end()));
+        }
         Matcher matcher = PAGES_PATTERN.matcher(input);
         if (matcher.find()) {
             pages = input.substring(matcher.start(), matcher.end());
@@ -193,6 +262,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         } else {
             lastParts.addAll(Arrays.asList(input.substring(afterAuthorsIndex).split(",|\\.")));
         }
+        lastParts.replaceAll(part -> stripTags(part).replaceAll("^[\\s:;,]+|[\\s:;,]+$", ""));
+        lastParts.removeIf(String::isEmpty);
         int nonDigitParts = 0;
         for (String part : lastParts) {
             if (containsDigit(part)) {
@@ -210,6 +281,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             isArticle = false;
         }
         return fixSpaces(input);
+    }
+
+    private static String stripTags(String input) {
+        return TAG_PATTERN.matcher(input).replaceAll("").replaceAll("\\s+", " ").trim();
     }
 
     /// Checks whether `input` contains at least one digit. Used instead of a
