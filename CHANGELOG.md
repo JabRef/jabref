@@ -85,6 +85,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed LibreOffice/OpenOffice bibliography refresh to remove outdated references and extra blank paragraphs only for the selected JabRef/Zotero citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice citation refresh to order citations by document text when citation positions on screen are unavailable. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We simplified secure credential storage and reduced macOS approval prompts for saved API keys. [#13687](https://github.com/JabRef/jabref/issues/13687)
 
 ### Fixed
 
