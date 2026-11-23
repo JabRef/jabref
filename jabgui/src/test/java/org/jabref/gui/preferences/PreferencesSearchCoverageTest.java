@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.application.HostServices;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;

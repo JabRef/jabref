@@ -3,8 +3,8 @@ package org.jabref.gui.preferences.network;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;

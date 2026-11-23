@@ -3,10 +3,10 @@ package org.jabref.gui.preferences.websearch;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
