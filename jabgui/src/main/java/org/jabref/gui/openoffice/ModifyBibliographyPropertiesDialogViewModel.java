@@ -1,12 +1,15 @@
 package org.jabref.gui.openoffice;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 
@@ -25,7 +28,10 @@ public class ModifyBibliographyPropertiesDialogViewModel {
 
     public ModifyBibliographyPropertiesDialogViewModel(OpenOfficePreferences openOfficePreferences) {
         this.openOfficePreferences = openOfficePreferences;
-        this.shouldDisableHeadingControls = openOfficePreferences.zoteroCompatibilityModeProperty();
+        this.shouldDisableHeadingControls = new SimpleBooleanProperty();
+        this.shouldDisableHeadingControls.bind(Bindings.createBooleanBinding(
+                () -> openOfficePreferences.getCurrentStyle() instanceof CitationStyle && openOfficePreferences.getZoteroCompatibilityMode(),
+                openOfficePreferences.currentStyleProperty(), openOfficePreferences.zoteroCompatibilityModeProperty()));
 
         this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());
         this.cslBibliographySelectedHeaderFormat.set(openOfficePreferences.getCslBibliographyHeaderFormat());

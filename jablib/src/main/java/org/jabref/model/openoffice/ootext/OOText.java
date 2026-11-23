@@ -2,7 +2,7 @@ package org.jabref.model.openoffice.ootext;
 
 import org.jspecify.annotations.NonNull;
 
-/// Text with HTML-like markup as understood by OOTextIntoOO.write
+/// Text with HTML-like markup interpreted by [org.jabref.logic.openoffice.uno.OOTextWriter].
 ///
 /// Some of the tags can be added using OOFormat methods. Others come from the layout engine, either by interpreting LaTeX markup or from settings in the jstyle file.
 public class OOText {
