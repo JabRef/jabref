@@ -3,10 +3,8 @@ package org.jabref.logic.preferences;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -92,6 +90,7 @@ import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.KeyringUtil.KeyringSlot;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushApplications;
@@ -99,7 +98,6 @@ import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -124,7 +122,6 @@ import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
-import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
 import com.nimbusds.oauth2.sdk.ParseException;
@@ -355,8 +352,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // CiteDrive
     // RefreshToken
-    private static final String CITE_DRIVE_KEYRING_SERVICE = "org.jabref";
-    private static final String CITE_DRIVE_KEYRING_ACCOUNT = "citedrive";
     private static final String CITE_DRIVE_ENABLED = "citeDriveEnabled";
     private static final String CITE_DRIVE_PERSIST_TOKEN = "citeDrivePersistToken";
     private static final String CITE_DRIVE_API_BASE_URL = "citeDriveApiBaseUrl";
@@ -470,6 +465,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String IMPORTER_WORKING_DIRECTORY = "importWorkingDirectory";
     private static final String IMPORTER_WARN_ABOUT_DUPLICATES = "warnAboutDuplicatesInInspection";
     private static final String IMPORTER_CUSTOM_FORMAT = "customImportFormat";
+    private static final String FETCHER_CUSTOM_KEY_BUNDLE_NAMES = "fetcherCustomKeyBundleNames";
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
     private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
@@ -493,7 +489,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private final Preferences preferencesNode;
     private final boolean resetsGlobalStores;
+    private boolean replayingImportedPreferences;
     private boolean resettingIsolatedNode;
+    private final Set<KeyringSlot> pendingCredentialSaves = new HashSet<>();
+    private final ThreadLocal<Boolean> publishingCredentials = ThreadLocal.withInitial(() -> false);
 
     /// Cache variables
     private LibraryPreferences libraryPreferences;
@@ -502,6 +501,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private TimestampPreferences timestampPreferences;
     private OpenOfficePreferences openOfficePreferences;
     private ImporterPreferences importerPreferences;
+    private Map<String, String> loadedFetcherKeyBundle = Map.of();
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
     private FilePreferences filePreferences;
@@ -530,23 +530,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private final List<PreferenceBinding> allBindings = new ArrayList<>();
 
     private record PreferenceBinding(Observable property, Object defaultValue, String preferencesKey, Runnable importFromStore, Runnable resetToDefaults) {
-    }
-
-    /// Identifies a single secret in the system keyring by its `service` and `account`.
-    ///
-    /// The secret is stored as plain text under `service`. Older versions stored it encrypted with [Password] under
-    /// `legacyService` (same `account`); such values are migrated when they are read.
-    ///
-    /// See [ADR 0081](https://devdocs.jabref.org/decisions/0081-store-keyring-secrets-without-application-encryption.html) for why no extra encryption is used.
-    private record KeyringSlot(String service, String account, String legacyService) {
-        // [impl->adr~keyring.no-application-encryption~1]
-        static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref.proxy", "proxy", "org.jabref");
-        static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref.github", "github", "org.jabref");
-
-        /// Slot holding a custom API key for the fetcher with the given name.
-        static KeyringSlot customApiKey(String fetcherName) {
-            return new KeyringSlot("org.jabref.apikeys", fetcherName, "org.jabref.customapikeys");
-        }
     }
 
     public JabRefCliPreferences() {
@@ -727,7 +710,17 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Calling this method will write all preferences into the preference store.
     @Override
     public void flush() {
-        if (getInternalPreferences().isMemoryStickMode()) {
+        prepareFlush().run();
+    }
+
+    @Override
+    public Runnable prepareFlush() {
+        boolean memoryStickMode = getInternalPreferences().isMemoryStickMode();
+        return () -> flush(memoryStickMode);
+    }
+
+    private void flush(boolean memoryStickMode) {
+        if (memoryStickMode) {
             try {
                 exportPreferences(Path.of("jabref.xml"));
             } catch (JabRefException e) {
@@ -988,127 +981,92 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param shouldPersist gate evaluated on every change; the value is written only while it returns true
     private void bindToKeyring(StringProperty property, KeyringSlot slot, BooleanSupplier shouldPersist) {
         EasyBind.listen(property, (_, _, newValue) -> {
-            if (shouldPersist.getAsBoolean()) {
+            if (!publishingCredentials.get() && shouldPersist.getAsBoolean()) {
                 writeKeyring(slot, newValue);
             }
         });
     }
 
-    /// Reads the secret at a single slot, or empty if it is absent/blank or the keyring is unavailable.
+    private KeyringUtil keyring() {
+        return new KeyringUtil(() -> getInternalPreferences().getUserHostInfo().getUserHostString());
+    }
+
     private Optional<String> readKeyring(KeyringSlot slot) {
-        return Optional.ofNullable(readKeyring(List.of(slot)).get(slot))
-                       .filter(StringUtil::isNotBlank);
+        return resettingIsolatedNode ? Optional.empty() : keyring().read(slot);
     }
 
-    /// Reads the secrets at the given slots in a single keyring session. On a successful open the result
-    /// holds an entry for **every** requested slot — the secret, or "" when that slot is empty. Returns an
-    /// empty map if the keyring cannot be opened, so callers tell failure from "all slots empty" by size
-    /// (`result.size() == slots.size()` iff the open succeeded; an empty `slots` is a no-op).
-    private Map<KeyringSlot, String> readKeyring(List<KeyringSlot> slots) {
-        if (resettingIsolatedNode) {
-            return Map.of();
-        }
-        Map<KeyringSlot, String> result = new HashMap<>();
-        try (Keyring keyring = Keyring.create()) {
-            for (KeyringSlot slot : slots) {
-                result.put(slot, readSecret(keyring, slot));
-            }
-        } catch (Exception ex) {
-            LOGGER.warn("Could not open keyring", ex);
-            return Map.of();
-        }
-        return result;
-    }
-
-    /// Reads the plain-text secret of a slot, migrating a legacy encrypted value first if needed. Returns "" when
-    /// nothing is stored.
-    private String readSecret(Keyring keyring, KeyringSlot slot) {
-        try {
-            return keyring.getPassword(slot.service(), slot.account());
-        } catch (PasswordAccessException _) {
-            return migrateLegacySecret(keyring, slot);
-        }
-    }
-
-    /// Moves a secret stored encrypted by older JabRef versions to the slot's current location as plain text.
-    ///
-    /// The legacy entry is removed only after the new one was written, so a failed write is retried on the next read.
-    /// A legacy value that cannot be decrypted (e.g., because the owner or the host name changed) is discarded.
-    ///
-    /// @return the decrypted secret, or "" if there is no legacy value or it cannot be decrypted
-    private String migrateLegacySecret(Keyring keyring, KeyringSlot slot) {
-        // [impl->req~keyring.legacy-migration~1]
-        String encrypted;
-        try {
-            encrypted = keyring.getPassword(slot.legacyService(), slot.account());
-        } catch (PasswordAccessException _) {
-            LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
-            return "";
-        }
-
-        String secret;
-        try {
-            secret = new Password(encrypted, getInternalPreferences().getUserHostInfo().getUserHostString()).decrypt();
-        } catch (GeneralSecurityException | UnsupportedEncodingException | IllegalArgumentException e) {
-            LOGGER.warn("Could not decrypt the stored secret for {}/{}. It is discarded and has to be entered again.", slot.legacyService(), slot.account(), e);
-            deleteFromKeyring(keyring, slot.legacyService(), slot.account());
-            return "";
-        }
-
-        try {
-            keyring.setPassword(slot.service(), slot.account(), secret);
-        } catch (PasswordAccessException e) {
-            LOGGER.warn("Could not move the secret for {}/{} to {}", slot.legacyService(), slot.account(), slot.service(), e);
-            return secret;
-        }
-        deleteFromKeyring(keyring, slot.legacyService(), slot.account());
-        return secret;
-    }
-
-    /// Deletes an entry from the keyring.
-    ///
-    /// @return `false` if deletion could not be confirmed
-    private static boolean deleteFromKeyring(Keyring keyring, String service, String account) {
-        try {
-            keyring.deletePassword(service, account);
-            return true;
-        } catch (PasswordAccessException e) {
-            LOGGER.debug("Could not delete keyring entry for {}/{}", service, account, e);
-            return false;
-        }
-    }
-
-    /// Writes (or, for a blank secret, clears) a single slot.
     private void writeKeyring(KeyringSlot slot, String secret) {
-        Map<KeyringSlot, String> single = new HashMap<>();
-        single.put(slot, secret);
-        writeKeyring(single);
-    }
-
-    /// Writes each secret as plain text to its slot in a single keyring session. A blank secret clears its slot.
-    /// In both cases, a legacy encrypted value of the slot is removed, so that it cannot be migrated later.
-    private void writeKeyring(Map<KeyringSlot, String> secrets) {
         if (resettingIsolatedNode) {
             return;
         }
-        // [impl->req~keyring.plain-text-storage~1]
-        // [impl->req~keyring.legacy-migration~1]
-        try (Keyring keyring = Keyring.create()) {
-            for (Map.Entry<KeyringSlot, String> entry : secrets.entrySet()) {
-                KeyringSlot slot = entry.getKey();
-                if (StringUtil.isNotBlank(entry.getValue())) {
-                    keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
-                    deleteFromKeyring(keyring, slot.legacyService(), slot.account());
-                } else {
-                    // A nonempty blank value suppresses migration and works with keyrings that reject empty values.
-                    keyring.setPassword(slot.service(), slot.account(), " ");
-                    if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
-                        deleteFromKeyring(keyring, slot.service(), slot.account());
+        try {
+            keyring().write(slot, secret);
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("Could not update keyring entries", ex);
+        }
+    }
+
+    @Override
+    public Optional<CredentialSave> prepareProxyPasswordSave(String password, CredentialPersistence persistence) {
+        ProxyPreferences proxy = getProxyPreferences();
+        return prepareStringCredentialSave(KeyringSlot.PROXY_PASSWORD, proxy.passwordProperty(),
+                proxy.persistPasswordProperty(), password, persistence);
+    }
+
+    @Override
+    public Optional<CredentialSave> prepareGitHubTokenSave(String token, CredentialPersistence persistence) {
+        GitPreferences git = getGitPreferences();
+        return prepareStringCredentialSave(KeyringSlot.GITHUB_PAT, git.patProperty(),
+                git.rememberPatProperty(), token, persistence);
+    }
+
+    private Optional<CredentialSave> prepareStringCredentialSave(KeyringSlot slot, StringProperty value,
+                                                                 BooleanProperty stored, String secret, CredentialPersistence persistence) {
+        boolean persist = persistence == CredentialPersistence.SAVE;
+        boolean wasPersisted = stored.get();
+        if (persist == wasPersisted && secret.equals(value.get()) && !pendingCredentialSaves.contains(slot)) {
+            return Optional.empty();
+        }
+        KeyringUtil keyring = keyring();
+        return Optional.of(() -> {
+            if (wasPersisted || (persist && StringUtil.isNotBlank(secret))) {
+                try {
+                    if (persist && StringUtil.isNotBlank(secret)) {
+                        keyring.write(slot, secret);
+                    } else {
+                        keyring.clearCredential(slot);
                     }
+                } catch (PasswordAccessException ex) {
+                    throw new CredentialSaveException(ex, () -> {
+                        if (persist == wasPersisted) {
+                            pendingCredentialSaves.add(slot);
+                        } else {
+                            pendingCredentialSaves.remove(slot);
+                        }
+                        publishCredentials(() -> value.set(secret));
+                    });
                 }
             }
-        } catch (Exception ex) {
-            LOGGER.warn("Could not open keyring", ex);
+            return CredentialCommit.of(() -> publishCredentials(() -> {
+                stored.set(persist);
+                value.set(secret);
+                pendingCredentialSaves.remove(slot);
+            }));
+        });
+    }
+
+    /// Applies credential preferences after any required keyring operation.
+    /// Binding callbacks still store ordinary preferences.
+    /// Keyring callbacks on this thread skip the duplicate write during publication.
+    private void publishCredentials(Runnable update) {
+        boolean previouslyPublishing = publishingCredentials.get();
+        publishingCredentials.set(true);
+        try {
+            update.run();
+        } finally {
+            if (!previouslyPublishing) {
+                publishingCredentials.remove();
+            }
         }
     }
 
@@ -1234,14 +1192,30 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
     @Override
     public void importPreferences(Path path) throws JabRefException {
+        // The bundle metadata describes the local keyring rather than the source of the XML file.
+        Optional<String> localBundleNames = Optional.ofNullable(preferencesNode.get(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, null));
         importPreferencesToBackingStore(path);
+        localBundleNames.ifPresentOrElse(
+                value -> put(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, value),
+                () -> remove(FETCHER_CUSTOM_KEY_BUNDLE_NAMES));
 
         initializeAll();
 
-        allBindings.forEach(binding -> binding.importFromStore().run());
+        // [impl->req~keyring.api-key-import~1]
+        replayingImportedPreferences = true;
+        try {
+            allBindings.forEach(binding -> binding.importFromStore().run());
 
-        // CiteDrive preferences are not registered in allBindings (the token lives in the keyring), so reload them explicitly.
-        getCiteDrivePreferences().setAll(getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault()));
+            // CiteDrive preferences are not registered in allBindings (the token lives in the keyring), so reload them explicitly.
+            getCiteDrivePreferences().setAll(getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault()));
+        } finally {
+            replayingImportedPreferences = false;
+        }
+
+        // The XML supplies metadata only. Keep the local bundle when persistence is enabled.
+        if (!getImporterPreferences().shouldPersistCustomKeys()) {
+            clearCustomFetcherKeys();
+        }
     }
 
     /// Instantiates every preference group so its bindings are registered in [#allBindings] before a bulk reset/import
@@ -1685,7 +1659,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindCustom(proxyPreferences.persistPasswordProperty(), PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword(),
                 (_, _, newValue) -> {
                     putBoolean(PROXY_PERSIST_PASSWORD, newValue);
-                    if (!newValue) {
+                    if (!publishingCredentials.get() && !newValue) {
                         writeKeyring(KeyringSlot.PROXY_PASSWORD, "");
                     }
                 },
@@ -1783,7 +1757,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(citeDrivePreferences.persistRefreshTokenProperty(), (_, _, newValue) -> {
             putBoolean(CITE_DRIVE_PERSIST_TOKEN, newValue);
-            setCiteDriveToken(newValue ? citeDrivePreferences.getRefreshToken() : null);
+            if (!publishingCredentials.get()) {
+                setCiteDriveToken(newValue ? citeDrivePreferences.getRefreshToken() : null);
+            }
         });
 
         EasyBind.listen(citeDrivePreferences.enabledProperty(), (_, _, newValue) -> putBoolean(CITE_DRIVE_ENABLED, newValue));
@@ -1791,12 +1767,64 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(citeDrivePreferences.appBaseUrlProperty(), (_, _, newValue) -> put(CITE_DRIVE_APP_BASE_URL, newValue));
 
         EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
-            if (citeDrivePreferences.shouldPersistRefreshToken()) {
+            if (!publishingCredentials.get() && citeDrivePreferences.shouldPersistRefreshToken()) {
                 setCiteDriveToken(newValue);
             }
         });
 
         return citeDrivePreferences;
+    }
+
+    @Override
+    public Optional<CredentialSave> prepareCiteDriveTokenSave(String apiBaseUrl, CredentialPersistence persistence) {
+        CiteDrivePreferences citeDrive = getCiteDrivePreferences();
+        boolean persist = persistence == CredentialPersistence.SAVE;
+        boolean wasPersisted = citeDrive.shouldPersistRefreshToken();
+        boolean serverChanged = !apiBaseUrl.equals(citeDrive.getApiBaseUrl());
+        if (!serverChanged && persist == wasPersisted) {
+            return Optional.empty();
+        }
+        if (persist && !serverChanged) {
+            return Optional.of(prepareCiteDrivePersistence(citeDrive, apiBaseUrl, false));
+        }
+
+        return Optional.of(() -> {
+            if (wasPersisted) {
+                try {
+                    KeyringUtil.clearCiteDriveToken();
+                } catch (Exception ex) {
+                    throw new JabRefException("Could not clear CiteDrive token from keyring", ex);
+                }
+            }
+            return CredentialCommit.of(() -> publishCredentials(() -> {
+                citeDrive.setPersistRefreshToken(persist);
+                citeDrive.setApiBaseUrl(apiBaseUrl);
+            }));
+        });
+    }
+
+    private CredentialSave prepareCiteDrivePersistence(CiteDrivePreferences citeDrive, String apiBaseUrl, boolean wroteToken) {
+        return () -> {
+            Optional<RefreshToken> token = Optional.ofNullable(citeDrive.getRefreshToken());
+            try {
+                if (token.isPresent()) {
+                    KeyringUtil.writeCiteDriveToken(serializeCiteDriveToken(token.orElseThrow(), apiBaseUrl));
+                } else if (wroteToken) {
+                    KeyringUtil.clearCiteDriveToken();
+                }
+            } catch (Exception ex) {
+                throw new JabRefException("Could not save CiteDrive token in keyring", ex);
+            }
+            return () -> {
+                synchronized (citeDrive) {
+                    if (!token.equals(Optional.ofNullable(citeDrive.getRefreshToken()))) {
+                        return Optional.of(prepareCiteDrivePersistence(citeDrive, apiBaseUrl, token.isPresent()));
+                    }
+                    publishCredentials(() -> citeDrive.setPersistRefreshToken(true));
+                    return Optional.empty();
+                }
+            };
+        };
     }
 
     private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
@@ -1816,8 +1844,8 @@ public class JabRefCliPreferences implements CliPreferences {
         if (resettingIsolatedNode) {
             return null;
         }
-        try (final Keyring keyring = Keyring.create()) {
-            return parseCiteDriveToken(keyring.getPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT), apiBaseUrl);
+        try {
+            return parseCiteDriveToken(KeyringUtil.readCiteDriveToken(), apiBaseUrl);
         } catch (PasswordAccessException _) {
             LOGGER.debug("No CiteDrive token stored in keyring");
         } catch (Exception ex) {
@@ -1831,11 +1859,11 @@ public class JabRefCliPreferences implements CliPreferences {
         if (resettingIsolatedNode) {
             return;
         }
-        try (final Keyring keyring = Keyring.create()) {
+        try {
             if (refreshToken == null) {
-                keyring.deletePassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT);
+                KeyringUtil.clearCiteDriveToken();
             } else {
-                keyring.setPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT, serializeCiteDriveToken(refreshToken, citeDrivePreferences.getApiBaseUrl()));
+                KeyringUtil.writeCiteDriveToken(serializeCiteDriveToken(refreshToken, citeDrivePreferences.getApiBaseUrl()));
             }
         } catch (PasswordAccessException _) {
             LOGGER.debug("No CiteDrive token stored in keyring, nothing to remove");
@@ -2678,12 +2706,11 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(importerPreferences.importWorkingDirectoryProperty(), IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory(),
                 Path::toString, Path::of);
         bindBoolean(importerPreferences.warnAboutDuplicatesOnImportProperty(), IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport());
-        // persistCustomKeys must be bound before apiKeys: loading the keys re-persists them and reads this flag to
-        // decide whether to write the keyring, so the flag has to be in place first.
         bindBoolean(importerPreferences.persistCustomKeysProperty(), FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys());
         bindSet(importerPreferences.getApiKeys(), FETCHER_CUSTOM_KEY_NAMES, defaultValues.getApiKeys(),
                 _ -> storeFetcherKeys(importerPreferences),
                 () -> getFetcherKeys(defaultValues.getApiKeys()));
+        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (_, _, _) -> storeFetcherKeys(importerPreferences));
         bindSet(importerPreferences.getCustomImporters(), IMPORTER_CUSTOM_FORMAT, defaultValues.getCustomImporters(),
                 this::storeCustomImportFormats,
                 () -> getCustomImportFormats(defaultValues.getCustomImporters()));
@@ -2741,61 +2768,161 @@ public class JabRefCliPreferences implements CliPreferences {
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
-        List<String> keys = getFetcherKeysFromKeyring(names);
-
-        if (names.size() != uses.size() || names.size() != keys.size()) {
+        if (names.size() != uses.size()) {
             LOGGER.warn("Could not load fetcher keys from preferences. Will ignore.");
             return defaults;
         }
-
+        Map<String, String> defaultKeys = defaults.stream().collect(Collectors.toMap(FetcherApiKey::name, FetcherApiKey::key));
+        Map<String, String> keys = getBoolean(FETCHER_CUSTOM_KEY_PERSIST, false)
+                                   ? getFetcherKeysFromKeyring(names) : Map.of();
+        loadedFetcherKeyBundle = Map.copyOf(keys);
         for (int i = 0; i < names.size(); i++) {
-            fetcherApiKeys.add(new FetcherApiKey(
-                    names.get(i),
-                    (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
-                    i < keys.size() ? keys.get(i) : ""));
+            String name = names.get(i);
+            fetcherApiKeys.add(new FetcherApiKey(name, Boolean.parseBoolean(uses.get(i)),
+                    keys.getOrDefault(name, defaultKeys.getOrDefault(name, ""))));
         }
-
         return fetcherApiKeys;
     }
 
-    /// Reads the stored API keys aligned to `names` order ("" where a key is absent), or an empty list if the
-    /// keyring is unavailable, so the caller falls back to default keys on a size mismatch.
-    private List<String> getFetcherKeysFromKeyring(List<String> names) {
-        List<KeyringSlot> slots = names.stream().map(KeyringSlot::customApiKey).toList();
-        Map<KeyringSlot, String> stored = readKeyring(slots);
-        if (stored.size() != slots.size()) {
-            return List.of();
+    private Map<String, String> getFetcherKeysFromKeyring(List<String> names) {
+        // [impl->req~keyring.api-key-bundle~1]
+        // [impl->adr~bundle-custom-api-keys~1]
+        // The metadata distinguishes an empty store from an installation that still needs migration.
+        if (resettingIsolatedNode || names.isEmpty()
+                || (hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES) && getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty())) {
+            return Map.of();
         }
-        return slots.stream().map(stored::get).toList();
+        if (hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES)) {
+            return keyring().readFetcherKeyBundle();
+        }
+
+        return migrateFetcherKeys(names);
     }
 
-    private void storeFetcherKeys(ImporterPreferences defaults) {
+    private Map<String, String> migrateFetcherKeys(List<String> names) {
+        KeyringUtil keyring = keyring();
+        KeyringUtil.FetcherKeyRead read = keyring.readFetcherKeysForMigration(names);
+        if (read.readyToMigrate()) {
+            try {
+                if (read.keys().isEmpty()) {
+                    putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, List.of());
+                } else {
+                    storeFetcherKeyBundle(read.keys());
+                }
+                keyring.clearIndividualFetcherKeys(read.individualEntriesToClear());
+            } catch (PasswordAccessException ex) {
+                LOGGER.warn("Could not migrate custom API keys to the keyring bundle", ex);
+            }
+        }
+        return read.keys();
+    }
+
+    private void storeFetcherKeyBundle(Map<String, String> keys) throws PasswordAccessException {
+        boolean mayHaveSavedKeys = hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES)
+                                   ? !getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty()
+                                   : hasKey(FETCHER_CUSTOM_KEY_NAMES);
+        if (!keys.isEmpty() || mayHaveSavedKeys) {
+            keyring().writeFetcherKeyBundle(keys);
+        }
+        putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, keys.keySet().stream().sorted().toList());
+    }
+
+    private void storeFetcherKeys(ImporterPreferences preferences) {
+        if (replayingImportedPreferences || resettingIsolatedNode || publishingCredentials.get()) {
+            return;
+        }
+        try {
+            prepareFetcherKeyStorage(preferences.getApiKeys(), preferences.shouldPersistCustomKeys()).writeKeyring().apply();
+        } catch (JabRefException ex) {
+            LOGGER.warn("Could not update saved custom API keys", ex);
+        }
+    }
+
+    @Override
+    public CredentialSave prepareSavedFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
+        return prepareCredentialSave(apiKeys, true);
+    }
+
+    @Override
+    public CredentialSave prepareSessionFetcherApiKeys(Set<FetcherApiKey> apiKeys) {
+        return prepareCredentialSave(apiKeys, false);
+    }
+
+    private CredentialSave prepareCredentialSave(Set<FetcherApiKey> apiKeys, boolean persist) {
+        Set<FetcherApiKey> requestedKeys = Set.copyOf(apiKeys);
+        ImporterPreferences preferences = getImporterPreferences();
+        CredentialSave save = prepareFetcherKeyStorage(requestedKeys, persist);
+        return () -> {
+            CredentialCommit updateMetadata = save.writeKeyring();
+            return CredentialCommit.of(() -> {
+                updateMetadata.apply();
+                publishCredentials(() -> {
+                    preferences.setPersistCustomKeys(persist);
+                    preferences.setApiKeys(requestedKeys);
+                });
+            });
+        };
+    }
+
+    private CredentialSave prepareFetcherKeyStorage(Set<FetcherApiKey> apiKeys, boolean persist) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
-        Map<KeyringSlot, String> keys = new HashMap<>();
-
-        for (FetcherApiKey apiKey : defaults.getApiKeys()) {
+        Map<String, String> keys = new HashMap<>();
+        Map<String, String> defaultKeys = ImporterPreferences.getDefault().getApiKeys().stream()
+                                                             .collect(Collectors.toMap(FetcherApiKey::name, FetcherApiKey::key));
+        for (FetcherApiKey apiKey : apiKeys) {
             names.add(apiKey.name());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.put(KeyringSlot.customApiKey(apiKey.name()), apiKey.key());
+            if (StringUtil.isNotBlank(apiKey.key()) && !apiKey.key().equals(defaultKeys.get(apiKey.name()))) {
+                keys.put(apiKey.name(), apiKey.key().trim());
+            }
         }
-
-        putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
-        putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-
-        if (defaults.shouldPersistCustomKeys()) {
-            writeKeyring(keys);
-        } else {
-            clearCustomFetcherKeys();
-        }
+        Map<String, String> bundle = persist ? Map.copyOf(keys) : Map.of();
+        boolean hasBundleMetadata = hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES);
+        boolean mayHaveSavedKeys = hasBundleMetadata
+                                   ? !getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty()
+                                   : hasKey(FETCHER_CUSTOM_KEY_NAMES) || getBoolean(FETCHER_CUSTOM_KEY_PERSIST, false);
+        List<String> legacyEntries = !persist && !hasBundleMetadata ? getStringList(FETCHER_CUSTOM_KEY_NAMES) : List.of();
+        Map<String, String> expectedBundle = loadedFetcherKeyBundle;
+        boolean checkExistingBundle = persist && hasBundleMetadata && mayHaveSavedKeys;
+        KeyringUtil keyring = keyring();
+        return () -> {
+            try {
+                if (checkExistingBundle) {
+                    keyring.replaceFetcherKeyBundle(expectedBundle, bundle);
+                } else if (!bundle.isEmpty() || mayHaveSavedKeys) {
+                    keyring.writeFetcherKeyBundle(bundle);
+                }
+                keyring.clearIndividualFetcherKeys(legacyEntries);
+            } catch (PasswordAccessException ex) {
+                throw new JabRefException("Could not update saved custom API keys", ex);
+            }
+            return CredentialCommit.of(() -> {
+                loadedFetcherKeyBundle = bundle;
+                putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, bundle.keySet().stream().sorted().toList());
+                putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
+                putStringList(FETCHER_CUSTOM_KEY_USES, uses);
+            });
+        };
     }
 
     private void clearCustomFetcherKeys() {
-        Map<KeyringSlot, String> cleared = new HashMap<>();
-        for (String name : getStringList(FETCHER_CUSTOM_KEY_NAMES)) {
-            cleared.put(KeyringSlot.customApiKey(name), "");
+        try {
+            removeSavedFetcherKeys();
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("Could not clear saved custom API keys", ex);
         }
-        writeKeyring(cleared);
+    }
+
+    private void removeSavedFetcherKeys() throws PasswordAccessException {
+        if (!hasKey(FETCHER_CUSTOM_KEY_BUNDLE_NAMES)) {
+            KeyringUtil keyring = keyring();
+            keyring.writeFetcherKeyBundle(Map.of());
+            keyring.clearIndividualFetcherKeys(getStringList(FETCHER_CUSTOM_KEY_NAMES));
+        } else if (!getStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES).isEmpty()) {
+            keyring().writeFetcherKeyBundle(Map.of());
+        }
+        putStringList(FETCHER_CUSTOM_KEY_BUNDLE_NAMES, List.of());
     }
 
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
@@ -2975,7 +3102,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindCustom(gitPreferences.rememberPatProperty(), GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat(),
                 (_, _, newValue) -> {
                     putBoolean(GITHUB_REMEMBER_PAT_KEY, newValue);
-                    if (!newValue) {
+                    if (!publishingCredentials.get() && !newValue) {
                         writeKeyring(KeyringSlot.GITHUB_PAT, "");
                     }
                 },
