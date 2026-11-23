@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 /// A single citation containing a DOI is resolved via the DOI without running the parser.
 /// For multiple citations, the parser runs first and every resulting entry carrying a DOI is replaced by the fetched entry.
 /// If the lookup fails or finds nothing, the parsed entry is kept.
+///
+/// [impl->req~import.plain-citation.doi-first~1]
 @NullMarked
 public class DoiFirstPlainCitationParser implements PlainCitationParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFirstPlainCitationParser.class);

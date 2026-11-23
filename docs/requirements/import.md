@@ -197,4 +197,12 @@ see: [JabRef issue #17549](https://github.com/JabRef/jabref/issues/17549)
 
 Needs: impl, utest
 
+## Plain citations with a DOI must be imported from the DOI's metadata
+`req~import.plain-citation.doi-first~1`
+
+When a plain-text citation contains a DOI, JabRef imports the metadata registered for that DOI instead of the fields guessed by the citation parser.
+If the DOI lookup fails, the parsed entry is imported.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

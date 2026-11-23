@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+// [utest->req~import.plain-citation.doi-first~1]
 class DoiFirstPlainCitationParserTest {
 
     private static final String CITATION = "Vendome C, Bavota G, Di Penta M, Linares-Vásquez M, German DM, Poshyvanyk D (2017) License usage and changes: A large-scale study on GitHub. Empirical Software Engineering 22(3):1537–1577. https://doi.org/10.1007/s10664-016-9438-4";
