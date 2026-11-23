@@ -8,6 +8,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.LinkNotification;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -75,12 +76,12 @@ public class CiteDrivePushAction extends SimpleCommand {
                             // [impl->req~citedrive.push.import-page~1]
                             String importPage = session.importPage().toASCIIString();
                             UiTaskExecutor.runInJavaFXThread(() -> {
-                                dialogService.notify(new CiteDriveLoginAction.PageNotification(
+                                dialogService.notify(new LinkNotification(
                                         Localization.lang("Import into CiteDrive"),
                                         Localization.lang("Continue on the CiteDrive import page in the browser. If no browser opened, open the import page from here or copy the link."),
-                                        Localization.lang("Open import page"),
-                                        importPage, dialogService, nativeDesktop, clipBoardManager,
-                                        Notification.OnClickBehaviour.REMOVE));
+                                        importPage, dialogService, clipBoardManager,
+                                        Notification.OnClickBehaviour.REMOVE)
+                                        .withOpenAction(Localization.lang("Open import page"), nativeDesktop));
                                 CiteDriveLoginAction.openPage(nativeDesktop, importPage);
                             });
                         }
