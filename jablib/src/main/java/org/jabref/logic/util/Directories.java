@@ -14,7 +14,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.model.search.LinkedFilesConstants;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Suppliers;
 import net.harawata.appdirs.AppDirsFactory;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -25,11 +24,6 @@ import org.slf4j.LoggerFactory;
 /// See e.g. `org.jabref.gui.desktop.os.NativeDesktop#getApplicationDirectory()`
 @NullMarked
 public class Directories {
-    /// `xdg-user-dir` reads the user's configuration in `user-dirs.dirs`, which holds customized and localized folder names.
-    /// The lookup starts a process; its result does not change while JabRef runs, and the defaults of the preferences need it
-    /// again on every [org.jabref.logic.FilePreferences#getDefault()].
-    private static final Supplier<Optional<Path>> XDG_DOCUMENTS_DIRECTORY = Suppliers.memoize(Directories::getXdgDocumentsDirectory);
-
     /// Returns the path to the system's user directory.
     ///
     /// @return the path
@@ -40,7 +34,7 @@ public class Directories {
     /// Falls back to the user directory if there is no documents directory.
     public static Path getDocumentsDirectory() {
         return getDocumentsDirectory(System.getenv("XDG_DOCUMENTS_DIR"), getUserDirectory(),
-                () -> OS.LINUX ? XDG_DOCUMENTS_DIRECTORY.get() : Optional.empty());
+                () -> OS.LINUX ? getXdgDocumentsDirectory() : Optional.empty());
     }
 
     @VisibleForTesting
