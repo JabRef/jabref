@@ -39,6 +39,8 @@ import org.jabref.model.entry.LinkedFile;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.sun.net.httpserver.HttpServer;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -63,6 +66,7 @@ import static org.mockito.Mockito.when;
 
 // Need to run on JavaFX thread since {@link org.jabref.gui.linkedfile.DeleteFileAction.execute} creates a DialogPane
 @ExtendWith(JavaFxExtension.class)
+@NullMarked
 class LinkedFileViewModelTest {
 
     private Path tempFile;
@@ -74,8 +78,9 @@ class LinkedFileViewModelTest {
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
+    private final NativeDesktop nativeDesktop = mock(NativeDesktop.class);
     private CookieManager cookieManager;
-    private HttpServer httpServer;
+    private @Nullable HttpServer httpServer;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws IOException {
@@ -85,7 +90,7 @@ class LinkedFileViewModelTest {
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
-        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
+        Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
         when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
@@ -178,6 +183,26 @@ class LinkedFileViewModelTest {
 
         assertTrue(removed);
         assertFalse(Files.exists(tempFile));
+    }
+
+    @Test
+    void deleteWhenTrashRefusesTheFileReturnsFalseAndKeepsFile() throws IOException {
+        linkedFile = new LinkedFile("", tempFile, "");
+        when(filePreferences.moveToTrash()).thenReturn(true);
+        when(nativeDesktop.moveToTrashSupported()).thenReturn(true);
+        doThrow(new IOException("refused")).when(nativeDesktop).moveToTrash(any(Path.class));
+        when(dialogService.showCustomDialogAndWait(
+                anyString(),
+                any(DialogPane.class),
+                any(ButtonType.class),
+                any(ButtonType.class),
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - trash button
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        boolean removed = viewModel.delete();
+
+        assertFalse(removed);
+        assertTrue(Files.exists(tempFile));
     }
 
     @Test
