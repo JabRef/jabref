@@ -1,5 +1,6 @@
 package org.jabref.gui.openoffice;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.RadioButton;
@@ -9,12 +10,16 @@ import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.engine.StyleCapabilities;
 import org.jabref.model.openoffice.style.CitationType;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class CiteSpecialDialogView extends BaseDialog<CiteSpecialDialogViewModel> {
 
+    private final StyleCapabilities capabilities;
     private final CitationType initialCitationType;
 
     @FXML private TextField pageInfo;
@@ -26,8 +31,9 @@ public class CiteSpecialDialogView extends BaseDialog<CiteSpecialDialogViewModel
     @FXML private ToggleGroup citeToggleGroup;
     private CiteSpecialDialogViewModel viewModel;
 
-    public CiteSpecialDialogView(CitationType initialCitationType) {
-        this.initialCitationType = initialCitationType;
+    public CiteSpecialDialogView(CitationType initialCitationType, StyleCapabilities capabilities) {
+        this.initialCitationType = capabilities.supportedTypes().contains(initialCitationType) ? initialCitationType : CitationType.AUTHORYEAR_PAR;
+        this.capabilities = capabilities;
 
         ViewLoader.view(this)
                   .load()
@@ -53,9 +59,9 @@ public class CiteSpecialDialogView extends BaseDialog<CiteSpecialDialogViewModel
         authorOnly.setUserData(CitationType.AUTHOR_ONLY);
         yearOnly.setUserData(CitationType.YEAR_ONLY);
 
-        // Page information belongs next to the year. Therefore it stays available for
-        // YEAR_ONLY, but not for AUTHOR_ONLY where there is no visible year part.
-        pageInfo.disableProperty().bind(authorOnly.selectedProperty());
+        // Page information belongs next to the year, so AUTHOR_ONLY cannot include it.
+        pageInfo.disableProperty().bind(Bindings.createBooleanBinding(
+                () -> !capabilities.supportsPageInfo() || authorOnly.isSelected(), authorOnly.selectedProperty()));
 
         citeToggleGroup.selectedToggleProperty().addListener((_, _, selected) -> {
             if (selected != null) {
@@ -63,6 +69,8 @@ public class CiteSpecialDialogView extends BaseDialog<CiteSpecialDialogViewModel
             }
         });
         for (Toggle toggle : citeToggleGroup.getToggles()) {
+            RadioButton radioButton = (RadioButton) toggle;
+            radioButton.setDisable(!capabilities.supportedTypes().contains(toggle.getUserData()));
             if (toggle.getUserData() == viewModel.citationTypeProperty().get()) {
                 citeToggleGroup.selectToggle(toggle);
             }

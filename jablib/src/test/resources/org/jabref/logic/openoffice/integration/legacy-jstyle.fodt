@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+                 xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                 xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                 xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+                 office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
+  <office:meta><meta:user-defined meta:name="JR_cite_1_alpha" meta:value-type="string">p. 42</meta:user-defined></office:meta>
+  <office:styles><style:default-style style:family="paragraph"/></office:styles>
+  <office:body>
+    <office:text>
+      <text:p>Before <text:reference-mark-start text:name="JR_cite_1_alpha"/>[1]<text:reference-mark-end text:name="JR_cite_1_alpha"/> after.</text:p>
+      <text:p>Note<text:note text:id="ftn1" text:note-class="footnote"><text:note-citation>1</text:note-citation><text:note-body><text:p>Footnote <text:reference-mark-start text:name="JR_cite_1_beta"/>[2]<text:reference-mark-end text:name="JR_cite_1_beta"/>.</text:p></text:note-body></text:note> anchor.</text:p>
+      <table:table table:name="Citations"><table:table-column/><table:table-row><table:table-cell office:value-type="string"><text:p>Table <text:reference-mark-start text:name="JR_cite_1_gamma"/>[3]<text:reference-mark-end text:name="JR_cite_1_gamma"/>.</text:p></table:table-cell></table:table-row></table:table>
+      <text:p>Empty <text:reference-mark text:name="JR_cite_3_delta"/> end.</text:p>
+    </office:text>
+  </office:body>
+</office:document>
