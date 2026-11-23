@@ -33,6 +33,9 @@ The [requirements](../../requirements/openoffice.md) and [ADR-0084](../../decisi
 | Citation conversion | `CitationFormatConverter` | Prepare insertion-triggered, lossy canonical/native conversion and one-way legacy JStyle migration. |
 
 The engine and renderers live in `jablib/src/main/java/org/jabref/logic/openoffice/engine/`; canonical storage is in its `storage` subpackage.
+Writer-specific style helpers are grouped in `logic.openoffice.jstyle`, `logic.openoffice.bst`, and `logic.openoffice.csl`; `logic.openoffice.style` contains only the common `OOStyle` contract.
+Shared CSL styles, loading, and metadata remain in `logic.citationstyle`.
+The render/action boundary, including the package-private `BstCitationFormatter`, stays in `engine`; see the [package layout and ownership guide](code-reorganization.md).
 `DocumentCitations` and `DocumentOrder` are in `logic/openoffice/frontend/`.
 `DocumentCitations` is an action-local facade combining a mutable `CitationGroups` model with live `MarkStore` and Writer range access, not a document subtype or immutable snapshot.
 Core facade instances are named `documentCitations`; GUI controller instances are named `citationController`.

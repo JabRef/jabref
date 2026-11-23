@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.oocsltext;
+package org.jabref.logic.openoffice.csl;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.oocsltext;
+package org.jabref.logic.openoffice.csl;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,7 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.generateAlphanumericCitation;
+import static org.jabref.logic.openoffice.csl.CSLFormatUtils.generateAlphanumericCitation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Execution(ExecutionMode.SAME_THREAD)

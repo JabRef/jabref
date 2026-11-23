@@ -84,7 +84,7 @@ import org.jabref.logic.layout.format.ToUpperCase;
 import org.jabref.logic.layout.format.WrapContent;
 import org.jabref.logic.layout.format.WrapFileLinks;
 import org.jabref.logic.layout.format.XMLChars;
-import org.jabref.logic.openoffice.style.OOPreFormatter;
+import org.jabref.logic.openoffice.jstyle.OOPreFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;

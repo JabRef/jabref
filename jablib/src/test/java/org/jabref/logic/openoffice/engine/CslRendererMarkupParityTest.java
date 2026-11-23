@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.bst.BstCitationFormat;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;

@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.style;
+package org.jabref.logic.openoffice.jstyle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -214,7 +214,7 @@ final class JStyleCitationFormatter {
                                                                        @NonNull BibDatabase database,
                                                                        @NonNull OrFields fields) {
         for (Field field : fields.getFields() /* FieldFactory.parseOrFields(fields)*/) {
-            // NOT LaTeX free, because there is some latextohtml in org.jabref.logic.openoffice.style.OOPreFormatter
+            // NOT LaTeX free, because there is some latextohtml in org.jabref.logic.openoffice.jstyle.OOPreFormatter
             Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
             final boolean foundSomething = !StringUtil.isBlank(optionalContent);
             if (foundSomething) {

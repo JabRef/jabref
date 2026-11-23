@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.style;
+package org.jabref.logic.openoffice.bst;
 
 /// Controls the in-text citation marker format used by the BST citation adapter.
 /// The bibliography is always rendered by the BST engine regardless of this setting.

@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+import org.jabref.logic.openoffice.csl.CSLFormatUtils;
 
 public class ModifyBibliographyPropertiesDialogViewModel {
 
