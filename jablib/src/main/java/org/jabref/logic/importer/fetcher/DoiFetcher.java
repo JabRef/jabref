@@ -87,25 +87,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         return Optional.of(HelpFile.FETCHER_DOI);
     }
 
-    private void doAPILimiting(String identifier) {
-        Optional<DOI> doi = DOI.parse(identifier);
-
-        try {
-            Optional<String> agency;
-            if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
-                if ("datacite".equalsIgnoreCase(agency.get())) {
-                    DATA_CITE_DCN_RATE_LIMITER.acquire(identifier);
-                } else if ("crossref".equalsIgnoreCase(agency.get())) {
-                    CROSSREF_DCN_RATE_LIMITER.acquire(identifier);
-                } // mEDRA does not explicit an API rating
-            }
-        } catch (FetcherException | MalformedURLException e) {
-            LOGGER.warn("Could not limit DOI API access rate", e);
-        }
-    }
-
     protected CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) {
-        doAPILimiting(identifier);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return performSearchById(identifier);
@@ -138,6 +120,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         }
         if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
             return new Medra().performSearchById(identifier);
+        }
+        if (agency.isPresent() && "datacite".equalsIgnoreCase(agency.get())) {
+            DATA_CITE_DCN_RATE_LIMITER.acquire(identifier);
+        } else if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
+            CROSSREF_DCN_RATE_LIMITER.acquire(identifier);
         }
 
         URLDownload download = getUrlDownload(doiURL);

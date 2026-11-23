@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /// Prefers the metadata registered for a DOI over what a plain-citation parser guesses from the text.
 ///
 /// A single citation containing a DOI is resolved via the DOI without running the parser.
-/// For multiple citations, the parser runs first and every resulting entry carrying a DOI is replaced by the fetched entry.
+/// For multiple citations, the parser runs first and every resulting entry carrying a DOI (in the DOI or URL field) is replaced by the fetched entry.
 /// If the lookup fails or finds nothing, the parsed entry is kept.
 ///
 /// [impl->req~import.plain-citation.doi-first~1]
@@ -48,6 +48,8 @@ public class DoiFirstPlainCitationParser implements PlainCitationParser {
         for (BibEntry parsed : delegate.parseMultiplePlainCitations(text)) {
             result.add(parsed.getField(StandardField.DOI)
                              .flatMap(DOI::parse)
+                             // Some parsers keep a doi.org link in the URL field only
+                             .or(() -> parsed.getField(StandardField.URL).flatMap(DOI::findInText))
                              .flatMap(this::fetch)
                              .orElse(parsed));
         }

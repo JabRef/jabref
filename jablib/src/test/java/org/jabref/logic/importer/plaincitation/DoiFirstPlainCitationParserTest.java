@@ -59,4 +59,13 @@ class DoiFirstPlainCitationParserTest {
 
         assertEquals(List.of(FETCHED, PARSED), parser.parseMultiplePlainCitations("text"));
     }
+
+    @Test
+    void doiLinkInUrlFieldIsFetched() throws FetcherException {
+        BibEntry parsedWithDoiUrl = new BibEntry().withField(StandardField.URL, "https://doi.org/10.1007/s10664-016-9438-4");
+        when(delegate.parseMultiplePlainCitations("text")).thenReturn(List.of(parsedWithDoiUrl));
+        when(doiFetcher.performSearchById("10.1007/s10664-016-9438-4")).thenReturn(Optional.of(FETCHED));
+
+        assertEquals(List.of(FETCHED), parser.parseMultiplePlainCitations("text"));
+    }
 }
