@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -163,19 +164,15 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private String findYear(String input) {
-        Matcher parenthesized = PARENTHESIZED_YEAR_PATTERN.matcher(input);
-        while (parenthesized.find()) {
-            if (isPlausibleYear(parenthesized.group(1))) {
-                year = parenthesized.group(1);
-                return fixSpaces(input.substring(0, parenthesized.start()) + YEAR_TAG + input.substring(parenthesized.end()));
-            }
-        }
         Matcher matcher = YEAR_PATTERN.matcher(input);
         while (matcher.find()) {
             String yearCandidate = input.substring(matcher.start(), matcher.end());
             if (isPlausibleYear(yearCandidate)) {
                 year = yearCandidate;
-                return fixSpaces(input.replace(year, YEAR_TAG));
+                // "(2017)" is replaced including its parentheses, so that they do not end up in the title
+                String withoutParenthesizedYear = PARENTHESIZED_YEAR_PATTERN.matcher(input)
+                                                                            .replaceAll(match -> match.group(1).equals(year) ? YEAR_TAG : Matcher.quoteReplacement(match.group()));
+                return fixSpaces(withoutParenthesizedYear.replace(year, YEAR_TAG));
             }
         }
         return input;
@@ -217,20 +214,21 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private String findVolume(String input) {
-        Matcher matcher = VOLUME_NUMBER_PATTERN.matcher(input);
-        if (!matcher.find()) {
-            return input;
-        }
-        volume = matcher.group(1);
-        number = matcher.group(2);
-        return fixSpaces(input.substring(0, matcher.start()) + VOLUME_TAG + input.substring(matcher.end()));
+        // Volume and number follow the title, so the last match wins over numbers inside the title
+        return lastMatch(VOLUME_NUMBER_PATTERN, input)
+                .map(match -> {
+                    volume = match.group(1);
+                    number = match.group(2);
+                    return fixSpaces(input.substring(0, match.start()) + VOLUME_TAG + input.substring(match.end()));
+                })
+                .orElse(input);
     }
 
     private String findPages(String input) {
-        Matcher range = PAGE_RANGE_PATTERN.matcher(input);
-        if (range.find()) {
-            pages = range.group(1) + "--" + range.group(2);
-            return fixSpaces(input.substring(0, range.start()) + PAGES_TAG + input.substring(range.end()));
+        Optional<MatchResult> range = lastMatch(PAGE_RANGE_PATTERN, input);
+        if (range.isPresent()) {
+            pages = range.get().group(1) + "--" + range.get().group(2);
+            return fixSpaces(input.substring(0, range.get().start()) + PAGES_TAG + input.substring(range.get().end()));
         }
         Matcher matcher = PAGES_PATTERN.matcher(input);
         if (matcher.find()) {
@@ -281,6 +279,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             isArticle = false;
         }
         return fixSpaces(input);
+    }
+
+    private static Optional<MatchResult> lastMatch(Pattern pattern, String input) {
+        return pattern.matcher(input).results().reduce((_, second) -> second);
     }
 
     private static String stripTags(String input) {

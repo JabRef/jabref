@@ -56,6 +56,20 @@ class RuleBasedPlainCitationParserTest {
     }
 
     @Test
+    void yearInTitleDoesNotReplacePublicationYear() {
+        BibEntry entry = parser.parsePlainCitation("Doe, J. 2023. Effects of treatment (2019) outcomes. Journal of Medicine 10(2):1-5.").orElseThrow();
+        assertEquals(Optional.of("2023"), entry.getField(StandardField.YEAR));
+    }
+
+    @Test
+    void numbersInTitleDoNotBecomeVolume() {
+        BibEntry entry = parser.parsePlainCitation("Doe, J. (2020). Results from 2(3) experiments on 10-20 subjects. Journal of Testing, 5(2), 110-120.").orElseThrow();
+        assertEquals(Optional.of("5"), entry.getField(StandardField.VOLUME));
+        assertEquals(Optional.of("2"), entry.getField(StandardField.NUMBER));
+        assertEquals(Optional.of("110--120"), entry.getField(StandardField.PAGES));
+    }
+
+    @Test
     void noLowerCaseLetterIsTakenForAnInitial() {
         BibEntry entry = parser.parsePlainCitation("Doe J (2017) Studying GitHub. Empirical Software Engineering 22(3):1537–1577.").orElseThrow();
         assertEquals(Optional.of("Doe, J."), entry.getField(StandardField.AUTHOR));
