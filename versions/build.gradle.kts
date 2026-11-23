@@ -139,7 +139,7 @@ dependencies.constraints {
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.graalvm.sdk:nativeimage:25.5.5.0.3")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.1.6.Final")
+    api("org.hibernate.validator:hibernate-validator:9.2.0.Final")
     api("org.hisp.dhis:json-tree:1.14.0")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
