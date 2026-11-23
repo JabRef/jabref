@@ -2,7 +2,7 @@
 	<td>\format[Authors(LastFirst,InitialsNoSpace),HTMLChars]{\author}</td>
 	<td>\format[HTMLChars]{\title} <p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\citationkey}','abstract')">Abstract</a>] \end{abstract}\begin{comment}[<a href="javascript:toggleInfo('\format{\citationkey}','comment')">Comment</a>] \end{comment}[<a href="javascript:toggleInfo('\format{\citationkey}','bibtex')">BibTeX</a>]</p></td>
 	<td>\year</td>
-	<td>\format[HTMLChars]{\journal}\begin{volume}<br/>Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\format[HTMLChars]{\booktitle}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school}\begin{howpublished}\format[HTMLChars]{\howpublished}\end{howpublished}&nbsp;</td>
+	<td>\format[HTMLChars]{\journal}\begin{volume}<br/>Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\format[HTMLChars]{\booktitle}\begin{pages;journal}, pp. \format[FormatPagesForHTML]{\pages}\end{pages;journal}\begin{pages;!journal;booktitle}, pp. \format[FormatPagesForHTML]{\pages}\end{pages;!journal;booktitle}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school}\begin{howpublished}\format[HTMLChars]{\howpublished}\end{howpublished}&nbsp;</td>
 	<td>\format[ToLowerCase]{\entrytype}</td>
 	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a> \end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url}&nbsp;</td>
 </tr>\begin{abstract}
