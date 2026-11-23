@@ -19,7 +19,9 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -45,10 +47,10 @@ class CiteDriveTokenStorageTest {
             CliPreferences.CredentialSave save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SAVE).orElseThrow();
 
             CliPreferences.CredentialCommit commit = save.writeKeyring();
-            assertEquals(false, citeDrive.shouldPersistRefreshToken());
+            assertFalse(citeDrive.shouldPersistRefreshToken());
             commit.apply();
 
-            assertEquals(true, citeDrive.shouldPersistRefreshToken());
+            assertTrue(citeDrive.shouldPersistRefreshToken());
             verify(keyring).setPassword("org.jabref", "citedrive",
                     JabRefCliPreferences.serializeCiteDriveToken(token, citeDrive.getApiBaseUrl()));
         } finally {
@@ -73,9 +75,9 @@ class CiteDriveTokenStorageTest {
             citeDrive.setRefreshToken(refreshed);
             CliPreferences.CredentialSave retry = commit.apply().orElseThrow();
 
-            assertEquals(false, citeDrive.shouldPersistRefreshToken());
+            assertFalse(citeDrive.shouldPersistRefreshToken());
             assertEquals(Optional.empty(), retry.writeKeyring().apply());
-            assertEquals(true, citeDrive.shouldPersistRefreshToken());
+            assertTrue(citeDrive.shouldPersistRefreshToken());
             verify(keyring).setPassword("org.jabref", "citedrive",
                     JabRefCliPreferences.serializeCiteDriveToken(refreshed, citeDrive.getApiBaseUrl()));
         } finally {
@@ -98,7 +100,7 @@ class CiteDriveTokenStorageTest {
             CliPreferences.CredentialSave save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SESSION_ONLY).orElseThrow();
 
             assertThrows(JabRefException.class, save::writeKeyring);
-            assertEquals(true, citeDrive.shouldPersistRefreshToken());
+            assertTrue(citeDrive.shouldPersistRefreshToken());
         } finally {
             node.removeNode();
         }
