@@ -206,6 +206,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing bibliography paragraph styles blocking JStyle citation insertion in LibreOffice/OpenOffice when bibliography synchronization is disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed LibreOffice/OpenOffice citation updates modifying citations marked for deletion through Track Changes after change recording was disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed edits to selected JStyle files not taking effect when inserting or refreshing citations in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed an issue where the generate citation keys toolbar button stopped working after canceling an overwrite. [#17748](https://github.com/JabRef/jabref/issues/17748)
 
 ### Removed
 
