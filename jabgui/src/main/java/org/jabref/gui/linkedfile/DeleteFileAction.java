@@ -167,14 +167,18 @@ public class DeleteFileAction extends SimpleCommand {
     }
 
     /// Deletes the files from the entry and optionally from disk.
+    /// A link is kept if its file could not be removed from disk, so the entry still points to the file left behind.
     ///
     /// @param deleteFromDisk if true, the files are deleted from disk, otherwise they are only removed from the entry
     private void deleteFiles(boolean deleteFromDisk) {
-        // default: We have a success
         success = true;
         for (LinkedFileViewModel fileViewModel : filesToDelete) {
-            if (!fileViewModel.getFile().isOnlineLink() && deleteFromDisk) {
-                deleteFileHelper(databaseContext, fileViewModel.getFile());
+            boolean removedFromDisk = fileViewModel.getFile().isOnlineLink()
+                    || !deleteFromDisk
+                    || deleteFileHelper(databaseContext, fileViewModel.getFile());
+            if (!removedFromDisk) {
+                success = false;
+                continue;
             }
             if (viewModel != null) {
                 viewModel.removeFileLink(fileViewModel);
@@ -185,15 +189,15 @@ public class DeleteFileAction extends SimpleCommand {
     /// Helper method to delete the specified file from disk
     ///
     /// @param linkedFile The LinkedFile (file which linked to an entry) to be deleted from disk
-    private void deleteFileHelper(BibDatabaseContext databaseContext, LinkedFile linkedFile) {
+    /// @return false if the file exists, but could not be deleted or moved to the trash
+    private boolean deleteFileHelper(BibDatabaseContext databaseContext, LinkedFile linkedFile) {
         Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
 
         if (file.isEmpty()) {
             LOGGER.warn("Could not find file {}", linkedFile.getLink());
             dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
             // Deleting a non-existing file is a success
-            success = true;
-            return;
+            return true;
         }
 
         Path theFile = file.get();
@@ -205,11 +209,11 @@ public class DeleteFileAction extends SimpleCommand {
                 LOGGER.debug("Deleting: {}", theFile);
                 Files.delete(theFile);
             }
-            success = true;
+            return true;
         } catch (IOException ex) {
-            success = false;
-            dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file '%0'", theFile), Localization.lang("File permission error"));
             LOGGER.warn("Error while deleting: {}", linkedFile, ex);
+            dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file '%0'", theFile), ex);
+            return false;
         }
     }
 
