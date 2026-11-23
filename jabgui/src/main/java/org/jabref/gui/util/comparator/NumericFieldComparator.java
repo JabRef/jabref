@@ -8,7 +8,6 @@ import org.jabref.logic.util.strings.StringUtil;
 /// as if they were strings.
 public class NumericFieldComparator implements Comparator<String> {
 
-
     @Override
     public int compare(String val1, String val2) {
         if ((val1 == null) && (val2 == null)) {
