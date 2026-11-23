@@ -24,7 +24,9 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -114,7 +116,7 @@ class KeyringMigrationTest {
                 failure.applySessionUpdate();
 
                 assertEquals("replacement", git.getPat());
-                assertEquals(true, git.getPersistPat());
+                assertTrue(git.getPersistPat());
                 verify(keyring).setPassword("org.jabref.github", "github", "replacement");
 
                 preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE).orElseThrow().writeKeyring().apply();
@@ -150,15 +152,15 @@ class KeyringMigrationTest {
             failure.applySessionUpdate();
 
             assertEquals("session", proxy.getPassword());
-            assertEquals(true, proxy.shouldPersistPassword());
-            assertEquals(true, preferences.getBoolean(PROXY_PERSIST_PASSWORD, false));
+            assertTrue(proxy.shouldPersistPassword());
+            assertTrue(preferences.getBoolean(PROXY_PERSIST_PASSWORD, false));
             verify(keyring, never()).setPassword(NEW_SERVICE, ACCOUNT, "session");
 
             preferences.prepareProxyPasswordSave("session", CredentialPersistence.SESSION_ONLY).orElseThrow().writeKeyring().apply();
 
             assertEquals("session", proxy.getPassword());
-            assertEquals(false, proxy.shouldPersistPassword());
-            assertEquals(false, preferences.getBoolean(PROXY_PERSIST_PASSWORD, true));
+            assertFalse(proxy.shouldPersistPassword());
+            assertFalse(preferences.getBoolean(PROXY_PERSIST_PASSWORD, true));
             verify(keyring, times(2)).deletePassword(LEGACY_SERVICE, ACCOUNT);
         }
     }
