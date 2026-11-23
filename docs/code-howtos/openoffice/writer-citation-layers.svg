@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1460" viewBox="0 0 1000 1460" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1280" viewBox="0 0 1000 1280" role="img" aria-labelledby="title description">
   <title id="title">Writer citation integration architecture</title>
-  <desc id="description">The OpenOffice panel and citation controller delegate to CitationEngine in logic.openoffice.engine. JStyle and BST use canonical storage and updates; CSL shares this path with Zotero compatibility disabled. With compatibility enabled, ZoteroCitationStrategy uses separate native storage, ordering, validation, and writes, sharing CslRenderer, the pure model, and Writer infrastructure. CitationFormatConverter converts canonical and native citation marks on the next CSL insertion when formats differ, and migrates supported legacy JR_cite marks on insertion outside native mode. Bibliography formats are not converted. Mixed managed citation formats are unsupported. Writer family helpers live in jstyle, bst, and csl; style contains OOStyle and family-neutral Writer paragraph-style catalogs. OOPreFormatter belongs to shared logic.layout.format. Renderers and the package-private BstCitationFormatter remain in engine. Shared CSL loading and metadata remain in logic.citationstyle. Package labels below are relative to org.jabref.</desc>
+  <desc id="description">The OpenOffice panel and citation controller delegate to CitationEngine in logic.openoffice.engine. JStyle and BST use canonical storage and updates; CSL shares this path with Zotero compatibility disabled. With compatibility enabled, ZoteroCitationStrategy uses separate native storage, ordering, validation, and writes, sharing CslRenderer, the pure model, and Writer infrastructure. CitationFormatConverter converts canonical and native citation marks on the next CSL insertion when formats differ, and migrates supported legacy JR_cite marks on insertion outside native mode. Bibliography formats are not converted. Mixed managed citation formats are unsupported. Package labels below are relative to org.jabref.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 Z" fill="#35658d"/>
@@ -23,7 +23,7 @@
     </style>
   </defs>
 
-  <rect width="1000" height="1460" fill="#ffffff"/>
+  <rect width="1000" height="1280" fill="#ffffff"/>
   <text class="title" x="500" y="37" text-anchor="middle">Writer citation integration</text>
 
   <rect class="box" x="30" y="66" width="940" height="108" rx="12" fill="#edf5ff"/>
@@ -51,10 +51,10 @@
   <path class="flow" d="M 342 519 V 539"/>
 
   <rect class="box" x="50" y="539" width="585" height="116" rx="9" fill="#edf8f0"/>
-  <text class="component" x="69" y="569">engine: RendererFactory → CitationRenderer</text>
+  <text class="component" x="69" y="569">RendererFactory → CitationRenderer</text>
   <text class="detail" x="69" y="597">JStyleRenderer · CslRenderer · BstRenderer</text>
   <text class="small" x="69" y="622">Ordered CitationGroup input → RenderResult containing OOText</text>
-  <text class="small muted" x="69" y="644">Render before mutation; family helpers in jstyle / csl / bst</text>
+  <text class="small muted" x="69" y="644">Render before mutation; BST bibliography output may require Pandoc</text>
   <path class="flow" d="M 342 655 V 675"/>
 
   <rect class="box" x="50" y="675" width="585" height="134" rx="9" fill="#ffffff"/>
@@ -98,13 +98,6 @@
   <text class="heading" x="500" y="1177" text-anchor="middle">LibreOffice Writer document</text>
   <text class="detail" x="500" y="1203" text-anchor="middle">Reference marks · bibliography text sections · custom document properties</text>
 
-  <rect class="box" x="30" y="1236" width="940" height="154" rx="12" fill="#edf8f0"/>
-  <text class="heading" x="500" y="1265" text-anchor="middle">Style helper packages · logic.openoffice</text>
-  <text class="detail" x="500" y="1291" text-anchor="middle">jstyle: JStyle styles + processors · bst: BST styles + Pandoc helpers</text>
-  <text class="detail" x="500" y="1317" text-anchor="middle">csl: CSLFormatUtils · style: OOStyle + WriterParagraphStyles</text>
-  <text class="small" x="500" y="1343" text-anchor="middle">Renderers and package-private BstCitationFormatter stay in engine at the render/action boundary</text>
-  <text class="small muted" x="500" y="1373" text-anchor="middle">Shared CSL loading/metadata: logic.citationstyle · Layout formatting: logic.layout.format</text>
-
-  <text class="small muted" x="500" y="1423" text-anchor="middle">Packages relative to org.jabref; canonical subpackages relative to logic.openoffice. Mixed managed formats unsupported.</text>
-  <text class="small muted" x="500" y="1444" text-anchor="middle">Solid arrows: orchestration and UNO access. Dashed arrows: shared model use.</text>
+  <text class="small muted" x="500" y="1253" text-anchor="middle">Packages relative to org.jabref; canonical subpackages relative to logic.openoffice. Mixed managed formats unsupported.</text>
+  <text class="small muted" x="500" y="1274" text-anchor="middle">Solid arrows: orchestration and UNO access. Dashed arrows: shared model use.</text>
 </svg>
