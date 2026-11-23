@@ -20,9 +20,14 @@ public record BstVMContext(List<BstEntry> entries,
                            Map<String, BstFunctions.BstFunction> functions,
                            Deque<Object> stack,
                            BibDatabase bibDatabase,
-                           Optional<Path> path) {
+                           Optional<Path> path,
+                           String preamble) {
     public BstVMContext(List<BstEntry> entries, BibDatabase bibDatabase, @Nullable Path path) {
+        this(entries, bibDatabase, path, bibDatabase.getPreamble().orElse(""));
+    }
+
+    public BstVMContext(List<BstEntry> entries, BibDatabase bibDatabase, @Nullable Path path, String preamble) {
         // LinkedList instead of ArrayDeque, because we (currently) need null support
-        this(entries, new HashMap<>(), new HashMap<>(), new HashMap<>(), new LinkedList<>(), bibDatabase, Optional.ofNullable(path));
+        this(entries, new HashMap<>(), new HashMap<>(), new HashMap<>(), new LinkedList<>(), bibDatabase, Optional.ofNullable(path), preamble);
     }
 }
