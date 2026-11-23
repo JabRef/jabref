@@ -3,27 +3,35 @@ package org.jabref.logic.openoffice;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.regex.Pattern;
 
-import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.openoffice.style.CitationType;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ZoteroReferenceMarkTest {
     private static final Gson GSON = new Gson();
+    private static final Pattern CITATION_ID = Pattern.compile("[a-z][a-z0-9]{7}");
+    private static final Pattern RANDOM_SUFFIX = Pattern.compile("RND[a-z][a-z0-9]{9}");
 
     @Test
     void buildReferenceMarkCreatesZoteroReferenceMarkWithEmbeddedItemData() {
@@ -37,13 +45,12 @@ class ZoteroReferenceMarkTest {
         ZoteroReferenceMark referenceMark = ZoteroReferenceMark.buildReferenceMark(
                 List.of(entry),
                 List.of("Smith2020"),
-                List.of(0),
                 1,
-                CSLCitationType.IN_TEXT,
+                CitationType.AUTHORYEAR_INTEXT,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
                 Map.of());
-        String referenceMarkName = referenceMark.getName();
+        String referenceMarkName = referenceMark.name();
 
         assertTrue(referenceMarkName.startsWith("ZOTERO_ITEM CSL_CITATION {"));
         assertTrue(referenceMarkName.indexOf("\"schema\"") < referenceMarkName.indexOf("\"citationID\""));
@@ -55,6 +62,7 @@ class ZoteroReferenceMarkTest {
         assertFalse(citationJson.has("properties"));
         assertEquals(ZoteroCitationData.CSL_CITATION_SCHEMA, citation.schema);
         assertEquals(8, citation.citationId.length());
+        assertTrue(CITATION_ID.matcher(citation.citationId).matches());
         assertEquals(Boolean.TRUE, citationItem.suppressAuthor);
         assertFalse(citationItemJson.has("jabref-citation-number"));
         assertEquals(List.of("http://www.jabref.org/Smith2020"), citationItem.uris);
@@ -70,15 +78,15 @@ class ZoteroReferenceMarkTest {
         assertTrue(dateParts.get(2).getAsJsonPrimitive().isNumber());
         assertEquals(3, dateParts.get(2).getAsInt());
 
-        String uniqueId = referenceMark.getUniqueId();
+        String uniqueId = referenceMark.uniqueId();
         assertEquals(new ZoteroReferenceMark(
                 referenceMarkName,
                 List.of("Smith2020"),
-                List.of(0),
                 uniqueId,
-                CSLCitationType.IN_TEXT), referenceMark);
+                CitationType.AUTHORYEAR_INTEXT), referenceMark);
         assertEquals(13, uniqueId.length());
         assertEquals("RND", uniqueId.substring(0, 3));
+        assertTrue(RANDOM_SUFFIX.matcher(uniqueId).matches());
 
         BibEntry parsedEntry = ZoteroCitationMarkParser.parseCslCitationJson(
                 ZoteroReferenceMark.getCSLJson(referenceMarkName)).getFirst();
@@ -98,12 +106,11 @@ class ZoteroReferenceMarkTest {
         String referenceMarkName = ZoteroReferenceMark.buildReferenceMark(
                 List.of(entry),
                 List.of("Smith2020"),
-                List.of(0),
                 1,
-                CSLCitationType.NORMAL,
+                CitationType.AUTHORYEAR_PAR,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
-                Map.of()).getName();
+                Map.of()).name();
 
         JsonObject itemData = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject()
                                                                 .getAsJsonObject("itemData");
@@ -128,21 +135,19 @@ class ZoteroReferenceMarkTest {
         String firstReferenceMarkName = ZoteroReferenceMark.buildReferenceMark(
                 List.of(entry),
                 List.of("Smith2020"),
-                List.of(0),
                 1,
-                CSLCitationType.NORMAL,
+                CitationType.AUTHORYEAR_PAR,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
-                Map.of()).getName();
+                Map.of()).name();
         String secondReferenceMarkName = ZoteroReferenceMark.buildReferenceMark(
                 List.of(entry),
                 List.of("Smith2020"),
-                List.of(0),
                 1,
-                CSLCitationType.NORMAL,
+                CitationType.AUTHORYEAR_PAR,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
-                Map.of()).getName();
+                Map.of()).name();
 
         String firstUri = getCitationJson(firstReferenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject()
                                                                  .getAsJsonArray("uris").get(0).getAsString();
@@ -150,6 +155,8 @@ class ZoteroReferenceMarkTest {
                                                                    .getAsJsonArray("uris").get(0).getAsString();
 
         assertEquals(firstUri, secondUri);
+        assertNotEquals(getCitationJson(firstReferenceMarkName).get("citationID"), getCitationJson(secondReferenceMarkName).get("citationID"));
+        assertNotEquals(ZoteroReferenceMark.parse(firstReferenceMarkName).orElseThrow().uniqueId(), ZoteroReferenceMark.parse(secondReferenceMarkName).orElseThrow().uniqueId());
     }
 
     @Test
@@ -162,12 +169,11 @@ class ZoteroReferenceMarkTest {
         String referenceMarkName = ZoteroReferenceMark.buildReferenceMark(
                 List.of(entry),
                 List.of("Smith2020"),
-                List.of(0),
                 1,
-                CSLCitationType.NORMAL,
+                CitationType.AUTHORYEAR_PAR,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
-                Map.of("Smith2020", "http://zotero.org/users/123/items/ABCD1234")).getName();
+                Map.of("Smith2020", "http://zotero.org/users/123/items/ABCD1234")).name();
 
         JsonObject citationItem = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject();
 
@@ -188,12 +194,11 @@ class ZoteroReferenceMarkTest {
         String referenceMarkName = ZoteroReferenceMark.buildReferenceMark(
                 List.of(firstEntry, secondEntry),
                 List.of("Smith2020", "Jones2021"),
-                List.of(0, 0),
                 1,
-                CSLCitationType.NORMAL,
+                CitationType.AUTHORYEAR_PAR,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
-                Map.of()).getName();
+                Map.of()).name();
 
         JsonObject firstCitationItem = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject();
         JsonObject secondCitationItem = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(1).getAsJsonObject();
@@ -219,12 +224,11 @@ class ZoteroReferenceMarkTest {
         String referenceMarkName = ZoteroReferenceMark.buildReferenceMark(
                 List.of(firstEntry, secondEntry),
                 List.of("Smith2020", "Jones2021"),
-                List.of(0, 0),
                 3,
-                CSLCitationType.NORMAL,
+                CitationType.AUTHORYEAR_PAR,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
-                Map.of()).getName();
+                Map.of()).name();
 
         JsonObject firstCitationItem = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject();
         JsonObject secondCitationItem = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(1).getAsJsonObject();
@@ -252,9 +256,9 @@ class ZoteroReferenceMarkTest {
                 } RNDabc123DEF4
                 """.trim();
 
-        ReferenceMark referenceMark = ReferenceMark.parse(referenceMarkName).orElseThrow();
+        ZoteroReferenceMark referenceMark = ZoteroReferenceMark.parse(referenceMarkName).orElseThrow();
 
-        assertEquals(List.of("123"), referenceMark.getCitationKeys());
+        assertEquals(List.of("123"), referenceMark.citationKeys());
     }
 
     @Test
@@ -277,9 +281,9 @@ class ZoteroReferenceMarkTest {
                 } RNDabc123DEF4
                 """.trim();
 
-        ReferenceMark referenceMark = ReferenceMark.parse(referenceMarkName).orElseThrow();
+        ZoteroReferenceMark referenceMark = ZoteroReferenceMark.parse(referenceMarkName).orElseThrow();
 
-        assertEquals(List.of("Smith2020"), referenceMark.getCitationKeys());
+        assertEquals(List.of("Smith2020"), referenceMark.citationKeys());
     }
 
     @Test
@@ -309,11 +313,7 @@ class ZoteroReferenceMarkTest {
 
     @Test
     void extractZoteroUriByCitationKeyReturnsEmptyMapForJabRefReferenceMark() {
-        String referenceMarkName = JabRefReferenceMark.buildReferenceMarkName(
-                List.of("Smith2020"),
-                List.of(1),
-                "uniqueId1",
-                CSLCitationType.NORMAL);
+        String referenceMarkName = "JABREF_Smith2020 CID_1 uniqueId1 NORMAL";
 
         Map<String, String> zoteroUriByCitationKey = ZoteroReferenceMark.extractZoteroUriByCitationKey(referenceMarkName);
 
@@ -358,12 +358,11 @@ class ZoteroReferenceMarkTest {
         String referenceMarkName = ZoteroReferenceMark.buildReferenceMark(
                 List.of(entry),
                 List.of("Smith2020"),
-                List.of(0),
                 1,
-                CSLCitationType.NORMAL,
+                CitationType.AUTHORYEAR_PAR,
                 bibDatabaseContext,
                 new BibEntryTypesManager(),
-                Map.of()).getName();
+                Map.of()).name();
 
         JsonObject citationItem = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject();
 
@@ -388,8 +387,8 @@ class ZoteroReferenceMarkTest {
                 } RNDabc123DEF4
                 """.trim();
 
-        String updatedReferenceMarkName = ZoteroReferenceMark.updateCitationType(referenceMarkName, CSLCitationType.NORMAL);
-        ReferenceMark referenceMark = ReferenceMark.parse(updatedReferenceMarkName).orElseThrow();
+        String updatedReferenceMarkName = ZoteroReferenceMark.updateCitationType(referenceMarkName, CitationType.AUTHORYEAR_PAR);
+        ZoteroReferenceMark referenceMark = ZoteroReferenceMark.parse(updatedReferenceMarkName).orElseThrow();
         JsonObject citation = getCitationJson(updatedReferenceMarkName);
         JsonObject citationItem = citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
 
@@ -398,9 +397,40 @@ class ZoteroReferenceMarkTest {
         assertEquals(new ZoteroReferenceMark(
                 updatedReferenceMarkName,
                 List.of("Smith2020"),
-                List.of(0),
                 "RNDabc123DEF4",
-                CSLCitationType.NORMAL), referenceMark);
+                CitationType.AUTHORYEAR_PAR), referenceMark);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0, 0", "00000, 0", "000001, 1", "2147483646, 2147483646", "2147483647, 2147483647", "0002147483647, 2147483647"})
+    void boundedItemIdsAcceptLeadingZerosAndIntegerBoundaries(String id, int expected) {
+        assertEquals(OptionalInt.of(expected), ZoteroReferenceMark.boundedItemId(id));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "opaque-id", "+1", "-1", "2147483648", "0002147483648", "9999999999999999999999999999999999999999"})
+    void foreignItemIdsOutsideTheBoundedDecimalPolicyRemainOpaque(String id) {
+        assertEquals(OptionalInt.empty(), ZoteroReferenceMark.boundedItemId(id));
+    }
+
+    @Test
+    void hugeAndLeadingZeroNativeItemIdsArePreservedWhenFindingTheMaximum() {
+        String foreignId = "9999999999999999999999999999999999999999";
+        String boundedId = "0".repeat(10_000) + Integer.MAX_VALUE;
+        JsonObject item = new JsonObject();
+        item.addProperty("id", foreignId);
+        JsonObject itemData = new JsonObject();
+        itemData.addProperty("id", boundedId);
+        item.add("itemData", itemData);
+        JsonArray items = new JsonArray();
+        items.add(item);
+        JsonObject citation = new JsonObject();
+        citation.add("citationItems", items);
+        String name = ZoteroReferenceMark.PREFIX + citation;
+        assertEquals(Integer.MAX_VALUE, ZoteroReferenceMark.getMaxItemId(name));
+        JsonObject original = getCitationJson(name).getAsJsonArray("citationItems").get(0).getAsJsonObject();
+        assertEquals(foreignId, original.get("id").getAsString());
+        assertEquals(boundedId, original.getAsJsonObject("itemData").get("id").getAsString());
     }
 
     private static JsonObject getCitationJson(String referenceMarkName) {
