@@ -126,6 +126,7 @@ public abstract class DefinitionProvider {
         }
 
         for (KeyBounds kb : findCitationKeys(content)) {
+            // `kb.end()` is exclusive: hovering the separator right after a key must not show that key
             if (caret >= kb.start() && caret < kb.end()) {
                 return Optional.of(kb.key());
             }
