@@ -266,7 +266,7 @@ class CustomApiKeyBundleTest {
         CliPreferences.CredentialSave save = preferences.prepareSavedFetcherApiKeys(updatedKeys);
         verifyNoInteractions(keyring);
 
-        var commit = save.writeKeyring();
+        CliPreferences.CredentialCommit commit = save.writeKeyring();
         verify(keyring).setPassword("org.jabref.apikeys.bundle", "keys", "{\"Updated\":\"new-key\"}");
         assertEquals(savedKeys, preferences.getImporterPreferences().getApiKeys());
         assertEquals(List.of("Previous"), preferences.getStringList("fetcherCustomKeyBundleNames"));

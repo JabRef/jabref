@@ -6,6 +6,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 
 import com.github.javakeyring.Keyring;
@@ -38,12 +39,12 @@ class CiteDriveTokenStorageTest {
             factory.when(Keyring::create).thenReturn(keyring);
             JabRefCliPreferences preferences = new JabRefCliPreferences(node);
             preferences.putBoolean("citeDrivePersistToken", false);
-            var citeDrive = preferences.getCiteDrivePreferences();
+            CiteDrivePreferences citeDrive = preferences.getCiteDrivePreferences();
             RefreshToken token = new RefreshToken("test-token");
             citeDrive.setRefreshToken(token);
-            var save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SAVE).orElseThrow();
+            CliPreferences.CredentialSave save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SAVE).orElseThrow();
 
-            var commit = save.writeKeyring();
+            CliPreferences.CredentialCommit commit = save.writeKeyring();
             assertEquals(false, citeDrive.shouldPersistRefreshToken());
             commit.apply();
 
@@ -63,14 +64,14 @@ class CiteDriveTokenStorageTest {
             factory.when(Keyring::create).thenReturn(keyring);
             JabRefCliPreferences preferences = new JabRefCliPreferences(node);
             preferences.putBoolean("citeDrivePersistToken", false);
-            var citeDrive = preferences.getCiteDrivePreferences();
+            CiteDrivePreferences citeDrive = preferences.getCiteDrivePreferences();
             citeDrive.setRefreshToken(new RefreshToken("previous"));
-            var save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SAVE).orElseThrow();
-            var commit = save.writeKeyring();
+            CliPreferences.CredentialSave save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SAVE).orElseThrow();
+            CliPreferences.CredentialCommit commit = save.writeKeyring();
 
             RefreshToken refreshed = new RefreshToken("refreshed");
             citeDrive.setRefreshToken(refreshed);
-            var retry = commit.apply().orElseThrow();
+            CliPreferences.CredentialSave retry = commit.apply().orElseThrow();
 
             assertEquals(false, citeDrive.shouldPersistRefreshToken());
             assertEquals(Optional.empty(), retry.writeKeyring().apply());
@@ -93,8 +94,8 @@ class CiteDriveTokenStorageTest {
             doThrow(new PasswordAccessException("Denied")).when(keyring).deletePassword("org.jabref", "citedrive");
             JabRefCliPreferences preferences = new JabRefCliPreferences(node);
             preferences.putBoolean("citeDrivePersistToken", true);
-            var citeDrive = preferences.getCiteDrivePreferences();
-            var save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SESSION_ONLY).orElseThrow();
+            CiteDrivePreferences citeDrive = preferences.getCiteDrivePreferences();
+            CliPreferences.CredentialSave save = preferences.prepareCiteDriveTokenSave(citeDrive.getApiBaseUrl(), CredentialPersistence.SESSION_ONLY).orElseThrow();
 
             assertThrows(JabRefException.class, save::writeKeyring);
             assertEquals(true, citeDrive.shouldPersistRefreshToken());
@@ -117,10 +118,10 @@ class CiteDriveTokenStorageTest {
             preferences.putBoolean("citeDrivePersistToken", true);
             when(keyring.getPassword("org.jabref", "citedrive"))
                     .thenReturn(JabRefCliPreferences.serializeCiteDriveToken(token, previousServer));
-            var citeDrive = preferences.getCiteDrivePreferences();
-            var save = preferences.prepareCiteDriveTokenSave(newServer, CredentialPersistence.SAVE).orElseThrow();
+            CiteDrivePreferences citeDrive = preferences.getCiteDrivePreferences();
+            CliPreferences.CredentialSave save = preferences.prepareCiteDriveTokenSave(newServer, CredentialPersistence.SAVE).orElseThrow();
 
-            var commit = save.writeKeyring();
+            CliPreferences.CredentialCommit commit = save.writeKeyring();
             assertEquals(previousServer, citeDrive.getApiBaseUrl());
             assertEquals(token, citeDrive.getRefreshToken());
             commit.apply();

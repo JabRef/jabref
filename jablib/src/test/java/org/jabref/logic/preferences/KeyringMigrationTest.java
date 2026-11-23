@@ -2,6 +2,8 @@ package org.jabref.logic.preferences;
 
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 import org.jabref.model.metadata.UserHostInfo;
 
@@ -72,11 +74,11 @@ class KeyringMigrationTest {
         try (MockedStatic<Keyring> factory = Mockito.mockStatic(Keyring.class)) {
             factory.when(Keyring::create).thenReturn(keyring);
             JabRefCliPreferences preferences = createPreferences(LEGACY_KEY);
-            var proxy = preferences.getProxyPreferences();
-            var save = preferences.prepareProxyPasswordSave("replacement", CredentialPersistence.SAVE).orElseThrow();
+            ProxyPreferences proxy = preferences.getProxyPreferences();
+            CliPreferences.CredentialSave save = preferences.prepareProxyPasswordSave("replacement", CredentialPersistence.SAVE).orElseThrow();
             verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
 
-            var commit = save.writeKeyring();
+            CliPreferences.CredentialCommit commit = save.writeKeyring();
             assertEquals(PLAIN_TEXT, proxy.getPassword());
             commit.apply();
 
@@ -92,11 +94,11 @@ class KeyringMigrationTest {
         try (MockedStatic<Keyring> factory = Mockito.mockStatic(Keyring.class)) {
             factory.when(Keyring::create).thenReturn(keyring);
             JabRefCliPreferences preferences = createPreferences(LEGACY_KEY);
-            var git = preferences.getGitPreferences();
+            GitPreferences git = preferences.getGitPreferences();
             String previous = git.getPat();
             boolean previouslyPersisted = git.getPersistPat();
 
-            var save = preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE).orElseThrow();
+            CliPreferences.CredentialSave save = preferences.prepareGitHubTokenSave("replacement", CredentialPersistence.SAVE).orElseThrow();
 
             assertThrows(JabRefException.class, save::writeKeyring);
             assertEquals(previous, git.getPat());
