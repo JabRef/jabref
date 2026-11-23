@@ -4,6 +4,7 @@ import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
 import org.jabref.logic.importer.util.GrobidPreferences;
 
@@ -12,13 +13,15 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class PlainCitationParserFactory {
 
+    /// Every parser returned here resolves DOIs found in the citation text, see [DoiFirstPlainCitationParser].
+    ///
     /// Creates a parser for any choice that does not require AI dependencies.
     /// For [PlainCitationParserChoice#LLM] use [#getLlmPlainCitationParser].
     public static PlainCitationParser getPlainCitationParser(PlainCitationParserChoice parserChoice,
                                                              CitationKeyPatternPreferences citationKeyPatternPreferences,
                                                              GrobidPreferences grobidPreferences,
                                                              ImportFormatPreferences importFormatPreferences) {
-        return switch (parserChoice) {
+        PlainCitationParser parser = switch (parserChoice) {
             case PlainCitationParserChoice.RULE_BASED_GENERAL ->
                     new RuleBasedPlainCitationParser();
             case PlainCitationParserChoice.RULE_BASED_IEEE ->
@@ -28,11 +31,14 @@ public class PlainCitationParserFactory {
             case PlainCitationParserChoice.LLM ->
                     throw new IllegalArgumentException("LLM parser requires AI dependencies; call getLlmPlainCitationParser instead");
         };
+        return new DoiFirstPlainCitationParser(parser, new DoiFetcher(importFormatPreferences));
     }
 
     public static PlainCitationParser getLlmPlainCitationParser(ImportFormatPreferences importFormatPreferences,
                                                                 AiPreferences aiPreferences,
                                                                 ChatModel chatModel) {
-        return new LlmPlainCitationParser(importFormatPreferences, aiPreferences.getCitationParsingSystemMessageTemplate(), chatModel);
+        return new DoiFirstPlainCitationParser(
+                new LlmPlainCitationParser(importFormatPreferences, aiPreferences.getCitationParsingSystemMessageTemplate(), chatModel),
+                new DoiFetcher(importFormatPreferences));
     }
 }
