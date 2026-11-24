@@ -101,6 +101,11 @@ Each upload therefore uses one request from the endpoint's current allowance of 
 Setting the test JVM system property `citedrive.batch.fixture` to a generated 100,000-entry library adds that fixture to the same check.
 The test records the payload size and preparation timings without contacting CiteDrive.
 
+The CiteDrive menu also offers "Import from CiteDrive". It opens the configured CiteDrive web application's `/jabref/export` page.
+The default API and web addresses point to CiteDrive's production servers; the preferences can override them for development.
+The user connects that page to JabRef's local HTTP server, selects references, a target library, and optionally a group.
+The page then sends BibTeX to `POST /libraries/{id}/entries`; JabRef opens the import dialog unless direct HTTP import is enabled.
+
 ## Developing with IntelliJ
 
 IntelliJ Ultimate offers a Markdown-based http-client. You need to open the file `jabsrv/src/test/rest-api.http`.

@@ -257,11 +257,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     null,
                     groupDialogHeader));
 
+            if (currentDatabase.filter(active -> active == database).isEmpty()) {
+                return;
+            }
+
+            // A context menu can still refer to the old "All entries" node after the tree is rebuilt.
+            GroupNodeViewModel currentParent = parent.isAllEntriesGroup() ? rootGroup.get() : parent;
             newGroup.ifPresent(group -> recordTreeChange(Localization.lang("Add group"), _ -> {
-                GroupTreeNode newSubgroup = parent.addSubgroup(group);
+                GroupTreeNode newSubgroup = currentParent.addSubgroup(group);
                 // [impl->req~ux.groups.create-explicit-from-selection~1]
-                GroupNodeViewModel newViewModel = parent.findGroupNodeViewModel(newSubgroup)
-                                                        .orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                GroupNodeViewModel newViewModel = currentParent.findGroupNodeViewModel(newSubgroup)
+                                                               .orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
                 selectedGroups.setAll(newViewModel);
 
                 // TODO: expand the parent so the new group is visible
@@ -497,8 +503,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         keepAssignments,
                         removeAssignments,
                         cancel);
-                boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                        && (group instanceof ExplicitGroup);
+                // [impl->req~groups.edit.remove-obsolete-explicit-assignments~1]
+                boolean removePreviousAssignments = oldGroupDef instanceof ExplicitGroup;
 
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();

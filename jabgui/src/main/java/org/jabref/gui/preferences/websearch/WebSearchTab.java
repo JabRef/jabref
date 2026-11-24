@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -54,16 +55,17 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     private final Label externalFetcherNote = new Label(Localization.lang("Browser-extension fulltext providers discovered in JabRef's fulltext-providers directory. Each provider runs locally and exposes the Browser-Extension Fulltext Protocol."));
 
     /// @param workingAiPreferences the dialog-scoped working copy edited by the AI tab; this tab observes its master switch to offer or hide the LLM citation parser
-    public WebSearchTab(AiPreferences workingAiPreferences) {
+    public WebSearchTab(AiPreferences workingAiPreferences, ReadOnlyBooleanProperty keyringAvailable) {
         this.viewModel = new WebSearchTabViewModel(
-                preferences.getImporterPreferences(),
+                preferences,
                 preferences.getGrobidPreferences(),
                 preferences.getDOIPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getLibraryPreferences(),
                 workingAiPreferences.aiFeaturesEnabledCurrentlyProperty(),
-                taskExecutor);
+                taskExecutor,
+                keyringAvailable);
         buildView();
     }
 

@@ -1,16 +1,26 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
@@ -91,6 +102,10 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
+        return generateKey(entry, pattern, database, DEFAULT_UNWANTED_CHARACTERS);
+    }
+
+    private static String generateKey(BibEntry entry, String pattern, BibDatabase database, String unwantedCharacters) {
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences =
                 new CitationKeyPatternPreferences(true,
@@ -100,11 +115,264 @@ class CitationKeyGeneratorTest {
                         CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                         "",
                         "",
-                        DEFAULT_UNWANTED_CHARACTERS,
+                        unwantedCharacters,
                         keyPattern,
                         new SimpleObjectProperty<>(','));
 
         return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            ALWAYS, Smith2024a
+            SECOND_WITH_A, Smith2024a
+            SECOND_WITH_B, Smith2024b
+            """)
+    void reservedBaseUsesConfiguredSuffix(CitationKeyPatternPreferences.KeySuffix keySuffix, String expected) {
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+        preferences.setKeySuffix(keySuffix);
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(), preferences, Set.of("Smith2024"));
+
+        assertEquals(expected, generator.generateKey(entry));
+    }
+
+    @Test
+    void reservedBaseAndSuffixesAreOccupiedAlongsideExistingKeys() {
+        BibDatabase database = new BibDatabase(List.of(
+                new BibEntry().withCitationKey("Smith2024b"),
+                new BibEntry().withCitationKey("Smith2024d")));
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(database),
+                CitationKeyPatternPreferences.getDefault(), Set.of("Smith2024", "Smith2024a", "Smith2024c"));
+
+        assertEquals("Smith2024e", generator.generateKey(entry));
+    }
+
+    // [utest->req~import.libreoffice.unambiguous-keys~1]
+    @Test
+    void globalTransliterationAvoidsReservedBaseAndSuffix() {
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+        preferences.setShouldTransliterateFieldsForCitationKey(true);
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Надежда Карпенко")
+                .withField(StandardField.YEAR, "2025");
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(), preferences,
+                Set.of("Karpenko2025", "Karpenko2025a"));
+
+        assertEquals("Karpenko2025b", generator.generateKey(entry));
+    }
+
+    // [utest->req~import.libreoffice.unambiguous-keys~1]
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            Karpenko2025, Karpenko2025a, Karpenko2025b
+            OtherDocumentKey, Karpenko2025, Karpenko2025a
+            """)
+    void reservationEnabledTransliterationChecksExistingFinalKeys(String reservedKey, String existingKey, String expected) {
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+        preferences.setShouldTransliterateFieldsForCitationKey(true);
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Надежда Карпенко")
+                .withField(StandardField.YEAR, "2025");
+        BibDatabase database = new BibDatabase(List.of(new BibEntry().withCitationKey(existingKey)));
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(database), preferences, Set.of(reservedKey));
+
+        assertEquals(expected, generator.generateKey(entry));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            Karpenko2025, Unrelated
+            Karpenko2025a, Karpenko2025
+            """)
+    void reservationEnabledTransliterationDiscountsOwnFinalKey(String oldKey, String existingKey) {
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+        preferences.setShouldTransliterateFieldsForCitationKey(true);
+        BibEntry entry = new BibEntry()
+                .withCitationKey(oldKey)
+                .withField(StandardField.AUTHOR, "Надежда Карпенко")
+                .withField(StandardField.YEAR, "2025");
+        BibDatabase database = new BibDatabase(List.of(entry, new BibEntry().withCitationKey(existingKey)));
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(database), preferences, Set.of("OtherDocumentKey"));
+
+        assertEquals(oldKey, generator.generateKey(entry));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            Karpenko2025, Karpenko2025
+            Карпенко2025, Karpenko2025a
+            """)
+    void emptyReservationsKeepLegacyCollisionChecksBeforeTransliteration(String existingKey, String expected) {
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+        preferences.setShouldTransliterateFieldsForCitationKey(true);
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Надежда Карпенко")
+                .withField(StandardField.YEAR, "2025");
+        BibDatabase database = new BibDatabase(List.of(new BibEntry().withCitationKey(existingKey)));
+        BibDatabaseContext context = new BibDatabaseContext(database);
+
+        assertEquals(List.of(expected, expected, expected), List.of(
+                new CitationKeyGenerator(context, preferences).generateKey(entry),
+                new CitationKeyGenerator(context, preferences, Set.of()).generateKey(entry),
+                new CitationKeyGenerator(preferences.getKeyPatterns(), database, preferences).generateKey(entry)));
+    }
+
+    @Test
+    void patternAndRegexCleanupAvoidReservedBaseAndSuffix() {
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+        preferences.setKeyPatterns(GlobalCitationKeyPatterns.fromPattern("[auth]-[year]"));
+        preferences.setKeyPatternRegex("2024");
+        preferences.setKeyPatternReplacement("{2024}");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(), preferences,
+                Set.of("Smith2024", "Smith2024a"));
+
+        assertEquals("Smith2024b", generator.generateKey(entry));
+    }
+
+    @Test
+    void existingBaseSkipsReservedSuffixes() {
+        BibDatabase database = new BibDatabase(List.of(new BibEntry().withCitationKey("Smith2024")));
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(database),
+                CitationKeyPatternPreferences.getDefault(), Set.of("Smith2024a", "Smith2024b"));
+
+        assertEquals("Smith2024c", generator.generateKey(entry));
+    }
+
+    @Test
+    void reservedSuffixDoesNotOccupyUnreservedBase() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(),
+                CitationKeyPatternPreferences.getDefault(), Set.of("Smith2024a"));
+
+        assertEquals("Smith2024", generator.generateKey(entry));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            Smith2024, Unrelated, Smith2024a
+            Smith2024a, Smith2024, Smith2024b
+            """)
+    void ownKeyDiscountDoesNotReuseReservedKey(String oldKey, String existingKey, String expected) {
+        BibEntry entry = new BibEntry()
+                .withCitationKey(oldKey)
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        BibDatabase database = new BibDatabase(List.of(entry, new BibEntry().withCitationKey(existingKey)));
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(database),
+                CitationKeyPatternPreferences.getDefault(), Set.of(oldKey));
+
+        assertEquals(expected, generator.generateKey(entry));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith2024", "Smith2024a"})
+    void ownKeyOutsideDatabaseDoesNotReuseReservation(String oldKey) {
+        BibEntry entry = new BibEntry()
+                .withCitationKey(oldKey)
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(),
+                CitationKeyPatternPreferences.getDefault(), Set.of("Smith2024", "Smith2024a"));
+
+        assertEquals("Smith2024b", generator.generateKey(entry));
+    }
+
+    @Test
+    void reservedCitationKeysAreAnImmutableSnapshot() {
+        Set<String> reservedCitationKeys = new HashSet<>(Set.of("Smith2024"));
+        CitationKeyGenerator generator = new CitationKeyGenerator(new BibDatabaseContext(),
+                CitationKeyPatternPreferences.getDefault(), reservedCitationKeys);
+        reservedCitationKeys.clear();
+        reservedCitationKeys.add("Smith2024a");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+
+        assertEquals("Smith2024a", generator.generateKey(entry));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            Smith2024, Unrelated
+            Smith2024a, Smith2024
+            """)
+    void emptyReservationsPreserveOwnKeyDiscountForExistingConstructors(String oldKey, String existingKey) {
+        BibEntry entry = new BibEntry()
+                .withCitationKey(oldKey)
+                .withField(StandardField.AUTHOR, "John Smith")
+                .withField(StandardField.YEAR, "2024");
+        BibDatabase database = new BibDatabase(List.of(entry, new BibEntry().withCitationKey(existingKey)));
+        BibDatabaseContext context = new BibDatabaseContext(database);
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+
+        assertEquals(List.of(oldKey, oldKey, oldKey), List.of(
+                new CitationKeyGenerator(context, preferences).generateKey(entry),
+                new CitationKeyGenerator(context, preferences, Set.of()).generateKey(entry),
+                new CitationKeyGenerator(preferences.getKeyPatterns(), database, preferences).generateKey(entry)));
+    }
+
+    @Test
+    void contextConstructorsPreserveLibraryKeywordSeparator() {
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.getMetaData().setKeywordSeparator(';');
+        CitationKeyPatternPreferences preferences = CitationKeyPatternPreferences.getDefault();
+        preferences.setKeyPatterns(GlobalCitationKeyPatterns.fromPattern("[keyword2]"));
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "alpha; beta");
+
+        assertEquals(List.of("beta", "beta", "betaa"), List.of(
+                new CitationKeyGenerator(context, preferences).generateKey(entry),
+                new CitationKeyGenerator(context, preferences, Set.of()).generateKey(entry),
+                new CitationKeyGenerator(context, preferences, Set.of("beta")).generateKey(entry)));
+    }
+
+    // [utest->req~save.citation-keys.normalize-extended-names~1]
+    @ParameterizedTest
+    @CsvSource({
+            "'family=Hasselt', '[author:normalize_names]', Hasselt",
+            "'given=Hado, family=Hasselt', '[author:normalize_names]', HasseltHado",
+            "'given=Hado, family=Hasselt', '[author:lower:normalize_names:upper]', HASSELTHADO"
+    })
+    void normalizedAuthorKeysSurviveSaveAndReparse(String author, String pattern, String expectedKey) throws Exception {
+        BibEntry entry = createABibEntryAuthor(author);
+        entry.withCitationKey(generateKey(entry, pattern)).withChanged(true);
+        var output = new StringWriter();
+        var writer = new BibEntryWriter(new FieldWriter(new FieldPreferences(true, List.of(), List.of())), new BibEntryTypesManager());
+
+        writer.write(entry, new BibWriter(output, "\n"), BibDatabaseMode.BIBLATEX);
+
+        BibEntry reloaded = BibtexParser.singleFromString(output.toString(), importFormatPreferences).orElseThrow();
+        assertEquals(Optional.of(expectedKey), reloaded.getCitationKey());
+        assertEquals(Optional.of(author), reloaded.getField(StandardField.AUTHOR));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "John Smith, SmithJohn",
+            "'Smith, John', JohnSmith",
+            "'{Research and Development}', ResearchandDevelopment"
+    })
+    void normalizeNamesKeepsConventionalKeyCleanUp(String name, String expectedKey) {
+        assertEquals(expectedKey, generateKey(createABibEntryAuthor(name), "[author:normalize_names]"));
+    }
+
+    @Test
+    void normalizeNamesKeepsUserDefinedUnwantedCharactersForConventionalKeys() {
+        BibEntry entry = createABibEntryAuthor("John Smith");
+        assertEquals("JohnSmith", generateKey(entry, "[author:normalize_names]", new BibDatabase(), DEFAULT_UNWANTED_CHARACTERS + " "));
     }
 
     @Test
