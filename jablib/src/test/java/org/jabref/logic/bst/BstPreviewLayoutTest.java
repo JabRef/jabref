@@ -102,9 +102,9 @@ class BstPreviewLayoutTest {
                 Arguments.of("\\textsc{A\\{B\\}C}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">ABC.</span>"),
                 Arguments.of("{\\scshape Lopez}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">Lopez.</span>"),
 
-                // Malformed input should fall back to the existing preview pipeline without failing
-                Arguments.of("\\textsc{L{\\'o}pez", "O.&nbsp;Kopp. López."),
-                Arguments.of("{\\sc L{\\'o}pez", "O.&nbsp;Kopp. lópez."),
+                // After BST brace sanitization, recover supported commands as HTML and close remaining formatting scopes.
+                Arguments.of("\\textsc{L{\\'o}pez", "O.&nbsp;Kopp. L&oacute;pez."),
+                Arguments.of("{\\sc L{\\'o}pez", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">l&oacute;pez.</span>"),
 
                 // Emphasis becomes HTML, not Unicode mathematical italic or bold letters
                 // abbrv lowercases titles, as BibTeX does inside {\\em ...}
