@@ -161,8 +161,9 @@ final class LatexMarkupConverter {
         }
     }
 
+    /// `StringEscapeUtils.escapeHtml4` does not parse LaTeX escapes and would double-escape existing entities.
+    /// Recognize entities in the source, before removing groups could assemble an unintended entity.
     private void convertAmpersand() {
-        // Recognize entities in the source, before removing groups could assemble an unintended entity.
         Matcher entity = HTML_ENTITY_PATTERN.matcher(text).region(index, text.length());
         if (entity.lookingAt()) {
             output.append(entity.group());
