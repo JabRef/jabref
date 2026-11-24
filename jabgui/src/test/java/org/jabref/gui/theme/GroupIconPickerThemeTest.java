@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 class GroupIconPickerThemeTest extends JavaFxTest {
 
     private GroupDialogView dialog;
+    private PopOver picker;
 
     @Override
     public void start(Stage stage) {
@@ -71,15 +72,19 @@ class GroupIconPickerThemeTest extends JavaFxTest {
             stylesheets.add(theme.getStyleSheet().getSceneStylesheetLocation());
             stylesheets.add(ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation());
             dialog.getDialogPane().getScene().getStylesheets().setAll(stylesheets);
+            dialog.getDialogPane().applyCss();
+            dialog.getDialogPane().layout();
             ((Button) dialog.getDialogPane().lookup("#iconPickerButton")).fire();
+
+            // Owner-window layout can hide the popup while queued icon loading is processed.
+            picker = Window.getWindows().stream()
+                           .filter(PopOver.class::isInstance)
+                           .map(PopOver.class::cast)
+                           .findFirst().orElseThrow();
         });
         awaitEvents();
 
         interact(() -> {
-            PopOver picker = Window.getWindows().stream()
-                                   .filter(PopOver.class::isInstance)
-                                   .map(PopOver.class::cast)
-                                   .findFirst().orElseThrow();
             Scene scene = picker.getScene();
             Region reference = new Region();
             reference.getStyleClass().addAll("bg-secondary", "bordered");
