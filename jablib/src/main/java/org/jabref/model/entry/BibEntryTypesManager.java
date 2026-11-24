@@ -1,7 +1,6 @@
 package org.jabref.model.entry;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -188,14 +187,14 @@ public class BibEntryTypesManager {
     /// This class is used to specify entry types for either BIBTEX and BIBLATEX.
     ///
     /// The customized types are read on background threads (e.g., when comparing libraries) while the UI thread may change them.
-    /// Therefore, every change replaces the whole set by a new unmodifiable copy (copy-on-write).
+    /// Therefore, every change replaces the whole set by a new copy (copy-on-write); a set is never modified after it has been assigned.
     /// A reader reads the field once and then works on a consistent snapshot.
     @VisibleForTesting
     static class InternalEntryTypes {
         @VisibleForTesting final Set<BibEntryType> standardTypes;
 
         // TreeSet needs to be used here, because then, org.jabref.model.entry.BibEntryType.compareTo is used - instead of org.jabref.model.entry.BibEntryType.equals
-        private volatile SortedSet<BibEntryType> customOrModifiedType = Collections.emptySortedSet();
+        private volatile SortedSet<BibEntryType> customOrModifiedType = new TreeSet<>();
 
         private InternalEntryTypes(List<BibEntryType> standardTypes) {
             this.standardTypes = new HashSet<>(standardTypes);
@@ -233,21 +232,21 @@ public class BibEntryTypesManager {
             SortedSet<BibEntryType> changedTypes = new TreeSet<>(customOrModifiedType);
             changedTypes.remove(type);
             changedTypes.add(type);
-            customOrModifiedType = Collections.unmodifiableSortedSet(changedTypes);
+            customOrModifiedType = changedTypes;
         }
 
         private synchronized void removeCustomOrModifiedEntryType(BibEntryType type) {
             SortedSet<BibEntryType> changedTypes = new TreeSet<>(customOrModifiedType);
             changedTypes.remove(type);
-            customOrModifiedType = Collections.unmodifiableSortedSet(changedTypes);
+            customOrModifiedType = changedTypes;
         }
 
         private synchronized void clearAllCustomEntryTypes() {
-            customOrModifiedType = Collections.emptySortedSet();
+            customOrModifiedType = new TreeSet<>();
         }
 
         private synchronized void replaceCustomOrModifiedTypes(Collection<BibEntryType> types) {
-            customOrModifiedType = Collections.unmodifiableSortedSet(new TreeSet<>(types));
+            customOrModifiedType = new TreeSet<>(types);
         }
 
         /// Returns all types known to JabRef. This includes the standard types as well as the customized types
