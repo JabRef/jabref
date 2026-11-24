@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -44,6 +45,7 @@ class ModsExporter extends Exporter {
     private static final String MINUS = "-";
     private static final String DOUBLE_MINUS = "--";
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModsExporter.class);
 
@@ -85,9 +87,9 @@ class ModsExporter extends Exporter {
                     String value = entry.getValue();
 
                     if (StandardField.AUTHOR == field) {
-                        handleAuthors(writer, value, "aut");
+                        handleNames(writer, value, "aut");
                     } else if (StandardField.EDITOR == field) {
-                        handleAuthors(writer, value, "edt");
+                        handleNames(writer, value, "edt");
                     } else if (new UnknownField("affiliation").equals(field)) {
                         addAffiliation(writer, value);
                     } else if (StandardField.ABSTRACT == field) {
@@ -363,7 +365,7 @@ class ModsExporter extends Exporter {
         }
     }
 
-    private void handleAuthors(XMLStreamWriter writer, String value, String role) throws XMLStreamException {
+    private void handleNames(XMLStreamWriter writer, String value, String role) throws XMLStreamException {
         AuthorList authors = AuthorList.parse(value);
 
         for (Author author : authors) {
@@ -382,7 +384,7 @@ class ModsExporter extends Exporter {
             String givenName = author.getGivenName().orElse("");
 
             if (!givenName.isEmpty()) {
-                for (String given : givenName.split("\\s+")) {
+                for (String given : WHITESPACE_PATTERN.split(givenName)) {
                     writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
                     writer.writeAttribute("type", "given");
                     writer.writeCharacters(given);

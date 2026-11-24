@@ -53,11 +53,11 @@ class ModsExportFormatTest {
 
     @Test
     void exportNamesWithAuthorAndEditorRoles(@TempDir Path tempDir) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Book);
-        entry.setField(StandardField.TITLE, "MODS Name Export Test");
-        entry.setField(StandardField.AUTHOR, "Sandra Sanders and John Smith");
-        entry.setField(StandardField.EDITOR, "Sam Flanders and Alice Johnson");
-        entry.setField(StandardField.YEAR, "2026");
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "MODS Name Export Test")
+                .withField(StandardField.AUTHOR, "Sandra Sanders and John Smith")
+                .withField(StandardField.EDITOR, "Sam Flanders and Alice Johnson")
+                .withField(StandardField.YEAR, "2026");
 
         Path file = tempDir.resolve("names.xml");
         modsExportFormat.export(databaseContext, file, List.of(entry));

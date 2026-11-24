@@ -60,5 +60,15 @@ Local attachments that cannot be resolved or represented relatively are omitted.
 
 Needs: impl, utest
 
+## MODS author and editor export
+`req~export.mods.names~1`
+
+MODS exports preserve author and editor names without incorrectly splitting names containing "and".
+Authors and editors are exported with the MARC relator codes `aut` and `edt`, respectively.
+
+See [issue 17898](https://github.com/JabRef/jabref/issues/17898).
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD013 MD033 MD041 -->
 <!-- markdownlint-disable-file MD022 -->
