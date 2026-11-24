@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.bst.BstCitationFormat;
+import org.jabref.logic.openoffice.bst.BstStyle;
 import org.jabref.logic.openoffice.bst.PandocLatexConverter;
-import org.jabref.logic.openoffice.style.BstCitationFormat;
-import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.openoffice.style.CitationType;

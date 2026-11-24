@@ -125,6 +125,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing backups of values typed into newly added fields. [#17846](https://github.com/JabRef/jabref/pull/17846)
 - We fixed an issue where merging a backup file did not prompt the user to save upon exiting. [#12265](https://github.com/JabRef/jabref/issues/12265)
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
+- We fixed an issue where accepting changes from a backup did not mark the restored library as modified. [#15846](https://github.com/JabRef/jabref/issues/15846)
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
 - We fixed duplicate detection across compatible book-section and conference-paper entry types. [#17293](https://github.com/JabRef/jabref/issues/17293)
@@ -150,6 +151,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed API key validation when saving a new or edited key. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
+- We fixed the group icon picker background and borders not following the active theme. [#17887](https://github.com/JabRef/jabref/issues/17887)
 - We fixed subgroups disappearing after adding them from the "All entries" context menu in a new library. [#17764](https://github.com/JabRef/jabref/issues/17764)
 - We fixed an issue where group selections were lost when changing library tabs. [#1104](https://github.com/JabRef/jabref/issues/1104)
 - We fixed obsolete group assignments remaining after changing an explicit group's grouping method. [#8824](https://github.com/JabRef/jabref/issues/8824)
@@ -206,6 +208,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing bibliography paragraph styles blocking JStyle citation insertion in LibreOffice/OpenOffice when bibliography synchronization is disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed LibreOffice/OpenOffice citation updates modifying citations marked for deletion through Track Changes after change recording was disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed edits to selected JStyle files not taking effect when inserting or refreshing citations in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed an issue where the generate citation keys toolbar button stopped working after canceling an overwrite. [#17748](https://github.com/JabRef/jabref/issues/17748)
 
 ### Removed
 

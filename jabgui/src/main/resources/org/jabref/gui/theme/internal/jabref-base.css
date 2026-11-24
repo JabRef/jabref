@@ -1186,6 +1186,18 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-accent-subtle;
 }
 
+/* GroupDialog */
+
+.popover.group-icon-picker > .border {
+    -fx-fill: -color-bg-secondary;
+    -fx-stroke: -color-border-light;
+}
+
+.group-icon-picker .grid-cell:filled {
+    -fx-border-color: -color-border-light;
+    -fx-border-width: 1;
+}
+
 /* GroupTree */
 
 .group-tree {
