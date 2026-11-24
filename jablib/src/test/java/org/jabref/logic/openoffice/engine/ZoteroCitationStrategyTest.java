@@ -1,0 +1,640 @@
+package org.jabref.logic.openoffice.engine;
+
+import java.lang.reflect.Modifier;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.CitedEntryCollector;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.ZoteroCitationLinker;
+import org.jabref.logic.openoffice.ZoteroCitationLinker.LinkPlan;
+import org.jabref.logic.openoffice.ZoteroDocumentPreferences;
+import org.jabref.logic.openoffice.ZoteroReferenceMark;
+import org.jabref.logic.openoffice.backend.WriterReferenceMark;
+import org.jabref.logic.openoffice.backend.WriterReferenceMark.BoundaryPolicy;
+import org.jabref.logic.openoffice.backend.WriterReferenceMarks;
+import org.jabref.logic.openoffice.bst.BstStyle;
+import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.Reason;
+import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StoredCitation;
+import org.jabref.logic.openoffice.engine.ZoteroCitationStrategy.StrategyException;
+import org.jabref.logic.openoffice.engine.storage.UndoableDocumentProperties;
+import org.jabref.logic.openoffice.jstyle.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.openoffice.uno.OOTextWriter;
+import org.jabref.logic.openoffice.uno.UnoDispatch;
+import org.jabref.logic.openoffice.uno.UnoRedlines;
+import org.jabref.logic.openoffice.uno.UnoUserDefinedProperty;
+import org.jabref.logic.openoffice.uno.WriterDocumentAccessException;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.openoffice.ootext.OOText;
+import org.jabref.model.openoffice.style.CitationType;
+import org.jabref.model.openoffice.util.OOResult;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.sun.star.beans.XPropertySet;
+import com.sun.star.container.XEnumeration;
+import com.sun.star.container.XEnumerationAccess;
+import com.sun.star.container.XNameAccess;
+import com.sun.star.document.XRedlinesSupplier;
+import com.sun.star.text.XText;
+import com.sun.star.text.XTextContent;
+import com.sun.star.text.XTextCursor;
+import com.sun.star.text.XTextDocument;
+import com.sun.star.text.XTextRange;
+import com.sun.star.text.XTextRangeCompare;
+import com.sun.star.text.XTextSectionsSupplier;
+import com.sun.star.uno.XComponentContext;
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+
+import static org.jabref.logic.openoffice.engine.RendererTestData.entry;
+import static org.jabref.logic.openoffice.engine.RendererTestData.numericStyle;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Answers.CALLS_REAL_METHODS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
+@NullMarked
+@ResourceLock("Localization.lang")
+class ZoteroCitationStrategyTest {
+
+    private static final String ZOTERO = ZoteroReferenceMark.PREFIX + """
+            {"citationID":"citation1","citationItems":[{"id":"1",\
+            "uris":["http://zotero.org/users/1/items/ITEM1","http://www.jabref.org/a"],\
+            "itemData":{"id":"1","citation-key":"a","type":"article","title":"A"}}],\
+            "properties":{"noteIndex":3,"custom":"keep metadata"}} RNDabcdefghij""";
+    private static final String LEGACY_CID = "JABREF_legacy CID_7 uid NORMAL";
+    private static final String LEGACY_JSTYLE = "JR_cite0_1_legacy";
+    private static final String CANONICAL = "JABREF_canonical NORMAL stableuid";
+
+    private final XTextDocument document = mock(XTextDocument.class, withSettings().extraInterfaces(XTextSectionsSupplier.class, XRedlinesSupplier.class));
+    private final XComponentContext context = mock(XComponentContext.class);
+    private final OpenOfficePreferences preferences = mock(OpenOfficePreferences.class);
+    private final BibEntryTypesManager entryTypes = new BibEntryTypesManager();
+    private final WriterReferenceMarks ranges = mock(WriterReferenceMarks.class);
+    private final XText text = mock(XText.class, withSettings().extraInterfaces(XTextRangeCompare.class));
+    private final XTextCursor cursor = mock(XTextCursor.class);
+    private final WriterReferenceMark range = mock(WriterReferenceMark.class);
+    private final Map<XTextRange, int[]> positions = new IdentityHashMap<>();
+    private final XEnumeration redlines = mock(XEnumeration.class);
+
+    @BeforeEach
+    void prepareDocument() throws Exception {
+        when(preferences.getCslBibliographyBodyFormat()).thenReturn("Text body");
+        when(ranges.names(document)).thenReturn(List.of());
+        when(text.createTextCursorByRange(any(XTextRange.class))).thenReturn(cursor);
+        when(cursor.getText()).thenReturn(text);
+        when(cursor.getStart()).thenReturn(cursor);
+        when(cursor.getEnd()).thenReturn(cursor);
+        positions.put(cursor, new int[] {10, 10});
+        XTextRangeCompare compare = (XTextRangeCompare) text;
+        when(compare.compareRegionStarts(any(XTextRange.class), any(XTextRange.class))).thenAnswer(invocation ->
+                (short) Integer.compare(coordinate(invocation.getArgument(1), 0), coordinate(invocation.getArgument(0), 0)));
+        when(compare.compareRegionEnds(any(XTextRange.class), any(XTextRange.class))).thenAnswer(invocation ->
+                (short) Integer.compare(coordinate(invocation.getArgument(1), 1), coordinate(invocation.getArgument(0), 1)));
+        XNameAccess sections = mock(XNameAccess.class);
+        when(((XTextSectionsSupplier) document).getTextSections()).thenReturn(sections);
+        when(sections.getElementNames()).thenReturn(new String[0]);
+        XEnumerationAccess changes = mock(XEnumerationAccess.class);
+        when(((XRedlinesSupplier) document).getRedlines()).thenReturn(changes);
+        when(changes.createEnumeration()).thenReturn(redlines);
+        WriterReferenceMark foreign = mock(WriterReferenceMark.class);
+        XTextRange foreignAnchor = span(30, 35);
+        when(foreign.getMarkRange(document)).thenReturn(Optional.of(foreignAnchor));
+        when(ranges.find(document, LEGACY_CID, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(foreign));
+        when(cursor.getString()).thenReturn("[1]");
+        XTextRange anchor = span(1, 4);
+        when(range.getMarkRange(document)).thenReturn(Optional.of(anchor));
+        when(range.getRawCursor(document)).thenReturn(Optional.of(cursor));
+        when(range.getFillCursor(document)).thenReturn(cursor);
+        when(ranges.find(document, ZOTERO, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        when(ranges.create(eq(document), eq(context), anyString(), eq(cursor), anyBoolean(), anyBoolean(), eq(BoundaryPolicy.TEMPORARY))).thenReturn(range);
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonCslStyles")
+    void nonCslStylesReturnLocalizedTypedErrorBeforeDocumentAccess(OOStyle style) {
+        OOResult<List<String>, JabRefException> result = strategy().refresh(List.of(), style);
+        StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+
+        assertEquals(Reason.UNSUPPORTED_STYLE, error.reason());
+        assertEquals(Localization.lang("Cannot generate citation based on selected citation style."), error.getLocalizedMessage());
+        verifyNoInteractions(document, context, ranges, preferences);
+    }
+
+    private static Stream<OOStyle> nonCslStyles() {
+        return Stream.of(mock(JStyle.class), mock(BstStyle.class));
+    }
+
+    @Test
+    void nativeCapabilitiesExposeOnlyNormalAndInTextInsertion() {
+        when(preferences.getZoteroCompatibilityMode()).thenReturn(true);
+        try (CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            assertEquals(List.of(CitationType.AUTHORYEAR_PAR, CitationType.AUTHORYEAR_INTEXT),
+                    engine.capabilities(style()).supportedTypes().stream().sorted().toList());
+        }
+    }
+
+    @Test
+    void importCitedDelegatesReferenceMarkNamesToCollector() {
+        List<String> names = List.of(ZOTERO, CANONICAL);
+        List<BibEntry> entries = List.of(entry("a", "A"));
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             MockedStatic<CitedEntryCollector> collector = mockStatic(CitedEntryCollector.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(names);
+            collector.when(() -> CitedEntryCollector.collectCitedEntries(names)).thenReturn(entries);
+
+            assertSame(entries, engine.importCited().get());
+
+            marks.verify(() -> WriterReferenceMarks.getListOfNames(document));
+            collector.verify(() -> CitedEntryCollector.collectCitedEntries(names));
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void importCitedReadsNativeDataWithoutStyleChecksConversionOrDocumentMutation(boolean zoteroMode) {
+        when(preferences.getZoteroCompatibilityMode()).thenReturn(zoteroMode);
+        String nativeMark = ZoteroReferenceMark.PREFIX + """
+                {"citationID":"native","citationItems":[{"id":587,\
+                "uris":["http://zotero.org/users/123/items/ABCD1234"],\
+                "itemData":{"id":587,"type":"article-journal","title":"Native Zotero article",\
+                "DOI":"10.1234/native.2024"}}]} RNDklmnopqrst""";
+        List<String> names = List.of(CANONICAL, ZOTERO, nativeMark, LEGACY_CID, LEGACY_JSTYLE);
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             MockedStatic<CitationFormatConverter> conversion = mockStatic(CitationFormatConverter.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(names);
+
+            List<BibEntry> imported = engine.importCited().get();
+
+            assertEquals(List.of(Optional.of("a"), Optional.empty()), imported.stream().map(BibEntry::getCitationKey).toList());
+            assertEquals(List.of(Optional.of("A"), Optional.of("Native Zotero article")),
+                    imported.stream().map(importedEntry -> importedEntry.getField(StandardField.TITLE)).toList());
+            assertEquals(Optional.of("10.1234/native.2024"), imported.getLast().getField(StandardField.DOI));
+            marks.verify(() -> WriterReferenceMarks.getListOfNames(document));
+            marks.verifyNoMoreInteractions();
+            conversion.verifyNoInteractions();
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void importCitedReturnsSuccessfulEmptyListForEmptyOrCanonicalOnlyDocument(boolean canonicalOnly) {
+        List<String> names = canonicalOnly ? List.of(CANONICAL, LEGACY_CID, LEGACY_JSTYLE) : List.of();
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenReturn(names);
+
+            assertEquals(Optional.of(List.of()), engine.importCited().getOptional());
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @Test
+    void importCitedRejectsClosedEngineWithoutReadingDocument() {
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            engine.close();
+
+            assertEquals(Localization.lang("Not connected to any Writer document. Please make sure a document is open, and use the 'Select Writer document' button to connect to it."),
+                    engine.importCited().getError().getLocalizedMessage());
+            marks.verifyNoInteractions();
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("importReadFailures")
+    void importCitedReturnsLocalizedReadFailureWithoutDocumentMutation(Exception cause) {
+        try (MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             CitationEngine engine = new CitationEngine(document, context, preferences, entryTypes)) {
+            marks.when(() -> WriterReferenceMarks.getListOfNames(document)).thenThrow(cause);
+
+            JabRefException error = engine.importCited().getError();
+
+            assertEquals(Localization.lang("Unable to import cited entries"), error.getLocalizedMessage());
+            assertSame(cause, error.getCause());
+            verifyNoInteractions(document, context, ranges, preferences);
+        }
+    }
+
+    private static Stream<Exception> importReadFailures() {
+        return Stream.of(new WriterDocumentAccessException("Reference marks unavailable"),
+                new com.sun.star.uno.RuntimeException("Reference mark read failed"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CitationType.class, names = {"AUTHOR_ONLY", "YEAR_ONLY", "AUTHORYEAR_NOPAR", "INVISIBLE_CIT"})
+    void unsupportedTypesAreNotSilentlyReinterpreted(CitationType type) {
+        OOResult<List<String>, JabRefException> result = strategy().insert(List.of(entry("a", "A")), List.of(), style(), type, "", cursor, false);
+
+        assertEquals(Reason.UNSUPPORTED_TYPE, assertInstanceOf(StrategyException.class, result.getError()).reason());
+        verifyNoInteractions(document, context, ranges);
+    }
+
+    @Test
+    void pageInfoReturnsTypedErrorBeforeAnyWrites() {
+        OOResult<List<String>, JabRefException> result = strategy().insert(List.of(entry("a", "A")), List.of(), style(), CitationType.AUTHORYEAR_PAR, "p. 5", cursor, false);
+
+        assertEquals(Reason.PAGE_INFO_NOT_SUPPORTED, assertInstanceOf(StrategyException.class, result.getError()).reason());
+        verifyNoInteractions(document, ranges);
+    }
+
+    @Test
+    void missingKeysAreRejectedWithoutEntryIdFallback() {
+        OOResult<List<String>, JabRefException> result = strategy().insert(List.of(new BibEntry()), List.of(), style(), CitationType.AUTHORYEAR_PAR, "", cursor, false);
+
+        assertEquals(Reason.INVALID_ENTRY, assertInstanceOf(StrategyException.class, result.getError()).reason());
+        verifyNoInteractions(document, ranges);
+    }
+
+    @Test
+    void exportReadsOnlyZoteroMarksAndDoesNotModifyDocument() throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(LEGACY_CID, LEGACY_JSTYLE, CANONICAL, ZOTERO));
+        BibDatabase database = new BibDatabase(List.of(entry("a", "A"), entry("legacy", "Old"), entry("canonical", "Canonical")));
+        CitedEntryExporter.ExportResult result = strategy().exportCited(List.of(database)).get();
+
+        assertEquals(List.of("a"), result.database().getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).toList());
+        assertEquals(List.of(), result.unresolvedKeys());
+        verify(ranges, never()).find(document, LEGACY_CID, BoundaryPolicy.TEMPORARY);
+        verify(ranges, never()).find(document, LEGACY_JSTYLE, BoundaryPolicy.TEMPORARY);
+        verify(ranges, never()).find(document, CANONICAL, BoundaryPolicy.TEMPORARY);
+        verifyNoInteractions(document, preferences, context);
+    }
+
+    @ParameterizedTest
+    @MethodSource("unsupportedNativeNames")
+        // [utest->req~openoffice.zotero-modifier-compatibility~1]
+    void readingNativeModifiersRetainsMetadataAndExistingGroupType(String name) throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(name));
+        when(ranges.find(document, name, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+
+        StoredCitation citation = strategy().read().getFirst();
+        ZoteroReferenceMark parsed = ZoteroReferenceMark.parse(name).orElseThrow();
+
+        assertEquals(name, citation.originalName());
+        assertEquals(parsed, citation.mark());
+        assertEquals(parsed.citationKeys(), citation.group().citationsInStorageOrder.stream().map(item -> item.citationKey).toList());
+        assertEquals(parsed.citationType(), citation.group().citationType);
+        verifyNoInteractions(document, context, preferences);
+    }
+
+    @Test
+    void malformedSuppressionWithLocatorCannotBeReadByTheTolerantParser() {
+        assertEquals(Optional.empty(), ZoteroReferenceMark.parse(malformedSuppressionWithLocatorName()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("unsupportedNativeNames")
+    void exportWithUnsupportedModifiersStillReadsKeysWithoutDocumentWrites(String name) throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(name));
+        when(ranges.find(document, name, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        CitedEntryExporter.ExportResult result = strategy().exportCited(List.of(new BibDatabase(List.of(entry("a", "A"))))).get();
+
+        assertEquals(List.of("a"), result.database().getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).toList());
+        assertEquals(List.of(), result.unresolvedKeys());
+        verifyNoInteractions(document, context, preferences);
+        verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
+        verify(cursor, never()).setString(anyString());
+    }
+
+    private static String malformedSuppressionWithLocatorName() {
+        JsonObject citation = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+        JsonObject item = citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+        item.addProperty("locator", "17");
+        item.add("suppress-author", new JsonObject());
+        return ZoteroReferenceMark.PREFIX + citation + " RNDabcdefghij";
+    }
+
+    private static Stream<String> unsupportedNativeNames() {
+        Stream.Builder<String> names = Stream.builder();
+        for (String field : List.of("locator", "label", "prefix", "suffix")) {
+            for (String location : List.of("citation", "properties", "item")) {
+                JsonObject citation = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+                JsonObject target = switch (location) {
+                    case "properties" ->
+                            citation.getAsJsonObject("properties");
+                    case "item" ->
+                            citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+                    default ->
+                            citation;
+                };
+                target.addProperty(field, "value");
+                names.add(ZoteroReferenceMark.PREFIX + citation + " RNDabcdefghij");
+            }
+        }
+        JsonObject authorOnly = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+        authorOnly.getAsJsonArray("citationItems").get(0).getAsJsonObject().addProperty("author-only", true);
+        names.add(ZoteroReferenceMark.PREFIX + authorOnly + " RNDabcdefghij");
+        JsonObject mixed = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(ZOTERO)).getAsJsonObject();
+        JsonObject item = mixed.getAsJsonArray("citationItems").get(0).getAsJsonObject();
+        mixed.getAsJsonArray("citationItems").add(item.deepCopy());
+        item.addProperty("suppress-author", true);
+        names.add(ZoteroReferenceMark.PREFIX + mixed + " RNDabcdefghij");
+        return names.build();
+    }
+
+    @Test
+    void exportRereadsMarksInsteadOfRetainingEarlierActionState() throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(ZOTERO), List.of(LEGACY_CID));
+        ZoteroCitationStrategy strategy = strategy();
+        BibDatabase database = new BibDatabase(List.of(entry("a", "A")));
+        assertEquals(1, strategy.exportCited(List.of(database)).get().database().getEntryCount());
+
+        assertEquals(List.of(), strategy.exportCited(List.of(database)).get().database().getEntries());
+    }
+
+    @Test
+    void refreshUsesExplicitStyleAndPreservesMarkIdentityAndMetadata() throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(ZOTERO, LEGACY_CID));
+        CitationStyle style = style();
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class, CALLS_REAL_METHODS);
+             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<UnoDispatch> dispatch = mockStatic(UnoDispatch.class)) {
+            documentPreferences.when(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style)).thenReturn(true);
+            OOResult<List<String>, JabRefException> result = strategy().refresh(List.of(new BibDatabase(List.of(entry("a", "A")))), style);
+
+            assertEquals(List.of(), result.get());
+            writer.verify(() -> OOTextWriter.write(document, cursor, OOText.fromString("<span lang=\"zxx\">[1]</span>")));
+            linker.verify(() -> ZoteroCitationLinker.planLinks(eq(List.of(ZOTERO)), any(BibDatabaseContext.class), eq(entryTypes)));
+            documentPreferences.verify(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style));
+            verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
+            verify(preferences, never()).getCurrentStyle();
+            verify(preferences, never()).zoteroCompatibilityModeProperty();
+            verify(ranges).find(document, ZOTERO, BoundaryPolicy.TEMPORARY);
+        }
+    }
+
+    @Test
+    void insertionReusesTheLinkedZoteroUriWithoutMigratingCidMarks() throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(ZOTERO, LEGACY_CID));
+        CitationStyle style = style();
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class, CALLS_REAL_METHODS);
+             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<UnoDispatch> dispatch = mockStatic(UnoDispatch.class)) {
+            documentPreferences.when(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style)).thenReturn(true);
+            BibEntry entry = entry("a", "A");
+            OOResult<List<String>, JabRefException> result = strategy().insert(List.of(entry), List.of(new BibDatabase(List.of(entry))), style, CitationType.AUTHORYEAR_PAR, "", cursor, false);
+            assertEquals(List.of(), result.get());
+            ArgumentCaptor<String> name = ArgumentCaptor.forClass(String.class);
+            verify(ranges).create(eq(document), eq(context), name.capture(), eq(cursor), eq(false), eq(false), eq(BoundaryPolicy.TEMPORARY));
+
+            assertEquals("http://zotero.org/users/1/items/ITEM1", ZoteroReferenceMark.extractZoteroUriByCitationKey(name.getValue()).get("a"));
+            assertEquals(List.of("a"), ZoteroReferenceMark.parse(name.getValue()).orElseThrow().citationKeys());
+            verify(ranges).find(document, LEGACY_CID, BoundaryPolicy.TEMPORARY);
+        }
+    }
+
+    @Test
+    void blankNativeCitationUsesItsJsonTypeInsteadOfAnInvisibleTextHeuristic() throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(ZOTERO));
+        when(cursor.getString()).thenReturn("\u200b\u200b");
+        CitationStyle style = style();
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class, CALLS_REAL_METHODS);
+             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<UnoDispatch> dispatch = mockStatic(UnoDispatch.class)) {
+            documentPreferences.when(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style)).thenReturn(true);
+            BibDatabase database = new BibDatabase(List.of(entry("a", "A")));
+            assertEquals(List.of(), strategy().refresh(List.of(database), style).get());
+            assertEquals(List.of(), strategy().refresh(List.of(database), style).get());
+
+            writer.verify(() -> OOTextWriter.write(document, cursor, OOText.fromString("<span lang=\"zxx\">[1]</span>")), times(2));
+            assertEquals(CitationType.AUTHORYEAR_PAR, strategy().read().getFirst().group().citationType);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"insert", "refresh"})
+    void nativeRelinkingPreservesJsonWithoutAccessingConversionProperties(String operation) throws Exception {
+        String nativeName = ZOTERO.replace(",\"http://www.jabref.org/a\"", "")
+                                  .replace("\"title\":\"A\"", "\"title\":\"A\",\"DOI\":\"10.123/native\"");
+        when(ranges.names(document)).thenReturn(List.of(nativeName));
+        when(ranges.find(document, nativeName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        XTextContent content = mock(XTextContent.class);
+        XTextRange anchor = span(1, 4);
+        when(content.getAnchor()).thenReturn(anchor);
+        BibEntry entry = entry("a", "A").withField(StandardField.DOI, "10.123/native");
+        BibDatabase database = new BibDatabase(List.of(entry));
+        CitationStyle style = style();
+        try (MockedStatic<UnoUserDefinedProperty> properties = mockStatic(UnoUserDefinedProperty.class);
+             MockedStatic<UndoableDocumentProperties> undoable = mockStatic(UndoableDocumentProperties.class);
+             MockedStatic<WriterReferenceMarks> marks = mockStatic(WriterReferenceMarks.class);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<UnoDispatch> dispatch = mockStatic(UnoDispatch.class);
+             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class)) {
+            marks.when(() -> WriterReferenceMarks.getAsTextContent(document, nativeName)).thenReturn(Optional.of(content));
+            documentPreferences.when(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style)).thenReturn(true);
+            OOResult<List<String>, JabRefException> result = "refresh".equals(operation) ? strategy().refresh(List.of(database), style)
+                                                                                         : strategy().insert(List.of(entry), List.of(database), style, CitationType.AUTHORYEAR_PAR, "", cursor, false);
+
+            assertEquals(List.of(), result.get());
+            ArgumentCaptor<String> names = ArgumentCaptor.forClass(String.class);
+            verify(ranges, times("refresh".equals(operation) ? 1 : 2)).create(eq(document), eq(context), names.capture(), eq(cursor), eq(false), eq(false), eq(BoundaryPolicy.TEMPORARY));
+            String linkedName = names.getAllValues().stream()
+                                     .filter(name -> "RNDabcdefghij".equals(ZoteroReferenceMark.parse(name).orElseThrow().uniqueId()))
+                                     .findFirst().orElseThrow();
+            JsonObject expected = JsonParser.parseString(ZoteroReferenceMark.getCSLJson(nativeName)).getAsJsonObject();
+            expected.getAsJsonArray("citationItems").get(0).getAsJsonObject().getAsJsonArray("uris").add("http://www.jabref.org/a");
+            assertEquals(expected, JsonParser.parseString(ZoteroReferenceMark.getCSLJson(linkedName)));
+            assertEquals(List.of("a"), ZoteroReferenceMark.parse(linkedName).orElseThrow().citationKeys());
+            verify(text).removeTextContent(content);
+            writer.verify(() -> OOTextWriter.write(document, cursor, OOText.fromString("<span lang=\"zxx\">[1]</span>")), times("refresh".equals(operation) ? 1 : 2));
+            documentPreferences.verify(() -> ZoteroDocumentPreferences.writeCitationStyle(document, style));
+            properties.verifyNoInteractions();
+            undoable.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void emptyLinkPlanDoesNotReadOrResolveLibraryEntries() {
+        BibDatabase database = mock(BibDatabase.class);
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class)) {
+            assertEquals(new LinkPlan(List.of(), Map.of()), strategy().planLinks(List.of(), List.of(database)));
+            verifyNoInteractions(database);
+            linker.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void linkableNativeMarkIsNotRenamedWhenRenderingFails() throws Exception {
+        String nativeName = ZOTERO.replace(",\"http://www.jabref.org/a\"", "")
+                                  .replace("\"title\":\"A\"", "\"title\":\"A\",\"DOI\":\"10.123/native\"");
+        when(ranges.names(document)).thenReturn(List.of(nativeName));
+        when(ranges.find(document, nativeName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(range));
+        BibDatabase database = new BibDatabase(List.of(entry("a", "A").withField(StandardField.DOI, "10.123/native")));
+        CitationStyle invalid = new CitationStyle("invalid.csl", "invalid", "in-text", "Invalid", "", true, false, false, false, "not XML", false);
+        try (MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class);
+             MockedStatic<ZoteroDocumentPreferences> documentPreferences = mockStatic(ZoteroDocumentPreferences.class)) {
+            OOResult<List<String>, JabRefException> result = strategy().refresh(List.of(database), invalid);
+
+            assertEquals(Reason.DOCUMENT_FAILURE, assertInstanceOf(StrategyException.class, result.getError()).reason());
+            writer.verifyNoInteractions();
+            documentPreferences.verifyNoInteractions();
+            verify(ranges, never()).create(any(), any(), anyString(), any(), anyBoolean(), anyBoolean(), any(BoundaryPolicy.class));
+            verify(text, never()).removeTextContent(any());
+        }
+    }
+
+    @Test
+    void pendingDeletionsAreCheckedWithoutConsultingRecordingFlag() throws Exception {
+        when(ranges.names(document)).thenReturn(List.of(ZOTERO));
+        XTextRange start = point(2);
+        XTextRange end = point(3);
+        XTextCursor deletion = mock(XTextCursor.class);
+        positions.put(deletion, new int[] {2, 3});
+        when(deletion.getText()).thenReturn(text);
+        when(deletion.getStart()).thenReturn(start);
+        when(deletion.getEnd()).thenReturn(end);
+        when(text.createTextCursorByRange(start)).thenReturn(deletion);
+        XPropertySet change = mock(XPropertySet.class);
+        when(change.getPropertyValue("RedlineType")).thenReturn("Delete");
+        when(change.getPropertyValue("RedlineStart")).thenReturn(start);
+        when(change.getPropertyValue("RedlineEnd")).thenReturn(end);
+        when(redlines.hasMoreElements()).thenReturn(true, false);
+        when(redlines.nextElement()).thenReturn(change);
+        try (MockedStatic<UnoRedlines> recording = mockStatic(UnoRedlines.class, CALLS_REAL_METHODS);
+             MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class, CALLS_REAL_METHODS);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class)) {
+            OOResult<List<String>, JabRefException> result = strategy().refresh(List.of(new BibDatabase(List.of(entry("a", "A")))), style());
+
+            assertEquals(Reason.PENDING_DELETIONS, assertInstanceOf(StrategyException.class, result.getError()).reason());
+            recording.verify(() -> UnoRedlines.getRecordChanges(document), never());
+            linker.verifyNoInteractions();
+            writer.verifyNoInteractions();
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void insertionProtectsOwnAndUnmanagedMarkAnchorsBeforePlanning(boolean foreign) throws Exception {
+        when(ranges.names(document)).thenReturn(foreign ? List.of(LEGACY_CID) : List.of(ZOTERO));
+        positions.put(cursor, foreign ? new int[] {32, 32} : new int[] {2, 2});
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class, CALLS_REAL_METHODS);
+             MockedStatic<OOTextWriter> writer = mockStatic(OOTextWriter.class)) {
+            OOResult<List<String>, JabRefException> result = strategy().insert(List.of(entry("a", "A")), List.of(), style(), CitationType.AUTHORYEAR_PAR, "", cursor, false);
+
+            StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+            assertEquals(Reason.PROTECTED_RANGE, error.reason());
+            assertEquals(Localization.lang("The cursor is in a protected area.") + "\n" + Localization.lang("Found overlapping ranges"), error.getLocalizedMessage());
+            linker.verifyNoInteractions();
+            writer.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void nestedZoteroRangesAreRejectedBeforeLinkPlanning() throws Exception {
+        String nestedName = ZOTERO.replace("citation1", "citation2");
+        WriterReferenceMark nested = mock(WriterReferenceMark.class);
+        XTextRange nestedAnchor = span(2, 3);
+        when(nested.getMarkRange(document)).thenReturn(Optional.of(nestedAnchor));
+        when(nested.getRawCursor(document)).thenReturn(Optional.of(cursor));
+        when(ranges.find(document, nestedName, BoundaryPolicy.TEMPORARY)).thenReturn(Optional.of(nested));
+        when(ranges.names(document)).thenReturn(List.of(ZOTERO, nestedName));
+        try (MockedStatic<ZoteroCitationLinker> linker = mockStatic(ZoteroCitationLinker.class, CALLS_REAL_METHODS)) {
+            OOResult<List<String>, JabRefException> result = strategy().refresh(List.of(new BibDatabase(List.of(entry("a", "A")))), style());
+
+            StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+            assertEquals(Reason.OVERLAPPING_RANGES, error.reason());
+            assertEquals(Localization.lang("Found overlapping ranges"), error.getLocalizedMessage());
+            linker.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void documentReadFailureIsReturnedAsCheckedLocalizedError() throws Exception {
+        WriterDocumentAccessException cause = new WriterDocumentAccessException("Disconnected");
+        when(ranges.names(document)).thenThrow(cause);
+        OOResult<CitedEntryExporter.ExportResult, JabRefException> result = strategy().exportCited(List.of());
+        StrategyException error = assertInstanceOf(StrategyException.class, result.getError());
+
+        assertEquals(Reason.DOCUMENT_FAILURE, error.reason());
+        assertSame(cause, error.getCause());
+        assertEquals(Localization.lang("Problem collecting citations"), error.getLocalizedMessage());
+    }
+
+    @Test
+    void closeIsIdempotentAndPreventsDocumentAccess() {
+        ZoteroCitationStrategy strategy = strategy();
+        strategy.close();
+        strategy.close();
+
+        assertEquals(Reason.CLOSED, assertInstanceOf(StrategyException.class, strategy.exportCited(List.of()).getError()).reason());
+        verifyNoInteractions(document, ranges);
+    }
+
+    @Test
+    void styleImplementationsAreFinal() {
+        assertEquals(List.of(true, true, true), Stream.of(CitationStyle.class, JStyle.class, BstStyle.class).map(type -> Modifier.isFinal(type.getModifiers())).toList());
+    }
+
+    private int coordinate(XTextRange range, int endpoint) {
+        return Optional.ofNullable(positions.get(range)).orElseThrow()[endpoint];
+    }
+
+    private XTextRange point(int position) {
+        XTextRange range = mock(XTextRange.class);
+        positions.put(range, new int[] {position, position});
+        when(range.getText()).thenReturn(text);
+        when(range.getStart()).thenReturn(range);
+        when(range.getEnd()).thenReturn(range);
+        return range;
+    }
+
+    private XTextRange span(int start, int end) {
+        XTextRange range = mock(XTextRange.class);
+        positions.put(range, new int[] {start, end});
+        when(range.getText()).thenReturn(text);
+        XTextRange first = point(start);
+        XTextRange last = point(end);
+        when(range.getStart()).thenReturn(first);
+        when(range.getEnd()).thenReturn(last);
+        return range;
+    }
+
+    private ZoteroCitationStrategy strategy() {
+        return new ZoteroCitationStrategy(document, context, preferences, entryTypes, ranges);
+    }
+
+    private static CitationStyle style() {
+        CitationStyle base = numericStyle(false, false);
+        return new CitationStyle("zotero-test.csl", "http://www.zotero.org/styles/test", "in-text", "Zotero test", "", true, false, false, false, base.getSource(), false);
+    }
+}

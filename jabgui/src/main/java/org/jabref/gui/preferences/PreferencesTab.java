@@ -1,8 +1,11 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.Node;
+
+import org.jabref.logic.preferences.CliPreferences.CredentialSave;
 
 /// A prefsTab is a component displayed in the PreferenceDialog.
 ///
@@ -43,6 +46,13 @@ public interface PreferencesTab {
     /// This method is called when the user presses OK in the Preferences
     /// dialog. This calls the appropriate method in the ViewModel.
     void storeSettings();
+
+    /// Captures a credential change on the JavaFX thread before the dialog starts its background save.
+    ///
+    /// @return the prepared save, or an empty optional when there is no credential change
+    default Optional<CredentialSave> prepareCredentialSave() {
+        return Optional.empty();
+    }
 
     /// This method is called before the [#storeSettings()] method,
     /// to check if there are illegal settings in the tab, or if is ready
