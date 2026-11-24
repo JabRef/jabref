@@ -179,6 +179,42 @@ class JabFixCommandTest extends AbstractJabKitTest {
         assertEquals(once, Files.readString(library));
     }
 
+    /// A magic comment naming no rule switches nothing off, so the check says so instead of letting
+    /// the entry be repaired as if the comment were not there.
+    @Test
+    void checkReportsAMagicCommentThatNamesNoRule(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("typo.bib"), """
+                % jabref-format-ignore surounding-whitespace
+                @Article{key,
+                  author = {Doe, Jane},
+                }
+                """);
+
+        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", library.toString()));
+
+        String findings = commandLine.getStandardOutput();
+        assertTrue(findings.contains("[magic-comment]"), findings);
+    }
+
+    /// Trimming is a rule like any other now, so a magic comment keeps that one field as written
+    /// while the rest of the entry is still repaired.
+    @Test
+    void aSuppressedFieldKeepsItsWhitespace(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("suppressed.bib"), """
+                % jabref-format-ignore author:surrounding-whitespace
+                @ARTICLE{key,
+                author = " Doe, Jane ",
+                title = " A Title "
+                }
+                """);
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", library.toString()));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = { Doe, Jane },"), formatted);
+        assertTrue(formatted.contains("title  = {A Title},"), formatted);
+    }
+
     @Test
     void inPlaceAndCheckCannotBeCombined() {
         assertEquals(CommandLine.ExitCode.USAGE,

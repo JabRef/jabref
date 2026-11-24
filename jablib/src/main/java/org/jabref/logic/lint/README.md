@@ -10,12 +10,13 @@ Defaults will be based on a study of `.bib` files on GitHub.
 ```text
 JabFix.java          applies a RuleSet to the entries of a library
 JabFixResult.java    findings + the field changes the repairs made
-rule/                API: Rule, Finding, Fix, RuleSet, FieldValueRule, CleanupRule, SaveActionRule
+rule/                API: Rule, Finding, Fix, RuleSet, FieldValueRule, CleanupRule, SaveActionRule,
+                     MagicCommentRule, Suppressions
 rules/               the built-in rules
 ```
 
 A `FieldValueRule` only states what a field value should be.
-A `CleanupRule` runs one of JabRef's `CleanupJob`s as a rule, which is how the cleanups a save has always applied become reportable; `SaveActionRule` is the one identified by the field and formatter it is configured with.
+A `CleanupRule` runs one of JabRef's `CleanupJob`s as a rule, which is how the cleanups a save has always applied become reportable; `SaveActionRule` is the one identified by the formatter key it is configured under.
 
 Rules run once each, in `RuleSet` order, and must be idempotent.
 
@@ -59,6 +60,25 @@ Layout is normalized by `BibDatabaseWriter` either way, so a library JabFix has 
 `LintSettings` are not written to the `.bib` file yet — `jabkit fix` sets them on the library it has just read.
 Storing them in a `jabref-meta` entry is the next step.
 
+## Switching rules off for one entry
+
+A comment directly above an entry switches rules off for it:
+
+```bibtex
+% jabref-format-ignore surrounding-whitespace author,title:page-ranges /comment-.*/:/normalize-.*/
+@Article{knuth1984,
+  ...
+}
+```
+
+A token without a colon covers the whole entry, `fields:rules` only those fields.
+Both sides are comma-separated lists, and an item between slashes is a regex that has to match a whole field name (ignoring case) or rule id.
+A field name may itself contain a colon (`note:de`); where the entry has such a field, its name is read as a whole.
+
+`Suppressions` reads the comments of an entry and `JabFix` drops what they cover before the repairs are applied, so a suppressed finding is neither reported nor repaired.
+
+A comment that switches nothing off is reported by `magic-comment`, because the entry would be repaired as if it were not there: an id or regex that names no rule of the run, or a field that is neither a BibTeX field nor one the entry carries.
+
 ## The CLI
 
 `jabkit fix [--check | --in-place] [--enable RULE,...] [--disable RULE,...] [--check-only RULE,...] FILE`.
@@ -91,7 +111,7 @@ Still missing:
 - built-in rules beyond whitespace,
 - library-level rules (`Rule#scan` sees one entry),
 - context for rules (file directories, abbreviation list, key patterns), which citation key generation and journal abbreviation need before they can become rules,
-- configuration beyond the command line, including rule parameters and where the settings are stored,
+- configuration beyond the command line and the comments above an entry, including rule parameters and where the settings are stored,
 - GUI integration: `BibDatabaseWriter` reads the settings, but no GUI save writes them yet,
 - leaving out metadata JabRef only inferred (the database type); writing it back changes libraries that are otherwise clean.
 

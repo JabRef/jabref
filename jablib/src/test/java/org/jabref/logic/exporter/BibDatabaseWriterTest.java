@@ -1033,11 +1033,11 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("title-lower-case", RuleMode.FIX)));
+        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
-        assertEquals(List.of("title-lower-case"),
+        assertEquals(List.of("lower-case"),
                 databaseWriter.getFindings().stream().map(finding -> finding.rule().id()).toList());
     }
 
@@ -1049,7 +1049,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("title-lower-case", RuleMode.OFF)));
+        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.OFF)));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1065,11 +1065,11 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("title-lower-case", RuleMode.CHECK)));
+        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.CHECK)));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
-        assertEquals(List.of("title-lower-case"),
+        assertEquals(List.of("lower-case"),
                 databaseWriter.getFindings().stream().map(finding -> finding.rule().id()).toList());
         assertEquals(List.of(), databaseWriter.getSaveActionsFieldChanges());
     }
@@ -1081,7 +1081,7 @@ class BibDatabaseWriterTest {
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         database.insertEntry(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE"));
 
-        metaData.setLintSettings(new LintSettings(Map.of("title-lower-case", RuleMode.CHECK)));
+        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.CHECK)));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(List.of(false),
@@ -1101,8 +1101,8 @@ class BibDatabaseWriterTest {
         database.insertEntry(entry);
 
         metaData.setLintSettings(new LintSettings(Map.of(
-                "title-lower-case", RuleMode.CHECK,
-                "journal-upper-case", RuleMode.FIX,
+                "lower-case", RuleMode.CHECK,
+                "upper-case", RuleMode.FIX,
                 "surrounding-whitespace", RuleMode.OFF)));
         databaseWriter.writeDatabase(bibtexContext);
 
@@ -1126,6 +1126,25 @@ class BibDatabaseWriterTest {
         assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());
     }
 
+    /// A magic comment above an entry is an exception to a rule of the library, which the writer
+    /// applying the Save Actions itself could not honour.
+    @Test
+    void aMagicCommentSwitchesASaveActionOffForItsEntry() throws IOException {
+        metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(
+                new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
+        BibEntry exempt = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "SOME TITLE")
+                .withUserComments("% jabref-format-ignore lower-case");
+        BibEntry other = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "ANOTHER TITLE");
+        database.insertEntries(exempt, other);
+
+        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("SOME TITLE", exempt.getField(StandardField.TITLE).orElseThrow());
+        assertEquals("another title", other.getField(StandardField.TITLE).orElseThrow());
+    }
+
     /// The undo manager of the GUI collects these, so a repair has to reach the same list a Save
     /// Action reaches for a library that asks for no rules.
     @Test
@@ -1134,7 +1153,7 @@ class BibDatabaseWriterTest {
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         database.insertEntry(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE"));
 
-        metaData.setLintSettings(new LintSettings(Map.of("title-lower-case", RuleMode.FIX)));
+        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(List.of("some title"),
@@ -1153,7 +1172,7 @@ class BibDatabaseWriterTest {
             scheduledMutations.incrementAndGet();
             mutation.run();
         });
-        metaData.setLintSettings(new LintSettings(Map.of("title-lower-case", RuleMode.FIX)));
+        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(1, scheduledMutations.get());
