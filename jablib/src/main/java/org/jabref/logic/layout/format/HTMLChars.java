@@ -29,7 +29,7 @@ public class HTMLChars implements ParamLayoutFormatter {
     @Override
     public String format(String inField) {
         return LatexMarkupConverter.convert(normalizedField(inField), LatexMarkupConverter.Dialect.HTML,
-                keepCurlyBraces ? LatexMarkupConverter.GroupBraces.PRESERVE : LatexMarkupConverter.GroupBraces.DISCARD)
+                                           keepCurlyBraces ? LatexMarkupConverter.GroupBraces.PRESERVE : LatexMarkupConverter.GroupBraces.DISCARD)
                                    .replace("~", "&nbsp;"); // Replace any remaining ~ with &nbsp; (non-breaking spaces)
     }
 
