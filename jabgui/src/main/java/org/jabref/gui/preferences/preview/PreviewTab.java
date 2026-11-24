@@ -525,7 +525,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void mouseClickedChosen(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.removeFromChosen();
-            viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
             focusAvailableOnLastRoutedLayout();
             event.consume();
         }

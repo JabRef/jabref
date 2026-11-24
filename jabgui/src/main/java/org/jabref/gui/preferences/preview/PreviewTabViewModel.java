@@ -663,8 +663,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    /// Commits an edit to the selected TextBasedPreviewLayout. User is warned if edit is blank or the name already exists.
-    /// The customized list is resorted after a successful rename.
+    /// Renames the given TextBasedPreviewLayout to `newName` (trimmed). Other layout types are ignored.
+    /// The user is warned if the name is blank or already exists. The customized list is resorted after a successful rename.
     /// [impl->feat~entry-preview.rename-custom-style~1]
     public void renameStyle(@NonNull String newName, PreviewLayout previewLayout) {
         if (!(previewLayout instanceof TextBasedPreviewLayout textLayout)) {
