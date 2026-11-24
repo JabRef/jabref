@@ -39,7 +39,6 @@ public class HTMLChars implements ParamLayoutFormatter {
     }
 
     private String convert(String field) {
-
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
 
