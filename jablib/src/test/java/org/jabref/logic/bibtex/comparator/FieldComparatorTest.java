@@ -1,5 +1,6 @@
 package org.jabref.logic.bibtex.comparator;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
@@ -14,8 +15,56 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldComparatorTest {
+    @Test
+    void extendedNamesSortByTheirExplicitPrefixOption() {
+        for (StandardField field : new StandardField[] {StandardField.AUTHOR, StandardField.EDITOR}) {
+            BibEntry withoutPrefix = new BibEntry().withField(field, "family=Hasselt, given=Hado P., prefix=van, useprefix=false");
+            BibEntry withPrefix = new BibEntry().withField(field, "family=Hasselt, given=Hado P., prefix=van, useprefix=true");
+            BibEntry middle = new BibEntry().withField(field, "Miller, Max");
+            FieldComparator ascending = new FieldComparator(field);
+            FieldComparator descending = new FieldComparator(new OrFields(field), true);
+
+            assertEquals(-1, Integer.signum(ascending.compare(withoutPrefix, middle)));
+            assertEquals(1, Integer.signum(ascending.compare(withPrefix, middle)));
+            assertEquals(1, Integer.signum(descending.compare(withoutPrefix, middle)));
+            assertEquals(-1, Integer.signum(descending.compare(withPrefix, middle)));
+        }
+    }
+
+    @Test
+    void conventionalAndExtendedNamesWithSameFamilyAndInitialTie() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry conventional = new BibEntry().withField(StandardField.AUTHOR, "Smith, John");
+        BibEntry extended = new BibEntry().withField(StandardField.AUTHOR, "family=Smith, given=Jane");
+
+        assertEquals(0, comparator.compare(conventional, extended));
+        assertEquals(0, comparator.compare(extended, conventional));
+    }
+
+    @Test
+    void saveOrderHonorsListPrefixDefaultAndIndividualOverride() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        String name = "useprefix=1 and family=Hasselt, prefix=van";
+        BibEntry inheritedPrefix = new BibEntry().withField(StandardField.AUTHOR, name);
+        BibEntry excludedPrefix = new BibEntry().withField(StandardField.AUTHOR, name + ", useprefix=FALSE");
+        BibEntry middle = new BibEntry().withField(StandardField.AUTHOR, "Miller, Max");
+
+        assertEquals(1, Integer.signum(comparator.compare(inheritedPrefix, middle)));
+        assertEquals(-1, Integer.signum(comparator.compare(excludedPrefix, middle)));
+    }
+
+    @Test
+    void nameSortingUsesEditorWhenAuthorIsMissing() {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), false);
+        BibEntry edited = new BibEntry().withField(StandardField.EDITOR, "family=Hasselt, prefix=van, useprefix=true");
+        BibEntry authored = new BibEntry().withField(StandardField.AUTHOR, "Miller, Max");
+
+        assertEquals(1, Integer.signum(comparator.compare(edited, authored)));
+    }
+
     @Test
     void compareMonthFieldIdentity() {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);
@@ -260,5 +309,80 @@ class FieldComparatorTest {
                 .withField(StandardField.AUTHOR, "Mustermann, Max");
 
         assertEquals(1, comparator.compare(smaller, bigger));
+    }
+
+    @Test
+    void compareAuthorFieldWithBracedOrganisationNameAscending() {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR), false);
+        BibEntry organisation = new BibEntry()
+                .withField(StandardField.AUTHOR, "{The Geany contributors}");
+        BibEntry person = new BibEntry()
+                .withField(StandardField.AUTHOR, "Abbott, Anne");
+
+        assertTrue(comparator.compare(organisation, person) > 0);
+    }
+
+    @Test
+    void compareAuthorFieldWithBracedOrganisationNameDescending() {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR), true);
+        BibEntry organisation = new BibEntry()
+                .withField(StandardField.AUTHOR, "{The Geany contributors}");
+        BibEntry person = new BibEntry()
+                .withField(StandardField.AUTHOR, "Abbott, Anne");
+
+        assertTrue(comparator.compare(organisation, person) < 0);
+    }
+
+    @Test
+    void sortAuthorsWithBracedOrganisationNamesAlphabetically() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry smith = new BibEntry().withField(StandardField.AUTHOR, "Smith, John");
+        BibEntry geany = new BibEntry().withField(StandardField.AUTHOR, "{The Geany contributors}");
+        BibEntry abbott = new BibEntry().withField(StandardField.AUTHOR, "Abbott, Anne");
+        BibEntry linux = new BibEntry().withField(StandardField.AUTHOR, "{Linux Foundation}");
+
+        List<BibEntry> sorted = Stream.of(smith, geany, abbott, linux)
+                                      .sorted(comparator)
+                                      .toList();
+
+        assertEquals(List.of(abbott, linux, smith, geany), sorted);
+    }
+
+    @Test
+    void compareAuthorFieldKeepsBracesInMultipleAuthors() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry organisationAndPerson = new BibEntry()
+                .withField(StandardField.AUTHOR, "{The Geany contributors} and Smith, John");
+        BibEntry person = new BibEntry()
+                .withField(StandardField.AUTHOR, "Abbott, Anne");
+
+        assertEquals(1, Integer.signum(comparator.compare(organisationAndPerson, person)));
+    }
+
+    @Test
+    void compareTitleFieldIgnoresProtectiveBraces() {
+        FieldComparator comparator = new FieldComparator(StandardField.TITLE);
+        BibEntry braced = new BibEntry().withField(StandardField.TITLE, "{DNA} sequencing");
+        BibEntry plain = new BibEntry().withField(StandardField.TITLE, "DNA sequencing");
+
+        assertEquals(0, comparator.compare(braced, plain));
+    }
+
+    @Test
+    void compareTitleFieldDecodesLatexAccents() {
+        FieldComparator comparator = new FieldComparator(StandardField.TITLE);
+        BibEntry latex = new BibEntry().withField(StandardField.TITLE, "Kr{\\\"U}ger");
+        BibEntry unicode = new BibEntry().withField(StandardField.TITLE, "KrÜger");
+
+        assertEquals(0, comparator.compare(latex, unicode));
+    }
+
+    @Test
+    void compareBracedOrganisationWithUnbracedCounterpart() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry organisation = new BibEntry().withField(StandardField.AUTHOR, "{Ford Motor Company}");
+        BibEntry person = new BibEntry().withField(StandardField.AUTHOR, "Ford Motor Company");
+
+        assertEquals(1, Integer.signum(comparator.compare(organisation, person)));
     }
 }

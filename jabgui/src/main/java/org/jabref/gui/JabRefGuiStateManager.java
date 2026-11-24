@@ -84,7 +84,8 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasksPairs = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final ObservableList<Task<?>> backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);
-    private final FilteredList<Task<?>> runningBackgroundTasks = new FilteredList<>(backgroundTasks, Task::isRunning);
+    private final FilteredList<Pair<BackgroundTask<?>, Task<?>>> runningBackgroundTasksPairs = new FilteredList<>(backgroundTasksPairs, pair -> pair.getValue().isRunning());
+    private final ObservableList<Task<?>> runningBackgroundTasks = EasyBind.map(runningBackgroundTasksPairs, Pair::getValue);
     private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
@@ -172,17 +173,17 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     @Override
     @NullMarked
     public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
-        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
+        selectedGroups.computeIfAbsent(context.getUid(), _ -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 
     @Override
     public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context) {
-        return selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList());
+        return selectedGroups.computeIfAbsent(context.getUid(), _ -> FXCollections.observableArrayList());
     }
 
     @Override
     public void clearSelectedGroups(BibDatabaseContext context) {
-        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
+        selectedGroups.computeIfAbsent(context.getUid(), _ -> FXCollections.observableArrayList()).clear();
     }
 
     @Override
@@ -227,6 +228,11 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     @Override
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
         this.backgroundTasksPairs.addFirst(new Pair<>(backgroundTask, task));
+    }
+
+    @Override
+    public ObservableList<Pair<BackgroundTask<?>, Task<?>>> getRunningBackgroundTasksPairs() {
+        return runningBackgroundTasksPairs;
     }
 
     @Override
@@ -298,7 +304,7 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
 
     @Override
     public void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow) {
-        groupAiChatWindows.computeIfAbsent(context.getUid(), k -> new HashMap<>())
+        groupAiChatWindows.computeIfAbsent(context.getUid(), _ -> new HashMap<>())
                           .put(groupName, aiGroupChatWindow);
     }
 
@@ -311,6 +317,12 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
                 groupAiChatWindows.remove(context.getUid());
             }
         }
+    }
+
+    @Override
+    public void closeAiChatWindows(BibDatabaseContext context) {
+        Optional.ofNullable(groupAiChatWindows.remove(context.getUid()))
+                .ifPresent(windows -> List.copyOf(windows.values()).forEach(AiGroupChatWindow::close));
     }
 
     @Override

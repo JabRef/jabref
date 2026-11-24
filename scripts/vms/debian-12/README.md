@@ -17,6 +17,6 @@ After `vagrant up`:
 7. `exit`
 8. In the graphical VirtualBox window, you can now login
 9. Enter `startx` to see IceWM.
-10. Open termminal
+10. Open terminal
 11. `cd jabref`
 12. `./gradlew :jabgui:run`

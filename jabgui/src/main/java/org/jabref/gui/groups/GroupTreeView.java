@@ -21,7 +21,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollBar;
@@ -43,6 +42,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -194,7 +194,7 @@ public class GroupTreeView extends BorderPane {
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(addNewGroup, Priority.ALWAYS);
         addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
-        addNewGroup.setOnAction(event -> addNewGroup());
+        addNewGroup.setOnAction(_ -> addNewGroup());
 
         HBox groupBar = new HBox(addNewGroup);
         groupBar.setId("group-bar");
@@ -231,7 +231,7 @@ public class GroupTreeView extends BorderPane {
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
             viewModel.selectedGroupsProperty().setAll(previouslySelectedGroup);
         });
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
+        searchField.textProperty().addListener((_, _, _) -> searchTask.restart());
 
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
@@ -292,7 +292,7 @@ public class GroupTreeView extends BorderPane {
                             button.setTooltip(new Tooltip(Localization.lang("Add subgroup")));
                         }
                         setGraphic(pane);
-                        button.setOnAction(event -> viewModel.addNewSubgroup(
+                        button.setOnAction(_ -> viewModel.addNewSubgroup(
                                 group,
                                 group.isRoot() ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP));
                     } else {
@@ -301,7 +301,7 @@ public class GroupTreeView extends BorderPane {
                 }
             };
 
-            cell.tableRowProperty().addListener((obs, oldRow, newRow) -> {
+            cell.tableRowProperty().addListener((_, _, newRow) -> {
                 button.visibleProperty().unbind();
                 if (newRow != null) {
                     button.visibleProperty().bind(newRow.hoverProperty());
@@ -315,9 +315,9 @@ public class GroupTreeView extends BorderPane {
 
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
-                .withEventFilter(MouseEvent.MOUSE_PRESSED, (row, event) -> {
+                .withEventFilter(MouseEvent.MOUSE_PRESSED, (_, event) -> {
                     if (((MouseEvent) event).getButton() == MouseButton.SECONDARY && !stateManager.getSelectedEntries().isEmpty()) {
-                        // Prevent right-click to select group whe we have selected entries
+                        // Prevent right-click to select group when we have selected entries
                         event.consume();
                     } else if (event.getTarget() instanceof StackPane pane) {
                         if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
@@ -329,7 +329,7 @@ public class GroupTreeView extends BorderPane {
                     // Remove disclosure node since we display custom version in separate column
                     // Simply setting to null is not enough since it would be replaced by the default node on every change
                     row.setDisclosureNode(null);
-                    row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
+                    row.disclosureNodeProperty().addListener((_, _, _) -> row.setDisclosureNode(null));
                 })
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
@@ -390,7 +390,7 @@ public class GroupTreeView extends BorderPane {
         text.getStyleClass().setAll("text");
 
         node.getChildren().add(text);
-        node.setMaxWidth(Control.USE_PREF_SIZE);
+        node.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         return node;
     }
 
@@ -464,8 +464,7 @@ public class GroupTreeView extends BorderPane {
                     taskExecutor);
             List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
-            importHandler.importFilesInBackground(files, event.getTransferMode())
-                         .executeWith(taskExecutor);
+            importHandler.importDroppedFiles(files, event.getTransferMode());
             success = true;
         }
         event.setDropCompleted(success);
@@ -554,7 +553,7 @@ public class GroupTreeView extends BorderPane {
                 }));
 
         // Start
-        groupTree.setOnDragEntered(event -> {
+        groupTree.setOnDragEntered(_ -> {
             initScrolling();
             scrollTimer.restart();
         });
@@ -585,10 +584,10 @@ public class GroupTreeView extends BorderPane {
         });
 
         // Stop
-        groupTree.setOnScroll(event -> scrollTimer.stop());
-        groupTree.setOnDragDone(event -> scrollTimer.stop());
-        groupTree.setOnDragDropped(event -> scrollTimer.stop());
-        groupTree.setOnDragExited(event -> scrollTimer.stop());
+        groupTree.setOnScroll(_ -> scrollTimer.stop());
+        groupTree.setOnDragDone(_ -> scrollTimer.stop());
+        groupTree.setOnDragDropped(_ -> scrollTimer.stop());
+        groupTree.setOnDragExited(_ -> scrollTimer.stop());
     }
 
     private void initScrolling() {

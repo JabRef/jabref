@@ -368,7 +368,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // (the remaining race between the check and the write cannot be closed by a path-based API)
             Optional.ofNullable(committedTargetFileState)
                     .filter(state -> state.matches(targetFile))
-                    .ifPresent(state -> applyAttributes(targetFile, preservedAttributes));
+                    .ifPresent(_ -> applyAttributes(targetFile, preservedAttributes));
 
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {

@@ -52,14 +52,15 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         this.setGraphic(headerGraphic);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
         MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
+        MainTableColumnFactory.bindExactWidth(this, headerGraphic);
         this.setResizable(false);
         this.setCellValueFactory(cellData -> cellData.getValue().getLinkedIdentifiers());
         new ValueTableCellFactory<BibEntryTableViewModel, Map<Field, String>>()
                 .withGraphic(this::createIdentifierGraphic)
                 .withTooltip(this::createIdentifierTooltip)
                 .withMenu(this::createIdentifierMenu)
-                .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
-                    // If we only have one identifer, open directly
+                .withOnMouseClickedEvent((_, linkedFiles) -> event -> {
+                    // If we only have one identifier, open directly
                     if ((linkedFiles.size() == 1) && (event.getButton() == MouseButton.PRIMARY)) {
                         new OpenUrlAction(dialogService, stateManager, preferences).execute();
                     }

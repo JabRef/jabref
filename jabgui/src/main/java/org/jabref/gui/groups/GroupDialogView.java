@@ -25,10 +25,6 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -226,9 +222,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
         searchGroupCaseSensitive.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.CASE_SENSITIVE));
-        searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.CASE_SENSITIVE, newValue));
+        searchGroupCaseSensitive.selectedProperty().addListener((_, _, newValue) -> viewModel.setSearchFlag(SearchFlags.CASE_SENSITIVE, newValue));
         searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
-        searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newValue));
+        searchGroupRegex.selectedProperty().addListener((_, _, newValue) -> viewModel.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newValue));
 
         autoGroupKeywordsOption.selectedProperty().bindBidirectional(viewModel.autoGroupKeywordsOptionProperty());
         autoGroupKeywordsField.textProperty().bindBidirectional(viewModel.autoGroupKeywordsFieldProperty());
@@ -258,12 +254,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
-            validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
+            validationVisualizer.initVisualization(viewModel.texGroupFilePathValidationStatus(), texGroupFilePath);
             nameField.requestFocus();
         });
 
         autoColorCheckbox.setSelected(useAutoColoring);
-        autoColorCheckbox.setOnAction(event -> {
+        autoColorCheckbox.setOnAction(_ -> {
             useAutoColoring = autoColorCheckbox.isSelected();
             if (!autoColorCheckbox.isSelected()) {
                 return;
@@ -303,7 +299,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         });
 
         GridView<GroupIconPickerItem> ikonGridView = new GridView<>(FXCollections.observableArrayList());
-        ikonGridView.setCellFactory(gridView -> new IkonliCell());
+        ikonGridView.setCellFactory(_ -> new IkonliCell());
         ikonGridView.setPrefWidth(520);
         ikonGridView.setPrefHeight(400);
         ikonGridView.setHorizontalCellSpacing(4);
@@ -318,6 +314,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         Platform.runLater(() -> ikonGridView.setItems(filteredList));
 
         PopOver popOver = new PopOver(vBox);
+        popOver.getStyleClass().add("group-icon-picker");
         popOver.setDetachable(false);
         popOver.setArrowSize(0);
         popOver.setCornerRadius(0);
@@ -363,9 +360,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 setGraphic(ikon.icon().withSize(22).getGraphicNode());
                 setAlignment(Pos.BASELINE_CENTER);
                 setPadding(new Insets(1));
-                setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
-                setOnMouseClicked(event -> {
+                setOnMouseClicked(_ -> {
                     iconField.textProperty().setValue(ikon.persistedIdentifier());
                     PopOver stage = (PopOver) this.getGridView().getParent().getScene().getWindow();
                     stage.hide();

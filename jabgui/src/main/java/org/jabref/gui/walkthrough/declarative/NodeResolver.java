@@ -1,5 +1,6 @@
 package org.jabref.gui.walkthrough.declarative;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -63,11 +64,28 @@ public interface NodeResolver {
                     if (!(node instanceof ButtonBase button) || !NodeResolver.isVisible(button)) {
                         return false;
                     }
-                    Node graphic = button.getGraphic();
-                    return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
-                            glyph.matches(graphic);
+                    return containsGlyph(button.getGraphic(), glyph);
                 })
                 .findFirst();
+    }
+
+    /// Creates a resolver that finds a button by its graphic below the first visible node of
+    /// type `container`. Use it when the same glyph occurs elsewhere in the scene (e.g. the
+    /// DOI row's "Look up" button shares its icon with the file editor's "Get fulltext").
+    static NodeResolver buttonWithGraphicIn(Class<? extends Node> container, IconTheme.JabRefIcons glyph) {
+        return scene -> predicate(container::isInstance)
+                .resolve(scene)
+                .map(root -> findNode(root, node -> (node instanceof ButtonBase button)
+                        && NodeResolver.isVisible(button)
+                        && containsGlyph(button.getGraphic(), glyph)));
+    }
+
+    /// Creates a resolver that returns the first node any of the given resolvers finds, in order.
+    static NodeResolver firstOf(NodeResolver... resolvers) {
+        return scene -> Arrays.stream(resolvers)
+                              .map(resolver -> resolver.resolve(scene))
+                              .flatMap(Optional::stream)
+                              .findFirst();
     }
 
     /// Creates a resolver that finds a node by a predicate. The returned node is
@@ -188,6 +206,11 @@ public interface NodeResolver {
         }
 
         return null;
+    }
+
+    private static boolean containsGlyph(@Nullable Node graphic, IconTheme.JabRefIcons glyph) {
+        return graphic != null && findNode(graphic,
+                node -> (node instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph || glyph.matches(node)) != null;
     }
 
     private static boolean isVisible(@Nullable Node node) {

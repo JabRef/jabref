@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.ai.AiPrivacyNoticeView?>
+<?import org.jabref.gui.ai.chat.AiChatFindBar?>
 <?import org.jabref.gui.ai.statuspane.UniversalStatusPaneView?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.jabref.gui.util.component.HistoryTextArea?>
@@ -71,6 +72,14 @@
                         fx:id="loadingIndicator"
                         maxWidth="50"
                         maxHeight="50"/>
+
+                <AiChatFindBar fx:id="findBar"
+                               StackPane.alignment="TOP_RIGHT">
+                    <StackPane.margin>
+                        <Insets top="8"
+                                right="24"/>
+                    </StackPane.margin>
+                </AiChatFindBar>
             </StackPane>
         </center>
 

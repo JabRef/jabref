@@ -11,18 +11,20 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.function.Predicate.not;
 
 /// Abstract class for pushing entries into different editors.
+@NullMarked
 public abstract class AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
@@ -40,7 +42,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         this.preferences = preferences;
     }
 
-    protected String getKeyString(List<BibEntry> entries, @NonNull String delimiter) {
+    protected String getKeyString(List<BibEntry> entries, String delimiter) {
         return entries.stream()
                       .map(BibEntry::getCitationKey)
                       .filter(Optional::isPresent)
@@ -87,10 +89,10 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     Collections.addAll(openCommand, Arrays.copyOfRange(commands, 1, commands.length));
                 }
                 processBuilder.command(openCommand);
-                processBuilder.start();
+                ProcessLauncher.startDetached(processBuilder);
             } else {
                 processBuilder.command(commands);
-                processBuilder.start();
+                ProcessLauncher.startDetached(processBuilder);
             }
         } catch (IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
@@ -169,8 +171,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     public void jumpToLine(Path fileName, int line, int column) {
-        String path = preferences.getCommandPaths().get(this.getDisplayName());
-        commandPath = path != null ? path : "";
+        commandPath = preferences.getCommandPaths().getOrDefault(this.getDisplayName(), "");
 
         if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;
@@ -181,7 +182,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         ProcessBuilder processBuilder = new ProcessBuilder();
         try {
             processBuilder.command(command);
-            processBuilder.start();
+            ProcessLauncher.startDetached(processBuilder);
         } catch (IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;

@@ -2,15 +2,18 @@ package org.jabref.logic.citationstyle;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.SequencedCollection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.integrity.PagesChecker;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -103,6 +106,8 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
 
         Optional<BibEntryType> entryType = entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
+        BibDatabase database = bibDatabaseContext.getDatabase();
+        Set<Field> clearedFields = new HashSet<>();
 
         if (bibEntry.getType().equals(StandardEntryType.Article)) {
             // Patch bibEntry to contain the right BibTeX (not BibLaTeX) fields
@@ -110,35 +115,43 @@ public class JabRefItemDataProvider implements ItemDataProvider {
             // See BibTeXConverter
             if (bibDatabaseContext.isBiblatexMode()) {
                 // Map "number" to CSL "issue", unless no number exists
-                Optional<String> numberField = bibEntry.getField(StandardField.NUMBER);
+                Optional<String> numberField = bibEntry.getResolvedFieldOrAlias(StandardField.NUMBER, database);
                 numberField.ifPresent(number -> {
                             bibEntry.setField(StandardField.ISSUE, number);
                             bibEntry.clearField(StandardField.NUMBER);
+                            clearedFields.add(StandardField.NUMBER);
                         }
                 );
 
-                bibEntry.getField(StandardField.EID).ifPresent(eid -> {
-                    if (!bibEntry.hasField(StandardField.NUMBER)) {
+                bibEntry.getResolvedFieldOrAlias(StandardField.EID, database).ifPresent(eid -> {
+                    boolean hasNumber = !clearedFields.contains(StandardField.NUMBER)
+                            && bibEntry.getResolvedFieldOrAlias(StandardField.NUMBER, database).isPresent();
+                    if (!hasNumber) {
                         bibEntry.setField(StandardField.NUMBER, eid);
+                        clearedFields.remove(StandardField.NUMBER);
                         bibEntry.clearField(StandardField.EID);
+                        clearedFields.add(StandardField.EID);
                     }
                 });
             } else {
                 // BibTeX mode
-                bibEntry.getField(StandardField.NUMBER).ifPresent(number -> {
+                bibEntry.getResolvedFieldOrAlias(StandardField.NUMBER, database).ifPresent(number -> {
                     bibEntry.setField(StandardField.ISSUE, number);
                     bibEntry.clearField(StandardField.NUMBER);
+                    clearedFields.add(StandardField.NUMBER);
                 });
-                bibEntry.getField(StandardField.PAGES).ifPresent(pages -> {
+                bibEntry.getResolvedFieldOrAlias(StandardField.PAGES, database).ifPresent(pages -> {
                     if (pages.toLowerCase(Locale.ROOT).startsWith("article ")) {
                         pages = pages.substring("Article ".length());
                         bibEntry.setField(StandardField.NUMBER, pages);
+                        clearedFields.remove(StandardField.NUMBER);
                     }
                 });
-                bibEntry.getField(StandardField.EID).ifPresent(eid -> {
-                    if (!bibEntry.hasField(StandardField.PAGES)) {
+                bibEntry.getResolvedFieldOrAlias(StandardField.EID, database).ifPresent(eid -> {
+                    if (bibEntry.getResolvedFieldOrAlias(StandardField.PAGES, database).isEmpty()) {
                         bibEntry.setField(StandardField.PAGES, eid);
                         bibEntry.clearField(StandardField.EID);
+                        clearedFields.add(StandardField.EID);
                     }
                 });
             }
@@ -152,7 +165,10 @@ public class JabRefItemDataProvider implements ItemDataProvider {
             fields = bibEntry.getFields();
         }
         for (Field key : fields) {
-            bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
+            if (clearedFields.contains(key)) {
+                continue;
+            }
+            bibEntry.getResolvedFieldOrAlias(key, database)
                     .map(removeNewlinesFormatter::format)
                     .map(LatexToUnicodeAdapter::format)
                     .ifPresent(value -> {

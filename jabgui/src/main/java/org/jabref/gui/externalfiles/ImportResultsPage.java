@@ -104,7 +104,7 @@ public class ImportResultsPage extends WizardPane {
 
         HBox buttonBar = new HBox();
         exportButton = new Button(Localization.lang("Export results"));
-        exportButton.setOnAction(e -> viewModel.startExport());
+        exportButton.setOnAction(_ -> viewModel.startExport());
         buttonBar.getChildren().add(exportButton);
 
         contentPane.getChildren().addAll(summaryLabel, resultsTable, buttonBar);
@@ -117,7 +117,7 @@ public class ImportResultsPage extends WizardPane {
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
 
-        viewModel.resultTableItems().addListener((ListChangeListener<ImportFilesResultItemViewModel>) c -> {
+        viewModel.resultTableItems().addListener((ListChangeListener<ImportFilesResultItemViewModel>) _ -> {
             if (!viewModel.resultTableItems().isEmpty() && !viewModel.taskActiveProperty().get()) {
                 Platform.runLater(() -> {
                     ((BorderPane) getContent()).setCenter(contentPane);
@@ -130,11 +130,11 @@ public class ImportResultsPage extends WizardPane {
     }
 
     private void updateSummary() {
-        int totalCount = viewModel.resultTableItems().size();
-        long successCount = viewModel.resultTableItems().stream().filter(ImportFilesResultItemViewModel::isSuccess).count();
-        long failCount = totalCount - successCount;
+        long successCount = viewModel.resultTableItems().stream().filter(result -> result.status() == ImportFilesResultItemViewModel.Status.SUCCESS).count();
+        long warningCount = viewModel.resultTableItems().stream().filter(result -> result.status() == ImportFilesResultItemViewModel.Status.WARNING).count();
+        long failCount = viewModel.resultTableItems().stream().filter(result -> result.status() == ImportFilesResultItemViewModel.Status.FAILURE).count();
 
-        String summaryText = Localization.lang("Import completed: %0 successful, %1 failed", String.valueOf(successCount), String.valueOf(failCount));
+        String summaryText = Localization.lang("Import completed: %0 successful, %1 with warnings, %2 failed", String.valueOf(successCount), String.valueOf(warningCount), String.valueOf(failCount));
 
         summaryLabel.setText(summaryText);
     }

@@ -17,7 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
-import org.jabref.logic.openoffice.style.BstStyle;
+import org.jabref.logic.openoffice.bst.BstStyle;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -137,7 +137,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         BibEntry entry = new BibEntry(originalEntry);
         new ConvertToBibtexCleanup().cleanup(entry);
         convertBracedMathToUnicode(entry);
-        String result = bstVM.render(List.of(entry));
+        String result = bstVM.renderWithoutPreamble(List.of(entry), databaseContext.getDatabase());
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
         // Remove all LaTeX comments

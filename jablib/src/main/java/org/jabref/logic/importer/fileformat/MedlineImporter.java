@@ -872,9 +872,9 @@ public class MedlineImporter extends Importer implements Parser {
         articleIdList.forEach(id -> {
             if (!id.idType().isBlank() && !"url".equals(id.idType())) {
                 if ("pubmed".equals(id.idType())) {
-                    fields.computeIfAbsent(StandardField.PMID, k -> id.content());
+                    fields.computeIfAbsent(StandardField.PMID, _ -> id.content());
                 } else {
-                    fields.computeIfAbsent(FieldFactory.parseField(StandardEntryType.Article, id.idType()), k -> id.content());
+                    fields.computeIfAbsent(FieldFactory.parseField(StandardEntryType.Article, id.idType()), _ -> id.content());
                 }
             }
         });

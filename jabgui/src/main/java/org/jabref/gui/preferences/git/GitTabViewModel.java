@@ -11,7 +11,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -24,15 +25,18 @@ public class GitTabViewModel implements PreferenceTabViewModel {
     private final StringProperty usernameProperty = new SimpleStringProperty("");
     private final StringProperty patProperty = new SimpleStringProperty("");
     private final BooleanProperty persistPatProperty = new SimpleBooleanProperty();
-    private final BooleanProperty passwordPersistAvailable = new SimpleBooleanProperty();
+    private final ReadOnlyBooleanProperty passwordPersistAvailable;
     private final StringProperty pullIntervalInMinutesProperty = new SimpleStringProperty("");
 
     private final GitPreferences gitPreferences;
+    private final CliPreferences preferences;
 
     private final Validator pullIntervalValidator;
 
-    public GitTabViewModel(GitPreferences gitPreferences) {
-        this.gitPreferences = gitPreferences;
+    public GitTabViewModel(CliPreferences preferences, ReadOnlyBooleanProperty keyringAvailable) {
+        this.preferences = preferences;
+        this.passwordPersistAvailable = keyringAvailable;
+        this.gitPreferences = preferences.getGitPreferences();
 
         pullIntervalValidator = new FunctionBasedValidator<>(
                 pullIntervalInMinutesProperty,
@@ -48,16 +52,19 @@ public class GitTabViewModel implements PreferenceTabViewModel {
         usernameProperty.setValue(gitPreferences.getUsername());
         patProperty.setValue(gitPreferences.getPat());
         persistPatProperty.setValue(gitPreferences.getPersistPat());
-        passwordPersistAvailable.setValue(OS.isKeyringAvailable());
         pullIntervalInMinutesProperty.setValue(String.valueOf(gitPreferences.getPullIntervalInMinutes()));
     }
 
     @Override
     public void storeSettings() {
         gitPreferences.setUsername(usernameProperty.getValue().trim());
-        gitPreferences.setPersistPat(persistPatProperty.getValue());
-        gitPreferences.setPat(patProperty.getValue().trim());
         gitPreferences.setPullIntervalInMinutes(Integer.parseInt(pullIntervalInMinutesProperty.getValue().trim()));
+    }
+
+    @Override
+    public Optional<CliPreferences.CredentialSave> prepareCredentialSave() {
+        return preferences.prepareGitHubTokenSave(patProperty.get().trim(),
+                persistPatProperty.get() ? CredentialPersistence.SAVE : CredentialPersistence.SESSION_ONLY);
     }
 
     @Override
@@ -68,7 +75,7 @@ public class GitTabViewModel implements PreferenceTabViewModel {
     private Optional<Integer> getIntervalAsInt(String value) {
         try {
             return Optional.of(Integer.parseInt(value));
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

@@ -23,10 +23,10 @@ public class TextFlowLimited extends TextFlow {
 
         this.setPrefWidth(Region.USE_PREF_SIZE);
 
-        moreLink.setOnAction(event -> expand());
+        moreLink.setOnAction(_ -> expand());
         moreLink.getStyleClass().add("text-flow-more-link");
 
-        this.setOnMouseClicked(event -> expand());
+        this.setOnMouseClicked(_ -> expand());
     }
 
     private void expand() {
@@ -42,7 +42,7 @@ public class TextFlowLimited extends TextFlow {
             }
         };
 
-        expandPanel.setOnFinished(event -> {
+        expandPanel.setOnFinished(_ -> {
             isCollapsed = false;
             requestLayout();
         });

@@ -41,8 +41,8 @@ public class Version {
     private Version() {
     }
 
-    /// Tinylog does not allow for altering existing loging configuraitons after the logger was initialized .
-    /// Lazy initialization to enable tinylog writing to a file (and also still enabling loggin in this class)
+    /// Tinylog does not allow for altering existing logging configurations after the logger was initialized .
+    /// Lazy initialization to enable tinylog writing to a file (and also still enabling logging in this class)
     private static Logger getLogger() {
         return LoggerFactory.getLogger(Version.class);
     }

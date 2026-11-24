@@ -51,6 +51,14 @@ class EmbeddingModelCacheTest {
     }
 
     @Test
+    void switchingModelEvictsPreviousModel() {
+        AsyncEmbeddingModel modelA = cache.getOrCreate(MODEL_A);
+        cache.getOrCreate(MODEL_B);
+
+        assertNotSame(modelA, cache.getOrCreate(MODEL_A));
+    }
+
+    @Test
     void closeDoesNotThrowAndClearsCache() {
         cache.getOrCreate(MODEL_A);
         cache.close();

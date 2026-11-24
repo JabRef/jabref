@@ -27,7 +27,7 @@ public class FileHistoryMenu extends Menu {
 
         this.clearRecentLibraries = new MenuItem();
         clearRecentLibraries.setText(Localization.lang("Clear recent libraries"));
-        clearRecentLibraries.setOnAction(event -> clearLibrariesHistory());
+        clearRecentLibraries.setOnAction(_ -> clearLibrariesHistory());
 
         this.history = fileHistory;
         this.dialogService = dialogService;
@@ -37,7 +37,7 @@ public class FileHistoryMenu extends Menu {
         } else {
             setItems();
         }
-        history.addListener((InvalidationListener) obs -> setItems());
+        history.addListener((InvalidationListener) _ -> setItems());
     }
 
     /// This method is to use typed letters to access recent libraries in menu.
@@ -85,7 +85,7 @@ public class FileHistoryMenu extends Menu {
         // i.e if the file name was called "bib_test.bib", a key combination "ALT+t" will be created
         // so to avoid this, mnemonic parsing should be set to false to print normally the underscore character.
         item.setMnemonicParsing(false);
-        item.setOnAction(event -> openFile(file));
+        item.setOnAction(_ -> openFile(file));
         getItems().add(item);
     }
 

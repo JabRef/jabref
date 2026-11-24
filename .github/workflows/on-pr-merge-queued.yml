@@ -17,7 +17,7 @@ jobs:
           ref="${GITHUB_REF_NAME}"
           if [[ "$ref" =~ ^gh-readonly-queue/[^/]+/pr-([0-9]+)- ]]; then
             pr="${BASH_REMATCH[1]}"
-            gh pr edit "$pr" --repo "$GITHUB_REPOSITORY" --remove-label "status: ready-for-review" --remote-label "status: awaiting-second-review" --add-label "status: to-be-merged"
+            gh pr edit "$pr" --repo "$GITHUB_REPOSITORY" --remove-label "status: ready-for-review" --remove-label "status: awaiting-second-review" --add-label "status: to-be-merged"
           else
             echo "Cannot extract PR number from ref: $ref" >&2
             exit 1

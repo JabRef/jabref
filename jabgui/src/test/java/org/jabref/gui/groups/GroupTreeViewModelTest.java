@@ -1,12 +1,16 @@
 package org.jabref.gui.groups;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
@@ -17,12 +21,16 @@ import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.NoOpSearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -30,29 +38,51 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticDateGroup;
+import org.jabref.model.groups.AutomaticEntryTypeGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.undo.CompoundEdit;
 
 import com.google.common.eventbus.Subscribe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
+import org.mockito.MockedConstruction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // org.jabref.gui.groups.GroupNodeViewModel.refreshGroup is used, which uses "Platform.runlater"
 @ExtendWith(JavaFxExtension.class)
+@ResourceLock("Localization.lang")
 class GroupTreeViewModelTest {
 
     private StateManager stateManager;
@@ -106,9 +136,154 @@ class GroupTreeViewModelTest {
     }
 
     @Test
+    void addSubgroupFromPreviousRootPersistsInCurrentTree() {
+        JavaFxExtension.invokeAndWait(() -> {
+            GroupNodeViewModel previousRoot = groupTree.rootGroupProperty().get();
+            databaseContext.getDatabase().insertEntry(new BibEntry());
+            activeDatabase.setValue(Optional.empty());
+            activeDatabase.setValue(Optional.of(databaseContext));
+
+            try (var ignored = mockConstruction(GroupDialogView.class)) {
+                when(dialogService.showCustomDialogAndWait(any(GroupDialogView.class)))
+                        .thenReturn(Optional.of(new ExplicitGroup("a", GroupHierarchyType.INDEPENDENT, ',')));
+                groupTree.addNewSubgroup(previousRoot, GroupDialogHeader.SUBGROUP);
+            }
+        });
+
+        assertEquals(List.of("a"), childNames());
+    }
+
+    @Test
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
         assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
+    }
+
+    private static Stream<Arguments> replacementGroups() throws IOException {
+        AuxParser auxParser = mock(AuxParser.class);
+        when(auxParser.parse(any())).thenReturn(new AuxParserResult(new BibDatabase()));
+        return Stream.of(
+                Arguments.of(new WordKeywordGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.GROUPS, "2", true, ',', false), Optional.of("2")),
+                Arguments.of(new WordKeywordGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "biology", true, ',', false), Optional.empty()),
+                Arguments.of(new RegexKeywordGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "biology", true), Optional.empty()),
+                Arguments.of(new SearchGroup("1", GroupHierarchyType.INDEPENDENT, "keywords:biology", EnumSet.noneOf(SearchFlags.class)), Optional.empty()),
+                Arguments.of(new AutomaticKeywordGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>'), Optional.empty()),
+                Arguments.of(new AutomaticPersonsGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR), Optional.empty()),
+                Arguments.of(new AutomaticDateGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.DATE), Optional.empty()),
+                Arguments.of(new AutomaticEntryTypeGroup("1", GroupHierarchyType.INDEPENDENT), Optional.empty()),
+                Arguments.of(TexGroup.create("1", GroupHierarchyType.INDEPENDENT, Path.of("group.aux"), auxParser, new MetaData(), "user"), Optional.empty()));
+    }
+
+    // [utest->req~groups.edit.remove-obsolete-explicit-assignments~1]
+    @ParameterizedTest
+    @MethodSource("replacementGroups")
+    void editingExplicitGroupRemovesObsoleteAssignmentWhenAssigning(AbstractGroup replacement, Optional<String> expectedGroups) {
+        BibEntry entry = new BibEntry().withField(StandardField.GROUPS, "1")
+                                       .withField(StandardField.KEYWORDS, "biology");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        editGroup(new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ','), replacement, ButtonType.YES);
+
+        assertEquals(expectedGroups, entry.getField(StandardField.GROUPS));
+        assertEquals(Optional.of("biology"), entry.getField(StandardField.KEYWORDS));
+    }
+
+    @ParameterizedTest
+    @MethodSource("replacementGroups")
+    void editingExplicitGroupRemovesObsoleteAssignmentWithoutAssigning(AbstractGroup replacement, Optional<String> expectedGroupsWhenAssigning) {
+        BibEntry entry = new BibEntry().withField(StandardField.GROUPS, "1");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        editGroup(new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ','), replacement, ButtonType.NO);
+
+        assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS));
+        assertEquals(Optional.empty(), entry.getField(StandardField.KEYWORDS));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void editingExplicitGroupPreservesAssignmentForDuplicateName(boolean assign) {
+        BibEntry entry = new BibEntry().withField(StandardField.GROUPS, "1");
+        databaseContext.getDatabase().insertEntry(entry);
+        JavaFxExtension.invokeAndWait(() -> groupTree.rootGroupProperty().getValue().getGroupNode()
+                                                     .addSubgroup(new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ',')));
+        WordKeywordGroup replacement = new WordKeywordGroup("2", GroupHierarchyType.INDEPENDENT, StandardField.GROUPS, "2", true, ',', false);
+
+        editGroup(new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ','), replacement, assign ? ButtonType.YES : ButtonType.NO);
+
+        assertEquals(Optional.of(assign ? "1, 2" : "1"), entry.getField(StandardField.GROUPS));
+    }
+
+    @Test
+    void editingExplicitGroupPreservesUnrelatedAssignmentsAndEntries() {
+        BibEntry member = new BibEntry().withField(StandardField.GROUPS, "1, other");
+        BibEntry nonMember = new BibEntry().withField(StandardField.GROUPS, "other");
+        databaseContext.getDatabase().insertEntries(List.of(member, nonMember));
+
+        editGroup(new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ','),
+                new WordKeywordGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "biology", true, ',', false), ButtonType.YES);
+
+        assertEquals(Optional.of("other"), member.getField(StandardField.GROUPS));
+        assertEquals(Optional.of("biology"), member.getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of("other"), nonMember.getField(StandardField.GROUPS));
+        assertEquals(Optional.empty(), nonMember.getField(StandardField.KEYWORDS));
+    }
+
+    @Test
+    void editingKeywordGroupPreservesBibliographicKeywords() {
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "biology");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        editGroup(new WordKeywordGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "biology", true, ',', false),
+                new ExplicitGroup("2", GroupHierarchyType.INDEPENDENT, ','), ButtonType.YES);
+
+        assertEquals(Optional.of("biology"), entry.getField(StandardField.KEYWORDS));
+        assertEquals(Optional.of("2"), entry.getField(StandardField.GROUPS));
+    }
+
+    @Test
+    void cancellingGroupingMethodChangePreservesExplicitAssignment() {
+        BibEntry entry = new BibEntry().withField(StandardField.GROUPS, "1");
+        databaseContext.getDatabase().insertEntry(entry);
+        ExplicitGroup original = new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ',');
+
+        editGroup(original, new AutomaticEntryTypeGroup("1", GroupHierarchyType.INDEPENDENT), ButtonType.CANCEL);
+
+        assertEquals(Optional.of("1"), entry.getField(StandardField.GROUPS));
+        assertEquals(original, databaseContext.getMetaData().getGroups().orElseThrow().getChildren().getFirst().getGroup());
+        assertFalse(journal.canUndo());
+    }
+
+    @Test
+    void groupingMethodChangeUndoesAndRedoesEntryAssignmentsWithGroupDefinition() {
+        BibEntry entry = new BibEntry().withField(StandardField.GROUPS, "1");
+        databaseContext.getDatabase().insertEntry(entry);
+        ExplicitGroup original = new ExplicitGroup("1", GroupHierarchyType.INDEPENDENT, ',');
+        WordKeywordGroup replacement = new WordKeywordGroup("1", GroupHierarchyType.INDEPENDENT, StandardField.GROUPS, "2", true, ',', false);
+        editGroup(original, replacement, ButtonType.YES);
+
+        JavaFxExtension.invokeAndWait(journal::undo);
+        assertEquals(Optional.of("1"), entry.getField(StandardField.GROUPS));
+        assertEquals(original, databaseContext.getMetaData().getGroups().orElseThrow().getChildren().getFirst().getGroup());
+
+        JavaFxExtension.invokeAndWait(journal::redo);
+        assertEquals(Optional.of("2"), entry.getField(StandardField.GROUPS));
+        assertEquals(replacement, databaseContext.getMetaData().getGroups().orElseThrow().getChildren().getFirst().getGroup());
+    }
+
+    private void editGroup(AbstractGroup original, AbstractGroup replacement, ButtonType assignmentChoice) {
+        JavaFxExtension.invokeAndWait(() -> {
+            GroupTreeNode root = groupTree.rootGroupProperty().getValue().getGroupNode();
+            GroupTreeNode node = root.addSubgroup(original);
+            databaseContext.getMetaData().setGroups(root);
+            groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+            when(dialogService.showCustomDialogAndWait(any(GroupDialogView.class))).thenReturn(Optional.of(replacement));
+            when(dialogService.showCustomButtonDialogAndWait(any(), any(), any(), any(), any(), any())).thenReturn(Optional.of(assignmentChoice));
+
+            try (MockedConstruction<GroupDialogView> _ = mockConstruction(GroupDialogView.class)) {
+                groupTree.editGroup(groupTree.rootGroupProperty().getValue().findGroupNodeViewModel(node).orElseThrow());
+            }
+        });
     }
 
     @Test
@@ -211,6 +386,47 @@ class GroupTreeViewModelTest {
                 events.stream().map(MetaDataChangedEvent::getSource).distinct().toList());
     }
 
+    @Test
+    void removingSubgroupsIsConfirmedWithTheRemoveLabel() {
+        GroupNodeViewModel root = rootWithTwoSubgroups();
+        when(dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove")))
+                .thenReturn(true);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.removeSubgroups(root));
+
+        assertEquals(List.of(), childNames());
+    }
+
+    @Test
+    void cancellingTheRemoveSubgroupsDialogKeepsTheSubgroups() {
+        GroupNodeViewModel root = rootWithTwoSubgroups();
+        when(dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove")))
+                .thenReturn(false);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.removeSubgroups(root));
+
+        verify(dialogService).showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove"));
+        assertEquals(List.of("A", "B"), childNames());
+    }
+
+    private GroupNodeViewModel rootWithTwoSubgroups() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        return groupTree.rootGroupProperty().getValue();
+    }
+
     private List<String> childNames() {
         return databaseContext.getMetaData().getGroups().orElseThrow().getChildren().stream()
                               .map(node -> node.getGroup().getName())
@@ -280,7 +496,7 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    void shouldShowDialogWhenCaseSensitivyDiffers() {
+    void shouldShowDialogWhenCaseSensitivityDiffers() {
         AbstractGroup oldGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordTest", false, ',', true);
         AbstractGroup newGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordChanged", true, ',', true);
 
@@ -355,5 +571,71 @@ class GroupTreeViewModelTest {
         List<GroupNodeViewModel> groups = model.rootGroupProperty().getValue().getChildren();
 
         assertEquals(0, groups.size());
+    }
+
+    @Test
+        // [utest->req~ux.groups.library-switch-preserves-selection~1]
+    void selectionOfNewDatabaseSurvivesSwitch() {
+        BibDatabaseContext secondDatabase = new BibDatabaseContext();
+        secondDatabase.setDatabasePath(Path.of("second.bib"));
+        GroupTreeNode groupA = setUpLibraryWithGroup(databaseContext, "A");
+        GroupTreeNode groupB = setUpLibraryWithGroup(secondDatabase, "B");
+        var storedSelectionA = stateManager.getSelectedGroups(databaseContext);
+
+        assertEquals(List.of(groupA), selectedGroupNodes());
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+
+        clearInvocations(stateManager);
+
+        activeDatabase.setValue(Optional.of(secondDatabase));
+        assertEquals(List.of(groupB), selectedGroupNodes());
+        activeDatabase.setValue(Optional.of(databaseContext));
+        assertEquals(List.of(groupA), selectedGroupNodes());
+        assertEquals(List.of(groupA), storedSelectionA);
+
+        verify(stateManager, never()).clearSelectedGroups(any(BibDatabaseContext.class));
+    }
+
+    @Test
+        // [utest->req~ux.groups.shared-update-preserves-selection~1]
+    void sharedDatabaseGroupUpdatePreservesSelection() {
+        GroupTreeNode selectedGroup = setUpLibraryWithGroup(databaseContext, "A");
+        var storedSelection = stateManager.getSelectedGroups(databaseContext);
+        GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        updatedRoot.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+        clearInvocations(stateManager);
+
+        JavaFxExtension.invokeAndWait(() -> databaseContext.getMetaData().setGroups(updatedRoot));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertEquals(List.of(selectedGroup), storedSelection);
+        assertEquals(List.of("A"), selectedGroupNodes().stream().map(GroupTreeNode::getName).toList());
+        verify(stateManager, never()).clearSelectedGroups(databaseContext);
+    }
+
+    private GroupTreeNode setUpLibraryWithGroup(BibDatabaseContext library, String name) {
+        var root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode group = root.addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, ','));
+        var storedSelection = FXCollections.observableArrayList(group);
+        when(stateManager.getSelectedGroups(library)).thenReturn(storedSelection);
+        doAnswer(_ -> {
+            storedSelection.clear();
+            return null;
+        }).when(stateManager).clearSelectedGroups(library);
+        // the root is attached last otherwise refresh will overlap with stubbing
+        // the second invokeAndWait() waits for the refresh queued by setGroups to finish
+        JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+        return group;
+    }
+
+    private List<GroupTreeNode> selectedGroupNodes() {
+        return groupTree.selectedGroupsProperty().stream().map(GroupNodeViewModel::getGroupNode).toList();
     }
 }

@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ import org.jabref.gui.maintable.columns.FileColumn;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.maintable.columns.NameColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
@@ -39,6 +41,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
 
@@ -135,7 +139,11 @@ public class MainTableColumnFactory {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
-        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
+        columnPreferences.getColumns().stream()
+                         .filter(MainTableColumnModel::isConfigurable)
+                         .map(this::createColumn)
+                         .filter(Objects::nonNull)
+                         .forEach(columns::add);
         return columns;
     }
 
@@ -143,6 +151,15 @@ public class MainTableColumnFactory {
         column.setMinWidth(width);
         column.setPrefWidth(width);
         column.setMaxWidth(width);
+    }
+
+    /// Keeps the column exactly as wide as the node plus [ColumnPreferences#ICON_COLUMN_MARGIN], so it follows the font size.
+    public static void bindExactWidth(TableColumn<?, ?> column, Node node) {
+        node.layoutBoundsProperty().subscribe(bounds -> {
+            if (bounds.getWidth() > 0) {
+                setExactWidth(column, bounds.getWidth() + ColumnPreferences.ICON_COLUMN_MARGIN);
+            }
+        });
     }
 
     /// Creates a column for the match category.
@@ -183,6 +200,7 @@ public class MainTableColumnFactory {
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
+        bindExactWidth(column, headerGraphic);
         column.setResizable(false);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
@@ -273,6 +291,10 @@ public class MainTableColumnFactory {
 
     /// Creates a text column to display any standard field.
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel, MainTableTooltip tooltip) {
+        OrFields fields = FieldFactory.parseOrFields(columnModel.getQualifier());
+        if (!fields.isEmpty() && fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
+            return new NameColumn(columnModel, tooltip);
+        }
         return new FieldColumn(columnModel, tooltip);
     }
 

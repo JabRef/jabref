@@ -208,7 +208,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             progressIndicator.visibleProperty().bind(column.isLoadingProperty());
         }
 
-        column.isLoadingProperty().addListener((obs, oldValue, newValue) -> {
+        column.isLoadingProperty().addListener((_, _, newValue) -> {
             if (!newValue) {
                 header.setGraphic(null);
                 if (column.entryProperty().get() == null) {
@@ -466,7 +466,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
             addRow(field);
 
-            fieldEditorCell.addEventFilter(KeyEvent.KEY_PRESSED, event -> toggleGroup.selectToggle(null));
+            fieldEditorCell.addEventFilter(KeyEvent.KEY_PRESSED, _ -> toggleGroup.selectToggle(null));
 
             toggleGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
                 if (newValue == null) {

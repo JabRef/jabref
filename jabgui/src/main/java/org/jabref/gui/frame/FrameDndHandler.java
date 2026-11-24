@@ -64,12 +64,12 @@ public class FrameDndHandler {
                 // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
                 for (Node destinationTabNode : tabPane.lookupAll(".tab")) {
                     destinationTabNode.setOnDragOver(tabDragEvent -> onTabDragOver(event, tabDragEvent, dndIndicator));
-                    destinationTabNode.setOnDragExited(tabDragEvent -> tabPane.getTabs().remove(dndIndicator));
+                    destinationTabNode.setOnDragExited(_ -> tabPane.getTabs().remove(dndIndicator));
                     destinationTabNode.setOnDragDropped(tabDragEvent -> onTabDragDropped(destinationTabNode, tabDragEvent, dndIndicator));
                 }
                 event.consume();
             });
-            scene.get().setOnDragExited(event -> tabPane.getTabs().remove(dndIndicator));
+            scene.get().setOnDragExited(_ -> tabPane.getTabs().remove(dndIndicator));
             scene.get().setOnDragDropped(event -> onSceneDragDropped(event, dndIndicator));
         });
     }

@@ -9,7 +9,7 @@ import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 /// separated by a comma. To indicate the comma character, use an escape
 /// sequence: \,
 /// For inserting newlines and tabs in arguments, use \n and \t, respectively.
-/// The first part is the regular expression to search for. Remember that any commma
+/// The first part is the regular expression to search for. Remember that any comma
 /// character must be preceded by a backslash, and consequently a literal backslash must
 /// be written as a pair of backslashes. A description of Java regular expressions can be
 /// found at:
@@ -18,7 +18,7 @@ import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 /// For instance:
 ///
 /// `\format[Replace(and,&)]{\author}`
-///      will output the "author" field after replacing all occurences of "and"
+///      will output the "author" field after replacing all occurrences of "and"
 ///      by "&"
 ///
 ///  `\format[Replace(\s,_)]{\author}`

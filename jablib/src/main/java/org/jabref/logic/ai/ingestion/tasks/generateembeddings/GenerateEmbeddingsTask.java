@@ -48,7 +48,7 @@ public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
                     request.bibDatabaseContext(),
                     request.linkedFile()
             );
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             LOGGER.debug("There is a embeddings generation task. It will be cancelled, because user quits JabRef");
         }
 

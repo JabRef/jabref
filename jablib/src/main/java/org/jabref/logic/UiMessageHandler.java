@@ -16,7 +16,7 @@ public interface UiMessageHandler {
     ///
     /// Calling [#handleUiCommands] on it means the GUI check was skipped (a programming error), so it
     /// fails fast rather than silently swallowing the command.
-    UiMessageHandler NONE = uiCommands -> {
+    UiMessageHandler NONE = _ -> {
         throw new UnsupportedOperationException("No GUI is connected to the JabRef HTTP server");
     };
 

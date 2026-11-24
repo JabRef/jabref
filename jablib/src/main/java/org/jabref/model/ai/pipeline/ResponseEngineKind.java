@@ -12,7 +12,7 @@ public enum ResponseEngineKind {
     public static ResponseEngineKind safeValueOf(String name) {
         try {
             return ResponseEngineKind.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return AiDefaultEnums.RESPONSE_ENGINE_KIND;
         }
     }

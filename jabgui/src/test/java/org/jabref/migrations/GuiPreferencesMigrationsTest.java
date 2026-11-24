@@ -3,11 +3,15 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingCategory;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
@@ -16,11 +20,16 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -65,7 +74,7 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void arbitraryBibtexkeyPattern() {
-        String arbitraryPattern = "[anyUserPrividedString]";
+        String arbitraryPattern = "[anyUserProvidedString]";
 
         when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(arbitraryPattern);
 
@@ -92,6 +101,129 @@ class GuiPreferencesMigrationsTest {
         expectedBindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "shortcut+alt+F");
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
         verify(preferences).putBoolean(JabRefGuiPreferences.MACOS_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    /// Simulates a snapshot persisted before the macOS text-editing defaults existed: all editor bindings are empty.
+    private static List<String> snapshotWithoutTextEditingDefaults(List<String> bindNames) {
+        List<String> bindings = new ArrayList<>(Arrays.stream(KeyBinding.values()).map(KeyBinding::getDefaultKeyBinding).toList());
+        Arrays.stream(KeyBinding.values())
+              .filter(keyBinding -> keyBinding.getCategory() == KeyBindingCategory.EDITOR)
+              .forEach(keyBinding -> bindings.set(bindNames.indexOf(keyBinding.getConstant()), ""));
+        return bindings;
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void upgradeMacTextEditingKeyBindingDefaultsAssignsDefaultsToEmptyEditorBindings() {
+        List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
+        List<String> bindings = snapshotWithoutTextEditingDefaults(bindNames);
+        bindings.set(bindNames.indexOf(KeyBinding.EDITOR_END.getConstant()), "shortcut+shift+E");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        List<String> expectedBindings = new ArrayList<>(bindings);
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_BEGINNING.getConstant()), "ctrl+A");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_DELETE.getConstant()), "ctrl+D");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_BACKWARD.getConstant()), "ctrl+B");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_FORWARD.getConstant()), "ctrl+F");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_UP.getConstant()), "ctrl+P");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_DOWN.getConstant()), "ctrl+N");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_KILL_LINE.getConstant()), "ctrl+K");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_CENTER_CARET.getConstant()), "ctrl+L");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_INSERT_LINE_AFTER.getConstant()), "ctrl+O");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getConstant()), "ctrl+T");
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
+        verify(preferences).putBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void upgradeMacTextEditingKeyBindingDefaultsKeepsBindingEmptyIfKeyCombinationIsUsedByOtherAction() {
+        List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
+        List<String> bindings = snapshotWithoutTextEditingDefaults(bindNames);
+        bindings.set(bindNames.indexOf(KeyBinding.CLEANUP.getConstant()), "Ctrl+T");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        ArgumentCaptor<List<String>> migratedBindings = ArgumentCaptor.captor();
+        verify(preferences).putStringList(eq(JabRefGuiPreferences.BINDINGS), migratedBindings.capture());
+        assertEquals("", migratedBindings.getValue().get(bindNames.indexOf(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS.getConstant())));
+        assertEquals("Ctrl+T", migratedBindings.getValue().get(bindNames.indexOf(KeyBinding.CLEANUP.getConstant())));
+        assertEquals("ctrl+A", migratedBindings.getValue().get(bindNames.indexOf(KeyBinding.EDITOR_BEGINNING.getConstant())));
+    }
+
+    @Test
+        // [utest->req~macos.text-editing-shortcuts~1]
+    void upgradeMacTextEditingKeyBindingDefaultsStoresMissingEditorBindingAsUnassignedIfKeyCombinationIsUsed() {
+        List<String> bindNames = List.of(KeyBinding.CLEANUP.getConstant());
+        List<String> bindings = List.of("ctrl+O");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        ArgumentCaptor<List<String>> migratedNames = ArgumentCaptor.captor();
+        ArgumentCaptor<List<String>> migratedBindings = ArgumentCaptor.captor();
+        verify(preferences).putStringList(eq(JabRefGuiPreferences.BIND_NAMES), migratedNames.capture());
+        verify(preferences).putStringList(eq(JabRefGuiPreferences.BINDINGS), migratedBindings.capture());
+        KeyBindingRepository repository = new KeyBindingRepository(migratedNames.getValue(), migratedBindings.getValue());
+        assertEquals(Optional.of(""), repository.get(KeyBinding.EDITOR_INSERT_LINE_AFTER));
+        assertEquals(Optional.of("ctrl+T"), repository.get(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS));
+        assertEquals(Optional.of("ctrl+O"), repository.get(KeyBinding.CLEANUP));
+    }
+
+    @Test
+    void upgradeMacTextEditingKeyBindingDefaultsMarksFreshPreferencesAsMigrated() {
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(List.of());
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        verify(preferences, never()).putStringList(eq(JabRefGuiPreferences.BINDINGS), any());
+        verify(preferences).putBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, true);
+    }
+
+    @Test
+    void upgradeMacTextEditingKeyBindingDefaultsRunsOnlyOnce() {
+        when(preferences.getBoolean(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED, false)).thenReturn(true);
+
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, true);
+
+        verify(preferences, never()).putStringList(any(), any());
+        verify(preferences, never()).putBoolean(eq(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED), anyBoolean());
+    }
+
+    @Test
+    void upgradeMacTextEditingKeyBindingDefaultsLeavesOtherPlatformsUnchanged() {
+        PreferencesMigrations.upgradeMacTextEditingKeyBindingDefaults(preferences, false);
+
+        verify(preferences, never()).putStringList(any(), any());
+        verify(preferences, never()).putBoolean(eq(JabRefGuiPreferences.MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED), anyBoolean());
+    }
+
+    @Test
+    void upgradeMacKeyBindingDefaultsLeavesEditorBindingsToTextEditingMigration() {
+        List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
+        List<String> bindings = snapshotWithoutTextEditingDefaults(bindNames);
+        bindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "alt+s");
+        bindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "alt+F");
+
+        when(preferences.getStringList(JabRefGuiPreferences.BIND_NAMES)).thenReturn(bindNames);
+        when(preferences.getStringList(JabRefGuiPreferences.BINDINGS)).thenReturn(bindings);
+
+        PreferencesMigrations.upgradeMacKeyBindingDefaults(preferences, true);
+
+        List<String> expectedBindings = new ArrayList<>(bindings);
+        expectedBindings.set(bindNames.indexOf(KeyBinding.FOCUS_GROUP_LIST.getConstant()), "shortcut+alt+G");
+        expectedBindings.set(bindNames.indexOf(KeyBinding.LOOKUP_DOC_IDENTIFIER.getConstant()), "shortcut+alt+F");
+        verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, expectedBindings);
     }
 
     @Test
@@ -262,23 +394,69 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void moveApiKeysToKeyRing() throws PasswordAccessException {
-        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
-        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final String fetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String fetcherCustomKeys = "fetcherCustomKeys";
         final Keyring keyring = mock(Keyring.class);
 
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
-        when(preferences.getInternalPreferences().getUserHostInfo().getUserHostString()).thenReturn("user-host");
+        when(preferences.getStringList(fetcherCustomKeyNames)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
+        when(preferences.getStringList(fetcherCustomKeys)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
+
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenThrow(new PasswordAccessException("No entry stored"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherC")).thenThrow(new PasswordAccessException("No entry stored"));
 
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
             keyringFactory.when(Keyring::create).thenReturn(keyring);
 
             PreferencesMigrations.moveApiKeysToKeyring(preferences);
 
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherA"), any());
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherB"), any());
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
-            verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherA"), eq("KeyA"));
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherB"), eq("KeyB"));
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherC"), eq("KeyC"));
+            verify(preferences).deleteKey(fetcherCustomKeys);
+        }
+    }
+
+    @Test
+    void moveApiKeysToKeyRingKeepsExistingKey() throws PasswordAccessException {
+        final String fetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String fetcherCustomKeys = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(preferences.getStringList(fetcherCustomKeyNames)).thenReturn(List.of("FetcherA", "FetcherB"));
+        when(preferences.getStringList(fetcherCustomKeys)).thenReturn(List.of("StaleA", "KeyB"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenReturn("CurrentA");
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+            PreferencesMigrations.moveApiKeysToKeyring(preferences);
+
+            verify(keyring, never()).setPassword(eq("org.jabref.apikeys"), eq("FetcherA"), any());
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherB"), eq("KeyB"));
+            verify(keyring).deletePassword(eq("org.jabref.customapikeys"), eq("FetcherA"));
+            verify(keyring).deletePassword(eq("org.jabref.customapikeys"), eq("FetcherB"));
+            verify(preferences).deleteKey(fetcherCustomKeys);
+        }
+    }
+
+    @Test
+    void moveApiKeysToKeyRingKeepsLegacyEntryWithoutNewValue() throws PasswordAccessException {
+        final String fetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String fetcherCustomKeys = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(preferences.getStringList(fetcherCustomKeyNames)).thenReturn(List.of("FetcherA"));
+        when(preferences.getStringList(fetcherCustomKeys)).thenReturn(List.of(""));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenThrow(new PasswordAccessException("No entry stored"));
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+            PreferencesMigrations.moveApiKeysToKeyring(preferences);
+
+            verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+            verify(keyring, never()).deletePassword(anyString(), anyString());
+            verify(preferences).deleteKey(fetcherCustomKeys);
         }
     }
 
@@ -478,5 +656,48 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
 
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+A"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void upgradeImportDialogDownloadLinkedFilesCopiesWebSearchChoice(boolean webSearchChoice) {
+        // [utest->req~import.dialog.download-linked-files~1]
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(false);
+        when(preferences.hasKey("downloadLinkedFiles")).thenReturn(true);
+        when(preferences.getBoolean(eq("downloadLinkedFiles"), anyBoolean())).thenReturn(webSearchChoice);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences).setImportDialogDownloadLinkedFiles(webSearchChoice);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", webSearchChoice);
+        verify(filePreferences, never()).setDownloadLinkedFiles(anyBoolean());
+    }
+
+    @Test
+    void upgradeImportDialogDownloadLinkedFilesKeepsStoredDialogChoice() {
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(true);
+        when(preferences.hasKey("downloadLinkedFiles")).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences, never()).setImportDialogDownloadLinkedFiles(anyBoolean());
+        verify(preferences, never()).putBoolean(eq("importDialogDownloadLinkedFiles"), anyBoolean());
+    }
+
+    @Test
+    void upgradeImportDialogDownloadLinkedFilesKeepsDefaultForNewUsers() {
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(false);
+        when(preferences.getBoolean("downloadLinkedFiles", true)).thenReturn(true);
+
+        PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
+
+        verify(filePreferences).setImportDialogDownloadLinkedFiles(true);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", true);
     }
 }

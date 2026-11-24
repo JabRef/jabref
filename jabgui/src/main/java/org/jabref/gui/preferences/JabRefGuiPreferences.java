@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
@@ -21,7 +22,6 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -60,6 +60,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
@@ -94,6 +95,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String PREVIEW_CYCLE = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
     public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
+    public static final String ENTRY_TABLE_TOOLTIP_DURATION = "entryTableTooltipDuration";
     public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
     public static final String PREVIEW_COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
@@ -102,6 +104,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String BIND_NAMES = "bindNames";
     public static final String BINDINGS = "bindings";
     public static final String MACOS_KEY_BINDING_DEFAULTS_MIGRATED = "macOSKeyBindingDefaultsMigrated";
+    public static final String MACOS_TEXT_EDITING_KEY_BINDING_DEFAULTS_MIGRATED = "macOSTextEditingKeyBindingDefaultsMigrated";
     // endregion
 
     // region column names
@@ -131,6 +134,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     private static final String CONFIRM_DELETE = "confirmDelete";
     private static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
+    private static final String WRAP_MAIN_TABLE_TEXT = "wrapMainTableText";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
     // endregion
 
@@ -170,12 +174,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region ExternalApplicationsPreferences
     private static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     private static final String CONSOLE_COMMAND = "consoleCommand";
+    private static final String CONSOLE_COMMAND_ARGUMENTS = "consoleCommandArguments";
+    private static final String LEGACY_WINDOWS_CONSOLE_COMMAND = "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"";
     private static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
     private static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     private static final String EMAIL_SUBJECT = "emailSubject";
     private static final String KINDLE_EMAIL = "kindleEmail";
     private static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     private static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
+    private static final String FILE_BROWSER_COMMAND_ARGUMENTS = "fileBrowserCommandArguments";
     // endregion
 
     // region Auto completion
@@ -224,7 +231,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // region Donation preferences
     private static final String DONATION_NEVER_SHOW = "donationNeverShow";
-    private static final String DONATION_LAST_SHOWN_EPOCH_DAY = "donationLastShownEpochDay";
+    private static final String DONATION_NEXT_NOTIFICATION_EPOCH_DAY = "donationNextNotificationEpochDay";
     // endregion
 
     // region NewEntryPreferences
@@ -303,6 +310,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private DonationPreferences donationPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private MathSciNetPreferences mathSciNetPreferences;
+
+    public JabRefGuiPreferences() {
+        super();
+    }
+
+    public JabRefGuiPreferences(Preferences preferencesNode) {
+        super(preferencesNode);
+    }
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).
@@ -709,6 +724,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints()),
                 getBoolean(CONFIRM_DELETE, defaultValues.shouldConfirmDelete()),
                 getBoolean(CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar()),
+                getBoolean(WRAP_MAIN_TABLE_TEXT, defaultValues.shouldWrapMainTableText()),
                 getStringList(SELECTED_SLR_CATALOGS));
 
         bindCustom(workspacePreferences.languageProperty(), LANGUAGE, defaultValues.getLanguage(),
@@ -734,6 +750,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(workspacePreferences.showAdvancedHintsProperty(), SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints());
         bindBoolean(workspacePreferences.confirmDeleteProperty(), CONFIRM_DELETE, defaultValues.shouldConfirmDelete());
         bindBoolean(workspacePreferences.hideTabBarProperty(), CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar());
+        bindBoolean(workspacePreferences.wrapMainTableTextProperty(), WRAP_MAIN_TABLE_TEXT, defaultValues.shouldWrapMainTableText());
         bindCustomList(workspacePreferences.getSelectedSlrCatalogs(), SELECTED_SLR_CATALOGS, defaultValues.getSelectedSlrCatalogs(),
                 boundList -> putStringList(SELECTED_SLR_CATALOGS, boundList),
                 () -> getStringList(SELECTED_SLR_CATALOGS));
@@ -876,24 +893,55 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder()),
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))),
                 !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal()), // mind the !
-                get(CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
+                getCommandArguments(this, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser()), // mind the !
-                get(FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
+                getCommandArguments(this, FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
                 get(KINDLE_EMAIL, defaultValues.getKindleEmail())
         );
 
         bindString(externalApplicationsPreferences.eMailSubjectProperty(), EMAIL_SUBJECT, defaultValues.getEmailSubject());
         bindBoolean(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(), OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder());
         bindBooleanInverted(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal());
-        bindString(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand());
+        bindCustom(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND_ARGUMENTS, defaultValues.getCustomTerminalCommand(),
+                (_, _, value) -> putStringList(CONSOLE_COMMAND_ARGUMENTS, value),
+                () -> externalApplicationsPreferences.setCustomTerminalCommand(getCommandArguments(this, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand())),
+                () -> externalApplicationsPreferences.setCustomTerminalCommand(defaultValues.getCustomTerminalCommand()));
         bindBooleanInverted(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser());
-        bindString(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand());
+        bindCustom(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND_ARGUMENTS, defaultValues.getCustomFileBrowserCommand(),
+                (_, _, value) -> putStringList(FILE_BROWSER_COMMAND_ARGUMENTS, value),
+                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(getCommandArguments(this, FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand())),
+                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(defaultValues.getCustomFileBrowserCommand()));
         bindString(externalApplicationsPreferences.kindleEmailProperty(), KINDLE_EMAIL, defaultValues.getKindleEmail());
         bindSet(externalApplicationsPreferences.getExternalFileTypes(), EXTERNAL_FILE_TYPES, defaultValues.getExternalFileTypes(),
                 set -> put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(set)),
                 () -> ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))));
 
         return externalApplicationsPreferences;
+    }
+
+    @VisibleForTesting
+    static List<String> getCommandArguments(JabRefCliPreferences preferences, String key, String legacyKey, List<String> defaultArguments) {
+        if (preferences.hasKey(key)) {
+            return preferences.getStringList(key);
+        }
+
+        if (!preferences.hasKey(legacyKey)) {
+            return defaultArguments;
+        }
+
+        List<String> arguments = migrateLegacyCommand(preferences.get(legacyKey, ""), defaultArguments);
+        if (!arguments.isEmpty()) {
+            preferences.putStringList(key, arguments);
+        }
+        return arguments;
+    }
+
+    @VisibleForTesting
+    static List<String> migrateLegacyCommand(String command, List<String> defaultArguments) {
+        if (!defaultArguments.isEmpty() && LEGACY_WINDOWS_CONSOLE_COMMAND.equals(command)) {
+            return defaultArguments;
+        }
+        return CommandLineParser.splitLegacyCommandLine(command);
     }
     // endregion
 
@@ -1000,6 +1048,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 customPreviewLayout,
                 getBoolean(PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab()),
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip()),
+                Math.clamp(getInt(ENTRY_TABLE_TOOLTIP_DURATION, defaultValues.getTooltipDuration()), 0, 300),
                 bstPaths,
                 getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers())
         );
@@ -1027,6 +1076,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 () -> previewPreferences.customPreviewLayoutProperty().set(defaultValues.getCustomPreviewLayout()));
         bindBoolean(previewPreferences.showPreviewAsExtraTabProperty(), PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab());
         bindBoolean(previewPreferences.showPreviewEntryTableTooltip(), PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip());
+        bindInt(previewPreferences.tooltipDurationProperty(), ENTRY_TABLE_TOOLTIP_DURATION, defaultValues.getTooltipDuration());
         bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
                 this::storeBstPaths,
                 () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
@@ -1229,7 +1279,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     // ASCENDING on unknown/corrupted values so recovery operations (reset/import) do not fail.
                     try {
                         return TableColumn.SortType.valueOf(sortType);
-                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException _) {
                         return TableColumn.SortType.ASCENDING;
                     }
                 }).toList();
@@ -1351,10 +1401,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         donationPreferences = new DonationPreferences(
                 getBoolean(DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain()),
-                getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay()));
+                getInt(DONATION_NEXT_NOTIFICATION_EPOCH_DAY, defaultValues.getNextNotificationEpochDay()));
 
         bindBoolean(donationPreferences.neverShowAgainProperty(), DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain());
-        bindInt(donationPreferences.lastShownEpochDayProperty(), DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay());
+        bindInt(donationPreferences.nextNotificationEpochDayProperty(), DONATION_NEXT_NOTIFICATION_EPOCH_DAY, defaultValues.getNextNotificationEpochDay());
 
         return donationPreferences;
     }
@@ -1423,16 +1473,5 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         });
 
         return keyBindingRepository;
-    }
-
-    /// In GUI mode, we can look up the directory better
-    @Override
-    protected Path getDefaultPath() {
-        return NativeDesktop.get().getDefaultFileChooserDirectory();
-    }
-
-    @Override
-    protected boolean moveToTrashSupported() {
-        return NativeDesktop.get().moveToTrashSupported();
     }
 }

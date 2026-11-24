@@ -4,7 +4,10 @@
 ///
 /// Entry points: [org.jabref.model.database.BibDatabaseContext] (an open library),
 /// [org.jabref.model.entry.BibEntry], [org.jabref.logic.importer.ImportFormatReader],
-/// [org.jabref.logic.exporter.ExporterFactory].
+/// [org.jabref.logic.exporter.ExporterFactory], and
+/// [org.jabref.logic.openoffice.engine.CitationEngine] (Writer citation actions).
+/// Writer style contracts live in [org.jabref.logic.openoffice.style]; family-specific helpers
+/// live in [org.jabref.logic.openoffice.bst], [org.jabref.logic.openoffice.csl], and [org.jabref.logic.openoffice.jstyle].
 ///
 /// @see <a href="https://devdocs.jabref.org/architecture-and-components.html">Architecture and components</a>
 open module org.jabref.jablib {
@@ -56,6 +59,7 @@ open module org.jabref.jablib {
     exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
     exports org.jabref.logic.pdf;
+    exports org.jabref.logic.pdf.reader;
     exports org.jabref.model.database.event;
     exports org.jabref.model.entry.event;
     exports org.jabref.logic.push;
@@ -99,12 +103,15 @@ open module org.jabref.jablib {
     exports org.jabref.model.openoffice;
     exports org.jabref.logic.openoffice;
     exports org.jabref.logic.openoffice.bst;
-    exports org.jabref.logic.openoffice.action;
+    exports org.jabref.logic.openoffice.csl;
+    exports org.jabref.logic.openoffice.jstyle;
+
     exports org.jabref.logic.openoffice.frontend;
-    exports org.jabref.logic.openoffice.oocsltext;
-    exports org.jabref.model.openoffice.rangesort;
+    exports org.jabref.logic.openoffice.engine;
+    exports org.jabref.logic.openoffice.engine.storage;
+    exports org.jabref.logic.openoffice.rangesort;
     exports org.jabref.model.openoffice.style;
-    exports org.jabref.model.openoffice.uno;
+    exports org.jabref.logic.openoffice.uno;
     exports org.jabref.model.openoffice.util;
     exports org.jabref.logic.importer.plaincitation;
     exports org.jabref.logic.bst;
@@ -126,10 +133,12 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.preferences;
     exports org.jabref.logic.icore;
     exports org.jabref.model.icore;
+    exports org.jabref.logic.git.merge;
     exports org.jabref.logic.git.merge.planning;
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
+    exports org.jabref.logic.citedrive;
     exports org.jabref.logic.ocr;
     exports org.jabref.logic.lint;
     exports org.jabref.logic.lint.rule;
@@ -234,6 +243,11 @@ open module org.jabref.jablib {
     requires /*runtime*/ unirest.modules.gson;
     // endregion
 
+    // region nimbusds / OAuth2
+    requires json.smart;
+    requires transitive nimbusds.oauth2.oidc.sdk;
+    // endregion
+
     // region: SQL databases
     requires embedded.postgres;
 
@@ -294,7 +308,7 @@ open module org.jabref.jablib {
     uses org.apache.lucene.codecs.lucene104.Lucene104Codec;
     requires org.apache.lucene.analysis.common;
     requires transitive org.apache.lucene.core;
-    requires transitive org.apache.lucene.highlighter;
+    requires org.apache.lucene.highlighter;
     requires org.apache.lucene.queryparser;
     // endregion
 

@@ -133,7 +133,7 @@ public class AiChatStatusViewModel extends AbstractViewModel {
                 aiPreferences.getChatProperties()
         ));
 
-        this.embeddingModel.bind(ObservablesHelper.createClosableObjectBinding(
+        this.embeddingModel.bind(ObservablesHelper.createObjectBinding(
                 () -> EmbeddingModelFactory.create(aiPreferences, embeddingModelCache),
                 aiPreferences.getEmbeddingsProperties()
         ));

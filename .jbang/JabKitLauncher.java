@@ -33,6 +33,8 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitedWorks.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitingWorks.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Git.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GitMergeDriver.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/InputOption.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabFixCommand.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java

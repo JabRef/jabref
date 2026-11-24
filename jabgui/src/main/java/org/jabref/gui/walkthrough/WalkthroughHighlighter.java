@@ -27,7 +27,6 @@ public class WalkthroughHighlighter {
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
 
     private final Map<Window, EffectState> currentEffects = new HashMap<>();
-    private @Nullable Runnable onBackgroundClickHandler;
 
     /// Applies the specified highlight configuration.
     ///
@@ -56,10 +55,6 @@ public class WalkthroughHighlighter {
     /// Sets a handler to be called when the user clicks on backdrop or darkened areas.
     ///
     /// @param handler The handler to call when the background is clicked. If null, no action will be taken on background clicks. Usually used to support quit walkthrough on clicking the effects.
-    public void setOnBackgroundClick(@Nullable Runnable handler) {
-        this.onBackgroundClickHandler = handler;
-    }
-
     /// Detaches the specified window from all effects. Restore the scene graph on this
     /// window to the state before any effects were applied.
     public void detach(@NonNull Window window) {
@@ -193,7 +188,6 @@ public class WalkthroughHighlighter {
     private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
         WalkthroughPane.of(window).ifPresentOrElse(pane -> {
             Spotlight backdrop = getOrCreateBackdropHighlight(window, pane);
-            backdrop.setOnClick(onBackgroundClickHandler);
             backdrop.attach(targetNode);
         }, () -> logMissingPane(window));
     }
@@ -207,7 +201,6 @@ public class WalkthroughHighlighter {
     private void applyFullScreenDarken(@NonNull Window window) {
         WalkthroughPane.of(window).ifPresentOrElse(pane -> {
             FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);
-            fullDarken.setOnClick(onBackgroundClickHandler);
             fullDarken.attach();
         }, () -> logMissingPane(window));
     }

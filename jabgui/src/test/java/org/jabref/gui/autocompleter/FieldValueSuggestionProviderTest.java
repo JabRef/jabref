@@ -85,7 +85,7 @@ class FieldValueSuggestionProviderTest {
     }
 
     @Test
-    void completeBeginnigOfValueReturnsValue() {
+    void completeBeginningOfValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "testValue");
         database.insertEntry(entry);
@@ -147,7 +147,7 @@ class FieldValueSuggestionProviderTest {
     }
 
     @Test
-    void completeBeginnigOfSecondWordReturnsWholeFieldValue() {
+    void completeBeginningOfSecondWordReturnsWholeFieldValue() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "test value");
         database.insertEntry(entry);

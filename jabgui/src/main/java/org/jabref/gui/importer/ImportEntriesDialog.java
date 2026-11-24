@@ -33,6 +33,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXCodeTextModel;
 import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
@@ -231,7 +232,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
                     return container;
                 })
-                .withOnMouseClickedEvent((entry, event) -> {
+                .withOnMouseClickedEvent((entry, _) -> {
                     entriesListView.getCheckModel().toggleCheckState(entry);
                     displayBibTeX(entry, viewModel.getSourceString(entry));
                 })
@@ -316,7 +317,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
-        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
+        // [impl->req~import.dialog.download-linked-files~1]
+        downloadLinkedOnlineFiles.setSelected(viewModel.shouldDownloadLinkedFiles());
 
         setResultConverter(button -> {
             if (button == importButton) {
@@ -344,6 +346,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
             return false;
         });
+    }
+
+    public void useWebSearchDownloadPreference() {
+        viewModel.useWebSearchDownloadPreference();
+        downloadLinkedOnlineFiles.setSelected(viewModel.shouldDownloadLinkedFiles());
     }
 
     private void setupPaginationBindings() {
@@ -461,10 +468,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         bibTeXDataLabel.setText(Localization.lang("%0 source", "BibTeX"));
         bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         bibTeXData.setPadding(new Insets(5.0));
-        showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -> {
+        showEntryInformation.selectedProperty().addListener((_, _, new_val) -> {
             bibTeXDataBox.setVisible(new_val);
             bibTeXDataBox.setManaged(new_val);
         });
+        bibTeXData.setModel(new BibTeXCodeTextModel());
         bibTeXData.setSyntaxDecorator(new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter));
     }
 

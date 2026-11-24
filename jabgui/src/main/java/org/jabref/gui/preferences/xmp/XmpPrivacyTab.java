@@ -77,9 +77,9 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         actionsColumn.getStyleClass().add("actions-column");
         actionsColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue()));
         new ValueTableCellFactory<Field, Field>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(item -> Localization.lang("Remove") + " " + item.getName())
-                .withOnMouseClickedEvent(item -> _ -> viewModel.removeFilter(filterList.getFocusModel().getFocusedItem()))
+                .withOnMouseClickedEvent(_ -> _ -> viewModel.removeFilter(filterList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
         filterList.getColumns().add(fieldColumn);

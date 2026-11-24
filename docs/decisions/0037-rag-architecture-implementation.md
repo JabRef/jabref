@@ -23,7 +23,7 @@ How source data is processed:
 3. **Splitting**: the string from previous step is split into parts (because LLM has fixed context window, meaning
 it cannot handle big documents).
 4. **Embedding generation**: a vector consisting of float values is generated out of chunks. This vector represents meaning
-of text and the main propety of such vectors is that chunks with similar meaning has vectors that are close to.
+of text and the main property of such vectors is that chunks with similar meaning has vectors that are close to.
 Generation of such a vector is achieved by using a separate model called *embedding model*.
 5. **Store**: chunks with relevant metadata (for example, from which document they were generated) and embedding vector are stored in a vector database.
 

@@ -53,7 +53,7 @@ public class FieldRowView {
 
         // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
         // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
-        leftValueCell.parentProperty().addListener(e -> {
+        leftValueCell.parentProperty().addListener(_ -> {
             if (leftValueCell.getParent() instanceof GridPane grid) {
                 parent = grid;
             }
@@ -64,7 +64,7 @@ public class FieldRowView {
             toggleMergeUnmergeButton.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
             fieldNameCell.addSideButton(toggleMergeUnmergeButton);
 
-            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), (observableValue, old, fieldState) -> {
+            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), (_, _, fieldState) -> {
                 LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
                 if (fieldState == ToggleMergeUnmergeButton.FieldState.MERGED) {
                     viewModel.mergeFields();
@@ -111,7 +111,7 @@ public class FieldRowView {
             }
         });
 
-        EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (obs, old, isEqual) -> {
+        EasyBind.listen(viewModel.hasEqualLeftAndRightBinding(), (_, _, isEqual) -> {
             if (isEqual) {
                 LOGGER.debug("Left and right values are equal, LEFT==RIGHT=={}", viewModel.getLeftFieldValue());
                 hideDiff();

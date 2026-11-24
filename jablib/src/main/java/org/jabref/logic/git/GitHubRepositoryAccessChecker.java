@@ -32,9 +32,9 @@ public class GitHubRepositoryAccessChecker {
                     return GitHubRepositoryAccess.WRITE_ACCESS;
                 }
             }
-        } catch (URISyntaxException | NotSupportedException e) {
+        } catch (URISyntaxException | NotSupportedException _) {
             return GitHubRepositoryAccess.INVALID_REPOSITORY_URL;
-        } catch (TransportException e) {
+        } catch (TransportException _) {
             return GitHubRepositoryAccess.REPOSITORY_NOT_ACCESSIBLE;
         }
     }

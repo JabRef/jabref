@@ -34,7 +34,8 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class FromAuxDialogViewModel {
 
-    private final BooleanProperty parseFailedProperty = new SimpleBooleanProperty(false);
+    // Initially true: nothing has been parsed yet, so there is no result to generate a library from
+    private final BooleanProperty parseFailedProperty = new SimpleBooleanProperty(true);
     private final StringProperty auxFileProperty = new SimpleStringProperty();
     private final StringProperty statusTextProperty = new SimpleStringProperty();
     private final ListProperty<String> notFoundList = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -59,10 +60,15 @@ public class FromAuxDialogViewModel {
 
         librariesProperty.setAll(stateManager.getOpenDatabases());
         selectedLibraryProperty.set(tabContainer.getCurrentLibraryTab().getBibDatabaseContext());
-        EasyBind.listen(selectedLibraryProperty, (obs, oldValue, newValue) -> {
+        EasyBind.listen(selectedLibraryProperty, (_, _, _) -> {
             if (auxParserResult != null) {
                 parse();
             }
+        });
+        // A changed AUX file path invalidates the previous parse result
+        EasyBind.listen(auxFileProperty, (_, _, _) -> {
+            auxParserResult = null;
+            parseFailedProperty.set(true);
         });
     }
 
@@ -88,6 +94,7 @@ public class FromAuxDialogViewModel {
 
     public void parse() {
         parseFailedProperty.set(false);
+        auxParserResult = null;
         notFoundList.clear();
         statusTextProperty.setValue("");
         BibDatabase referenceDatabase = selectedLibraryProperty.get().getDatabase();
@@ -110,6 +117,9 @@ public class FromAuxDialogViewModel {
     }
 
     public void addResultToTabContainer() {
+        if (auxParserResult == null) {
+            return;
+        }
         BibDatabaseContext context = new BibDatabaseContext(auxParserResult.getGeneratedBibDatabase());
         tabContainer.addTab(context, true);
     }

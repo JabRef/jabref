@@ -137,12 +137,13 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                     return null;
                 }
             }
-                    .onSuccess(result -> {
+                    .onSuccess(_ -> {
                         if (showFeedback) {
                             showResults();
                         }
                     })
                     .onFailure(dialogService::showErrorDialogAndWait)
+                    .failureShownByCaller(true)
                     .executeWith(taskExecutor);
         } else {
             cleanup(cleanupPreset, entriesToProcess);

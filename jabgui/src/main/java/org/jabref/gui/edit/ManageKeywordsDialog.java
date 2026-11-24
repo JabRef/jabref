@@ -73,15 +73,15 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
             viewModel.getKeywords().set(event.getTablePosition().getRow(), event.getNewValue());
         });
         keywordsTableMainColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        keywordsTableEditColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
-        keywordsTableDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
+        keywordsTableEditColumn.setCellValueFactory(_ -> BindingsHelper.constantOf(true));
+        keywordsTableDeleteColumn.setCellValueFactory(_ -> BindingsHelper.constantOf(true));
         new ValueTableCellFactory<String, Boolean>()
-                .withGraphic(none -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
-                .withOnMouseClickedEvent(none -> event -> keywordsTable.edit(keywordsTable.getFocusModel().getFocusedIndex(), keywordsTableMainColumn))
+                .withGraphic(_ -> IconTheme.JabRefIcons.EDIT.getGraphicNode())
+                .withOnMouseClickedEvent(_ -> _ -> keywordsTable.edit(keywordsTable.getFocusModel().getFocusedIndex(), keywordsTableMainColumn))
                 .install(keywordsTableEditColumn);
         new ValueTableCellFactory<String, Boolean>()
-                .withGraphic(none -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
-                .withOnMouseClickedEvent((keyword, none) -> event -> viewModel.removeKeyword(keyword))
+                .withGraphic(_ -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
+                .withOnMouseClickedEvent((keyword, _) -> _ -> viewModel.removeKeyword(keyword))
                 .install(keywordsTableDeleteColumn);
     }
 }

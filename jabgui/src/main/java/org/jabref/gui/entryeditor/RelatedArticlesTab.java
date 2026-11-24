@@ -137,7 +137,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             journalText.setFont(Font.font(Font.getDefault().getFamily(), FontPosture.ITALIC, Font.getDefault().getSize()));
             Text authorsText = new Text(authors);
 
-            titleLink.setOnAction(event -> {
+            titleLink.setOnAction(_ -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
                         NativeDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferences.getExternalApplicationsPreferences());
@@ -206,7 +206,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Text line3 = new Text(Localization.lang("This setting may be changed in preferences at any time."));
         line3.wrappingWidthProperty().bind(rootWidth);
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
-        mdlLink.setOnAction(event -> {
+        mdlLink.setOnAction(_ -> {
             try {
                 NativeDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferences.getExternalApplicationsPreferences());
             } catch (IOException e) {

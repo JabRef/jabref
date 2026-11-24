@@ -37,7 +37,7 @@ public enum CitationFetcherType {
     public static CitationFetcherType safeValueOf(String name) {
         try {
             return CitationFetcherType.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return SEMANTIC_SCHOLAR;
         }
     }

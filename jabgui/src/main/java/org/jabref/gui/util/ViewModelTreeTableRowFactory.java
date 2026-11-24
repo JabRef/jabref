@@ -67,7 +67,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragDetected(BiConsumer<S, ? super MouseEvent> toOnDragDetected) {
-        this.toOnDragDetected = (row, viewModel, event) -> toOnDragDetected.accept(viewModel, event);
+        this.toOnDragDetected = (_, viewModel, event) -> toOnDragDetected.accept(viewModel, event);
         return this;
     }
 
@@ -77,7 +77,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragDropped(BiConsumer<S, ? super DragEvent> toOnDragDropped) {
-        return setOnDragDropped((row, viewModel, event) -> toOnDragDropped.accept(viewModel, event));
+        return setOnDragDropped((_, viewModel, event) -> toOnDragDropped.accept(viewModel, event));
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragEntered(BiConsumer<S, ? super DragEvent> toOnDragEntered) {
@@ -91,7 +91,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
     }
 
     public ViewModelTreeTableRowFactory<S> setOnMouseDragEntered(BiConsumer<S, ? super MouseDragEvent> toOnDragEntered) {
-        return setOnMouseDragEntered((row, viewModel, event) -> toOnDragEntered.accept(viewModel, event));
+        return setOnMouseDragEntered((_, viewModel, event) -> toOnDragEntered.accept(viewModel, event));
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragExited(TriConsumer<TreeTableRow<S>, S, ? super DragEvent> toOnDragExited) {
@@ -100,7 +100,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragExited(BiConsumer<S, ? super DragEvent> toOnDragExited) {
-        return setOnDragExited((row, viewModel, event) -> toOnDragExited.accept(viewModel, event));
+        return setOnDragExited((_, viewModel, event) -> toOnDragExited.accept(viewModel, event));
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragOver(TriConsumer<TreeTableRow<S>, S, ? super DragEvent> toOnDragOver) {
@@ -109,7 +109,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
     }
 
     public ViewModelTreeTableRowFactory<S> setOnDragOver(BiConsumer<S, ? super DragEvent> toOnDragOver) {
-        return setOnDragOver((row, viewModel, event) -> toOnDragOver.accept(viewModel, event));
+        return setOnDragOver((_, viewModel, event) -> toOnDragOver.accept(viewModel, event));
     }
 
     public ViewModelTreeTableRowFactory<S> withPseudoClass(PseudoClass pseudoClass, Callback<TreeTableRow<S>, ObservableValue<Boolean>> toCondition) {

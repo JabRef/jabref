@@ -210,7 +210,7 @@ class PdfExtractReferences implements Callable<Integer> {
             String urlPath = URI.create(input).getPath();
             Path lastSegment = (urlPath == null || urlPath.isEmpty()) ? null : Path.of(urlPath).getFileName();
             return lastSegment == null ? "downloaded" : FileUtil.getBaseName(lastSegment);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // Downloadable URL that is no strict URI (or whose path is no valid Path) - it carries no usable file name
             return "downloaded";
         }

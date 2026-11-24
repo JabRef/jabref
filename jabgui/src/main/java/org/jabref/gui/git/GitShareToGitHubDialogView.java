@@ -81,7 +81,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 Localization.lang("Create an empty repository on GitHub, then copy the HTTPS URL (ends with .git). Click to open GitHub.")
         );
         Tooltip.install(repoHelpIcon, repoHelpTooltip);
-        repoHelpIcon.setOnMouseClicked(e ->
+        repoHelpIcon.setOnMouseClicked(_ ->
                 NativeDesktop.openBrowserShowPopup(
                         GITHUB_NEW_REPO_URL,
                         dialogService,

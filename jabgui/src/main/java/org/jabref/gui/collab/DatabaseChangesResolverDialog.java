@@ -69,7 +69,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
                   .load()
                   .setAsDialogPane(this);
 
-        this.setResultConverter(button -> {
+        this.setResultConverter(_ -> {
             if (viewModel.areAllChangesResolved()) {
                 LOGGER.info("External changes are resolved successfully");
                 return true;

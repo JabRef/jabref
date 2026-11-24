@@ -100,7 +100,7 @@ public class KeyBindingRepository {
     }
 
     public void resetToDefault() {
-        bindings.forEach((b, s) -> bindings.put(b, b.getDefaultKeyBinding()));
+        bindings.forEach((b, _) -> bindings.put(b, b.getDefaultKeyBinding()));
     }
 
     public int size() {
@@ -141,6 +141,19 @@ public class KeyBindingRepository {
             return Optional.empty();
         }
         return Optional.of(KeyCombination.valueOf(binding));
+    }
+
+    /// Finds all other key bindings that already use the key combination of the given key event
+    ///
+    /// @param keyBinding the binding to be changed
+    /// @param keyEvent   the key event the new shortcut is created from
+    /// @return the conflicting key bindings, empty if there are none
+    public List<KeyBinding> findConflictingKeyBindings(KeyBinding keyBinding, KeyEvent keyEvent) {
+        // [impl->req~ux.keybindings.duplicate-warning~1]
+        return bindings.keySet().stream()
+                       .filter(other -> other != keyBinding)
+                       .filter(other -> checkKeyCombinationEquality(other, keyEvent))
+                       .toList();
     }
 
     /// Check if the given KeyBinding equals the given keyEvent

@@ -67,7 +67,7 @@ public class ExternalFileTypesTabViewModelTest {
     @Test
     void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful() {
         ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
-        doAnswer(mocked -> {
+        doAnswer(_ -> {
             ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
             this.viewModelClone(capturedItem);
             return null;
@@ -84,7 +84,7 @@ public class ExternalFileTypesTabViewModelTest {
     void WhenExternalFileTypeItemViewModelMissNameThenAddNewTypeIsFailed() {
         setupViewModelWithoutName();
         ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
-        doAnswer(mocked -> {
+        doAnswer(_ -> {
             ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
             viewModelClone(capturedItem);
             return null;

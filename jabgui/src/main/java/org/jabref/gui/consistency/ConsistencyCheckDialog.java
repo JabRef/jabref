@@ -1,32 +1,27 @@
 package org.jabref.gui.consistency;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
@@ -40,31 +35,28 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
+    @FXML private RadioButton restrictToBstFieldsRadio;
+    @FXML private Label bstStyleLabel;
+    @FXML private RadioButton restrictToAuxEntriesRadio;
+    @FXML private Label auxFileLabel;
 
     @Inject private StateManager stateManager;
     @Inject private EntryEditor entryEditor;
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final GuiPreferences preferences;
-    private final BibEntryTypesManager entryTypesManager;
-    private final BibliographyConsistencyCheck.Result result;
-
-    private ConsistencyCheckDialogViewModel viewModel;
+    private final ConsistencyCheckDialogViewModel viewModel;
 
     public ConsistencyCheckDialog(LibraryTab libraryTab,
                                   DialogService dialogService,
-                                  GuiPreferences preferences,
-                                  BibEntryTypesManager entryTypesManager,
-                                  BibliographyConsistencyCheck.Result result) {
+                                  ConsistencyCheckDialogViewModel viewModel) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.entryTypesManager = entryTypesManager;
-        this.result = result;
+        this.viewModel = viewModel;
 
         this.setTitle(Localization.lang("Check consistency"));
         this.initModality(Modality.NONE);
+        this.setOnHidden(_ -> viewModel.cancelPendingLoads());
 
         ViewLoader.view(this)
                   .load()
@@ -77,11 +69,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);
-
-        entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
+        entryTypeCombo.setItems(viewModel.getEntryTypes());
         entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
-        EasyBind.listen(entryTypeCombo.getEditor().textProperty(), observable -> entryTypeCombo.commitValue());
+        EasyBind.listen(entryTypeCombo.getEditor().textProperty(), _ -> entryTypeCombo.commitValue());
         entryTypeCombo.getSelectionModel().selectFirst();
 
         FilteredList<ConsistencyMessage> filteredData = new FilteredList<>(viewModel.getTableData(), message ->
@@ -95,10 +85,38 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         tableView.setItems(filteredData);
 
+        restrictToBstFieldsRadio.selectedProperty().bindBidirectional(viewModel.restrictToBstFieldsProperty());
+        restrictToBstFieldsRadio.disableProperty().bind(viewModel.bstStyleNameProperty().isEmpty());
+        bstStyleLabel.textProperty().bind(viewModel.bstStyleNameProperty());
+
+        restrictToAuxEntriesRadio.selectedProperty().bindBidirectional(viewModel.restrictToAuxEntriesProperty());
+        restrictToAuxEntriesRadio.disableProperty().bind(viewModel.auxFileNameProperty().isEmpty());
+        auxFileLabel.textProperty().bind(viewModel.auxFileNameProperty());
+        tableView.setPlaceholder(new Label(Localization.lang("No problems found.")));
+        rebuildColumns();
+        viewModel.reportRevisionProperty().addListener(_ -> rebuildColumns());
+
+        // A hidden column must not keep sorting the rows
+        EasyBind.listen(viewModel.shownFieldsProperty(), _ -> tableView.getSortOrder().removeIf(column -> !column.isVisible()));
+    }
+
+    private void rebuildColumns() {
+        tableView.getSortOrder().clear();
+        tableView.getColumns().forEach(column -> column.visibleProperty().unbind());
+        tableView.getColumns().clear();
+        List<Field> reportedFields = viewModel.getReportedFields();
         int columnIndex = 0;
+        // [impl->req~ux.consistency.missing-field-columns~1]
         for (String columnName : viewModel.getColumnNames()) {
             final int currentIndex = columnIndex;
             TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(columnName);
+
+            // The first two columns (entry type and citation key) are always shown
+            if (currentIndex >= 2) {
+                Field field = reportedFields.get(currentIndex - 2);
+                // [impl->req~ux.consistency.bst-field-columns~2]
+                tableColumn.visibleProperty().bind(viewModel.shownFieldsProperty().map(shown -> shown.test(field)));
+            }
 
             tableColumn.setCellValueFactory(row -> {
                 List<String> message = row.getValue().message();
@@ -117,14 +135,20 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                     if (empty || item == null) {
                         setGraphic(null);
                         setText(null);
+                        setTooltip(null);
                         return;
                     }
 
                     ConsistencySymbol.fromText(item)
                                      .ifPresentOrElse(
-                                             symbol -> setGraphic(symbol.getIcon().getGraphicNode()),
+                                             symbol -> {
+                                                 setText(null);
+                                                 setGraphic(symbol.getIcon().getGraphicNode());
+                                                 setTooltip(new Tooltip(symbol.getDescription()));
+                                             },
                                              () -> {
                                                  setGraphic(null);
+                                                 setTooltip(null);
                                                  setText(item);
                                              }
                                      );
@@ -138,20 +162,12 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             Field field = FieldFactory.parseField(clickedColumn.getText());
                             boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
 
-                            if (field.isStandardField()) {
-                                stateManager.getEditorShowing().setValue(true);
-                                Platform.runLater(() -> {
-                                    libraryTab.clearAndSelect(message.bibEntry());
-                                    entryEditor.setFocusToField(field);
-                                });
-                            } else if (!message.bibEntry().hasField(field) && isUnsetField) {
+                            if (!field.isStandardField() && !message.bibEntry().hasField(field) && isUnsetField) {
                                 libraryTab.showAndEdit(message.bibEntry());
                             } else {
                                 stateManager.getEditorShowing().setValue(true);
-                                Platform.runLater(() -> {
-                                    libraryTab.clearAndSelect(message.bibEntry());
-                                    entryEditor.setFocusToField(field);
-                                });
+                                libraryTab.clearAndSelect(message.bibEntry());
+                                entryEditor.setFocusToField(field);
                             }
                         }
                     });
@@ -161,36 +177,23 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
             tableView.getColumns().add(tableColumn);
         }
 
-        EnumSet<ConsistencySymbol> targetSymbols = EnumSet.of(
-                ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
-                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
-                ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
-                ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
-        );
-
-        targetSymbols.stream()
-                     .map(ConsistencySymbol::getText)
-                     .forEach(this::removeColumnWithUniformValue);
-
         Arrays.stream(SpecialField.values())
               .map(FieldTextMapper::getDisplayName)
               .forEach(this::removeColumnByTitle);
     }
 
-    private void removeColumnWithUniformValue(String symbol) {
-        List<TableColumn<ConsistencyMessage, ?>> columnToRemove = tableView.getColumns().stream()
-                                                                           .filter(column -> {
-                                                                               Set<String> values = tableView.getItems().stream()
-                                                                                                             .map(item -> Optional.ofNullable(column.getCellObservableValue(item).getValue()).map(Object::toString).orElse(""))
-                                                                                                             .collect(Collectors.toSet());
-                                                                               return values.size() == 1 && values.contains(symbol);
-                                                                           })
-                                                                           .toList();
-        tableView.getColumns().removeAll(columnToRemove);
-    }
-
     public void removeColumnByTitle(String columnName) {
         tableView.getColumns().removeIf(column -> column.getText().equalsIgnoreCase(columnName));
+    }
+
+    @FXML
+    private void browseBstFile() {
+        viewModel.browseBstFile();
+    }
+
+    @FXML
+    private void browseAuxFile() {
+        viewModel.browseAuxFile();
     }
 
     @FXML

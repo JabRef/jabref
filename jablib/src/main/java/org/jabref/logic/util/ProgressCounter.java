@@ -61,8 +61,8 @@ public class ProgressCounter implements Progress {
         long periodSeconds = PERIODIC_UPDATE_DURATION.getSeconds();
         periodicUpdate.scheduleAtFixedRate(this::update, periodSeconds, periodSeconds, TimeUnit.SECONDS);
 
-        workDone.addListener(obs -> update());
-        workMax.addListener(obs -> update());
+        workDone.addListener(_ -> update());
+        workMax.addListener(_ -> update());
     }
 
     public void increaseWorkDone(int incr) {
@@ -98,9 +98,9 @@ public class ProgressCounter implements Progress {
     }
 
     public void listenToAllProperties(Runnable runnable) {
-        workDoneProperty().addListener(obs -> runnable.run());
-        workMaxProperty().addListener(obs -> runnable.run());
-        messageProperty().addListener(obs -> runnable.run());
+        workDoneProperty().addListener(_ -> runnable.run());
+        workMaxProperty().addListener(_ -> runnable.run());
+        messageProperty().addListener(_ -> runnable.run());
     }
 
     private void update() {

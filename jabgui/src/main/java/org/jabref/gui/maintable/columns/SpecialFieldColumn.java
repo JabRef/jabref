@@ -58,12 +58,13 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
                     .install(this);
         } else {
             MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
+            MainTableColumnFactory.bindExactWidth(this, headerGraphic);
             this.setResizable(false);
 
             if (specialField.isSingleValueField()) {
                 new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
-                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, fieldAction))
-                        .withOnMouseClickedEvent((entry, value) -> event -> {
+                        .withGraphic((_, value) -> createSpecialFieldIcon(value, fieldAction))
+                        .withOnMouseClickedEvent((entry, _) -> event -> {
                             if (event.getButton() == MouseButton.PRIMARY) {
                                 writerFor(specialField, entry).toggle(entry.getEntry());
                             }
@@ -71,8 +72,8 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
                         .install(this);
             } else {
                 new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
-                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, fieldAction))
-                        .withMenu((entry, value) -> createSpecialFieldMenu(entry.getEntry(), writerFor(specialField, entry)))
+                        .withGraphic((_, value) -> createSpecialFieldIcon(value, fieldAction))
+                        .withMenu((entry, _) -> createSpecialFieldMenu(entry.getEntry(), writerFor(specialField, entry)))
                         .install(this);
             }
         }
@@ -90,6 +91,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
     private Rating createSpecialRating(BibEntryTableViewModel entry, Optional<SpecialFieldValueViewModel> value) {
         Rating ranking = new Rating();
+        MainTableColumnFactory.bindExactWidth(this, ranking);
 
         if (value.isPresent()) {
             ranking.setRating(value.get().getValue().toRating());
@@ -118,7 +120,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
         for (SpecialFieldValueViewModel value : specialField.getValues()) {
             MenuItem menuItem = new MenuItem(value.getMenuString(), value.getIcon().map(JabRefIcon::getGraphicNode).orElse(null));
-            menuItem.setOnAction(event -> specialField.setSpecialFieldValue(entry, value.getValue()));
+            menuItem.setOnAction(_ -> specialField.setSpecialFieldValue(entry, value.getValue()));
             contextMenu.getItems().add(menuItem);
         }
 

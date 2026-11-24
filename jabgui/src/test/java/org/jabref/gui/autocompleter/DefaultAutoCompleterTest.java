@@ -124,7 +124,7 @@ class DefaultAutoCompleterTest {
     }
 
     @Test
-    void completeBeginnigOfSecondWordReturnsWord() {
+    void completeBeginningOfSecondWordReturnsWord() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "test value");
         database.insertEntry(entry);

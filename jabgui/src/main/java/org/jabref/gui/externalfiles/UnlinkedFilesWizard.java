@@ -45,7 +45,7 @@ public class UnlinkedFilesWizard {
                 stage.setResizable(true);
                 stage.setWidth(650);
                 stage.setHeight(550);
-                stage.getIcons().addAll(IconTheme.getLogoSet());
+                IconTheme.applyLogo(stage);
             }
         });
 

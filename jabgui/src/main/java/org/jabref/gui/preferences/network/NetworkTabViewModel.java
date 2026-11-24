@@ -29,7 +29,8 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
 
@@ -49,7 +50,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
     private final BooleanProperty proxyPersistPasswordProperty = new SimpleBooleanProperty();
-    private final BooleanProperty passwordPersistAvailable = new SimpleBooleanProperty();
+    private final ReadOnlyBooleanProperty passwordPersistAvailable;
     private final ListProperty<CustomCertificateViewModel> customCertificateListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final Validator proxyHostnameValidator;
@@ -68,14 +69,19 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
+    private final CliPreferences preferences;
+
     public NetworkTabViewModel(DialogService dialogService,
-                               ProxyPreferences proxyPreferences,
+                               CliPreferences preferences,
                                InternalPreferences internalPreferences,
                                SSLPreferences sslPreferences,
-                               FilePreferences filePreferences) {
+                               FilePreferences filePreferences,
+                               ReadOnlyBooleanProperty keyringAvailable) {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
-        this.proxyPreferences = proxyPreferences;
+        this.preferences = preferences;
+        this.passwordPersistAvailable = keyringAvailable;
+        this.proxyPreferences = preferences.getProxyPreferences();
         this.internalPreferences = internalPreferences;
 
         backupProxyPreferences = new ProxyPreferences(
@@ -138,7 +144,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyUsernameProperty.setValue(proxyPreferences.getUsername());
         proxyPasswordProperty.setValue(proxyPreferences.getPassword());
         proxyPersistPasswordProperty.setValue(proxyPreferences.shouldPersistPassword());
-        passwordPersistAvailable.setValue(OS.isKeyringAvailable());
     }
 
     private void setSSLValues() {
@@ -167,11 +172,15 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyPreferences.setPort(proxyPortProperty.getValue().trim());
         proxyPreferences.setUseAuthentication(proxyUseAuthenticationProperty.getValue());
         proxyPreferences.setUsername(proxyUsernameProperty.getValue().trim());
-        proxyPreferences.setPersistPassword(proxyPersistPasswordProperty.getValue()); // Set before the password to actually persist
-        proxyPreferences.setPassword(proxyPasswordProperty.getValue());
         ProxyRegisterer.register(proxyPreferences);
 
         trustStoreManager.flush();
+    }
+
+    @Override
+    public Optional<CliPreferences.CredentialSave> prepareCredentialSave() {
+        return preferences.prepareProxyPasswordSave(proxyPasswordProperty.get(),
+                proxyPersistPasswordProperty.get() ? CredentialPersistence.SAVE : CredentialPersistence.SESSION_ONLY);
     }
 
     private Optional<Integer> getPortAsInt(String value) {
@@ -249,7 +258,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             } else {
                 dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException _) {
             // Why would that happen? Because one of developers inserted a failing url in testUrl...
         } catch (UnirestException _) {
             dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);

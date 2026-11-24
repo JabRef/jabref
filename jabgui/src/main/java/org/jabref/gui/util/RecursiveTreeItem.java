@@ -50,7 +50,7 @@ public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
             bindExpandedProperty(value, expandedProperty);
         }
 
-        valueProperty().addListener((obs, oldValue, newValue) -> {
+        valueProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 addChildrenListener(newValue);
                 bindExpandedProperty(newValue, expandedProperty);

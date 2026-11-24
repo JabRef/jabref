@@ -50,7 +50,7 @@ public class CustomLocalDragboard {
 
     /// Get a List of [BibEntry] from the dragboard
     ///
-    /// @return List of BibEntry or empty list if no entries are avaiable
+    /// @return List of BibEntry or empty list if no entries are available
     public List<BibEntry> getBibEntries() {
         if (hasBibEntries()) {
             return getValue(BIB_ENTRIES);
@@ -71,7 +71,7 @@ public class CustomLocalDragboard {
 
     /// Get a List of [PreviewLayout] from the dragboard
     ///
-    /// @return List of PreviewLayout or empty list if no entries are avaiable
+    /// @return List of PreviewLayout or empty list if no entries are available
     public List<PreviewLayout> getPreviewLayouts() {
         if (hasType(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS)) {
             return getValue(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS);

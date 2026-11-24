@@ -74,7 +74,7 @@ public class FileDialogConfiguration {
                     directory = directory.getParent();
                 }
                 // The lines above work also if the dir does not exist at all!
-                // NULL is accepted by the filechooser as no inital path
+                // NULL is accepted by the filechooser as no initial path
                 // Explicit null check, if somehow the parent is null, as Files.exists throws an NPE otherwise
                 if ((directory != null) && !Files.exists(directory)) {
                     directory = null;

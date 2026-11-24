@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -55,6 +56,12 @@ public class ThemeManager {
 
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+
+    private final ChangeListener<Scene> sceneChangeListener = (_, _, newScene) -> {
+        if (newScene != null) {
+            registerScene(newScene);
+        }
+    };
 
     /// Marks a scene whose root this manager already follows for the font size. A window re-enters
     /// [Window#getWindows()] every time it is shown again, and the scene it brings is the same one.
@@ -110,6 +117,7 @@ public class ThemeManager {
 
     private void updateFontStyleForScene(Scene scene) {
         scene.getRoot().getStyleClass().removeIf(styleClass -> styleClass.startsWith(FONT_SIZE_STYLE_CLASS_PREFIX));
+
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().getStyleClass().add(FONT_SIZE_STYLE_CLASS_PREFIX + workspacePreferences.getMainFontSize());
@@ -123,11 +131,8 @@ public class ThemeManager {
                     continue;
                 }
                 for (Window window : change.getAddedSubList()) {
-                    window.sceneProperty().addListener((_, _, newScene) -> {
-                        if (newScene != null) {
-                            registerScene(newScene);
-                        }
-                    });
+                    window.sceneProperty().removeListener(sceneChangeListener);
+                    window.sceneProperty().addListener(sceneChangeListener);
                     Scene scene = window.getScene();
                     if (scene != null) {
                         registerScene(scene);

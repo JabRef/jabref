@@ -35,7 +35,7 @@ public class EditorMenus {
         return () -> {
             MenuItem normalizeNames = new MenuItem(Localization.lang("Normalize to BibTeX name format"));
             EasyBind.subscribe(textInput.textProperty(), value -> normalizeNames.setDisable(StringUtil.isNullOrEmpty(value)));
-            normalizeNames.setOnAction(event -> textInput.setText(new NormalizeNamesFormatter().format(textInput.getText())));
+            normalizeNames.setOnAction(_ -> textInput.setText(new NormalizeNamesFormatter().format(textInput.getText())));
             List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(normalizeNames);
             menuItems.addAll(new DefaultMenu(textInput).get());
@@ -70,7 +70,7 @@ public class EditorMenus {
         return () -> {
             MenuItem cleanupURL = new MenuItem(Localization.lang("Cleanup URL link"));
             cleanupURL.setDisable(textField.textProperty().isEmpty().get());
-            cleanupURL.setOnAction(event -> textField.setText(new CleanupUrlFormatter().format(textField.getText())));
+            cleanupURL.setOnAction(_ -> textField.setText(new CleanupUrlFormatter().format(textField.getText())));
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(cleanupURL);
             return menuItems;

@@ -33,7 +33,7 @@ import static uk.ac.ed.ph.snuggletex.definitions.Globals.TEXT_MODE_ONLY;
 /// Similar check to [HTMLCharacterChecker].
 /// Here, we use <a href="https://github.com/davemckain/snuggletex">SnuggleTeX</a>, in the [HTMLCharacterChecker], it is searched for HTML characters.
 ///
-/// Unescaped ampersands cannot be checked by SnuggleTeX, therefore the [AmpersandChecker] is available additionaly.
+/// Unescaped ampersands cannot be checked by SnuggleTeX, therefore the [AmpersandChecker] is available additionally.
 public class LatexIntegrityChecker implements EntryChecker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexIntegrityChecker.class);

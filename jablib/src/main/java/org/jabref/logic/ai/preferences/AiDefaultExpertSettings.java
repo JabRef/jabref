@@ -12,8 +12,10 @@ import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 public class AiDefaultExpertSettings {
     public static final SummarizatorKind SUMMARIZATOR_KIND = SummarizatorKind.CHUNKED;
     public static final TokenEstimatorKind TOKEN_ESTIMATOR_KIND = TokenEstimatorKind.MAX;
-    public static final String EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L12-v2";
+    public static final String EMBEDDING_MODEL = "intfloat/multilingual-e5-small";
     public static final float TEMPERATURE = 0.7F;
+    /// Used for models JabRef does not know, e.g., local ones served by Ollama or Koboldcpp
+    public static final int CONTEXT_WINDOW_SIZE = 64 * 1024;
 
     public static final DocumentSplitterKind DOCUMENT_SPLITTER_KIND = DocumentSplitterKind.SLIDING_WINDOW;
     public static final int DOCUMENT_SPLITTER_CHUNK_SIZE = 300;
@@ -22,4 +24,6 @@ public class AiDefaultExpertSettings {
     public static final ResponseEngineKind RESPONSE_ENGINE_KIND = ResponseEngineKind.EMBEDDINGS_SEARCH;
     public static final int RAG_MAX_RESULTS_COUNT = 10;
     public static final float RAG_MIN_SCORE = 0.3F;
+
+    public static final boolean ENABLE_AI_DEBUG_PROVIDER = false;
 }

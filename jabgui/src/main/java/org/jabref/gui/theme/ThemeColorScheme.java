@@ -20,7 +20,7 @@ public enum ThemeColorScheme {
 
         try {
             return valueOf(colorScheme);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return FOLLOW_SYSTEM;
         }
     }

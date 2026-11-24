@@ -156,11 +156,11 @@ class MSBibEntry {
         String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
         String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
 
-        Optional<Date> parsedDateAcessed = Date.parse(Optional.ofNullable(yearAccessed),
+        Optional<Date> parsedDateAccessed = Date.parse(Optional.ofNullable(yearAccessed),
                 Optional.ofNullable(monthAccessed),
                 Optional.ofNullable(dayAccessed));
 
-        parsedDateAcessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
+        parsedDateAccessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
 
         NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
@@ -233,7 +233,7 @@ class MSBibEntry {
     /// Gets the dom representation for one entry, used for export
     ///
     /// @param document XmlDocument
-    /// @return XmlElement represenation of one entry
+    /// @return XmlElement representation of one entry
     public Element getEntryDom(Document document) {
         Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Source");
 
@@ -241,7 +241,7 @@ class MSBibEntry {
             addField(document, rootNode, entry.getKey(), entry.getValue());
         }
 
-        Optional.ofNullable(dateAccessed).ifPresent(field -> addDateAcessedFields(document, rootNode));
+        Optional.ofNullable(dateAccessed).ifPresent(_ -> addDateAccessedFields(document, rootNode));
 
         Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
 
@@ -329,7 +329,7 @@ class MSBibEntry {
         allAuthors.appendChild(authorTop);
     }
 
-    private void addDateAcessedFields(Document document, Element rootNode) {
+    private void addDateAccessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
         parsedDateAcesseField.flatMap(Date::getYear)
                              .map(Object::toString)
@@ -337,7 +337,7 @@ class MSBibEntry {
 
         parsedDateAcesseField.flatMap(Date::getMonth)
                              .map(Month::getFullName)
-                             .ifPresent(monthAcessed -> addField(document, rootNode, "Month" + "Accessed", monthAcessed));
+                             .ifPresent(monthAccessed -> addField(document, rootNode, "Month" + "Accessed", monthAccessed));
         parsedDateAcesseField.flatMap(Date::getDay)
                              .map(Object::toString)
                              .ifPresent(dayAccessed -> addField(document, rootNode, "Day" + "Accessed", dayAccessed));

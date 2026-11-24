@@ -2,6 +2,7 @@ package org.jabref.logic.ai.ingestion.repositories;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.l10n.Localization;
@@ -12,6 +13,8 @@ import org.jabref.logic.util.NotificationService;
 /// The class tracks files by their SHA-256 hash.
 public class MVStoreIngestedDocumentsRepository extends MVStoreBase implements IngestedDocumentsRepository {
     private static final String INGESTED_MAP_NAME = "ingested";
+    private static final String SETTINGS_MAP_NAME = "settings";
+    private static final String EMBEDDING_MODEL_KEY = "embeddingModel";
 
     // This map stores the ingested documents. The key is the SHA-256 hash of the file, and the value is a dummy boolean (always true).
     // If an entry is present, then it means the document was ingested. Otherwise, document was not ingested.
@@ -19,6 +22,7 @@ public class MVStoreIngestedDocumentsRepository extends MVStoreBase implements I
     // any embeddings because when we ingest a document embeddings are generated in series, so if 1 embedding is present
     // it doesn't mean the document is fully ingested.
     private final Map<String, Boolean> ingestedMap;
+    private final Map<String, String> settingsMap;
 
     public MVStoreIngestedDocumentsRepository(
             NotificationService dialogService,
@@ -27,6 +31,7 @@ public class MVStoreIngestedDocumentsRepository extends MVStoreBase implements I
         super(path, dialogService);
 
         this.ingestedMap = this.mvStore.openMap(INGESTED_MAP_NAME);
+        this.settingsMap = this.mvStore.openMap(SETTINGS_MAP_NAME);
     }
 
     public void markDocumentAsFullyIngested(String fileHash) {
@@ -43,6 +48,16 @@ public class MVStoreIngestedDocumentsRepository extends MVStoreBase implements I
 
     public void removeAll() {
         ingestedMap.clear();
+    }
+
+    @Override
+    public Optional<String> getEmbeddingModel() {
+        return Optional.ofNullable(settingsMap.get(EMBEDDING_MODEL_KEY));
+    }
+
+    @Override
+    public void setEmbeddingModel(String embeddingModel) {
+        settingsMap.put(EMBEDDING_MODEL_KEY, embeddingModel);
     }
 
     @Override

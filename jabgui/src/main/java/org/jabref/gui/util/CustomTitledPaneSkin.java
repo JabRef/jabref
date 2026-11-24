@@ -97,7 +97,7 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
 
         arrow.getTransforms().add(rotate);
 
-        registerChangeListener(control.graphicProperty(), ov -> adjustTitleLayout());
+        registerChangeListener(control.graphicProperty(), _ -> adjustTitleLayout());
     }
 
     /* ********************************************************
