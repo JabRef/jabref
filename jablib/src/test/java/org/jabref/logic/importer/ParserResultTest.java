@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -34,6 +38,59 @@ class ParserResultTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(bibEntry));
         ParserResult parserResult = new ParserResult(bibDatabase);
         assertFalse(parserResult.isEmpty());
+    }
+
+    @Test
+    void getDatabaseContextReturnsSameContextOnEveryCall() {
+        ParserResult parserResult = new ParserResult();
+        assertSame(parserResult.getDatabaseContext(), parserResult.getDatabaseContext());
+    }
+
+    @Test
+    void pathSetOnParserResultIsSeenByContext() {
+        ParserResult parserResult = new ParserResult();
+        BibDatabaseContext context = parserResult.getDatabaseContext();
+        Path path = Path.of("library.bib");
+
+        parserResult.setPath(path);
+
+        assertEquals(Optional.of(path), context.getDatabasePath());
+    }
+
+    @Test
+    void pathSetOnContextIsSeenByParserResult() {
+        ParserResult parserResult = new ParserResult();
+        Path path = Path.of("library.bib");
+
+        parserResult.getDatabaseContext().setDatabasePath(path);
+
+        assertEquals(Optional.of(path), parserResult.getPath());
+    }
+
+    @Test
+    void setMetaDataKeepsDatabaseAndPath() {
+        BibDatabase database = new BibDatabase();
+        ParserResult parserResult = new ParserResult(database);
+        Path path = Path.of("library.bib");
+        parserResult.setPath(path);
+        MetaData metaData = new MetaData();
+
+        parserResult.setMetaData(metaData);
+
+        BibDatabaseContext context = parserResult.getDatabaseContext();
+        assertSame(database, context.getDatabase());
+        assertSame(metaData, context.getMetaData());
+        assertEquals(Optional.of(path), context.getDatabasePath());
+    }
+
+    @Test
+    void setDatabaseContextIsReturnedByGetDatabaseContext() {
+        ParserResult parserResult = new ParserResult();
+        BibDatabaseContext context = new BibDatabaseContext();
+
+        parserResult.setDatabaseContext(context);
+
+        assertSame(context, parserResult.getDatabaseContext());
     }
 
     @Test
