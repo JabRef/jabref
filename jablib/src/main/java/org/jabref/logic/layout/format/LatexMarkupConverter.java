@@ -179,11 +179,22 @@ final class LatexMarkupConverter {
     /// Unicode spaces approximate TeX widths without adding layout machinery or requiring HTML5 entity support.
     private boolean convertControlSymbol(char symbol) {
         switch (symbol) {
-            case ' ', '#', '%', '\\', '_', '{', '}' -> output.append(symbol);
-            case '&' -> output.append("&amp;");
-            case ',' -> output.append('\u2009');
-            case ':' -> output.append('\u205F');
-            case ';' -> output.append('\u2005');
+            case ' ',
+                 '#',
+                 '%',
+                 '\\',
+                 '_',
+                 '{',
+                 '}' ->
+                    output.append(symbol);
+            case '&' ->
+                    output.append("&amp;");
+            case ',' ->
+                    output.append('\u2009');
+            case ':' ->
+                    output.append('\u205F');
+            case ';' ->
+                    output.append('\u2005');
             // Negative spacing has no representation in the supported markup.
             case '!' -> {
             }
