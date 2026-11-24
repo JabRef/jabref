@@ -67,4 +67,16 @@ class RisAuthorsTest {
         assertEquals("AU  - World Health Organization" + OS.NEWLINE + "AU  - Smith, John",
                 formatter.format("{World Health Organization}\n    and John Smith"));
     }
+
+    @Test
+    void namesSeparatedByMultipleSpacesAreSplit() {
+        assertEquals("AU  - Smith, John" + OS.NEWLINE + "AU  - Doe, Jane",
+                formatter.format("John Smith  Jane Doe"));
+    }
+
+    @Test
+    void namesSeparatedByLineBreakAreSplit() {
+        assertEquals("AU  - Smith, John" + OS.NEWLINE + "AU  - Doe, Jane",
+                formatter.format("John Smith\nJane Doe"));
+    }
 }
