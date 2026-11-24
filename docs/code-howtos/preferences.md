@@ -137,6 +137,19 @@ Further rules:
 * Defaults depending on the user's language must not be localized when the preferences are initialized, because the language may change later. See [ADR-0023](../decisions/0023-localized-preferences.md).
 * Defaults depending on the operating system (e.g., paths, commands) are computed in the preference object, too, e.g., using `org.jabref.logic.os.OS`.
 * Secrets (passwords, API keys, tokens) are not stored in the backing store but in the system keyring.
+  Custom API keys share one JSON object in a single keyring item; `fetcherCustomKeyBundleNames` records only their names in preferences.
+  An empty name list or disabled persistence prevents keyring reads at startup.
+  An absent name list identifies installations that still need migration from separate keyring items.
+  Web Search saves the complete key set in one operation and commits preference metadata only after the keyring operation succeeds.
+  Before replacing an established bundle, Web Search compares it with the loaded keys and rejects a stale update.
+  The Preferences dialog checks keyring availability once and saves changed credentials in background tasks.
+  The JavaFX thread applies each credential update after its keyring operation succeeds.
+  If a credential update fails, the dialog attempts the remaining updates and saves ordinary preferences before reporting the affected tabs.
+  Proxy password and GitHub token edits take effect for the current session when their keyring update fails.
+  The dialog stays open so failed updates can be retried.
+  The launcher loads credential preferences before JavaFX starts, and the dialog runs its final backing-store flush in a background task.
+  Preference imports preserve the local bundle's name list.
+  See [ADR 0085](../decisions/0085-bundle-custom-api-keys.md).
 
 ## Adding a new preference
 
