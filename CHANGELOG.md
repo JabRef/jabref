@@ -52,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added approximate author-only and year-only citations through "Cite special" for CSL styles in LibreOffice/OpenOffice, outside Zotero compatibility mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added "Settings → More settings" in the LibreOffice/OpenOffice panel to open JabRef's integration preferences without connecting a document. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added citation refresh in LibreOffice/OpenOffice for CSL styles that do not generate bibliographies. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We added entry details on hover to the JabRef language server, which now also reads `bibliography:` from Markdown front matter. [#17302](https://github.com/JabRef/jabref/pull/17302)
 
 ### Changed
 
@@ -84,6 +85,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed LibreOffice/OpenOffice bibliography refresh to remove outdated references and extra blank paragraphs only for the selected JabRef/Zotero citation mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice citation refresh to order citations by document text when citation positions on screen are unavailable. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We simplified secure credential storage and reduced macOS approval prompts for saved API keys. [#13687](https://github.com/JabRef/jabref/issues/13687)
 
 ### Fixed
 
@@ -122,6 +124,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing backups of values typed into newly added fields. [#17846](https://github.com/JabRef/jabref/pull/17846)
 - We fixed an issue where merging a backup file did not prompt the user to save upon exiting. [#12265](https://github.com/JabRef/jabref/issues/12265)
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
+- We fixed an issue where accepting changes from a backup did not mark the restored library as modified. [#15846](https://github.com/JabRef/jabref/issues/15846)
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
 - We fixed duplicate detection across compatible book-section and conference-paper entry types. [#17293](https://github.com/JabRef/jabref/issues/17293)
@@ -147,6 +150,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed API key validation when saving a new or edited key. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
+- We fixed the group icon picker background and borders not following the active theme. [#17887](https://github.com/JabRef/jabref/issues/17887)
 - We fixed subgroups disappearing after adding them from the "All entries" context menu in a new library. [#17764](https://github.com/JabRef/jabref/issues/17764)
 - We fixed an issue where group selections were lost when changing library tabs. [#1104](https://github.com/JabRef/jabref/issues/1104)
 - We fixed obsolete group assignments remaining after changing an explicit group's grouping method. [#8824](https://github.com/JabRef/jabref/issues/8824)
@@ -187,6 +191,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where searching for unlinked files failed when `.gitignore` contained a literal opening brace. [#17546](https://github.com/JabRef/jabref/issues/17546)
 - We fixed an issue on Windows where linked files with very long paths opened the file explorer, not the file. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where opening the backup folder from the backup dialog failed when a custom file browser was set. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
+- We fixed an issue where a file link was removed although the file could not be deleted or moved to the trash. [#17885](https://github.com/JabRef/jabref/pull/17885)
+- We fixed an issue where "Open terminal here" failed on Linux distributions without `/etc/alternatives/x-terminal-emulator`. [#17885](https://github.com/JabRef/jabref/pull/17885)
+- We fixed an issue where "Open folder(s)" did not select the file on Ubuntu and other Linux desktops. [#17885](https://github.com/JabRef/jabref/pull/17885)
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where the RIS importer overwrote the journal issue number (`IS`) with the accession number (`AN`). [#17817](https://github.com/JabRef/jabref/issues/17817)
@@ -201,6 +208,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing bibliography paragraph styles blocking JStyle citation insertion in LibreOffice/OpenOffice when bibliography synchronization is disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed LibreOffice/OpenOffice citation updates modifying citations marked for deletion through Track Changes after change recording was disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed edits to selected JStyle files not taking effect when inserting or refreshing citations in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed an issue where the generate citation keys toolbar button stopped working after canceling an overwrite. [#17748](https://github.com/JabRef/jabref/issues/17748)
 
 ### Removed
 

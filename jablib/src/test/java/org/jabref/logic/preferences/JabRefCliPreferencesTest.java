@@ -18,9 +18,9 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.style.BstStyle;
-import org.jabref.logic.openoffice.style.JStyle;
-import org.jabref.logic.openoffice.style.JStyleLoader;
+import org.jabref.logic.openoffice.bst.BstStyle;
+import org.jabref.logic.openoffice.jstyle.JStyle;
+import org.jabref.logic.openoffice.jstyle.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 
@@ -209,9 +209,10 @@ class JabRefCliPreferencesTest {
             assertEquals(4, secrets.size());
             assertEquals(List.of("test-reset"), preferences.getStringList("fetcherCustomKeyNames"));
 
+            Mockito.clearInvocations(keyring);
             preferences.clear();
 
-            verify(keyring).deletePassword("org.jabref.apikeys", "test-reset");
+            verify(keyring).deletePassword("org.jabref.apikeys.bundle", "keys");
             assertEquals(Map.of(), secrets);
             assertEquals(1, trustStores.constructed().size());
             verify(trustStores.constructed().getFirst()).clearCustomCertificates();

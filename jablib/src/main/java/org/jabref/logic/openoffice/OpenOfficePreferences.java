@@ -13,8 +13,8 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
-import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.bst.BstCitationFormat;
+import org.jabref.logic.openoffice.csl.CSLFormatUtils;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
 import org.jabref.model.openoffice.style.CitationType;
