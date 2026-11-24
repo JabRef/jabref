@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
@@ -22,11 +23,15 @@ import javafx.beans.value.ObservableValue;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
@@ -36,12 +41,26 @@ import org.jabref.model.groups.GroupTreeNode;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 public class BibEntryTableViewModel {
+    @NullMarked
+    public record NameValue(String display, Optional<Map.Entry<Field, String>> resolved, AuthorList sortNames, boolean externallyResolved) {
+        public String source() {
+            return resolved.map(Map.Entry::getValue).orElse("");
+        }
+
+        @Override
+        public String toString() {
+            return display;
+        }
+    }
+
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     @Nullable private Map<OrFields, ObservableValue<String>> fieldValues;
+    @Nullable private Map<OrFields, ObjectBinding<NameValue>> nameValues;
     @Nullable private Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues;
     private final BibDatabaseContext bibDatabaseContext;
     private boolean hasFullTextResults;
@@ -152,6 +171,49 @@ public class BibEntryTableViewModel {
                 getFieldValueDependencies());
         getFieldValues().put(fields, value);
         return value;
+    }
+
+    public ObservableValue<NameValue> getNameFields(OrFields fields) {
+        assert Platform.isFxApplicationThread();
+        if (nameValues == null) {
+            nameValues = new HashMap<>();
+        }
+        ObjectBinding<NameValue> binding = nameValues.computeIfAbsent(fields, key -> Bindings.createObjectBinding(
+                () -> createNameValue(key), getFieldValueDependencies()));
+        // An inherited value or macro may have changed without invalidating the row.
+        // Refresh the display and sort value together when the table requests the cell.
+        if (binding.isValid()) {
+            NameValue value = binding.get();
+            if (value.externallyResolved() && !value.resolved().equals(resolveNameField(fields))) {
+                binding.invalidate();
+            }
+        }
+        return binding;
+    }
+
+    private NameValue createNameValue(OrFields fields) {
+        String display = fieldValueFormatter.getValue().formatFieldsValues(fields, entry);
+        Optional<Map.Entry<Field, String>> resolved = resolveNameField(fields);
+        // A fallback title uses its entire display text as the primary collation component,
+        // so comparisons between names and titles use one consistent ordering.
+        AuthorList sortNames = resolved.map(value -> value.getKey().getProperties().contains(FieldProperty.PERSON_NAMES)
+                                                     ? AuthorList.parse(value.getValue()).latexFree()
+                                                     : AuthorList.of(new Author("", "", "", display, "")))
+                                       .orElseGet(AuthorList::of);
+        boolean externallyResolved = entry.hasField(StandardField.XDATA) || entry.hasField(StandardField.CROSSREF)
+                || fields.getFields().stream().map(entry::getFieldOrAlias).flatMap(Optional::stream)
+                         .anyMatch(value -> value.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL) >= 0);
+        return new NameValue(display, resolved, sortNames, externallyResolved);
+    }
+
+    private Optional<Map.Entry<Field, String>> resolveNameField(OrFields fields) {
+        for (Field field : fields.getFields()) {
+            Optional<String> value = entry.getResolvedFieldOrAlias(field, bibDatabaseContext.getDatabase());
+            if (value.isPresent()) {
+                return value.map(source -> Map.entry(field, source));
+            }
+        }
+        return Optional.empty();
     }
 
     private Map<OrFields, ObservableValue<String>> getFieldValues() {

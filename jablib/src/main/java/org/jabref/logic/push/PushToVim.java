@@ -8,14 +8,17 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class PushToVim extends AbstractPushToApplication {
 
     public static final PushApplications APPLICATION = PushApplications.VIM;
@@ -136,7 +139,7 @@ public class PushToVim extends AbstractPushToApplication {
                         command[2],
                         command[3]);
             }
-            processBuilder.start();
+            ProcessLauncher.startDetached(processBuilder);
         } catch (IOException e) {
             LOGGER.warn("Problem pushing to Vim.", e);
             couldNotCall = true;

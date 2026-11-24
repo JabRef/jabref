@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+                 xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                 xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                 xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+                 office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
+  <office:styles><style:default-style style:family="paragraph"><style:text-properties fo:font-size="12pt"/></style:default-style></office:styles>
+  <office:body>
+    <office:text>
+      <text:p>Before <text:reference-mark-start text:name="JABREF_alpha NORMAL goldenAlpha"/>&#x200B;[1]&#x200B;<text:reference-mark-end text:name="JABREF_alpha NORMAL goldenAlpha"/> after.</text:p>
+      <text:p>Note<text:note text:id="ftn1" text:note-class="footnote"><text:note-citation>1</text:note-citation><text:note-body><text:p>Footnote <text:reference-mark-start text:name="JABREF_beta NORMAL goldenBeta"/>&#x200B;[2]&#x200B;<text:reference-mark-end text:name="JABREF_beta NORMAL goldenBeta"/>.</text:p></text:note-body></text:note> anchor.</text:p>
+      <table:table table:name="Citations"><table:table-column/><table:table-row><table:table-cell office:value-type="string"><text:p>Table <text:reference-mark-start text:name="JABREF_gamma NORMAL goldenGamma"/>&#x200B;[3]&#x200B;<text:reference-mark-end text:name="JABREF_gamma NORMAL goldenGamma"/>.</text:p></table:table-cell></table:table-row></table:table>
+      <text:p>Empty <text:reference-mark-start text:name="JABREF_delta EMPTY goldenEmpty"/>&#x200B;&#x200B;<text:reference-mark-end text:name="JABREF_delta EMPTY goldenEmpty"/> end.</text:p>
+    </office:text>
+  </office:body>
+</office:document>

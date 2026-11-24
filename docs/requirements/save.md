@@ -47,6 +47,16 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Changes accepted from a backup must be recorded in the undo history of the restored library
+`req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1`
+
+Issue: [#15846](https://github.com/JabRef/jabref/issues/15846)
+
+When a library is opened and the user accepts changes while reviewing its backup, the merge must be recorded in the undo history of the tab that shows the library.
+Then the library is marked as modified and the merge can be undone; otherwise, the restored library looks saved and the restored content is lost when it is closed.
+
+Needs: impl, utest
+
 ## Backup must batch field edits into scheduled writes
 `req~jabgui.autosaveandbackup.backup-every-edit~1`
 
@@ -111,6 +121,27 @@ Needs: impl, utest
 `req~save.cleanup.latex-to-unicode-aware-latex.keep-escaped-characters~1`
 
 Escaped LaTeX special characters (`\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `\\`) stay escaped, because the unescaped character has a different meaning in LaTeX.
+
+Needs: impl, utest
+
+### JabRef must preserve extended name parts on save
+`req~save.names.preserve-extended-parts~1`
+
+BibLaTeX extended name attributes include keys such as `family=`, `given=`, `prefix=`, and `useprefix=`.
+
+Needs: impl, utest
+
+### Name normalization must preserve BibLaTeX extended name data
+`req~save.names.normalize-extended-parts~1`
+
+Normalization preserves name attributes, name-list options, and quotes protecting individual name parts. If an extended name has malformed syntax or repeats an attribute, normalization preserves the field as entered.
+
+Needs: impl, utest
+
+### Citation key generation must normalize extended names to readable name parts
+`req~save.citation-keys.normalize-extended-names~1`
+
+The `normalize_names` modifier in a citation key pattern uses the names without their BibLaTeX attribute labels. Saving and reopening the entry preserves the generated key and the original name field.
 
 Needs: impl, utest
 

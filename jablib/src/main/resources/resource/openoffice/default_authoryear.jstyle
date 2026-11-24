@@ -15,7 +15,7 @@ ReferenceParagraphFormat="Text body"
 ReferenceHeaderParagraphFormat="Heading 2"
 
 CITATION
-BibtexKeyCitations=false
+BibTeXKeyCitations=false
 AuthorField="author/editor"
 YearField="year"
 MaxAuthors="2"
