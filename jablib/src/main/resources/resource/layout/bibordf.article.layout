@@ -8,7 +8,7 @@
 
 
 \begin{author}
-   \format[XMLChars,CreateBibORDFAuthors]{\author}
+   \format[CreateBibORDFAuthors]{\author}
 \end{author}
 
 </bibo:Article>
