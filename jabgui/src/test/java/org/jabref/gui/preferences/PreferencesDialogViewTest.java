@@ -3,6 +3,7 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Bounds;
@@ -22,6 +23,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
@@ -46,6 +48,7 @@ class PreferencesDialogViewTest extends JavaFxTest {
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
         Injector.setModelOrService(GuiPreferences.class, mock(GuiPreferences.class));
         Injector.setModelOrService(KeyBindingRepository.class, new KeyBindingRepository());
+        Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
 
         PreferencesTab firstTab = tab("First", new Label("First setting"));
         target = new Label("A setting near the bottom");
@@ -60,6 +63,8 @@ class PreferencesDialogViewTest extends JavaFxTest {
                 (viewModel, _) -> {
                     when(viewModel.getPreferenceTabs()).thenReturn(FXCollections.observableArrayList(firstTab, secondTab));
                     when(viewModel.getMemoryStickProperty()).thenReturn(new SimpleBooleanProperty());
+                    when(viewModel.savingProperty()).thenReturn(new ReadOnlyBooleanWrapper().getReadOnlyProperty());
+                    when(viewModel.checkingKeyringProperty()).thenReturn(new ReadOnlyBooleanWrapper().getReadOnlyProperty());
                 })) {
             dialog = new PreferencesDialogView(firstTab.getClass().asSubclass(PreferencesTab.class));
         }

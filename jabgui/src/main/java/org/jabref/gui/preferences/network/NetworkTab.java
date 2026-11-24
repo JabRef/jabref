@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -39,13 +40,14 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
     private TextField proxyUsername;
     private EnhancedPasswordField proxyPassword;
 
-    public NetworkTab() {
+    public NetworkTab(ReadOnlyBooleanProperty keyringAvailable) {
         this.viewModel = new NetworkTabViewModel(
                 dialogService,
-                preferences.getProxyPreferences(),
+                preferences,
                 preferences.getInternalPreferences(),
                 preferences.getSSLPreferences(),
-                preferences.getFilePreferences());
+                preferences.getFilePreferences(),
+                keyringAvailable);
         buildView();
     }
 
