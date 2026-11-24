@@ -1,9 +1,12 @@
 package org.jabref.gui.preferences.external;
 
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -30,8 +33,8 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
 
     // Kept as fields so validation can be attached after the grids are assembled.
     private TextField citeCommand;
-    private TextArea customTerminalCommand;
-    private TextArea customFileBrowserCommand;
+    private TextField customTerminalCommand;
+    private TextField customFileBrowserCommand;
 
     public ExternalTab() {
         this.viewModel = new ExternalTabViewModel(
@@ -107,17 +110,17 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     private Node buildCustomApplicationsGrid() {
-        String dirPlaceholderHint = Localization.lang("Enter the application on the first line and one argument per following line. Use %DIR% for the library directory.");
-
         CheckBox useCustomTerminal = new CheckBox(Localization.lang("Use custom terminal emulator"));
         useCustomTerminal.selectedProperty().bindBidirectional(viewModel.useCustomTerminalProperty());
-        customTerminalCommand = commandField(dirPlaceholderHint, viewModel.customTerminalCommandProperty(), useCustomTerminal);
+        customTerminalCommand = commandField(viewModel.customTerminalCommandProperty(), useCustomTerminal);
         Button terminalBrowse = browseButton(useCustomTerminal, viewModel::customTerminalBrowse);
+        Button terminalArguments = argumentsButton(viewModel.customTerminalCommandProperty(), useCustomTerminal);
 
         CheckBox useCustomFileBrowser = new CheckBox(Localization.lang("Use custom file browser"));
         useCustomFileBrowser.selectedProperty().bindBidirectional(viewModel.useCustomFileBrowserProperty());
-        customFileBrowserCommand = commandField(dirPlaceholderHint, viewModel.customFileBrowserCommandProperty(), useCustomFileBrowser);
+        customFileBrowserCommand = commandField(viewModel.customFileBrowserCommandProperty(), useCustomFileBrowser);
         Button fileBrowserBrowse = browseButton(useCustomFileBrowser, viewModel::customFileBrowserBrowse);
+        Button fileBrowserArguments = argumentsButton(viewModel.customFileBrowserCommandProperty(), useCustomFileBrowser);
 
         GridPane grid = new GridPane();
         grid.setHgap(4.0);
@@ -129,23 +132,42 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         ColumnConstraints commandColumn = new ColumnConstraints();
         commandColumn.setHgrow(Priority.ALWAYS);
         commandColumn.setMinWidth(100.0);
-        grid.getColumnConstraints().addAll(checkColumn, commandColumn, new ColumnConstraints());
+        grid.getColumnConstraints().addAll(checkColumn, commandColumn, new ColumnConstraints(), new ColumnConstraints());
         grid.add(useCustomTerminal, 0, 0);
         grid.add(customTerminalCommand, 1, 0);
         grid.add(terminalBrowse, 2, 0);
+        grid.add(terminalArguments, 3, 0);
         grid.add(useCustomFileBrowser, 0, 1);
         grid.add(customFileBrowserCommand, 1, 1);
         grid.add(fileBrowserBrowse, 2, 1);
+        grid.add(fileBrowserArguments, 3, 1);
         return grid;
     }
 
-    private TextArea commandField(String tooltip, javafx.beans.property.StringProperty value, CheckBox enabler) {
-        TextArea field = new TextArea();
-        field.setPrefRowCount(3);
-        field.textProperty().bindBidirectional(value);
-        field.setTooltip(new Tooltip(tooltip));
+    private TextField commandField(StringProperty value, CheckBox enabler) {
+        TextField field = new TextField(ExternalTabViewModel.getExecutable(value.get()));
+        value.addListener((_, _, command) -> field.setText(ExternalTabViewModel.getExecutable(command)));
+        field.textProperty().addListener((_, _, executable) -> value.set(ExternalTabViewModel.replaceExecutable(value.get(), executable)));
+        field.setTooltip(new Tooltip(Localization.lang("Application")));
+        field.setAccessibleText(enabler.getText());
         field.disableProperty().bind(enabler.selectedProperty().not());
         return field;
+    }
+
+    private Button argumentsButton(StringProperty command, CheckBox enabler) {
+        Button button = new Button(Localization.lang("Arguments"));
+        button.disableProperty().bind(enabler.selectedProperty().not());
+        button.setOnAction(_ -> {
+            TextArea arguments = new TextArea(ExternalTabViewModel.getArguments(command.get()));
+            arguments.setPrefRowCount(5);
+            DialogPane pane = new DialogPane();
+            pane.setHeaderText(Localization.lang("Enter one argument per line. Use %DIR% for the library directory."));
+            pane.setContent(arguments);
+            dialogService.showCustomDialogAndWait(Localization.lang("Arguments"), pane, ButtonType.OK, ButtonType.CANCEL)
+                         .filter(ButtonType.OK::equals)
+                         .ifPresent(_ -> command.set(ExternalTabViewModel.replaceArguments(command.get(), arguments.getText())));
+        });
+        return button;
     }
 
     private Button browseButton(CheckBox enabler, Runnable action) {

@@ -224,6 +224,20 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                      .ifPresent(file -> customFileBrowserCommandProperty.setValue(replaceExecutable(customFileBrowserCommandProperty.getValue(), file.toAbsolutePath().toString())));
     }
 
+    static String getExecutable(String command) {
+        int endOfExecutable = command.indexOf('\n');
+        return endOfExecutable < 0 ? command : command.substring(0, endOfExecutable);
+    }
+
+    static String getArguments(String command) {
+        int endOfExecutable = command.indexOf('\n');
+        return endOfExecutable < 0 ? "" : command.substring(endOfExecutable + 1);
+    }
+
+    static String replaceArguments(String command, String arguments) {
+        return getExecutable(command) + (arguments.isEmpty() ? "" : "\n" + arguments);
+    }
+
     static String replaceExecutable(String command, String executable) {
         int endOfExecutable = command.indexOf('\n');
         return endOfExecutable < 0 ? executable : executable + command.substring(endOfExecutable);
