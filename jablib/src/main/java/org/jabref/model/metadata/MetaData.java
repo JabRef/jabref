@@ -4,10 +4,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.SortedSet;
 
 import javafx.beans.property.ObjectProperty;
@@ -40,10 +42,31 @@ import org.jspecify.annotations.Nullable;
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
+
+    /// Opens the `@Comment` that holds everything JabRef stores as one embedded JSON object, rather
+    /// than as one `jabref-meta:` item per setting. The version is the format's, not JabRef's: a
+    /// reader knows from it what the object may contain.
+    public static final String META_FLAG_V1 = "jabref-meta-0.1.0";
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     public static final String ENTRYTYPE_FLAG_V2 = "jabref-entrytype-v2: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String SAVE_ACTIONS = "saveActions";
+
+    /// What the library asks JabFix to do, inside the embedded JSON metadata. Named after what it
+    /// asks for and not after what does it, so that the name survives the component being renamed.
+    public static final String FORMATTING = "formatting";
+
+    /// The mode inside that block: the key of a named set of rules JabFix ships, which the rules
+    /// beside it are laid over.
+    public static final String FORMATTING_MODE = "mode";
+
+    /// The rules inside that block. They are one key of it rather than the block itself, so that
+    /// the mode can stand beside them without a reader having to know which keys are rule ids.
+    public static final String FORMATTING_RULES = "rules";
+
+    /// The mode of a rule whose entry opens into an object, where it stands beside the values the
+    /// rule takes.
+    public static final String FORMATTING_RULE_MODE = "mode";
     public static final String LIBRARY_ABBREVIATION_TYPE = "libraryAbbreviationType";
     public static final String KEYWORD_SEPARATOR = "keywordSeparator";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
@@ -83,7 +106,7 @@ public class MetaData {
     @Nullable private SaveOrder saveOrder;
     @Nullable private String defaultCiteKeyPattern;
     @Nullable private FieldFormatterCleanupActions saveActions;
-    @Nullable private LintSettings lintSettings;
+    @Nullable private LintSettings formatting;
     @Nullable private BibDatabaseMode mode;
     @Nullable private AbbreviationType libraryAbbreviationType;
     @Nullable private Character keywordSeparator;
@@ -94,6 +117,7 @@ public class MetaData {
     private final ContentSelectors contentSelectors = new ContentSelectors();
 
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
+    private final SequencedMap<String, String> unknownJsonMetaData = new LinkedHashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     @Nullable private String versionDBStructure;
@@ -255,17 +279,18 @@ public class MetaData {
         postChange();
     }
 
-    /// What the library asks JabFix to do when it is saved. Empty for a library that says nothing,
-    /// which is saved the way it always was.
+    /// What the library itself asks JabFix to do, which is what is written back to the `.bib` file.
     ///
-    /// Not written to the `.bib` file yet: the settings are read from the command line so far, and
-    /// storing them in a `jabref-meta` entry is a change of its own.
-    public Optional<LintSettings> getLintSettings() {
-        return Optional.ofNullable(lintSettings);
+    /// This is the library's own configuration, so only reading the file and configuring the
+    /// library set it -- not a command that merely wants different rules applied once, which hands
+    /// them to the writer instead. Configuring a library is `JabFixConfiguration#configure`, which
+    /// moves its Save Actions into the configuration as well.
+    public Optional<LintSettings> getFormatting() {
+        return Optional.ofNullable(formatting);
     }
 
-    public void setLintSettings(@NonNull LintSettings lintSettings) {
-        this.lintSettings = lintSettings;
+    public void setFormatting(@NonNull LintSettings formatting) {
+        this.formatting = formatting;
         postChange();
     }
 
@@ -425,8 +450,8 @@ public class MetaData {
         postChange();
     }
 
-    public void clearLintSettings() {
-        lintSettings = null;
+    public void clearFormatting() {
+        formatting = null;
         postChange();
     }
 
@@ -463,6 +488,8 @@ public class MetaData {
         blgFilePathMap.putAll(other.blgFilePathMap);
         unknownMetaData.clear();
         unknownMetaData.putAll(other.unknownMetaData);
+        unknownJsonMetaData.clear();
+        unknownJsonMetaData.putAll(other.unknownJsonMetaData);
 
         contentSelectors.setAll(other.contentSelectors.getContentSelectors());
 
@@ -472,7 +499,7 @@ public class MetaData {
         saveOrder = other.saveOrder;
         defaultCiteKeyPattern = other.defaultCiteKeyPattern;
         saveActions = other.saveActions;
-        lintSettings = other.lintSettings;
+        formatting = other.formatting;
         mode = other.mode;
         libraryAbbreviationType = other.libraryAbbreviationType;
         keywordSeparator = other.keywordSeparator;
@@ -573,6 +600,20 @@ public class MetaData {
         unknownMetaData.put(key, value);
     }
 
+    /// What the embedded JSON metadata said that this JabRef does not model, by key, each as the
+    /// JSON text of its value, in the order the file had them.
+    ///
+    /// A library written by a newer JabRef is opened, saved and handed back with everything it
+    /// arrived with, rather than with the parts this one happens to understand. This is the same
+    /// promise [#getUnknownMetaData()] makes for the `jabref-meta:` items, kept the same way.
+    public SequencedMap<String, String> getUnknownJsonMetaData() {
+        return Collections.unmodifiableSequencedMap(unknownJsonMetaData);
+    }
+
+    public void putUnknownJsonMetaDataItem(@NonNull String key, @NonNull String json) {
+        unknownJsonMetaData.put(key, json);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -591,7 +632,7 @@ public class MetaData {
                 && Objects.equals(latexFileDirectory, that.latexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
                 && Objects.equals(saveActions, that.saveActions)
-                && Objects.equals(lintSettings, that.lintSettings)
+                && Objects.equals(formatting, that.formatting)
                 && (mode == that.mode)
                 && (libraryAbbreviationType == that.libraryAbbreviationType)
                 && Objects.equals(keywordSeparator, that.keywordSeparator)
@@ -607,12 +648,12 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, lintSettings, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, formatting, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", lintSettings=" + lintSettings + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", formatting=" + formatting + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {

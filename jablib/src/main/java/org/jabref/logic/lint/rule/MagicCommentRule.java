@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -17,8 +18,10 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// A misspelled id in `% jabref-format-ignore` switches nothing off, which is the one thing a user of it
 /// never notices: the entry is repaired as if the comment were not there. The id is therefore held
-/// against the rules of the run, and one that names none of them is reported like any other
-/// finding -- with no fix, since only the person who wrote the comment knows what was meant.
+/// against every rule JabFix knows, and one that names none of them is reported like any other
+/// finding -- with no fix, since only the person who wrote the comment knows what was meant. A rule
+/// that merely is not enabled in this run counts as known, so switching one off does not turn the
+/// comments that name it into findings.
 ///
 /// A token the parser could not take apart, such as `author:` or `author:title:page-ranges`, is
 /// kept as one rule id by [Suppressions] and so lands here as well. A regex is reported when it
@@ -31,18 +34,18 @@ import org.jspecify.annotations.NullMarked;
 /// entry that has no such field is a typo in all but name. A field regex is reported when it
 /// matches neither a field JabRef knows nor one the entry carries.
 ///
-/// The rule is not one of [RuleSet#all]: it needs the ids of the run it belongs to, which
-/// [org.jabref.logic.lint.JabFix] hands it. Its own id counts as known, so `% jabref-format-ignore
-/// magic-comment` silences it where a comment is meant as it is written.
+/// It is one of [RuleSet#builtIn], so it runs where a mode or the rules enable it, like any other.
+/// Its own id counts as known, so `% jabref-format-ignore magic-comment` silences it where a
+/// comment is meant as it is written.
 @NullMarked
 public class MagicCommentRule implements Rule {
-    private static final String ID = "magic-comment";
+    public static final String ID = "magic-comment";
 
     private static final Set<Field> KNOWN_FIELDS = FieldFactory.getAllFieldsWithOutInternal();
 
     private final Set<String> knownRuleIds;
 
-    /// @param knownRuleIds the ids of the rules the run applies
+    /// @param knownRuleIds the ids of every rule JabFix knows
     public MagicCommentRule(Set<String> knownRuleIds) {
         this.knownRuleIds = Stream.concat(knownRuleIds.stream(), Stream.of(ID)).collect(Collectors.toUnmodifiableSet());
     }
@@ -54,7 +57,7 @@ public class MagicCommentRule implements Rule {
 
     @Override
     public String description() {
-        return "Reports a magic comment that names no rule.";
+        return Localization.lang("Reports a magic comment that names no rule.");
     }
 
     @Override
@@ -67,16 +70,16 @@ public class MagicCommentRule implements Rule {
     private Stream<Finding> forRules(BibEntry entry, Suppressions.Token token) {
         Stream<String> unknownIds = token.rules().stream()
                                          .filter(ruleId -> !knownRuleIds.contains(ruleId))
-                                         .map("switches off \"%s\", which is no rule of this run"::formatted);
+                                         .map(ruleId -> Localization.lang("the magic comment switches off \"%0\", which is no rule of this run", ruleId));
         Stream<String> unmatchedRegexes = token.ruleRegexes().stream()
                                                .filter(regex -> knownRuleIds.stream().noneMatch(ruleId -> Suppressions.Token.ruleMatches(regex, ruleId)))
-                                               .map("switches off /%s/, which matches no rule of this run"::formatted);
+                                               .map(regex -> Localization.lang("the magic comment switches off /%0/, which matches no rule of this run", regex));
 
         List<Optional<Field>> reportedOn = token.fields().isEmpty()
                                            ? List.of(Optional.empty())
                                            : token.fields().stream().map(Optional::of).toList();
         return Stream.concat(unknownIds, unmatchedRegexes)
-                     .flatMap(what -> reportedOn.stream().map(field -> finding(entry, field, what)));
+                     .flatMap(message -> reportedOn.stream().map(field -> finding(entry, field, message)));
     }
 
     private Stream<Finding> forFields(BibEntry entry, Suppressions.Token token) {
@@ -84,16 +87,16 @@ public class MagicCommentRule implements Rule {
                                              .filter(field -> field instanceof UnknownField)
                                              .filter(field -> !entry.hasField(field))
                                              .map(field -> finding(entry, Optional.of(field),
-                                                     "names the field \"%s\", which is neither a BibTeX field nor one this entry has".formatted(field.getName())));
+                                                     Localization.lang("the magic comment names the field \"%0\", which is neither a BibTeX field nor one this entry has", field.getName())));
         Stream<Finding> unmatchedRegexes = token.fieldRegexes().stream()
                                                 .filter(regex -> Stream.concat(KNOWN_FIELDS.stream(), entry.getFields().stream())
                                                                        .noneMatch(field -> Suppressions.Token.fieldMatches(regex, field)))
                                                 .map(regex -> finding(entry, Optional.empty(),
-                                                        "names the fields /%s/, which match neither a BibTeX field nor one this entry has".formatted(regex)));
+                                                        Localization.lang("the magic comment names the fields /%0/, which match neither a BibTeX field nor one this entry has", regex)));
         return Stream.concat(missingFields, unmatchedRegexes);
     }
 
-    private Finding finding(BibEntry entry, Optional<Field> field, String what) {
-        return new Finding(this, entry, field, "the magic comment " + what, Optional.empty());
+    private Finding finding(BibEntry entry, Optional<Field> field, String message) {
+        return new Finding(this, entry, field, message, Optional.empty());
     }
 }

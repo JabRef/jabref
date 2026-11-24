@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 /// above one entry add up, and every other comment line is left to whoever wrote it.
 ///
 /// Rule ids are not checked here against the rules that exist, because the parser does not know
-/// them -- [RuleSet#without] does that for the ids given on the command line. A token that cannot
+/// them -- [RuleSet#rejectUnknown] does that for the ids given on the command line. A token that cannot
 /// be taken apart -- an empty item as in `author:` or `author,,title:page-ranges`, a colon too many,
 /// or a regex that is not closed or does not compile -- is therefore kept whole as one rule id, so
 /// that it surfaces as an unknown rule once ids are checked, rather than being dropped here.

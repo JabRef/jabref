@@ -10,6 +10,8 @@ Defaults will be based on a study of `.bib` files on GitHub.
 ```text
 JabFix.java          applies a RuleSet to the entries of a library
 JabFixResult.java    findings + the field changes the repairs made
+JabFixMode.java      the modes: named sets of rules with their modes
+JabFixConfiguration  what a run applies, layer by layer, and configuring a library
 rule/                API: Rule, Finding, Fix, RuleSet, FieldValueRule, CleanupRule, SaveActionRule,
                      MagicCommentRule, Suppressions
 rules/               the built-in rules
@@ -26,17 +28,32 @@ Rules run once each, in `RuleSet` order, and must be idempotent.
 The asking is `LintSettings` in the library's `MetaData`, next to its Save Actions:
 
 ```java
-databaseContext.getMetaData().setLintSettings(new LintSettings(Map.of(
-        "surrounding-whitespace", RuleMode.FIX)));
+databaseContext.getMetaData().setFormatting(
+        LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
 
 BibDatabaseWriter writer = new BibDatabaseWriter(...);
 writer.writeDatabase(databaseContext);
 List<Finding> findings = writer.getFindings();
 ```
 
-The writer resolves the settings into a rule set itself, with `RuleSet.forLibrary`, which carries the library's own Save Actions into the run, and `RuleSet.asConfiguredBy`, which lets each rule go as far as the library allows.
+The writer resolves the settings into a rule set itself: `JabFixConfiguration.applied` puts the layers below together, and `RuleSet.configuredBy` builds the rules they name, each going as far as they allow.
 
-`LintSettings` holds one `RuleMode` per rule id, and a rule runs only where the library names it:
+`setFormatting` is what the library says about itself, and it is what is written back to the file; `JabFixConfiguration.configure` sets it and moves the library's Save Actions into it on the way.
+A command that formats a library hands the rules of its run to the writer with `asFormatterRun` instead, so that `jabkit fix --rule lower-case=off` does not leave the library configured that way, and so that formatting a library does not hand it a configuration it never had.
+
+A run applies four layers, each outranking the ones before it:
+
+1. a mode — `JabFixMode`, a set of rules with their modes that JabFix ships — the run's where it names one, otherwise the library's,
+2. the library's Save Actions, while it still has its `saveActions` item: each repairs on its field,
+3. the rules the library's configuration names,
+4. the rules the run names.
+
+A rule none of them names does not run: JabFix is off by default, and `jabkit fix` warns when nothing is enabled.
+A layer outranks another per rule — a selector about every field replaces everything the layer below says about that rule, one about a field only that field — so a rule only the library names still runs when the command line names others.
+The Save Actions rank right below the configuration's rules, which is why moving them into it changes nothing a run applies.
+The modes are placeholders for now.
+
+`LintSettings` holds the mode and, per `RuleSelector` — a rule, on one field or on every field it looks at — a `RuleSettings`, which is the values the rule takes and one `RuleMode`:
 
 | Mode    | What the rule does                                      |
 |---------|---------------------------------------------------------|
@@ -45,20 +62,68 @@ The writer resolves the settings into a rule set itself, with `RuleSet.forLibrar
 | `FIX`   | reports what it finds and repairs it                    |
 
 So a library can have three rules report and three others repair, in one place per rule.
-A library that carries no settings has nothing done to it, which is how every library written before this reads.
-A checked rule is wrapped by `CheckOnlyRule`, which takes the `Fix` off its findings, so the run then handles them the way it already handles a rule that knows no repair: `jabkit fix` says them out loud instead of letting them pass unseen in the output.
-This is also where the value a rule takes will go, once rules take any — it belongs to the entry that configures the rule, not to a list beside it.
+Every formatter a Save Action can use is a rule too, by its key in kebab-case (`title:lower-case`), whether or not the library has such a Save Action.
+Naming a field narrows an entry to that field, and the more specific entry wins, so a library can have a rule repair everywhere and only report on its titles.
+A selector naming `all` or `all-text-fields` is about every field the rule visits, since a Save Action may be configured with those while its findings name the concrete fields it went through.
+A rule is wrapped in `ConfiguredRule`, which settles per finding how far the rule goes there — taking the `Fix` off a checked one, so the run handles it the way it already handles a rule that knows no repair: `jabkit fix` says it out loud instead of letting it pass unseen in the output.
+The values a rule takes belong to the entry that configures it as well, not to a list beside it: `Rule#configuredWith` hands them to the rule, and a rule that cannot read them is passed over with a warning.
 
-An id naming no rule of this JabFix is passed over rather than rejected, so that a library configured by a newer JabFix still saves with an older one; an id a user typed is held against the rules instead, which is what makes `jabkit fix --disable typo` a usage error.
+An id naming no rule of this JabFix is passed over rather than rejected, so that a library configured by a newer JabFix still saves with an older one; an id a user typed is held against the rules instead, which is what makes `jabkit fix --rule typo=off` a usage error.
 
-For such a library the rules are the only thing that changes an entry: the writer applies neither the Save Actions nor its whitespace cleanup on its own, and it generates no citation keys and abbreviates no journals, because nothing may be changed that no rule reported.
+For such a library the writer applies neither the Save Actions nor its whitespace cleanup on its own; the rules do.
+Citation keys are still generated and journals abbreviated on an ordinary save, so that configuring a library does not switch off what its other users rely on; only a formatter run (`jabkit fix`) leaves them out, because it changes nothing that no rule reported.
 What a repair changed is reported as a `FieldChange`, the same way a Save Action's change is, so that it can be undone, and every mutation goes through the writer's mutation scheduler, so a GUI can keep them on the JavaFX thread.
 
-A library that carries no settings is saved the way it always was; carrying them at all is what asks for anything to be done, so there is no flag to switch off.
+A library that carries no settings is saved by the GUI the way it always was; carrying them at all, even an empty block, is what hands it to JabFix.
 Layout is normalized by `BibDatabaseWriter` either way, so a library JabFix has already formatted produces no diff.
+The exception is an entry nothing changed, which a save writes back as it was read, so `entry-brackets` replaces the delimiters of `@Article( ... )` in what was read rather than leaving it to the writer.
+What the writer does write anew it encloses in the bracket that rule goes by, wherever the rule runs, so that the run meant to bring a library in line does not undo it.
+Where the rule does not run, that is braces, which in a formatter run means every entry; a magic comment naming the rule does not change what the writer writes either.
 
-`LintSettings` are not written to the `.bib` file yet — `jabkit fix` sets them on the library it has just read.
-Storing them in a `jabref-meta` entry is the next step.
+## Where the settings are stored
+
+In the library, as a `formatting` block of the embedded JSON metadata:
+
+```bibtex
+@Comment{jabref-meta-0.1.0
+{
+  "formatting" : {
+    "mode" : "whitespace",
+    "rules" : {
+      "repeated-whitespace" : "off",
+      "title:lower-case" : "check"
+    }
+  }
+}
+}
+```
+
+`mode` names a `JabFixMode`; one this JabFix does not know is passed over, like a rule it does not know.
+A key of `rules` is `rule-id`, or `field:rule-id` for one field; the rule id is what stands after the last colon, since a rule id never contains one while a BibTeX field name may.
+The comma lists and `/regex/` items the magic comments above an entry accept are not read here yet, and a key that looks like one is not read at all rather than read as a field name containing a comma.
+A mode is spelled in lower case, and only in lower case.
+
+A rule that takes values opens its entry into an object, with its mode under `mode` and the values beside it:
+
+```json
+"entry-brackets" : {
+  "mode" : "fix",
+  "bracket" : "parentheses"
+}
+```
+
+`entry-brackets` takes `bracket`, which is `parentheses` or `braces`; without it, the rule goes by braces.
+A value is a string, and only an entry naming no field holds any; an entry that holds something else is not read.
+An entry holding no values is written back as its mode.
+A layer that only states a mode, such as `--rule entry-brackets=check`, leaves the values stated below it standing.
+
+What this JabFix cannot read — a selector spelled some other way, a mode it does not know, or something standing beside the rules — is written back as it came, so a library configured by a newer JabFix is handed back with what it arrived with.
+
+A `saveActions` item that is still there is read beside this block, as the layer right below its rules, and `JabFixConfiguration.configure` moves it into the block.
+The `rules` key exists so that the mode can stand beside them; the decision, and the form of an entry in detail, is ADR-0075.
+
+`@Comment{jabref-meta-0.1.0 ...}` is the single embedded JSON object of <https://github.com/JabRef/jabref/issues/10371>.
+A `jabref-meta:` item could not hold this: its separator is the same `;` a Save Action uses inside its own value, so nothing that nests fits.
 
 ## Switching rules off for one entry
 
@@ -77,20 +142,26 @@ A field name may itself contain a colon (`note:de`); where the entry has such a 
 
 `Suppressions` reads the comments of an entry and `JabFix` drops what they cover before the repairs are applied, so a suppressed finding is neither reported nor repaired.
 
-A comment that switches nothing off is reported by `magic-comment`, because the entry would be repaired as if it were not there: an id or regex that names no rule of the run, or a field that is neither a BibTeX field nor one the entry carries.
+A comment that switches nothing off is reported by `magic-comment`, because the entry would be repaired as if it were not there: an id or regex that names no rule JabFix knows, or a field that is neither a BibTeX field nor one the entry carries.
+`magic-comment` is a rule like the others, so it runs where a mode or the rules enable it.
 
 ## The CLI
 
-`jabkit fix [--check | --in-place] [--enable RULE,...] [--disable RULE,...] [--check-only RULE,...] FILE`.
+`jabkit fix [--check | --in-place] [--mode MODE] [--rule RULE=MODE[:NAME=VALUE],...] [--save-config] FILE`.
+
+The CLI is meant to need one knob: pick a mode once with `jabkit fix --mode whitespace --save-config --in-place FILE`, and from then on `jabkit fix --in-place FILE` and JabRef's own saves apply it.
+
+`--mode` takes the place of the library's mode.
+`--rule` gives a rule, or a rule on one field as `field:rule`, the mode `off`, `check` or `fix`, spelled as in the stored configuration, and outranks what the library says about how far that rule goes; the values the library states for it stay.
+A rule that takes values is given them after its mode, each as `:name=value`, as in `--rule entry-brackets=fix:bracket=parentheses`, since the comma separates the rules of a list; each outranks what the library states under that name.
+A value the rule cannot read is a usage error, like a misspelled id, and so is one given on `field:rule`.
+`--check` is the whole run: every rule reports and nothing is written, whatever the modes say.
+`--save-config` stores `--mode` and `--rule` in the library through `JabFixConfiguration.configure`, which moves its Save Actions in as well; the run applies the same either way.
+
+A library that only has Save Actions needs no option at all: `jabkit fix` applies them, and nothing moves them unless `--save-config` is given.
 
 Findings are written one per line, in the `file:line:column:citationKey[:field]: message [rule-id]` format the `check` commands use, so an editor or a CI log scraper can jump to the place at fault.
 Where that place is comes from the `ParserResult` of the file the library was read from, through `ErrorFormat`, which the integrity and consistency checks report through as well.
-
-`--enable`, `--disable` and `--check-only` set the mode of a rule for that run, and cover the library's Save Actions too, since they are rules of the run.
-Without `--enable` the command names every rule the library has, which is what makes a bare `jabkit fix` format it; with it, the named rules are the only ones that run.
-`--check-only` names a rule as well, so one left out of `--enable` still reports what it finds.
-A rule named by several of them is switched off: the strictest wins.
-`--check` is the whole run: every rule reports and nothing is written, whatever the modes say.
 
 ## Goal
 
@@ -108,11 +179,13 @@ Integrity checkers become report-only rules, cleanup jobs and Save Actions forma
 
 Still missing:
 
+- the modes JabFix ships with (the current ones are placeholders),
 - built-in rules beyond whitespace,
-- library-level rules (`Rule#scan` sees one entry),
+- library-level rules (`Rule#scan` sees one entry, so `@String( ... )` and `@Preamble( ... )` keep their parentheses, and the writer encloses them in braces whichever bracket `entry-brackets` goes by),
 - context for rules (file directories, abbreviation list, key patterns), which citation key generation and journal abbreviation need before they can become rules,
-- configuration beyond the command line and the comments above an entry, including rule parameters and where the settings are stored,
-- GUI integration: `BibDatabaseWriter` reads the settings, but no GUI save writes them yet,
+- rule values other than strings,
+- a graphical way to configure the block, which would call `JabFixConfiguration.configure` and so migrate the `saveActions` item in passing,
+- GUI integration: a save reads the block and writes it back, but nothing in the GUI edits it or shows what a `check` rule reports; Library Properties writes a `saveActions` item back into a migrated library, and a shared database does not synchronize the block,
 - leaving out metadata JabRef only inferred (the database type); writing it back changes libraries that are otherwise clean.
 
 ## Consolidation into JabFix

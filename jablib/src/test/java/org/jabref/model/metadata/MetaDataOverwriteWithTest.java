@@ -83,7 +83,7 @@ class MetaDataOverwriteWithTest {
         metaData.setCiteKeyPattern(new CitationKeyPattern("[auth]", CitationKeyPattern.Category.AUTHOR_RELATED),
                 Map.of(StandardEntryType.Article, new CitationKeyPattern("[auth][year]", CitationKeyPattern.Category.AUTHOR_RELATED)));
         metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of()));
-        metaData.setLintSettings(new LintSettings(Map.of("surrounding-whitespace", RuleMode.CHECK)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.CHECK));
         metaData.setMode(BibDatabaseMode.BIBLATEX);
         metaData.setLibraryAbbreviationType(AbbreviationType.DOTLESS);
         metaData.setKeywordSeparator(';');
@@ -97,6 +97,7 @@ class MetaDataOverwriteWithTest {
         metaData.setEncoding(StandardCharsets.ISO_8859_1);
         metaData.setEncodingExplicitlySupplied(true);
         metaData.putUnknownMetaDataItem("unknown", List.of("value"));
+        metaData.putUnknownJsonMetaDataItem("unknownJson", "{\"a\":1}");
         metaData.setBlgFilePath("user-host", Path.of("/tmp/library.blg"));
         return metaData;
     }

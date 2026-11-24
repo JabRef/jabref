@@ -2,12 +2,9 @@ package org.jabref.logic.lint;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import org.jabref.logic.lint.rule.Finding;
-import org.jabref.logic.lint.rule.MagicCommentRule;
 import org.jabref.logic.lint.rule.Rule;
 import org.jabref.logic.lint.rule.RuleSet;
 import org.jabref.logic.lint.rule.Suppressions;
@@ -22,7 +19,9 @@ import org.jspecify.annotations.NullMarked;
 /// whether a value may be padded with whitespace. Serialization is not this class's business: it is
 /// left to JabRef's own [org.jabref.logic.exporter.BibDatabaseWriter], which settles everything that
 /// does *not* survive parsing -- entry type capitalization, whether values are braced or quoted,
-/// field order, indentation -- and which runs this engine when it is given one.
+/// field order, indentation -- and which runs this engine when it is given one. The one exception is
+/// [org.jabref.logic.lint.rules.EntryBracketsRule], because the writer leaves an entry nothing
+/// changed the way it was read, its brackets included.
 @NullMarked
 public class JabFix {
 
@@ -48,21 +47,18 @@ public class JabFix {
     /// repairs are applied, so a suppressed finding is neither reported nor repaired. A rule that
     /// is switched off for one field only still runs on the rest of the entry.
     ///
-    /// A [MagicCommentRule] runs ahead of the rule set, since a comment that names no rule of this
-    /// run switches nothing off and would otherwise go unnoticed.
+    /// What the library itself switches off is already settled by then: the [RuleSet] this engine
+    /// was given has been configured, and the two are deliberately separate -- the library says
+    /// what is done to it, an entry's comments say where that does not apply.
     ///
     /// @param mutationScheduler routes the [BibEntry] mutations the repairs make to the correct
     ///                          thread; it has to run each of them synchronously
     public JabFixResult apply(List<BibEntry> entries, Consumer<Runnable> mutationScheduler) {
-        List<Rule> rules = Stream.concat(
-                Stream.of(new MagicCommentRule(Set.copyOf(ruleSet.ids()))),
-                ruleSet.rules().stream()).toList();
-
         List<Finding> findings = new ArrayList<>();
         List<FieldChange> changes = new ArrayList<>();
         for (BibEntry entry : entries) {
             Suppressions suppressions = Suppressions.in(entry);
-            for (Rule rule : rules) {
+            for (Rule rule : ruleSet.rules()) {
                 List<Finding> reported = rule.scan(entry).stream()
                                              .filter(finding -> !suppressions.suppresses(rule.id(), finding.field()))
                                              .toList();

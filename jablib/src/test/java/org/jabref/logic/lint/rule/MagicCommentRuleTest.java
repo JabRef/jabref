@@ -10,10 +10,12 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@ResourceLock("Localization.lang")
 class MagicCommentRuleTest {
 
     private final MagicCommentRule rule = new MagicCommentRule(Set.of("surrounding-whitespace"));

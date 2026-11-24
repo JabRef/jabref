@@ -1,10 +1,10 @@
 package org.jabref.logic.lint.rule;
 
-import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.CleanupJob;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 
@@ -30,10 +30,14 @@ public class SaveActionRule extends CleanupRule {
     ///
     /// Which fields the Save Action covers is its own business and is left out of the id, so that
     /// the same formatter on several fields is one rule to switch off. A single field is narrowed
-    /// down where every other rule is too, by `field:rule` in a magic comment (see [Suppressions]).
+    /// down where every other rule is too, by `field:rule` -- in a magic comment above an entry
+    /// (see [Suppressions]), or in the library's formatting configuration.
+    ///
+    /// [SaveActionIds] is where this is decided, since the way back from an id to the formatter
+    /// cannot be had by reversing it.
     @Override
     public String id() {
-        return saveAction.getFormatter().getKey().replace('_', '-').toLowerCase(Locale.ROOT);
+        return SaveActionIds.idOf(saveAction.getFormatter());
     }
 
     @Override
@@ -52,7 +56,7 @@ public class SaveActionRule extends CleanupRule {
     protected String message(FieldChange change) {
         String oldValue = StringUtil.limitStringLength(change.oldValue(), MAX_REPORTED_VALUE_LENGTH);
         return Optional.ofNullable(change.newValue())
-                       .map(newValue -> "\"%s\", should be \"%s\"".formatted(oldValue, StringUtil.limitStringLength(newValue, MAX_REPORTED_VALUE_LENGTH)))
-                       .orElse("\"%s\", should be removed".formatted(oldValue));
+                       .map(newValue -> Localization.lang("\"%0\", should be \"%1\"", oldValue, StringUtil.limitStringLength(newValue, MAX_REPORTED_VALUE_LENGTH)))
+                       .orElse(Localization.lang("\"%0\", should be removed", oldValue));
     }
 }

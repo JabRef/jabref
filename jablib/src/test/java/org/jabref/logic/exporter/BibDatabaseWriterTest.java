@@ -11,10 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
+import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
@@ -31,7 +35,9 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.lint.JabFixMode;
 import org.jabref.logic.lint.rule.Finding;
+import org.jabref.logic.lint.rules.EntryBracketsRule;
 import org.jabref.logic.os.OS;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -57,6 +63,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
+import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -66,6 +74,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +86,14 @@ import static org.mockito.Mockito.when;
 /// Tests for reading can be found at [org.jabref.logic.importer.fileformat.BibtexImporterTest]
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("exporter")
+@ResourceLock("Localization.lang")
 class BibDatabaseWriterTest {
+
+    private static final String IN_PARENTHESES = """
+            @Article( key,
+                title = {A title}
+            )
+            """;
 
     private BibDatabaseWriter databaseWriter;
     private BibDatabase database;
@@ -893,6 +910,161 @@ class BibDatabaseWriterTest {
                 stringWriter.toString());
     }
 
+    /// The whole point of the embedded JSON: a library written by a newer JabRef is handed back
+    /// with what it arrived with, rather than with the parts this one happens to understand.
+    @Test
+    void writeJsonMetaDataOfANewerJabRef() throws IOException {
+        metaData.putUnknownJsonMetaDataItem("somethingElse", "{\"a\":[1,2]}");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "somethingElse" : {
+                    "a" : [ 1, 2 ]
+                  }
+                }
+                }
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+    }
+
+    @Test
+    void writeFormattingBlock() throws IOException {
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK));
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "rules" : {
+                      "surrounding-whitespace" : "fix",
+                      "title:lower-case" : "check"
+                    }
+                  }
+                }
+                }
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+    }
+
+    // [utest->adr~per-rule-modes-in-the-formatting-configuration~1]
+    @ParameterizedTest
+    @MethodSource
+    void aFormattingBlockSurvivesARoundTrip(LintSettings formatting) throws IOException {
+        metaData.setFormatting(formatting);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+
+        assertEquals(metaData.getFormatting(), read.getMetaData().getFormatting());
+    }
+
+    /// The empty one included: it says the library enables nothing, which a library without one
+    /// does not say.
+    static Stream<LintSettings> aFormattingBlockSurvivesARoundTrip() {
+        return Stream.of(
+                LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
+                            .and(RuleSelector.of("repeated-whitespace"), RuleMode.OFF),
+                LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF).withMode("whitespace"),
+                LintSettings.NONE.withMode("mode-of-a-newer-jabfix"),
+                LintSettings.NONE,
+                inParentheses(RuleMode.FIX),
+                LintSettings.NONE.and(RuleSelector.of(EntryBracketsRule.ID),
+                        new RuleSettings(RuleMode.FIX, new LinkedHashMap<>(Map.of(EntryBracketsRule.BRACKET, "bracket-of-a-newer-jabfix")))));
+    }
+
+    /// The form the decision record describes: a rule given a value opens into an object, its mode
+    /// first, beside rules that only name a mode.
+    // [utest->adr~per-rule-modes-in-the-formatting-configuration~1]
+    @Test
+    void writeFormattingBlockWithARuleGivenAValue() throws IOException {
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                                           .and(RuleSelector.of(EntryBracketsRule.ID),
+                                                   new RuleSettings(RuleMode.CHECK, new LinkedHashMap<>(Map.of(EntryBracketsRule.BRACKET, "parentheses")))));
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "rules" : {
+                      "surrounding-whitespace" : "fix",
+                      "entry-brackets" : {
+                        "mode" : "check",
+                        "bracket" : "parentheses"
+                      }
+                    }
+                  }
+                }
+                }
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+    }
+
+    private static LintSettings inParentheses(RuleMode mode) {
+        return LintSettings.NONE.and(RuleSelector.of(EntryBracketsRule.ID),
+                new RuleSettings(mode, new LinkedHashMap<>(Map.of(EntryBracketsRule.BRACKET, "parentheses"))));
+    }
+
+    /// A library configured by a newer JabFix still saves here, and is handed back with what it
+    /// arrived with rather than with the parts this version happens to understand.
+    // [utest->adr~per-rule-modes-in-the-formatting-configuration~1]
+    @Test
+    void whatANewerJabFixConfiguredSurvivesARoundTrip() throws IOException {
+        ParserResult written = new BibtexParser(importFormatPreferences).parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "rules" : {
+                      "surrounding-whitespace" : "fix",
+                      "rule-of-a-newer-jabfix" : "fix",
+                      "title:lower-case" : "warn",
+                      "author,editor:lower-case" : "fix",
+                      "line-length" : {"mode" : "check", "max" : 120}
+                    },
+                    "ruleset" : "recommended"
+                  },
+                  "somethingElse" : [1, 2]
+                }
+                }
+                """));
+
+        BibDatabaseContext context = new BibDatabaseContext(written.getDatabase(), written.getMetaData());
+        databaseWriter.writePartOfDatabase(context, List.of());
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+
+        assertEquals(written.getMetaData().getFormatting(), read.getMetaData().getFormatting());
+        assertEquals(written.getMetaData().getUnknownJsonMetaData(), read.getMetaData().getUnknownJsonMetaData());
+    }
+
+    /// The comment ends where its braces balance, so a brace inside a key or a value must not be
+    /// read back as one of the comment's own -- an escaped one that came in included.
+    @Test
+    void bracesInsideTheJsonMetaDataSurviveARoundTrip() throws IOException {
+        metaData.putUnknownJsonMetaDataItem("pattern{", "\"} {\\\\}\\u007d\"");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+
+        assertEquals(Map.of("pattern{", "\"} {\\\\}}\""), read.getMetaData().getUnknownJsonMetaData());
+    }
+
+    /// A library that keeps nothing that way is written exactly as it was before the comment
+    /// existed, which is what every other test in this class goes on asserting.
+    @Test
+    void writeNoJsonMetaDataCommentForALibraryThatHasNone() throws IOException {
+        metaData.setAiLibraryId("test-ai-library-id");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: aiLibraryId:test-ai-library-id;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
     @Test
     void writeFileDirectories() throws IOException {
         metaData.setLibrarySpecificFileDirectory("\\Literature\\");
@@ -1024,7 +1196,8 @@ class BibDatabaseWriterTest {
     }
 
     /// For a library that asks for rules, they are the only thing that changes an entry, so its Save
-    /// Actions run as rules -- reported, and repairing exactly what they reported.
+    /// Actions run as rules -- reported, and repairing exactly what they reported. They are rule
+    /// settings of the library, so they run beside a configuration that does not name them.
     // [utest->req~logic.exporter.lint-on-save~1]
     @Test
     void theLibrarysSaveActionsAreAppliedAsRules() throws IOException {
@@ -1033,7 +1206,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1049,7 +1222,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.OFF)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1065,7 +1238,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.CHECK)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1081,7 +1254,7 @@ class BibDatabaseWriterTest {
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         database.insertEntry(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE"));
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.CHECK)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(List.of(false),
@@ -1100,10 +1273,9 @@ class BibDatabaseWriterTest {
                 .withField(StandardField.AUTHOR, " Doe, Jane ");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of(
-                "lower-case", RuleMode.CHECK,
-                "upper-case", RuleMode.FIX,
-                "surrounding-whitespace", RuleMode.OFF)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
+                                           .and(RuleSelector.on(StandardField.JOURNAL, "upper-case"), RuleMode.FIX)
+                                           .and(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1118,9 +1290,8 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, " Doe, Jane ");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of(
-                "rule-of-a-newer-jabfix", RuleMode.CHECK,
-                "surrounding-whitespace", RuleMode.FIX)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("rule-of-a-newer-jabfix"), RuleMode.CHECK)
+                                           .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());
@@ -1138,7 +1309,7 @@ class BibDatabaseWriterTest {
         BibEntry other = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "ANOTHER TITLE");
         database.insertEntries(exempt, other);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", exempt.getField(StandardField.TITLE).orElseThrow());
@@ -1153,7 +1324,7 @@ class BibDatabaseWriterTest {
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         database.insertEntry(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE"));
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(List.of("some title"),
@@ -1172,25 +1343,101 @@ class BibDatabaseWriterTest {
             scheduledMutations.incrementAndGet();
             mutation.run();
         });
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(1, scheduledMutations.get());
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
     }
 
-    /// Nothing is changed that no rule reported, and no rule generates a key yet.
+    /// A formatter run changes nothing that no rule reported, and no rule generates a key yet.
     // [utest->req~logic.exporter.lint-on-save~1]
     @Test
-    void citationKeysAreNotGeneratedForALibraryThatAsksForRules() throws IOException {
+    void aFormatterRunGeneratesNoCitationKeys() throws IOException {
         when(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()).thenReturn(true);
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Doe, Jane");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("surrounding-whitespace", RuleMode.FIX)));
-        databaseWriter.writeDatabase(bibtexContext);
+        databaseWriter.asFormatterRun(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
+                      .writeDatabase(bibtexContext);
 
         assertEquals(Optional.empty(), entry.getCitationKey());
+    }
+
+    /// Whoever configured the library did not decide for its other users that their keys go
+    /// ungenerated.
+    // [utest->req~logic.exporter.lint-on-save~1]
+    @Test
+    void anOrdinarySaveOfAConfiguredLibraryStillGeneratesCitationKeys() throws IOException {
+        citationKeyPatternPreferences = new CitationKeyPatternPreferences(false, false, false, true,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A, "", "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"), new SimpleObjectProperty<>(','));
+        initializeDatabaseWriter();
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Doe, Jane")
+                .withField(StandardField.YEAR, "2024");
+        database.insertEntry(entry);
+
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals(Optional.of("Doe2024"), entry.getCitationKey());
+    }
+
+    /// What a command asks for outranks what the library says, for that one save.
+    @Test
+    void settingsOfTheSaveOutrankTheLibrarys() throws IOException {
+        metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(
+                new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
+        database.insertEntry(entry);
+
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
+        databaseWriter.asFormatterRun(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX))
+                      .writeDatabase(bibtexContext);
+
+        assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
+    }
+
+    /// The settings of one save are not what the library says about itself, so they are not written.
+    @Test
+    void settingsOfTheSaveFormatALibraryWithoutGivingItAConfiguration() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, " Doe, Jane ");
+        database.insertEntry(entry);
+
+        databaseWriter.asFormatterRun(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
+                      .writeDatabase(bibtexContext);
+
+        assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());
+        assertEquals(Optional.empty(), metaData.getFormatting());
+    }
+
+    @Test
+    void aModeTheLibraryNamesIsApplied() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, " Doe,  Jane ");
+        database.insertEntry(entry);
+
+        metaData.setFormatting(LintSettings.NONE.withMode(JabFixMode.WHITESPACE.getKey()));
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());
+    }
+
+    /// Off by default: a library that is configured but enables nothing has nothing done to it --
+    /// not even the cleanups a save applies to a library that is not configured.
+    @Test
+    void aConfigurationEnablingNothingChangesNothing() throws IOException {
+        metaData.setSaveActions(new FieldFormatterCleanupActions(false, List.of(
+                new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, " SOME TITLE ");
+        entry.setChanged(true);
+        database.insertEntry(entry);
+
+        metaData.setFormatting(LintSettings.NONE);
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals(" SOME TITLE ", entry.getField(StandardField.TITLE).orElseThrow());
     }
 
     /// Carrying no settings at all, that is: the save applies its own Save Actions, as always.
@@ -1206,6 +1453,132 @@ class BibDatabaseWriterTest {
 
         assertEquals(List.of(), databaseWriter.getFindings());
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
+    }
+
+    /// A save writes an entry nothing changed back the way it was read, and Save Actions only change
+    /// what a field holds, so neither touches the parentheses.
+    @Test
+    void anEntryInParenthesesOfALibraryAskingForNoRulesKeepsThem() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(IN_PARENTHESES));
+
+        writeParsed(result);
+
+        assertEquals(IN_PARENTHESES, stringWriter.toString());
+    }
+
+    /// The delimiters are the whole repair: the rest of the entry is still written the way it was
+    /// read, not in the layout a save gives an entry it writes anew.
+    @Test
+    void anEntryInParenthesesIsEnclosedInBracesAndKeepsItsLayout() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(IN_PARENTHESES));
+        result.getMetaData().setFormatting(LintSettings.of(RuleSelector.of(EntryBracketsRule.ID), RuleMode.FIX));
+
+        writeParsed(result);
+
+        assertEquals(List.of("@Article{ key,", "    title = {A title}", "}"), stringWriter.toString().lines().limit(3).toList());
+    }
+
+    /// The same repair the other way round, for a library that asks for parentheses.
+    @Test
+    void anEntryInBracesIsEnclosedInParenthesesAndKeepsItsLayout() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of("""
+                @Article{ key,
+                    title = {A title}
+                }
+                """));
+        result.getMetaData().setFormatting(inParentheses(RuleMode.FIX));
+
+        writeParsed(result);
+
+        assertEquals(List.of("@Article( key,", "    title = {A title}", ")"), stringWriter.toString().lines().limit(3).toList());
+    }
+
+    /// An edited entry is written anew, so the repair of what was read would not reach the file.
+    // [utest->req~logic.exporter.entry-bracket~1]
+    @Test
+    void anEditedEntryIsWrittenInTheBracketTheLibraryAsksFor() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(IN_PARENTHESES));
+        result.getMetaData().setFormatting(inParentheses(RuleMode.FIX));
+        result.getDatabase().getEntries().getFirst().setField(StandardField.TITLE, "Another title");
+
+        writeParsed(result);
+
+        assertEquals(List.of("@Article(key,", "  title = {Another title},", ")"), stringWriter.toString().lines().limit(3).toList());
+    }
+
+    /// There is nothing read to repair, so the writer alone decides what this entry is enclosed in.
+    @Test
+    void aNewEntryIsWrittenInTheBracketTheLibraryAsksFor() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.FIX));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals(List.of("@Article(key,", "  title = {A title},", ")"), stringWriter.toString().lines().limit(3).toList());
+        assertEquals(List.of(), databaseWriter.getFindings());
+    }
+
+    /// A rule that only reports leaves what was read alone, but what is written anew has to be
+    /// written in something, and only the bracket asked for is not reported next time.
+    @Test
+    void aRuleThatOnlyReportsStillDecidesTheBracketOfAnEntryWrittenAnew() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.CHECK));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("@Article(key,", stringWriter.toString().lines().findFirst().orElseThrow());
+    }
+
+    @Test
+    void aRuleSwitchedOffLeavesAnEntryWrittenAnewInBraces() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.OFF));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("@Article{key,", stringWriter.toString().lines().findFirst().orElseThrow());
+    }
+
+    /// Naming the rule without a value goes by braces, as it did before the rule took one.
+    @Test
+    void aLibraryThatDoesNotAskForParenthesesIsWrittenInBraces() throws IOException {
+        metaData.setFormatting(LintSettings.of(RuleSelector.of(EntryBracketsRule.ID), RuleMode.FIX));
+        database.insertEntry(changedEntry());
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("@Article{key,", stringWriter.toString().lines().findFirst().orElseThrow());
+    }
+
+    /// What a save wrote in parentheses is read back as the same entry, and has nothing left to report.
+    @Test
+    void anEntryWrittenInParenthesesReadsBackTheSameAndIsClean() throws IOException {
+        metaData.setFormatting(inParentheses(RuleMode.FIX));
+        BibEntry entry = changedEntry().withField(StandardField.TITLE, "A (small) {title}");
+        entry.setChanged(true);
+        database.insertEntry(entry);
+        databaseWriter.writeDatabase(bibtexContext);
+
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+        stringWriter.getBuffer().setLength(0);
+        writeParsed(read);
+
+        assertEquals(List.of(entry), read.getDatabase().getEntries());
+        assertEquals(List.of(), databaseWriter.getFindings());
+    }
+
+    /// Marked changed, since a save only writes an entry anew that has changed, and a wither does not mark it.
+    private static BibEntry changedEntry() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("key").withField(StandardField.TITLE, "A title");
+        entry.setChanged(true);
+        return entry;
+    }
+
+    private void writeParsed(ParserResult result) throws IOException {
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
+        databaseWriter.writePartOfDatabase(new BibDatabaseContext(result.getDatabase(), result.getMetaData()), result.getDatabase().getEntries());
     }
 
     @Test

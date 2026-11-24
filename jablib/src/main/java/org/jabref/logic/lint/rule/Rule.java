@@ -1,6 +1,8 @@
 package org.jabref.logic.lint.rule;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -34,4 +36,17 @@ public interface Rule {
     ///
     /// @return the findings, in the order they occur in the entry; empty when the entry is clean
     List<Finding> scan(BibEntry entry);
+
+    /// This rule, taking the values a configuration states for it. A rule that takes none has none to
+    /// read, which is what this does unless it is overridden.
+    ///
+    /// A rule must not guess at what it cannot read, whether a value it does not take or one it does
+    /// not know: such a value may come from a newer JabFix, or be a typo, and running without it would
+    /// do something the library did not ask for.
+    ///
+    /// @param values what the configuration states, by name; empty where it states nothing
+    /// @return the rule to run, or nothing where it cannot read them, which passes the rule over
+    default Optional<Rule> configuredWith(Map<String, String> values) {
+        return values.isEmpty() ? Optional.of(this) : Optional.empty();
+    }
 }

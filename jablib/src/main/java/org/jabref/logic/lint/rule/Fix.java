@@ -20,6 +20,7 @@ import org.jspecify.annotations.NullMarked;
 public interface Fix {
 
     /// @param entry the entry the finding was reported on
-    /// @return what the repair changed, empty when the entry already carried that value
+    /// @return what the repair changed, empty when the entry already carried that value or the repair
+    ///         changed no field
     Optional<FieldChange> applyTo(BibEntry entry);
 }

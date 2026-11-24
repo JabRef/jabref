@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -37,6 +38,7 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
@@ -178,6 +180,87 @@ class BibtexParserTest {
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Ed von Test");
         assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseReadsJsonMetaDataComment() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "somethingElse": {"a": [1, 2]}
+                }
+                }
+                """));
+
+        assertEquals(Map.of("somethingElse", "{\"a\":[1,2]}"),
+                result.getMetaData().getUnknownJsonMetaData());
+    }
+
+    /// Both comments are dropped from the text, so a key only the earlier one states has to survive
+    /// in what is read -- and the user has to learn that one of them lost where both state a key.
+    @Test
+    void parseMergesASecondJsonMetaDataCommentIntoTheFirst() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {"onlyEarlier": 1, "both": 1}
+                }
+                @Comment{jabref-meta-0.1.0
+                {"both": 2, "onlyLater": 2}
+                }
+                """));
+
+        assertEquals(Map.of("onlyEarlier", "1", "both", "2", "onlyLater", "2"),
+                result.getMetaData().getUnknownJsonMetaData());
+        assertEquals(List.of(Localization.lang("More than one JSON metadata comment in BIB file. Where they state the same setting, the later one is kept.")),
+                result.warnings());
+    }
+
+    /// The text of the JSON comment is dropped once it is read, so a `jabref-meta:` item that fails
+    /// to parse must not take it along: the next save would lose it.
+    @Test
+    void parseKeepsTheJsonMetaDataWhereAMetaDataItemIsUnreadable() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta: databaseType:bibtex;biblatex;}
+                @Comment{jabref-meta-0.1.0
+                {"somethingElse": 1}
+                }
+                """));
+
+        assertEquals(Map.of("somethingElse", "1"), result.getMetaData().getUnknownJsonMetaData());
+    }
+
+    @Test
+    void parseForgetsTheJsonMetaDataOfAnEarlierCall() throws IOException {
+        parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {"somethingElse": 1}
+                }
+                """));
+
+        ParserResult result = parser.parse(Reader.of("@article{test,author={Ed von Test}}"));
+
+        assertEquals(Map.of(), result.getMetaData().getUnknownJsonMetaData());
+    }
+
+    /// A missing comma is no reason to delete what somebody wrote, so the comment stays in the file
+    /// as text -- which is to say, it reaches the entry after it as a comment of that entry.
+    @Test
+    void parseKeepsAnUnreadableJsonMetaDataCommentAsText() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "somethingElse":
+                }
+                }
+                @Article{test,
+                  author = {Ed von Test},
+                }
+                """));
+
+        assertTrue(result.hasWarnings(), "an unreadable comment has to be reported");
+        assertEquals(Map.of(), result.getMetaData().getUnknownJsonMetaData());
+        assertTrue(result.getDatabase().getEntries().getFirst().getUserComments().contains("jabref-meta-0.1.0"),
+                result.getDatabase().getEntries().getFirst().getUserComments());
     }
 
     @Test

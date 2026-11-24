@@ -13,10 +13,12 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@ResourceLock("Localization.lang")
 class SaveActionRuleTest {
 
     private final SaveActionRule normalizePages = new SaveActionRule(
@@ -71,6 +73,15 @@ class SaveActionRuleTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.NOTE, "to be removed");
 
         assertEquals("\"to be removed\", should be removed", clearNote.scan(entry).getFirst().message());
+    }
+
+    /// A URL may well hold what looks like a placeholder of the message.
+    @Test
+    void aValueThatLooksLikeAPlaceholderIsReportedAsItStands() {
+        SaveActionRule trimUrl = new SaveActionRule(new FieldFormatterCleanup(StandardField.URL, new TrimWhitespaceFormatter()));
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.URL, "https://a.org/x%1Fy ");
+
+        assertEquals("\"https://a.org/x%1Fy \", should be \"https://a.org/x%1Fy\"", trimUrl.scan(entry).getFirst().message());
     }
 
     /// A field value can be as long as an abstract, while a finding is one line.
