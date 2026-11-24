@@ -190,7 +190,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where the RIS importer overwrote the journal issue number (`IS`) with the accession number (`AN`). [#17817](https://github.com/JabRef/jabref/issues/17817)
-- We fixed an issue where the last character and caret were not fully visible when editing long text in entry editor fields. [#14318](https://github.com/JabRef/jabref/issues/14318)
 - We fixed issue where last character and caret not visible when editing long text in entry editor fields. [#14318](https://github.com/JabRef/jabref/issues/14318)
 - We fixed LibreOffice/OpenOffice citations losing their normal, in-text, or invisible form when refreshed using CSL styles outside Zotero compatibility mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed citation page information being lost, misplaced, or not cleared when editing LibreOffice/OpenOffice citations or undoing citation edits. [#17673](https://github.com/JabRef/jabref/pull/17673)
