@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.bst.BstCitationFormat;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;

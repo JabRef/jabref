@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.style;
+package org.jabref.logic.openoffice.jstyle;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.format.OOPreFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -734,7 +735,7 @@ class JStyleTest {
 
     @Test
     void isValidWithDefaultSectionAtTheStart() throws IOException {
-        JStyle style = new JStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences, abbreviationRepository);
+        JStyle style = new JStyle("testWithDefaultLayoutFirst.jstyle", layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
     }
 
