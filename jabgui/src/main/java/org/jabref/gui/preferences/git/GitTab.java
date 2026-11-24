@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.git;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.SplitPane;
@@ -18,8 +19,8 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
     private static final String GITHUB_PAT_DOCS_URL =
             "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens";
 
-    public GitTab() {
-        this.viewModel = new GitTabViewModel(preferences.getGitPreferences());
+    public GitTab(ReadOnlyBooleanProperty keyringAvailable) {
+        this.viewModel = new GitTabViewModel(preferences, keyringAvailable);
         buildView();
     }
 

@@ -2,7 +2,15 @@
 parent: The LibreOffice Panel
 grand_parent: Code Howtos
 ---
-# Alternatives to using OOResult and OOVoidResult in OOBibBase
+# Alternatives to using OOResult and OOVoidResult in OpenOfficeCitationController
+
+The alternatives and code sketches below are historical research, not current implementation instructions or proposals awaiting adoption.
+They preserve the then-current exception-policy discussion. The snippets are illustrative pseudocode, not compilable examples; helper methods such as `readDocumentCitations` are not current APIs.
+
+`OpenOfficePanel` delegates through `citationController` (`OpenOfficeCitationController`) to `CitationEngine`.
+Canonical engine actions use a fresh `documentCitations` (`DocumentCitations`) facade, while `OOError` stays at the GUI boundary and core results carry `JabRefException`.
+See the [error-handling introduction](index.md) for current source locations and the [overview](../overview.md) for active action and recovery contracts.
+The historical examples and evidence links below are retained.
 
 (Talk about ADRs prompted me to think about alternatives to what I used.)
 
@@ -45,7 +53,7 @@ try {
    try {
       B b = g(a);
       try {
-         realAction(ab);
+         realAction(a, b);
       } catch (...){
          showDialog();
       }
@@ -76,7 +84,7 @@ try {
     return;
 }
 try {
-    realAction(ab);
+    realAction(a, b);
 } catch (...){
     showDialog();
 }
@@ -168,7 +176,7 @@ OOResult<A, OOError> wrap_f() {
 }
 // [1] : this OOError constructor (explicit message but no title) is missing
 
-Optional<B, OOError> wrap_g(A a) {
+OOResult<B, OOError> wrap_g(A a) {
     try {
        return OOResult.ok(g(a));
     } catch (G ex) {
@@ -201,8 +209,8 @@ try {
 If `g` did not need `a`, we could simplify to
 
 ```java
-Optional<A> a = wrap_f();
-Optional<B> b = wrap_g();
+OOResult<A, OOError> a = wrap_f();
+OOResult<B, OOError> b = wrap_g();
 if (testDialog(title, a, b)) { // a single dialog can show both messages
   return;
 }
@@ -420,23 +428,23 @@ The more promising variants were
 ```java
 final String title = "Could not insert citation";
 
-OOResult<XTextDocument, OOError> odoc = getXTextDocument();
+OOResult<XTextDocument, OOError> documentResult = getXTextDocument();
 if (testDialog(title,
-               odoc,
+               documentResult,
                styleIsRequired(style),
                selectedBibEntryIsRequired(entries, OOError::noEntriesSelectedForCitation))) {
     return;
 }
-XTextDocument doc = odoc.get();
+XTextDocument document = documentResult.get();
 
-OOResult<OOFrontend, OOError> ofr = getFrontend(doc);
-if (testDialog(title, ofr)) {
+OOResult<DocumentCitations, OOError> documentCitationsResult = readDocumentCitations(document);
+if (testDialog(title, documentCitationsResult)) {
     return;
 }
-OOFrontend fr = ofr.get();
+DocumentCitations documentCitations = documentCitationsResult.get();
 
-OOResult<XTextCursor, OOError> cursor = getUserCursorForTextInsertion(doc);
-if (testDialog(title, cursor)) {
+OOResult<XTextCursor, OOError> cursorResult = getUserCursorForTextInsertion(document);
+if (testDialog(title, cursorResult)) {
     return;
 }
 ...
@@ -448,11 +456,11 @@ if (testDialog(title, cursor)) {
 final String title = "Could not insert citation";
 
 try {
-  XTextDocument doc = getXTextDocument();
+  XTextDocument document = getXTextDocument();
   styleIsRequired(style);
   selectedBibEntryIsRequired(entries, OOError::noEntriesSelectedForCitation);
-  OOFrontend fr = getFrontend(doc);
-  XTextCursor cursor = getUserCursorForTextInsertion(doc);
+  DocumentCitations documentCitations = readDocumentCitations(document);
+  XTextCursor cursor = getUserCursorForTextInsertion(document);
   ...
 } catch (PreconditionException ex) {
    showDialog(title, ex);
@@ -464,5 +472,5 @@ I would suggest using the latter,
 
 * probably using `OOError` for `PreconditionException`
   * In this case `OOError` being in `gui` becomes an asset: we can be sure code in `logic` cannot throw it.
-* We lose the capability to collect mmessages in a single dialog (we stop processing at the first problem).
+* We lose the capability to collect messages in a single dialog (we stop processing at the first problem).
 * The division between precondition checking (only throws PreconditionException) and `realAction`becomes invisible in the action code.

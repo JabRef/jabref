@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -14,6 +17,7 @@ import org.jabref.migrations.PreferencesMigrations;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -172,6 +176,22 @@ class JabRefGuiPreferencesTest {
         PreferencesMigrations.upgradeLegacyCustomPreviewStyle(preferences);   // next startup
 
         assertEquals(List.of(), preferences.getCustomizedPreviewStyle(List.of()));
+    }
+
+    @Test
+    void suppliedPreferencesNodePersistsWorkspaceSettings() throws BackingStoreException {
+        Preferences node = Preferences.userRoot().node("/org/jabref-gui-preferences-test-" + UUID.randomUUID());
+        try {
+            JabRefGuiPreferences preferences = new JabRefGuiPreferences(node);
+            preferences.getWorkspacePreferences().setMainFontSize(17);
+            preferences.getWorkspacePreferences().setWrapMainTableText(false);
+
+            JabRefGuiPreferences reloaded = new JabRefGuiPreferences(node);
+            assertEquals(17, reloaded.getWorkspacePreferences().getMainFontSize());
+            assertFalse(reloaded.getWorkspacePreferences().shouldWrapMainTableText());
+        } finally {
+            node.removeNode();
+        }
     }
 }
 

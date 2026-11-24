@@ -23,6 +23,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -30,7 +31,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.keyboard.WalkthroughKeyBindings;
-import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.openoffice.OpenOfficeDocumentConnection;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.shared.SharedDatabaseCleanup;
@@ -50,8 +51,11 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
+import org.jabref.logic.preferences.CliPreferences.CredentialSaveException;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -97,6 +101,7 @@ public class JabRefGUI extends Application {
     private static ThemeManager themeManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static NativeDesktop nativeDesktop;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
 
     private static DialogService dialogService;
@@ -145,7 +150,8 @@ public class JabRefGUI extends Application {
                     taskExecutor,
                     gitHandlerRegistry,
                     journalAbbreviationRepository,
-                    oAuthSessionRegistry);
+                    oAuthSessionRegistry,
+                    nativeDesktop);
 
             openWindow();
 
@@ -264,6 +270,9 @@ public class JabRefGUI extends Application {
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
+        JabRefGUI.nativeDesktop = NativeDesktop.create(getHostServices(), preferences, clipBoardManager);
+        Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
+
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
@@ -309,21 +318,21 @@ public class JabRefGUI extends Application {
         }
     }
 
+    /// Registers proxy authentication for this session. If the user supplies a password at startup,
+    /// the proxy can authenticate immediately while the worker handles any requested keyring write.
     private void setupProxy() {
-        if (!preferences.getProxyPreferences().shouldUseProxy()) {
+        ProxyPreferences proxy = preferences.getProxyPreferences();
+        if (!proxy.shouldUseProxy()) {
             return;
         }
 
-        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
-            ProxyRegisterer.register(preferences.getProxyPreferences());
+        if (!proxy.shouldUseAuthentication()) {
+            ProxyRegisterer.register(proxy);
             return;
         }
 
-        assert preferences.getProxyPreferences().shouldUseAuthentication();
-
-        if (preferences.getProxyPreferences().shouldPersistPassword()
-                && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
-            ProxyRegisterer.register(preferences.getProxyPreferences());
+        if (proxy.shouldPersistPassword() && StringUtil.isNotBlank(proxy.getPassword())) {
+            ProxyRegisterer.register(proxy);
             return;
         }
 
@@ -332,12 +341,22 @@ public class JabRefGUI extends Application {
                 Localization.lang("Proxy requires password"),
                 Localization.lang("Password"));
 
-        if (password.isPresent()) {
-            preferences.getProxyPreferences().setPassword(password.get());
-            ProxyRegisterer.register(preferences.getProxyPreferences());
-        } else {
-            LOGGER.warn("No proxy password specified");
-        }
+        password.ifPresentOrElse(secret -> {
+            // Authentication can use the entered password immediately, even if the keyring is unavailable.
+            ProxyRegisterer.register(new ProxyPreferences(proxy.shouldUseProxy(), proxy.getHostname(), proxy.getPort(),
+                    proxy.shouldUseAuthentication(), proxy.getUsername(), secret, false));
+            CredentialPersistence persistence = proxy.shouldPersistPassword() ? CredentialPersistence.SAVE : CredentialPersistence.SESSION_ONLY;
+            preferences.prepareProxyPasswordSave(secret, persistence).ifPresent(save ->
+                    BackgroundTask.wrap(save::writeKeyring)
+                                  .onSuccess(commit -> commit.apply())
+                                  .onFailure(ex -> {
+                                      if (ex instanceof CredentialSaveException credentialFailure) {
+                                          credentialFailure.applySessionUpdate();
+                                      }
+                                      LOGGER.warn("Could not save proxy password in keyring", ex);
+                                  })
+                                  .executeWith(taskExecutor));
+        }, () -> LOGGER.warn("No proxy password specified"));
     }
 
     private void openWindow() {
@@ -586,9 +605,9 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Closing OpenOffice connection");
-                OOBibBaseConnect.closeOfficeConnection();
-                LOGGER.trace("OpenOffice connection closed");
+                LOGGER.trace("Disposing client-side UNO bridges");
+                OpenOfficeDocumentConnection.disposeAllBridges();
+                LOGGER.trace("Client-side UNO bridges disposed");
             });
 
             executor.submit(() -> {

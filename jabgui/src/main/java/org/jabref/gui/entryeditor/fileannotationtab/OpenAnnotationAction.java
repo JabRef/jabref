@@ -19,10 +19,9 @@ import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.os.ProcessLauncher;
 import org.jabref.logic.pdf.reader.ExternalPdfReader;
 import org.jabref.logic.pdf.reader.ExternalPdfReaders;
-import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -45,19 +44,22 @@ public class OpenAnnotationAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
 
     public OpenAnnotationAction(ObjectExpression<@Nullable Path> currentFile,
                                 ObjectExpression<@Nullable FileAnnotationViewModel> currentAnnotation,
                                 BibEntry entry,
                                 StateManager stateManager,
                                 GuiPreferences preferences,
-                                DialogService dialogService) {
+                                DialogService dialogService,
+                                NativeDesktop nativeDesktop) {
         this.currentFile = currentFile;
         this.currentAnnotation = currentAnnotation;
         this.entry = entry;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
 
         this.executable.bind(currentFile.isNotNull().and(currentAnnotation.isNotNull()));
     }
@@ -110,28 +112,19 @@ public class OpenAnnotationAction extends SimpleCommand {
 
     private void openExternally(List<String> commandLine, ProcessBuilder processBuilder) {
         processBuilder.command(commandLine);
-        Process process;
         try {
-            process = processBuilder.start();
+            ProcessLauncher.startDetached(processBuilder);
         } catch (IOException e) {
             LOGGER.warn("Could not run {}", commandLine, e);
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Could not call executable '%0'.", commandLine.getFirst()),
                     Localization.lang("Please check the path in the preferences."));
-            return;
         }
-
-        // Readers write Qt/GTK warnings to their streams and would block once an unread pipe fills
-        // up, so both are drained into the log.
-        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getInputStream(), LOGGER::debug));
-        HeadlessExecutorService.INSTANCE.execute(new StreamGobbler(process.getErrorStream(), LOGGER::debug));
     }
 
     private void openWithoutPage(Path pdfFile, Path executable) {
         try {
-            NativeDesktop.get().openFile(pdfFile.toString(),
-                    StandardExternalFileType.PDF.getExtension(),
-                    preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openFile(pdfFile.toString(), StandardExternalFileType.PDF.getExtension());
         } catch (IOException e) {
             LOGGER.warn("Could not open '{}' with '{}'", pdfFile, executable, e);
             dialogService.showErrorDialogAndWait(

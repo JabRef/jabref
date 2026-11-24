@@ -2,10 +2,12 @@ package org.jabref.model.entry;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -107,6 +109,15 @@ public class BibEntry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
 
+    private static final Set<Field> FORBIDDEN_INHERITANCE_FIELDS = Set.of(
+            StandardField.IDS,
+            StandardField.CROSSREF,
+            StandardField.XREF,
+            StandardField.ENTRYSET,
+            StandardField.RELATED,
+            StandardField.SORTKEY
+    );
+
     private final SharedBibEntryData sharedBibEntryData;
 
     /// Map to store the words in every field
@@ -196,12 +207,7 @@ public class BibEntry {
     /// @return the mapped field or null if there is no valid mapping available
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
         // 1. Sort out forbidden fields
-        if ((targetField == StandardField.IDS) ||
-                (targetField == StandardField.CROSSREF) ||
-                (targetField == StandardField.XREF) ||
-                (targetField == StandardField.ENTRYSET) ||
-                (targetField == StandardField.RELATED) ||
-                (targetField == StandardField.SORTKEY)) {
+        if (FORBIDDEN_INHERITANCE_FIELDS.contains(targetField)) {
             return Optional.empty();
         }
 
@@ -315,7 +321,8 @@ public class BibEntry {
     /// If a database is given, this function will try to resolve any string
     /// references in the field-value.
     /// Also, if a database is given, this function will try to find values for
-    /// unset fields in the entry linked by the "crossref" ([StandardField#CROSSREF]) field, if any.
+    /// unset fields in entries linked by "xdata" ([StandardField#XDATA]) and
+    /// "crossref" ([StandardField#CROSSREF]), if any.
     ///
     /// @param field    The field to return the value of.
     /// @param database The database of the bibtex entry.
@@ -338,6 +345,9 @@ public class BibEntry {
         }
 
         Optional<String> result = getFieldOrAlias.apply(this, field);
+        if (result.isEmpty() && (database != null)) {
+            result = getFieldOrAliasFromXData(this, field, database, getFieldOrAlias);
+        }
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry, following the biblatex rules
         if (result.isEmpty() && (database != null)) {
@@ -348,7 +358,10 @@ public class BibEntry {
                 Optional<Field> sourceField = getSourceField(field, targetEntry, sourceEntry);
 
                 if (sourceField.isPresent()) {
-                    result = getFieldOrAlias.apply(referred.get(), sourceField.get());
+                    result = getInheritableFieldOrAlias(referred.get(), sourceField.get(), getFieldOrAlias);
+                    if (result.isEmpty()) {
+                        result = getFieldOrAliasFromXData(referred.get(), sourceField.get(), database, getFieldOrAlias);
+                    }
                 }
             }
         }
@@ -356,6 +369,58 @@ public class BibEntry {
         return (database == null) || result.isEmpty() ?
                result :
                Optional.of(database.resolveForStrings(result.get()));
+    }
+
+    private Optional<String> getFieldOrAliasFromXData(BibEntry entry,
+                                                      Field field,
+                                                      BibDatabase database,
+                                                      BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
+        if (FORBIDDEN_INHERITANCE_FIELDS.contains(field) || (field == StandardField.XDATA)) {
+            return Optional.empty();
+        }
+        Set<String> visitedKeys = new HashSet<>();
+        entry.getCitationKey().ifPresent(visitedKeys::add);
+        Deque<String> keysToVisit = new ArrayDeque<>();
+        pushXDataKeys(entry, keysToVisit, visitedKeys);
+
+        while (!keysToVisit.isEmpty()) {
+            String key = keysToVisit.pop();
+            if (!visitedKeys.add(key)) {
+                continue;
+            }
+            Optional<BibEntry> xdataEntry = database.getEntryByCitationKey(key);
+            Optional<String> directValue = xdataEntry.flatMap(target -> getInheritableFieldOrAlias(target, field, getFieldOrAlias));
+            if (directValue.isPresent()) {
+                return directValue;
+            }
+            xdataEntry.ifPresent(target -> pushXDataKeys(target, keysToVisit, visitedKeys));
+        }
+        return Optional.empty();
+    }
+
+    private static void pushXDataKeys(BibEntry sourceEntry, Deque<String> keysToVisit, Set<String> visitedKeys) {
+        Optional<String> xdataField = sourceEntry.getField(StandardField.XDATA);
+        if (xdataField.isEmpty()) {
+            return;
+        }
+        String[] rawKeys = xdataField.get().split(ENTRY_LINK_SEPARATOR);
+        for (int i = rawKeys.length - 1; i >= 0; i--) {
+            String key = rawKeys[i].trim();
+            if (!key.isEmpty() && !visitedKeys.contains(key)) {
+                keysToVisit.push(key);
+            }
+        }
+    }
+
+    private static Optional<String> getInheritableFieldOrAlias(BibEntry sourceEntry,
+                                                               Field field,
+                                                               BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
+        Field alias = EntryConverter.FIELD_ALIASES.get(field);
+        if ((alias != null) && FORBIDDEN_INHERITANCE_FIELDS.contains(alias)
+                && sourceEntry.getField(field).filter(not(String::isEmpty)).isEmpty()) {
+            return Optional.empty();
+        }
+        return getFieldOrAlias.apply(sourceEntry, field);
     }
 
     /// Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
