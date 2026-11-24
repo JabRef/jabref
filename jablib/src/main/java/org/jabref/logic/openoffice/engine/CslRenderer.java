@@ -13,7 +13,7 @@ import java.util.StringJoiner;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.citationstyle.JabRefLocaleProvider;
-import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+import org.jabref.logic.openoffice.csl.CSLFormatUtils;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

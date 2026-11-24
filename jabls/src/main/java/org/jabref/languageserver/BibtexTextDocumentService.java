@@ -20,6 +20,8 @@ import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.DocumentLink;
 import org.eclipse.lsp4j.DocumentLinkParams;
+import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.HoverParams;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
@@ -29,6 +31,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +68,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
         if ("bibtex".equals(textDocument.getLanguageId())) {
             diagnosticHandler.computeAndPublishDiagnostics(client, textDocument.getUri(), textDocument.getText(), textDocument.getVersion());
+        } else if ("markdown".equals(textDocument.getLanguageId())) {
+            linkHandler.loadBibliographiesFromFrontMatter(textDocument.getUri(), textDocument.getText());
         }
         contentCache.put(textDocument.getUri(), textDocument.getText());
     }
@@ -86,10 +91,24 @@ public class BibtexTextDocumentService implements TextDocumentService {
     public void didClose(DidCloseTextDocumentParams params) {
         fileUriToLanguageId.remove(params.getTextDocument().getUri());
         contentCache.remove(params.getTextDocument().getUri());
+        linkHandler.documentClosed(params.getTextDocument().getUri());
     }
 
     @Override
     public void didSave(DidSaveTextDocumentParams params) {
+        String fileUri = params.getTextDocument().getUri();
+        if ("markdown".equals(fileUriToLanguageId.get(fileUri)) && contentCache.containsKey(fileUri)) {
+            linkHandler.loadBibliographiesFromFrontMatter(fileUri, contentCache.get(fileUri));
+        }
+    }
+
+    @Override
+    public CompletableFuture<@Nullable Hover> hover(HoverParams params) {
+        String fileUri = params.getTextDocument().getUri();
+        if (!fileUriToLanguageId.containsKey(fileUri)) {
+            return CompletableFuture.completedFuture(null);
+        }
+        return linkHandler.provideHover(fileUriToLanguageId.get(fileUri), contentCache.get(fileUri), params.getPosition());
     }
 
     @Override

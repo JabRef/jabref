@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
-import org.jabref.logic.openoffice.style.BstStyle;
-import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.bst.BstStyle;
+import org.jabref.logic.openoffice.jstyle.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.openoffice.style.CitationType;
 
