@@ -25,6 +25,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -83,7 +85,9 @@ class ModsExporter extends Exporter {
                     String value = entry.getValue();
 
                     if (StandardField.AUTHOR == field) {
-                        handleAuthors(writer, value);
+                        handleAuthors(writer, value, "aut");
+                    } else if (StandardField.EDITOR == field) {
+                        handleAuthors(writer, value, "edt");
                     } else if (new UnknownField("affiliation").equals(field)) {
                         addAffiliation(writer, value);
                     } else if (StandardField.ABSTRACT == field) {
@@ -359,41 +363,41 @@ class ModsExporter extends Exporter {
         }
     }
 
-    private void handleAuthors(XMLStreamWriter writer, String value) throws XMLStreamException {
-        String[] authors = value.split("and");
-        for (String author : authors) {
+    private void handleAuthors(XMLStreamWriter writer, String value, String role) throws XMLStreamException {
+        AuthorList authors = AuthorList.parse(value);
+
+        for (Author author : authors) {
             writer.writeStartElement("mods", "name", MODS_NAMESPACE_URI);
             writer.writeAttribute("type", "personal");
 
-            if (author.contains(",")) {
-                // if author contains ","  then this indicates that the author has a forename and family name
-                int commaIndex = author.indexOf(',');
-                String familyName = author.substring(0, commaIndex);
+            String familyName = author.getNamePrefixAndFamilyName();
+
+            if (!familyName.isEmpty()) {
                 writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
                 writer.writeAttribute("type", "family");
                 writer.writeCharacters(familyName);
                 writer.writeEndElement();
-
-                // now take care of the forenames
-                String forename = author.substring(commaIndex + 1);
-                String[] forenames = forename.split(" ");
-                for (String given : forenames) {
-                    if (!given.isEmpty()) {
-                        writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
-                        writer.writeAttribute("type", "given");
-                        writer.writeCharacters(given);
-                        writer.writeEndElement();
-                    }
-                }
-                writer.writeEndElement();
-            } else {
-                // no "," indicates that there should only be a family name
-                writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
-                writer.writeAttribute("type", "family");
-                writer.writeCharacters(author);
-                writer.writeEndElement();
-                writer.writeEndElement();
             }
+
+            String givenName = author.getGivenName().orElse("");
+
+            if (!givenName.isEmpty()) {
+                for (String given : givenName.split("\\s+")) {
+                    writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
+                    writer.writeAttribute("type", "given");
+                    writer.writeCharacters(given);
+                    writer.writeEndElement();
+                }
+            }
+
+            writer.writeStartElement("mods", "role", MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "roleTerm", MODS_NAMESPACE_URI);
+            writer.writeAttribute("type", "code");
+            writer.writeAttribute("authority", "marcrelator");
+            writer.writeCharacters(role);
+            writer.writeEndElement();
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
     }
 

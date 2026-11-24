@@ -9,11 +9,17 @@
         <mods:name type="personal">
             <mods:namePart type="family">Don't</mods:namePart>
             <mods:namePart type="given">know</mods:namePart>
+            <mods:role>
+                <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+            </mods:role>
         </mods:name>
         <mods:name type="personal">
-            <mods:namePart type="family"> Realy</mods:namePart>
+            <mods:namePart type="family">Realy</mods:namePart>
             <mods:namePart type="given">don't</mods:namePart>
             <mods:namePart type="given">know</mods:namePart>
+            <mods:role>
+                <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+            </mods:role>
         </mods:name>
         <mods:identifier type="doi">someDoi</mods:identifier>
         <mods:subject>

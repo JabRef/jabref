@@ -5,6 +5,9 @@
         <mods:genre>inbook</mods:genre>
         <mods:name type="personal">
             <mods:namePart type="family">Mustermann</mods:namePart>
+            <mods:role>
+                <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+            </mods:role>
         </mods:name>
         <mods:subject>
             <mods:topic>keyword</mods:topic>
