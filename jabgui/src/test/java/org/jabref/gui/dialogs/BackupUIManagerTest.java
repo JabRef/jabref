@@ -365,7 +365,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 });
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+        doReturn(new TextBasedPreviewLayout("id", "name", "", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
                 .when(previewPreferences).getSelectedPreviewLayout();
         Injector.setModelOrService(DialogService.class, dialogService);
         Injector.setModelOrService(GuiPreferences.class, preferences);
@@ -415,7 +415,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 });
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+        doReturn(new TextBasedPreviewLayout("id", "name", "", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
                 .when(previewPreferences).getSelectedPreviewLayout();
         Injector.setModelOrService(DialogService.class, dialogService);
         Injector.setModelOrService(GuiPreferences.class, preferences);

@@ -82,6 +82,8 @@ class GlobalSearchResultDialogTest {
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         org.mockito.Mockito.doReturn(
                 new org.jabref.logic.preview.TextBasedPreviewLayout(
+                        "id",
+                        "name",
                         "",
                         mock(org.jabref.logic.layout.LayoutFormatterPreferences.class),
                         mock(org.jabref.logic.journals.JournalAbbreviationRepository.class)

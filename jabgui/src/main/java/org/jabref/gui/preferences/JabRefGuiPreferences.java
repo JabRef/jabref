@@ -1084,10 +1084,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
             if (customizedLayouts.isEmpty()) {
-                CustomizedPreviewStyle defaultStyle = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
-                        TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, TextBasedPreviewLayout.DEFAULT);
-                customizedLayouts.add(defaultStyle);
-                cycle.add(defaultStyle.id());
+                customizedLayouts.add(PreviewPreferences.DEFAULT_STYLE);
+                cycle.add(PreviewPreferences.DEFAULT_STYLE.id());
             } else {
                 cycle.add(customizedLayouts.getFirst().id());
             }

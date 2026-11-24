@@ -852,7 +852,7 @@ public class PreferencesMigrations {
     /// Before that, a single customized style lived under `previewStyle`; it is moved into the series once.
     /// JabRefGuiPreferences#PREVIEW_STYLE_CUSTOMIZED_MIGRATED is written once and never purged, so an
     /// emptied list is not migrated again on a later startup.
-    static public void upgradeLegacyCustomPreviewStyle(JabRefCliPreferences prefs) {
+    public static void upgradeLegacyCustomPreviewStyle(JabRefCliPreferences prefs) {
         if (prefs.hasKey(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0")
                 || prefs.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false)) {
             return;

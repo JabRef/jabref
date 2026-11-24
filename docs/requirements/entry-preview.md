@@ -12,7 +12,7 @@ The Entry Preview displays two distinct views under the 'Available' Panel. Each 
 
 Needs: impl
 
-### User can manage manage custom preview layouts in the Entry Preview
+### User can manage custom preview layouts in the Entry Preview
 `feat~entry-preview.create-custom-style~1`
 
 The add field allows the user to create custom preview styles.

@@ -135,7 +135,7 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
         when(preferences.getAutoLinkPreferences()).thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
 
         previewPreferences = mock(PreviewPreferences.class);
-        PreviewLayout previewLayout = new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class));
+        PreviewLayout previewLayout = new TextBasedPreviewLayout("id", "name", "", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class));
         doReturn(previewLayout).when(previewPreferences).getSelectedPreviewLayout();
         when(preferences.getPreviewPreferences()).thenReturn(previewPreferences);
 
@@ -414,7 +414,7 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
 
     @Test
     void preview_showsTheEntry_whenTheDialogIsBuilt() {
-        doReturn(new TextBasedPreviewLayout("\\title", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+        doReturn(new TextBasedPreviewLayout("id", "name", "\\title", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
                 .when(previewPreferences).getSelectedPreviewLayout();
 
         BibEntry entry = new BibEntry(StandardEntryType.Article)

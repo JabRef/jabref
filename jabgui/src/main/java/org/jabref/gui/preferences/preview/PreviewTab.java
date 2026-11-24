@@ -212,7 +212,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         resetDefaultButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
         resetDefaultButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         resetDefaultButton.setPrefSize(20.0, 20.0);
-        resetDefaultButton.setTooltip(new Tooltip(Localization.lang("Reset default preview style")));
+        resetDefaultButton.setTooltip(new Tooltip(Localization.lang("Reset to default")));
         resetDefaultButton.setOnAction(_ -> resetDefaultButtonAction());
         HBox topRight = new HBox(10, readOnlyLabel,
                 resetDefaultButton);
