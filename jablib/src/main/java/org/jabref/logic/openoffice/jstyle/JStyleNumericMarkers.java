@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.style;
+package org.jabref.logic.openoffice.jstyle;
 
 import java.util.List;
 import java.util.Optional;

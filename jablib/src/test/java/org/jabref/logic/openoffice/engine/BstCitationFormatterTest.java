@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bst.BstVM;
-import org.jabref.logic.openoffice.style.BstStyle;
+import org.jabref.logic.openoffice.bst.BstStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
