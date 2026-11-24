@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,6 +46,9 @@ class LatexMarkupConverterTest {
                 Arguments.of("\\^{q}", "q", ""),
                 Arguments.of("\\^q", "q", ""),
                 Arguments.of("\\c{q}", "q", "q"),
+                Arguments.of("\\^& B", "&amp; B", " B"),
+                Arguments.of("\\^&{copy;}", "&amp;copy;", "copy;"),
+                Arguments.of("\\unknown{\\^&{copy;}}", "&amp;copy;", "copy;"),
                 Arguments.of("\\textit{a {\\bf b", "<i>a <b>b</b></i>", "<i>a <b>b</b></i>"),
                 Arguments.of("\\unknown{\\textit{x", "<i>x</i>", "<i>x</i>"),
                 Arguments.of("\\textit {word} tail", "<i>word</i> tail", "<i>word</i> tail"),
@@ -129,8 +133,8 @@ class LatexMarkupConverterTest {
 
     private static Stream<Arguments> adapterNormalizationData() {
         return Stream.of(
-                Arguments.of("A & B", "A &amp; B", "A & B"),
-                Arguments.of("A \\& B", "A &amp; B", "A & B"),
+                Arguments.of("A & B", "A &amp; B", "A &amp; B"),
+                Arguments.of("A \\& B", "A &amp; B", "A &amp; B"),
                 Arguments.of("A~B", "A&nbsp;B", "A~B"),
                 Arguments.of("a\nb", "a<br>b", "a\nb"),
                 Arguments.of("a\n\nb", "a<p>b", "a\n\nb"),
@@ -140,7 +144,7 @@ class LatexMarkupConverterTest {
                 Arguments.of(
                         "\\textit{A \\textbf{\\& B}~C\nD\n\nE}",
                         "<i>A <b>&amp; B</b>&nbsp;C<br>D<p>E</i>",
-                        "<i>A <b>& B</b>~C\nD\n\nE</i>"),
+                        "<i>A <b>&amp; B</b>~C\nD\n\nE</i>"),
                 Arguments.of(
                         "<i>British <b>Journal</b> of Nutrition</i>",
                         "<i>British <b>Journal</b> of Nutrition</i>",
@@ -162,6 +166,111 @@ class LatexMarkupConverterTest {
         assertAll(
                 () -> assertEquals(expectedHtml, new HTMLChars().format(input)),
                 () -> assertEquals(expectedWriter, new OOPreFormatter().format(input))
+        );
+    }
+
+    private static Stream<Arguments> controlSymbolData() {
+        return Stream.of(
+                Arguments.of("a\\, b", "a\u2009 b", "a\u2009 b"),
+                Arguments.of("a\\,b", "a\u2009b", "a\u2009b"),
+                Arguments.of("a\\;b", "a\u2005b", "a\u2005b"),
+                Arguments.of("a\\!b", "ab", "ab"),
+                Arguments.of("a\\:b", "a\u205Fb", "a\u205Fb"),
+                Arguments.of("a\\ b", "a b", "a b"),
+                Arguments.of("a\\,{b}", "a\u2009b", "a\u2009b"),
+                Arguments.of("a\\;{b}", "a\u2005b", "a\u2005b"),
+                Arguments.of("a\\!{b}", "ab", "ab"),
+                Arguments.of("a\\:{b}", "a\u205Fb", "a\u205Fb"),
+                Arguments.of("a\\ {b}", "a b", "a b"),
+                Arguments.of("\\,", "\u2009", "\u2009"),
+                Arguments.of("\\;", "\u2005", "\u2005"),
+                Arguments.of("\\!", "", ""),
+                Arguments.of("\\:", "\u205F", "\u205F"),
+                Arguments.of("a,;!:b", "a,;!:b", "a,;!:b"),
+                Arguments.of("a\\%b", "a%b", "a%b"),
+                Arguments.of("a\\_b", "a_b", "a_b"),
+                Arguments.of("a\\#b", "a#b", "a#b"),
+                Arguments.of("a\\_{b}", "a_b", "a_b"),
+                Arguments.of("a\\#{b}", "a#b", "a#b")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("controlSymbolData")
+    void publicAdaptersPreserveControlSymbolPolicies(String input, String expectedHtml, String expectedWriter) {
+        assertAll(
+                () -> assertEquals(expectedHtml, new HTMLChars().format(input)),
+                () -> assertEquals(expectedWriter, new OOPreFormatter().format(input)),
+                () -> assertEquals("<i>" + expectedHtml + "</i>", new HTMLChars().format("\\textit{" + input + "}")),
+                () -> assertEquals("<i>" + expectedWriter + "</i>", new OOPreFormatter().format("\\textit{" + input + "}")),
+                () -> assertEquals("<i><b>" + expectedHtml + "</b></i>", new HTMLChars().format("\\textit{\\textbf{" + input + "}}")),
+                () -> assertEquals("<i><b>" + expectedWriter + "</b></i>", new OOPreFormatter().format("\\textit{\\textbf{" + input + "}}"))
+        );
+    }
+
+    @Test
+    void htmlControlSymbolsDoNotConsumeFollowingProtectionGroups() {
+        HTMLChars formatter = new HTMLChars();
+        formatter.setArgument("keepCurlyBraces");
+
+        assertAll(
+                () -> assertEquals("a\u2009{b}", formatter.format("a\\,{b}")),
+                () -> assertEquals("a {b}", formatter.format("a\\ {b}")),
+                () -> assertEquals("a_{b}", formatter.format("a\\_{b}")),
+                () -> assertEquals("a#{b}", formatter.format("a\\#{b}"))
+        );
+    }
+
+    private static Stream<Arguments> ampersandData() {
+        return Stream.of(
+                Arguments.of("&", "&amp;", "&"),
+                Arguments.of("\\&", "&amp;", "&"),
+                Arguments.of("&{copy;}", "&amp;copy;", "&copy;"),
+                Arguments.of("&\\unknown{copy;}", "&amp;copy;", "&copy;"),
+                Arguments.of("&co{}py;", "&amp;copy;", "&copy;"),
+                Arguments.of("\\&copy;", "&amp;copy;", "&copy;"),
+                Arguments.of("\\&amp;", "&amp;amp;", "&amp;"),
+                Arguments.of("\\&#38;", "&amp;#38;", "&#38;"),
+                Arguments.of("\\&{copy;}", "&amp;copy;", "&copy;"),
+                Arguments.of("&amp;", "&amp;", "&"),
+                Arguments.of("&copy;", "&copy;", "©"),
+                Arguments.of("&#38;", "&#38;", "&"),
+                Arguments.of("&#x26;", "&#x26;", "&"),
+                Arguments.of("&amp;copy;", "&amp;copy;", "&copy;"),
+                Arguments.of("\\unknown{A & B}", "A &amp; B", "A & B"),
+                Arguments.of("\\unknown{A \\& B}", "A &amp; B", "A & B")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("ampersandData")
+    void publicAdaptersProtectLiteralAmpersands(String input, String expectedMarkup, String expectedText) {
+        String html = new HTMLChars().format(input);
+        String writer = new OOPreFormatter().format(input);
+
+        assertAll(
+                () -> assertEquals(expectedMarkup, html),
+                () -> assertEquals(expectedMarkup, writer),
+                () -> assertEquals(expectedText, StringEscapeUtils.unescapeHtml4(html)),
+                () -> assertEquals(expectedText, StringEscapeUtils.unescapeHtml4(writer)),
+                () -> assertEquals("<i>" + expectedMarkup + "</i>", new HTMLChars().format("\\textit{" + input + "}")),
+                () -> assertEquals("<i>" + expectedMarkup + "</i>", new OOPreFormatter().format("\\textit{" + input + "}"))
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
+    void publicAdaptersRespectBackslashParityBeforeAmpersands(int backslashes) {
+        String prefix = "\\".repeat(backslashes);
+        String expectedPrefix = "\\".repeat(backslashes / 2);
+
+        assertAll(
+                () -> assertEquals(expectedPrefix + "&amp;", new HTMLChars().format(prefix + "&")),
+                () -> assertEquals(expectedPrefix + "&amp;", new OOPreFormatter().format(prefix + "&")),
+                () -> assertEquals(expectedPrefix + "&amp;b", new HTMLChars().format(prefix + "&{b}")),
+                () -> assertEquals(expectedPrefix + "&amp;b", new OOPreFormatter().format(prefix + "&{b}")),
+                () -> assertEquals("<i>" + expectedPrefix + "&amp;</i>", new HTMLChars().format("\\textit{" + prefix + "&}")),
+                () -> assertEquals("<i>" + expectedPrefix + "&amp;</i>", new OOPreFormatter().format("\\textit{" + prefix + "&}"))
         );
     }
 

@@ -166,6 +166,10 @@ The JStyle processors, formatters, and loaders live in `logic.openoffice.jstyle`
 They use `logic.layout.format.OOPreFormatter` to convert supported LaTeX commands to Unicode and `OOText` tags; its registered layout name remains `OOPreFormatter`.
 `OOPreFormatter` and `HTMLChars` share the package-private `LatexMarkupConverter` traversal, while retaining formatter-specific normalization, character mappings, and output rules.
 Nested formatting commands are converted within their enclosing groups; protection braces are discarded in Writer output, while escaped literal braces are preserved.
+Both outputs approximate `\,` with U+2009 thin space, `\:` with U+205F medium mathematical space, and `\;` with U+2005 four-per-em space; these are font-dependent approximations, not TeX glue.
+Negative spacing (`\!`) is omitted because the supported markup cannot represent it; control symbols do not consume following groups.
+Ampersands are escaped during traversal, preserving source entities without creating new entities when groups disappear.
+Escaped literal ampersands remain protected as `&amp;` until HTML rendering or Writer's single entity-decoding step.
 Malformed input receives best-effort conversion: commands without arguments produce no formatting, and open formatting scopes close at the end of input.
 BST preview brace sanitization precedes conversion, so malformed titles can retain recoverable formatting rather than falling back to plain Unicode.
 `OOText` and `OOFormat` describe that output without depending on logic implementations; only the logic-layer `OOTextWriter` interprets it into Writer text.

@@ -83,7 +83,7 @@ class OOPreFormatterTest {
                     # nested accents and normalization compatibility
                     \\textit{M{\\\"{u}}ller \\textbf{caf\\'{e}}} -> <i>Müller <b>café</b></i>
                     \\textit{cost \\textbf{\\$5} and $x$} -> <i>cost <b>$5</b> and x</i>
-                    \\textit{A \\textbf{\\& B}} -> <i>A <b>& B</b></i>
+                    \\textit{A \\textbf{\\& B}} -> <i>A <b>&amp; B</b></i>
                     \\textit{\\textbf{\\$}x\\$} -> <i><b>$</b>x$</i>
                     <i>British <b>Journal</b> of Nutrition</i> -> <i>British <b>Journal</b> of Nutrition</i>
                     \\textit{British <b>Journal</b>} -> <i>British <b>Journal</b></i>

@@ -10,8 +10,7 @@ public class OOPreFormatter implements LayoutFormatter {
 
     @Override
     public String format(String field) {
-        String normalizedField = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
-                                      .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+        String normalizedField = field.replace("\\$", "&dollar;") // Replace \$ with &dollar;
                                       .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         return LatexMarkupConverter.convert(normalizedField, LatexMarkupConverter.Dialect.WRITER, LatexMarkupConverter.GroupBraces.DISCARD)

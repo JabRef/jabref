@@ -151,7 +151,8 @@ class HTMLCharsTest {
                 Arguments.of("&Alpha;", "&Alpha;"),
                 Arguments.of("&alpha;", "&alpha;"),
                 Arguments.of("&amp;HelloWorld", "&HelloWorld"),
-                Arguments.of("&amp;amp;", "\\\\&"),
+                Arguments.of("&amp;", "\\&"),
+                Arguments.of("\\&amp;", "\\\\&"),
                 Arguments.of("&lt;", "&lt;"),
                 Arguments.of("&gt;", "&gt;")
         );
