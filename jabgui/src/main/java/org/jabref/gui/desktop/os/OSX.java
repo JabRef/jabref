@@ -5,9 +5,9 @@ import java.nio.file.Path;
 
 import javafx.application.HostServices;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.os.ProcessLauncher;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -25,27 +25,27 @@ public class OSX extends NativeDesktop {
 
     @Override
     protected void openFileWithDefaultApplication(String filePath) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", filePath));
+        ProcessLauncher.startDetached(new ProcessBuilder("/usr/bin/open", filePath));
     }
 
     @Override
     protected void openUrlWithSystemHandler(String url) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", url));
+        ProcessLauncher.startDetached(new ProcessBuilder("/usr/bin/open", url));
     }
 
     @Override
     protected void openFileWithCustomApplication(String filePath, String application) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", "-a", application, filePath));
+        ProcessLauncher.startDetached(new ProcessBuilder("/usr/bin/open", "-a", application, filePath));
     }
 
     @Override
     protected void openFolderAndSelectFileWithDefaultFileBrowser(Path file) throws IOException {
-        startProcess(new ProcessBuilder("/usr/bin/open", "-R", file.toString()));
+        ProcessLauncher.startDetached(new ProcessBuilder("/usr/bin/open", "-R", file.toString()));
     }
 
     @Override
-    protected void openConsoleWithDefaultTerminal(String absolutePath, DialogService dialogService) throws IOException {
-        startProcess(new ProcessBuilder("open", "-a", "Terminal", absolutePath));
+    protected void openConsoleWithDefaultTerminal(Path directory) throws IOException {
+        ProcessLauncher.startDetached(new ProcessBuilder("/usr/bin/open", "-a", "Terminal", directory.toString()));
     }
 
     @Override

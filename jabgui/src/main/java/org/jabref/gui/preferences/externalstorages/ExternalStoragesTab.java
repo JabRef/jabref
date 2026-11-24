@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 public class ExternalStoragesTab extends AbstractPreferenceTabView<ExternalStoragesTabViewModel> {
 
     public ExternalStoragesTab() {
-        this.viewModel = new ExternalStoragesTabViewModel(preferences.getCiteDrivePreferences());
+        this.viewModel = new ExternalStoragesTabViewModel(preferences);
         buildView();
     }
 
