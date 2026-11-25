@@ -9,12 +9,14 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +30,25 @@ public class CleanupWorker {
     private final TimestampPreferences timestampPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final boolean useFJournalField;
+    private final @Nullable ProtectedTermsLoader protectedTermsLoader;
     private final List<JabRefException> failures;
 
     public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, boolean useFJournalField, JournalAbbreviationRepository abbreviationRepository) {
+        this(databaseContext, filePreferences, timestampPreferences, useFJournalField, abbreviationRepository, null);
+    }
+
+    public CleanupWorker(BibDatabaseContext databaseContext,
+                         FilePreferences filePreferences,
+                         TimestampPreferences timestampPreferences,
+                         boolean useFJournalField,
+                         JournalAbbreviationRepository abbreviationRepository,
+                         @Nullable ProtectedTermsLoader protectedTermsLoader) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
         this.abbreviationRepository = abbreviationRepository;
         this.useFJournalField = useFJournalField;
+        this.protectedTermsLoader = protectedTermsLoader;
         this.failures = new ArrayList<>();
     }
 
@@ -71,7 +84,9 @@ public class CleanupWorker {
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
-            jobs.addAll(preset.getFieldFormatterCleanups().getConfiguredActions(databaseContext.getMetaData().getKeywordSeparator().orElse(null)));
+            jobs.addAll(preset.getFieldFormatterCleanups().getConfiguredActions(
+                    databaseContext.getMetaData().getKeywordSeparator().orElse(null),
+                    protectedTermsLoader));
         }
 
         return jobs;

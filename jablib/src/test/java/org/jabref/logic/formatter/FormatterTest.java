@@ -5,12 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,15 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FormatterTest {
-
-    private static ProtectedTermsLoader protectedTermsLoader;
-
-    @BeforeAll
-    static void setUp() {
-        protectedTermsLoader = new ProtectedTermsLoader(
-                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), List.of(),
-                        List.of(), List.of()));
-    }
 
     /// When a new formatter is added by copy and pasting another formatter, it may happen that the `getKey()`
     /// method is not adapted. This results in duplicate keys, which this test tests for.
@@ -102,11 +89,9 @@ class FormatterTest {
                 Formatters.getAll().stream(),
                 // following formatters are not contained in the list of all formatters, because
                 // - the IdentityFormatter is not offered to the user,
-                // - the ProtectTermsFormatter needs more configuration,
                 // - the TruncateFormatter needs setup,
                 Stream.of(
                         new IdentityFormatter(),
-                        new ProtectTermsFormatter(protectedTermsLoader),
                         new TruncateFormatter(0)));
         // @formatter:on
     }

@@ -1,5 +1,6 @@
 package org.jabref.logic.cleanup;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,11 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+import org.jabref.logic.protectedterms.ProtectedTermsList;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -25,6 +30,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -359,8 +365,32 @@ public class FieldFormatterCleanupActionsTest {
     public static Stream<Arguments> formatterFromString() {
         return Stream.of(
                 Arguments.of(new ReplaceUnicodeLigaturesFormatter(), "replace_unicode_ligatures"),
-                Arguments.of(new LowerCaseFormatter(), "lower_case")
+                Arguments.of(new LowerCaseFormatter(), "lower_case"),
+                Arguments.of(new ProtectTermsFormatter(), "protect_terms")
         );
+    }
+
+    @Test
+    void checkProtectTermsSaveAction(@TempDir Path tempDir) {
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(
+                true,
+                FieldFormatterCleanupMapper.parseActions("title[protect_terms]"));
+        assertEquals(
+                List.of(new FieldFormatterCleanup(StandardField.TITLE, new ProtectTermsFormatter())),
+                actions.getConfiguredActions());
+        assertEquals("title[protect_terms]\n", FieldFormatterCleanupActions.getMetaDataString(actions.getConfiguredActions(), "\n"));
+
+        ProtectedTermsLoader loader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(List.of(), List.of(), ProtectedTermsLoader.getInternalLists(), List.of()));
+        ProtectedTermsList customList = loader.addNewProtectedTermsList(
+                "Custom", tempDir.resolve("custom.terms").toString(), true);
+        customList.addProtectedTerm("LiveTerm");
+
+        BibEntry customEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "In LiveTerm");
+        actions.applySaveActions(customEntry, null, loader, Runnable::run);
+
+        assertEquals(Optional.of("In {LiveTerm}"), customEntry.getField(StandardField.TITLE));
     }
 
     @ParameterizedTest

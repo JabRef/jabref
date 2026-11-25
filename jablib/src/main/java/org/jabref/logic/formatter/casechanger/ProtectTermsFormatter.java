@@ -1,22 +1,36 @@
 package org.jabref.logic.formatter.casechanger;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.jabref.logic.cleanup.ProtectedTermsLoaderAware;
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.util.strings.StringLengthComparator;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Adds {} brackets around acronyms, month names and countries to preserve their case.
 /// Related formatter: [org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter]
-public class ProtectTermsFormatter extends Formatter {
+@NullMarked
+public class ProtectTermsFormatter extends Formatter implements ProtectedTermsLoaderAware {
 
-    private final ProtectedTermsLoader protectedTermsLoader;
+    private final Optional<ProtectedTermsLoader> protectedTermsLoader;
+
+    /// Unbound: uses the default built-in protected terms lists lazily when formatting.
+    public ProtectTermsFormatter() {
+        this.protectedTermsLoader = Optional.empty();
+    }
 
     public ProtectTermsFormatter(ProtectedTermsLoader protectedTermsLoader) {
-        this.protectedTermsLoader = protectedTermsLoader;
+        this.protectedTermsLoader = Optional.of(protectedTermsLoader);
+    }
+
+    @Override
+    public Formatter withProtectedTermsLoader(ProtectedTermsLoader protectedTermsLoader) {
+        return new ProtectTermsFormatter(protectedTermsLoader);
     }
 
     private String format(String text, List<String> listOfWords) {
@@ -34,11 +48,13 @@ public class ProtectTermsFormatter extends Formatter {
     }
 
     @Override
-    public String format(@NonNull String text) {
+    public String format(String text) {
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, this.protectedTermsLoader.getProtectedTerms());
+        ProtectedTermsLoader loader = protectedTermsLoader
+                .orElseGet(() -> new ProtectedTermsLoader(ProtectedTermsPreferences.getDefault()));
+        return this.format(text, loader.getProtectedTerms());
     }
 
     @Override

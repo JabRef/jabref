@@ -29,7 +29,6 @@ class FormattersTest {
                     // Need configuration
                     "org.jabref.logic.formatter.bibtexfields.RegexFormatter",
                     "org.jabref.logic.formatter.casechanger.CamelNFormatter",
-                    "org.jabref.logic.formatter.casechanger.ProtectTermsFormatter",
                     "org.jabref.logic.formatter.minifier.TruncateFormatter",
                     "org.jabref.logic.layout.LayoutFormatterBasedFormatter",
                     // Used internally only, not offered to the user

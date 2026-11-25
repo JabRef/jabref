@@ -27,6 +27,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -286,14 +287,17 @@ public class BackupManager {
         try (AtomicFileWriter writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             try {
-                new BibDatabaseWriter(
+                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
                         preferences.getFieldPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager)
-                        // we save the clone to prevent the original database (and thus the UI) from being changed
-                        .writeDatabase(bibDatabaseContextClone);
+                        entryTypesManager);
+                Optional.ofNullable(preferences.getProtectedTermsPreferences())
+                        .map(ProtectedTermsLoader::new)
+                        .ifPresent(databaseWriter::withProtectedTermsLoader);
+                // we save the clone to prevent the original database (and thus the UI) from being changed
+                databaseWriter.writeDatabase(bibDatabaseContextClone);
                 // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
             } catch (IOException e) {
                 writer.abort();

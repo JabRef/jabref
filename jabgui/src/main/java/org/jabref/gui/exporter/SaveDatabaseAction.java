@@ -42,6 +42,7 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -73,6 +74,7 @@ public class SaveDatabaseAction {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final TaskExecutor taskExecutor;
+    private final Optional<ProtectedTermsLoader> protectedTermsLoader;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -97,7 +99,8 @@ public class SaveDatabaseAction {
                 stateManager,
                 journalAbbreviationRepository,
                 Injector.instantiateModelOrService(GitHandlerRegistry.class),
-                Injector.instantiateModelOrService(TaskExecutor.class));
+                Injector.instantiateModelOrService(TaskExecutor.class),
+                Injector.instantiateModelOrService(ProtectedTermsLoader.class));
     }
 
     public SaveDatabaseAction(LibraryTab libraryTab,
@@ -108,6 +111,26 @@ public class SaveDatabaseAction {
                               JournalAbbreviationRepository journalAbbreviationRepository,
                               GitHandlerRegistry gitHandlerRegistry,
                               TaskExecutor taskExecutor) {
+        this(libraryTab,
+                dialogService,
+                preferences,
+                entryTypesManager,
+                stateManager,
+                journalAbbreviationRepository,
+                gitHandlerRegistry,
+                taskExecutor,
+                null);
+    }
+
+    public SaveDatabaseAction(LibraryTab libraryTab,
+                              DialogService dialogService,
+                              GuiPreferences preferences,
+                              BibEntryTypesManager entryTypesManager,
+                              StateManager stateManager,
+                              JournalAbbreviationRepository journalAbbreviationRepository,
+                              GitHandlerRegistry gitHandlerRegistry,
+                              TaskExecutor taskExecutor,
+                              @Nullable ProtectedTermsLoader protectedTermsLoader) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -116,6 +139,7 @@ public class SaveDatabaseAction {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.taskExecutor = taskExecutor;
+        this.protectedTermsLoader = Optional.ofNullable(protectedTermsLoader);
     }
 
     public SaveResult save() {
@@ -362,6 +386,7 @@ public class SaveDatabaseAction {
                                 journalAbbreviationRepository,
                                 preferences.getAbbreviationPreferences().shouldUseFJournalField())
                         .withMutationScheduler(SaveDatabaseAction::runSaveMutation);
+                protectedTermsLoader.ifPresent(databaseWriter::withProtectedTermsLoader);
 
                 try {
                     if (selectedOnly) {

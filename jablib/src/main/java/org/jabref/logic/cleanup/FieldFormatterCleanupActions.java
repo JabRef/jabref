@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.jabref.logic.formatter.Formatter;
@@ -21,6 +22,7 @@ import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -89,16 +91,38 @@ public class FieldFormatterCleanupActions {
     }
 
     /// The configured actions with every [KeywordSeparatorAware] formatter bound to the given library separator.
-    /// `null` leaves the actions unbound, so those formatters use the global preference.
+    /// `null` leaves those actions unbound, so those formatters fall back to the global preference.
     public List<FieldFormatterCleanup> getConfiguredActions(@Nullable Character libraryKeywordSeparator) {
-        if (libraryKeywordSeparator == null) {
+        return getConfiguredActions(libraryKeywordSeparator, null);
+    }
+
+    /// The configured actions with any [KeywordSeparatorAware] and [ProtectedTermsLoaderAware] formatters bound.
+    /// `null` leaves the corresponding formatters unbound.
+    public List<FieldFormatterCleanup> getConfiguredActions(@Nullable Character libraryKeywordSeparator,
+                                                            @Nullable ProtectedTermsLoader protectedTermsLoader) {
+        Optional<Character> separator = Optional.ofNullable(libraryKeywordSeparator);
+        Optional<ProtectedTermsLoader> termsLoader = Optional.ofNullable(protectedTermsLoader);
+        if (separator.isEmpty() && termsLoader.isEmpty()) {
             return getConfiguredActions();
         }
         return actions.stream()
-                      .map(action -> action.getFormatter() instanceof KeywordSeparatorAware aware
-                                     ? new FieldFormatterCleanup(action.getField(), aware.withKeywordSeparator(libraryKeywordSeparator))
-                                     : action)
+                      .map(action -> bindFormatter(action, separator, termsLoader))
                       .toList();
+    }
+
+    private static FieldFormatterCleanup bindFormatter(FieldFormatterCleanup action,
+                                                       Optional<Character> separator,
+                                                       Optional<ProtectedTermsLoader> termsLoader) {
+        Optional<Formatter> bound = switch (action.getFormatter()) {
+            case KeywordSeparatorAware aware ->
+                    separator.map(aware::withKeywordSeparator);
+            case ProtectedTermsLoaderAware aware ->
+                    termsLoader.map(aware::withProtectedTermsLoader);
+            default ->
+                    Optional.empty();
+        };
+        return bound.map(formatter -> new FieldFormatterCleanup(action.getField(), formatter))
+                    .orElse(action);
     }
 
     public List<FieldChange> applySaveActions(BibEntry entry) {
@@ -114,8 +138,17 @@ public class FieldFormatterCleanupActions {
     public List<FieldChange> applySaveActions(BibEntry entry,
                                               @Nullable Character libraryKeywordSeparator,
                                               Consumer<Runnable> mutationScheduler) {
+        return applySaveActions(entry, libraryKeywordSeparator, null, mutationScheduler);
+    }
+
+    /// @param protectedTermsLoader the active protected terms loader, or `null` to use default built-in lists
+    /// @param mutationScheduler    routes [BibEntry] field mutations to the correct thread
+    public List<FieldChange> applySaveActions(BibEntry entry,
+                                              @Nullable Character libraryKeywordSeparator,
+                                              @Nullable ProtectedTermsLoader protectedTermsLoader,
+                                              Consumer<Runnable> mutationScheduler) {
         if (enabled) {
-            return applyAllActions(entry, libraryKeywordSeparator, mutationScheduler);
+            return applyAllActions(entry, libraryKeywordSeparator, protectedTermsLoader, mutationScheduler);
         } else {
             return List.of();
         }
@@ -123,10 +156,11 @@ public class FieldFormatterCleanupActions {
 
     private List<FieldChange> applyAllActions(BibEntry entry,
                                               @Nullable Character libraryKeywordSeparator,
+                                              @Nullable ProtectedTermsLoader protectedTermsLoader,
                                               Consumer<Runnable> mutationScheduler) {
         List<FieldChange> result = new ArrayList<>();
 
-        for (FieldFormatterCleanup action : getConfiguredActions(libraryKeywordSeparator)) {
+        for (FieldFormatterCleanup action : getConfiguredActions(libraryKeywordSeparator, protectedTermsLoader)) {
             result.addAll(action.cleanup(entry, mutationScheduler));
         }
 

@@ -11,10 +11,13 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+
+import org.jspecify.annotations.Nullable;
 
 public class FieldFormatterCleanupMapper {
     private static final String CLEANUP_FOR_PARSING = ",(?![^\\[]*])";
@@ -80,10 +83,17 @@ public class FieldFormatterCleanupMapper {
         return result.toString();
     }
 
-    public static void applyFormatters(String fieldFormatters, List<BibEntry> entries) {
-        if (fieldFormatters != null && !fieldFormatters.isBlank()) {
+    public static void applyFormatters(@Nullable String fieldFormatters, List<BibEntry> entries) {
+        applyFormatters(fieldFormatters, entries, null);
+    }
+
+    public static void applyFormatters(@Nullable String fieldFormatters,
+                                       List<BibEntry> entries,
+                                       @Nullable ProtectedTermsLoader protectedTermsLoader) {
+        if (!StringUtil.isBlank(fieldFormatters)) {
             String parseableString = fieldFormatters.replaceAll(CLEANUP_FOR_PARSING, "\n");
-            List<FieldFormatterCleanup> cleanups = parseActions(parseableString);
+            List<FieldFormatterCleanup> cleanups = new FieldFormatterCleanupActions(true, parseActions(parseableString))
+                    .getConfiguredActions(null, protectedTermsLoader);
             for (BibEntry entry : entries) {
                 for (FieldFormatterCleanup cleanup : cleanups) {
                     cleanup.cleanup(entry);

@@ -2,6 +2,7 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.toolkit.exception.ExportServiceException;
@@ -44,7 +46,7 @@ class GenerateBibFromAux implements Callable<Integer> {
     @Option(names = "--output")
     private Path outputFile;
 
-    @Option(names = {"--field-formatters"}, description = "Field Formatter")
+    @Option(names = { "--field-formatters" }, description = "Field Formatter")
     private String fieldFormatters;
 
     @Override
@@ -61,7 +63,8 @@ class GenerateBibFromAux implements Callable<Integer> {
         }
 
         if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Creating excerpt of from '%0' with '%1'.", inputFile, auxFile.toAbsolutePath()));
+            System.out.println(
+                    Localization.lang("Creating excerpt of from '%0' with '%1'.", inputFile, auxFile.toAbsolutePath()));
         }
 
         AuxParser auxParser = new DefaultAuxParser(pr.getDatabase());
@@ -77,16 +80,22 @@ class GenerateBibFromAux implements Callable<Integer> {
             return CommandLine.ExitCode.OK;
         }
 
-        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, subDatabase.getEntries());
+        ProtectedTermsLoader protectedTermsLoader = Optional
+                .ofNullable(argumentProcessor.cliPreferences.getProtectedTermsPreferences())
+                .map(ProtectedTermsLoader::new)
+                .orElse(null);
+        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, subDatabase.getEntries(), protectedTermsLoader);
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()
-                                          .map(BibEntry::toString)
-                                          .collect(Collectors.joining("\n\n")));
+                    .map(BibEntry::toString)
+                    .collect(Collectors.joining("\n\n")));
         } else {
-            ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain).saveDatabase(subDatabase, outputFile);
+            ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain).saveDatabase(subDatabase,
+                    outputFile);
             if (!sharedOptions.porcelain) {
-                System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
+                System.out
+                        .println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
             }
         }
         return CommandLine.ExitCode.OK;
