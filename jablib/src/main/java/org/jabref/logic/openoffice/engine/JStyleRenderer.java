@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import org.jabref.logic.openoffice.style.JStyle;
-import org.jabref.logic.openoffice.style.JStyleBibliographyFormatter;
-import org.jabref.logic.openoffice.style.JStyleCitationProcessor;
+import org.jabref.logic.openoffice.jstyle.JStyle;
+import org.jabref.logic.openoffice.jstyle.JStyleBibliographyFormatter;
+import org.jabref.logic.openoffice.jstyle.JStyleCitationProcessor;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
