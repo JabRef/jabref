@@ -46,7 +46,7 @@ class GenerateBibFromAux implements Callable<Integer> {
     @Option(names = "--output")
     private Path outputFile;
 
-    @Option(names = { "--field-formatters" }, description = "Field Formatter")
+    @Option(names = {"--field-formatters"}, description = "Field Formatter")
     private String fieldFormatters;
 
     @Override
@@ -88,8 +88,8 @@ class GenerateBibFromAux implements Callable<Integer> {
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()
-                    .map(BibEntry::toString)
-                    .collect(Collectors.joining("\n\n")));
+                                          .map(BibEntry::toString)
+                                          .collect(Collectors.joining("\n\n")));
         } else {
             ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain).saveDatabase(subDatabase,
                     outputFile);
