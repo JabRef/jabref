@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.style;
+package org.jabref.logic.openoffice.bst;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.bst.BstVM;
+import org.jabref.logic.openoffice.style.OOStyle;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NullMarked;

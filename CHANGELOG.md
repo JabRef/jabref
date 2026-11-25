@@ -11,6 +11,18 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+### Changed
+
+- We changed the main table to keep the entry shown in the entry editor visible when enlarging the entry editor. [#17167](https://github.com/JabRef/jabref/pull/17167)
+
+### Fixed
+
+### Removed
+
+## [6.0-beta.2] - 2026-11-24
+
+### Added
+
 - We added the ability to import citations from a LibreOffice document into the current JabRef library. [#16516](https://github.com/JabRef/jabref/issues/16516)
 - We added native macOS text-editing shortcuts, such as <kbd>Ctrl</kbd> + <kbd>A</kbd>, to text fields and the BibTeX source editor. [#16529](https://github.com/JabRef/jabref/issues/16529)
 - We added an option to enable AI provider debugging in expert settings for testing AI features without external API calls. [#17607](https://github.com/JabRef/jabref/pull/17607)
@@ -86,7 +98,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice citation refresh to order citations by document text when citation positions on screen are unavailable. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We simplified secure credential storage and reduced macOS approval prompts for saved API keys. [#13687](https://github.com/JabRef/jabref/issues/13687)
-- We changed the main table to keep the entry shown in the entry editor visible when enlarging the entry editor. [#17167](https://github.com/JabRef/jabref/pull/17167)
 
 ### Fixed
 
@@ -125,6 +136,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing backups of values typed into newly added fields. [#17846](https://github.com/JabRef/jabref/pull/17846)
 - We fixed an issue where merging a backup file did not prompt the user to save upon exiting. [#12265](https://github.com/JabRef/jabref/issues/12265)
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
+- We fixed an issue where accepting changes from a backup did not mark the restored library as modified. [#15846](https://github.com/JabRef/jabref/issues/15846)
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
 - We fixed duplicate detection across compatible book-section and conference-paper entry types. [#17293](https://github.com/JabRef/jabref/issues/17293)
@@ -150,6 +162,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed API key validation when saving a new or edited key. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
+- We fixed the group icon picker background and borders not following the active theme. [#17887](https://github.com/JabRef/jabref/issues/17887)
 - We fixed subgroups disappearing after adding them from the "All entries" context menu in a new library. [#17764](https://github.com/JabRef/jabref/issues/17764)
 - We fixed an issue where group selections were lost when changing library tabs. [#1104](https://github.com/JabRef/jabref/issues/1104)
 - We fixed obsolete group assignments remaining after changing an explicit group's grouping method. [#8824](https://github.com/JabRef/jabref/issues/8824)
@@ -206,6 +219,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing bibliography paragraph styles blocking JStyle citation insertion in LibreOffice/OpenOffice when bibliography synchronization is disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed LibreOffice/OpenOffice citation updates modifying citations marked for deletion through Track Changes after change recording was disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed edits to selected JStyle files not taking effect when inserting or refreshing citations in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
+- We fixed an issue where the generate citation keys toolbar button stopped working after canceling an overwrite. [#17748](https://github.com/JabRef/jabref/issues/17748)
 
 ### Removed
 
@@ -2519,7 +2533,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-beta.1...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-beta.2...HEAD
+[6.0-beta.2]: https://github.com/JabRef/jabref/compare/v6.0-beta.1...v6.0-beta.2
 [6.0-beta.1]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...v6.0-beta.1
 [6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
 [6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5

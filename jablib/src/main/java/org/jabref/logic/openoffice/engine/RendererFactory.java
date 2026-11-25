@@ -1,8 +1,8 @@
 package org.jabref.logic.openoffice.engine;
 
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.openoffice.style.BstStyle;
-import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.bst.BstStyle;
+import org.jabref.logic.openoffice.jstyle.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.entry.BibEntryTypesManager;
 

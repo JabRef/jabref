@@ -1,6 +1,6 @@
 package org.jabref.logic.openoffice.engine;
 
-import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.bst.BstCitationFormat;
 
 import org.jspecify.annotations.NullMarked;
 
