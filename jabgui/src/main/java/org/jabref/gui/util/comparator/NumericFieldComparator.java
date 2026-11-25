@@ -39,14 +39,13 @@ public class NumericFieldComparator implements Comparator<String> {
             return -1;
         } else {
             if (val1 == null) {
-             return -1;
-        } else if (val2 == null) {
-             return 1;
-        } else {
-             return val1.compareTo(val2);
+                return -1;
+            } else if (val2 == null) {
+                return 1;
+            } else {
+                return val1.compareTo(val2);
+            }
         }
-    }
-
     }
 
     private Optional<Integer> toNumber(String value) {
