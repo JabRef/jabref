@@ -64,6 +64,9 @@ classDiagram
 * GUI code obtains the preferences object via dependency injection (see [ADR-0055](../decisions/0055-dependency-injection-approach.md)) and hands the needed preference objects on.
 * Since preference objects are observable, code which must react on a changed setting listens to the property instead of re-reading the value.
 * In tests, create the preference objects directly or mock them. See [Preferences in tests](testing.md#preferences-in-tests).
+  Integration tests can pass a dedicated `java.util.prefs.Preferences` node to `new JabRefCliPreferences(node)` or `new JabRefGuiPreferences(node)`; remove the node after the test.
+  Calling `clear()` on these injected instances resets their node and preference objects without clearing shared-database connections, the certificate truststore, or system keyring secrets.
+  Instances created with the no-argument constructors retain the full reset behavior.
 
 ### Preferences dialog
 
@@ -134,6 +137,19 @@ Further rules:
 * Defaults depending on the user's language must not be localized when the preferences are initialized, because the language may change later. See [ADR-0023](../decisions/0023-localized-preferences.md).
 * Defaults depending on the operating system (e.g., paths, commands) are computed in the preference object, too, e.g., using `org.jabref.logic.os.OS`.
 * Secrets (passwords, API keys, tokens) are not stored in the backing store but in the system keyring.
+  Custom API keys share one JSON object in a single keyring item; `fetcherCustomKeyBundleNames` records only their names in preferences.
+  An empty name list or disabled persistence prevents keyring reads at startup.
+  An absent name list identifies installations that still need migration from separate keyring items.
+  Web Search saves the complete key set in one operation and commits preference metadata only after the keyring operation succeeds.
+  Before replacing an established bundle, Web Search compares it with the loaded keys and rejects a stale update.
+  The Preferences dialog checks keyring availability once and saves changed credentials in background tasks.
+  The JavaFX thread applies each credential update after its keyring operation succeeds.
+  If a credential update fails, the dialog attempts the remaining updates and saves ordinary preferences before reporting the affected tabs.
+  Proxy password and GitHub token edits take effect for the current session when their keyring update fails.
+  The dialog stays open so failed updates can be retried.
+  The launcher loads credential preferences before JavaFX starts, and the dialog runs its final backing-store flush in a background task.
+  Preference imports preserve the local bundle's name list.
+  See [ADR 0085](../decisions/0085-bundle-custom-api-keys.md).
 
 ## Adding a new preference
 
