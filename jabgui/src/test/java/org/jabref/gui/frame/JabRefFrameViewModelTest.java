@@ -67,6 +67,7 @@ class JabRefFrameViewModelTest extends JavaFxTest {
         Injector.setModelOrService(GuiPreferences.class, preferences);
         Injector.setModelOrService(AiService.class, aiService);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 

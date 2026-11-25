@@ -209,6 +209,7 @@ class BackupUIManagerTest extends JavaFxTest {
         Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
         Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
     }
 
     @Test
@@ -409,6 +410,7 @@ class BackupUIManagerTest extends JavaFxTest {
         Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
         Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
 
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@Article{original, title = {Original}}");
@@ -460,6 +462,7 @@ class BackupUIManagerTest extends JavaFxTest {
         Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
         Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
 
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@Article{original, title = {Original}}");
