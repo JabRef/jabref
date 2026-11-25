@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice.style;
+package org.jabref.logic.openoffice.jstyle;
 
 import java.io.IOException;
 import java.nio.file.Files;
