@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.engine.storage.CitationMarkerWriter;
-import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.jstyle.JStyle;
 import org.jabref.logic.openoffice.uno.UnoStyle;
 
 import com.sun.star.style.XStyle;

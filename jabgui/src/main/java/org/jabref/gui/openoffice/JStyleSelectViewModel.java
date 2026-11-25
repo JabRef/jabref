@@ -10,7 +10,7 @@ import javafx.scene.Node;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.jstyle.JStyle;
 
 public class JStyleSelectViewModel {
 

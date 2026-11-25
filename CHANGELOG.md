@@ -11,6 +11,20 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added an option to automatically merge changes made to the library file outside JabRef into the open library. [#8431](https://github.com/JabRef/jabref/issues/8431)
+
+### Changed
+
+### Fixed
+
+- We fixed an issue where accepting an external change to an entry lost its table position, selection, and open entry editor. [#16813](https://github.com/JabRef/jabref/pull/16813)
+
+### Removed
+
+## [6.0-beta.2] - 2026-11-24
+
+### Added
+
 - We added the ability to import citations from a LibreOffice document into the current JabRef library. [#16516](https://github.com/JabRef/jabref/issues/16516)
 - We added native macOS text-editing shortcuts, such as <kbd>Ctrl</kbd> + <kbd>A</kbd>, to text fields and the BibTeX source editor. [#16529](https://github.com/JabRef/jabref/issues/16529)
 - We added an option to enable AI provider debugging in expert settings for testing AI features without external API calls. [#17607](https://github.com/JabRef/jabref/pull/17607)
@@ -53,7 +67,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Settings → More settings" in the LibreOffice/OpenOffice panel to open JabRef's integration preferences without connecting a document. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added citation refresh in LibreOffice/OpenOffice for CSL styles that do not generate bibliographies. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added entry details on hover to the JabRef language server, which now also reads `bibliography:` from Markdown front matter. [#17302](https://github.com/JabRef/jabref/pull/17302)
-- We added an option to automatically merge changes made to the library file outside JabRef into the open library. [#8431](https://github.com/JabRef/jabref/issues/8431)
 
 ### Changed
 
@@ -151,6 +164,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed API key validation when saving a new or edited key. [#17012](https://github.com/JabRef/jabref/pull/17012)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
+- We fixed the group icon picker background and borders not following the active theme. [#17887](https://github.com/JabRef/jabref/issues/17887)
 - We fixed subgroups disappearing after adding them from the "All entries" context menu in a new library. [#17764](https://github.com/JabRef/jabref/issues/17764)
 - We fixed an issue where group selections were lost when changing library tabs. [#1104](https://github.com/JabRef/jabref/issues/1104)
 - We fixed obsolete group assignments remaining after changing an explicit group's grouping method. [#8824](https://github.com/JabRef/jabref/issues/8824)
@@ -208,7 +222,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed LibreOffice/OpenOffice citation updates modifying citations marked for deletion through Track Changes after change recording was disabled. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed edits to selected JStyle files not taking effect when inserting or refreshing citations in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed an issue where the generate citation keys toolbar button stopped working after canceling an overwrite. [#17748](https://github.com/JabRef/jabref/issues/17748)
-- We fixed an issue where accepting an external change to an entry lost its table position, selection, and open entry editor. [#16813](https://github.com/JabRef/jabref/pull/16813)
 
 ### Removed
 
@@ -2522,7 +2535,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-beta.1...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-beta.2...HEAD
+[6.0-beta.2]: https://github.com/JabRef/jabref/compare/v6.0-beta.1...v6.0-beta.2
 [6.0-beta.1]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...v6.0-beta.1
 [6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
 [6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5
