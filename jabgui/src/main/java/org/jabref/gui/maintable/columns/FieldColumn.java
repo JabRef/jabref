@@ -44,7 +44,7 @@ public class FieldColumn extends MainTableColumn<String> {
                 .showTooltipRegardlessOfTruncation(tooltip::shouldAlwaysShowTooltip)
                 .install(this);
 
-        this.setComparator(isNumeric() ? new NumericFieldComparator(isRomanNumeralAllowed()): TEXT_COMPARATOR);
+        this.setComparator(isNumeric() ? new NumericFieldComparator(isRomanNumeralAllowed()) : TEXT_COMPARATOR);
 
         this.setSortable(true);
     }

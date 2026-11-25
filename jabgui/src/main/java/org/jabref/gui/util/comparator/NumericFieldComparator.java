@@ -10,7 +10,7 @@ import org.jabref.logic.util.strings.StringUtil;
 /// as if they were strings.
 public class NumericFieldComparator implements Comparator<String> {
 
-    private  final boolean parseRomanNumerals;
+    private final boolean parseRomanNumerals;
 
     public NumericFieldComparator() {
         this(false);
@@ -19,6 +19,7 @@ public class NumericFieldComparator implements Comparator<String> {
     public NumericFieldComparator(boolean parseRomanNumerals) {
         this.parseRomanNumerals = parseRomanNumerals;
     }
+
     @Override
     public int compare(String val1, String val2) {
         if ((val1 == null) && (val2 == null)) {
@@ -38,13 +39,14 @@ public class NumericFieldComparator implements Comparator<String> {
             return -1;
         } else {
             if (val1 == null) {
-            return -1;
+             return -1;
         } else if (val2 == null) {
-            return 1;
+             return 1;
         } else {
-            return val1.compareTo(val2);
+             return val1.compareTo(val2);
         }
     }
+
     }
 
     private Optional<Integer> toNumber(String value) {
