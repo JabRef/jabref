@@ -44,6 +44,21 @@ class BSTFormatUtilsTest {
         assertEquals("TLY+21", BSTFormatUtils.normalizeBibItemLabel("TLY\\etalchar{+}21"));
     }
 
+    @ParameterizedTest
+    @MethodSource
+    void normalizeBibItemLabelPreservesDisambiguationAndUnsupportedCommands(String label, String expected) {
+        assertEquals(expected, BSTFormatUtils.normalizeBibItemLabel(label));
+    }
+
+    static Stream<Arguments> normalizeBibItemLabelPreservesDisambiguationAndUnsupportedCommands() {
+        return Stream.of(
+                Arguments.of("ABC20a", "ABC20a"),
+                Arguments.of("{ABC}20b", "{ABC}20b"),
+                Arguments.of("TLY{\\etalchar{+}}21a", "TLY+21a"),
+                Arguments.of("TLY\\etalchar{+}21b", "TLY+21b"),
+                Arguments.of("\\protect\\astroncite{Tan et al.}{2021}", "\\protect\\astroncite{Tan et al.}{2021}"));
+    }
+
     @Test
     void mapsPandocSmallcapsStyleToOO() {
         String html = "<p><span style=\"font-variant: small-caps\">Name</span></p>";
