@@ -462,6 +462,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String IMPORTER_ENABLED = "importersEnabled";
     private static final String IMPORTER_GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     private static final String IMPORTER_WORKING_DIRECTORY = "importWorkingDirectory";
+    private static final String IMPORTER_WARN_ABOUT_BIB_FILE = "warnAboutBibFileImport";
     private static final String IMPORTER_WARN_ABOUT_DUPLICATES = "warnAboutDuplicatesInInspection";
     private static final String IMPORTER_CUSTOM_FORMAT = "customImportFormat";
     private static final String FETCHER_CUSTOM_KEY_BUNDLE_NAMES = "fetcherCustomKeyBundleNames";
@@ -2684,6 +2685,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(IMPORTER_GENERATE_KEY_ON_IMPORT, defaultValues.shouldGenerateNewKeyOnImport()),
                 Path.of(get(IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory().toString())),
                 getBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport()),
+                getBoolean(IMPORTER_WARN_ABOUT_BIB_FILE, defaultValues.shouldWarnAboutBibFileImport()),
                 getCustomImportFormats(defaultValues.getCustomImporters()),
                 getFetcherKeys(defaultValues.getApiKeys()),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys()),
@@ -2697,6 +2699,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(importerPreferences.importWorkingDirectoryProperty(), IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory(),
                 Path::toString, Path::of);
         bindBoolean(importerPreferences.warnAboutDuplicatesOnImportProperty(), IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport());
+        bindBoolean(importerPreferences.warnAboutBibFileImportProperty(), IMPORTER_WARN_ABOUT_BIB_FILE, defaultValues.shouldWarnAboutBibFileImport());
         bindBoolean(importerPreferences.persistCustomKeysProperty(), FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys());
         bindSet(importerPreferences.getApiKeys(), FETCHER_CUSTOM_KEY_NAMES, defaultValues.getApiKeys(),
                 _ -> storeFetcherKeys(importerPreferences),

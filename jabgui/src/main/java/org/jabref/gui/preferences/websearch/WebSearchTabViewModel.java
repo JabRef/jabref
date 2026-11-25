@@ -47,6 +47,7 @@ import org.jabref.logic.util.TaskExecutor;
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
+    private final BooleanProperty warnAboutBibFileImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
 
@@ -160,6 +161,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
+        warnAboutBibFileImportProperty.setValue(importerPreferences.shouldWarnAboutBibFileImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldKeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
         addImportedEntries.setValue(libraryPreferences.shouldAddImportedEntries());
@@ -237,6 +239,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
+        importerPreferences.setWarnAboutBibFileImport(warnAboutBibFileImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldKeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
@@ -326,6 +329,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty warnAboutDuplicatesOnImportProperty() {
         return warnAboutDuplicatesOnImportProperty;
+    }
+
+    public BooleanProperty warnAboutBibFileImportProperty() {
+        return warnAboutBibFileImportProperty;
     }
 
     public BooleanProperty shouldDownloadLinkedOnlineFiles() {

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -85,11 +86,15 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
@@ -504,6 +509,82 @@ class ImportHandlerTest {
         // Assert
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
+    }
+
+    @Test
+    void confirmBibFileImportReturnsTrueWhenNoBibFiles() {
+        List<Path> files = List.of(Path.of("paper.pdf"));
+
+        assertTrue(importHandler.confirmBibFileImportIfNecessary(files));
+
+        verifyNoInteractions(dialogService);
+    }
+
+    @Test
+    void confirmBibFileImportReturnsTrueWhenWarningDisabled() {
+        ImporterPreferences importerPreferences = preferences.getImporterPreferences();
+        when(importerPreferences.shouldWarnAboutBibFileImport()).thenReturn(false);
+
+        List<Path> files = List.of(Path.of("library.bib"));
+
+        assertTrue(importHandler.confirmBibFileImportIfNecessary(files));
+
+        verifyNoInteractions(dialogService);
+    }
+
+    @Test
+    void confirmBibFileImportReturnsFalseWhenCancelled() {
+        ImporterPreferences importerPreferences = preferences.getImporterPreferences();
+        when(importerPreferences.shouldWarnAboutBibFileImport()).thenReturn(true);
+
+        when(dialogService.showConfirmationDialogWithOptOutAndWait(
+                any(), any(), any(), any(), any(), any()))
+                .thenReturn(false);
+
+        List<Path> files = List.of(Path.of("library.bib"));
+
+        assertFalse(importHandler.confirmBibFileImportIfNecessary(files));
+
+        verify(importerPreferences, never())
+                .setWarnAboutBibFileImport(anyBoolean());
+    }
+
+    @Test
+    void confirmBibFileImportUpdatesPreferenceWhenOptOutSelectedAndConfirmed() {
+        ImporterPreferences importerPreferences = preferences.getImporterPreferences();
+        when(importerPreferences.shouldWarnAboutBibFileImport()).thenReturn(true);
+
+        doAnswer(invocation -> {
+            Consumer<Boolean> optOutConsumer = invocation.getArgument(5);
+            optOutConsumer.accept(true);
+            return true;
+        }).when(dialogService).showConfirmationDialogWithOptOutAndWait(
+                any(), any(), any(), any(), any(), any());
+
+        List<Path> files = List.of(Path.of("library.bib"));
+
+        assertTrue(importHandler.confirmBibFileImportIfNecessary(files));
+
+        verify(importerPreferences).setWarnAboutBibFileImport(false);
+    }
+
+    @Test
+    void confirmBibFileImportUpdatesPreferenceWhenOptOutSelectedAndCancelled() {
+        ImporterPreferences importerPreferences = preferences.getImporterPreferences();
+        when(importerPreferences.shouldWarnAboutBibFileImport()).thenReturn(true);
+
+        doAnswer(invocation -> {
+            Consumer<Boolean> optOutConsumer = invocation.getArgument(5);
+            optOutConsumer.accept(true);
+            return false;
+        }).when(dialogService).showConfirmationDialogWithOptOutAndWait(
+                any(), any(), any(), any(), any(), any());
+
+        List<Path> files = List.of(Path.of("library.bib"));
+
+        assertFalse(importHandler.confirmBibFileImportIfNecessary(files));
+
+        verify(importerPreferences).setWarnAboutBibFileImport(false);
     }
 
     @Test
