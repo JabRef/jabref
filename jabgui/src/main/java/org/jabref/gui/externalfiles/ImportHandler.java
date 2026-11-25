@@ -251,7 +251,7 @@ public class ImportHandler {
                                         linkedEntries.add(entry);
                                     }
                                 });
-                                if (!linkedEntries.isEmpty()) {
+                                if (linkedEntries.isEmpty()) {
                                     addResultToList(file, FAILURE, Localization.lang("Could not move file '%0'.", file));
                                 } else {
                                     addToImportEntriesGroup(pdfEntriesInFile);

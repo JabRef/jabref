@@ -63,7 +63,6 @@ public class LinkedFileHandler {
                     filePreferences.getFileDirectoryPattern());
         }
 
-        Path targetDirectory = databaseFileDirectoryOpt.get().resolve(targetDirectoryName);
         return copyOrMoveToExactDirectory(databaseFileDirectoryOpt.get(), Path.of(targetDirectoryName), shouldMove, shouldRenameToFilenamePattern);
     }
 
