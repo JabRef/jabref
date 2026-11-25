@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                 xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+                 xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                 office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
+  <office:styles><style:default-style style:family="paragraph"/></office:styles>
+  <office:body><office:text><text:p>Before<text:reference-mark text:name="JABREF_delta CID_1 goldenEmpty EMPTY"/> after.</text:p></office:text></office:body>
+</office:document>

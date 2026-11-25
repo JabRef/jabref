@@ -42,11 +42,11 @@ public record CSLStyleLoader(
         loadExternalStyles();
     }
 
-    /// Returns a list of all available citation styles (both internal and external).
+    /// Returns an unmodifiable snapshot of all available citation styles, with internal styles before external styles.
     public static List<CitationStyle> getStyles() {
         List<CitationStyle> result = new ArrayList<>(getInternalStyles());
         result.addAll(EXTERNAL_STYLES);
-        return result;
+        return List.copyOf(result);
     }
 
     /// Returns the default citation style which is currently set to [CSLStyleLoader#DEFAULT_STYLE].
@@ -149,10 +149,22 @@ public record CSLStyleLoader(
         }
     }
 
-    /// Adds a new external CSL style.
-    public void addExternalStyle(@NonNull CitationStyle citationStyle) {
+    /// Adds a new external CSL style unless it is internal or duplicates an existing title or nonblank short title.
+    ///
+    /// @return true if the style was added, false otherwise
+    public boolean addExternalStyle(@NonNull CitationStyle citationStyle) {
+        if (citationStyle.isInternalStyle()) {
+            return false;
+        }
+        boolean duplicate = getStyles().stream()
+                                       .anyMatch(style -> style.getTitle().equals(citationStyle.getTitle())
+                                               || (!citationStyle.getShortTitle().isBlank() && style.getShortTitle().equals(citationStyle.getShortTitle())));
+        if (duplicate) {
+            return false;
+        }
         EXTERNAL_STYLES.add(citationStyle);
         storeExternalStyles();
+        return true;
     }
 
     /// Stores the current list of external styles to preferences.
@@ -167,12 +179,11 @@ public record CSLStyleLoader(
     ///
     /// @return true if the style was removed, false otherwise
     public boolean removeStyle(@NonNull CitationStyle style) {
-        if (!style.isInternalStyle()) {
-            boolean result = EXTERNAL_STYLES.remove(style);
-            storeExternalStyles();
-            return result;
+        if (style.isInternalStyle() || !EXTERNAL_STYLES.remove(style)) {
+            return false;
         }
-        return false;
+        storeExternalStyles();
+        return true;
     }
 
     public static List<CitationStyle> getInternalStyles() {
