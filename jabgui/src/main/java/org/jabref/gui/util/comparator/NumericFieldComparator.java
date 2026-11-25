@@ -6,6 +6,7 @@ import org.jabref.logic.util.strings.StringUtil;
 
 /// Comparator for numeric cases. The purpose of this class is to add the numeric comparison, because values are sorted
 /// as if they were strings.
+/// This comparator ranks numeric values above non-numeric values.
 public class NumericFieldComparator implements Comparator<String> {
 
     @Override
@@ -34,27 +35,22 @@ public class NumericFieldComparator implements Comparator<String> {
             i2present = false;
         }
 
+        // We assume that "null" is "less than" any other value.
         if (i1present && i2present) {
             return i1 - i2;
         } else if (i1present) {
-            // The first one was parsable, but not the second one.
-            // This means we consider one < two
-            // We assume that "null" is "less than" any other value.
+            // Numeric values are ranked above non-numeric values.
             return 1;
         } else if (i2present) {
-            // The second one was parsable, but not the first one.
-            // This means we consider one > two
-            // We assume that "null" is "less than" any other value.
             return -1;
         } else {
+            // Neither value could be parsed as an integer.
             if (val1 != null && val2 != null) {
                 return val1.compareTo(val2);
             } else if (val1 == null) {
                 return -1;
-            } else if (val2 == null) {
-                return 1;
             } else {
-                return CharSequence.compare(val1, val2);
+                return 1;
             }
         }
     }
