@@ -786,7 +786,7 @@ class FileUtilTest {
     void resolveInsideDirectoryRejectsSymlinkToOutside(@TempDir Path base, @TempDir Path outside) {
         try {
             Files.createSymbolicLink(base.resolve("link"), outside);
-        } catch (IOException | UnsupportedOperationException e) {
+        } catch (IOException | UnsupportedOperationException _) {
             Assumptions.abort("Symlinks not supported");
         }
         assertThrows(IOException.class, () -> FileUtil.resolveInsideDirectory(base, Path.of("link/sub")));
