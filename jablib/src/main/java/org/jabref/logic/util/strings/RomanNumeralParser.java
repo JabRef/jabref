@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class RomanNumeralParser {
+public class RomanNumeralParser {
 
     // Roman Numbers Map
     private static final Map<Character, Integer> ROMAN_VALUES = Map.of(
