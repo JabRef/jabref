@@ -736,6 +736,7 @@ public class FileUtil {
 
     /// Resolves relative path inside with respect to baseDir and ensures target directory stays inside it
     /// This can be used for re-validation too
+    ///
     /// @param baseDir the base directory that must exist
     /// @param subDir  relative path (can be pattern) in base directory
     /// @return resolved path that is guaranteed to be inside baseDir
