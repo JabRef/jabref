@@ -328,9 +328,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public void moveToDirectory(Path destinationDirectory) {
+    public boolean moveToDirectory(Path destinationDirectory) {
         if (linkedFile.isOnlineLink()) {
-            return;
+            return true;
         }
 
         Optional<Path> currentFile = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
@@ -339,26 +339,26 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("File not found"),
                     Localization.lang("Could not find file '%0'.", linkedFile.getLink())
             );
-            return;
+            return false;
         }
 
-        Path destDirectoryWithPattern = getFullDestinationDirectory(destinationDirectory);
-
         try {
-            linkedFileHandler.moveToExactDirectory(destDirectoryWithPattern);
+            Path destDirectoryWithPattern = getFullDestinationDirectory(destinationDirectory);
+            linkedFileHandler.moveToExactDirectory(destinationDirectory, getFileDirectoryPattern());
+            return true;
         } catch (IOException exception) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Move file"),
                     Localization.lang("Could not move file '%0'.", currentFile.get().toString()),
                     exception);
+            return false;
         }
     }
 
     public void moveToDirectoryAndRename(Path destinationDirectory) {
-        if (!isInCurrentDirectory(destinationDirectory)) {
-            moveToDirectory(destinationDirectory);
+        if (isInCurrentDirectory(destinationDirectory) || moveToDirectory(destinationDirectory)) {
+            renameToSuggestion();
         }
-        renameToSuggestion();
     }
 
     /// Checks if the current linked file is already located in the target directory (considering also the directory pattern if exists).
@@ -368,11 +368,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return false;
         }
 
-        Path destDirectoryWithPattern = getFullDestinationDirectory(destinationDirectory);
         try {
+            Path destDirectoryWithPattern = getFullDestinationDirectory(destinationDirectory);
             return Files.isSameFile(currentDirectory.get(), destDirectoryWithPattern);
         } catch (IOException e) {
-            LOGGER.debug("Could not compare directories {} and {}.", currentDirectory.get(), destDirectoryWithPattern, e);
+            LOGGER.debug("Could not compare directories {} and {}.", currentDirectory.get(), destinationDirectory, e);
             return false;
         }
     }
@@ -383,8 +383,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /// Constructs the target directory by appending the directory pattern (if exists) to the given base directory.
-    private Path getFullDestinationDirectory(Path targetBaseDirectory) {
-        return targetBaseDirectory.resolve(getFileDirectoryPattern()).normalize();
+    private Path getFullDestinationDirectory(Path targetBaseDirectory) throws IOException {
+        return FileUtil.resolveInsideDirectory(targetBaseDirectory, getFileDirectoryPattern());
     }
 
     private Path getFileDirectoryPattern() {

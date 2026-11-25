@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
@@ -38,6 +39,7 @@ import mslinks.ShellLinkException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -731,5 +733,31 @@ public class FileUtil {
         String driveLetter = path.substring(letterIndex, letterIndex + 1).toUpperCase();
         String windowsPath = path.substring(letterIndex + 1).replace("/", "\\\\");
         return Path.of(driveLetter + ":" + windowsPath);
+    }
+
+    /// Resolves relative path inside with respect to baseDir and ensures target directory stays inside it
+    ///
+    /// @param baseDir the base directory that must exist
+    /// @param subDir  relative path (can be pattern) in base directory
+    /// @return resolved path that is guaranteed to be inside baseDir
+    /// @throws IOException if resolved path escapes baseDir
+    public static Path resolveInsideDirectory(Path baseDir, Path subDir) throws IOException {
+        Path base = resolvingExistingPart(baseDir.toAbsolutePath().normalize());
+        Path target = resolvingExistingPart(base.resolve(subDir).normalize());
+        if (!target.startsWith(base)) {
+            throw new IOException("Directory '%s' is outside of '%s'".formatted(target, base));
+        }
+        return target;
+    }
+
+    private static Path resolvingExistingPart(Path path) throws IOException {
+        @Nullable Path existing = path;
+        while (existing != null && !Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
+            existing = existing.getParent();
+        }
+        if (existing == null) {
+            return path.normalize();
+        }
+        return existing.toRealPath().resolve(existing.relativize(path)).normalize();
     }
 }

@@ -43,8 +43,8 @@ public class LinkedFileHandler {
         return copyOrMoveToDefaultDirectory(true, false);
     }
 
-    public void moveToExactDirectory(Path targetDirectory) throws IOException {
-        copyOrMoveToExactDirectory(targetDirectory, true, false);
+    public void moveToExactDirectory(Path targetDirectory, Path subDirectory) throws IOException {
+        copyOrMoveToExactDirectory(targetDirectory, subDirectory, true, false);
     }
 
     /// @return true if the file was copied/moved or the same file exists in the target directory
@@ -64,17 +64,17 @@ public class LinkedFileHandler {
         }
 
         Path targetDirectory = databaseFileDirectoryOpt.get().resolve(targetDirectoryName);
-        return copyOrMoveToExactDirectory(targetDirectory, shouldMove, shouldRenameToFilenamePattern);
+        return copyOrMoveToExactDirectory(databaseFileDirectoryOpt.get(), Path.of(targetDirectoryName), shouldMove, shouldRenameToFilenamePattern);
     }
 
-    private boolean copyOrMoveToExactDirectory(Path targetDirectory, boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
+    private boolean copyOrMoveToExactDirectory(Path baseDirectory, Path subDirectory, boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         Optional<Path> sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);
         if (sourcePathOpt.isEmpty()) {
             LOGGER.warn("Could not find file {}", linkedFile.getLink());
             return false;
         }
         Path sourcePath = sourcePathOpt.get();
-
+        Path targetDirectory = FileUtil.resolveInsideDirectory(baseDirectory, subDirectory);
         // Ensure that this directory exists
         Files.createDirectories(targetDirectory);
 

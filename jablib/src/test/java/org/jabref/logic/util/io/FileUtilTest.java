@@ -15,11 +15,13 @@ import java.util.stream.Stream;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -758,5 +761,34 @@ class FileUtilTest {
     @ValueSource(strings = {"/home/username/Downloads/test.bib"})
     void convertCygwinPathToWindowsShouldReturnOriginalFilePathWhenRunningOnWindows(String filePath) {
         assertEquals(Path.of(filePath), FileUtil.convertCygwinPathToWindows(filePath));
+    }
+
+    @Test
+    void getLinkedDirNameWithTraversalInAuthor() {
+        // End to end: BibTeX input producing safe directory name
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.AUTHOR, "../../../../Desktop");
+        assertEquals("Desktop", FileUtil.createDirNameFromPattern(new BibDatabase(), entry, "[author]"));
+    }
+
+    @Test
+    void resolveInsideDirectory(@TempDir Path base) {
+        assertThrows(IOException.class, () -> FileUtil.resolveInsideDirectory(base, Path.of("../../x")));
+    }
+
+    @Test
+    void resolveInsideDirectoryKeepsSubdirectory(@TempDir Path base) throws IOException {
+        Path expected = base.toRealPath().resolve("a/b");
+        assertEquals(expected, FileUtil.resolveInsideDirectory(base, Path.of("a/b")));
+    }
+
+    @Test
+    void resolveInsideDirectoryRejectsSymlinkToOutside(@TempDir Path base, @TempDir Path outside) {
+        try {
+            Files.createSymbolicLink(base.resolve("link"), outside);
+        } catch (IOException | UnsupportedOperationException e) {
+            Assumptions.abort("Symlinks not supported");
+        }
+        assertThrows(IOException.class, () -> FileUtil.resolveInsideDirectory(base, Path.of("link/sub")));
     }
 }
