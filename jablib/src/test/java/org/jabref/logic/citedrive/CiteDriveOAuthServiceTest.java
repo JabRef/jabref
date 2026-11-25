@@ -3,8 +3,10 @@ package org.jabref.logic.citedrive;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -133,7 +135,7 @@ class CiteDriveOAuthServiceTest {
         preferences.setRefreshToken(new RefreshToken("expired"));
         when(sender.send(any())).thenReturn(response(400, "{\"error\":\"invalid_grant\"}"));
         CompletableFuture<URI> browserOpened = new CompletableFuture<>();
-        CiteDriveOAuthService service = new CiteDriveOAuthService(remotePreferences, preferences, registry, browserOpened::complete, () -> false, sender);
+        CiteDriveOAuthService service = new CiteDriveOAuthService(remotePreferences, preferences, registry, page -> browserOpened.complete(page.uri()), () -> false, sender);
 
         CompletableFuture<?> login = service.getAccessToken();
         AuthorizationRequest request = AuthorizationRequest.parse(browserOpened.get(5, TimeUnit.SECONDS));
@@ -141,6 +143,20 @@ class CiteDriveOAuthServiceTest {
         assertEquals(Optional.empty(), Optional.ofNullable(preferences.getRefreshToken()));
         registry.fail(request.getState().getValue(), new IOException("Login cancelled by test"));
         assertThrows(ExecutionException.class, () -> login.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void authorizationPageFinishesOnlyWithItsOwnLoginAttempt() throws Exception {
+        List<CiteDriveOAuthService.AuthorizationPage> pages = new CopyOnWriteArrayList<>();
+        CiteDriveOAuthService service = new CiteDriveOAuthService(remotePreferences, preferences, registry, pages::add, () -> false, sender);
+        service.authorizeInteractive();
+        service.authorizeInteractive();
+
+        String firstState = AuthorizationRequest.parse(pages.getFirst().uri()).getState().getValue();
+        registry.fail(firstState, new IOException("Login cancelled by test"));
+
+        assertThrows(ExecutionException.class, () -> pages.getFirst().finished().toCompletableFuture().get(5, TimeUnit.SECONDS));
+        assertFalse(pages.getLast().finished().toCompletableFuture().isDone());
     }
 
     @Test
@@ -225,8 +241,8 @@ class CiteDriveOAuthServiceTest {
         preferences.setApiBaseUrl("https://other.example/");
         preferences.setAppBaseUrl("https://other-app.example/");
 
-        assertEquals(URI.create("https://api-dev.citedrive.com/jabref/push/"), session.pushEndpoint());
-        assertEquals(URI.create("https://app-dev.citedrive.com/jabref/import/"), session.importPage());
+        assertEquals(URI.create("https://api.citedrive.com/jabref/push/"), session.pushEndpoint());
+        assertEquals(URI.create("https://app.citedrive.com/jabref/import/"), session.importPage());
     }
 
     @Test
@@ -277,7 +293,7 @@ class CiteDriveOAuthServiceTest {
     }
 
     private CiteDriveOAuthService service() {
-        return new CiteDriveOAuthService(remotePreferences, preferences, registry, openedPage::set, () -> false, sender);
+        return new CiteDriveOAuthService(remotePreferences, preferences, registry, page -> openedPage.set(page.uri()), () -> false, sender);
     }
 
     private void assertRequestTimeouts() throws IOException {

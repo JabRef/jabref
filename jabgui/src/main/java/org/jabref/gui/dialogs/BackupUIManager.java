@@ -105,7 +105,7 @@ public class BackupUIManager {
                                                                  Path originalPath,
                                                                  Path backupDir) {
         return UiTaskExecutor.runInJavaFXThread(() -> showForLibrary(tabContainer, stateManager, originalPath,
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences))));
+                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences, dialogService))));
     }
 
     private static <T> T showForLibrary(LibraryTabContainer tabContainer, StateManager stateManager, Path path, Supplier<T> showDialog) {
@@ -177,13 +177,20 @@ public class BackupUIManager {
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
                     // The library is still being opened, so no tab exists for it yet - the active tab (if any) belongs to another
-                    // library. Its change monitor is set up when the tab is created.
+                    // library. Its change monitor is set up when the tab is created. The tab installs this very context once
+                    // loading finished, so the merge lands in the journal that drives its modified marker and undo.
+                    // [impl->req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1]
                     stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
 
                     // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                     markRecoveredIfContentRestored(originalParserResult);
+
+                    // The tab gets a new database context along with its own journal, meaning the undo step won't mark it as changed
+                    if (resolvedChanges.stream().anyMatch(DatabaseChange::isAccepted)) {
+                        originalParserResult.setChangedOnMigration(true);
+                    }
                     return Optional.of(originalParserResult);
                 }
 

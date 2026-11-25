@@ -248,6 +248,7 @@ class BstFunctionsTest {
             "a, abcd, -4, 1",
             "'', abcd, -5, 1",                    // invalid number -5
             "'', abcd, -2147483647, 2147483647",  // invalid number
+            "'', , -1, 1",                        // null string (unset field)
     })
     void substringPlain(String expected, String full, Integer start, Integer length) {
         BstVMContext bstVMContext = new BstVMContext(List.of(), new BibDatabase(), Path.of("404.bst"));
@@ -259,6 +260,27 @@ class BstFunctionsTest {
                 new BstVMVisitor(new BstVMContext(List.of(), new BibDatabase(), null), new StringBuilder(0)),
                 ParserRuleContext.EMPTY);
         assertEquals(expected, bstVMContext.stack().pop());
+    }
+
+    @Test
+    void substringWithMissingField() {
+        BstVM vm = new BstVM("""
+                ENTRY { journal } { } { }
+                READ
+                FUNCTION { test } {
+                    journal #-1 #1 substring$ "." =
+                        { journal }
+                        { journal " " * }
+                    if$
+                }
+                ITERATE { test }
+                """);
+        List<BibEntry> testEntry = List.of(new BibEntry(StandardEntryType.Article));
+
+        vm.render(testEntry);
+
+        assertEquals(" ", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test

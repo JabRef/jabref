@@ -5,6 +5,7 @@ import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
 import org.jabref.gradle.EmbeddedPostgresBinaries
+import java.time.Duration
 import java.util.Calendar
 
 plugins {
@@ -25,7 +26,7 @@ plugins {
     // See https://github.com/jbangdev/jbang-gradle-plugin/issues/20
     id("dev.jbang") version "0.4.0" apply false
 
-    id("net.ltgt.errorprone") version "5.1.1"
+    id("net.ltgt.errorprone") version "5.2.0"
     id("net.ltgt.nullaway") version "3.3.0"
 }
 
@@ -220,6 +221,9 @@ val year = Calendar.getInstance().get(Calendar.YEAR).toString()
 
 val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
 val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDataSystemAPIKey").orElse("")
+// BibSonomy credentials are a full account login, used only by the fetcher tests. Never set them in binaries.yml.
+val bibSonomyApiKey = providers.environmentVariable("BibSonomyApiKey").orElse("")
+val bibSonomyUsername = providers.environmentVariable("BibSonomyUsername").orElse("")
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
@@ -245,6 +249,8 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("azureInstrumentationKey", azureInstrumentationKey)
 
     inputs.property("astrophysicsDataSystemAPIKey", astrophysicsDataSystemAPIKey)
+    inputs.property("bibSonomyApiKey", bibSonomyApiKey)
+    inputs.property("bibSonomyUsername", bibSonomyUsername)
     inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
     inputs.property("ieeeAPIKey", ieeeAPIKey)
     inputs.property("medlineApiKey", medlineApiKey)
@@ -266,6 +272,8 @@ tasks.named<ProcessResources>("processResources") {
                 "azureInstrumentationKey" to inputs.properties["azureInstrumentationKey"],
 
                 "astrophysicsDataSystemAPIKey" to inputs.properties["astrophysicsDataSystemAPIKey"],
+                "bibSonomyApiKey" to inputs.properties["bibSonomyApiKey"],
+                "bibSonomyUsername" to inputs.properties["bibSonomyUsername"],
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "medlineApiKey" to inputs.properties["medlineApiKey"],
@@ -323,7 +331,7 @@ tasks.test {
     systemProperty("prism.order", "sw")
 
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "ExternalServicesTest", "ConverterTest")
+        excludeTags("DatabaseTest", "ExternalServicesTest", "ConverterTest", "LibreOfficeTest")
     }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
@@ -372,6 +380,26 @@ tasks.register<Test>("databaseTest") {
         includeTags("DatabaseTest")
     }
     maxParallelForks = 1
+}
+
+tasks.register<Test>("libreOfficeTest") {
+    description = "Runs the required real-Writer safety gate (LibreOffice and Pandoc must be installed)"
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform {
+        includeTags("LibreOfficeTest")
+    }
+    maxParallelForks = 1
+    forkEvery = 0
+    systemProperty("junit.jupiter.execution.parallel.enabled", "false")
+    systemProperty("jabref.writer.artifacts", layout.buildDirectory.dir("writer-integration").get().asFile.absolutePath)
+    jvmArgs("-javaagent:${configurations.mockitoAgent.get().asPath}")
+    timeout = Duration.ofMinutes(10)
+    // Writer/Pandoc installations are external inputs: a cached green run is not a safety gate.
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
+    testLogging.events("PASSED", "FAILED", "SKIPPED")
 }
 
 tasks.register<Test>("converterTest") {

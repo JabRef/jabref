@@ -182,22 +182,6 @@ class ChangeTriageTest {
     }
 
     @Test
-    void undoOfAppliedChangeRestoresTheParsedState() {
-        disk.setField(StandardField.TITLE, "Disk title");
-        ChangeTriage.Triage triage = triage();
-        EntryChange change = assertInstanceOf(EntryChange.class, triage.diskOnly().getFirst());
-        local.setChanged(false);
-        CompoundEdit edit = new CompoundEdit("test");
-
-        change.applyChange(edit);
-        assertTrue(local.hasChanged());
-        edit.toChangeSet().inverted().apply();
-
-        assertEquals(Optional.of("Title"), local.getField(StandardField.TITLE));
-        assertFalse(local.hasChanged());
-    }
-
-    @Test
     void pairEstablishedBySimilarityOnlyGoesToReview() {
         // memory edits the entry, disk replaces it by a similar one under another key
         local.setField(StandardField.YEAR, "2021");

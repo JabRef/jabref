@@ -5,7 +5,6 @@ import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableChangeType;
-import org.jabref.model.undo.UndoableChangedFlag;
 import org.jabref.model.undo.UndoableCommentsChange;
 import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.undo.UndoableGroupTreeChange;
@@ -47,8 +46,6 @@ public class BibChangeDescriber {
                     Localization.lang("Change entry type");
             case UndoableCommentsChange _ ->
                     Localization.lang("Change entry comments");
-            case UndoableChangedFlag _ ->
-                    Localization.lang("Mark entry as changed");
             case UndoableInsertEntries insert ->
                     insert.entries().size() == 1 ? Localization.lang("Insert entry") : Localization.lang("Insert entries");
             case UndoableRemoveEntries remove ->

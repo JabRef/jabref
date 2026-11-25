@@ -60,12 +60,14 @@ import org.jabref.logic.layout.format.Iso690NamesAuthors;
 import org.jabref.logic.layout.format.JournalAbbreviator;
 import org.jabref.logic.layout.format.LastPage;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.MarkdownEscaper;
 import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
 import org.jabref.logic.layout.format.NotFoundFormatter;
 import org.jabref.logic.layout.format.Number;
+import org.jabref.logic.layout.format.OOPreFormatter;
 import org.jabref.logic.layout.format.Ordinal;
 import org.jabref.logic.layout.format.RTFChars;
 import org.jabref.logic.layout.format.RemoveBrackets;
@@ -83,7 +85,6 @@ import org.jabref.logic.layout.format.ToUpperCase;
 import org.jabref.logic.layout.format.WrapContent;
 import org.jabref.logic.layout.format.WrapFileLinks;
 import org.jabref.logic.layout.format.XMLChars;
-import org.jabref.logic.openoffice.style.OOPreFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -555,6 +556,8 @@ class LayoutEntry {
                     new WrapFileLinks(fileDirForDatabase, preferences.getMainFileDirectory());
             case "Markdown" ->
                     new MarkdownFormatter();
+            case "MarkdownEscaper" ->
+                    new MarkdownEscaper();
             case "CSLType" ->
                     new CSLType();
             case "ShortMonth" ->

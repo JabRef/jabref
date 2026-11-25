@@ -1,10 +1,13 @@
 package org.jabref.gui.citedrive;
 
+import java.io.IOException;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeoutException;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.LinkNotification;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -13,6 +16,7 @@ import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.RemotePreferences;
 
+import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +27,30 @@ public class CiteDriveLoginAction extends SimpleCommand {
     private final DialogService dialogService;
     private final CiteDriveOAuthService citeDriveOAuthService;
 
-    public CiteDriveLoginAction(DialogService dialogService, GuiPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
+    public CiteDriveLoginAction(DialogService dialogService,
+                                GuiPreferences preferences,
+                                OAuthSessionRegistry oAuthSessionRegistry,
+                                NativeDesktop nativeDesktop,
+                                ClipBoardManager clipBoardManager) {
         this.dialogService = dialogService;
-        this.citeDriveOAuthService = createOAuthService(dialogService, preferences, oAuthSessionRegistry);
+        this.citeDriveOAuthService = createOAuthService(dialogService, preferences, oAuthSessionRegistry, nativeDesktop, clipBoardManager);
     }
 
-    static CiteDriveOAuthService createOAuthService(DialogService dialogService, GuiPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
+    static CiteDriveOAuthService createOAuthService(DialogService dialogService,
+                                                    GuiPreferences preferences,
+                                                    OAuthSessionRegistry oAuthSessionRegistry,
+                                                    NativeDesktop nativeDesktop,
+                                                    ClipBoardManager clipBoardManager) {
         return new CiteDriveOAuthService(
                 preferences.getRemotePreferences(),
                 preferences.getCiteDrivePreferences(),
                 oAuthSessionRegistry,
-                uri -> UiTaskExecutor.runInJavaFXThread(() -> {
-                    dialogService.notify(Localization.lang("Opening the CiteDrive login page in the browser"));
-                    NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences());
+                page -> UiTaskExecutor.runInJavaFXThread(() -> {
+                    String loginPage = page.uri().toASCIIString();
+                    LinkNotification notification = loginPageNotification(loginPage, dialogService, nativeDesktop, clipBoardManager);
+                    dialogService.notify(notification);
+                    page.finished().whenComplete((_, _) -> UiTaskExecutor.runInJavaFXThread(notification::remove));
+                    openPage(nativeDesktop, loginPage);
                 }),
                 () -> enableHttpServer(dialogService, preferences.getRemotePreferences()));
     }
@@ -76,5 +91,23 @@ public class CiteDriveLoginAction extends SimpleCommand {
                         dialogService.notify(Localization.lang("CiteDrive login failed: could not obtain access token."));
                     }
                 });
+    }
+
+    /// The page notification already offers to open or copy the page, so a failure is only logged
+    static void openPage(NativeDesktop nativeDesktop, String page) {
+        try {
+            nativeDesktop.openBrowser(page);
+        } catch (IOException e) {
+            LOGGER.warn("Could not open {}", page, e);
+        }
+    }
+
+    /// Stays until its login attempt completes, as the user may need the page again while the login is pending
+    private static LinkNotification loginPageNotification(String loginPage, DialogService dialogService, NativeDesktop nativeDesktop, ClipBoardManager clipBoardManager) {
+        return new LinkNotification(
+                Localization.lang("Log in to CiteDrive"),
+                Localization.lang("Log in to CiteDrive in the browser. If no browser opened, open the login page from here or copy the link."),
+                loginPage, dialogService, clipBoardManager, OnClickBehaviour.NONE)
+                .withOpenAction(Localization.lang("Open login page"), nativeDesktop);
     }
 }

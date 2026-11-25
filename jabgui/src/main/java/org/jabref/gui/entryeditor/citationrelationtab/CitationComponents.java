@@ -14,6 +14,5 @@ public record CitationComponents(
         Button abortButton,
         Button refreshButton,
         CitationFetcher.SearchType searchType,
-        Button importButton,
         ProgressIndicator progress) {
 }
