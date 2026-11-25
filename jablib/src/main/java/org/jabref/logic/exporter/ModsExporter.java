@@ -365,6 +365,7 @@ class ModsExporter extends Exporter {
         }
     }
 
+    // [impl->req~export.mods.names~1]
     private void handleNames(XMLStreamWriter writer, String value, String role) throws XMLStreamException {
         AuthorList authors = AuthorList.parse(value);
 

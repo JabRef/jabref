@@ -60,7 +60,7 @@ Local attachments that cannot be resolved or represented relatively are omitted.
 
 Needs: impl, utest
 
-## MODS author and editor export
+## MODS exports must preserve author and editor names
 `req~export.mods.names~1`
 
 MODS exports preserve author and editor names without incorrectly splitting names containing "and".
