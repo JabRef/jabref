@@ -77,6 +77,8 @@ public class LinkedFileHandler {
         Path targetDirectory = FileUtil.resolveInsideDirectory(baseDirectory, subDirectory);
         // Ensure that this directory exists
         Files.createDirectories(targetDirectory);
+        //Re-validate
+        FileUtil.resolveInsideDirectory(baseDirectory, targetDirectory);
 
         GetTargetPathResult getTargetPathResult = null;
         if (shouldRenameToFilenamePattern) {

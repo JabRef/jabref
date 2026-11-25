@@ -343,7 +343,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         try {
-            Path destDirectoryWithPattern = getFullDestinationDirectory(destinationDirectory);
             linkedFileHandler.moveToExactDirectory(destinationDirectory, getFileDirectoryPattern());
             return true;
         } catch (IOException exception) {

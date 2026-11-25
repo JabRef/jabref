@@ -81,6 +81,8 @@ public class ExternalFilesEntryLinker {
                 linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
             } catch (IOException exception) {
                 LOGGER.error("Error while copying/moving file {}", file, exception);
+                notificationService.notify(Localization.lang("Could not move file '%0' outside the file directory.", file));
+                continue;
             }
 
             String link = linkedFile.getLink();
