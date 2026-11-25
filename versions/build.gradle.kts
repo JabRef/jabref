@@ -68,7 +68,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.google.errorprone:error_prone_core:2.53.0")
     api("com.google.guava:guava:33.8.0-jre")
-    api("com.googlecode.plist:dd-plist:1.30")
+    api("com.googlecode.plist:dd-plist:1.31")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
     api("com.nimbusds:oauth2-oidc-sdk:11.39")
@@ -137,7 +137,7 @@ dependencies.constraints {
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
-    api("org.graalvm.sdk:nativeimage:25.5.5.0.3")
+    api("org.graalvm.sdk:nativeimage:25.6.5.1")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.2.0.Final")
     api("org.hisp.dhis:json-tree:1.14.0")
