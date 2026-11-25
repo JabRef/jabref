@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -22,6 +23,9 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 import org.w3c.dom.Element;
 
@@ -51,13 +55,44 @@ class ModsExportFormatTest {
         assertEquals(List.of(), Files.readAllLines(file));
     }
 
-    @Test
-    void exportNamesWithAuthorAndEditorRoles(@TempDir Path tempDir) throws Exception {
+    static Stream<Arguments> authorAndEditorNames() {
+        return Stream.of(
+                Arguments.of(
+                        "Sandra Sanders and John Smith",
+                        "Sam Flanders and Alice Johnson",
+                        List.of(
+                                "Sanders|Sandra|aut",
+                                "Smith|John|aut",
+                                "Flanders|Sam|edt",
+                                "Johnson|Alice|edt"
+                        )
+                ),
+                Arguments.of(
+                        "Doe, John and Smith, Sandra and Sanders, Bill",
+                        "Flanders, Sam",
+                        List.of(
+                                "Doe|John|aut",
+                                "Smith|Sandra|aut",
+                                "Sanders|Bill|aut",
+                                "Flanders|Sam|edt"
+                        )
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("authorAndEditorNames")
+    void exportNamesWithAuthorAndEditorRoles(
+            String authors,
+            String editors,
+            List<String> expected,
+            @TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Book)
-                .withField(StandardField.TITLE, "MODS Name Export Test")
-                .withField(StandardField.AUTHOR, "Sandra Sanders and John Smith")
-                .withField(StandardField.EDITOR, "Sam Flanders and Alice Johnson")
-                .withField(StandardField.YEAR, "2026");
+                .withField(StandardField.TITLE, "Sands")
+                .withField(StandardField.AUTHOR, authors)
+                .withField(StandardField.EDITOR, editors)
+                .withField(StandardField.DATE, "2026")
+                .withField(StandardField.PUBLISHER, "Sanders Academic");
 
         Path file = tempDir.resolve("names.xml");
         modsExportFormat.export(databaseContext, file, List.of(entry));
@@ -69,14 +104,7 @@ class ModsExportFormatTest {
         String namespace = "http://www.loc.gov/mods/v3";
         var names = document.getElementsByTagNameNS(namespace, "name");
 
-        assertEquals(4, names.getLength());
-
-        List<String> expected = List.of(
-                "Sanders|Sandra|aut",
-                "Smith|John|aut",
-                "Flanders|Sam|edt",
-                "Johnson|Alice|edt"
-        );
+        assertEquals(expected.size(), names.getLength());
 
         for (int i = 0; i < names.getLength(); i++) {
             Element name = (Element) names.item(i);
