@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.externalstorages;
 
+import java.util.Optional;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -8,6 +10,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.CiteDrivePreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -24,12 +28,14 @@ public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty citeDriveAppBaseUrlProperty = new SimpleStringProperty("");
 
     private final CiteDrivePreferences citeDrivePreferences;
+    private final CliPreferences preferences;
 
     private final Validator apiBaseUrlValidator;
     private final Validator appBaseUrlValidator;
 
-    public ExternalStoragesTabViewModel(CiteDrivePreferences citeDrivePreferences) {
-        this.citeDrivePreferences = citeDrivePreferences;
+    public ExternalStoragesTabViewModel(CliPreferences preferences) {
+        this.preferences = preferences;
+        this.citeDrivePreferences = preferences.getCiteDrivePreferences();
 
         apiBaseUrlValidator = urlValidator(citeDriveApiBaseUrlProperty, Localization.lang("Server address"));
         appBaseUrlValidator = urlValidator(citeDriveAppBaseUrlProperty, Localization.lang("Web address"));
@@ -56,9 +62,14 @@ public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         citeDrivePreferences.setEnabled(citeDriveEnabledProperty.getValue());
-        citeDrivePreferences.setPersistRefreshToken(rememberCiteDriveLoginProperty.getValue());
-        citeDrivePreferences.setApiBaseUrl(citeDriveApiBaseUrlProperty.getValue().trim());
         citeDrivePreferences.setAppBaseUrl(citeDriveAppBaseUrlProperty.getValue().trim());
+    }
+
+    @Override
+    public Optional<CliPreferences.CredentialSave> prepareCredentialSave() {
+        return preferences.prepareCiteDriveTokenSave(
+                citeDriveApiBaseUrlProperty.get().trim(),
+                rememberCiteDriveLoginProperty.get() ? CredentialPersistence.SAVE : CredentialPersistence.SESSION_ONLY);
     }
 
     @Override
