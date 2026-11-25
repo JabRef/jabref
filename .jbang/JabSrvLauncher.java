@@ -37,7 +37,7 @@
 //DEPS org.apache.commons:commons-lang3:3.22.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.1
 //DEPS org.bouncycastle:bcprov-jdk18on:1.87
-//DEPS org.postgresql:postgresql:42.7.14
+//DEPS org.postgresql:postgresql:42.7.15
 //DEPS org.slf4j:slf4j-api:2.0.20
 //DEPS org.slf4j:jul-to-slf4j:2.0.20
 //DEPS org.tinylog:slf4j-tinylog:2.8.1
@@ -50,7 +50,7 @@
 //DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.3
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.3
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.3
-//DEPS org.hibernate.validator:hibernate-validator:9.1.6.Final
+//DEPS org.hibernate.validator:hibernate-validator:9.2.0.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS tools.jackson.core:jackson-core:3.3.0
 //DEPS tools.jackson.core:jackson-databind:3.3.0

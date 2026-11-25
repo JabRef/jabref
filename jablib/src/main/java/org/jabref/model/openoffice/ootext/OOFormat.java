@@ -1,12 +1,12 @@
 package org.jabref.model.openoffice.ootext;
 
-import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.util.strings.StringUtil;
+import java.util.Optional;
 
-/// Helper functions to produce some of the markup as understood by OOTextIntoOO.write
+import org.jspecify.annotations.Nullable;
+
+/// Helper functions to produce markup interpreted by [org.jabref.logic.openoffice.uno.OOTextWriter].
 ///
 /// These do not cover all tags, only those needed to embed markup from Layout and citation marker formatters into citation markers and bibliography.
-@AllowedToUseLogic("Uses StringUtil temporarily")
 public class OOFormat {
 
     private OOFormat() {
@@ -41,13 +41,13 @@ public class OOFormat {
                 + "</span>");
     }
 
-    /// Mark `ootext` as part of a paragraph with style `paraStyle`
-    public static OOText paragraph(OOText ootext, String paraStyle) {
-        if (StringUtil.isNullOrEmpty(paraStyle)) {
-            return paragraph(ootext);
-        }
-        String startTag = "<p oo:ParaStyleName=\"%s\">".formatted(paraStyle);
-        return OOText.fromString(startTag + ootext.toString() + "</p>");
+    /// Mark `ootext` as part of a paragraph with style `paraStyle`.
+    /// An absent or empty style produces an unstyled paragraph; nonempty names are preserved verbatim.
+    public static OOText paragraph(OOText ootext, @Nullable String paraStyle) {
+        return Optional.ofNullable(paraStyle)
+                       .filter(style -> !style.isEmpty())
+                       .map(style -> OOText.fromString("<p oo:ParaStyleName=\"%s\">".formatted(style) + ootext.toString() + "</p>"))
+                       .orElseGet(() -> paragraph(ootext));
     }
 
     /// Mark `ootext` as part of a paragraph.

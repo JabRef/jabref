@@ -25,10 +25,6 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -318,6 +314,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         Platform.runLater(() -> ikonGridView.setItems(filteredList));
 
         PopOver popOver = new PopOver(vBox);
+        popOver.getStyleClass().add("group-icon-picker");
         popOver.setDetachable(false);
         popOver.setArrowSize(0);
         popOver.setCornerRadius(0);
@@ -363,7 +360,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 setGraphic(ikon.icon().withSize(22).getGraphicNode());
                 setAlignment(Pos.BASELINE_CENTER);
                 setPadding(new Insets(1));
-                setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
                 setOnMouseClicked(_ -> {
                     iconField.textProperty().setValue(ikon.persistedIdentifier());

@@ -1,0 +1,15 @@
+/// Canonical Writer citation storage and write-in-place operations.
+/// [MarkStore] reads canonical reference-mark identities and page information keyed by group uid and zero-based storage index.
+/// [CitationMarkerWriter] applies formatted renderer output inside existing marks and keeps its change baseline in memory.
+/// [DocumentStyleStore] records the successfully applied style independently of Zotero preferences.
+/// [UndoableDocumentProperties] records custom-property deltas for page information and format conversion.
+/// Rendering and action coordination live in [org.jabref.logic.openoffice.engine]; document ordering
+/// lives in [org.jabref.logic.openoffice.frontend]. Low-level document operations are in
+/// [org.jabref.logic.openoffice.uno].
+///
+/// @see <a href="https://devdocs.jabref.org/code-howtos/openoffice/overview.html#what-is-stored-in-a-document">Canonical document storage</a>
+/// @see <a href="https://devdocs.jabref.org/decisions/0084-canonical-writer-citations.html">Canonical Writer citation decision</a>
+@NullMarked
+package org.jabref.logic.openoffice.engine.storage;
+
+import org.jspecify.annotations.NullMarked;
