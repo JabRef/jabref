@@ -585,7 +585,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 taskExecutor,
                 gitHandlerRegistry,
-                this::isModified);
+                this::isModified,
+                nativeDesktop);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -1169,7 +1170,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 preferences,
                 getUndoManager(),
                 stateManager,
-                this));
+                this,
+                nativeDesktop));
     }
 
     public void suspendChangeMonitor() {

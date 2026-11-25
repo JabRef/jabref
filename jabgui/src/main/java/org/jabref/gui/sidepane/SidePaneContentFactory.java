@@ -89,7 +89,8 @@ public class SidePaneContentFactory {
                     new WebSearchPaneView(
                             preferences,
                             dialogService,
-                            stateManager);
+                            stateManager,
+                            nativeDesktop);
         };
     }
 }

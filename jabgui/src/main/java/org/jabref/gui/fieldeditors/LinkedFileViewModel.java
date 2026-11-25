@@ -216,7 +216,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void open() {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
-            boolean successful = NativeDesktop.openExternalFileAnyFormat(databaseContext, preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), linkedFile.getLink(), type);
+            boolean successful = nativeDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
@@ -233,7 +233,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                         linkedFile.getLink(),
                         preferences.getFilePreferences());
                 if (resolvedPath.isPresent()) {
-                    NativeDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences.getExternalApplicationsPreferences(), dialogService);
+                    nativeDesktop.openFolderAndSelectFile(resolvedPath.get(), dialogService);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
                 }

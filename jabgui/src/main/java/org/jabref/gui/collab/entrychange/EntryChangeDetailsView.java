@@ -8,6 +8,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.StyleClasses;
@@ -28,7 +29,8 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   GuiPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   PreviewViewer previewViewer,
-                                  TaskExecutor taskExecutor) {
+                                  TaskExecutor taskExecutor,
+                                  NativeDesktop nativeDesktop) {
         this(
                 oldEntry,
                 newEntry,
@@ -40,7 +42,8 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                 previewViewer,
                 taskExecutor,
                 Localization.lang("In JabRef"),
-                Localization.lang("On disk")
+                Localization.lang("On disk"),
+                nativeDesktop
         );
     }
 
@@ -54,14 +57,15 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   PreviewViewer previewViewer,
                                   TaskExecutor taskExecutor,
                                   String leftLabelText,
-                                  String rightLabelText) {
+                                  String rightLabelText,
+                                  NativeDesktop nativeDesktop) {
         Label inJabRef = new Label(leftLabelText);
         inJabRef.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
         Label onDisk = new Label(rightLabelText);
         onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         // we need a copy here as we otherwise would set the same entry twice
-        PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, taskExecutor);
+        PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, taskExecutor, nativeDesktop);
         previewClone.setDatabaseContext(oldDatabaseContext);
         previewViewer.setDatabaseContext(newDatabaseContext);
 

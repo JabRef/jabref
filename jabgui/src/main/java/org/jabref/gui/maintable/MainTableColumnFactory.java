@@ -82,7 +82,7 @@ public class MainTableColumnFactory {
         this.nativeDesktop = nativeDesktop;
         this.cellFactory = new CellFactory(preferences);
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
+        this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor, nativeDesktop);
     }
 
     @Nullable
@@ -304,7 +304,7 @@ public class MainTableColumnFactory {
 
     /// Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager, nativeDesktop);
     }
 
     /// Creates a column that displays a [SpecialField]

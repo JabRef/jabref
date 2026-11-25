@@ -118,7 +118,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 preferences.getKeyBindingRepository(),
                 preferences,
                 taskExecutor,
-                stateManager);
+                stateManager,
+                nativeDesktop);
 
         EntryEditorTabFactory tabFactory = new EntryEditorTabFactory(
                 previewPanel,
@@ -146,7 +147,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 dialogService,
                 journalAbbreviationRepository,
                 tabSupplier,
-                tabFactory);
+                tabFactory,
+                nativeDesktop);
 
         typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
         Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
@@ -245,7 +247,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                     focusUtils.captureFocusedField();
                     tabSupplier.get().selectPreviousEntry();
                 })
-                .on(KeyBinding.HELP, () -> new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute())
+                .on(KeyBinding.HELP, () -> new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, nativeDesktop).execute())
                 // We do not want to close the entry editor as such
                 // We just want to unfocus the field
                 .onWithoutConsuming(KeyBinding.CLOSE, tabbed::requestFocus)

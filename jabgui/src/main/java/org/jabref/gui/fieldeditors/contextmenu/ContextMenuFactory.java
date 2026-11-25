@@ -38,7 +38,7 @@ public class ContextMenuFactory {
                               @NonNull NativeDesktop nativeDesktop) {
         this.menuBuilders = List.of(
                 new SingleSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel, taskExecutor, fileUpdateMonitor, undoManager, stateManager, nativeDesktop),
-                new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel)
+                new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel, nativeDesktop)
         );
     }
 

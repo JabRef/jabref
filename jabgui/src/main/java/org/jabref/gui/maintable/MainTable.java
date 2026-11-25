@@ -433,9 +433,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager);
         EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager);
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager);
-        OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
+        OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences, nativeDesktop);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor, nativeDesktop);
-        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
+        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, nativeDesktop);
         LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor);
 
         KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(keyBindings)

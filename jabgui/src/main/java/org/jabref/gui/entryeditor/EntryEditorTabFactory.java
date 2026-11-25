@@ -130,7 +130,7 @@ public class EntryEditorTabFactory {
             case ALL_FIELDS ->
                     new AllFieldsTab(undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case RELATED_ARTICLES ->
-                    new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor);
+                    new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor, nativeDesktop);
             case AI_SUMMARY ->
                     new AiSummaryTab(preferences, stateManager);
             case AI_CHAT ->

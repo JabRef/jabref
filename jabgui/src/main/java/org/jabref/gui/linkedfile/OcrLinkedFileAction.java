@@ -144,7 +144,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
 
             NotificationAction<Path> action = new NotificationAction<>(Localization.lang("Show file"), _ -> {
                 try {
-                    NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
+                    nativeDesktop.openFolderAndSelectFile(path, dialogService);
                 } catch (IOException e) {
                     LOGGER.error("Could not open OCRed file.", e);
                 }

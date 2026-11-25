@@ -46,6 +46,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.FieldListSections;
 import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
@@ -179,7 +180,8 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                                      GuiPreferences preferences,
                                      StateManager stateManager,
                                      DialogService dialogService,
-                                     TaskExecutor taskExecutor) {
+                                     TaskExecutor taskExecutor,
+                                     NativeDesktop nativeDesktop) {
         this.entry = entry;
         this.databaseContext = databaseContext;
         this.entryTypesManager = entryTypesManager;
@@ -190,7 +192,7 @@ public class CitationEntryReviewDialog extends BaseDialog<CitationEntryReviewDia
                                                .orElse(new SuggestionProviders());
         this.undoAction = createUndoAction(dialogService, stateManager);
         this.redoAction = createRedoAction(dialogService, stateManager);
-        this.previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
+        this.previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, nativeDesktop);
         String defaultOwner = NON_ALPHANUMERIC.matcher(
                 preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);

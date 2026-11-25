@@ -34,6 +34,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final ClipBoardManager clipBoardManager;
     private final BuildInfo buildInfo;
     private final ListProperty<LogEventViewModel> allMessagesData;
@@ -41,9 +42,11 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     public ErrorConsoleViewModel(@NonNull DialogService dialogService,
                                  @NonNull GuiPreferences preferences,
                                  @NonNull ClipBoardManager clipBoardManager,
-                                 @NonNull BuildInfo buildInfo) {
+                                 @NonNull BuildInfo buildInfo,
+                                 @NonNull NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.clipBoardManager = clipBoardManager;
         this.buildInfo = buildInfo;
         ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(
@@ -116,7 +119,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
                     .setParameter("body", issueBody);
-            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openBrowser(uriBuilder.build().toString());
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Problem opening url", e);
         }

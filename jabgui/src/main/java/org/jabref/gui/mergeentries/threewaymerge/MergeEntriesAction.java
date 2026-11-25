@@ -7,6 +7,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.l10n.Localization;
@@ -19,11 +20,13 @@ public class MergeEntriesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
+    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(NUMBER_OF_ENTRIES_NEEDED, stateManager));
     }
@@ -60,7 +63,7 @@ public class MergeEntriesAction extends SimpleCommand {
             second = one;
         }
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferences, stateManager);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferences, stateManager, nativeDesktop);
         dialog.setTitle(Localization.lang("Merge entries"));
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);

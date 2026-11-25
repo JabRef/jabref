@@ -73,7 +73,7 @@ public class RightClickMenu {
                 createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferences, nativeDesktop)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -95,14 +95,14 @@ public class RightClickMenu {
                 extractFileReferencesOffline,
                 factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager, preferences)),
 
-                factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences, nativeDesktop)),
 
-                createSearchSubMenu(factory, dialogService, stateManager, preferences),
+                createSearchSubMenu(factory, dialogService, stateManager, preferences, nativeDesktop),
 
                 new SeparatorMenuItem(),
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager(), entryTypesManager).asSubMenu(),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences)),
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, nativeDesktop)),
                 factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor))
         );
 
@@ -257,12 +257,13 @@ public class RightClickMenu {
     private static Menu createSearchSubMenu(ActionFactory factory,
                                             DialogService dialogService,
                                             StateManager stateManager,
-                                            GuiPreferences preferences) {
+                                            GuiPreferences preferences,
+                                            NativeDesktop nativeDesktop) {
         Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
         searchMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SEMANTIC_SCHOLAR, new SearchSemanticScholarAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences))
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEARCH_SEMANTIC_SCHOLAR, new SearchSemanticScholarAction(dialogService, stateManager, preferences, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences, nativeDesktop))
         );
         return searchMenu;
     }

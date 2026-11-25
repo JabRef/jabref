@@ -173,7 +173,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
-        this.previewTooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
+        this.previewTooltip = new MainTableTooltip(dialogService, preferences, taskExecutor, nativeDesktop);
         // Close the preview automatically when the user clicks somewhere outside of it.
         this.previewTooltip.setAutoHide(true);
 
@@ -362,7 +362,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 try {
-                    NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
+                    nativeDesktop.openBrowser(url);
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(
@@ -379,7 +379,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         providedByButtonMetrics.setTooltip(new Tooltip(Localization.lang("Metrics provided by scite.ai")));
         providedByButtonMetrics.setOnAction(_ -> {
             try {
-                NativeDesktop.openBrowser(URLs.SCITE_URL, preferences.getExternalApplicationsPreferences());
+                nativeDesktop.openBrowser(URLs.SCITE_URL);
             } catch (IOException ioex) {
                 // Can't throw a checked exception from here, so display a message to the user instead.
                 dialogService.showErrorDialogAndWait(
@@ -395,7 +395,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         providedByButtonRelations.setTooltip(new Tooltip(Localization.lang("Relations provided by Semantic Scholar")));
         providedByButtonRelations.setOnAction(_ -> {
             try {
-                NativeDesktop.openBrowser(URLs.SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
+                nativeDesktop.openBrowser(URLs.SEMANTIC_SCHOLAR_URL);
             } catch (IOException ioex) {
                 // Can't throw a checked exception from here, so display a message to the user instead.
                 dialogService.showErrorDialogAndWait(
@@ -632,7 +632,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 return;
                             }
                             try {
-                                NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
+                                nativeDesktop.openBrowser(url);
                             } catch (IOException _) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
@@ -818,7 +818,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             /// check for safety
             uri.ifPresent(apiUri -> {
                 try {
-                    NativeDesktop.openBrowser(apiUri, preferences.getExternalApplicationsPreferences());
+                    nativeDesktop.openBrowser(apiUri);
                 } catch (IOException e) {
                     LOGGER.warn("Could not open API URL in browser: {}", apiUri, e);
                     dialogService.notify(Localization.lang("Unable to open link."));
@@ -1113,7 +1113,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                     preferences,
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    nativeDesktop);
 
             // Closing the window without choosing a button discards the review like "End review without imports" does.
             review.applyDecision(dialogService.showCustomDialogAndWait(reviewDialog)
@@ -1139,7 +1140,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         String leftHeader = Localization.lang("Library Entry");
         String rightHeader = Localization.lang("Citation Entry");
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(libraryEntry, citationEntry, leftHeader, rightHeader, preferences, stateManager);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(libraryEntry, citationEntry, leftHeader, rightHeader, preferences, stateManager, nativeDesktop);
         dialog.setTitle(Localization.lang("Possible duplicate entries"));
 
         Optional<EntriesMergeResult> entriesMergeResult = dialogService.showCustomDialogAndWait(dialog);

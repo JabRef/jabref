@@ -242,8 +242,8 @@ class StyleSelectDialogViewTest {
     private StyleSelectDialogView dialog(int family, int row) {
         when(openOfficePreferences.getCurrentStyle()).thenReturn(style(family, row));
         return new StyleSelectDialogView(cslStyleLoader, jStyleLoader, bstStyleLoader, journalAbbreviationRepository,
-                (dialogService, preferences, taskExecutor) -> {
-                    PreviewViewer viewer = spy(new PreviewViewer(dialogService, preferences, taskExecutor));
+                (dialogService, preferences, taskExecutor, nativeDesktop) -> {
+                    PreviewViewer viewer = spy(new PreviewViewer(dialogService, preferences, taskExecutor, nativeDesktop));
                     doNothing().when(viewer).setDatabaseContext(any());
                     doNothing().when(viewer).setEntry(any());
                     doNothing().when(viewer).setLayout(any());

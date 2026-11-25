@@ -705,7 +705,8 @@ public class ImportHandler {
                 DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK,
                 stateManager,
                 dialogService,
-                preferences
+                preferences,
+                nativeDesktop
         );
         DuplicateResolverDialog.DuplicateResolverResult effectiveDecision = decision;
         if (effectiveDecision == BREAK && rememberedBatchDuplicateDecision != BREAK) {

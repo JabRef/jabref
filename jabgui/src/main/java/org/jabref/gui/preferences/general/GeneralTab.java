@@ -49,7 +49,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                 Injector.instantiateModelOrService(UiMessageHandler.class),
                 Injector.instantiateModelOrService(OAuthSessionRegistry.class),
                 Injector.instantiateModelOrService(RemoteListenerServerManager.class),
-                Injector.instantiateModelOrService(StateManager.class));
+                Injector.instantiateModelOrService(StateManager.class),
+                nativeDesktop);
         buildView();
     }
 

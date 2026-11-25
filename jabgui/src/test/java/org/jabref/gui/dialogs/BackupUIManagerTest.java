@@ -22,7 +22,7 @@ import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
@@ -78,7 +78,6 @@ class BackupUIManagerTest extends JavaFxTest {
         Localization.setLanguage(Language.ENGLISH);
         dialogService = mock(DialogService.class);
         preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
     }
 
     @AfterEach
@@ -107,7 +106,8 @@ class BackupUIManagerTest extends JavaFxTest {
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                new JabRefGuiStateManager()));
+                new JabRefGuiStateManager(),
+                mock(NativeDesktop.class)));
 
         verify(dialogService).showErrorDialogAndWait(
                 eq(Localization.lang("Restore backup")),
@@ -150,7 +150,8 @@ class BackupUIManagerTest extends JavaFxTest {
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                new JabRefGuiStateManager());
+                new JabRefGuiStateManager(),
+                mock(NativeDesktop.class));
 
         BibDatabaseContext restored = result.orElseThrow().getDatabaseContext();
         assertEquals(2, restored.getDatabase().getEntryCount());
@@ -180,7 +181,8 @@ class BackupUIManagerTest extends JavaFxTest {
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                stateManager);
+                stateManager,
+                mock(NativeDesktop.class));
 
         // The same call LibraryTab makes when it installs the loaded library
         BibDatabaseContext loaded = result.orElseThrow().getDatabaseContext();
@@ -231,7 +233,8 @@ class BackupUIManagerTest extends JavaFxTest {
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                new JabRefGuiStateManager()));
+                new JabRefGuiStateManager(),
+                mock(NativeDesktop.class)));
 
         InOrder inOrder = inOrder(tabContainer, dialogService);
         inOrder.verify(tabContainer).showLibraryTab(affectedTab);
@@ -257,13 +260,13 @@ class BackupUIManagerTest extends JavaFxTest {
         when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class))).thenAnswer(_ -> {
             if (calls.getAndIncrement() == 0) {
                 BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, innerFile, preferences,
-                        mock(FileUpdateMonitor.class), stateManager);
+                        mock(FileUpdateMonitor.class), stateManager, mock(NativeDesktop.class));
             }
             return Optional.of(BackupResolverDialog.IGNORE_BACKUP);
         });
 
         interact(() -> BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, outerFile, preferences,
-                mock(FileUpdateMonitor.class), stateManager));
+                mock(FileUpdateMonitor.class), stateManager, mock(NativeDesktop.class)));
 
         InOrder order = inOrder(tabContainer, dialogService);
         order.verify(tabContainer).showLibraryTab(outerTab);
@@ -304,7 +307,7 @@ class BackupUIManagerTest extends JavaFxTest {
         });
 
         interact(() -> BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, originalFile, preferences,
-                mock(FileUpdateMonitor.class), stateManager));
+                mock(FileUpdateMonitor.class), stateManager, mock(NativeDesktop.class)));
 
         assertEquals(affectedTab, selectionDuringDialog.get());
         interact(() -> tabContainer.showLibraryTab(otherTab));
@@ -328,7 +331,7 @@ class BackupUIManagerTest extends JavaFxTest {
 
         AtomicReference<@Nullable String> dialogContent = new AtomicReference<>();
         interact(() -> {
-            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class), dialogService);
+            BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(NativeDesktop.class), dialogService);
             StackPane content = (StackPane) dialog.getDialogPane().getContent();
             HyperlinkLabel hyperlink = (HyperlinkLabel) content.getChildren().getFirst();
             dialogContent.set(hyperlink.getText());
@@ -426,7 +429,8 @@ class BackupUIManagerTest extends JavaFxTest {
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                new JabRefGuiStateManager());
+                new JabRefGuiStateManager(),
+                mock(NativeDesktop.class));
 
         assertTrue(result.orElseThrow().getChangedOnMigration());
     }
@@ -476,7 +480,8 @@ class BackupUIManagerTest extends JavaFxTest {
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                new JabRefGuiStateManager());
+                new JabRefGuiStateManager(),
+                mock(NativeDesktop.class));
 
         assertFalse(result.orElseThrow().getChangedOnMigration());
     }

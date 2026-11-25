@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.JumpToEntryPdfAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -55,6 +56,7 @@ public class AiChatMessageView extends HBox {
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private GuiPreferences preferences;
+    @Inject private NativeDesktop nativeDesktop;
 
     // Tooltip for the whole component.
     private final Tooltip tooltip = new Tooltip();
@@ -214,7 +216,7 @@ public class AiChatMessageView extends HBox {
         if (JumpToEntryPdfAction.parseUrl(url).isPresent()) {
             new JumpToEntryPdfAction(url, stateManager, dialogService).execute();
         } else {
-            new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute();
+            new OpenBrowserAction(url, dialogService, nativeDesktop).execute();
         }
     }
 
