@@ -254,11 +254,9 @@ public class ImportHandler {
                                 if (linkedEntries.isEmpty()) {
                                     addResultToList(file, FAILURE, Localization.lang("Could not move file '%0'.", file));
                                 } else {
-                                    addToImportEntriesGroup(pdfEntriesInFile);
-                                    entriesToAdd.addAll(pdfEntriesInFile);
-                                    pdfWarning.ifPresentOrElse(
-                                            warning -> addResultToList(file, WARNING, Localization.lang("File was imported as %0, but warnings were reported: %1", "PDF", warning)),
-                                            () -> addResultToList(file, true, Localization.lang("File was successfully imported as a new entry")));
+                                    addToImportEntriesGroup(linkedEntries);
+                                    entriesToAdd.addAll(linkedEntries);
+                                    addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                                 }
                             }
                         } else if (FileUtil.isBibFile(file)) {

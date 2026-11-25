@@ -79,7 +79,12 @@ public class ExternalFilesEntryLinker {
             LinkedFile linkedFile = new LinkedFile("", file, typeName);
             LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, bibDatabaseContextSupplier.get(), filePreferences);
             try {
-                linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
+                boolean success = linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
+                if (!success) {
+                    LOGGER.warn("Could not copy/move file {} — no destination directory", file);
+                    notificationService.notify(Localization.lang("Could not move file '%0'.", file));
+                    continue;
+                }
             } catch (FileUtil.OutsideFileDirectoryException exception) {
                 LOGGER.warn("Refused to move file {} outside the file directory", file, exception);
                 notificationService.notify(Localization.lang("Could not move file '%0' outside the file directory.", file));
