@@ -7,8 +7,8 @@ import org.jabref.gui.preferences.openoffice.OpenOfficeTabViewModel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.style.BstStyle;
-import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.bst.BstStyle;
+import org.jabref.logic.openoffice.jstyle.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.TaskExecutor;
 
