@@ -109,6 +109,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final SearchCitationsRelationsService searchCitationsRelationsService;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
@@ -135,11 +136,13 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 TaskExecutor taskExecutor,
                                 BibEntryTypesManager bibEntryTypesManager,
                                 SearchCitationsRelationsService searchCitationsRelationsService,
-                                BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
+                                BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter,
+                                NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
@@ -154,7 +157,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                 stateManager,
                 dialogService,
                 fileUpdateMonitor,
-                taskExecutor
+                taskExecutor,
+                nativeDesktop
         );
 
         EasyBind.subscribe(citationsRelationsTabViewModel.lastImportedEntryProperty(), entry -> {

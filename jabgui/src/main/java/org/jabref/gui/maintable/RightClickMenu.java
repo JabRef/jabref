@@ -89,8 +89,8 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.GET_FULLTEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
-                createMoreFileOperationsSubMenu(factory, libraryTab, dialogService, stateManager, preferences, taskExecutor),
+                factory.createMenuItem(StandardActions.GET_FULLTEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor, nativeDesktop)),
+                createMoreFileOperationsSubMenu(factory, libraryTab, dialogService, stateManager, preferences, taskExecutor, nativeDesktop),
                 extractFileReferencesOnline,
                 extractFileReferencesOffline,
                 factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager, preferences)),
@@ -242,13 +242,14 @@ public class RightClickMenu {
                                                         DialogService dialogService,
                                                         StateManager stateManager,
                                                         GuiPreferences preferences,
-                                                        TaskExecutor taskExecutor) {
+                                                        TaskExecutor taskExecutor,
+                                                        NativeDesktop nativeDesktop) {
         Menu moreFileOperationsMenu = factory.createMenu(StandardActions.MORE_FILE_OPERATIONS);
         moreFileOperationsMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences())),
-                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences)),
-                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor)),
-                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor))
+                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences, nativeDesktop)),
+                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor, nativeDesktop)),
+                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor, nativeDesktop))
         );
         return moreFileOperationsMenu;
     }

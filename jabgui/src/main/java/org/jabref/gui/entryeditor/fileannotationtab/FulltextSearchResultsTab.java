@@ -60,6 +60,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final TextFlow content;
 
     private BibEntry entry;
@@ -78,12 +79,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    TaskExecutor taskExecutor) {
+                                    TaskExecutor taskExecutor,
+                                    NativeDesktop nativeDesktop) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
 
         this.contentVisibility = Bindings.createBooleanBinding(
                 () -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
@@ -210,9 +213,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private ContextMenu getFileContextMenu(LinkedFile file) {
         ContextMenu fileContextMenu = new ContextMenu();
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
+                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, entry, file, taskExecutor, nativeDesktop)));
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_EXTERNAL_FILE, new OpenSingleExternalFileAction(dialogService, preferences, entry, file, taskExecutor, stateManager)));
+                StandardActions.OPEN_EXTERNAL_FILE, new OpenSingleExternalFileAction(dialogService, preferences, entry, file, taskExecutor, stateManager, nativeDesktop)));
         return fileContextMenu;
     }
 

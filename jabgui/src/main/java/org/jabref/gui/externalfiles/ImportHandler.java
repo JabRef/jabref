@@ -24,6 +24,7 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.AddGroupImportEntriesAction;
@@ -111,6 +112,7 @@ public class ImportHandler {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final FilePreferences filePreferences;
     private Optional<Boolean> downloadLinkedFilesOverride = Optional.empty();
     private final Deque<DuplicateDecisionRequest> duplicateDecisionRequests = new ArrayDeque<>();
@@ -134,13 +136,15 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         NativeDesktop nativeDesktop) {
         this.targetBibDatabaseContext = targetBibDatabaseContext;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
 
         this.filePreferences = preferences.getFilePreferences();
 
@@ -745,7 +749,8 @@ public class ImportHandler {
                                  targetBibDatabaseContext,
                                  taskExecutor,
                                  dialogService,
-                                 preferences
+                                 preferences,
+                                 nativeDesktop
                          ).download(false, undoManager)
                  );
         }

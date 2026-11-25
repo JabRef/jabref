@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
@@ -37,6 +38,7 @@ public class EntryEditorTabFactory {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileMonitor;
     private final DirectoryMonitor directoryMonitor;
@@ -60,7 +62,8 @@ public class EntryEditorTabFactory {
                                  JournalAbbreviationRepository journalAbbreviationRepository,
                                  KeyBindingRepository keyBindingRepository,
                                  SearchCitationsRelationsService searchCitationsRelationsService,
-                                 BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
+                                 BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter,
+                                 NativeDesktop nativeDesktop) {
         this.previewPanel = previewPanel;
         this.undoAction = undoAction;
         this.redoAction = redoAction;
@@ -68,6 +71,7 @@ public class EntryEditorTabFactory {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
         this.fileMonitor = fileMonitor;
         this.directoryMonitor = directoryMonitor;
@@ -144,7 +148,8 @@ public class EntryEditorTabFactory {
                             taskExecutor,
                             bibEntryTypesManager,
                             searchCitationsRelationsService,
-                            bibTeXSyntaxHighlighter);
+                            bibTeXSyntaxHighlighter,
+                            nativeDesktop);
             case SOURCE ->
                     new SourceTab(
                             preferences.getFieldPreferences(),
@@ -157,7 +162,7 @@ public class EntryEditorTabFactory {
                             bibTeXSyntaxHighlighter
                     );
             case FULLTEXT_SEARCH_RESULTS ->
-                    new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor);
+                    new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, nativeDesktop);
         };
     }
 }

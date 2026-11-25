@@ -158,7 +158,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 preferences.getMainTableColumnPreferences(),
                 dialogService,
                 stateManager,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
 
         this.columnPreferencesApplier = new ColumnPreferencesApplier(this, mainTableColumnFactory, mainTablePreferences);
         columnPreferencesApplier.bind();
@@ -433,7 +434,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager);
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
-        OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
+        OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor, nativeDesktop);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
         LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor);
 

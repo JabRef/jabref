@@ -69,7 +69,8 @@ public class SidePaneContentFactory {
                             dialogService,
                             aiService,
                             fileUpdateMonitor,
-                            taskExecutor);
+                            taskExecutor,
+                            nativeDesktop);
             case OPEN_OFFICE ->
                     new OpenOfficePanel(
                             tabContainer,

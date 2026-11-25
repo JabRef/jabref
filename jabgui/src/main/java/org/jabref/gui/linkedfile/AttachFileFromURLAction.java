@@ -9,6 +9,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -25,15 +26,18 @@ public class AttachFileFromURLAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
 
     public AttachFileFromURLAction(DialogService dialogService,
                                    StateManager stateManager,
                                    TaskExecutor taskExecutor,
-                                   GuiPreferences preferences) {
+                                   GuiPreferences preferences,
+                                   NativeDesktop nativeDesktop) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
@@ -68,7 +72,8 @@ public class AttachFileFromURLAction extends SimpleCommand {
                     databaseContext,
                     taskExecutor,
                     dialogService,
-                    preferences);
+                    preferences,
+                    nativeDesktop);
             onlineFile.download(true, stateManager.getUndoManager(databaseContext));
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);

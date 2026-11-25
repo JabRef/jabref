@@ -12,6 +12,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
@@ -83,7 +84,8 @@ class JabRefFrameViewModelTest extends JavaFxTest {
                 entryTypesManager,
                 fileUpdateMonitor,
                 clipBoardManager,
-                taskExecutor
+                taskExecutor,
+                mock(NativeDesktop.class)
         );
     }
 
