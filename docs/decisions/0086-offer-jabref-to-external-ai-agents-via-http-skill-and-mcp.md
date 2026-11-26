@@ -40,11 +40,17 @@ How does JabRef offer its functionality - first: semantic search over the embedd
 * External reader of the embeddings store
 * Other tool protocols (LTP, TCP)
 
+For the MCP server, there are two options for the implementation:
+
+* MCP endpoint built with the MCP Java SDK
+* MCP endpoint written by hand
+
 ## Decision Outcome
 
 Chosen option: "Skill and HTTP endpoint in `jabsrv`" together with "MCP server in `jabsrv`", because both run inside the JabRef which already holds the embeddings store and the embedding model, the skill has near-zero context cost, and MCP reaches the agents which cannot use skills.
 
-Both are thin layers over one service, which wraps `EmbeddingsSearchResponseEngine`.
+Both are thin layers over one service (`SemanticSearch`).
+The service does not wrap `EmbeddingsSearchResponseEngine`, which serves the chat about a few selected entries: it hashes the linked files once per entry and once more per match, which is too slow for a whole library, and it returns neither the score nor the file.
 The realization has two steps:
 
 1. HTTP endpoint (`POST libraries/{id}/ai/search`: query, maximum number of results, minimum score → citation key, page, score, chunk text) and a skill in `skills/users/` calling it.
@@ -52,10 +58,11 @@ The realization has two steps:
 
 Constraints for both:
 
-* Available only if the HTTP server and the AI features are enabled.
+* Available only if the HTTP server is enabled. The semantic search additionally needs the AI features to be enabled; the other MCP tools work without them.
 * A search triggers the ingestion of the linked files which are not yet ingested. It does not wait for it, since ingestion can take minutes: the response contains the results from what is ingested and reports the linked files which are still pending.
-* The MCP server offers a small, fixed set of tools (semantic search, library search, get entry) and uses the official [MCP Java SDK](https://github.com/modelcontextprotocol/java-sdk). This is the answer to the context-window concern of issue 1164: the cost grows with number and size of the tool definitions, so the set is kept small.
+* The MCP server offers a small, fixed set of tools (list libraries, semantic search, library search, get entry). This is the answer to the context-window concern of issue 1164: the cost grows with number and size of the tool definitions, so the set is kept small.
 * MCP is spoken over HTTP inside the running GUI, not over stdio.
+* The MCP endpoint is written by hand as a Jersey resource and speaks only the current revision of the specification (2026-07-28). The [MCP Java SDK](https://github.com/modelcontextprotocol/java-sdk) is not used for now, see the pros and cons of "MCP endpoint built with the MCP Java SDK".
 
 ### Consequences
 
@@ -66,10 +73,12 @@ Constraints for both:
 * Bad, because nothing works headless: the GUI has to run with the HTTP server enabled.
 * Bad, because full-text chunks of PDFs become readable for every local process, and - as long as `CORSFilter` answers `Access-Control-Allow-Origin: *` - for every web page open in the user's browser.
 * Bad, because two interfaces have to be documented and kept stable.
+* Bad, because JabRef has to follow changes of the MCP specification itself.
+* Bad, because MCP clients which only speak a revision with the `initialize` handshake (2025-11-25 and earlier) cannot connect.
 
 ### Confirmation
 
-A `jabsrv` test calls the endpoint with a filled embeddings store and checks citation key, page and chunk text of the result.
+A `jablib` test runs the service on a filled embeddings store and checks citation key, page, score and chunk text of the result; `jabsrv` tests check the JSON of the endpoint and the messages of the MCP endpoint.
 The service is linked to this decision by the OpenFastTrace tag `[impl->adr~external-ai-agent-access~1]`; `Needs: impl` is added to this ADR together with step 1.
 
 ## Pros and Cons of the Options
@@ -90,8 +99,32 @@ The service is linked to this decision by the OpenFastTrace tag `[impl->adr~exte
 * Good, because MCP also offers "resources" and "prompts", which JabRef can use later.
 * Neutral, because some clients load tool schemas on demand, which removes the context cost there.
 * Bad, because tool definitions cost context in the other clients. Kept low by the small tool set.
-* Bad, because it adds a dependency (MCP Java SDK).
 * Bad, because it needs the running GUI.
+
+### MCP endpoint built with the MCP Java SDK
+
+Checked with version 2.2.0 of the [MCP Java SDK](https://github.com/modelcontextprotocol/java-sdk).
+
+* Good, because changes of the specification arrive with a new version of the SDK.
+* Good, because it is the reference implementation: header validation, version negotiation, error codes, and validation of tool arguments against their schema are done.
+* Good, because resources, prompts, streaming responses, and progress are available if JabRef needs them.
+* Bad, because `mcp-core` (about 25,000 source lines, of which about 6,500 serve a server on the current revision), `mcp-json-jackson3`, `reactor-core`, and `reactive-streams` are automatic modules, which JabRef's build rejects (`failOnAutomaticModules`); each needs a module patch.
+* Bad, because its HTTP transports are servlets, so Grizzly needs a servlet layer next to Jersey.
+* Bad, because it ships no GraalVM native-image metadata, which the `jabsrv` native image needs.
+* Bad, because Reactor and the servlet API are added for one endpoint, also to `jabgui`.
+
+### MCP endpoint written by hand
+
+Revision 2026-07-28 of the specification removed the `initialize` handshake, sessions, and the GET stream: each request is a self-contained HTTP POST.
+A server offering tools only has to answer three methods: `server/discover`, `tools/list`, and `tools/call`.
+The endpoint is a Jersey resource next to the other resources of `jabsrv`.
+
+* Good, because it adds no dependency: about 300 lines for the protocol, using Gson, which `jabsrv` already has.
+* Good, because the tools are plain classes behind one interface; moving them to the SDK later replaces the resource only.
+* Bad, because JabRef has to follow changes of the specification itself.
+* Bad, because only the current revision is spoken.
+
+The SDK can be reconsidered when it comes as proper Java modules or when JabRef needs more than tools.
 
 ### `jabkit` command reading the embeddings store
 
