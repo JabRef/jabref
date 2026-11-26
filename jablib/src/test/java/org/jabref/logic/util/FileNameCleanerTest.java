@@ -2,7 +2,6 @@ package org.jabref.logic.util;
 
 import org.jabref.logic.util.io.FileNameCleaner;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -47,38 +46,21 @@ class FileNameCleanerTest {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
     }
 
-    @Test
-    void cleanDirectoryNameRemovesEscaping() {
-        assertEquals("Desktop", FileNameCleaner.cleanDirectoryName("../../../../Desktop"));
-        assertEquals("Desktop", FileNameCleaner.cleanDirectoryName("..\\..\\..\\..\\Desktop"));
-    }
-
-    @Test
-    void cleanDirectoryNameRemovesWindowsTrailingSpaceTraversal() {
-        // Windows resolves ".. " and ".. ." to ".."
-        assertEquals("Desktop", FileNameCleaner.cleanDirectoryName("..  /Desktop"));
-        assertEquals("a/b", FileNameCleaner.cleanDirectoryName("a/.. ./b"));
-    }
-
-    @Test
-    void cleanDirectoryNameKeepsSeparators() {
-        // Patterns like [author]/[year]/..
-        assertEquals("foo/bar/test", FileNameCleaner.cleanDirectoryName("foo/bar/test"));
-        // Windows uses '\'
-        assertEquals("foo\\bar\\test", FileNameCleaner.cleanDirectoryName("foo\\bar\\test"));
-    }
-
-    @Test
-    void cleanDirectoryNameDropsLeadingRoot() {
-        assertEquals("foo/bar", FileNameCleaner.cleanDirectoryName("/foo/bar"));
-    }
-
     @ParameterizedTest
     @CsvSource({
+            // "." and ".." segments dropped
             "Desktop, ../../../../Desktop",
+            "Desktop, ..\\..\\..\\..\\Desktop",
             "a/b, a/../b",
             "a\\b, a\\..\\b",
+            // Windows resolves ".. " and ".. ." to ".."
+            "Desktop, '..  /Desktop'",
+            "a/b, 'a/.. ./b'",
+            // leading separator dropped, else resolve() ignores base directory
+            "foo/bar, /foo/bar",
             "outside, /outside",
+            "outside, ' /outside'",
+            // only whole segments are dropped
             "..Desktop, ../..Desktop",
             "draft./2026, draft./2026"
     })
