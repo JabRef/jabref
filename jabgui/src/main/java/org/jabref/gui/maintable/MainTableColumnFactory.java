@@ -21,6 +21,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.columns.ContentSelectorColumn;
@@ -62,6 +63,7 @@ public class MainTableColumnFactory {
     private final CellFactory cellFactory;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
@@ -70,15 +72,17 @@ public class MainTableColumnFactory {
                                   ColumnPreferences abstractColumnPrefs,
                                   DialogService dialogService,
                                   StateManager stateManager,
-                                  TaskExecutor taskExecutor) {
+                                  TaskExecutor taskExecutor,
+                                  NativeDesktop nativeDesktop) {
         this.database = database;
         this.preferences = preferences;
         this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.cellFactory = new CellFactory(preferences);
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
+        this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor, nativeDesktop);
     }
 
     @Nullable
@@ -300,7 +304,7 @@ public class MainTableColumnFactory {
 
     /// Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager, nativeDesktop);
     }
 
     /// Creates a column that displays a [SpecialField]
@@ -320,7 +324,8 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferences,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
     }
 
     /// Creates a column for all the linked files of a single file type.
@@ -330,7 +335,8 @@ public class MainTableColumnFactory {
                 dialogService,
                 preferences,
                 columnModel.getQualifier(),
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
     }
 
     /// Create library column containing the Filename of the library's bib file

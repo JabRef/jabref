@@ -25,12 +25,14 @@ public class SearchSemanticScholarAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final ExternalLinkCreator externalLinkCreator;
 
-    public SearchSemanticScholarAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
+    public SearchSemanticScholarAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         this.externalLinkCreator = new ExternalLinkCreator(preferences.getImporterPreferences());
 
@@ -44,7 +46,7 @@ public class SearchSemanticScholarAction extends SimpleCommand {
             final List<BibEntry> bibEntries = stateManager.getSelectedEntries();
             externalLinkCreator.getSemanticScholarSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
-                    NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
+                    nativeDesktop.openExternalViewer(databaseContext, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
                     LOGGER.warn("Could not open Semantic Scholar", ex);
                     dialogService.notify(Localization.lang("Unable to open Semantic Scholar.") + " " + ex.getMessage());

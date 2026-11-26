@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -73,7 +74,7 @@ class LinkedFileViewModelMoveFileTest {
         Files.createFile(sourceFile);
 
         LinkedFile linkedFile = new LinkedFile("desc", sourceFile, "pdf");
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, mock(NativeDesktop.class));
 
         viewModel.moveToDirectory(destinationDir);
 
@@ -90,7 +91,7 @@ class LinkedFileViewModelMoveFileTest {
 
         LinkedFile linkedFile = new LinkedFile("desc", sourceFile, "pdf");
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, mock(NativeDesktop.class));
 
         viewModel.moveToDirectory(destinationDir);
 
@@ -105,7 +106,7 @@ class LinkedFileViewModelMoveFileTest {
         Path missingFile = sourceDir.resolve("missing.pdf");
         LinkedFile linkedFile = new LinkedFile("desc", missingFile, "pdf");
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, mock(NativeDesktop.class));
 
         viewModel.moveToDirectory(destinationDir);
 
@@ -126,7 +127,7 @@ class LinkedFileViewModelMoveFileTest {
 
         LinkedFile linkedFile = new LinkedFile("desc", existingFile, "pdf");
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, mock(NativeDesktop.class));
 
         assertTrue(viewModel.isInCurrentDirectory(destinationDir));
     }
@@ -137,7 +138,7 @@ class LinkedFileViewModelMoveFileTest {
         Files.createFile(existingFile);
         LinkedFile linkedFile = new LinkedFile("desc", existingFile, "pdf");
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, mock(NativeDesktop.class));
 
         assertFalse(viewModel.isInCurrentDirectory(destinationDir));
     }

@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -21,6 +22,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
     public ISSNEditorViewModel(
             Field field,
@@ -30,13 +32,15 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
             DialogService dialogService,
             UndoManager undoManager,
             StateManager stateManager,
-            GuiPreferences preferences) {
+            GuiPreferences preferences,
+            NativeDesktop nativeDesktop) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
     }
 
     public void showJournalInfo(Button journalInfoButton) {
@@ -45,7 +49,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {
         stateManager.getActiveDatabase().ifPresentOrElse(
-                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager)
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager, nativeDesktop)
                         .fetchAndMerge(bibEntry, StandardField.ISSN),
                 () -> dialogService.notify(Localization.lang("No library selected"))
         );

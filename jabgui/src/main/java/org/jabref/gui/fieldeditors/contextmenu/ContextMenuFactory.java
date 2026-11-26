@@ -9,6 +9,7 @@ import javafx.scene.control.ContextMenu;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -33,10 +34,11 @@ public class ContextMenuFactory {
                               @NonNull TaskExecutor taskExecutor,
                               @NonNull FileUpdateMonitor fileUpdateMonitor,
                               @NonNull UndoManager undoManager,
-                              @NonNull StateManager stateManager) {
+                              @NonNull StateManager stateManager,
+                              @NonNull NativeDesktop nativeDesktop) {
         this.menuBuilders = List.of(
-                new SingleSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel, taskExecutor, fileUpdateMonitor, undoManager, stateManager),
-                new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel)
+                new SingleSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel, taskExecutor, fileUpdateMonitor, undoManager, stateManager, nativeDesktop),
+                new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel, nativeDesktop)
         );
     }
 

@@ -7,6 +7,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.threewaymerge.FieldRowViewModel.Selection;
 import org.jabref.gui.mergeentries.threewaymerge.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.threewaymerge.cell.FieldValueCell;
@@ -16,7 +17,6 @@ import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighli
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.UnifiedDiffHighlighter;
 import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.threewaymerge.toolbar.ThreeWayMergeToolbar;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -43,12 +43,12 @@ public class FieldRowView {
 
     private GridPane parent;
 
-    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, GuiPreferences preferences, StateManager stateManager, int rowIndex) {
+    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, NativeDesktop nativeDesktop, StateManager stateManager, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
         fieldNameCell = new FieldNameCell(FieldTextMapper.getDisplayName(field), rowIndex);
-        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferences, stateManager);
-        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferences, stateManager);
+        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, nativeDesktop, stateManager);
+        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, nativeDesktop, stateManager);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
         // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.

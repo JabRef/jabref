@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -55,6 +56,7 @@ public class DuplicateSearch extends SimpleCommand {
     private final StateManager stateManager;
 
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final DuplicateCheck duplicateCheck;
     private final TaskExecutor taskExecutor;
 
@@ -67,11 +69,13 @@ public class DuplicateSearch extends SimpleCommand {
                            StateManager stateManager,
                            GuiPreferences preferences,
                            BibEntryTypesManager entryTypesManager,
-                           TaskExecutor taskExecutor) {
+                           TaskExecutor taskExecutor,
+                           NativeDesktop nativeDesktop) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         this.taskExecutor = taskExecutor;
 
@@ -163,7 +167,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences, nativeDesktop);
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress).concat("/").concat(duplicateTotal).concat(")"));
 

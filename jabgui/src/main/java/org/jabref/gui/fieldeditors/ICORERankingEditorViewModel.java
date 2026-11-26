@@ -24,6 +24,7 @@ public class ICORERankingEditorViewModel extends AbstractEditorViewModel {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final ConferenceRepository repo;
 
     private ConferenceEntry matchedConference;
@@ -35,11 +36,13 @@ public class ICORERankingEditorViewModel extends AbstractEditorViewModel {
             DialogService dialogService,
             UndoManager undoManager,
             GuiPreferences preferences,
-            ConferenceRepository conferenceRepository
+            ConferenceRepository conferenceRepository,
+            NativeDesktop nativeDesktop
     ) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.repo = conferenceRepository;
     }
 
@@ -66,7 +69,7 @@ public class ICORERankingEditorViewModel extends AbstractEditorViewModel {
     public void openExternalLink() {
         if (matchedConference != null) {
             try {
-                NativeDesktop.openBrowser(matchedConference.getICOREURL(), preferences.getExternalApplicationsPreferences());
+                nativeDesktop.openBrowser(matchedConference.getICOREURL());
             } catch (IOException e) {
                 LOGGER.error("Error opening external link in browser", e);
                 dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
