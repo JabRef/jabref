@@ -66,7 +66,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We changed the groups field in the merge entries dialog to show groups as tags. [#15109](https://github.com/JabRef/jabref/issues/15109)
 - We combined the add and review actions in the citations tab into one button and arranged entry buttons compactly. [#17847](https://github.com/JabRef/jabref/issues/17847)
 - We improved OCR failure messages to show the executed command and diagnostic output. [#16679](https://github.com/JabRef/jabref/issues/16679)
 - We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
@@ -97,6 +96,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed "Separate citations" for JStyle styles in LibreOffice/OpenOffice to preserve in-text, invisible, no-parentheses, author-only, and year-only citation groups. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice citation refresh to order citations by document text when citation positions on screen are unavailable. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We simplified secure credential storage and reduced macOS approval prompts for saved API keys. [#13687](https://github.com/JabRef/jabref/issues/13687)
+- We changed the groups field in the merge entries dialog to show groups as tags. [#15109](https://github.com/JabRef/jabref/issues/15109)
 
 ### Fixed
 
