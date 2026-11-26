@@ -11,11 +11,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added `jabkit fix`, which checks and repairs a library's formatting by the rules it configures; saving applies them too. [#17948](https://github.com/JabRef/jabref/pull/17948)
+
 ### Changed
 
 ### Fixed
 
-- We fixed an issue where messages garbled file names and URLs containing a percent sign followed by a digit. TODO
+- We fixed an issue where messages garbled file names and URLs containing a percent sign followed by a digit. [#17948](https://github.com/JabRef/jabref/pull/17948)
 
 ### Removed
 
