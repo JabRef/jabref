@@ -49,6 +49,9 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     @Inject
     private GuiPreferences preferences;
 
+    @Inject
+    private NativeDesktop nativeDesktop;
+
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public GitShareToGitHubDialogView() {
@@ -82,10 +85,9 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
         );
         Tooltip.install(repoHelpIcon, repoHelpTooltip);
         repoHelpIcon.setOnMouseClicked(_ ->
-                NativeDesktop.openBrowserShowPopup(
+                nativeDesktop.openBrowserShowPopup(
                         GITHUB_NEW_REPO_URL,
-                        dialogService,
-                        preferences.getExternalApplicationsPreferences()
+                        dialogService
                 )
         );
 
@@ -119,7 +121,8 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                         stateManager,
                         taskExecutor,
                         gitHandlerRegistry,
-                        tab::isModified));
+                        tab::isModified,
+                        nativeDesktop));
         close();
     }
 

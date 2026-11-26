@@ -13,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
@@ -54,6 +55,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     @Inject private GuiPreferences preferences;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private NativeDesktop nativeDesktop;
 
     /// A dialog going through the given `changes`, which are diffs to the provided `database`.
     /// The dialog collects the user's accept, deny, or merge decisions so callers can apply the resolved changes afterward.
@@ -98,9 +100,9 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, nativeDesktop);
         previewViewer.setDatabaseContext(database);
-        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, preferences, entryTypesManager, previewViewer, taskExecutor);
+        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, preferences, entryTypesManager, previewViewer, taskExecutor, nativeDesktop);
 
         viewModel = new ExternalChangesResolverViewModel(changes);
 

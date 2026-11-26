@@ -38,7 +38,8 @@ record MultiSelectionMenuBuilder(
         BibDatabaseContext databaseContext,
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
-        LinkedFilesEditorViewModel viewModel
+        LinkedFilesEditorViewModel viewModel,
+        NativeDesktop nativeDesktop
 ) implements ContextMenuBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiSelectionMenuBuilder.class);
@@ -47,12 +48,14 @@ record MultiSelectionMenuBuilder(
                               @NonNull BibDatabaseContext databaseContext,
                               @NonNull ObservableOptionalValue<BibEntry> bibEntry,
                               @NonNull GuiPreferences preferences,
-                              @NonNull LinkedFilesEditorViewModel viewModel) {
+                              @NonNull LinkedFilesEditorViewModel viewModel,
+                              @NonNull NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.bibEntry = bibEntry;
         this.preferences = preferences;
         this.viewModel = viewModel;
+        this.nativeDesktop = nativeDesktop;
     }
 
     @Override
@@ -228,7 +231,7 @@ record MultiSelectionMenuBuilder(
 
         for (Path fileToSelect : representativeByDir.values()) {
             try {
-                NativeDesktop.openFolderAndSelectFile(fileToSelect, preferences.getExternalApplicationsPreferences(), dialogService);
+                nativeDesktop.openFolderAndSelectFile(fileToSelect, dialogService);
             } catch (IOException e) {
                 LOGGER.warn("Could not open folder and select file: {}", fileToSelect, e);
             }

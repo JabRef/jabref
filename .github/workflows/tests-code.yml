@@ -149,7 +149,7 @@ jobs:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
       - name: Setup JDK
-        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           java-version: '24'
           distribution: 'corretto'
@@ -234,7 +234,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@696eb3f2509270d7b882d2aa68347bc676e7af34 # v25.0.0
+        uses: DavidAnson/markdownlint-cli2-action@3ce8f712b5d8f31acd8e201be6d97e3d2bb23eb7 # v25.1.0
         with:
           globs: |
             *.md
@@ -317,7 +317,7 @@ jobs:
       - name: Resolve //DEPS into the cached directory
         # JBang resolves script dependencies into ~/.m2, which is not cached here.
         run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
-      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: 'corretto'
           java-version: '25'
@@ -650,7 +650,11 @@ jobs:
       - name: Publish jablib to the local Maven repository
         # -Dmaven.repo.local: the jbang-check action points JBANG_REPO at ~/.jbang/repository,
         # so the snapshot has to be published there instead of into ~/.m2.
-        run: gradle -Dmaven.repo.local="$HOME/.jbang/repository" -PprojVersion=6.0 :jablib:publishToMavenLocal
+        # Gradle does not replace Maven's provenance records for previously downloaded snapshots.
+        # Remove the cached jablib snapshot so JBang recognizes the publication as locally installed.
+        run: |
+          rm -rf "$HOME/.jbang/repository/org/jabref/jablib/6.0-SNAPSHOT"
+          gradle -Dmaven.repo.local="$HOME/.jbang/repository" -PprojVersion=6.0 :jablib:publishToMavenLocal
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
@@ -670,7 +674,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           java-version: 25
           distribution: 'corretto'

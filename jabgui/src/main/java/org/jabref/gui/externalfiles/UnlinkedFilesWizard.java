@@ -7,6 +7,7 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -23,6 +24,7 @@ public class UnlinkedFilesWizard {
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private NativeDesktop nativeDesktop;
 
     private UnlinkedFilesDialogViewModel viewModel;
     private BibDatabaseContext bibDatabaseContext;
@@ -73,7 +75,7 @@ public class UnlinkedFilesWizard {
         }
         this.bibDatabaseContext = activeDatabase.get();
 
-        viewModel = new UnlinkedFilesDialogViewModel(dialogService, stateManager.getUndoManager(bibDatabaseContext), fileUpdateMonitor, preferences, stateManager, taskExecutor);
+        viewModel = new UnlinkedFilesDialogViewModel(dialogService, stateManager.getUndoManager(bibDatabaseContext), fileUpdateMonitor, preferences, stateManager, taskExecutor, nativeDesktop);
 
         page1 = new SearchConfigurationPage(viewModel, bibDatabaseContext, preferences);
         page2 = new FileSelectionPage(stateManager, viewModel, preferences.getImportFormatPreferences(), taskExecutor);

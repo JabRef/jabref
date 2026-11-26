@@ -21,6 +21,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.columns.ContentSelectorColumn;
@@ -29,6 +30,7 @@ import org.jabref.gui.maintable.columns.FileColumn;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.maintable.columns.NameColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
@@ -40,6 +42,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
 
@@ -59,6 +63,7 @@ public class MainTableColumnFactory {
     private final CellFactory cellFactory;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
@@ -67,15 +72,17 @@ public class MainTableColumnFactory {
                                   ColumnPreferences abstractColumnPrefs,
                                   DialogService dialogService,
                                   StateManager stateManager,
-                                  TaskExecutor taskExecutor) {
+                                  TaskExecutor taskExecutor,
+                                  NativeDesktop nativeDesktop) {
         this.database = database;
         this.preferences = preferences;
         this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.cellFactory = new CellFactory(preferences);
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
+        this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor, nativeDesktop);
     }
 
     @Nullable
@@ -150,6 +157,15 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
+    /// Keeps the column exactly as wide as the node plus [ColumnPreferences#ICON_COLUMN_MARGIN], so it follows the font size.
+    public static void bindExactWidth(TableColumn<?, ?> column, Node node) {
+        node.layoutBoundsProperty().subscribe(bounds -> {
+            if (bounds.getWidth() > 0) {
+                setExactWidth(column, bounds.getWidth() + ColumnPreferences.ICON_COLUMN_MARGIN);
+            }
+        });
+    }
+
     /// Creates a column for the match category.
     /// This column is always hidden but is used for sorting the table
     /// in the floating mode. The order of the [MatchCategory] enum constants
@@ -188,6 +204,7 @@ public class MainTableColumnFactory {
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
+        bindExactWidth(column, headerGraphic);
         column.setResizable(false);
         column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
@@ -278,12 +295,16 @@ public class MainTableColumnFactory {
 
     /// Creates a text column to display any standard field.
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel, MainTableTooltip tooltip) {
+        OrFields fields = FieldFactory.parseOrFields(columnModel.getQualifier());
+        if (!fields.isEmpty() && fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
+            return new NameColumn(columnModel, tooltip);
+        }
         return new FieldColumn(columnModel, tooltip);
     }
 
     /// Creates a clickable icons column for DOIs, URLs, URIs and EPrints.
     private TableColumn<BibEntryTableViewModel, Map<Field, String>> createIdentifierColumn(MainTableColumnModel columnModel) {
-        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
+        return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager, nativeDesktop);
     }
 
     /// Creates a column that displays a [SpecialField]
@@ -303,7 +324,8 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferences,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
     }
 
     /// Creates a column for all the linked files of a single file type.
@@ -313,7 +335,8 @@ public class MainTableColumnFactory {
                 dialogService,
                 preferences,
                 columnModel.getQualifier(),
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
     }
 
     /// Create library column containing the Filename of the library's bib file

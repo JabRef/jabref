@@ -13,6 +13,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -94,7 +95,8 @@ class SharedDatabaseLoginDialogViewModelTest {
                 mock(ClipBoardManager.class),
                 taskExecutor,
                 mock(JournalAbbreviationRepository.class),
-                mock(GitHandlerRegistry.class));
+                mock(GitHandlerRegistry.class),
+                mock(NativeDesktop.class));
     }
 
     private void openLibraryOf(String sharedDatabaseId) {

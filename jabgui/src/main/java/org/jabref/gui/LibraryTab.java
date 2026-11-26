@@ -350,6 +350,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
+    public void importCitedEntriesWithDuplicateCheck(List<BibEntry> entries) {
+        importHandler.importEntriesWithDuplicateCheckPreservingCitationKeys(entries);
+    }
+
     private void initializeComponentsAndListeners(boolean isDummyContext) {
         if (!isDummyContext) {
             createSearchContext();
@@ -373,7 +377,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 getUndoManager(),
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
 
         setupMainPanel();
         setupAutoCompletion();
@@ -580,7 +585,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 taskExecutor,
                 gitHandlerRegistry,
-                this::isModified);
+                this::isModified,
+                nativeDesktop);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -1164,7 +1170,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 preferences,
                 getUndoManager(),
                 stateManager,
-                this));
+                this,
+                nativeDesktop));
     }
 
     public void suspendChangeMonitor() {
@@ -1356,7 +1363,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
             if (!linkedFileList.isEmpty()) {
                 List<LinkedFileViewModel> viewModels = linkedFileList.stream()
-                                                                     .map(linkedFile -> LinkedFileViewModel.fromLinkedFile(linkedFile, null, bibDatabaseContext, null, null, preferences))
+                                                                     .map(linkedFile -> LinkedFileViewModel.fromLinkedFile(linkedFile, null, bibDatabaseContext, null, null, preferences, nativeDesktop))
                                                                      .collect(Collectors.toList());
 
                 new DeleteFileAction(dialogService, preferences.getFilePreferences(), bibDatabaseContext, viewModels, nativeDesktop).execute();

@@ -13,6 +13,7 @@ import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -87,7 +88,8 @@ class ContextMenuFactoryTest {
                 mock(TaskExecutor.class),
                 mock(FileUpdateMonitor.class),
                 mock(UndoManager.class),
-                mock(StateManager.class)
+                mock(StateManager.class),
+                mock(NativeDesktop.class)
         );
     }
 

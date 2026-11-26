@@ -16,6 +16,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -57,6 +58,7 @@ public class CitationsRelationsTabViewModel {
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
 
     private final SciteAiFetcher sciteAiFetcher;
 
@@ -70,12 +72,13 @@ public class CitationsRelationsTabViewModel {
     private @Nullable BackgroundTask<List<CitationRelationItem>> citedByTask;
     private @Nullable BibEntry currentEntry;
 
-    public CitationsRelationsTabViewModel(GuiPreferences preferences, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
+    public CitationsRelationsTabViewModel(GuiPreferences preferences, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, NativeDesktop nativeDesktop) {
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
 
         this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);
         this.searchError = new SimpleStringProperty("");
@@ -148,7 +151,8 @@ public class CitationsRelationsTabViewModel {
                 stateManager.getUndoManager(databaseContext),
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
     }
 
     /// Records the citation relation between the inspected entry and the imported entries, which must already have their citation keys.

@@ -30,6 +30,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -79,6 +80,7 @@ public class JabRefFrameViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
 
     public JabRefFrameViewModel(GuiPreferences preferences,
                                 AiService aiService,
@@ -89,7 +91,8 @@ public class JabRefFrameViewModel {
                                 BibEntryTypesManager entryTypesManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 ClipBoardManager clipBoardManager,
-                                TaskExecutor taskExecutor) {
+                                TaskExecutor taskExecutor,
+                                NativeDesktop nativeDesktop) {
         this.preferences = preferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
@@ -100,6 +103,7 @@ public class JabRefFrameViewModel {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
     }
 
     void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase, List<String> sharedDatabaseIds) {
@@ -340,7 +344,8 @@ public class JabRefFrameViewModel {
                 stateManager.getUndoManager(databaseContext),
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
     }
 
     private void checkForBibInUpperDir() {

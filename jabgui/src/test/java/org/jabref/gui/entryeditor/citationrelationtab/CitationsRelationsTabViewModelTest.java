@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
@@ -127,7 +128,8 @@ class CitationsRelationsTabViewModelTest {
                 stateManager,
                 dialogService,
                 new DummyFileUpdateMonitor(),
-                new CurrentThreadTaskExecutor());
+                new CurrentThreadTaskExecutor(),
+                mock(NativeDesktop.class));
 
         existingEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2023")

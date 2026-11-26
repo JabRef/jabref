@@ -4,6 +4,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -14,16 +15,16 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
     private final BibEntry one;
     private final BibEntry two;
 
-    public MergeEntriesDialog(BibEntry one, BibEntry two, GuiPreferences preferences, StateManager stateManager) {
-        threeWayMergeView = new ThreeWayMergeView(one, two, preferences, stateManager);
+    public MergeEntriesDialog(BibEntry one, BibEntry two, GuiPreferences preferences, StateManager stateManager, NativeDesktop nativeDesktop) {
+        threeWayMergeView = new ThreeWayMergeView(one, two, preferences, stateManager, nativeDesktop);
         this.one = one;
         this.two = two;
 
         init();
     }
 
-    public MergeEntriesDialog(BibEntry one, BibEntry two, String leftHeader, String rightHeader, GuiPreferences preferences, StateManager stateManager) {
-        threeWayMergeView = new ThreeWayMergeView(one, two, leftHeader, rightHeader, preferences, stateManager);
+    public MergeEntriesDialog(BibEntry one, BibEntry two, String leftHeader, String rightHeader, GuiPreferences preferences, StateManager stateManager, NativeDesktop nativeDesktop) {
+        threeWayMergeView = new ThreeWayMergeView(one, two, leftHeader, rightHeader, preferences, stateManager, nativeDesktop);
         this.one = one;
         this.two = two;
 

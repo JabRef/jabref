@@ -17,6 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -58,6 +59,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private ClipBoardManager clipBoardManager;
+    @Inject private NativeDesktop nativeDesktop;
 
     public GlobalSearchResultDialog(LibraryTabContainer libraryTabContainer) {
         this.libraryTabContainer = libraryTabContainer;
@@ -77,12 +79,12 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH), nativeDesktop);
         previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setDatabaseContext(viewModel.getSearchDatabaseContext());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferences, stateManager, taskExecutor);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, dialogService, stateManager, taskExecutor);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, dialogService, stateManager, taskExecutor, nativeDesktop);
 
         resultsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);

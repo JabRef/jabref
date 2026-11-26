@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.GroupsEditor;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
@@ -49,7 +50,7 @@ class FieldRowViewTest extends JavaFxTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
 
-        groupsRow = new FieldRowView(StandardField.GROUPS, leftEntry, rightEntry, new BibEntry(), new FieldMergerFactory(','), preferences, stateManager, 0);
+        groupsRow = new FieldRowView(StandardField.GROUPS, leftEntry, rightEntry, new BibEntry(), new FieldMergerFactory(','), preferences, mock(NativeDesktop.class), stateManager, 0);
 
         stage.setScene(new Scene(new HBox(groupsRow.getMergedValueCell())));
         stage.show();
