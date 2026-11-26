@@ -1,11 +1,15 @@
 package org.jabref.logic.util;
 
+import java.time.Duration;
+
 import org.jabref.logic.util.io.FileNameCleaner;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class FileNameCleanerTest {
 
@@ -28,9 +32,7 @@ class FileNameCleanerTest {
     @CsvSource({
             "legalFilename.txt, legalFilename.txt",
             "subdir/legalFilename.txt, subdir/legalFilename.txt",
-            "illegalFilename/_____.txt, illegalFilename/?*<>|.txt",
-            "draft., draft.",
-            "a/archive.../b, a/archive.../b"
+            "illegalFilename/_____.txt, illegalFilename/?*<>|.txt"
     })
     void cleanDirectoryName(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
@@ -63,14 +65,22 @@ class FileNameCleanerTest {
             // only whole segments are dropped
             "..Desktop, ../..Desktop",
             "draft./2026, draft./2026",
+            "a/archive.../b, a/archive.../b",
             // valid on Unix, must stay
             "'...', '...'",
             "a/.../b, a/.../b",
             "a/..../b, a/..../b",
             "'a/ /b', 'a/ /b'",
-            "'a/ ../b', 'a/ ../b'",
+            "'a/ ../b', 'a/ ../b'"
     })
     void cleanDirectoryNameRemovesTraversal(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
+    }
+
+    @Test
+    void cleanDirectoryNameHandlesLongInputQuickly() {
+        //  For backtracking regex
+        String input = "." + " ".repeat(100_000) + "x";
+        assertTimeoutPreemptively(Duration.ofSeconds(2), () -> FileNameCleaner.cleanDirectoryName(input));
     }
 }

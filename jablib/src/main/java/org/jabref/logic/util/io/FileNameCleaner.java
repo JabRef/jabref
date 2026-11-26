@@ -9,9 +9,8 @@ import java.util.regex.Pattern;
 /// Regarding the maximum length, see [FileUtil#getValidFileName(String)]
 public class FileNameCleaner {
 
-    /// Matches a "." or ".." path segment. Also Windows forms like ".. " and ".. .",
-    /// which Windows resolves to "..". Does not match "..." or space-only names (valid on Unix).
-    private static final Pattern DOT_SEGMENT = Pattern.compile("(?<![^/\\\\])\\.{1,2}(?: +[ .]*)?(?:[/\\\\]+|$)");
+    /// Matches "." / ".." segments, also Windows forms like ".. " and ".. .". Keeps "..." (valid on Unix).
+    private static final Pattern DOT_SEGMENT = Pattern.compile("(?<![^/\\\\])\\.{1,2}+(?: ++[ .]*+)?+(?:[/\\\\]++|$)");
 
     /// Matches separators at the start of the path (e.g. leading '/' or '\\').
     private static final Pattern LEADING_SEPARATORS = Pattern.compile("^[/\\\\]+");
@@ -51,12 +50,9 @@ public class FileNameCleaner {
                 cleanName.append('_');
             }
         }
-        // Remove "." and ".." segments and preceding separators are kept a\..\b -> a\b
-        // This is to have resulting relative path always inside base directory
+        // Drop "." / ".." segments and leading separators: result stays inside base directory
         String result = cleanName.toString().trim();
-        // Drop segments made only of dots/spaces ("..", ".", "..  " on Windows)
         result = DOT_SEGMENT.matcher(result).replaceAll("");
-        // Drop leading separator
         return LEADING_SEPARATORS.matcher(result).replaceAll("");
     }
 }
