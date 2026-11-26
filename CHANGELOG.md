@@ -13,7 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We changed the preferences dialog to show each setting as a tile, with switches instead of checkboxes. [TODO](TODO)
+- We changed the preferences dialog to show each setting as a tile, with switches instead of checkboxes. [#17952](https://github.com/JabRef/jabref/pull/17952)
 
 ### Fixed
 
