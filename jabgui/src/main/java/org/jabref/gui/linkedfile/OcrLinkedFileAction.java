@@ -38,6 +38,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final List<BibEntry> linkedEntries;
     private final ImportHandler importHandler;
 
@@ -49,13 +50,15 @@ public class OcrLinkedFileAction extends SimpleCommand {
                                TaskExecutor taskExecutor,
                                FileUpdateMonitor fileUpdateMonitor,
                                UndoManager undoManager,
-                               StateManager stateManager) {
+                               StateManager stateManager,
+                               NativeDesktop nativeDesktop) {
         this.linkedFile = linkedFile;
         this.linkedEntries = bibEntries;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
@@ -63,7 +66,8 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor
+                taskExecutor,
+                nativeDesktop
         );
         boolean fileExists = linkedFile.findIn(databaseContext, preferences.getFilePreferences())
                                        .filter(Files::isRegularFile)
@@ -140,7 +144,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
 
             NotificationAction<Path> action = new NotificationAction<>(Localization.lang("Show file"), _ -> {
                 try {
-                    NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
+                    nativeDesktop.openFolderAndSelectFile(path, dialogService);
                 } catch (IOException e) {
                     LOGGER.error("Could not open OCRed file.", e);
                 }

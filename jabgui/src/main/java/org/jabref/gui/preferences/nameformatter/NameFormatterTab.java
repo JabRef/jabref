@@ -84,7 +84,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
         help.setPrefSize(25.0, 25.0);
         new ActionFactory().configureIconButton(
                 StandardActions.HELP_NAME_FORMATTER,
-                new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER, dialogService, preferences.getExternalApplicationsPreferences()),
+                new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER, dialogService, nativeDesktop),
                 help);
 
         Button add = new Button();

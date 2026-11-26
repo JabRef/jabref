@@ -52,6 +52,7 @@ public class StyleSelectDialogViewModel {
     private static final Pattern STYLE_SEARCH_SEPARATORS = Pattern.compile("[\\p{P}\\s]+");
 
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
 
     private final CSLStyleLoader cslStyleLoader;
     private final JStyleLoader jStyleLoader;
@@ -83,8 +84,10 @@ public class StyleSelectDialogViewModel {
                                       GuiPreferences preferences,
                                       JournalAbbreviationRepository journalAbbreviationRepository,
                                       TaskExecutor taskExecutor,
-                                      BibEntryTypesManager bibEntryTypesManager) {
+                                      BibEntryTypesManager bibEntryTypesManager,
+                                      NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
 
         this.cslStyleLoader = cslStyleLoader;
         this.jStyleLoader = jStyleLoader;
@@ -395,7 +398,7 @@ public class StyleSelectDialogViewModel {
 
     public void openJStylesWebsite() {
         try {
-            NativeDesktop.openBrowser("https://jstyles.jabref.org/", externalApplicationsPreferences);
+            nativeDesktop.openBrowser("https://jstyles.jabref.org/");
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }
@@ -405,7 +408,7 @@ public class StyleSelectDialogViewModel {
         JStyle jStyle = selectedJStyle.getValue().getJStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", externalApplicationsPreferences);
         try {
-            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, jStyle.getPath(), type);
+            nativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), jStyle.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }

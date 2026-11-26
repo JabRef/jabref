@@ -35,15 +35,18 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
 
     public AboutDialogViewModel(@NonNull DialogService dialogService,
                                 @NonNull GuiPreferences preferences,
                                 @NonNull ClipBoardManager clipBoardManager,
-                                BuildInfo buildInfo) {
+                                BuildInfo buildInfo,
+                                NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.clipBoardManager = clipBoardManager;
         String[] versionParts = buildInfo.version.getFullVersion().split("--");
         version.set(Localization.lang("Version") + " " + versionParts[0]);
@@ -149,7 +152,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private void openWebsite(String url) {
         try {
-            NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openBrowser(url);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             logger.error("Could not open default browser.", e);

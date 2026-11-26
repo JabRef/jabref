@@ -29,6 +29,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -66,7 +67,8 @@ public class PreviewPanel extends VBox implements PreviewControls {
                         KeyBindingRepository keyBindingRepository,
                         GuiPreferences preferences,
                         TaskExecutor taskExecutor,
-                        StateManager stateManager) {
+                        StateManager stateManager,
+                        NativeDesktop nativeDesktop) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         this.previewPreferences = preferences.getPreviewPreferences();
@@ -74,7 +76,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         this.stateManager = stateManager;
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH));
+        previewView = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), nativeDesktop);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);

@@ -33,8 +33,9 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
                                         TaskExecutor taskExecutor,
                                         GuiPreferences preferences,
                                         UndoManager undoManager,
-                                        StateManager stateManager) {
-        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                                        StateManager stateManager,
+                                        NativeDesktop nativeDesktop) {
+        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
         this.shortenDOIFormatter = new ShortenDOIFormatter();
         configure(true, true, true);
     }
@@ -61,7 +62,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     @Override
     public void fetchBibliographyInformation(BibEntry bibEntry) {
         stateManager.getActiveDatabase().ifPresentOrElse(
-                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager)
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager, nativeDesktop)
                         .fetchAndMerge(entry, field),
                 () -> dialogService.notify(Localization.lang("No library selected"))
         );
@@ -70,7 +71,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     @Override
     public void openExternalLink() {
         identifier.get().map(DOI::asString)
-                  .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
+                  .ifPresent(s -> nativeDesktop.openCustomDoi(s, dialogService));
     }
 
     @Override

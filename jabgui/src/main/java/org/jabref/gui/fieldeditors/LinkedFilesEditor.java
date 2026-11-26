@@ -152,7 +152,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
                 taskExecutor,
                 fieldCheckers,
                 preferences,
-                undoManager
+                undoManager,
+                nativeDesktop
         );
 
         this.contextMenuFactory = new ContextMenuFactory(
@@ -164,7 +165,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
                 taskExecutor,
                 fileUpdateMonitor,
                 undoManager,
-                stateManager
+                stateManager,
+                nativeDesktop
         );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
@@ -352,7 +354,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
                                 taskExecutor,
                                 fileUpdateMonitor,
                                 undoManager,
-                                stateManager
+                                stateManager,
+                                nativeDesktop
                         ).execute()))
                 .onConditionally(KeyBinding.OPEN_FOLDER, () -> executeOnSelectedFile(selectedFile ->
                         new ContextAction(StandardActions.OPEN_FOLDER, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute()))

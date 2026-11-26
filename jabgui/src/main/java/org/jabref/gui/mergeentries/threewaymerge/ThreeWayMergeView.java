@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.threewaymerge.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -39,13 +40,15 @@ public class ThreeWayMergeView extends VBox {
     private final List<FieldRowView> fieldRows = new ArrayList<>();
 
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private StateManager stateManager;
 
     private final FieldMergerFactory fieldMergerFactory;
     private final String keywordSeparator;
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, GuiPreferences preferences, StateManager stateManager) {
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, GuiPreferences preferences, StateManager stateManager, NativeDesktop nativeDesktop) {
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
 
         viewModel = new ThreeWayMergeViewModel(
@@ -78,8 +81,8 @@ public class ThreeWayMergeView extends VBox {
         getStyleClass().add("three-way-merge");
     }
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, GuiPreferences preferences, StateManager stateManager) {
-        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, preferences, stateManager);
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, GuiPreferences preferences, StateManager stateManager, NativeDesktop nativeDesktop) {
+        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, preferences, stateManager, nativeDesktop);
     }
 
     private void initializeToolbar() {
@@ -160,9 +163,9 @@ public class ThreeWayMergeView extends VBox {
 
         FieldRowView fieldRow;
         if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
-            fieldRow = new PersonsNameFieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, preferences, stateManager, fieldIndex);
+            fieldRow = new PersonsNameFieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, nativeDesktop, stateManager, fieldIndex);
         } else {
-            fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, preferences, stateManager, fieldIndex);
+            fieldRow = new FieldRowView(field, getLeftEntry(), getRightEntry(), getMergedEntry(), fieldMergerFactory, nativeDesktop, stateManager, fieldIndex);
         }
 
         fieldRows.add(fieldIndex, fieldRow);
