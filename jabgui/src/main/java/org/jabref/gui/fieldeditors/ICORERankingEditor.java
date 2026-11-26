@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.icore.ConferenceRepository;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -31,6 +32,7 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private ConferenceRepository conferenceRepository;
+    @Inject private NativeDesktop nativeDesktop;
 
     private Optional<BibEntry> entry = Optional.empty();
 
@@ -52,7 +54,8 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
                 dialogService,
                 undoManager,
                 preferences,
-                conferenceRepository
+                conferenceRepository,
+                nativeDesktop
         );
 
         textField.setId(field.getName());

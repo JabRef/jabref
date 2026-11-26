@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -34,6 +35,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
+    @Inject private NativeDesktop nativeDesktop;
 
     public UrlEditor(Field field,
                      SuggestionProvider<?> suggestionProvider,
@@ -45,7 +47,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferences, fieldCheckers, undoManager);
+        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferences, fieldCheckers, undoManager, nativeDesktop);
 
         textField.setId(field.getName());
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);

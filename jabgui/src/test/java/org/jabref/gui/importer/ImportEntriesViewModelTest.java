@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
@@ -51,7 +52,7 @@ class ImportEntriesViewModelTest {
                 BackgroundTask.wrap(() -> new ParserResult(entries)),
                 new CurrentThreadTaskExecutor(), database, mock(DialogService.class),
                 new JabRefUndoManager(), preferences, mock(StateManager.class),
-                new BibEntryTypesManager(), new DummyFileUpdateMonitor(), Optional.empty(), Optional.empty());
+                new BibEntryTypesManager(), new DummyFileUpdateMonitor(), Optional.empty(), Optional.empty(), mock(NativeDesktop.class));
         viewModel.selectedDbProperty().set(database);
         assertEquals(!choice, viewModel.shouldDownloadLinkedFiles());
 
@@ -91,7 +92,7 @@ class ImportEntriesViewModelTest {
                 BackgroundTask.wrap(() -> new ParserResult(entries)),
                 new CurrentThreadTaskExecutor(), database, mock(DialogService.class),
                 new JabRefUndoManager(), preferences, mock(StateManager.class),
-                new BibEntryTypesManager(), new DummyFileUpdateMonitor(), Optional.empty(), Optional.empty());
+                new BibEntryTypesManager(), new DummyFileUpdateMonitor(), Optional.empty(), Optional.empty(), mock(NativeDesktop.class));
         viewModel.selectedDbProperty().set(database);
 
         // DOI searches have no SearchBasedFetcher, so the source must be selected explicitly.

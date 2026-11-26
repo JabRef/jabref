@@ -26,6 +26,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.chat.AiChatView;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -220,6 +221,7 @@ class JabRefFrameTest {
         when(aiService.getEmbeddingModelCache()).thenReturn(embeddingModelCache);
         when(aiService.getEmbeddingModelMetadataService()).thenReturn(mock(EmbeddingModelMetadataService.class));
         Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
         Injector.setModelOrService(AiService.class, aiService);
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
         Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));

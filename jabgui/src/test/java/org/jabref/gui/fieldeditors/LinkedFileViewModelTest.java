@@ -37,7 +37,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.sun.net.httpserver.HttpServer;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -90,7 +89,6 @@ class LinkedFileViewModelTest {
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
-        Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
         when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
@@ -141,7 +139,7 @@ class LinkedFileViewModelTest {
         linkedFile = spy(new LinkedFile("", Path.of("nonexistent file"), ""));
         doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -161,7 +159,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(2))); // first vararg - remove button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -178,7 +176,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -198,7 +196,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - trash button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         boolean removed = viewModel.delete();
 
         assertFalse(removed);
@@ -215,7 +213,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -231,7 +229,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class),
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // third vararg - cancel button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         boolean removed = viewModel.delete();
 
         assertFalse(removed);
@@ -255,7 +253,7 @@ class LinkedFileViewModelTest {
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(url, fileType);
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, nativeDesktop);
 
         viewModel.download(keepHtmlLink, new JabRefUndoManager());
 
@@ -270,7 +268,7 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(Path.of("/home")));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         assertFalse(viewModel.isGeneratedPathSameAsOriginal());
     }
 
@@ -282,7 +280,7 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         assertTrue(viewModel.isGeneratedPathSameAsOriginal());
     }
 
@@ -295,7 +293,7 @@ class LinkedFileViewModelTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         assertFalse(viewModel.isGeneratedPathSameAsOriginal());
     }
 
@@ -311,7 +309,7 @@ class LinkedFileViewModelTest {
         LinkedFileHandler fileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
         fileHandler.moveToDefaultDirectory();
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences, nativeDesktop);
         assertTrue(viewModel.isGeneratedPathSameAsOriginal());
     }
 
@@ -335,7 +333,7 @@ class LinkedFileViewModelTest {
 
         databaseContext.setDatabasePath(tempFile);
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences, nativeDesktop);
 
         viewModel.download(keepHtml, new JabRefUndoManager());
 
