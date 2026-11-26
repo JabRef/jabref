@@ -1,6 +1,7 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import picocli.CommandLine;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,6 +27,14 @@ class JabFixCommandTest extends AbstractJabKitTest {
 
     private static final String NOTHING_ENABLED = Localization.lang("No mode or rule is enabled, so nothing is checked or fixed. Choose a mode with --mode (%0), and add --save-config to keep it.",
             "whitespace, report, default-save-actions");
+
+    private static final String LATIN_1_LIBRARY = """
+            % Encoding: ISO-8859-1
+
+            @Article{mueller2020,
+              author = { Müller, Jürgen },
+            }
+            """;
 
     private String inputFile;
 
@@ -265,6 +275,53 @@ class JabFixCommandTest extends AbstractJabKitTest {
 
         String errors = commandLine.getErrorOutput();
         assertTrue(errors.contains("Unknown rule mode: repair. Available rule modes: off, check, fix"), errors);
+    }
+
+    /// A run that failed has to be told apart from one that found something, which picocli's code for
+    /// a software error, 1, would not allow.
+    @Test
+    void anInputThatCannotBeFetchedIsASoftwareError() {
+        // Port 1 is privileged and unbound, so connecting fails at once
+        assertEquals(3, commandLine.executeToLog("fix", "--check", "postgresql://localhost:1/library"));
+    }
+
+    /// A library is saved in its own encoding, as JabRef saves it, so that its `% Encoding` line
+    /// stays true and the next read gets back what was written.
+    @Test
+    void inPlaceKeepsTheEncodingOfTheLibrary(@TempDir Path tempDir) throws IOException {
+        Path library = Files.write(tempDir.resolve("latin1.bib"), LATIN_1_LIBRARY.getBytes(StandardCharsets.ISO_8859_1));
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "-p", "--mode", "whitespace", library.toString()));
+
+        String written = Files.readString(library, StandardCharsets.ISO_8859_1);
+        assertTrue(written.contains("author = {Müller, Jürgen},"), written);
+    }
+
+    @Test
+    void checkComparesALibraryInItsOwnEncoding(@TempDir Path tempDir) throws IOException {
+        Path library = Files.write(tempDir.resolve("latin1.bib"), LATIN_1_LIBRARY.getBytes(StandardCharsets.ISO_8859_1));
+        commandLine.executeToLog("fix", "--in-place", "-p", "--mode", "whitespace", library.toString());
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--check", "-p", "--mode", "whitespace", library.toString()));
+    }
+
+    /// Replacing a character the encoding cannot hold would lose it, so nothing is written.
+    @Test
+    void aCharacterTheEncodingCannotHoldLeavesTheLibraryAsItWas(@TempDir Path tempDir) throws IOException {
+        byte[] original = """
+                % Encoding: ISO-8859-1
+
+                @Book{capek1920,
+                  author = {\\v{C}apek, Karel},
+                }
+                """.getBytes(StandardCharsets.ISO_8859_1);
+        Path library = Files.write(tempDir.resolve("latin1.bib"), original);
+
+        assertEquals(3, commandLine.executeToLog("fix", "--in-place", "-p", "--rule", "author:latex-to-unicode=fix", library.toString()));
+
+        assertArrayEquals(original, Files.readAllBytes(library));
+        String errors = commandLine.getErrorOutput();
+        assertTrue(errors.contains("The encoding ISO-8859-1 of the library cannot hold the characters Č."), errors);
     }
 
     /// Set once, the mode is what the library says, so later runs and JabRef's saves need no options.

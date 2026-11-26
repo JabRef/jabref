@@ -3,6 +3,11 @@ package org.jabref.toolkit.commands;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +21,7 @@ import java.util.SequencedMap;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.exporter.AtomicFileOutputStream;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -48,12 +54,23 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 /// Thin CLI wrapper around JabFix; the rules and the formatting live in the `org.jabref.logic.lint` package.
-///
-/// Exit codes follow the other checking commands: 0 = nothing to do, 1 = the library is not clean
-/// (`--check` only), 2/3 = error.
 @NullMarked
-@Command(name = "fix", description = "Lint and format a BibTeX library.")
+@Command(name = "fix", description = "Lint and format a BibTeX library.",
+        exitCodeOnExecutionException = JabFixCommand.SOFTWARE_ERROR,
+        exitCodeListHeading = "%nExit codes:%n",
+        exitCodeList = {"0:Done; with --check, the library is clean.",
+                "1:With --check, the library is not clean.",
+                "2:Usage error, such as an unknown rule or mode.",
+                "3:Any other error, such as a failed download or write."})
 class JabFixCommand implements Callable<Integer> {
+    /// What `--check` exits with when the library is not clean.
+    static final int NOT_CLEAN = 1;
+
+    /// Not picocli's [CommandLine.ExitCode#SOFTWARE], which is 1 as well, so that a run that failed
+    /// does not pass for one that found something. [org.jabref.toolkit.exception.CliExceptionHandler]
+    /// exits with it for a software error raised anywhere in the run, such as a failed download.
+    static final int SOFTWARE_ERROR = 3;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabFixCommand.class);
 
     @ParentCommand
@@ -118,27 +135,28 @@ class JabFixCommand implements Callable<Integer> {
             // Only the parsed library in memory is changed here; nothing reaches disk unless
             // --in-place says so, which is what lets --check reuse the very same run.
             SerializedLibrary library = serialize(databaseContext, runSettings);
-            List<Finding> findings = library.findings();
 
             if (checkOnly) {
-                return check(inputFile, findings, library.formatted(), parserResult);
+                return check(inputFile, library, parserResult);
             }
 
             // A rule that found something it cannot repair has to be said out loud, since it will
             // not show up in the output the way an applied fix does.
-            report(inputFile, findings.stream().filter(finding -> !finding.isFixable()).toList(), parserResult, System.err);
+            report(inputFile, library.findings().stream().filter(finding -> !finding.isFixable()).toList(), parserResult, System.err);
 
             if (inPlace) {
-                return write(inputFile, library.formatted());
+                return write(inputFile, library.bytes());
             }
 
-            System.out.print(library.formatted());
+            // In the library's encoding rather than the console's, so that redirecting the output
+            // gives the file --in-place would write.
+            System.out.writeBytes(library.bytes());
             System.out.flush();
             return CommandLine.ExitCode.OK;
         } catch (IOException e) {
             LOGGER.error("Unable to write the formatted library", e);
             System.err.println(Localization.lang("Unable to write to %0.", inPlace ? inputFile : "stdout"));
-            return CommandLine.ExitCode.SOFTWARE;
+            return SOFTWARE_ERROR;
         }
     }
 
@@ -240,8 +258,34 @@ class JabFixCommand implements Callable<Integer> {
         }
     }
 
-    /// What a save of the library produces: the text, and what the rules reported while producing it.
-    private record SerializedLibrary(String formatted, List<Finding> findings) {
+    /// What a save of the library produces: the text, the encoding it is saved in, and what the rules
+    /// reported while producing it.
+    private record SerializedLibrary(String formatted, Charset encoding, List<Finding> findings) {
+        /// The library as it is saved: in its own encoding, as JabRef saves it, so that its
+        /// `% Encoding` line stays true. A character the encoding cannot hold, such as one a rule
+        /// converted from LaTeX, is an error, since replacing it would lose it.
+        byte[] bytes() throws CliException {
+            try {
+                ByteBuffer encoded = encoding.newEncoder().encode(CharBuffer.wrap(formatted));
+                byte[] bytes = new byte[encoded.remaining()];
+                encoded.get(bytes);
+                return bytes;
+            } catch (CharacterCodingException e) {
+                LOGGER.debug("Unable to encode the formatted library in {}", encoding, e);
+                throw new CliException("Unable to encode the formatted library in " + encoding,
+                        Localization.lang("The encoding %0 of the library cannot hold the characters %1.", encoding.displayName(), unencodableCharacters()),
+                        SOFTWARE_ERROR);
+            }
+        }
+
+        private String unencodableCharacters() {
+            CharsetEncoder encoder = encoding.newEncoder();
+            return formatted.codePoints()
+                            .mapToObj(Character::toString)
+                            .filter(character -> !encoder.canEncode(character))
+                            .distinct()
+                            .collect(Collectors.joining(", "));
+        }
     }
 
     /// Writes the library, which applies the rules it asks for on the way, since that is what a save
@@ -263,28 +307,44 @@ class JabFixCommand implements Callable<Integer> {
                 .asFormatterRun(runSettings);
         databaseWriter.writeDatabase(databaseContext);
 
-        return new SerializedLibrary(stringWriter.toString(), databaseWriter.getFindings());
+        return new SerializedLibrary(stringWriter.toString(),
+                databaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8),
+                databaseWriter.getFindings());
     }
 
-    private int check(Path inputFile, List<Finding> findings, String formatted, ParserResult parserResult) throws IOException {
-        report(inputFile, findings, parserResult, System.out);
+    private int check(Path inputFile, SerializedLibrary library, ParserResult parserResult) throws CliException {
+        report(inputFile, library.findings(), parserResult, System.out);
 
         // Findings alone are not the whole story: reformatting alters things no rule reports on,
         // such as entry type capitalization, so the serialized result has to be compared as well.
-        boolean formattingDiffers = !formatted.equals(Files.readString(inputFile, StandardCharsets.UTF_8));
+        // As bytes, since --in-place would also change a file that is in another encoding.
+        boolean formattingDiffers = !Arrays.equals(library.bytes(), bytesOf(inputFile));
 
-        if (findings.isEmpty() && !formattingDiffers) {
+        if (library.findings().isEmpty() && !formattingDiffers) {
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("'%0' is already formatted.", inputFile));
             }
             return CommandLine.ExitCode.OK;
         }
         System.out.println(Localization.lang("'%0' would be reformatted.", inputFile));
-        return 1;
+        return NOT_CLEAN;
     }
 
-    private int write(Path inputFile, String formatted) throws IOException {
-        Files.writeString(inputFile, formatted, StandardCharsets.UTF_8);
+    /// `--check` only reads the file, so that is what it reports as failed.
+    private static byte[] bytesOf(Path inputFile) throws CliException {
+        try {
+            return Files.readAllBytes(inputFile);
+        } catch (IOException e) {
+            LOGGER.debug("Unable to read {}", inputFile, e);
+            throw new CliException("Unable to read " + inputFile, Localization.lang("Unable to open file '%0'.", inputFile), e, SOFTWARE_ERROR);
+        }
+    }
+
+    /// Atomically, so that a write that fails leaves the library as it was rather than cut short.
+    private int write(Path inputFile, byte[] library) throws IOException {
+        try (AtomicFileOutputStream outputStream = new AtomicFileOutputStream(inputFile)) {
+            outputStream.write(library);
+        }
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Saved %0.", inputFile));
         }

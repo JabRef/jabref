@@ -108,6 +108,8 @@ Needs: impl
 
 `jabkit fix` reports what the enabled rules find and repairs it where a rule is set to `fix`.
 With `--check`, it writes nothing and exits with 1 unless the library is clean.
+A usage error exits with 2 and any other error with 3, so that neither is taken for an unclean library.
+The library is written in the encoding it states; a character that encoding cannot hold is an error that leaves the library as it was.
 Formatting applies exactly the repairs that `--check` reports, and each finding names the rule that reported it.
 Rules are enabled in the library's metadata, by a mode or per rule; when no rule is enabled, the command warns.
 `--mode` and `--rule RULE=MODE[:NAME=VALUE]` override the library's configuration for one run.

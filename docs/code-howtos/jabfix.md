@@ -125,7 +125,10 @@ Both sides are comma-separated lists, and an item between slashes is a regular e
 ## Command line
 
 `jabkit fix` (`JabFixCommand`) writes the formatted library to standard output, or with `--in-place` back to the file.
-With `--check`, it only reports, and exits with 1 unless the library is clean.
+Either way it writes in the encoding the library states, as a save in JabRef does, and a character that encoding cannot hold is an error that leaves the library as it was.
+With `--check`, it only reports, and exits with 1 unless the library is clean, that is, unless it found something or the bytes it would write differ from the file.
+A usage error exits with 2 and any other error with 3, since picocli's code for a software error is 1 as well.
+`JabFixCommand` declares 3 as its `exitCodeOnExecutionException`, which `CliExceptionHandler` uses for a software error.
 `--mode` and `--rule` override the library's configuration for one run; `--save-config` stores them in the library instead:
 
 ```shell
