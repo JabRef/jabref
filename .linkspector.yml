@@ -20,3 +20,5 @@ ignorePatterns:
   - pattern: "onlinelibrary\\.wiley\\.com"
   # Automated access blocked by SourceForge
   - pattern: "sourceforge\\.net"
+  # Automated access blocked by Reddit (403)
+  - pattern: "reddit\\.com"
