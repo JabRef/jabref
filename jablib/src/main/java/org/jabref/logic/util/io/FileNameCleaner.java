@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class FileNameCleaner {
 
     /// Matches a '.' or '..' path segment (including Windows forms like ".. " and ".. ."),
-    private static final Pattern TRAVERSAL_SEGMENT = Pattern.compile("(?:^|[/\\\\])\\.{1,2}[ .]*(?=[/\\\\]|$)");
+    private static final Pattern DOT_SEGMENT = Pattern.compile("(?<![^/\\\\])[. ]+(?:[/\\\\]+|$)");
 
     /// Matches separators at the start of the path (e.g. leading '/' or '\\').
     private static final Pattern LEADING_SEPARATORS = Pattern.compile("^[/\\\\]+");
@@ -53,8 +53,9 @@ public class FileNameCleaner {
         // Remove "." and ".." segments and preceding separators are kept a\..\b -> a\b
         // This is to have resulting relative path always inside base directory
         String result = cleanName.toString().trim();
-        result = TRAVERSAL_SEGMENT.matcher(result).replaceAll("");
-        result = LEADING_SEPARATORS.matcher(result).replaceAll("");
-        return result;
+        // Drop segments made only of dots/spaces ("..", ".", "..  " on Windows)
+        result = DOT_SEGMENT.matcher(result).replaceAll("");
+        // Drop leading separator
+        return LEADING_SEPARATORS.matcher(result).replaceAll("");
     }
 }
