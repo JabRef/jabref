@@ -109,7 +109,7 @@ Deferred; it can be added on top of the same service once there is a need for he
 
 ### Other tool protocols (LTP, TCP)
 
-[Issue 1164](https://github.com/JabRef/jabref-issue-melting-pot/issues/1164) names the Lazy Tool Protocol and the Tool Call Protocol as alternatives to MCP.
+[Issue 1164](https://github.com/JabRef/jabref-issue-melting-pot/issues/1164) names the Lazy Tool Protocol and the Tool Call Protocol as alternatives to MCP. Both come from the Reddit thread ["Stop wasting your MCP context window"](https://www.reddit.com/r/LocalLLaMA/comments/1ptd60q/stop_wasting_your_mcp_context_window_ltp_lazy/), which is also the source of the token numbers above.
 
 * Good, because they are designed to save context.
 * Bad, because no support in the targeted agents is known. This was not verified in depth.
