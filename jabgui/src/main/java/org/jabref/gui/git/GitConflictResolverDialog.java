@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.threewaymerge.ShowDiffConfig;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
@@ -19,11 +20,13 @@ import org.jabref.model.entry.BibEntry;
 public class GitConflictResolverDialog {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final StateManager stateManager;
 
-    public GitConflictResolverDialog(DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+    public GitConflictResolverDialog(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
     }
 
@@ -32,7 +35,7 @@ public class GitConflictResolverDialog {
         BibEntry local = conflict.local();
         BibEntry remote = conflict.remote();
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(local, remote, preferences, stateManager);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(local, remote, preferences, stateManager, nativeDesktop);
         dialog.setLeftHeaderText(Localization.lang("Local"));
         dialog.setRightHeaderText(Localization.lang("Remote"));
         ShowDiffConfig diffConfig = new ShowDiffConfig(

@@ -7,6 +7,7 @@ import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -24,6 +25,7 @@ public class AboutDialogView extends BaseDialog<Void> {
     @Inject private GuiPreferences preferences;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
+    @Inject private NativeDesktop nativeDesktop;
 
     private AboutDialogViewModel viewModel;
 
@@ -41,7 +43,7 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new AboutDialogViewModel(dialogService, preferences, clipBoardManager, buildInfo);
+        viewModel = new AboutDialogViewModel(dialogService, preferences, clipBoardManager, buildInfo, nativeDesktop);
 
         textAreaVersions.setText(viewModel.getVersionInfo());
         closeButton.setText(ButtonType.CLOSE.getText());

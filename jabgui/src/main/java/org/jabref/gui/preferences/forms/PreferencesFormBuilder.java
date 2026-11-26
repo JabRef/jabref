@@ -42,6 +42,7 @@ import javafx.util.Callback;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -129,6 +130,7 @@ public class PreferencesFormBuilder {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
     private final VBox root = new VBox(GAP);
     private final Deque<Pane> containers = new ArrayDeque<>();
@@ -154,9 +156,10 @@ public class PreferencesFormBuilder {
     @Nullable
     private ToggleGroup currentToggleGroup;
 
-    public PreferencesFormBuilder(DialogService dialogService, GuiPreferences preferences) {
+    public PreferencesFormBuilder(DialogService dialogService, GuiPreferences preferences, NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.visualizer.setDecoration(new IconValidationDecorator());
         this.containers.push(root);
     }
@@ -773,7 +776,7 @@ public class PreferencesFormBuilder {
         button.setPrefWidth(FormMetrics.ICON_BUTTON_SIZE);
         new ActionFactory().configureIconButton(
                 action,
-                new HelpAction(helpFile, dialogService, preferences.getExternalApplicationsPreferences()),
+                new HelpAction(helpFile, dialogService, nativeDesktop),
                 button);
         return button;
     }

@@ -15,6 +15,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.SearchableElement;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -36,7 +37,7 @@ class PreferencesFormBuilderTest {
 
     /// The builder only needs its services for help buttons, which these forms do not use.
     private PreferencesFormBuilder form() {
-        return new PreferencesFormBuilder(mock(DialogService.class), mock(GuiPreferences.class));
+        return new PreferencesFormBuilder(mock(DialogService.class), mock(GuiPreferences.class), mock(NativeDesktop.class));
     }
 
     private static List<Node> childrenOf(Node node) {

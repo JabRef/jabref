@@ -30,6 +30,7 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -207,7 +208,8 @@ class CitationEntryReviewDialogTest extends JavaFxTest {
                 preferences,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                mock(NativeDesktop.class));
     }
 
     private static ButtonType findButtonType(CitationEntryReviewDialog dialog, ButtonBar.ButtonData buttonData) {

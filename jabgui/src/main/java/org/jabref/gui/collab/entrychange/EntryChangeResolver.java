@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolver;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.threewaymerge.ShowDiffConfig;
@@ -20,19 +21,21 @@ public final class EntryChangeResolver extends DatabaseChangeResolver {
     private final BibDatabaseContext databaseContext;
 
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final StateManager stateManager;
 
-    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, GuiPreferences preferences, StateManager stateManager) {
+    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, GuiPreferences preferences, StateManager stateManager, NativeDesktop nativeDesktop) {
         super(dialogService);
         this.entryChange = entryChange;
         this.databaseContext = databaseContext;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
     }
 
     @Override
     public Optional<DatabaseChange> askUserToResolveChange() {
-        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), preferences, stateManager);
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), preferences, stateManager, nativeDesktop);
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("In JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
         mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS));

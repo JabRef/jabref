@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.EmptySuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -45,7 +46,7 @@ class LinkedFilesEditorViewModelTest {
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));
 
         viewModel = new LinkedFilesEditorViewModel(StandardField.FILE, new EmptySuggestionProvider(), mock(DialogService.class), bibDatabaseContext,
-                new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager);
+                new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager, mock(NativeDesktop.class));
 
         viewModel.entry = new BibEntry().withCitationKey("test")
                                         .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");
@@ -66,7 +67,8 @@ class LinkedFilesEditorViewModelTest {
                 new CurrentThreadTaskExecutor(),
                 mock(FieldCheckers.class),
                 preferences,
-                undoManager
+                undoManager,
+                mock(NativeDesktop.class)
         );
         viewModel.bindToEntry(entry);
 

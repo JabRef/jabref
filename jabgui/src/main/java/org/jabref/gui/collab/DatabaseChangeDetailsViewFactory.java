@@ -20,6 +20,7 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.logic.util.TaskExecutor;
@@ -30,6 +31,7 @@ public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final BibEntryTypesManager entryTypesManager;
     private final PreviewViewer previewViewer;
     private final TaskExecutor taskExecutor;
@@ -39,10 +41,12 @@ public class DatabaseChangeDetailsViewFactory {
                                             GuiPreferences preferences,
                                             BibEntryTypesManager entryTypesManager,
                                             PreviewViewer previewViewer,
-                                            TaskExecutor taskExecutor) {
+                                            TaskExecutor taskExecutor,
+                                            NativeDesktop nativeDesktop) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.entryTypesManager = entryTypesManager;
         this.previewViewer = previewViewer;
         this.taskExecutor = taskExecutor;
@@ -59,7 +63,8 @@ public class DatabaseChangeDetailsViewFactory {
                             preferences,
                             entryTypesManager,
                             previewViewer,
-                            taskExecutor
+                            taskExecutor,
+                            nativeDesktop
                     );
             case EntryAdd entryAdd ->
                     new EntryWithPreviewAndSourceDetailsView(

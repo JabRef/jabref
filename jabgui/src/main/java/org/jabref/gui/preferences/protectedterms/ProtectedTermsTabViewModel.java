@@ -39,6 +39,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
     private final ProtectedTermsLoader termsLoader;
     private final ListProperty<ProtectedTermsListItemModel> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final ProtectedTermsPreferences protectedTermsPreferences;
@@ -47,9 +48,11 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
                                       DialogService dialogService,
                                       ExternalApplicationsPreferences externalApplicationsPreferences,
                                       FilePreferences filePreferences,
-                                      ProtectedTermsPreferences protectedTermsPreferences) {
+                                      ProtectedTermsPreferences protectedTermsPreferences,
+                                      NativeDesktop nativeDesktop) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.filePreferences = filePreferences;
         this.protectedTermsPreferences = protectedTermsPreferences;
@@ -132,7 +135,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
         String fileName = file.getTermsList().getLocation();
         try {
-            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, fileName, termsFileType);
+            nativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }

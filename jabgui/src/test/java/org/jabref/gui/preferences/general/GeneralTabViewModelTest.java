@@ -4,6 +4,7 @@ import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.gui.theme.ThemePreset;
@@ -53,6 +54,7 @@ class GeneralTabViewModelTest {
                 mock(UiMessageHandler.class),
                 mock(OAuthSessionRegistry.class),
                 mock(RemoteListenerServerManager.class),
-                mock(StateManager.class));
+                mock(StateManager.class),
+                mock(NativeDesktop.class));
     }
 }

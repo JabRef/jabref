@@ -111,6 +111,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final WorkspacePreferences workspacePreferences;
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
@@ -146,9 +147,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                                UiMessageHandler uiMessageHandler,
                                OAuthSessionRegistry oAuthSessionRegistry,
                                RemoteListenerServerManager remoteListenerServerManager,
-                               StateManager stateManager) {
+                               StateManager stateManager,
+                               NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
@@ -555,7 +558,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public void openBrowser() {
         String url = "https://themes.jabref.org";
         try {
-            NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openBrowser(url);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }
