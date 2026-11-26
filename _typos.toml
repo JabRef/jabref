@@ -105,10 +105,6 @@ tme = "tme"
 ue = "ue"
 urrent = "urrent"
 wrapp = "wrapp"
-# Misspelled rule ids, modes and fields in tests and examples of how unknown ones are reported
-autor = "autor"
-surounding = "surounding"
-whitespce = "whitespce"
 # Non-English test data
 abstrakt = "abstrakt"
 alle = "alle"

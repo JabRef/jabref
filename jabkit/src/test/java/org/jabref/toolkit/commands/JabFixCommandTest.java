@@ -60,10 +60,10 @@ class JabFixCommandTest extends AbstractJabKitTest {
 
     @Test
     void anUnknownModeIsAUsageError() {
-        assertEquals(CommandLine.ExitCode.USAGE, commandLine.executeToLog("fix", "--mode", "whitespce", inputFile));
+        assertEquals(CommandLine.ExitCode.USAGE, commandLine.executeToLog("fix", "--mode", "whitespaces", inputFile));
 
         String errors = commandLine.getErrorOutput();
-        assertTrue(errors.contains("Unknown mode: whitespce."), errors);
+        assertTrue(errors.contains("Unknown mode: whitespaces."), errors);
     }
 
     /// The save action goes on being applied, and the library now states it in the one place that
@@ -239,10 +239,10 @@ class JabFixCommandTest extends AbstractJabKitTest {
     @Test
     void aRuleOptionTakesACommaSeparatedList() {
         assertEquals(CommandLine.ExitCode.USAGE,
-                commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=off,surounding-whitespace=off", inputFile));
+                commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=off,surrounding-whitespaces=off", inputFile));
 
         String errors = commandLine.getErrorOutput();
-        assertTrue(errors.contains("Unknown rule: surounding-whitespace."), errors);
+        assertTrue(errors.contains("Unknown rule: surrounding-whitespaces."), errors);
     }
 
     /// A typo has to be reported, not passed over: otherwise the user believes a rule is off while
@@ -250,11 +250,12 @@ class JabFixCommandTest extends AbstractJabKitTest {
     @Test
     void anIdThatNamesNoRuleIsAUsageError() {
         assertEquals(CommandLine.ExitCode.USAGE,
-                commandLine.executeToLog("fix", "--rule", "surounding-whitespace=off", inputFile));
+                commandLine.executeToLog("fix", "--rule", "surrounding-whitespaces=off", inputFile));
 
         String errors = commandLine.getErrorOutput();
-        assertTrue(errors.contains("surounding-whitespace"), errors);
-        assertTrue(errors.contains("surrounding-whitespace"), errors);
+        assertTrue(errors.contains("Unknown rule: surrounding-whitespaces."), errors);
+        // The comma tells the rule in the list of available ones apart from the misspelled id above
+        assertTrue(errors.contains("surrounding-whitespace,"), errors);
     }
 
     @Test
@@ -351,7 +352,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
     @Test
     void checkReportsAMagicCommentThatNamesNoRule(@TempDir Path tempDir) throws IOException {
         Path library = Files.writeString(tempDir.resolve("typo.bib"), """
-                % jabref-format-ignore surounding-whitespace
+                % jabref-format-ignore surrounding-whitespaces
                 @Article{key,
                   author = {Doe, Jane},
                 }

@@ -164,7 +164,7 @@ class SuppressionsTest {
     /// finding, which is why a misspelled one switches nothing off.
     @Test
     void aMisspelledFieldNameSwitchesNothingOff() {
-        Suppressions suppressions = Suppressions.parse("% jabref-format-ignore autor:page-ranges");
+        Suppressions suppressions = Suppressions.parse("% jabref-format-ignore authors:page-ranges");
 
         assertFalse(suppressions.suppresses("page-ranges", Optional.of(StandardField.AUTHOR)));
     }

@@ -30,7 +30,7 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// The field of `field:rule` is reported on the same grounds, but only when JabRef does not know it
 /// *and* the entry does not carry it: any name is a valid BibTeX field, so a standard field the
-/// entry happens to lack may well be meant for what is added to it later, while `autor:` on an
+/// entry happens to lack may well be meant for what is added to it later, while `authors:` on an
 /// entry that has no such field is a typo in all but name. A field regex is reported when it
 /// matches neither a field JabRef knows nor one the entry carries.
 ///

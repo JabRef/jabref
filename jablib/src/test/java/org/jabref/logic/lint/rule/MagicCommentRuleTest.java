@@ -27,23 +27,23 @@ class MagicCommentRuleTest {
 
     @Test
     void anIdOfNoRuleOfTheRunIsReported() {
-        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore surounding-whitespace"));
+        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore surrounding-whitespaces"));
 
         assertEquals(1, findings.size());
         assertEquals(Optional.empty(), findings.getFirst().field());
-        assertEquals("the magic comment switches off \"surounding-whitespace\", which is no rule of this run",
+        assertEquals("the magic comment switches off \"surrounding-whitespaces\", which is no rule of this run",
                 findings.getFirst().message());
     }
 
     /// The person who wrote the comment is the only one who knows what was meant.
     @Test
     void theFindingCarriesNoFix() {
-        assertFalse(rule.scan(entryWithComment("% jabref-format-ignore surounding-whitespace")).getFirst().isFixable());
+        assertFalse(rule.scan(entryWithComment("% jabref-format-ignore surrounding-whitespaces")).getFirst().isFixable());
     }
 
     @Test
     void aFieldScopedIdIsReportedOnThatField() {
-        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore author:surounding-whitespace"));
+        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore author:surrounding-whitespaces"));
 
         assertEquals(1, findings.size());
         assertEquals(Optional.of(StandardField.AUTHOR), findings.getFirst().field());
@@ -61,7 +61,7 @@ class MagicCommentRuleTest {
 
     @Test
     void anIdOfNoRuleIsReportedOnEveryFieldTheTokenNames() {
-        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore author,title:surounding-whitespace"));
+        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore author,title:surrounding-whitespaces"));
 
         assertEquals(List.of(Optional.of(StandardField.AUTHOR), Optional.of(StandardField.TITLE)),
                 findings.stream().map(Finding::field).toList());
@@ -69,9 +69,9 @@ class MagicCommentRuleTest {
 
     @Test
     void aRuleRegexThatMatchesNoRuleOfTheRunIsReported() {
-        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore /surounding-.*/"));
+        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore /surroundings-.*/"));
 
-        assertEquals(List.of("the magic comment switches off /surounding-.*/, which matches no rule of this run"),
+        assertEquals(List.of("the magic comment switches off /surroundings-.*/, which matches no rule of this run"),
                 findings.stream().map(Finding::message).toList());
     }
 
@@ -82,9 +82,9 @@ class MagicCommentRuleTest {
 
     @Test
     void aFieldRegexThatMatchesNoFieldIsReported() {
-        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore /autor.*/:surrounding-whitespace"));
+        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore /authors.*/:surrounding-whitespace"));
 
-        assertEquals(List.of("the magic comment names the fields /autor.*/, which match neither a BibTeX field nor one this entry has"),
+        assertEquals(List.of("the magic comment names the fields /authors.*/, which match neither a BibTeX field nor one this entry has"),
                 findings.stream().map(Finding::message).toList());
     }
 
@@ -106,10 +106,10 @@ class MagicCommentRuleTest {
     /// A name JabRef does not know, on an entry that does not carry it, switches nothing off.
     @Test
     void aFieldNeitherKnownNorPresentIsReported() {
-        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore autor:surrounding-whitespace"));
+        List<Finding> findings = rule.scan(entryWithComment("% jabref-format-ignore authors:surrounding-whitespace"));
 
         assertEquals(1, findings.size());
-        assertEquals("the magic comment names the field \"autor\", which is neither a BibTeX field nor one this entry has",
+        assertEquals("the magic comment names the field \"authors\", which is neither a BibTeX field nor one this entry has",
                 findings.getFirst().message());
     }
 

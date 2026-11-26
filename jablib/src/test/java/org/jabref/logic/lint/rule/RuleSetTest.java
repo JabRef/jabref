@@ -67,9 +67,9 @@ class RuleSetTest {
     @Test
     void withoutRejectsAnIdThatNamesNoRule() {
         UnknownRuleException exception = assertThrows(UnknownRuleException.class,
-                () -> RuleSet.builtIn(FIELD_PREFERENCES).without(List.of("surounding-whitespace", "surrounding-whitespace")));
+                () -> RuleSet.builtIn(FIELD_PREFERENCES).without(List.of("surrounding-whitespaces", "surrounding-whitespace")));
 
-        assertEquals(List.of("surounding-whitespace"), exception.getUnknownIds());
+        assertEquals(List.of("surrounding-whitespaces"), exception.getUnknownIds());
         assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-brackets", "magic-comment"), exception.getKnownIds());
     }
 
@@ -277,9 +277,9 @@ class RuleSetTest {
     @Test
     void rejectUnknownRejectsAnIdThatNamesNoRule() {
         UnknownRuleException exception = assertThrows(UnknownRuleException.class,
-                () -> RuleSet.builtIn(FIELD_PREFERENCES).rejectUnknown(List.of("surounding-whitespace")));
+                () -> RuleSet.builtIn(FIELD_PREFERENCES).rejectUnknown(List.of("surrounding-whitespaces")));
 
-        assertEquals(List.of("surounding-whitespace"), exception.getUnknownIds());
+        assertEquals(List.of("surrounding-whitespaces"), exception.getUnknownIds());
     }
 
     @Test

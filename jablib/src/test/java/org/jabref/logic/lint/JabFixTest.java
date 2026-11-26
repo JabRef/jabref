@@ -199,7 +199,7 @@ class JabFixTest {
     @Test
     void aMagicCommentThatNamesNoRuleIsReported() throws IOException {
         List<BibEntry> entries = parse("""
-                % jabref-format-ignore surounding-whitespace
+                % jabref-format-ignore surrounding-whitespaces
                 @ARTICLE{key,
                 author = " Doe, Jane ",
                     YEAR="2024"
@@ -229,7 +229,7 @@ class JabFixTest {
     @Test
     void aMagicCommentCanSwitchOffTheReportAboutItself() throws IOException {
         JabFixResult result = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(parse("""
-                % jabref-format-ignore surounding-whitespace magic-comment
+                % jabref-format-ignore surrounding-whitespaces magic-comment
                 @ARTICLE{key,
                 author = " Doe, Jane ",
                     YEAR="2024"
