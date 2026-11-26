@@ -842,7 +842,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         ScrollPane scrollPane = new ScrollPane(root);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
         setContent(scrollPane);
