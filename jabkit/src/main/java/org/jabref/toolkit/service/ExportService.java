@@ -165,8 +165,7 @@ public class ExportService {
                 }
             };
             Optional.ofNullable(cliPreferences.getProtectedTermsPreferences())
-                    .map(ProtectedTermsLoader::new)
-                    .ifPresent(databaseWriter::withProtectedTermsLoader);
+                    .ifPresent(terms -> databaseWriter.withProtectedTermsLoader(() -> new ProtectedTermsLoader(terms)));
             databaseWriter.writePartOfDatabase(bibDatabaseContext, entries.stream().filter(entry -> !entry.isEmpty()).toList());
 
             // Show just a warning message if encoding did not work for all characters:

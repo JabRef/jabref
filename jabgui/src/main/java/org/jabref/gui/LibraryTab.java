@@ -77,6 +77,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.inmemory.InMemoryLuceneSearchBackend;
@@ -576,7 +577,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
-            BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
+            BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences, Injector.instantiateModelOrService(ProtectedTermsLoader.class));
         }
 
         GitPullScheduler.start(bibDatabaseContext,

@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,6 +27,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -96,6 +98,35 @@ class GitCommitActionTest {
             InOrder inOrder = inOrder(save, stateManager);
             inOrder.verify(save).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
             inOrder.verify(stateManager).getActiveDatabase();
+        }
+    }
+
+    @Test
+    void modifiedLibrarySaveForwardsProtectedTermsLoader() {
+        ProtectedTermsLoader expectedLoader = mock(ProtectedTermsLoader.class);
+        GitCommitAction actionWithLoader = new GitCommitAction(
+                () -> libraryTab,
+                dialogService,
+                stateManager,
+                preferences,
+                mock(BibEntryTypesManager.class),
+                mock(JournalAbbreviationRepository.class),
+                new CurrentThreadTaskExecutor(),
+                new GitHandlerRegistry(mock(GitPreferences.class)),
+                mock(NativeDesktop.class),
+                expectedLoader);
+        when(libraryTab.isModified()).thenReturn(true);
+
+        AtomicReference<List<?>> constructedArgs = new AtomicReference<>(List.of());
+        try (MockedConstruction<SaveDatabaseAction> saveDatabaseAction = mockConstruction(SaveDatabaseAction.class,
+                (mockedSave, context) -> {
+                    constructedArgs.set(context.arguments());
+                    when(mockedSave.saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL)).thenReturn(SaveResult.SUCCESS);
+                })) {
+            actionWithLoader.execute();
+
+            assertEquals(1, saveDatabaseAction.constructed().size());
+            assertEquals(expectedLoader, constructedArgs.get().get(9));
         }
     }
 
