@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
@@ -732,39 +731,5 @@ public class FileUtil {
         String driveLetter = path.substring(letterIndex, letterIndex + 1).toUpperCase();
         String windowsPath = path.substring(letterIndex + 1).replace("/", "\\\\");
         return Path.of(driveLetter + ":" + windowsPath);
-    }
-
-    /// Resolves relative path inside with respect to baseDir and ensures target directory stays inside it
-    /// This can be used for re-validation too
-    ///
-    /// @param baseDir the base directory that must exist
-    /// @param subDir  relative path (can be pattern) in base directory
-    /// @return resolved path that is guaranteed to be inside baseDir
-    /// @throws OutsideFileDirectoryException if resolved path escapes baseDir
-    public static Path resolveInsideDirectory(Path baseDir, Path subDir) throws IOException {
-        Path base = resolvingExistingPart(baseDir.toAbsolutePath().normalize());
-        Path target = resolvingExistingPart(base.resolve(subDir).normalize());
-        if (!target.startsWith(base)) {
-            throw new OutsideFileDirectoryException(base, target);
-        }
-        return target;
-    }
-
-    private static Path resolvingExistingPart(Path path) throws IOException {
-        Path existing = path;
-        while (!Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
-            Path parent = existing.getParent();
-            if (parent == null) {
-                return path.normalize();
-            }
-            existing = parent;
-        }
-        return existing.toRealPath().resolve(existing.relativize(path)).normalize();
-    }
-
-    public static class OutsideFileDirectoryException extends IOException {
-        public OutsideFileDirectoryException(Path base, Path target) {
-            super("Resolved path '%s' escapes base directory '%s'".formatted(target, base));
-        }
     }
 }

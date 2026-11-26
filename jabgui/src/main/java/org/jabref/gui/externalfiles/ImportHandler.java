@@ -237,7 +237,6 @@ public class ImportHandler {
                                 addResultToList(file, false, pdfWarning.map(warning -> Localization.lang("%0: %1", message, warning)).orElse(message));
                             } else {
                                 generateKeys(pdfEntriesInFile, KeyGenerationPolicy.RESPECT_IMPORT_PREFERENCE);
-                                List<BibEntry> linkedEntries = new ArrayList<>(pdfEntriesInFile.size());
                                 pdfEntriesInFile.forEach(entry -> {
                                     if (entry.getFiles().size() > 1) {
                                         LOGGER.warn("Entry has more than one file attached. This is not supported.");
@@ -246,18 +245,13 @@ public class ImportHandler {
                                     entry.clearField(StandardField.FILE);
                                     // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                                     // Similar code as org.jabref.gui.preview.PreviewPanel.PreviewPanel
-                                    List<LinkedFile> linkedFiles = DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);
-                                    if (!linkedFiles.isEmpty()) {
-                                        linkedEntries.add(entry);
-                                    }
+                                    DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);
                                 });
-                                if (linkedEntries.isEmpty()) {
-                                    addResultToList(file, FAILURE, Localization.lang("Could not move file '%0'.", file));
-                                } else {
-                                    addToImportEntriesGroup(linkedEntries);
-                                    entriesToAdd.addAll(linkedEntries);
-                                    addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
-                                }
+                                addToImportEntriesGroup(pdfEntriesInFile);
+                                entriesToAdd.addAll(pdfEntriesInFile);
+                                pdfWarning.ifPresentOrElse(
+                                        warning -> addResultToList(file, WARNING, Localization.lang("File was imported as %0, but warnings were reported: %1", "PDF", warning)),
+                                        () -> addResultToList(file, true, Localization.lang("File was successfully imported as a new entry")));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             ParserResult bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);

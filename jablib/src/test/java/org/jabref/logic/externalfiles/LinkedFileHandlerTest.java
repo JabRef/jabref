@@ -2,28 +2,23 @@ package org.jabref.logic.externalfiles;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -208,25 +203,5 @@ class LinkedFileHandlerTest {
         final LinkedFile linkedFile = new LinkedFile("", link, "");
         final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithoutCitationKey, databaseContext, filePreferences);
         assertEquals("other.txt", linkedFileHandler.getSuggestedFileName(), "\"" + link + "\" should be \"other.txt\" for empty citation key");
-    }
-
-    @Test
-    void resolveInsideDirectoryRejectsDirectorySwappedForSymlink(@TempDir Path base, @TempDir Path outside) throws IOException {
-        Path real = Files.createDirectory(base.resolve("real"));
-
-        // First validation passes on the real directory
-        assertDoesNotThrow(() -> FileUtil.resolveInsideDirectory(base, Path.of("real")));
-
-        // Component swapped for a symlink between validation and use
-        Files.delete(real);
-        try {
-            Files.createSymbolicLink(real, outside);
-        } catch (IOException | UnsupportedOperationException _) {
-            Assumptions.abort("Symlinks not supported");
-        }
-
-        // Re-validation at point of use catches it
-        assertThrows(FileUtil.OutsideFileDirectoryException.class,
-                () -> FileUtil.resolveInsideDirectory(base, Path.of("real")));
     }
 }

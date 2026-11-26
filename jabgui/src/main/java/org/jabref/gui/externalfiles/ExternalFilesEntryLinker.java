@@ -40,7 +40,7 @@ public class ExternalFilesEntryLinker {
         this.notificationService = notificationService;
     }
 
-    public List<LinkedFile> linkFilesToEntry(BibEntry entry, List<Path> files) {
+    public void linkFilesToEntry(BibEntry entry, List<Path> files) {
         List<LinkedFile> existingFiles = entry.getFiles();
         List<LinkedFile> linkedFiles = files.stream().flatMap(file -> {
             String typeName = FileUtil.getFileExtension(file)
@@ -59,7 +59,6 @@ public class ExternalFilesEntryLinker {
             }
         }).toList();
         entry.addFiles(linkedFiles);
-        return linkedFiles;
     }
 
     ///
@@ -68,7 +67,7 @@ public class ExternalFilesEntryLinker {
     /// - Rename file to configured pattern (and skip renaming if file already exists)
     /// - Avoid overwriting files - by adding " {number}" after the file name
     ///
-    public List<LinkedFile> coveOrMoveFilesSteps(BibEntry entry, List<Path> files, boolean shouldMove) {
+    public void coveOrMoveFilesSteps(BibEntry entry, List<Path> files, boolean shouldMove) {
         List<LinkedFile> existingFiles = entry.getFiles();
         List<LinkedFile> linkedFiles = new ArrayList<>(files.size());
         // "old school" loop to enable logging properly
@@ -79,20 +78,9 @@ public class ExternalFilesEntryLinker {
             LinkedFile linkedFile = new LinkedFile("", file, typeName);
             LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entry, bibDatabaseContextSupplier.get(), filePreferences);
             try {
-                boolean success = linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
-                if (!success) {
-                    LOGGER.warn("Could not copy/move file {} — no destination directory", file);
-                    notificationService.notify(Localization.lang("Could not move file '%0'.", file));
-                    continue;
-                }
-            } catch (FileUtil.OutsideFileDirectoryException exception) {
-                LOGGER.warn("Refused to move file {} outside the file directory", file, exception);
-                notificationService.notify(Localization.lang("Could not move file '%0' outside the file directory.", file));
-                continue;
+                linkedFileHandler.copyOrMoveToDefaultDirectory(shouldMove, true);
             } catch (IOException exception) {
                 LOGGER.error("Error while copying/moving file {}", file, exception);
-                notificationService.notify(Localization.lang("Could not move file '%0'.", file));
-                continue;
             }
 
             String link = linkedFile.getLink();
@@ -104,6 +92,5 @@ public class ExternalFilesEntryLinker {
             }
         }
         entry.addFiles(linkedFiles);
-        return linkedFiles;
     }
 }
