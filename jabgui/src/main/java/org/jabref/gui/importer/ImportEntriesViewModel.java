@@ -21,6 +21,7 @@ import javafx.collections.ObservableSet;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -55,6 +56,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final UndoManager undoManager;
@@ -89,8 +91,10 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor,
                                   Optional<SearchBasedFetcher> fetcher,
-                                  Optional<String> query) {
+                                  Optional<String> query,
+                                  NativeDesktop nativeDesktop) {
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
@@ -222,7 +226,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
         if (shouldDownloadFiles) {
             importHandler.enableLinkedFileDownloads();
         } else {

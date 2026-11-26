@@ -69,7 +69,8 @@ public class SidePaneContentFactory {
                             dialogService,
                             aiService,
                             fileUpdateMonitor,
-                            taskExecutor);
+                            taskExecutor,
+                            nativeDesktop);
             case OPEN_OFFICE ->
                     new OpenOfficePanel(
                             tabContainer,
@@ -88,7 +89,8 @@ public class SidePaneContentFactory {
                     new WebSearchPaneView(
                             preferences,
                             dialogService,
-                            stateManager);
+                            stateManager,
+                            nativeDesktop);
         };
     }
 }

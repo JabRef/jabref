@@ -15,6 +15,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -55,6 +56,7 @@ public class SharedDatabaseUIManager {
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final AiService aiService;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -72,10 +74,12 @@ public class SharedDatabaseUIManager {
                                    FileUpdateMonitor fileUpdateMonitor,
                                    ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor,
-                                   GitHandlerRegistry gitHandlerRegistry) {
+                                   GitHandlerRegistry gitHandlerRegistry,
+                                   NativeDesktop nativeDesktop) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
@@ -126,7 +130,7 @@ public class SharedDatabaseUIManager {
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message, ButtonType.CANCEL, merge);
 
         if (response.isPresent() && response.get().equals(merge)) {
-            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry, preferences, stateManager);
+            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry, preferences, stateManager, nativeDesktop);
             dialog.setTitle(Localization.lang("Update refused"));
             Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
 
