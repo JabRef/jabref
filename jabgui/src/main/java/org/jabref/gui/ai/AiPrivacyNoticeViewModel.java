@@ -13,7 +13,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
@@ -30,7 +29,7 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     private final StringProperty embeddingModelSize = new SimpleStringProperty("");
 
     private final AiPreferences aiPreferences;
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final NativeDesktop nativeDesktop;
     private final EntryEditorPreferences entryEditorPreferences;
     private final GroupsPreferences groupsPreferences;
     private final DialogService dialogService;
@@ -38,14 +37,14 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
 
     public AiPrivacyNoticeViewModel(
             AiPreferences aiPreferences,
-            ExternalApplicationsPreferences externalApplicationsPreferences,
+            NativeDesktop nativeDesktop,
             EntryEditorPreferences entryEditorPreferences,
             GroupsPreferences groupsPreferences,
             DialogService dialogService,
             EmbeddingModelMetadataService embeddingModelMetadataService
     ) {
         this.aiPreferences = aiPreferences;
-        this.externalApplicationsPreferences = externalApplicationsPreferences;
+        this.nativeDesktop = nativeDesktop;
         this.entryEditorPreferences = entryEditorPreferences;
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
@@ -73,7 +72,7 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
 
     public void openBrowser(String link) {
         try {
-            NativeDesktop.openBrowser(link, externalApplicationsPreferences);
+            nativeDesktop.openBrowser(link);
         } catch (IOException e) {
             LOGGER.error("Error opening the browser to the Privacy Policy page of the AI provider.", e);
             dialogService.showErrorDialogAndWait(e);

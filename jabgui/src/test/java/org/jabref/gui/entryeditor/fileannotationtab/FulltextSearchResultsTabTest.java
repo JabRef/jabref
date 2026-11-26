@@ -12,6 +12,7 @@ import javafx.scene.text.TextFlow;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -59,7 +60,7 @@ class FulltextSearchResultsTabTest {
         GuiPreferences preferences = mock(GuiPreferences.class);
         when(preferences.getFilePreferences()).thenReturn(FilePreferences.getDefault());
         FulltextSearchResultsTab tab = new FulltextSearchResultsTab(
-                stateManager, preferences, mock(DialogService.class), mock(TaskExecutor.class));
+                stateManager, preferences, mock(DialogService.class), mock(TaskExecutor.class), mock(NativeDesktop.class));
         BibEntry entry = new BibEntry().withFiles(List.of(new LinkedFile("", "paper.pdf", "PDF")));
         tab.bindToEntry(entry);
         TextFlow content = (TextFlow) ((ScrollPane) tab.getContent()).getContent();
@@ -101,7 +102,7 @@ class FulltextSearchResultsTabTest {
         when(stateManager.activeTabProperty()).thenReturn(activeTab);
 
         FulltextSearchResultsTab tab = new FulltextSearchResultsTab(
-                stateManager, mock(GuiPreferences.class), mock(DialogService.class), mock(TaskExecutor.class));
+                stateManager, mock(GuiPreferences.class), mock(DialogService.class), mock(TaskExecutor.class), mock(NativeDesktop.class));
         tab.bindToEntry(new BibEntry());
         TextFlow content = (TextFlow) ((ScrollPane) tab.getContent()).getContent();
 

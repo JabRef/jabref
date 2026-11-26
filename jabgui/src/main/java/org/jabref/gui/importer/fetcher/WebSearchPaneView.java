@@ -19,6 +19,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
@@ -35,11 +36,13 @@ public class WebSearchPaneView extends VBox {
 
     private final WebSearchPaneViewModel viewModel;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public WebSearchPaneView(GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {
+    public WebSearchPaneView(GuiPreferences preferences, DialogService dialogService, StateManager stateManager, NativeDesktop nativeDesktop) {
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
@@ -132,7 +135,7 @@ public class WebSearchPaneView extends VBox {
         ActionFactory factory = new ActionFactory();
         EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
             if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
-                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getExternalApplicationsPreferences()));
+                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, nativeDesktop));
                 helpButtonContainer.getChildren().setAll(helpButton);
             } else {
                 helpButtonContainer.getChildren().clear();

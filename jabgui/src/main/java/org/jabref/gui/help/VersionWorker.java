@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -34,17 +34,18 @@ public class VersionWorker {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final InternalPreferences internalPreferences;
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final NativeDesktop nativeDesktop;
 
     public VersionWorker(@NonNull Version installedVersion,
                          @NonNull DialogService dialogService,
                          @NonNull TaskExecutor taskExecutor,
-                         @NonNull GuiPreferences preferences) {
+                         @NonNull GuiPreferences preferences,
+                         @NonNull NativeDesktop nativeDesktop) {
         this.installedVersion = installedVersion;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.internalPreferences = preferences.getInternalPreferences();
-        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        this.nativeDesktop = nativeDesktop;
     }
 
     /// Returns a newer version excluding any non-stable versions, except if the installed one is unstable too. If no
@@ -89,7 +90,7 @@ public class VersionWorker {
         } else {
             // notify the user about a newer version
             if (dialogService.showCustomDialogAndWait(
-                                     new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
+                                     new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, nativeDesktop))
                              .orElse(true)) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }

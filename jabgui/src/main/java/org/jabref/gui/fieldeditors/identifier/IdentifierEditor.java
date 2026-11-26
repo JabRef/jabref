@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
@@ -48,6 +49,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private TaskExecutor taskExecutor;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
+    @Inject private NativeDesktop nativeDesktop;
     private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
@@ -61,15 +63,15 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
         switch (field) {
             case DOI ->
-                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
             case ISBN ->
-                    this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                    this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
             case ISSN ->
-                    this.viewModel = new ISSNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                    this.viewModel = new ISSNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
             case EPRINT ->
-                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
             case MR_NUMBER ->
-                    this.viewModel = new MathSciNetIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                    this.viewModel = new MathSciNetIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
 
             // TODO: Add support for PMID
             case null,

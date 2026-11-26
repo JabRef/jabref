@@ -31,7 +31,8 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
                 dialogService,
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
-                preferences.getProtectedTermsPreferences());
+                preferences.getProtectedTermsPreferences(),
+                nativeDesktop);
         buildView();
     }
 

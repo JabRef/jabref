@@ -30,6 +30,7 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -90,7 +91,8 @@ public class UnlinkedFilesDialogViewModel {
                                         FileUpdateMonitor fileUpdateMonitor,
                                         GuiPreferences preferences,
                                         StateManager stateManager,
-                                        TaskExecutor taskExecutor) {
+                                        TaskExecutor taskExecutor,
+                                        NativeDesktop nativeDesktop) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -102,7 +104,8 @@ public class UnlinkedFilesDialogViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
 
         this.fileFilterList = FXCollections.observableArrayList(
                 new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()),

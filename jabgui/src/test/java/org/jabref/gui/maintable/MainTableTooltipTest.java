@@ -6,6 +6,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.util.TaskExecutor;
@@ -30,7 +31,7 @@ class MainTableTooltipTest extends JavaFxTest {
         GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         AtomicReference<MainTableTooltip> tooltip = new AtomicReference<>();
-        interact(() -> tooltip.set(new MainTableTooltip(mock(DialogService.class), preferences, mock(TaskExecutor.class))));
+        interact(() -> tooltip.set(new MainTableTooltip(mock(DialogService.class), preferences, mock(TaskExecutor.class), mock(NativeDesktop.class))));
 
         assertEquals(Duration.INDEFINITE, tooltip.get().getShowDuration());
     }
@@ -42,7 +43,7 @@ class MainTableTooltipTest extends JavaFxTest {
         when(preferences.getPreviewPreferences().getTooltipDuration()).thenReturn(30, 0);
         AtomicReference<MainTableTooltip> tooltip = new AtomicReference<>();
         interact(() -> {
-            tooltip.set(new MainTableTooltip(mock(DialogService.class), preferences, mock(TaskExecutor.class)));
+            tooltip.set(new MainTableTooltip(mock(DialogService.class), preferences, mock(TaskExecutor.class), mock(NativeDesktop.class)));
             tooltip.get().createTooltip(mock(BibDatabaseContext.class), mock(BibEntry.class), "value");
         });
         assertEquals(Duration.seconds(30), tooltip.get().getShowDuration());
