@@ -9,7 +9,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
@@ -19,7 +18,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
     public NewVersionDialog(Version currentVersion,
                             Version latestVersion,
                             DialogService dialogService,
-                            ExternalApplicationsPreferences externalApplicationsPreferences) {
+                            NativeDesktop nativeDesktop) {
         this.setTitle(Localization.lang("New version available"));
 
         ButtonType btnIgnoreUpdate = new ButtonType(Localization.lang("Ignore this update"), ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -30,7 +29,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
             if (button == btnIgnoreUpdate) {
                 return false;
             } else if (button == btnDownloadUpdate) {
-                NativeDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService, externalApplicationsPreferences);
+                nativeDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService);
             }
             return true;
         });
@@ -39,7 +38,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
 
         Hyperlink lblMoreInformation = new Hyperlink(Localization.lang("See what's new"));
         lblMoreInformation.setOnAction(_ ->
-                NativeDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService, externalApplicationsPreferences)
+                nativeDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService)
         );
 
         VBox container = new VBox(

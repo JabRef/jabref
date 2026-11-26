@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.URLs;
 import org.jabref.logic.ai.AiNamingUtils;
@@ -28,6 +29,7 @@ public class AiPrivacyNoticeView extends ScrollPane {
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private AiService aiService;
+    @Inject private NativeDesktop nativeDesktop;
 
     private AiPrivacyNoticeViewModel viewModel;
 
@@ -41,7 +43,7 @@ public class AiPrivacyNoticeView extends ScrollPane {
     private void initialize() {
         viewModel = new AiPrivacyNoticeViewModel(
                 preferences.getAiPreferences(),
-                preferences.getExternalApplicationsPreferences(),
+                nativeDesktop,
                 preferences.getEntryEditorPreferences(),
                 preferences.getGroupsPreferences(),
                 dialogService,

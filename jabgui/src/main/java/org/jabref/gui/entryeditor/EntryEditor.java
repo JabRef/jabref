@@ -25,6 +25,7 @@ import javafx.stage.Modality;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -97,6 +98,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private AiService aiService;
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
     @Inject private BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
+    @Inject private NativeDesktop nativeDesktop;
 
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
@@ -116,7 +118,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 preferences.getKeyBindingRepository(),
                 preferences,
                 taskExecutor,
-                stateManager);
+                stateManager,
+                nativeDesktop);
 
         EntryEditorTabFactory tabFactory = new EntryEditorTabFactory(
                 previewPanel,
@@ -133,7 +136,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 journalAbbreviationRepository,
                 keyBindingRepository,
                 searchCitationsRelationsService,
-                bibTeXSyntaxHighlighter
+                bibTeXSyntaxHighlighter,
+                nativeDesktop
         );
 
         this.viewModel = new EntryEditorViewModel(
@@ -143,7 +147,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 dialogService,
                 journalAbbreviationRepository,
                 tabSupplier,
-                tabFactory);
+                tabFactory,
+                nativeDesktop);
 
         typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
         Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
@@ -242,7 +247,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                     focusUtils.captureFocusedField();
                     tabSupplier.get().selectPreviousEntry();
                 })
-                .on(KeyBinding.HELP, () -> new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute())
+                .on(KeyBinding.HELP, () -> new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, nativeDesktop).execute())
                 // We do not want to close the entry editor as such
                 // We just want to unfocus the field
                 .onWithoutConsuming(KeyBinding.CLOSE, tabbed::requestFocus)

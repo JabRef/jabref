@@ -9,6 +9,7 @@ import javafx.scene.control.TableView;
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.ColumnPreferencesRecorder;
 import org.jabref.gui.maintable.MainTableColumnFactory;
@@ -27,7 +28,8 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                               GuiPreferences preferences,
                               DialogService dialogService,
                               StateManager stateManager,
-                              TaskExecutor taskExecutor) {
+                              TaskExecutor taskExecutor,
+                              NativeDesktop nativeDesktop) {
         super();
 
         this.getStyleClass().add("main-table");
@@ -40,7 +42,8 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                 preferences.getSearchDialogColumnPreferences(),
                 dialogService,
                 stateManager,
-                taskExecutor).createColumns();
+                taskExecutor,
+                nativeDesktop).createColumns();
 
         if (allCols.stream().noneMatch(LibraryColumn.class::isInstance)) {
             allCols.addFirst(new LibraryColumn());

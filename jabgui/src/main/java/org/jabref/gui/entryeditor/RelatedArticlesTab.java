@@ -48,18 +48,21 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
 
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
     public RelatedArticlesTab(BuildInfo buildInfo,
                               GuiPreferences preferences,
                               DialogService dialogService,
                               StateManager stateManager,
-                              TaskExecutor taskExecutor) {
+                              TaskExecutor taskExecutor,
+                              NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.buildInfo = buildInfo;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
 
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         setText(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES.displayName());
         setTooltip(new Tooltip(Localization.lang("Related articles")));
@@ -140,7 +143,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             titleLink.setOnAction(_ -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
-                        NativeDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferences.getExternalApplicationsPreferences());
+                        nativeDesktop.openBrowser(entry.getField(StandardField.URL).get());
                     } catch (IOException e) {
                         LOGGER.error("Error opening the browser to: {}", entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
@@ -208,7 +211,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
         mdlLink.setOnAction(_ -> {
             try {
-                NativeDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferences.getExternalApplicationsPreferences());
+                nativeDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/");
             } catch (IOException e) {
                 LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
                 dialogService.showErrorDialogAndWait(e);

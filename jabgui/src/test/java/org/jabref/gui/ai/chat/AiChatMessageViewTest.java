@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
@@ -60,6 +61,7 @@ class AiChatMessageViewTest extends JavaFxTest {
         Injector.setModelOrService(DialogService.class, dialogService);
         Injector.setModelOrService(StateManager.class, stateManager);
         Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
         rootPane = new StackPane();
