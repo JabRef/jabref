@@ -1,5 +1,6 @@
 package org.jabref.gui.theme;
 
+import java.net.URL;
 import java.util.List;
 
 import javafx.beans.value.ObservableValue;
@@ -49,15 +50,18 @@ public class ThemePreviewView extends HBox {
                                          ? List.of(ThemeColorScheme.DARK, ThemeColorScheme.LIGHT)
                                          : List.of(colorScheme);
         for (ThemeColorScheme scheme : schemes) {
-            theme.getPreview(scheme).ifPresent(url -> {
-                ImageView preview = new ImageView(new Image(url.toExternalForm(), PREVIEW_WIDTH, PREVIEW_HEIGHT, true, true, true));
-                preview.setFitWidth(PREVIEW_WIDTH);
-                preview.setFitHeight(PREVIEW_HEIGHT);
-                preview.setPreserveRatio(true);
-                getChildren().add(frame(preview));
-            });
+            theme.getPreview(scheme).ifPresent(url -> getChildren().add(frame(screenshot(url, PREVIEW_WIDTH, PREVIEW_HEIGHT))));
         }
         setVisible(!getChildren().isEmpty());
+    }
+
+    /// A theme screenshot scaled to fit `width` x `height`, loaded in the background.
+    static ImageView screenshot(URL url, double width, double height) {
+        ImageView screenshot = new ImageView(new Image(url.toExternalForm(), width, height, true, true, true));
+        screenshot.setFitWidth(width);
+        screenshot.setFitHeight(height);
+        screenshot.setPreserveRatio(true);
+        return screenshot;
     }
 
     private static StackPane frame(ImageView preview) {

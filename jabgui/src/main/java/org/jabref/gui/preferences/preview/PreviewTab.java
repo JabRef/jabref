@@ -92,8 +92,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
         setContent(form()
                 .checkbox(Localization.lang("Show preview as a tab in entry editor"), viewModel.showAsExtraTabProperty())
-                .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
-                .stackedField(Localization.lang("Entry table tooltip duration in seconds (0 keeps it open)"), buildTooltipDurationSpinner())
+                .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip(),
+                        tooltip -> tooltip
+                                .attach(buildTooltipDurationSpinner(),
+                                        duration -> duration.disableWhen(viewModel.showPreviewInEntryTableTooltip().not()))
+                                .description(Localization.lang("Entry table tooltip duration in seconds (0 keeps it open)")))
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
                 .button(Localization.lang("Add BST file"), this::selectBstFile)
                 .custom(dualListRegion, lists -> lists

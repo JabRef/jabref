@@ -80,11 +80,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
                 .section(Localization.lang("General"), general -> general
                                 // [impl->feat~ai.llms.providers~1]
-                                .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
-                                .info(Localization.lang("AI functionality in Jabref includes:"))
-                                .info(Localization.lang("• Chatting with entries."))
-                                .info(Localization.lang("• Summarizing entries."))
-                                .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")),
+                                .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi(),
+                                        enableAi -> enableAi
+                                                .description(Localization.lang("AI functionality in Jabref includes:"))
+                                                .description(Localization.lang("• Chatting with entries."))
+                                                .description(Localization.lang("• Summarizing entries."))
+                                                .description(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry."))),
                         generalSection -> generalSection.help(HelpFile.AI_GENERAL_SETTINGS))
 
                 .section(Localization.lang("Connection"), connection -> connection

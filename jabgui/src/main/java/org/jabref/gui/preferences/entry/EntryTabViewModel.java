@@ -1,8 +1,5 @@
 package org.jabref.gui.preferences.entry;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -12,7 +9,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -21,8 +17,6 @@ import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.FieldTextMapper;
 
 public class EntryTabViewModel implements PreferenceTabViewModel {
 
@@ -153,32 +147,5 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty addModificationDateProperty() {
         return addModificationDateProperty;
-    }
-
-    public StringConverter<Field> getFieldStringConverter() {
-        return new StringConverter<>() {
-            @Override
-            public String toString(Field field) {
-                return FieldTextMapper.getDisplayName(field);
-            }
-
-            @Override
-            public Field fromString(String string) {
-                return FieldFactory.parseField(string);
-            }
-        };
-    }
-
-    public List<Field> getSuggestions(String request) {
-        List<Field> suggestions = FieldFactory.getAllFieldsWithOutInternal().stream()
-                                              .filter(field -> FieldTextMapper.getDisplayName(field).toLowerCase().contains(request.toLowerCase()))
-                                              .collect(Collectors.toList());
-
-        Field requestedField = FieldFactory.parseField(request.trim());
-        if (!suggestions.contains(requestedField)) {
-            suggestions.addFirst(requestedField);
-        }
-
-        return suggestions;
     }
 }

@@ -13,9 +13,9 @@
 ///   `Control` and offers none of that. Asking for the wrong capability does not compile.
 /// - **Secondary nodes are attachments, not separate builder methods.** A help button, a browse
 ///   button or an inline value field is attached to its primary control via the handle
-///   (`help(...)`, `browse(...)`, `attachField(...)`, `attach(...)`), which appends it right after
-///   the control and couples its state to it. The attachment's own config lambda makes it fully
-///   addressable. `checkWithField` remains as sugar over `checkbox` + `attachField` because the
+///   (`help(...)`, `browse(...)`, `attachField(...)`, `attach(...)`), which places it beside the
+///   control (right after it; left of it for a switch) and couples its state to it. The
+///   attachment's own config lambda makes it fully addressable. `checkWithField` remains as sugar over `checkbox` + `attachField` because the
 ///   "Enable X on port [..]" idiom reads better as one call.
 /// - **Regions nest via lambdas** (`section`, `group`, `columns`, `flow`), so a region
 ///   cannot be left unclosed and can be configured or disabled as a unit. Their handles mirror the

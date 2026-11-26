@@ -40,10 +40,9 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
         setContent(form()
 
                 .section(Localization.lang("General"), general -> general
-                        .checkbox(Localization.lang("Overwrite existing keys"), viewModel.overwriteAllowProperty())
-                        .checkbox(Localization.lang("Warn before overwriting existing keys"), viewModel.overwriteWarningProperty(),
-                                warn -> warn.disableWhen(viewModel.overwriteAllowProperty().not())
-                                            .styleClass("padding-left-12"))
+                        .checkbox(Localization.lang("Overwrite existing keys"), viewModel.overwriteAllowProperty(),
+                                overwrite -> overwrite.enabledWhenOn(keys -> keys
+                                        .checkbox(Localization.lang("Warn before overwriting existing keys"), viewModel.overwriteWarningProperty())))
                         .checkbox(Localization.lang("Generate keys before saving (only for entries without a key)"), viewModel.generateOnSaveProperty())
                         .checkbox(Localization.lang("Generate new keys for imported entries (overwriting their default)"), viewModel.generateKeyOnImportProperty())
 
