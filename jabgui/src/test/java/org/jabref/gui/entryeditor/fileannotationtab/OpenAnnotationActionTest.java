@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -29,12 +29,14 @@ import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /// Covers the paths through a configured reader. The document viewer branch is left to manual testing.
 @DisabledOnOs(value = OS.MAC, disabledReason = "No reader can be told a page on macOS, so no command line is built")
+@NullMarked
 class OpenAnnotationActionTest {
 
     private static final Path PDF_FILE = Path.of("C:/My Library/some paper.pdf");
@@ -59,8 +61,6 @@ class OpenAnnotationActionTest {
         when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(pdfType));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
-        when(process.getInputStream()).thenReturn(InputStream.nullInputStream());
-        when(process.getErrorStream()).thenReturn(InputStream.nullInputStream());
         when(processBuilder.start()).thenReturn(process);
     }
 
@@ -77,14 +77,12 @@ class OpenAnnotationActionTest {
                 SUMATRA.toString(), "-reuse-instance", "-page", "7", PDF_FILE.toString()));
     }
 
-    /// Both streams of the reader have to be read, otherwise it blocks as soon as an unread pipe
-    /// fills up with the warnings Qt and GTK readers write.
+    /// The reader is started detached, so that no pipe to it stays open
     @Test
-    void bothStreamsOfTheReaderAreRead() {
+    void readerIsStartedDetached() throws IOException {
         action().openAtAnnotation(PDF_FILE, annotationOnPage(PAGE), processBuilder);
 
-        verify(process).getInputStream();
-        verify(process).getErrorStream();
+        verify(processBuilder).redirectInput(any(ProcessBuilder.Redirect.class));
     }
 
     @Test

@@ -2,11 +2,14 @@ package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -45,10 +48,16 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences.CredentialSave;
+import org.jabref.logic.preferences.CliPreferences.CredentialSaveException;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,14 +69,19 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     /// concern (import/export/reset) and is therefore a footer toggle of the dialog itself,
     /// loaded in [#setValues()] and stored in [#storeAllSettings()] alongside the tabs.
     private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
+    private final ReadOnlyBooleanWrapper saving = new ReadOnlyBooleanWrapper();
+    private final ReadOnlyBooleanWrapper checkingKeyring = new ReadOnlyBooleanWrapper(true);
+    private final ReadOnlyBooleanWrapper keyringAvailable = new ReadOnlyBooleanWrapper();
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final TaskExecutor taskExecutor;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
-    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
+    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.taskExecutor = taskExecutor;
 
         // Dialog-scoped working copy of the AI preferences: the AI tab edits it and flushes it to
         // the live preferences on save; the web search tab observes its master switch meanwhile.
@@ -77,7 +91,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(workingAiPreferences),
+                new WebSearchTab(workingAiPreferences, keyringAvailable.getReadOnlyProperty()),
                 new AiTab(workingAiPreferences),
                 new EntryTab(),
                 new TableTab(),
@@ -98,10 +112,20 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new XmpPrivacyTab(),
                 new CustomImporterTab(),
                 new CustomExporterTab(),
-                new NetworkTab(),
+                new NetworkTab(keyringAvailable.getReadOnlyProperty()),
                 new ExternalStoragesTab(),
-                new GitTab()
+                new GitTab(keyringAvailable.getReadOnlyProperty())
         );
+        BackgroundTask.wrap(OS::isKeyringAvailable)
+                      .onSuccess(available -> {
+                          keyringAvailable.set(available);
+                          checkingKeyring.set(false);
+                      })
+                      .onFailure(ex -> {
+                          LOGGER.warn("Could not check keyring availability", ex);
+                          checkingKeyring.set(false);
+                      })
+                      .executeWith(taskExecutor);
     }
 
     public ObservableList<PreferencesTab> getPreferenceTabs() {
@@ -131,6 +155,9 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void exportPreferences() {
+        if (checkingKeyring.get()) {
+            return;
+        }
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
@@ -138,16 +165,15 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
-                     .ifPresent(exportFile -> {
+                     .ifPresent(exportFile -> storeAllSettings(() -> {
                          try {
-                             storeAllSettings();
                              preferences.exportPreferences(exportFile);
                              preferences.getInternalPreferences().setLastPreferencesExportPath(exportFile);
                          } catch (JabRefException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);
                          }
-                     });
+                     }));
     }
 
     public void showPreferences() {
@@ -186,21 +212,107 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         return true;
     }
 
-    /// @return true if the settings were valid and have been stored
-    public boolean storeAllSettings() {
-        if (!validSettings()) {
-            return false;
+    public ReadOnlyBooleanProperty savingProperty() {
+        return saving.getReadOnlyProperty();
+    }
+
+    public ReadOnlyBooleanProperty checkingKeyringProperty() {
+        return checkingKeyring.getReadOnlyProperty();
+    }
+
+    /// Starts a save from the JavaFX thread once settings have passed validation and the keyring check has finished.
+    /// A credential failure leaves the dialog open for retry after saving ordinary preferences.
+    /// Credential changes that already succeeded remain applied.
+    ///
+    /// @param onSaved the callback to run on the JavaFX thread after all settings have been saved and flushed
+    public void storeAllSettings(Runnable onSaved) {
+        if (saving.get() || checkingKeyring.get() || !validSettings()) {
+            return;
         }
 
-        // Store settings
-        preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
+        List<CredentialUpdate> credentialSaves = preferenceTabs.stream()
+                                                               .flatMap(tab -> tab.prepareCredentialSave().stream()
+                                                                                  .map(save -> new CredentialUpdate(tab.getTabName(), save)))
+                                                               .toList();
+        saving.set(true);
+        saveNextCredential(credentialSaves.iterator(), new ArrayList<>(), onSaved);
+    }
+
+    @NullMarked
+    private record CredentialUpdate(String tabName, CredentialSave save) {
+    }
+
+    /// Applies each credential update on JavaFX before starting the next keyring operation.
+    private void saveNextCredential(Iterator<CredentialUpdate> saves, List<String> credentialWarnings, Runnable onSaved) {
+        if (!saves.hasNext()) {
+            storeTabsAndFlush(() -> {
+                if (credentialWarnings.isEmpty()) {
+                    dialogService.notify(Localization.lang("Preferences recorded."));
+                    onSaved.run();
+                } else {
+                    dialogService.notify(String.join("\n", credentialWarnings));
+                }
+            });
+            return;
+        }
+
+        saveCredential(saves.next(), saves, credentialWarnings, onSaved);
+    }
+
+    private void saveCredential(CredentialUpdate update, Iterator<CredentialUpdate> saves, List<String> credentialWarnings, Runnable onSaved) {
+        BackgroundTask.wrap(update.save()::writeKeyring)
+                      .onSuccess(commit -> {
+                          try {
+                              commit.apply().ifPresentOrElse(
+                                      retry -> saveCredential(new CredentialUpdate(update.tabName(), retry), saves, credentialWarnings, onSaved),
+                                      () -> saveNextCredential(saves, credentialWarnings, onSaved));
+                          } catch (RuntimeException ex) {
+                              saving.set(false);
+                              throw ex;
+                          }
+                      })
+                      .onFailure(ex -> {
+                          LOGGER.warn("Could not update saved credentials for {}", update.tabName(), ex);
+                          if (ex instanceof CredentialSaveException credentialFailure) {
+                              credentialFailure.applySessionUpdate();
+                              credentialWarnings.add(Localization.lang("%0: Could not update saved credentials. The changes are available for this session.", update.tabName()));
+                          } else {
+                              credentialWarnings.add(Localization.lang("%0: Could not update saved credentials.", update.tabName()));
+                          }
+                          saveNextCredential(saves, credentialWarnings, onSaved);
+                      })
+                      .executeWith(taskExecutor);
+    }
+
+    private void storeTabsAndFlush(Runnable onSaved) {
         List<String> restartWarnings = new ArrayList<>();
-        for (PreferencesTab tab : preferenceTabs) {
-            tab.storeSettings();
-            restartWarnings.addAll(tab.getRestartWarnings());
+        try {
+            preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
+            for (PreferencesTab tab : preferenceTabs) {
+                tab.storeSettings();
+                restartWarnings.addAll(tab.getRestartWarnings());
+            }
+            BackgroundTask.wrap(preferences.prepareFlush())
+                          .onSuccess(_ -> {
+                              try {
+                                  finishSave(restartWarnings);
+                              } finally {
+                                  saving.set(false);
+                              }
+                              onSaved.run();
+                          })
+                          .onFailure(ex -> {
+                              saving.set(false);
+                              dialogService.showErrorDialogAndWait(Localization.lang("Save"), ex);
+                          })
+                          .executeWith(taskExecutor);
+        } catch (RuntimeException ex) {
+            saving.set(false);
+            throw ex;
         }
-        preferences.flush();
+    }
 
+    private void finishSave(List<String> restartWarnings) {
         if (!restartWarnings.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Restart required"),
                     String.join(",\n", restartWarnings)
@@ -209,8 +321,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         }
 
         Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
-        dialogService.notify(Localization.lang("Preferences recorded."));
-        return true;
     }
 
     /// Inserts the preference values into the Properties of the ViewModel

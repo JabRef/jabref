@@ -186,8 +186,10 @@ public class RisImporter extends Importer {
                         fields.put(new UnknownField("caption"), value);
                     } else if ("DB".equals(tag)) {
                         fields.put(new UnknownField("database"), value);
-                    } else if ("IS".equals(tag) || "AN".equals(tag) || "C7".equals(tag) || "M1".equals(tag)) {
+                    } else if ("IS".equals(tag) || "C7".equals(tag) || "M1".equals(tag)) {
                         fields.put(StandardField.NUMBER, value);
+                    } else if ("AN".equals(tag)) {
+                        fields.put(new UnknownField("accession-num"), value);
                     } else if ("SP".equals(tag)) {
                         startPage = value;
                     } else if ("PB".equals(tag)) {
