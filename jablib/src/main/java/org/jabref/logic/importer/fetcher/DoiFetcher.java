@@ -22,6 +22,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherRetry;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -99,6 +100,10 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        return FetcherRetry.executeWithRateLimitRetry(() -> performSearchByIdOnce(identifier));
+    }
+
+    private Optional<BibEntry> performSearchByIdOnce(String identifier) throws FetcherException {
         DOI doi = DOI.parse(identifier)
                      .orElseThrow(() -> new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier)));
 
