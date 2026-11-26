@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where RIS import stored a book's ISBN in the ISSN field. [#17889](https://github.com/JabRef/jabref/issues/17889)
+
 ### Removed
 
 ## [6.0-beta.2] - 2026-11-24
@@ -206,7 +208,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where "Open folder(s)" did not select the file on Ubuntu and other Linux desktops. [#17885](https://github.com/JabRef/jabref/pull/17885)
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
-- We fixed an issue where RIS import stored a book's ISBN in the ISSN field. [#17889](https://github.com/JabRef/jabref/issues/17889)
 - We fixed an issue where the RIS importer overwrote the journal issue number (`IS`) with the accession number (`AN`). [#17817](https://github.com/JabRef/jabref/issues/17817)
 - We fixed LibreOffice/OpenOffice citations losing their normal, in-text, or invisible form when refreshed using CSL styles outside Zotero compatibility mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed citation page information being lost, misplaced, or not cleared when editing LibreOffice/OpenOffice citations or undoing citation edits. [#17673](https://github.com/JabRef/jabref/pull/17673)
