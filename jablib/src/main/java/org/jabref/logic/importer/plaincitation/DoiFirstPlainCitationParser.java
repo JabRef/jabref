@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /// For multiple citations, the parser runs first and every resulting entry carrying a DOI (in the DOI or URL field) is replaced by the fetched entry.
 /// If the lookup fails or finds nothing, the parsed entry is kept.
 ///
-/// [impl->req~import.plain-citation.doi-first~1]
+/// [impl->req~import.plain-citation.doi-first~2]
 @NullMarked
 public class DoiFirstPlainCitationParser implements PlainCitationParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFirstPlainCitationParser.class);
@@ -44,6 +44,13 @@ public class DoiFirstPlainCitationParser implements PlainCitationParser {
 
     @Override
     public List<BibEntry> parseMultiplePlainCitations(String text) throws FetcherException {
+        String trimmed = text.trim();
+        if (!trimmed.isEmpty() && trimmed.chars().noneMatch(Character::isWhitespace)) {
+            Optional<BibEntry> fetched = DOI.parse(trimmed).flatMap(this::fetch);
+            if (fetched.isPresent()) {
+                return List.of(fetched.orElseThrow());
+            }
+        }
         List<BibEntry> result = new ArrayList<>();
         for (BibEntry parsed : delegate.parseMultiplePlainCitations(text)) {
             result.add(parsed.getField(StandardField.DOI)

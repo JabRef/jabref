@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-// [utest->req~import.plain-citation.doi-first~1]
+// [utest->req~import.plain-citation.doi-first~2]
 class DoiFirstPlainCitationParserTest {
 
     private static final String CITATION = "Vendome C, Bavota G, Di Penta M, Linares-Vásquez M, German DM, Poshyvanyk D (2017) License usage and changes: A large-scale study on GitHub. Empirical Software Engineering 22(3):1537–1577. https://doi.org/10.1007/s10664-016-9438-4";
@@ -50,6 +50,22 @@ class DoiFirstPlainCitationParserTest {
 
         assertEquals(Optional.of(PARSED), parser.parsePlainCitation("no identifier here"));
         verifyNoInteractions(doiFetcher);
+    }
+
+    @Test
+    void standaloneDoiInBatchResolvesBeforeDelegate() throws FetcherException {
+        when(doiFetcher.performSearchById("10.1007/s10664-016-9438-4")).thenReturn(Optional.of(fetched));
+
+        assertEquals(List.of(fetched), parser.parseMultiplePlainCitations("10.1007/s10664-016-9438-4"));
+        verifyNoInteractions(delegate);
+    }
+
+    @Test
+    void standaloneDoiInBatchFallsBackWhenLookupFails() throws FetcherException {
+        when(doiFetcher.performSearchById(anyString())).thenThrow(new FetcherException("offline"));
+        when(delegate.parseMultiplePlainCitations("10.1007/s10664-016-9438-4")).thenReturn(List.of(PARSED));
+
+        assertEquals(List.of(PARSED), parser.parseMultiplePlainCitations("10.1007/s10664-016-9438-4"));
     }
 
     @Test
