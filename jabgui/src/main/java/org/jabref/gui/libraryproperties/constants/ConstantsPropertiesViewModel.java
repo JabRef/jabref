@@ -16,7 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
@@ -42,13 +42,13 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     private final UndoManager undoManager;
 
     private final DialogService dialogService;
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final NativeDesktop nativeDesktop;
 
-    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences, UndoManager undoManager) {
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, NativeDesktop nativeDesktop, UndoManager undoManager) {
         this.databaseContext = databaseContext;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.externalApplicationsPreferences = externalApplicationsPreferences;
+        this.nativeDesktop = nativeDesktop;
 
         ObservableList<ObservableValue<Boolean>> allValidProperty =
                 EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);
@@ -122,7 +122,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.STRING_EDITOR, dialogService, externalApplicationsPreferences).execute();
+        new HelpAction(HelpFile.STRING_EDITOR, dialogService, nativeDesktop).execute();
     }
 
     public ListProperty<ConstantsItemModel> stringsListProperty() {

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -36,7 +37,8 @@ class GitAutoSyncTest {
                 gitHandlerRegistry,
                 new CurrentThreadTaskExecutor(),
                 mock(GuiPreferences.class, RETURNS_DEEP_STUBS),
-                mock(StateManager.class));
+                mock(StateManager.class),
+                mock(NativeDesktop.class));
     }
 
     @Test

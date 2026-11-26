@@ -22,11 +22,13 @@ public class OpenUrlAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
-    public OpenUrlAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
+    public OpenUrlAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         BooleanExpression fieldIsSet = ActionHelper.isAnyFieldSetForSelectedEntry(
                 List.of(StandardField.URL, StandardField.DOI, StandardField.URI, StandardField.EPRINT),
@@ -71,9 +73,9 @@ public class OpenUrlAction extends SimpleCommand {
             if (link.isPresent()) {
                 try {
                     if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().shouldUseCustom()) {
-                        NativeDesktop.openCustomDoi(link.get(), preferences, dialogService);
+                        nativeDesktop.openCustomDoi(link.get(), dialogService);
                     } else {
-                        NativeDesktop.openExternalViewer(databaseContext, preferences, link.get(), field, dialogService, entry);
+                        nativeDesktop.openExternalViewer(databaseContext, link.get(), field, dialogService, entry);
                     }
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);

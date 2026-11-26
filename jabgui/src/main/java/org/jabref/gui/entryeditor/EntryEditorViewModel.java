@@ -22,6 +22,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.cleanup.CleanupSingleAction;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -52,6 +53,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
 
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -81,9 +83,11 @@ public class EntryEditorViewModel extends AbstractViewModel {
                                 DialogService dialogService,
                                 JournalAbbreviationRepository journalAbbreviationRepository,
                                 Supplier<LibraryTab> tabSupplier,
-                                EntryEditorTabFactory tabFactory) {
+                                EntryEditorTabFactory tabFactory,
+                                NativeDesktop nativeDesktop) {
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
@@ -253,7 +257,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
             GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
         }
-        new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, stateManager.getUndoManager(activeDatabaseContext()), stateManager)
+        new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, stateManager.getUndoManager(activeDatabaseContext()), stateManager, nativeDesktop)
                 .fetchAndMerge(entry, fetcher);
     }
 

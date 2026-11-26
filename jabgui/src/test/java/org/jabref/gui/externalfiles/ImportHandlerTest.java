@@ -22,6 +22,7 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -154,7 +155,8 @@ class ImportHandlerTest {
                 new JabRefUndoManager(),
                 mock(StateManager.class),
                 dialogService,
-                new CurrentThreadTaskExecutor());
+                new CurrentThreadTaskExecutor(),
+                mock(NativeDesktop.class));
 
         testEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2023")
@@ -317,7 +319,8 @@ class ImportHandlerTest {
                 new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor());
+                new CurrentThreadTaskExecutor(),
+                mock(NativeDesktop.class));
 
         List<BibEntry> bibEntries = importHandler.handleBibTeXData("""
                 @InProceedings{Wen2013,
@@ -388,7 +391,8 @@ class ImportHandlerTest {
                 new JabRefUndoManager(),
                 stateManager,
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor());
+                new CurrentThreadTaskExecutor(),
+                mock(NativeDesktop.class));
 
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, realContext, 1);
         handler.importEntriesWithDuplicateCheck(null, List.of(testEntry), tracker);
@@ -427,7 +431,8 @@ class ImportHandlerTest {
                 new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor()));
+                new CurrentThreadTaskExecutor(),
+                mock(NativeDesktop.class)));
         // Mock the behavior of getDuplicateDecision to return KEEP_RIGHT
         Mockito.doReturn(CompletableFuture.completedFuture(decisionResult)).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
@@ -458,7 +463,8 @@ class ImportHandlerTest {
                 new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor()));
+                new CurrentThreadTaskExecutor(),
+                mock(NativeDesktop.class)));
         // Mock the behavior of getDuplicateDecision to return KEEP_BOTH
         Mockito.doReturn(CompletableFuture.completedFuture(decisionResult)).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
@@ -492,7 +498,8 @@ class ImportHandlerTest {
                 new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                new CurrentThreadTaskExecutor()));
+                new CurrentThreadTaskExecutor(),
+                mock(NativeDesktop.class)));
         // Mock the behavior of getDuplicateDecision to return KEEP_MERGE
         Mockito.doReturn(CompletableFuture.completedFuture(decisionResult)).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
@@ -1277,6 +1284,7 @@ class ImportHandlerTest {
                 journal,
                 stateManager,
                 dialogService,
-                executor);
+                executor,
+                mock(NativeDesktop.class));
     }
 }
