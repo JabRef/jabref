@@ -1,7 +1,9 @@
 package org.jabref.gui.preferences.forms;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -166,12 +168,8 @@ final class SettingTile extends VBox {
     /// Whether the click went to a control itself. The controls' row stretches up to the switch, so
     /// a click on its empty part is a click on the tile and toggles it.
     private boolean hitsControls(MouseEvent event) {
-        for (Node node = event.getPickResult().getIntersectedNode(); node != null; node = node.getParent()) {
-            if (node == control || node.getParent() == controls) {
-                return true;
-            }
-        }
-        return false;
+        return Stream.iterate(event.getPickResult().getIntersectedNode(), Objects::nonNull, Node::getParent)
+                     .anyMatch(node -> node == control || node.getParent() == controls);
     }
 
     private void followControl(Label caption) {
