@@ -33,7 +33,7 @@ class BstPreviewLayoutTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development");
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. Thoughts on development.", preview);
+        assertEquals("O.&nbsp;Kopp. Thoughts on development.", preview);
     }
 
     @Test
@@ -43,7 +43,7 @@ class BstPreviewLayoutTest {
                 .withField(StandardField.AUTHOR, "Jane Doe")
                 .withField(StandardField.TITLE, "Characterization of $\\alpha$");
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("J.\u00a0Doe. Characterization of α.", preview);
+        assertEquals("J.&nbsp;Doe. Characterization of &alpha;.", preview);
     }
 
     @Test
@@ -53,21 +53,21 @@ class BstPreviewLayoutTest {
                                        .withField(StandardField.TITLE, "Thoughts on Development")
                                        .withField(StandardField.MONTH, "#May#");
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. Thoughts on development, May.", preview);
+        assertEquals("O.&nbsp;Kopp. Thoughts on development, May.", preview);
     }
 
     @Test
     void generatePreviewForSliceTheoremPaperUsingAbbr() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
-        assertEquals("T.\u00a0Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. May 2014.", preview);
+        assertEquals("T.&nbsp;Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. May 2014.", preview);
     }
 
     @Test
     void generatePreviewForSliceTheoremPaperUsingIEEE() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
-        assertEquals("T.\u00a0Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);
+        assertEquals("T.&nbsp;Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);
     }
 
     @Test
@@ -76,7 +76,7 @@ class BstPreviewLayoutTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "{{$\\Sigma$}}{{$\\Delta$}} Modulator");
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. \u03a3\u0394 modulator.", preview);
+        assertEquals("O.&nbsp;Kopp. \u03a3\u0394 modulator.", preview);
     }
 
     @ParameterizedTest
@@ -93,23 +93,42 @@ class BstPreviewLayoutTest {
         return Stream.of(
 
                 // Small-caps forms that should be preserved in the preview output
-                Arguments.of("\\textsc{L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
-                Arguments.of("{\\sc L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
-                Arguments.of("\\textsc{Outer \\textsc{inner} text}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">Outer inner text.</span>"),
+                Arguments.of("\\textsc{L{\\'o}pez}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">L&oacute;pez.</span>"),
+                Arguments.of("{\\sc L{\\'o}pez}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">L&oacute;pez.</span>"),
+                Arguments.of("\\textsc{Outer \\textsc{inner} text}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">Outer <span style=\"font-variant: small-caps\">inner</span> text.</span>"),
 
                 // Parser edge cases that should still keep the surrounding small-caps span intact
-                Arguments.of("\\textsc {L{\\'o}pez}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">López.</span>"),
-                Arguments.of("\\textsc{A\\{B\\}C}", "O.\u00a0Kopp. <span style=\"font-variant: small-caps\">ABC.</span>"),
-                Arguments.of("{\\scshape Lopez}", "O.\u00a0Kopp. Lopez."),
+                Arguments.of("\\textsc {L{\\'o}pez}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">L&oacute;pez.</span>"),
+                Arguments.of("\\textsc{A\\{B\\}C}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">ABC.</span>"),
+                Arguments.of("{\\scshape Lopez}", "O.&nbsp;Kopp. <span style=\"font-variant: small-caps\">Lopez.</span>"),
 
                 // Malformed input should fall back to the existing preview pipeline without failing
-                Arguments.of("\\textsc{L{\\'o}pez", "O.\u00a0Kopp. López."),
-                Arguments.of("{\\sc L{\\'o}pez", "O.\u00a0Kopp. lópez."),
+                Arguments.of("\\textsc{L{\\'o}pez", "O.&nbsp;Kopp. López."),
+                Arguments.of("{\\sc L{\\'o}pez", "O.&nbsp;Kopp. lópez."),
 
-                // Existing superscript and subscript rendering should remain unchanged
-                Arguments.of("Proceedings of the 9\\textsuperscript{th} symposium", "O.\u00a0Kopp. Proceedings of the 9ᵗʰ symposium."),
-                Arguments.of("{H\\textsubscript{2}O}", "O.\u00a0Kopp. H₂O.")
+                // Emphasis becomes HTML, not Unicode mathematical italic or bold letters
+                // abbrv lowercases titles, as BibTeX does inside {\\em ...}
+                Arguments.of("On {\\em Drosophila} genetics", "O.&nbsp;Kopp. On <em>drosophila</em> genetics."),
+                Arguments.of("On \\emph{Drosophila} genetics", "O.&nbsp;Kopp. On <em>Drosophila</em> genetics."),
+                Arguments.of("On \\textit{Drosophila} genetics", "O.&nbsp;Kopp. On <i>Drosophila</i> genetics."),
+                Arguments.of("On \\textbf{Drosophila} genetics", "O.&nbsp;Kopp. On <b>Drosophila</b> genetics."),
+
+                // Superscript and subscript become HTML
+                Arguments.of("Proceedings of the 9\\textsuperscript{th} symposium", "O.&nbsp;Kopp. Proceedings of the 9<sup>th</sup> symposium."),
+                Arguments.of("{H\\textsubscript{2}O}", "O.&nbsp;Kopp. H<sub>2</sub>O.")
         );
+    }
+
+    @Test
+    void journalEmphasizedByBstIsRenderedItalic() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Karen A. Cooper")
+                .withField(StandardField.TITLE, "Cocoa and health: a decade of research")
+                .withField(StandardField.JOURNAL, "British Journal of Nutrition")
+                .withField(StandardField.YEAR, "2007");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("K.&nbsp;A. Cooper. Cocoa and health: a decade of research. <em>British Journal of Nutrition</em>, 2007.", preview);
     }
 
     @Test
@@ -118,7 +137,7 @@ class BstPreviewLayoutTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "{{$\\notacommand$}} Modulator");
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        assertEquals("O.\u00a0Kopp. modulator.", preview);
+        assertEquals("O.&nbsp;Kopp. notacommand modulator.", preview);
     }
 
     @Test
@@ -151,7 +170,7 @@ class BstPreviewLayoutTest {
 
         String preview = bstPreviewLayout.generatePreview(book, context);
 
-        assertEquals("D.\u00a0E. Knuth. 𝑇ℎ𝑒 𝐵𝑜𝑜𝑘. Number\u00a01 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
+        assertEquals("D.&nbsp;E. Knuth. <em>The TeX Book.</em> Number&nbsp;1 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
     }
 
     @Test
@@ -175,7 +194,7 @@ class BstPreviewLayoutTest {
 
         String preview = bstPreviewLayout.generatePreview(book, context);
 
-        assertEquals("D.\u00a0E. Knuth. 𝑇ℎ𝑒 𝐵𝑜𝑜𝑘. Number\u00a01 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
+        assertEquals("D.&nbsp;E. Knuth. <em>The TeX Book.</em> Number&nbsp;1 in Computers and Typesetting. Addison-Wesley, Reading, MA, 1984.", preview);
     }
 
     private static BibEntry getSliceTheoremPaper() {
