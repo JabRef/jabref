@@ -62,7 +62,13 @@ class FileNameCleanerTest {
             "outside, ' /outside'",
             // only whole segments are dropped
             "..Desktop, ../..Desktop",
-            "draft./2026, draft./2026"
+            "draft./2026, draft./2026",
+            // valid on Unix, must stay
+            "'...', '...'",
+            "a/.../b, a/.../b",
+            "a/..../b, a/..../b",
+            "'a/ /b', 'a/ /b'",
+            "'a/ ../b', 'a/ ../b'",
     })
     void cleanDirectoryNameRemovesTraversal(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));

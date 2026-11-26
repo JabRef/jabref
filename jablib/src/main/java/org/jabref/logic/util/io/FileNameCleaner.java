@@ -9,8 +9,9 @@ import java.util.regex.Pattern;
 /// Regarding the maximum length, see [FileUtil#getValidFileName(String)]
 public class FileNameCleaner {
 
-    /// Matches a '.' or '..' path segment (including Windows forms like ".. " and ".. ."),
-    private static final Pattern DOT_SEGMENT = Pattern.compile("(?<![^/\\\\])[. ]+(?:[/\\\\]+|$)");
+    /// Matches a "." or ".." path segment. Also Windows forms like ".. " and ".. .",
+    /// which Windows resolves to "..". Does not match "..." or space-only names (valid on Unix).
+    private static final Pattern DOT_SEGMENT = Pattern.compile("(?<![^/\\\\])\\.{1,2}(?: +[ .]*)?(?:[/\\\\]+|$)");
 
     /// Matches separators at the start of the path (e.g. leading '/' or '\\').
     private static final Pattern LEADING_SEPARATORS = Pattern.compile("^[/\\\\]+");
