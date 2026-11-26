@@ -72,4 +72,17 @@ class FileNameCleanerTest {
     void cleanDirectoryNameDropsLeadingRoot() {
         assertEquals("foo/bar", FileNameCleaner.cleanDirectoryName("/foo/bar"));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Desktop, ../../../../Desktop",
+            "a/b, a/../b",
+            "a\\b, a\\..\\b",
+            "outside, /outside",
+            "..Desktop, ../..Desktop",
+            "draft./2026, draft./2026"
+    })
+    void cleanDirectoryNameRemovesTraversal(String expected, String input) {
+        assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
+    }
 }
