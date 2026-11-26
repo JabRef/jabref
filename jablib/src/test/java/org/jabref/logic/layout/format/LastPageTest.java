@@ -36,7 +36,9 @@ class LastPageTest {
                 Arguments.of("", "   "),
                 Arguments.of("350", "\u00A0345-350"),
                 Arguments.of("350", "345\u00A0-\u00A0350"),
-                Arguments.of("350", "\u00A0 \u00A0345 \u00A0-\u00A0 350")
+                Arguments.of("350", "\u00A0 \u00A0345 \u00A0-\u00A0 350"),
+                Arguments.of("350", "\u202F345-350"),
+                Arguments.of("350", "pp. 345-350")
         );
     }
 }

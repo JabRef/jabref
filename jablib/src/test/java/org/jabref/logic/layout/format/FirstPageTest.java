@@ -34,7 +34,9 @@ class FirstPageTest {
                 Arguments.of("345", " 345"),
                 Arguments.of("", "   "),
                 Arguments.of("345", "\u00A0345-350"),
-                Arguments.of("345", "\u00A0 \u00A0345 \u00A0-\u00A0 350")
+                Arguments.of("345", "\u00A0 \u00A0345 \u00A0-\u00A0 350"),
+                Arguments.of("345", "\u202F345-350"),
+                Arguments.of("345", "pp. 345-350")
         );
     }
 }

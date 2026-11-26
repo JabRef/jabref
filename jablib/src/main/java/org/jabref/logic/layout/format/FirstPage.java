@@ -1,5 +1,7 @@
 package org.jabref.logic.layout.format;
 
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import org.jabref.logic.journals.ltwa.NormalizeUtils;
 import org.jabref.logic.layout.LayoutFormatter;
 
 /// Formatter that returns the first page from the "pages" field, if set.
@@ -10,17 +12,20 @@ import org.jabref.logic.layout.LayoutFormatter;
 /// returns "345".
 public class FirstPage implements LayoutFormatter {
 
+    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
+
     @Override
     public String format(String s) {
         if (s == null) {
             return "";
         }
-        String strippedPages = s.replace('\u00A0', ' ').strip();
-        String[] pageParts = strippedPages.split("[ \\-\u2013\u2014]+");
+        String normalizedPages = NormalizeUtils.toNFKC(s).orElse("");
+        String formattedPages = formatter.format(normalizedPages);
+        String[] pageParts = formattedPages.split("[ \\-\u2013\u2014]+");
         if (pageParts.length == 2) {
             return pageParts[0];
         } else {
-            return strippedPages;
+            return formattedPages;
         }
     }
 }
