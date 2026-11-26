@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -169,6 +170,8 @@ public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporte
             doi = doi.replace(" ", "");
             result.setField(StandardField.DOI, doi);
             reference = reference.substring(0, pos).trim();
+        } else {
+            DOI.findInText(originalReference).ifPresent(doi -> result.setField(StandardField.DOI, doi.asString()));
         }
 
         reference = updateEntryAndReferenceIfMatches(reference, PAGES, result, StandardField.PAGES).newReference;

@@ -51,6 +51,7 @@ public class DoiFirstPlainCitationParser implements PlainCitationParser {
                              // Some parsers keep a doi.org link in the URL field only
                              .or(() -> parsed.getField(StandardField.URL).flatMap(DOI::findInText))
                              .flatMap(this::fetch)
+                             .map(fetched -> retainParsedInformation(fetched, parsed))
                              .orElse(parsed));
         }
         return result;
@@ -58,10 +59,26 @@ public class DoiFirstPlainCitationParser implements PlainCitationParser {
 
     private Optional<BibEntry> fetch(DOI doi) {
         try {
-            return doiFetcher.performSearchById(doi.asString());
+            return doiFetcher.performSearchById(doi.asString())
+                             .map(entry -> {
+                                 if (!entry.hasField(StandardField.DOI)) {
+                                     entry.setField(StandardField.DOI, doi.asString());
+                                 }
+                                 return entry;
+                             });
         } catch (FetcherException e) {
             LOGGER.info("Could not fetch entry for DOI {}, falling back to plain-citation parsing", doi.asString(), e);
             return Optional.empty();
         }
+    }
+
+    private BibEntry retainParsedInformation(BibEntry fetched, BibEntry parsed) {
+        if (fetched.getCitationKey().isEmpty()) {
+            parsed.getCitationKey().ifPresent(fetched::setCitationKey);
+        }
+        parsed.getFields().stream()
+              .filter(field -> !fetched.hasField(field))
+              .forEach(field -> parsed.getField(field).ifPresent(value -> fetched.setField(field, value)));
+        return fetched;
     }
 }
