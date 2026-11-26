@@ -8,6 +8,7 @@ import java.util.function.BooleanSupplier;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
@@ -44,6 +45,7 @@ public class GitAutoSync {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitAutoSync.class);
 
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences guiPreferences;
@@ -53,8 +55,10 @@ public class GitAutoSync {
                        GitHandlerRegistry gitHandlerRegistry,
                        TaskExecutor taskExecutor,
                        GuiPreferences guiPreferences,
-                       StateManager stateManager) {
+                       StateManager stateManager,
+                       NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.taskExecutor = taskExecutor;
         this.guiPreferences = guiPreferences;
@@ -117,7 +121,7 @@ public class GitAutoSync {
                 return;
             }
             List<BibEntry> resolved = new GuiGitConflictResolverStrategy(
-                    new GitConflictResolverDialog(dialogService, guiPreferences, stateManager)).resolveConflicts(conflicts);
+                    new GitConflictResolverDialog(dialogService, guiPreferences, stateManager, nativeDesktop)).resolveConflicts(conflicts);
             if (resolved.isEmpty()) {
                 dialogService.notify(Localization.lang("Pull canceled."));
                 return;

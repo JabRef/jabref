@@ -179,4 +179,13 @@ This group-edit undo contract does not cover raw applied-style property writes i
 
 Needs: impl, utest
 
+## JStyle output must preserve supported nested LaTeX formatting in field content
+`req~openoffice.jstyle-nested-latex-formatting~1`
+
+Supported formatting commands remain effective inside enclosing formatting commands and protection groups.
+For example, `\textit{British \textbf{Journal} of Nutrition}` produces italic text with a bold journal name.
+Protection braces are omitted from displayed text; escaped literal braces remain visible.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

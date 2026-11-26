@@ -15,6 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveDatabaseMode;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveResult;
@@ -79,7 +80,8 @@ class GitCommitActionTest {
                 mock(BibEntryTypesManager.class),
                 mock(JournalAbbreviationRepository.class),
                 new CurrentThreadTaskExecutor(),
-                new GitHandlerRegistry(mock(GitPreferences.class)));
+                new GitHandlerRegistry(mock(GitPreferences.class)),
+                mock(NativeDesktop.class));
     }
 
     @Test
@@ -258,7 +260,8 @@ class GitCommitActionTest {
                 mock(BibEntryTypesManager.class),
                 mock(JournalAbbreviationRepository.class),
                 new CurrentThreadTaskExecutor(),
-                new GitHandlerRegistry(mock(GitPreferences.class))).execute();
+                new GitHandlerRegistry(mock(GitPreferences.class)),
+                mock(NativeDesktop.class)).execute();
     }
 
     private void clickButton(String label) {

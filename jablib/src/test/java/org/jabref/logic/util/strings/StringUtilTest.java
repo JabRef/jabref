@@ -188,6 +188,8 @@ class StringUtilTest {
             '',      'A closed mouth catches no }flies}',     25, false
             # Get the word from the end of the sentence
             bite,    'Barking dogs seldom bite',              19, true
+            # Escaped braces do not end the group
+            'A\\{B\\}C', '{A\\{B\\}C} D',                         0,  true
             """)
     void getPart(String expected, String input, int startIndex, boolean forward) {
         assertEquals(expected, StringUtil.getPart(input, startIndex, forward));

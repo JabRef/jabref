@@ -21,16 +21,18 @@ import com.tobiasdiez.easybind.EasyBind;
 public class UrlEditorViewModel extends AbstractEditorViewModel {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final BooleanProperty validUrlIsNotPresent = new SimpleBooleanProperty(true);
 
     public UrlEditorViewModel(Field field,
                               SuggestionProvider<?> suggestionProvider,
                               DialogService dialogService,
                               GuiPreferences preferences,
-                              FieldCheckers fieldCheckers, UndoManager undoManager) {
+                              FieldCheckers fieldCheckers, UndoManager undoManager, NativeDesktop nativeDesktop) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         validUrlIsNotPresent.bind(
                 EasyBind.map(text, input -> StringUtil.isBlank(input) || !URLUtil.isURL(input))
@@ -51,7 +53,7 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
         }
 
         try {
-            NativeDesktop.openBrowser(text.get(), preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openBrowser(text.get());
         } catch (IOException _) {
             dialogService.notify(Localization.lang("Unable to open link."));
         }

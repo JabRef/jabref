@@ -52,6 +52,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -97,6 +98,7 @@ public class GroupTreeView extends BorderPane {
     private final DialogService dialogService;
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
@@ -125,7 +127,8 @@ public class GroupTreeView extends BorderPane {
                          DialogService dialogService,
                          AiService aiService,
                          FileUpdateMonitor fileUpdateMonitor,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         NativeDesktop nativeDesktop) {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
@@ -133,6 +136,7 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
@@ -461,7 +465,8 @@ public class GroupTreeView extends BorderPane {
                     stateManager.getUndoManager(database),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    nativeDesktop);
             List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
             importHandler.importDroppedFiles(files, event.getTransferMode());

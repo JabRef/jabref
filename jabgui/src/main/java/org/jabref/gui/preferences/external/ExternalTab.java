@@ -88,7 +88,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         citeHelp.setPrefSize(20.0, 20.0);
         new ActionFactory().configureIconButton(
                 StandardActions.HELP_PUSH_TO_APPLICATION,
-                new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferences.getExternalApplicationsPreferences()),
+                new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, nativeDesktop),
                 citeHelp);
         Button resetCite = ControlHelper.narrowIconButton(IconTheme.JabRefIcons.REFRESH, Localization.lang("Reset to default"), viewModel::resetCiteCommandToDefault);
 
