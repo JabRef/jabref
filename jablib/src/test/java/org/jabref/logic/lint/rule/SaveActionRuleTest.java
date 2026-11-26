@@ -75,6 +75,14 @@ class SaveActionRuleTest {
         assertEquals("\"to be removed\", should be removed", clearNote.scan(entry).getFirst().message());
     }
 
+    /// A Save Action formats values that are there, but a change does not have to have an old value.
+    @Test
+    void theMessageOfAChangeWithoutAnOldValueReportsItAsEmpty() {
+        FieldChange change = new FieldChange(new BibEntry(StandardEntryType.Article), StandardField.PAGES, null, "21--45");
+
+        assertEquals("\"\", should be \"21--45\"", normalizePages.message(change));
+    }
+
     /// A URL may well hold what looks like a placeholder of the message.
     @Test
     void aValueThatLooksLikeAPlaceholderIsReportedAsItStands() {

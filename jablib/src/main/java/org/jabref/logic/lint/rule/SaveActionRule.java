@@ -51,10 +51,13 @@ public class SaveActionRule extends CleanupRule {
     }
 
     /// The value as it stands and what the Save Action makes of it, both cut short: a field value
-    /// can be as long as an abstract, while a finding is one line.
+    /// can be as long as an abstract, while a finding is one line. A field without a value is
+    /// reported as empty.
     @Override
     protected String message(FieldChange change) {
-        String oldValue = StringUtil.limitStringLength(change.oldValue(), MAX_REPORTED_VALUE_LENGTH);
+        String oldValue = Optional.ofNullable(change.oldValue())
+                                  .map(value -> StringUtil.limitStringLength(value, MAX_REPORTED_VALUE_LENGTH))
+                                  .orElse("");
         return Optional.ofNullable(change.newValue())
                        .map(newValue -> Localization.lang("\"%0\", should be \"%1\"", oldValue, StringUtil.limitStringLength(newValue, MAX_REPORTED_VALUE_LENGTH)))
                        .orElse(Localization.lang("\"%0\", should be removed", oldValue));
