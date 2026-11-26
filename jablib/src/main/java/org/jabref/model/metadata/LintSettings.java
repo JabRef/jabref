@@ -142,7 +142,7 @@ public record LintSettings(Optional<String> mode,
                     .filter(named -> ruleId.equals(named.getKey().ruleId())
                             && named.getKey().coversEveryField())
                     .map(named -> named.getValue().mode())
-                    .reduce((earlier, later) -> later);
+                    .reduce((_, later) -> later);
     }
 
     /// Whether any selector lets this rule do anything, on any field.

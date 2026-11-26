@@ -161,7 +161,7 @@ A value the rule cannot read is a usage error, like a misspelled id, and so is o
 A library that only has Save Actions needs no option at all: `jabkit fix` applies them, and nothing moves them unless `--save-config` is given.
 
 Findings are written one per line, in the `file:line:column:citationKey[:field]: message [rule-id]` format the `check` commands use, so an editor or a CI log scraper can jump to the place at fault.
-Where that place is comes from the `ParserResult` of the file the library was read from, through `ErrorFormat`, which the integrity and consistency checks report through as well.
+Where that place is comes from the `ParserResult` of the file the library was read from, as it does for the integrity and consistency checks.
 
 ## Goal
 

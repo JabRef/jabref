@@ -103,18 +103,16 @@ are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
 
-## Linting and formatting a library
+## JabKit fix must apply the lint rules enabled for a library
 `req~jabkit.cli.jabfix~1`
 
-`jabkit fix` checks a library against a set of rules and rewrites it to follow them.
-Each finding says where it is and names the rule that reported it by a stable id.
-Formatting applies exactly the repairs that `--check` reports, and `--check` exits with 1 if the library would change.
-A rule runs only where a mode or a rule setting enables it, from the library's metadata or from the command line; when nothing is enabled, the command warns.
-`--mode` takes the place of the library's mode, and `--rule RULE=MODE` sets how far a rule goes (`off`, `check` or `fix`), as `rule` or `field:rule`, outranking what the library says about that rule.
-A rule that takes values is given them after its mode, as `--rule RULE=MODE:NAME=VALUE`; a value the command line does not state stays what the library says.
-A rule the command line does not name goes on doing what the library says, and a rule setting outranks a mode wherever either comes from.
-None of the options changes what the library says about itself, unless `--save-config` stores them there; storing them moves the library's save actions into its stored configuration as well and drops the old metadata item, leaving what `jabkit fix` applies unchanged.
-An id that names no rule, or no mode, is a usage error, and so is a value the rule cannot read.
+`jabkit fix` reports what the enabled rules find and repairs it where a rule is set to `fix`.
+With `--check`, it writes nothing and exits with 1 unless the library is clean.
+Formatting applies exactly the repairs that `--check` reports, and each finding names the rule that reported it.
+Rules are enabled in the library's metadata, by a mode or per rule; when no rule is enabled, the command warns.
+`--mode` and `--rule RULE=MODE[:NAME=VALUE]` override the library's configuration for one run.
+`--save-config` stores them in the library instead, and moves the library's save actions into the same configuration.
+An unknown rule, mode, or rule value is a usage error.
 
 Needs: impl
 

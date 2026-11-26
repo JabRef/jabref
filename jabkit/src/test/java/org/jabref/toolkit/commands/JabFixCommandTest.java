@@ -374,8 +374,10 @@ class JabFixCommandTest extends AbstractJabKitTest {
 
         assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", "--rule", "entry-brackets=check", library.toString()));
 
-        String findings = commandLine.getStandardOutput();
-        assertTrue(findings.contains("entry is enclosed in parentheses instead of braces [entry-brackets]"), findings);
+        // About the entry as a whole, so the line names no field and points at the line of the citation key.
+        assertEquals(List.of(library + ":1:0:key: entry is enclosed in parentheses instead of braces [entry-brackets]"),
+                commandLine.getStandardOutput().replace("\r\n", "\n").lines()
+                           .filter(line -> line.contains("[")).toList());
     }
 
     /// A formatter run writes every entry anew, so it has to write the bracket the library names,

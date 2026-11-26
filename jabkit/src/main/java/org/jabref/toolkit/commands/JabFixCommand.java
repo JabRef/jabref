@@ -26,7 +26,6 @@ import org.jabref.logic.lint.JabFixMode;
 import org.jabref.logic.lint.rule.Finding;
 import org.jabref.logic.lint.rule.RuleSet;
 import org.jabref.logic.lint.rule.UnknownRuleException;
-import org.jabref.logic.util.ErrorFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
@@ -35,7 +34,6 @@ import org.jabref.model.metadata.RuleSelector;
 import org.jabref.model.metadata.RuleSettings;
 import org.jabref.toolkit.converter.JabFixModeConverter;
 import org.jabref.toolkit.exception.CliException;
-import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
 
 import org.jspecify.annotations.NullMarked;
@@ -49,7 +47,7 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
-/// Thin CLI wrapper around [JabFix]; the rules and the formatting live in the `org.jabref.logic.lint` package.
+/// Thin CLI wrapper around JabFix; the rules and the formatting live in the `org.jabref.logic.lint` package.
 ///
 /// Exit codes follow the other checking commands: 0 = nothing to do, 1 = the library is not clean
 /// (`--check` only), 2/3 = error.
@@ -90,7 +88,7 @@ class JabFixCommand implements Callable<Integer> {
 
     // [impl->req~jabkit.cli.jabfix~1]
     @Override
-    public Integer call() throws ImportServiceException, CliException {
+    public Integer call() throws CliException {
         if (inPlace && checkOnly) {
             throw new CliException("--in-place and --check are mutually exclusive",
                     Localization.lang("Only one of --in-place and --check can be given."),
@@ -138,6 +136,7 @@ class JabFixCommand implements Callable<Integer> {
             System.out.flush();
             return CommandLine.ExitCode.OK;
         } catch (IOException e) {
+            LOGGER.error("Unable to write the formatted library", e);
             System.err.println(Localization.lang("Unable to write to %0.", inPlace ? inputFile : "stdout"));
             return CommandLine.ExitCode.SOFTWARE;
         }
@@ -298,12 +297,17 @@ class JabFixCommand implements Callable<Integer> {
     // [impl->req~jabkit.cli.check-errorformat-output~1]
     private void report(Path inputFile, List<Finding> findings, ParserResult parserResult, PrintStream target) {
         for (Finding finding : findings) {
-            target.println(ErrorFormat.line(
-                    inputFile,
-                    rangeOf(finding, parserResult),
-                    finding.citationKey(),
-                    finding.field(),
-                    "%s [%s]".formatted(finding.message(), finding.rule().id())));
+            ParserResult.Range range = rangeOf(finding, parserResult);
+            String location = finding.field()
+                                     .map(field -> finding.citationKey() + ":" + field.getName())
+                                     .orElse(finding.citationKey());
+            target.printf(
+                    "%s:%d:%d:%s: %s [%s]%n", inputFile,
+                    range.startLine(),
+                    range.startColumn(),
+                    location,
+                    finding.message(),
+                    finding.rule().id());
         }
     }
 

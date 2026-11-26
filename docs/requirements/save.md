@@ -93,26 +93,25 @@ When the autosave manager is shut down, its periodic task must stop and pending 
 
 Needs: impl, utest
 
-## A save can apply lint rules instead of its own cleanups
+## Library save must apply the library's lint rules instead of its own cleanups
 `req~logic.exporter.lint-on-save~1`
 
-A library may ask, in its metadata, for lint rules to be applied when it is saved. The save then applies them to its entries and reports what each rule found, instead of applying the library's Save Actions and its whitespace cleanup itself.
-The library names a mode, a set of rules JabFix ships, and says per rule how far it goes: reporting only, or reporting and repairing; what it says about a rule outranks its mode. A rule that only reports leaves the value as it is, and its findings say that they carry no repair.
-The library's Save Actions are rules of its own as long as it has its `saveActions` metadata item, ranking right below the rules of its lint metadata, so that configuring the library, which moves the item into that metadata, leaves a save applying exactly what it applied before.
-A rule that neither the mode nor the rules enable does not run.
-An id naming no rule of this JabRef is passed over, so that a library configured by a newer version still saves.
-Citation keys are still generated and journals abbreviated as before, so that configuring a library does not switch off what its other users rely on. A formatter run, such as `jabkit fix`, does neither, because it changes nothing that no rule reported.
-What a rule repaired is reported as a field change, like a Save Action's, so that it can be undone.
-A library that asks for no rules is saved as before.
+When a library's metadata enables lint rules, saving the library applies them to its entries and reports what each rule found, instead of applying the save actions and the whitespace cleanup itself.
+Each rule only reports, or reports and repairs, as the library configures it; a rule that is not enabled does not run.
+While the library still has its `saveActions` metadata item, its save actions are applied as rules as well.
+A rule id that this version does not know is skipped, so that a library configured by a newer version still saves.
+Repairs are recorded as field changes, so that they can be undone.
+Citation keys are still generated and journals abbreviated, except in a formatter run such as `jabkit fix`.
+A library that enables no rules is saved as before.
 
 Needs: impl, utest
 
-## A save encloses entries in the bracket the library names
+## Library save must enclose entries in the bracket the library configures
 `req~logic.exporter.entry-bracket~1`
 
-A library may name, through the `entry-brackets` rule, whether its entries are enclosed in braces or in parentheses.
-Wherever that rule runs, a save encloses an entry it writes anew in that bracket, so that a library following what it asks for is left unchanged by a save and by a formatter run.
-A library that names no bracket has its entries written in braces, as before.
+The `entry-brackets` rule configures whether entries are enclosed in braces or in parentheses.
+While that rule runs, a save encloses every entry it writes anew in that bracket, so that a library following its configuration is left unchanged by a save and by `jabkit fix`.
+Otherwise, entries are written in braces, as before.
 
 Needs: impl, utest
 
