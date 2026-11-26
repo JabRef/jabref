@@ -41,7 +41,7 @@ class RISImporterTest {
                 """);
 
         assertEquals(StandardEntryType.Book, entry.getType());
-        assertEquals(Optional.of("ISBN 978-3-932869-19-8"), entry.getField(StandardField.ISBN));
+        assertEquals(Optional.of("978-3-932869-19-8"), entry.getField(StandardField.ISBN));
         assertEquals(Optional.empty(), entry.getField(StandardField.ISSN));
     }
 
@@ -57,6 +57,18 @@ class RISImporterTest {
         assertEquals(StandardEntryType.InCollection, entry.getType());
         assertEquals(Optional.of("978-1-4822-5326-9"), entry.getField(StandardField.ISBN));
         assertEquals(Optional.empty(), entry.getField(StandardField.ISSN));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"BOOK, isbn: 978-3-932869-19-8", "CHAP, IsSn : 978-3-932869-19-8"})
+    void serialNumberLabelsAreRemovedFromBooksAndChapters(String risType, String serialNumber) throws IOException {
+        BibEntry entry = importOne("""
+                TY  - %s
+                SN  - %s
+                ER  -
+                """.formatted(risType, serialNumber));
+
+        assertEquals(Optional.of("978-3-932869-19-8"), entry.getField(StandardField.ISBN));
     }
 
     @Test
