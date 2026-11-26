@@ -54,7 +54,7 @@ Constraints for both:
 
 * Available only if the HTTP server and the AI features are enabled.
 * A search triggers the ingestion of the linked files which are not yet ingested. It does not wait for it, since ingestion can take minutes: the response contains the results from what is ingested and reports the linked files which are still pending.
-* The MCP server offers a small, fixed set of tools (semantic search, library search, get entry) and uses the official [MCP Java SDK](https://modelcontextprotocol.io/sdk/java/mcp-server). This is the answer to the context-window concern of issue 1164: the cost grows with number and size of the tool definitions, so the set is kept small.
+* The MCP server offers a small, fixed set of tools (semantic search, library search, get entry) and uses the official [MCP Java SDK](https://github.com/modelcontextprotocol/java-sdk). This is the answer to the context-window concern of issue 1164: the cost grows with number and size of the tool definitions, so the set is kept small.
 * MCP is spoken over HTTP inside the running GUI, not over stdio.
 
 ### Consequences
