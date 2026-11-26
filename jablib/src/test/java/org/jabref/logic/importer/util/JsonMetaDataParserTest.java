@@ -18,7 +18,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ResourceLock("Localization.lang")
 class JsonMetaDataParserTest {
@@ -27,20 +29,16 @@ class JsonMetaDataParserTest {
     /// with, rather than with the parts this one happens to understand.
     @Test
     void aKeyThisJabRefDoesNotModelIsKeptAsItStands() throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
-                {"somethingElse": {"a": [1, 2]}}"""));
+        MetaData metaData = metaDataOf("""
+                {"somethingElse": {"a": [1, 2]}}""");
 
         assertEquals(Map.of("somethingElse", "{\"a\":[1,2]}"), metaData.getUnknownJsonMetaData());
     }
 
     @Test
     void theKeysKeepTheOrderTheFileHadThem() throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
-                {"zeta": 1, "alpha": 2}"""));
+        MetaData metaData = metaDataOf("""
+                {"zeta": 1, "alpha": 2}""");
 
         assertEquals(List.of("zeta", "alpha"), List.copyOf(metaData.getUnknownJsonMetaData().keySet()));
     }
@@ -49,10 +47,8 @@ class JsonMetaDataParserTest {
     /// whole library.
     @Test
     void aRuleKeyWithAPipeIsKeptAsAnUnreadRule() throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
-                {"formatting": {"rules": {"title|booktitle:lower-case": "fix"}}}"""));
+        MetaData metaData = metaDataOf("""
+                {"formatting": {"rules": {"title|booktitle:lower-case": "fix"}}}""");
 
         assertEquals(Map.of("title|booktitle:lower-case", "\"fix\""),
                 metaData.getFormatting().orElseThrow().unreadRules());
@@ -60,10 +56,8 @@ class JsonMetaDataParserTest {
 
     @Test
     void theModeIsRead() throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
-                {"formatting": {"mode": "whitespace"}}"""));
+        MetaData metaData = metaDataOf("""
+                {"formatting": {"mode": "whitespace"}}""");
 
         assertEquals(Optional.of("whitespace"), metaData.getFormatting().orElseThrow().mode());
     }
@@ -71,20 +65,16 @@ class JsonMetaDataParserTest {
     /// Not a mode this JabFix can name, so it is kept for the JabFix that wrote it.
     @Test
     void aModeThatIsNotAStringIsKeptAsAnUnreadKey() throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
-                {"formatting": {"mode": ["whitespace", "report"]}}"""));
+        MetaData metaData = metaDataOf("""
+                {"formatting": {"mode": ["whitespace", "report"]}}""");
 
         assertEquals(Map.of("mode", "[\"whitespace\",\"report\"]"), metaData.getFormatting().orElseThrow().unreadKeys());
     }
 
     @Test
     void aRuleGivenValuesIsRead() throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
-                {"formatting": {"rules": {"entry-brackets": {"mode": "check", "bracket": "parentheses"}}}}"""));
+        MetaData metaData = metaDataOf("""
+                {"formatting": {"rules": {"entry-brackets": {"mode": "check", "bracket": "parentheses"}}}}""");
 
         assertEquals(new RuleSettings(RuleMode.CHECK, new LinkedHashMap<>(Map.of("bracket", "parentheses"))),
                 metaData.getFormatting().orElseThrow().rules().get(RuleSelector.of("entry-brackets")));
@@ -94,9 +84,7 @@ class JsonMetaDataParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"{\"mode\":\"fix\"}", "\"fix\""})
     void anEntryWithoutValuesIsAMode(String entry) throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("{\"formatting\": {\"rules\": {\"some-rule\": " + entry + "}}}"));
+        MetaData metaData = metaDataOf("{\"formatting\": {\"rules\": {\"some-rule\": " + entry + "}}}");
 
         assertEquals(new RuleSettings(RuleMode.FIX), metaData.getFormatting().orElseThrow().rules().get(RuleSelector.of("some-rule")));
     }
@@ -113,9 +101,7 @@ class JsonMetaDataParserTest {
             "true"
     })
     void anEntryThisJabFixCannotReadIsKeptAsItStands(String entry) throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("{\"formatting\": {\"rules\": {\"some-rule\": " + entry + "}}}"));
+        MetaData metaData = metaDataOf("{\"formatting\": {\"rules\": {\"some-rule\": " + entry + "}}}");
 
         LintSettings formatting = metaData.getFormatting().orElseThrow();
         assertEquals(Map.of(), formatting.rules());
@@ -125,10 +111,8 @@ class JsonMetaDataParserTest {
     /// A rule is built once for a run, so values could not be acted on field by field.
     @Test
     void valuesOnAnEntryNamingAFieldAreKeptAsAnUnreadRule() throws ParseException {
-        MetaData metaData = new MetaData();
-
-        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
-                {"formatting": {"rules": {"title:some-rule": {"mode": "fix", "max": "120"}}}}"""));
+        MetaData metaData = metaDataOf("""
+                {"formatting": {"rules": {"title:some-rule": {"mode": "fix", "max": "120"}}}}""");
 
         assertEquals(Map.of("title:some-rule", "{\"mode\":\"fix\",\"max\":\"120\"}"), metaData.getFormatting().orElseThrow().unreadRules());
     }
@@ -137,6 +121,53 @@ class JsonMetaDataParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"{\"a\": }", "{", "", "[1, 2]", "\"a string\"", "12"})
     void aCommentThatDoesNotHoldAnObjectIsRejected(String json) {
-        assertThrows(ParseException.class, () -> JsonMetaDataParser.read(json));
+        assertThrows(ParseException.class, () -> new JsonMetaDataParser().read(json));
+    }
+
+    /// The text of both comments is dropped, so the earlier one lives on only in what is read here.
+    @Test
+    void aLaterCommentOutranksAnEarlierOneOnlyWhereBothStateAKey() throws ParseException {
+        MetaData metaData = metaDataOf("""
+                {"alpha": 1, "beta": 1}""", """
+                {"beta": 2}""");
+
+        assertEquals(Map.of("alpha", "1", "beta", "2"), metaData.getUnknownJsonMetaData());
+    }
+
+    /// The caller keeps the text of an unreadable comment, so none of it may count as read either.
+    @Test
+    void anUnreadableCommentLeavesWhatWasReadBefore() throws ParseException {
+        JsonMetaDataParser parser = new JsonMetaDataParser();
+        parser.read("""
+                {"alpha": 1}""");
+
+        assertThrows(ParseException.class, () -> parser.read("""
+                {"alpha": 2 "beta": 3}"""));
+
+        MetaData metaData = new MetaData();
+        parser.parse(metaData);
+        assertEquals(Map.of("alpha", "1"), metaData.getUnknownJsonMetaData());
+    }
+
+    /// So that the caller warns about a second comment, and only about one following a comment it read.
+    @Test
+    void onlyAReadableCommentCountsAsRead() throws ParseException {
+        JsonMetaDataParser parser = new JsonMetaDataParser();
+
+        assertThrows(ParseException.class, () -> parser.read("[1, 2]"));
+        assertFalse(parser.hasRead());
+
+        parser.read("{}");
+        assertTrue(parser.hasRead());
+    }
+
+    private static MetaData metaDataOf(String... comments) throws ParseException {
+        JsonMetaDataParser parser = new JsonMetaDataParser();
+        for (String comment : comments) {
+            parser.read(comment);
+        }
+        MetaData metaData = new MetaData();
+        parser.parse(metaData);
+        return metaData;
     }
 }

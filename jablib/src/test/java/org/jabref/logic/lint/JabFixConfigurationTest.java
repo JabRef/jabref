@@ -64,7 +64,7 @@ class JabFixConfigurationTest {
 
     /// A rule the library names is more specific than its mode, so it outranks it.
     @Test
-    void theLibrarysRulesOutrankItsMode() {
+    void theRulesOfTheLibraryOutrankItsMode() {
         MetaData metaData = library(Optional.empty(), Optional.of(
                 LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.CHECK).withMode(JabFixMode.WHITESPACE.getKey())));
 
@@ -75,7 +75,7 @@ class JabFixConfigurationTest {
     }
 
     @Test
-    void theRunsModeTakesThePlaceOfTheLibrarys() {
+    void theRunsModeTakesThePlaceOfTheModeOfTheLibrary() {
         MetaData metaData = library(Optional.empty(), Optional.of(LintSettings.NONE.withMode(JabFixMode.WHITESPACE.getKey())));
 
         LintSettings applied = JabFixConfiguration.applied(metaData, LintSettings.NONE.withMode(JabFixMode.REPORT.getKey()));
@@ -85,7 +85,7 @@ class JabFixConfigurationTest {
 
     /// The run's mode is broader than a rule the library names, so the rule goes on applying.
     @Test
-    void theLibrarysRulesOutrankTheRunsMode() {
+    void theRulesOfTheLibraryOutrankTheRunsMode() {
         MetaData metaData = library(Optional.empty(), Optional.of(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF)));
 
         LintSettings applied = JabFixConfiguration.applied(metaData, LintSettings.NONE.withMode(JabFixMode.WHITESPACE.getKey()));
@@ -96,7 +96,7 @@ class JabFixConfigurationTest {
 
     /// What the library names and the run does not still applies.
     @Test
-    void theRunsRulesOutrankOnlyTheLibrarysRulesTheyName() {
+    void theRunsRulesOutrankOnlyTheRulesOfTheLibraryTheyName() {
         MetaData metaData = library(Optional.empty(), Optional.of(
                 LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
                             .and(RuleSelector.on(StandardField.TITLE, "repeated-whitespace"), RuleMode.FIX)));
@@ -130,7 +130,7 @@ class JabFixConfigurationTest {
     }
 
     @Test
-    void theLibrarysRulesOutrankItsSaveActions() {
+    void theRulesOfTheLibraryOutrankItsSaveActions() {
         MetaData metaData = library(item(true, TITLE_LOWER_CASE),
                 Optional.of(LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)));
 

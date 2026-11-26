@@ -107,7 +107,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
     /// The library says `surrounding-whitespace` only reports, and names no other rule, so the
     /// whitespace around the author survives and is said out loud instead.
     @Test
-    void theLibrarysFormattingBlockConfiguresTheRun() {
+    void theFormattingBlockOfTheLibraryConfiguresTheRun() {
         assertEquals(CommandLine.ExitCode.OK,
                 commandLine.executeToLog("fix", getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
 
@@ -119,7 +119,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
 
     /// An option typed for one run outranks what the library says.
     @Test
-    void aRuleSwitchedOffBeatsTheLibrarysFormattingBlock() {
+    void aRuleSwitchedOffBeatsTheFormattingBlockOfTheLibrary() {
         assertEquals(CommandLine.ExitCode.OK,
                 commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=off",
                         getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
@@ -129,7 +129,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
     }
 
     @Test
-    void aRuleSetToFixBeatsTheLibrarysFormattingBlock() {
+    void aRuleSetToFixBeatsTheFormattingBlockOfTheLibrary() {
         assertEquals(CommandLine.ExitCode.OK,
                 commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=fix",
                         getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
@@ -163,7 +163,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
     }
 
     @Test
-    void theModeOfTheRunTakesThePlaceOfTheLibrarys(@TempDir Path tempDir) throws IOException {
+    void theModeOfTheRunTakesThePlaceOfTheModeOfTheLibrary(@TempDir Path tempDir) throws IOException {
         Path library = Files.writeString(tempDir.resolve("reported.bib"), """
                 @Comment{jabref-meta-0.1.0
                 {
@@ -460,7 +460,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
     }
 
     @Test
-    void aValueNamedOnTheCommandLineOutranksTheLibrarysForThisRun(@TempDir Path tempDir) throws IOException {
+    void aValueNamedOnTheCommandLineOutranksThatOfTheLibraryForThisRun(@TempDir Path tempDir) throws IOException {
         Path library = Files.writeString(tempDir.resolve("parenthesized.bib"), libraryAskingForParentheses("""
                 @Article(key,
                   author = {Doe, Jane},

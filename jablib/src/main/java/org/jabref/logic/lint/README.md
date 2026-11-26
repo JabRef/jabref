@@ -120,7 +120,7 @@ A layer that only states a mode, such as `--rule entry-brackets=check`, leaves t
 What this JabFix cannot read — a selector spelled some other way, a mode it does not know, or something standing beside the rules — is written back as it came, so a library configured by a newer JabFix is handed back with what it arrived with.
 
 A `saveActions` item that is still there is read beside this block, as the layer right below its rules, and `JabFixConfiguration.configure` moves it into the block.
-The `rules` key exists so that the mode can stand beside them; the decision, and the form of an entry in detail, is ADR-0075.
+The `rules` key exists so that the mode can stand beside them; the decision, and the form of an entry in detail, is ADR-0086.
 
 `@Comment{jabref-meta-0.1.0 ...}` is the single embedded JSON object of <https://github.com/JabRef/jabref/issues/10371>.
 A `jabref-meta:` item could not hold this: its separator is the same `;` a Save Action uses inside its own value, so nothing that nests fits.

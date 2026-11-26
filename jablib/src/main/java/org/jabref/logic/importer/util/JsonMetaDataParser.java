@@ -21,47 +21,61 @@ import tools.jackson.databind.node.ObjectNode;
 
 /// Reads the metadata JabRef keeps as one embedded JSON object. Writing it is
 /// [org.jabref.logic.exporter.JsonMetaDataSerializer].
+///
+/// One parser reads the comments of one file, since a file may hold more than one, and they are
+/// read before the metadata they go into exists.
 @NullMarked
 public class JsonMetaDataParser {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private JsonMetaDataParser() {
-    }
+    private Optional<ObjectNode> root = Optional.empty();
 
-    /// The object `json` holds.
+    /// Reads the object `json` holds over what the comments read before it say: a key both state is
+    /// this one's, and a key only an earlier one states stays. The caller drops the text of every
+    /// comment that was read, so an earlier one lives on only here.
     ///
     /// Reading is separate from applying it so that a caller learns whether the comment is readable
     /// while it still can act on the answer: JabRef writes such a comment back itself and therefore
     /// does not keep its text, and an unreadable one has to keep its text instead. A missing comma
     /// is no reason to delete what somebody wrote.
     ///
-    /// @throws ParseException if the comment does not hold one JSON object
-    public static ObjectNode read(String json) throws ParseException {
-        JsonNode root;
-        try {
-            root = MAPPER.readTree(json);
-        } catch (JacksonException e) {
-            throw new ParseException(Localization.lang("Ill-formed JSON metadata comment in BIB file"), e);
-        }
-        if (!(root instanceof ObjectNode object)) {
-            throw new ParseException(Localization.lang("The JSON metadata comment in the BIB file does not hold an object"));
-        }
-        return object;
+    /// @throws ParseException if the comment does not hold one JSON object. Nothing of it is read then.
+    public void read(String json) throws ParseException {
+        ObjectNode object = objectIn(json);
+        root.ifPresentOrElse(earlier -> earlier.setAll(object), () -> root = Optional.of(object));
     }
 
-    /// Reads what `root` says into `metaData`.
+    /// Whether a comment has been read, so that the caller can tell when a file holds a second one.
+    public boolean hasRead() {
+        return root.isPresent();
+    }
+
+    /// Reads what the comments say into `metaData`.
     ///
     /// A key this JabRef does not model is kept as it stands rather than dropped, so that a library
     /// configured by a newer one is handed back with everything it arrived with.
-    public static void parse(MetaData metaData, JsonNode root) {
-        root.properties().forEach(item -> {
+    public void parse(MetaData metaData) {
+        root.ifPresent(object -> object.properties().forEach(item -> {
             if (MetaData.FORMATTING.equals(item.getKey()) && item.getValue().isObject()) {
                 metaData.setFormatting(formatting(item.getValue()));
             } else {
                 metaData.putUnknownJsonMetaDataItem(item.getKey(), item.getValue().toString());
             }
-        });
+        }));
+    }
+
+    private static ObjectNode objectIn(String json) throws ParseException {
+        JsonNode parsed;
+        try {
+            parsed = MAPPER.readTree(json);
+        } catch (JacksonException e) {
+            throw new ParseException(Localization.lang("Ill-formed JSON metadata comment in BIB file"), e);
+        }
+        if (!(parsed instanceof ObjectNode object)) {
+            throw new ParseException(Localization.lang("The JSON metadata comment in the BIB file does not hold an object"));
+        }
+        return object;
     }
 
     /// What the library asks JabFix to do.

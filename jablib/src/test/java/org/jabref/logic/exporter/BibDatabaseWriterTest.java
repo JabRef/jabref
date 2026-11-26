@@ -1200,7 +1200,7 @@ class BibDatabaseWriterTest {
     /// settings of the library, so they run beside a configuration that does not name them.
     // [utest->req~logic.exporter.lint-on-save~1]
     @Test
-    void theLibrarysSaveActionsAreAppliedAsRules() throws IOException {
+    void theSaveActionsOfTheLibraryAreAppliedAsRules() throws IOException {
         metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
@@ -1387,7 +1387,7 @@ class BibDatabaseWriterTest {
 
     /// What a command asks for outranks what the library says, for that one save.
     @Test
-    void settingsOfTheSaveOutrankTheLibrarys() throws IOException {
+    void settingsOfTheSaveOutrankThoseOfTheLibrary() throws IOException {
         metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
