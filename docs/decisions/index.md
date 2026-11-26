@@ -20,3 +20,7 @@ Writer integration decisions:
 Keyring decisions:
 
 - [ADR-0085: Store custom API keys in one keyring item](0085-bundle-custom-api-keys.md).
+
+AI decisions:
+
+- [ADR-0086: Offer JabRef to external AI agents via an HTTP endpoint with a skill and via MCP](0086-offer-jabref-to-external-ai-agents-via-http-skill-and-mcp.md).
