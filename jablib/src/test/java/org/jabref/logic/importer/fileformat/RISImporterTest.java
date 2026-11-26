@@ -71,6 +71,20 @@ class RISImporterTest {
         assertEquals(Optional.of("978-3-932869-19-8"), entry.getField(StandardField.ISBN));
     }
 
+    @ParameterizedTest
+    @CsvSource({"EBOOK, Book", "ECHAP, InCollection"})
+    void electronicBooksAndChaptersImportSerialNumberAsIsbn(String risType, StandardEntryType expectedType) throws IOException {
+        BibEntry entry = importOne("""
+                TY  - %s
+                SN  - ISBN: 978-3-932869-19-8
+                ER  -
+                """.formatted(risType));
+
+        assertEquals(expectedType, entry.getType());
+        assertEquals(Optional.of("978-3-932869-19-8"), entry.getField(StandardField.ISBN));
+        assertEquals(Optional.empty(), entry.getField(StandardField.ISSN));
+    }
+
     @Test
     void serialNumberIsImportedAsIsbnWhenItComesBeforeTheType() throws IOException {
         BibEntry entry = importOne("""

@@ -121,7 +121,8 @@ public class RisImporter extends Importer {
                     String value = entry.substring(6).trim();
                     if ("TY".equals(tag)) {
                         type = switch (value) {
-                            case "BOOK" ->
+                            case "BOOK",
+                                 "EBOOK" ->
                                     StandardEntryType.Book;
                             case "JOUR",
                                  "MGZN" ->
@@ -134,7 +135,8 @@ public class RisImporter extends Importer {
                                     StandardEntryType.TechReport;
                             case "CONF" ->
                                     StandardEntryType.InProceedings;
-                            case "CHAP" ->
+                            case "CHAP",
+                                 "ECHAP" ->
                                     StandardEntryType.InCollection;
                             case "PAT" ->
                                     IEEETranEntryType.Patent;
