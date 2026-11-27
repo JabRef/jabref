@@ -3,5 +3,7 @@
 /// [org.jabref.logic.lint.rule.RuleSet#builtIn] registers them, and [org.jabref.logic.lint.rule.RuleSet#known] adds a rule per Save Action formatter.
 ///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/jabfix.html">JabFix code howto</a>
-
+@NullMarked
 package org.jabref.logic.lint.rules;
+
+import org.jspecify.annotations.NullMarked;

@@ -7,5 +7,7 @@
 /// The standalone built-in rules are in [org.jabref.logic.lint.rules].
 ///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/jabfix.html">JabFix code howto</a>
-
+@NullMarked
 package org.jabref.logic.lint.rule;
+
+import org.jspecify.annotations.NullMarked;

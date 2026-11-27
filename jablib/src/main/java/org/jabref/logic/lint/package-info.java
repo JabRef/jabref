@@ -9,5 +9,7 @@
 ///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/jabfix.html">JabFix code howto</a>
 /// @see <a href="https://devdocs.jabref.org/decisions/0086-per-rule-modes-in-the-formatting-configuration.html">ADR-0086: Per-rule modes in the formatting configuration</a>
-
+@NullMarked
 package org.jabref.logic.lint;
+
+import org.jspecify.annotations.NullMarked;
