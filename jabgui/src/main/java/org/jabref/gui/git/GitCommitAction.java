@@ -13,6 +13,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveDatabaseMode;
 import org.jabref.gui.exporter.SaveDatabaseAction.SaveResult;
@@ -42,6 +43,7 @@ public class GitCommitAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final TaskExecutor taskExecutor;
@@ -54,11 +56,13 @@ public class GitCommitAction extends SimpleCommand {
                            BibEntryTypesManager entryTypesManager,
                            JournalAbbreviationRepository journalAbbreviationRepository,
                            TaskExecutor taskExecutor,
-                           GitHandlerRegistry gitHandlerRegistry) {
+                           GitHandlerRegistry gitHandlerRegistry,
+                           NativeDesktop nativeDesktop) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.entryTypesManager = entryTypesManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.taskExecutor = taskExecutor;
@@ -178,7 +182,8 @@ public class GitCommitAction extends SimpleCommand {
                 stateManager,
                 journalAbbreviationRepository,
                 gitHandlerRegistry,
-                taskExecutor).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
+                taskExecutor,
+                nativeDesktop).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
         if (saveResult == SaveResult.ALREADY_SAVING) {
             // A save is still running (e.g. autosave), so the file on disk is not yet what the user sees.
             dialogService.notify(Localization.lang("The library is currently being saved. Please try again."));

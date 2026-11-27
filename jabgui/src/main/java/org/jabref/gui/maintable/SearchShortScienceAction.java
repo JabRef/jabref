@@ -27,12 +27,14 @@ public class SearchShortScienceAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final ExternalLinkCreator externalLinkCreator;
 
-    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
+    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.externalLinkCreator = new ExternalLinkCreator(preferences.getImporterPreferences());
 
         BooleanExpression fieldIsSet = isFieldSetForSelectedEntry(StandardField.TITLE, stateManager);
@@ -50,7 +52,7 @@ public class SearchShortScienceAction extends SimpleCommand {
             }
             externalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
-                    NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
+                    nativeDesktop.openExternalViewer(databaseContext, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
                     LOGGER.warn("Could not open ShortScience", ex);
                     dialogService.notify(Localization.lang("Unable to open ShortScience.") + " " + ex.getMessage());
