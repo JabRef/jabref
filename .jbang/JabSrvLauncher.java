@@ -12,13 +12,13 @@
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
-// Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
+// Pin JavaFX to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
 // Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with
-// javafx.base:26 fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
-//DEPS org.openjfx:javafx-base:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-graphics:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-controls:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-fxml:26.0.1:${os.detected.jfxname}
+// a current javafx.base fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
+//DEPS org.openjfx:javafx-base:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-graphics:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-controls:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-fxml:27.0.1.1:${os.detected.jfxname}
 
 // from jabsrv-cli
 //DEPS info.picocli:picocli:4.7.7
