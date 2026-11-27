@@ -21,6 +21,7 @@ import javafx.concurrent.Task;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -71,6 +72,7 @@ public class NewEntryViewModel {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UiTaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final AiService aiService;
 
@@ -110,12 +112,14 @@ public class NewEntryViewModel {
                              StateManager stateManager,
                              UiTaskExecutor taskExecutor,
                              FileUpdateMonitor fileUpdateMonitor,
-                             AiService aiService) {
+                             AiService aiService,
+                             NativeDesktop nativeDesktop) {
         this.preferences = preferences;
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.aiService = aiService;
 
@@ -384,7 +388,8 @@ public class NewEntryViewModel {
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    nativeDesktop);
             handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
 
             executedSuccessfully.set(true);
@@ -446,7 +451,8 @@ public class NewEntryViewModel {
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    nativeDesktop);
             handler.importEntriesWithDuplicateCheck(null, result);
 
             executedSuccessfully.set(true);
@@ -538,6 +544,7 @@ public class NewEntryViewModel {
                           importInterpretedCitations(result);
                       })
                       .onFailure(this::showInterpretCitationsFailure)
+                      .failureShownByCaller(true)
                       .executeWith(taskExecutor);
 
         executedSuccessfully.set(true);
@@ -585,7 +592,8 @@ public class NewEntryViewModel {
                 libraryTab.getUndoManager(),
                 stateManager,
                 dialogService,
-                taskExecutor);
+                taskExecutor,
+                nativeDesktop);
         handler.importEntriesWithDuplicateCheck(null, result.get());
         return true;
     }
@@ -665,7 +673,8 @@ public class NewEntryViewModel {
                     libraryTab.getUndoManager(),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    nativeDesktop);
             handler.importEntriesWithDuplicateCheck(null, result.get());
 
             executedSuccessfully.set(true);

@@ -20,8 +20,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Pair;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -29,31 +31,37 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.keyboard.WalkthroughKeyBindings;
-import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.openoffice.OpenOfficeDocumentConnection;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
+import org.jabref.gui.shared.SharedDatabaseCleanup;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.walkthrough.WalkthroughPane;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.GitSsh;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences.CredentialPersistence;
+import org.jabref.logic.preferences.CliPreferences.CredentialSaveException;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -93,6 +101,7 @@ public class JabRefGUI extends Application {
     private static ThemeManager themeManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static NativeDesktop nativeDesktop;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
 
     private static DialogService dialogService;
@@ -103,6 +112,7 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
+    private static OAuthSessionRegistry oAuthSessionRegistry;
     private static LanguageServerController languageServerController;
 
     private Stage mainStage;
@@ -139,7 +149,9 @@ public class JabRefGUI extends Application {
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry,
-                    journalAbbreviationRepository);
+                    journalAbbreviationRepository,
+                    oAuthSessionRegistry,
+                    nativeDesktop);
 
             openWindow();
 
@@ -159,7 +171,8 @@ public class JabRefGUI extends Application {
                     new VersionWorker(buildInfo.version,
                             dialogService,
                             taskExecutor,
-                            preferences)
+                            preferences,
+                            nativeDesktop)
                             .checkForNewVersionDelayed();
                 }
             });
@@ -206,7 +219,7 @@ public class JabRefGUI extends Application {
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
-        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        HeadlessExecutorService.INSTANCE.executeInterruptibleTask(fileUpdateMonitor, "FileUpdateMonitor");
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
 
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
@@ -228,6 +241,9 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
+        JabRefGUI.oAuthSessionRegistry = new OAuthSessionRegistry();
+        Injector.setModelOrService(OAuthSessionRegistry.class, JabRefGUI.oAuthSessionRegistry);
+
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
@@ -242,11 +258,11 @@ public class JabRefGUI extends Application {
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
 
-        stateManager.getRunningBackgroundTasks().addListener((ListChangeListener<? super Task<?>>) change -> {
+        stateManager.getRunningBackgroundTasksPairs().addListener((ListChangeListener<? super Pair<BackgroundTask<?>, Task<?>>>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    for (Task<?> task : change.getAddedSubList()) {
-                        dialogService.notify(new Notifications.TaskNotification(task));
+                    for (Pair<BackgroundTask<?>, Task<?>> pair : change.getAddedSubList()) {
+                        dialogService.notify(new Notifications.TaskNotification(pair.getValue(), pair.getKey()));
                     }
                 }
             }
@@ -254,6 +270,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.clipBoardManager = new ClipBoardManager(stateManager);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+
+        JabRefGUI.nativeDesktop = NativeDesktop.create(getHostServices(), preferences, clipBoardManager);
+        Injector.setModelOrService(NativeDesktop.class, nativeDesktop);
 
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
@@ -300,21 +319,21 @@ public class JabRefGUI extends Application {
         }
     }
 
+    /// Registers proxy authentication for this session. If the user supplies a password at startup,
+    /// the proxy can authenticate immediately while the worker handles any requested keyring write.
     private void setupProxy() {
-        if (!preferences.getProxyPreferences().shouldUseProxy()) {
+        ProxyPreferences proxy = preferences.getProxyPreferences();
+        if (!proxy.shouldUseProxy()) {
             return;
         }
 
-        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
-            ProxyRegisterer.register(preferences.getProxyPreferences());
+        if (!proxy.shouldUseAuthentication()) {
+            ProxyRegisterer.register(proxy);
             return;
         }
 
-        assert preferences.getProxyPreferences().shouldUseAuthentication();
-
-        if (preferences.getProxyPreferences().shouldPersistPassword()
-                && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
-            ProxyRegisterer.register(preferences.getProxyPreferences());
+        if (proxy.shouldPersistPassword() && StringUtil.isNotBlank(proxy.getPassword())) {
+            ProxyRegisterer.register(proxy);
             return;
         }
 
@@ -323,12 +342,22 @@ public class JabRefGUI extends Application {
                 Localization.lang("Proxy requires password"),
                 Localization.lang("Password"));
 
-        if (password.isPresent()) {
-            preferences.getProxyPreferences().setPassword(password.get());
-            ProxyRegisterer.register(preferences.getProxyPreferences());
-        } else {
-            LOGGER.warn("No proxy password specified");
-        }
+        password.ifPresentOrElse(secret -> {
+            // Authentication can use the entered password immediately, even if the keyring is unavailable.
+            ProxyRegisterer.register(new ProxyPreferences(proxy.shouldUseProxy(), proxy.getHostname(), proxy.getPort(),
+                    proxy.shouldUseAuthentication(), proxy.getUsername(), secret, false));
+            CredentialPersistence persistence = proxy.shouldPersistPassword() ? CredentialPersistence.SAVE : CredentialPersistence.SESSION_ONLY;
+            preferences.prepareProxyPasswordSave(secret, persistence).ifPresent(save ->
+                    BackgroundTask.wrap(save::writeKeyring)
+                                  .onSuccess(commit -> commit.apply())
+                                  .onFailure(ex -> {
+                                      if (ex instanceof CredentialSaveException credentialFailure) {
+                                          credentialFailure.applySessionUpdate();
+                                      }
+                                      LOGGER.warn("Could not save proxy password in keyring", ex);
+                                  })
+                                  .executeWith(taskExecutor));
+        }, () -> LOGGER.warn("No proxy password specified"));
     }
 
     private void openWindow() {
@@ -383,6 +412,8 @@ public class JabRefGUI extends Application {
         LOGGER.debug("installing CSS");
         themeManager.updateCssOnScene(scene);
 
+        TextInputKeyBindings.registerSecondaryWindows(mainStage, preferences.getKeyBindingRepository());
+
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
@@ -391,7 +422,7 @@ public class JabRefGUI extends Application {
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSet());
+        IconTheme.applyLogo(mainStage);
         mainStage.setScene(scene);
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
@@ -531,7 +562,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.shouldEnableHttpServer()) {
-            httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
@@ -544,7 +575,7 @@ public class JabRefGUI extends Application {
             // stop in all cases, because the port might have changed
             httpServerManager.stop();
             if (newValue) {
-                httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+                httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
             }
         });
     }
@@ -552,6 +583,7 @@ public class JabRefGUI extends Application {
     @Override
     public void stop() {
         LOGGER.trace("Stopping JabRef GUI");
+        SharedDatabaseCleanup.awaitAll();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
 
@@ -574,9 +606,9 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Closing OpenOffice connection");
-                OOBibBaseConnect.closeOfficeConnection();
-                LOGGER.trace("OpenOffice connection closed");
+                LOGGER.trace("Disposing client-side UNO bridges");
+                OpenOfficeDocumentConnection.disposeAllBridges();
+                LOGGER.trace("Client-side UNO bridges disposed");
             });
 
             executor.submit(() -> {

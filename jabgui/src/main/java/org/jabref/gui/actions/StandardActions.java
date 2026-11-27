@@ -58,9 +58,9 @@ public enum StandardActions implements Action {
     MORE_FILE_OPERATIONS(Localization.lang("More file operations..."), IconTheme.JabRefIcons.FILE),
     PRIORITY(Localization.lang("Priority"), IconTheme.JabRefIcons.PRIORITY),
     CLEAR_PRIORITY(Localization.lang("Clear priority")),
-    PRIORITY_HIGH(Localization.lang("Set priority to high"), IconTheme.JabRefIcons.PRIORITY_HIGH),
-    PRIORITY_MEDIUM(Localization.lang("Set priority to medium"), IconTheme.JabRefIcons.PRIORITY_MEDIUM),
-    PRIORITY_LOW(Localization.lang("Set priority to low"), IconTheme.JabRefIcons.PRIORITY_LOW),
+    PRIORITY_HIGH(Localization.lang("High"), IconTheme.JabRefIcons.PRIORITY_HIGH),
+    PRIORITY_MEDIUM(Localization.lang("Medium"), IconTheme.JabRefIcons.PRIORITY_MEDIUM),
+    PRIORITY_LOW(Localization.lang("Low"), IconTheme.JabRefIcons.PRIORITY_LOW),
     QUALITY(Localization.lang("Quality"), IconTheme.JabRefIcons.QUALITY),
     QUALITY_ASSURED(Localization.lang("Toggle quality assured"), IconTheme.JabRefIcons.QUALITY_ASSURED),
     RANKING(Localization.lang("Rank"), IconTheme.JabRefIcons.RANKING),
@@ -73,11 +73,11 @@ public enum StandardActions implements Action {
     PRINTED(Localization.lang("Printed"), IconTheme.JabRefIcons.PRINTED),
     TOGGLE_PRINTED(Localization.lang("Toggle print status"), IconTheme.JabRefIcons.PRINTED),
     READ_STATUS(Localization.lang("Read status"), IconTheme.JabRefIcons.READ_STATUS),
-    CLEAR_READ_STATUS(Localization.lang("Clear read status"), KeyBinding.CLEAR_READ_STATUS),
-    READ(Localization.lang("Set read status to read"), IconTheme.JabRefIcons.READ_STATUS_READ, KeyBinding.READ),
-    SKIMMED(Localization.lang("Set read status to skimmed"), IconTheme.JabRefIcons.READ_STATUS_SKIMMED, KeyBinding.SKIMMED),
+    CLEAR_READ_STATUS(Localization.lang("Mark as unread"), KeyBinding.CLEAR_READ_STATUS),
+    READ(Localization.lang("Mark as read"), IconTheme.JabRefIcons.READ_STATUS_READ, KeyBinding.READ),
+    SKIMMED(Localization.lang("Mark as skimmed"), IconTheme.JabRefIcons.READ_STATUS_SKIMMED, KeyBinding.SKIMMED),
     RELEVANCE(Localization.lang("Relevance"), IconTheme.JabRefIcons.RELEVANCE),
-    RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
+    TOGGLE_RELEVANCE(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
     NEW_LIBRARY(Localization.lang("New empty library"), IconTheme.JabRefIcons.NEW),
     OPEN_LIBRARY(Localization.lang("Open library..."), IconTheme.JabRefIcons.OPEN, KeyBinding.OPEN_LIBRARY),
     MERGE_LIBRARY(Localization.lang("Merge..."), IconTheme.JabRefIcons.MERGE_ENTRIES),
@@ -124,8 +124,8 @@ public enum StandardActions implements Action {
     EDIT_EXISTING_STUDY(Localization.lang("Manage study definition")),
 
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
-    OPEN_FOLDER(Localization.lang("Open folder(s)"), Localization.lang("Open folder"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
-    OPEN_FILE(Localization.lang("Open file(s)"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
+    OPEN_FOLDER(Localization.lang("Open folder(s)"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
+    OPEN_FILE(Localization.lang("Open file(s)"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_CONSOLE(Localization.lang("Open terminal here"), Localization.lang("Open terminal here"), IconTheme.JabRefIcons.CONSOLE, KeyBinding.OPEN_CONSOLE),
     SORT_TABS_ALPHABETICALLY(Localization.lang("Sort tabs alphabetically")),
     COPY_LINKED_FILES(Localization.lang("Copy linked file(s) to folder...")),
@@ -203,6 +203,7 @@ public enum StandardActions implements Action {
     OPEN_GITHUB("GitHub", Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
     WHATS_NEW(Localization.lang("What's new"), Localization.lang("Shows the changelog entries that landed in this checkout since your last look; restart to update when a newer version exists"), IconTheme.JabRefIcons.WHATS_NEW),
     DONATE(Localization.lang("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
+    CONTRIBUTE(Localization.lang("Contribute to JabRef"), Localization.lang("Contribute to JabRef"), IconTheme.JabRefIcons.CONTRIBUTE),
     OPEN_FORUM(Localization.lang("Community forum"), Localization.lang("Community forum"), IconTheme.JabRefIcons.FORUM),
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),
     SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
@@ -239,7 +240,12 @@ public enum StandardActions implements Action {
     GIT_PULL(Localization.lang("Pull")),
     GIT_PUSH(Localization.lang("Push")),
     GIT_COMMIT(Localization.lang("Commit")),
-    GIT_SHARE(Localization.lang("Share this library to GitHub"));
+    GIT_SHARE(Localization.lang("Share this library to GitHub")),
+
+    CITE_DRIVE(Localization.lang("CiteDrive")),
+    CITE_DRIVE_IMPORT(Localization.lang("Import from CiteDrive")),
+    CITE_DRIVE_LOGIN(Localization.lang("Login...")), // "Authorize" would be the more technical term here.
+    CITE_DRIVE_PUSH(Localization.lang("Push to CiteDrive"));
 
     private String text;
     private final String description;

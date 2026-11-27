@@ -192,7 +192,7 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
     }
 
     @Test
-    @Disabled("Year search is currently broken, because the API returns mutliple years.")
+    @Disabled("Year search is currently broken, because the API returns multiple years.")
     @Override
     public void supportsYearSearch() {
     }

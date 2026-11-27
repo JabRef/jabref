@@ -11,16 +11,33 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.css.PseudoClass;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -29,6 +46,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 
@@ -356,6 +377,167 @@ class ThemeManagerTest {
         assertEquals(List.of(styleClassChanges.getFirst(), styleClassChanges.getFirst(), styleClassChanges.getFirst()), styleClassChanges);
     }
 
+    @Test
+    void iconSizeFollowsFontSizeChanges() {
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
+        assertIconSizeFollowsFontSize(icon);
+    }
+
+    @Test
+    void colouredThemeSizedIconSizeFollowsFontSizeChanges() {
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).withColor(Color.AQUA).getGraphicNode();
+        assertIconSizeFollowsFontSize(icon);
+    }
+
+    @Test
+    void iconLaterCreatedFollowsFontSizeChanges() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        changeFontSize(workSpacePreferences, 20);
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
+        showNode(themeManager, icon);
+
+        changeFontSize(workSpacePreferences, 9);
+
+        assertEquals(15, applyCssAndGetIconSize(icon)); // 1.25em at 9pt (12px)
+    }
+
+    @Test
+    void explicitlySizedIconKeepsItsSize() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).withSize(27).getGraphicNode();
+        showNode(themeManager, icon);
+
+        changeFontSize(workSpacePreferences, 20);
+        changeFontSize(workSpacePreferences, 9);
+
+        assertEquals(27, applyCssAndGetIconSize(icon));
+    }
+
+    @Test
+    void cssSizedIconFollowsFontSizeChanges() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        var icon = (FontIcon) IconTheme.JabRefIcons.OPEN_LINK.getGraphicNode(); // Like FieldValueCell#createOpenLinkButton
+        icon.getStyleClass().add("action-icon");
+        HBox cell = new HBox(icon);
+        cell.getStyleClass().add("merge-field-value"); // From jabref-base.css
+        showNode(themeManager, cell);
+
+        changeFontSize(workSpacePreferences, 20);
+        changeFontSize(workSpacePreferences, 9);
+
+        assertEquals(15, applyCssAndGetIconSize(icon)); // 1.25em at 9pt (12px)
+    }
+
+    @Test
+    void defaultIconSizeMatchesIkonliDefault() {
+        // IkonliIcon.DEFAULT_SIZE = 8
+        assertEquals(8, new FontIcon().getIconSize(), "Default icon size of JabRef should match Ikonli default");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ThemePreset.class, names = {"JABREF", "NORD"})
+    void indexColumnRemainsRightAlignedInTallRows(ThemePreset theme) {
+        JavaFxExtension.invokeAndWait(() -> {
+            TableView<String> table = new TableView<>();
+            table.getStyleClass().add("main-table");
+            table.pseudoClassStateChanged(PseudoClass.getPseudoClass("wrap-text"), true);
+            TableColumn<String, String> indexColumn = new TableColumn<>("#");
+            indexColumn.getStyleClass().add("align-center-right");
+            indexColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue()));
+            table.getColumns().add(indexColumn);
+            table.getItems().addAll("1", "10", "100");
+
+            assertCellUtilitiesInBothColorSchemes(theme, table, () -> {
+                List<Pos> alignments = table.lookupAll(".table-cell").stream()
+                                            .filter(node -> node instanceof TableCell<?, ?> cell && !cell.isEmpty())
+                                            .map(node -> ((TableCell<?, ?>) node).getAlignment())
+                                            .toList();
+                assertEquals(List.of(Pos.CENTER_RIGHT, Pos.CENTER_RIGHT, Pos.CENTER_RIGHT), alignments);
+            });
+        });
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ThemePreset.class, names = {"JABREF", "NORD"})
+    void shortcutIconsFitTheirCompactRightAlignedCells(ThemePreset theme) {
+        JavaFxExtension.invokeAndWait(() -> {
+            TreeTableView<String> table = new TreeTableView<>(new TreeItem<>("Action"));
+            table.getStyleClass().add("keybinding-table");
+            TreeTableColumn<String, String> actionColumn = new TreeTableColumn<>("Action");
+            new ViewModelTreeTableCellFactory<String>().withText(value -> value).install(actionColumn);
+            TreeTableColumn<String, String> resetColumn = new TreeTableColumn<>();
+            resetColumn.setMinWidth(30);
+            resetColumn.setPrefWidth(30);
+            resetColumn.setMaxWidth(30);
+            new ViewModelTreeTableCellFactory<String>()
+                    .withGraphic(_ -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
+                    .withStyleClasses(() -> List.of("align-center-right", "padding-right-4"))
+                    .install(resetColumn);
+            table.getColumns().addAll(List.of(actionColumn, resetColumn));
+
+            assertCellUtilitiesInBothColorSchemes(theme, table, () -> {
+                TreeTableCell<?, ?> cell = table.lookupAll(".tree-table-cell").stream()
+                                                .filter(node -> node instanceof TreeTableCell<?, ?> candidate
+                                                        && candidate.getTableColumn() == resetColumn && !candidate.isEmpty())
+                                                .map(node -> (TreeTableCell<?, ?>) node)
+                                                .findFirst().orElseThrow();
+                assertEquals(Pos.CENTER_RIGHT, cell.getAlignment());
+                assertEquals(0, cell.getPadding().getLeft());
+                double availableWidth = cell.getWidth() - cell.getPadding().getLeft() - cell.getPadding().getRight();
+                assertTrue(availableWidth >= cell.getGraphic().getLayoutBounds().getWidth());
+            });
+        });
+    }
+
+    private static void assertCellUtilitiesInBothColorSchemes(ThemePreset theme, Node table, Runnable assertions) {
+        StackPane root = new StackPane(table);
+        Scene scene = new Scene(root, 400, 200);
+        List<String> stylesheets = new ArrayList<>();
+        theme.getParent().ifPresent(parent -> stylesheets.add(parent.getStyleSheet().getSceneStylesheetLocation()));
+        stylesheets.add(theme.getStyleSheet().getSceneStylesheetLocation());
+        stylesheets.add(ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation());
+        scene.getStylesheets().setAll(stylesheets);
+        root.resize(400, 200);
+        for (ColorScheme scheme : List.of(ColorScheme.LIGHT, ColorScheme.DARK)) {
+            scene.getPreferences().setColorScheme(scheme);
+            root.applyCss();
+            root.layout();
+            assertions.run();
+        }
+    }
+
+    private void assertIconSizeFollowsFontSize(FontIcon icon) {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        showNode(themeManager, icon);
+
+        double sizeBefore = applyCssAndGetIconSize(icon);
+        changeFontSize(workSpacePreferences, 20);
+        double sizeIncrease = applyCssAndGetIconSize(icon);
+        changeFontSize(workSpacePreferences, 9);
+        double sizeAfter = applyCssAndGetIconSize(icon);
+
+        assertTrue(sizeIncrease > sizeBefore);
+        assertEquals(sizeBefore, sizeAfter);
+    }
+
+    private void showNode(ThemeManager themeManager, Node node) {
+        JavaFxExtension.invokeAndWait(() -> {
+            var scene = new Scene(new StackPane(node));
+            themeManager.updateCssOnScene(scene);
+            var stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+        });
+    }
+
     private static int styleClassChangesOnNewScene(int timesShown) {
         StackPane root = new StackPane();
         AtomicInteger styleClassChanges = new AtomicInteger();
@@ -395,5 +577,32 @@ class ThemeManagerTest {
     private void assertCustomStyleSheet(Optional<StyleSheet> styleSheet, StyleSheet customTheme, Path customCss) {
         assertEquals(styleSheet.orElseThrow(), customTheme);
         assertEquals(customCss.toString(), customTheme.getName());
+    }
+
+    private Stage showIcon(ThemeManager themeManager, FontIcon icon) {
+        AtomicReference<Stage> stage = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            var scene = new Scene(new StackPane(icon));
+            themeManager.updateCssOnScene(scene);
+            var newStage = new Stage();
+            newStage.setScene(scene);
+            newStage.show();
+            stage.set(newStage);
+        });
+        return stage.get();
+    }
+
+    private void changeFontSize(WorkspacePreferences workspacePreferences, int fontSize) {
+        JavaFxExtension.invokeAndWait(() -> workspacePreferences.setMainFontSize(fontSize));
+        JavaFxExtension.awaitEvents();
+    }
+
+    private double applyCssAndGetIconSize(FontIcon icon) {
+        AtomicReference<Double> size = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            icon.getScene().getRoot().applyCss();
+            size.set(icon.getFont().getSize());
+        });
+        return size.get();
     }
 }

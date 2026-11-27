@@ -1,0 +1,24 @@
+<!-- Extracted from DNB SRU record 1415413312 on 2026-09-22:
+     https://services.dnb.de/sru/dnb?version=1.1&operation=searchRetrieve&query=idn%3D1415413312&recordSchema=MARC21-xml&maximumRecords=1 -->
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <marc:record type="Bibliographic">
+                    <marc:controlfield tag="001">1415413312</marc:controlfield>
+                    <marc:datafield tag="856" ind1="4" ind2="2">
+                        <marc:subfield code="m">X:MVB</marc:subfield>
+                        <marc:subfield code="q">text/html</marc:subfield>
+                        <marc:subfield code="u">https://services.dnb.de/plus/idn/1415413312/blurb/</marc:subfield>
+                        <marc:subfield code="3">Inhaltstext</marc:subfield>
+                    </marc:datafield>
+                </marc:record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

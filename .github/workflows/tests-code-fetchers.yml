@@ -37,6 +37,8 @@ on:
   workflow_dispatch:
 
 env:
+  BibSonomyApiKey: ${{ secrets.BibSonomyApiKey_FOR_TESTS }}
+  BibSonomyUsername: ${{ secrets.BibSonomyUsername_FOR_TESTS }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}

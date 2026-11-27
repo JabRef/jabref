@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
@@ -26,6 +27,7 @@ import org.jabref.model.ai.chatting.ChatMessage;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,6 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // [utest->feat~ai.chat.jump-to-entry-pdf~1]
+@ResourceLock("Localization.lang")
 class AiChatMessageViewTest extends JavaFxTest {
 
     private DialogService dialogService;
@@ -58,6 +61,7 @@ class AiChatMessageViewTest extends JavaFxTest {
         Injector.setModelOrService(DialogService.class, dialogService);
         Injector.setModelOrService(StateManager.class, stateManager);
         Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
         rootPane = new StackPane();
@@ -69,6 +73,14 @@ class AiChatMessageViewTest extends JavaFxTest {
         AtomicReference<AiChatMessageView> viewRef = new AtomicReference<>();
         interact(() -> viewRef.set(new AiChatMessageView()));
         return viewRef.get();
+    }
+
+    // [utest->feat~ai.chat.regenerate-response~1]
+    @Test
+    void userMessageCanBeRetried() {
+        AiChatMessageViewModel viewModel = new AiChatMessageViewModel(clipBoardManager);
+        viewModel.chatMessageProperty().set(ChatMessage.userMessage("question"));
+        assertTrue(viewModel.showRegenerateProperty().get());
     }
 
     @Test

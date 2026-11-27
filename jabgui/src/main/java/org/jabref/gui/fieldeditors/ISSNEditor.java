@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -37,6 +38,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private StateManager stateManager;
+    @Inject private NativeDesktop nativeDesktop;
 
     private Optional<BibEntry> entry = Optional.empty();
 
@@ -59,7 +61,8 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 dialogService,
                 undoManager,
                 stateManager,
-                preferences);
+                preferences,
+                nativeDesktop);
 
         textField.setId(field.getName());
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);

@@ -10,7 +10,7 @@ import javafx.scene.Node;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.style.BstStyle;
+import org.jabref.logic.openoffice.bst.BstStyle;
 
 /// Row model for a [BstStyle] entry in the BST styles table.
 public class BstStyleSelectViewModel {

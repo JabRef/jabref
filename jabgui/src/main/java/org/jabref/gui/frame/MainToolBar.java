@@ -19,6 +19,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.exporter.SaveAction;
@@ -50,6 +51,7 @@ public class MainToolBar extends ToolBar {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
@@ -78,6 +80,7 @@ public class MainToolBar extends ToolBar {
                        ClipBoardManager clipBoardManager,
                        JournalAbbreviationRepository journalAbbreviationRepository,
                        GitHandlerRegistry gitHandlerRegistry,
+                       NativeDesktop nativeDesktop,
                        BooleanSupplier quit) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -85,6 +88,7 @@ public class MainToolBar extends ToolBar {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
@@ -112,7 +116,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager, taskExecutor, gitHandlerRegistry)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferences, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager, taskExecutor, gitHandlerRegistry, nativeDesktop)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository))),
 
                 leftSpacer,
@@ -176,8 +180,8 @@ public class MainToolBar extends ToolBar {
     /// The GitHub link and, only while JabRef runs out of a git checkout, the "What's new" button before it.
     private HBox projectLinks(ActionFactory factory) {
         HBox links = new HBox(
-                factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences())));
-        WhatsNewButton.create(factory, taskExecutor, dialogService, preferences.getExternalApplicationsPreferences(), gitHandlerRegistry, quit)
+                factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, nativeDesktop)));
+        WhatsNewButton.create(factory, taskExecutor, dialogService, nativeDesktop, gitHandlerRegistry, quit)
                       .ifPresent(links.getChildren()::addFirst);
         return links;
     }

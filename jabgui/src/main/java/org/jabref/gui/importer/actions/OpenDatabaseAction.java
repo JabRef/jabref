@@ -17,6 +17,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -38,6 +39,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.migrations.PerformLoadDatabaseMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -62,6 +64,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final AiService aiService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -80,9 +83,11 @@ public class OpenDatabaseAction extends SimpleCommand {
                               BibEntryTypesManager entryTypesManager,
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor,
-                              GitHandlerRegistry gitHandlerRegistry) {
+                              GitHandlerRegistry gitHandlerRegistry,
+                              NativeDesktop nativeDesktop) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.aiService = aiService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -265,7 +270,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, stateManager)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, fileToLoad, preferences, fileUpdateMonitor, stateManager, nativeDesktop)
                                           .orElse(null);
         }
 
@@ -276,6 +281,13 @@ public class OpenDatabaseAction extends SimpleCommand {
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
             }
+
+            // [impl->req~import.bibtex.legacy-migrations~1]
+            PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(
+                    parserResult,
+                    parserResult.getDatabaseContext().getKeywordSeparator(preferences.getImportFormatPreferences().bibEntryPreferences().getKeywordSeparator()),
+                    // [impl->req~import.bibtex.legacy-migrations.announcement~1]
+                    () -> dialogService.notify(Localization.lang("Migrating library '%0' to the current version", fileToLoad.toString())));
         } catch (IOException e) {
             parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);
@@ -307,7 +319,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                     fileUpdateMonitor,
                     clipboardManager,
                     taskExecutor,
-                    gitHandlerRegistry);
+                    gitHandlerRegistry,
+                    nativeDesktop);
         }
         return parserResult;
     }
@@ -322,7 +335,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           FileUpdateMonitor fileUpdateMonitor,
                                           ClipBoardManager clipBoardManager,
                                           TaskExecutor taskExecutor,
-                                          GitHandlerRegistry gitHandlerRegistry)
+                                          GitHandlerRegistry gitHandlerRegistry,
+                                          NativeDesktop nativeDesktop)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
             new SharedDatabaseUIManager(
@@ -335,7 +349,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                     fileUpdateMonitor,
                     clipBoardManager,
                     taskExecutor,
-                    gitHandlerRegistry)
+                    gitHandlerRegistry,
+                    nativeDesktop)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                  NotASharedDatabaseException e) {

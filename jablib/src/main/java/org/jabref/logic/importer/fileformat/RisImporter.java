@@ -34,6 +34,7 @@ import org.jspecify.annotations.NonNull;
 
 public class RisImporter extends Importer {
 
+    private static final Pattern SERIAL_NUMBER_LABEL = Pattern.compile("^(ISBN|ISSN)\\s*:?\\s*", Pattern.CASE_INSENSITIVE);
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY {2}- .*");
     private static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
@@ -89,6 +90,7 @@ public class RisImporter extends Importer {
             String startPage = "";
             String endPage = "";
             String year = "";
+            String serialNumber = "";
             StringJoiner abstractContent = new StringJoiner("\n");
             StringJoiner comment = new StringJoiner("\n");
             Optional<Month> month = Optional.empty();
@@ -119,7 +121,8 @@ public class RisImporter extends Importer {
                     String value = entry.substring(6).trim();
                     if ("TY".equals(tag)) {
                         type = switch (value) {
-                            case "BOOK" ->
+                            case "BOOK",
+                                 "EBOOK" ->
                                     StandardEntryType.Book;
                             case "JOUR",
                                  "MGZN" ->
@@ -132,7 +135,8 @@ public class RisImporter extends Importer {
                                     StandardEntryType.TechReport;
                             case "CONF" ->
                                     StandardEntryType.InProceedings;
-                            case "CHAP" ->
+                            case "CHAP",
+                                 "ECHAP" ->
                                     StandardEntryType.InCollection;
                             case "PAT" ->
                                     IEEETranEntryType.Patent;
@@ -185,8 +189,10 @@ public class RisImporter extends Importer {
                         fields.put(new UnknownField("caption"), value);
                     } else if ("DB".equals(tag)) {
                         fields.put(new UnknownField("database"), value);
-                    } else if ("IS".equals(tag) || "AN".equals(tag) || "C7".equals(tag) || "M1".equals(tag)) {
+                    } else if ("IS".equals(tag) || "C7".equals(tag) || "M1".equals(tag)) {
                         fields.put(StandardField.NUMBER, value);
+                    } else if ("AN".equals(tag)) {
+                        fields.put(new UnknownField("accession-num"), value);
                     } else if ("SP".equals(tag)) {
                         startPage = value;
                     } else if ("PB".equals(tag)) {
@@ -205,7 +211,7 @@ public class RisImporter extends Importer {
                     } else if ("ET".equals(tag)) {
                         fields.put(StandardField.EDITION, value);
                     } else if ("SN".equals(tag)) {
-                        fields.put(StandardField.ISSN, value);
+                        serialNumber = value;
                     } else if ("VL".equals(tag)) {
                         fields.put(StandardField.VOLUME, value);
                     } else if ("N2".equals(tag) || "AB".equals(tag)) {
@@ -286,6 +292,14 @@ public class RisImporter extends Importer {
                     fields.put(StandardField.COMMENT, comment.toString());
                 }
                 fields.put(StandardField.PAGES, startPage + endPage);
+            }
+
+            // RIS uses SN for both: books and book chapters have an ISBN, everything else an ISSN.
+            // Decided here, because the SN tag can come before the TY tag.
+            if (type == StandardEntryType.Book || type == StandardEntryType.InCollection) {
+                fields.put(StandardField.ISBN, SERIAL_NUMBER_LABEL.matcher(serialNumber.trim()).replaceFirst("").trim());
+            } else {
+                fields.put(StandardField.ISSN, serialNumber);
             }
 
             // if we found a date

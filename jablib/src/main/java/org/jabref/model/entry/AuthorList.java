@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -19,7 +20,10 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
 ///
-/// Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
+/// Parsing algorithm is designed to satisfy two requirements:
+///   (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX;
+///   (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output).
+/// The following rules are used:
 /// 1. 'author field' is a sequence of tokens;
 ///     - tokens are separated by sequences of whitespaces (`Character.isWhitespace(c)==true`),
 ///       commas (,), dashes (-), and tildas (~);
@@ -61,7 +65,7 @@ import org.jspecify.annotations.Nullable;
 ///       fixing this problem, however, requires processing of the preabmle;
 /// 2. 'author names' in 'author field' are subsequences of tokens separated by
 ///    token `and` (`and` is case-insensitive); if 'author name' is an empty
-///    sequence of tokens, it is ignored; for examle, both
+///    sequence of tokens, it is ignored; for example, both
 ///    `"John Smith and Peter Black"` and
 ///    `"and and John Smith and and Peter Black"` consists of 2 'author name's
 ///    `"Johm Smith"` and `"Peter Black"` (in erroneous situations, this is a bit
@@ -79,7 +83,7 @@ import org.jspecify.annotations.Nullable;
 ///       token, 'von-part' consists of lower-case tokens starting the first lower-case
 ///       token and ending the lower-case token that is followed by upper-case token,
 ///       'last-part' consists of the rest of tokens; note that both 'first-part' and
-///       'latst-part' may be empty and 'last-part' may contain lower-case tokens; for
+///       'last-part' may be empty and 'last-part' may contain lower-case tokens; for
 ///       example: in `"von der"`, `'first-part'='last-part'=""`,
 ///       `'von-part'="von der"`; in
 ///       `"Charles Louis Xavier Joseph de la Vall{\'e}e la Poussin"`,
@@ -123,6 +127,8 @@ public class AuthorList implements Iterable<Author> {
                                                                           .build();
 
     private final List<Author> authors;
+    private final String listOption;
+    private final Optional<String> malformedSource;
     @Nullable private AuthorList latexFreeAuthors;
 
     /// Creates a new list of authors.
@@ -132,11 +138,21 @@ public class AuthorList implements Iterable<Author> {
     ///
     /// @param authors the list of authors which should underlie this instance
     private AuthorList(@NonNull List<Author> authors) {
+        this(authors, "", Optional.empty());
+    }
+
+    private AuthorList(List<Author> authors, String listOption, Optional<String> malformedSource) {
         this.authors = authors;
+        this.listOption = listOption;
+        this.malformedSource = malformedSource;
     }
 
     public static AuthorList of(List<Author> authors) {
         return new AuthorList(List.copyOf(authors));
+    }
+
+    public static AuthorList of(List<Author> authors, String listOption, Optional<String> malformedSource) {
+        return new AuthorList(List.copyOf(authors), listOption, malformedSource);
     }
 
     public static AuthorList of(Author... authors) {
@@ -265,12 +281,17 @@ public class AuthorList implements Iterable<Author> {
         return authors;
     }
 
+    /// Returns the authors without the "et al." placeholder [Author#OTHERS]
+    public List<Author> getNamedAuthors() {
+        return authors.stream().filter(author -> !Author.OTHERS.equals(author)).toList();
+    }
+
     /// Returns a LaTeX-free version of this `AuthorList`.
     public AuthorList latexFree() {
         if (latexFreeAuthors == null) {
             latexFreeAuthors = new AuthorList(authors.stream()
                                                      .map(Author::latexFree)
-                                                     .toList());
+                                                     .toList(), listOption, malformedSource);
             latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;
         }
         return latexFreeAuthors;
@@ -291,15 +312,16 @@ public class AuthorList implements Iterable<Author> {
             case 0 ->
                     "";
             case 1 ->
-                    authors.getFirst().getNamePrefixAndFamilyName();
+                    authors.getFirst().getFamilyNameForDisplay();
             case 2 ->
-                    authors.getFirst().getNamePrefixAndFamilyName() + " and " + authors.get(1).getNamePrefixAndFamilyName();
+                    authors.getFirst().getFamilyNameForDisplay() + " and " + authors.get(1).getFamilyNameForDisplay();
             default ->
-                    authors.getFirst().getNamePrefixAndFamilyName() + " et al.";
+                    authors.getFirst().getFamilyNameForDisplay() + " et al.";
         };
     }
 
     /// Returns the list of authors separated by commas with last name only; If the list consists of two or more authors, "and" is inserted before the last author's name.
+    /// Each author's explicit `useprefix` option controls inclusion of their prefix in the label.
     ///
     ///
     /// -  "John Smith" ==> "Smith"
@@ -309,10 +331,10 @@ public class AuthorList implements Iterable<Author> {
     ///
     /// @param oxfordComma Whether to put a comma before the and at the end.
     /// @return formatted list of authors.
-    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsLastNames(boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), Author::getNamePrefixAndFamilyName, oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), Author::getFamilyNameForDisplay, oxfordComma);
     }
 
     /// Returns the list of authors separated by commas with first names after last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
@@ -325,10 +347,10 @@ public class AuthorList implements Iterable<Author> {
     /// Neumann, John, Smith, John and Black Brown, Peter" or "von Neumann, J.,
     /// Smith, J. and Black Brown, P.".
     ///
-    /// @param abbreviate  whether to abbreivate first names.
+    /// @param abbreviate  whether to abbreviate first names.
     /// @param oxfordComma Whether to put a comma before the and at the end.
     /// @return formatted list of authors.
-    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), auth -> auth.getFamilyGiven(abbreviate), oxfordComma);
@@ -353,6 +375,30 @@ public class AuthorList implements Iterable<Author> {
         return getAuthors().stream()
                            .map(author -> author.getFamilyGiven(abbreviate))
                            .collect(Collectors.joining(" and "));
+    }
+
+    /// Returns the author field for storage, preserving extended BibLaTeX name parts per author.
+    // [impl->req~save.names.normalize-extended-parts~1]
+    public String getAsBibtex() {
+        return malformedSource.orElseGet(() -> joinForStorage(Author::getAsBibtex));
+    }
+
+    private String joinForStorage(Function<Author, String> formatName) {
+        String names = authors.stream().map(formatName).collect(Collectors.joining(" and "));
+        return listOption.isEmpty() ? names : listOption + " and " + names;
+    }
+
+    public boolean hasValidExtendedNames() {
+        return malformedSource.isEmpty()
+                && (!listOption.isEmpty() || authors.stream().anyMatch(author -> !author.getExtendedNameParts().isEmpty()))
+                && authors.stream().noneMatch(author -> author.getInvalidUsePrefix().isPresent());
+    }
+
+    public boolean matchesExtendedNameFormat(String input) {
+        return hasValidExtendedNames()
+                && (getAsBibtex().equals(input)
+                || joinForStorage(author -> author.getExtendedNameParts().isEmpty()
+                                            ? author.getGivenFamily(false) : author.getAsBibtex()).equals(input));
     }
 
     /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].
@@ -385,10 +431,10 @@ public class AuthorList implements Iterable<Author> {
     /// von Neumann, John Smith and Peter Black Brown" or "J. von Neumann, J.
     /// Smith and P. Black Brown"
     ///
-    /// @param abbreviate  whether to abbreivate first names.
+    /// @param abbreviate  whether to abbreviate first names.
     /// @param oxfordComma Whether to put a comma before the and at the end.
     /// @return formatted list of authors.
-    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+    /// @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explanation about the
     /// Oxford comma.</a>
     public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), author -> author.getGivenFamily(abbreviate), oxfordComma);
@@ -406,12 +452,12 @@ public class AuthorList implements Iterable<Author> {
             return false;
         }
 
-        return this.authors.equals(a.authors);
+        return authors.equals(a.authors) && listOption.equals(a.listOption) && malformedSource.equals(a.malformedSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authors);
+        return Objects.hash(authors, listOption, malformedSource);
     }
 
     /// Returns the list of authors separated by "and"s with first names before last name; first names are not abbreviated.
@@ -430,7 +476,10 @@ public class AuthorList implements Iterable<Author> {
                            .collect(Collectors.joining(" and "));
     }
 
-    /// Returns the list of authors in a form suitable for alphabetization. This means that last names come first, never preceded by "von" particles, and that any braces are removed. First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another. This form is not intended to be suitable for presentation, only for sorting.
+    /// Returns the list of authors in a form suitable for alphabetization.
+    /// This means that last names come first, never preceded by "von" particles, and that any braces are removed.
+    /// First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another.
+    /// This form is not intended to be suitable for presentation, only for sorting.
     ///
     ///
     /// - "John Smith" ==> "Smith, J.";

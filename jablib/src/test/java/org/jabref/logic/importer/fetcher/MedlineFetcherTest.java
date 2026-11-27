@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @ExternalServicesTest
 class MedlineFetcherTest {
-    // default value is empty string in BulidInfo
+    // default value is empty string in BuildInfo
     private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey).filter(StringUtil::isNotBlank);
 
     private MedlineFetcher fetcher;

@@ -24,7 +24,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /// Microsoft Word bibliography.
-/// The class is uesed both for import and export
+/// The class is used both for import and export
 /// See http://www.ecma-international.org/publications/standards/Ecma-376.htm
 public class MSBibDatabase {
 

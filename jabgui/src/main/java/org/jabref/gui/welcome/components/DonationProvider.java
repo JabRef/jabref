@@ -1,11 +1,13 @@
 package org.jabref.gui.welcome.components;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DelayedExecution;
@@ -17,18 +19,22 @@ import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/// Asks the user for a donation once a year - shown in the notification center.
+/// Asks the user for a donation every six months - shown in the notification center.
+///
+/// [impl->req~ux.donation.recurring-prompt~1]
 @NullMarked
 public class DonationProvider {
-    private static final int DONATION_INTERVAL_DAYS = 365;
+    private static final int DONATION_INTERVAL_MONTHS = 6;
 
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final DialogService dialogService;
 
     private @Nullable DelayedExecution scheduledShow;
 
-    public DonationProvider(GuiPreferences preferences, DialogService dialogService) {
+    public DonationProvider(GuiPreferences preferences, DialogService dialogService, NativeDesktop nativeDesktop) {
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.dialogService = dialogService;
     }
 
@@ -36,36 +42,45 @@ public class DonationProvider {
         if (preferences.getDonationPreferences().isNeverShowAgain()) {
             return;
         }
-        int lastShown = preferences.getDonationPreferences().getLastShownEpochDay();
-        scheduleAfterDays(calculateDaysUntilNextPopup(lastShown));
+        if (preferences.getDonationPreferences().getNextNotificationEpochDay() < 0) {
+            dismiss();
+        }
+        scheduleAfterDays(calculateDaysUntilNextNotification(
+                preferences.getDonationPreferences().getNextNotificationEpochDay(),
+                LocalDate.now()));
     }
 
-    public int calculateDaysUntilNextPopup(int lastShownEpochDay) {
-        int today = (int) LocalDate.now().toEpochDay();
-        if (lastShownEpochDay < 0) {
-            return 7; // 7 days after first-launch, show the donation notification
-        }
-        return Math.max(0, DONATION_INTERVAL_DAYS - (today - lastShownEpochDay));
+    public int calculateDaysUntilNextNotification(int nextNotificationEpochDay, LocalDate today) {
+        return (int) Math.max(0, ChronoUnit.DAYS.between(today, LocalDate.ofEpochDay(nextNotificationEpochDay)));
     }
 
     private void showNotification() {
-        preferences.getDonationPreferences().setLastShownEpochDay((int) LocalDate.now().toEpochDay());
+        dismiss();
 
         Notifications.DonationNotification notification = new Notifications.DonationNotification(
                 Localization.lang("Support JabRef"),
-                Localization.lang("Help us improve JabRef by donating."));
+                Localization.lang("You’ve been using JabRef for %0 months. Would you like to buy the JabRef team a coffee?", DONATION_INTERVAL_MONTHS),
+                () -> preferences.getDonationPreferences().setNeverShowAgain(true));
 
-        notification.getActions().add(new NotificationAction<>(Localization.lang("Never show again"), _ -> {
-            preferences.getDonationPreferences().setNeverShowAgain(true);
+        notification.getActions().add(new NotificationAction<>(Localization.lang("Dismiss"), _ -> {
+            dismiss();
             return OnClickBehaviour.HIDE_AND_REMOVE;
         }));
 
         notification.getActions().add(new NotificationAction<>(Localization.lang("Donate"), _ -> {
-            new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();
+            new OpenBrowserAction(URLs.DONATE_URL, dialogService, nativeDesktop).execute();
             return OnClickBehaviour.HIDE_AND_REMOVE;
         }));
 
         dialogService.notify(notification);
+    }
+
+    private void dismiss() {
+        scheduleNextNotification(LocalDate.now().plusMonths(DONATION_INTERVAL_MONTHS));
+    }
+
+    private void scheduleNextNotification(LocalDate date) {
+        preferences.getDonationPreferences().setNextNotificationEpochDay((int) date.toEpochDay());
     }
 
     /// Schedules the next donation notification after a specified number of days to take care
@@ -76,7 +91,9 @@ public class DonationProvider {
         int delayDays = days;
         if (days <= 0) {
             showNotification();
-            delayDays = DONATION_INTERVAL_DAYS;
+            delayDays = calculateDaysUntilNextNotification(
+                    preferences.getDonationPreferences().getNextNotificationEpochDay(),
+                    LocalDate.now());
         }
         scheduledShow = new DelayedExecution(Duration.hours(delayDays * 24), this::showIfNeeded);
         scheduledShow.start();

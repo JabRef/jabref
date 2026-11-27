@@ -7,6 +7,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.application.HostServices;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -16,6 +18,7 @@ import javafx.scene.control.Labeled;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.ai.AiTab;
 import org.jabref.gui.preferences.autocompletion.AutoCompletionTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
@@ -81,6 +84,7 @@ class PreferencesSearchCoverageTest {
         // under the interface they were written against.
         Injector.setModelOrService(CliPreferences.class, preferences);
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
+        Injector.setModelOrService(NativeDesktop.class, NativeDesktop.create(mock(HostServices.class), preferences, mock(ClipBoardManager.class)));
         Injector.setModelOrService(TaskExecutor.class, new CurrentThreadTaskExecutor());
         Injector.setModelOrService(StateManager.class, mock(StateManager.class, Answers.RETURNS_DEEP_STUBS));
         Injector.setModelOrService(AiService.class, mock(AiService.class, Answers.RETURNS_DEEP_STUBS));
@@ -116,8 +120,8 @@ class PreferencesSearchCoverageTest {
                 Named.of("XMP metadata", XmpPrivacyTab::new),
                 Named.of("Custom import formats", CustomImporterTab::new),
                 Named.of("Custom export formats", CustomExporterTab::new),
-                Named.of("Network", NetworkTab::new),
-                Named.of("Web search", () -> new WebSearchTab(AI_PREFERENCES)),
+                Named.of("Network", () -> new NetworkTab(new ReadOnlyBooleanWrapper(true).getReadOnlyProperty())),
+                Named.of("Web search", () -> new WebSearchTab(AI_PREFERENCES, new ReadOnlyBooleanWrapper(true).getReadOnlyProperty())),
                 Named.of("AI", () -> new AiTab(AI_PREFERENCES)));
     }
 

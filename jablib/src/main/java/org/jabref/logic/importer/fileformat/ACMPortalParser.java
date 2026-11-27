@@ -124,8 +124,8 @@ public class ACMPortalParser implements Parser {
         if ("PAPER_CONFERENCE".equals(typeStr)) {
             type = StandardEntryType.Conference;
         } else {
-            String upperUnderscoreTyeStr = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, typeStr);
-            type = Enums.getIfPresent(StandardEntryType.class, upperUnderscoreTyeStr).or(StandardEntryType.Article);
+            String upperUnderscoreTypeStr = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, typeStr);
+            type = Enums.getIfPresent(StandardEntryType.class, upperUnderscoreTypeStr).or(StandardEntryType.Article);
         }
         return type;
     }

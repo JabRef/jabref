@@ -98,13 +98,27 @@ public class Launcher {
             }
 
             CSLStyleLoader.loadInternalStyles();
+            loadKeyringPreferences(preferences);
 
             JabRefGUI.setup(uiCommands, preferences);
             JabRefGUI.launch(JabRefGUI.class, args);
         } catch (Throwable throwable) {
+            if (LOGGER == null) {
+                // initLogging itself failed; fall back to an unconfigured logger so the cause is not hidden by a NullPointerException
+                LOGGER = LoggerFactory.getLogger(Launcher.class);
+            }
             LOGGER.error("Could not launch JabRef", throwable);
             throw throwable;
         }
+    }
+
+    /// Initializes the credential-backed preference groups on the launcher thread after migrations.
+    /// The first JavaFX consumers then read the cached preferences, even when the keyring required user interaction.
+    private static void loadKeyringPreferences(CliPreferences preferences) {
+        preferences.getProxyPreferences();
+        preferences.getGitPreferences();
+        preferences.getImporterPreferences();
+        preferences.getCiteDrivePreferences();
     }
 
     /// This needs to be called as early as possible. After the first log write, it

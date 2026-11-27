@@ -2,7 +2,7 @@
 //JAVA 25
 //REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-//DEPS org.openjfx:javafx-controls:26.0.2
+//DEPS org.openjfx:javafx-controls:27
 // JavaFX loads glass/prism through System.load, which Java 25 flags (JEP 472). jbang resolves the //DEPS onto the
 // module path, so the caller is the `javafx.graphics` module, not ALL-UNNAMED as in the other launchers. Without
 // this, every window run prints four WARNING lines before the window and nothing else.

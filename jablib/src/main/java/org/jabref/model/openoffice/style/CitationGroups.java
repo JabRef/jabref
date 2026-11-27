@@ -103,7 +103,7 @@ public class CitationGroups {
         return OOListUtil.map(globalOrder.get(), citationGroupsUnordered::get);
     }
 
-    /// Impose an order of citation groups by providing the order of their citation group idendifiers.
+    /// Impose an order of citation groups by providing the order of their citation group identifiers.
     ///
     /// Also set indexInGlobalOrder for each citation group.
     public void setGlobalOrder(@NonNull List<CitationGroupId> globalOrder) {

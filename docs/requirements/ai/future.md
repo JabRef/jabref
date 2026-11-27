@@ -3,8 +3,6 @@ parent: AI
 grand_parent: Requirements
 ---
 
-<!-- oft:off -->
-
 # Future features
 `feat~ai.future~1`
 
@@ -58,7 +56,5 @@ User needs to adjust the RAG parameters to refine AI outputs.
 Needs: impl
 
 Status: draft
-
-<!-- oft:on -->
 
 <!-- markdownlint-disable-file MD022 -->

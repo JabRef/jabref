@@ -8,11 +8,15 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class OcrEngineFactory {
 
+    @SuppressWarnings("checkstyle:NoWhitespaceBefore")
     public static OcrEngine create(OcrPreferences preferences) {
         return switch (preferences.getEngineSelection()) {
             case DOCLING ->
                     new DoclingEngine(preferences);
-            case OCRMYPDF ->
+            case TESSERACT,
+                 EASYOCR,
+                 PADDLEOCR,
+                 APPLEOCR ->
                     new OcrMyPdfEngine(preferences);
         };
     }

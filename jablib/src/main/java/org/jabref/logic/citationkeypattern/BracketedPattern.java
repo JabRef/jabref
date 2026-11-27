@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.integrity.PagesChecker;
@@ -546,6 +547,8 @@ public class BracketedPattern {
                     }
                 }
                 resultingLabel = abbreviateSB.toString();
+            } else if (NormalizeNamesFormatter.KEY.equals(modifier)) {
+                resultingLabel = AuthorList.parse(resultingLabel).getAsLastFirstNamesWithAnd(false);
             } else {
                 Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                 if (formatter.isPresent()) {
@@ -716,7 +719,7 @@ public class BracketedPattern {
     /// Gets the last name of the first author/editor
     ///
     /// @param authorList an [AuthorList]
-    /// @return the surname of an author/editor or the von part if no lastname is prsent or ""  if no author was found or both firstname+lastname are empty
+    /// @return the surname of an author/editor or the von part if no lastname is present or ""  if no author was found or both firstname+lastname are empty
     /// This method is guaranteed to never return null.
     private static String firstAuthor(AuthorList authorList) {
         return authorList.getAuthors().stream()
@@ -836,7 +839,7 @@ public class BracketedPattern {
     }
 
     /// Returns the authors according to the <a href="https://github.com/michel-kraemer/citeproc-java">BibTeX LNI template</a>
-    /// Examples: <a href="https://github.com/gi-ev/biblatex-lni/blob/main/basic-test-en.tex">Examples from the tmplate</a>
+    /// Examples: <a href="https://github.com/gi-ev/biblatex-lni/blob/main/basic-test-en.tex">Examples from the template</a>
     /// Also see discussion at the <a href="https://github.com/JabRef/jabref/pull/11614">pull request that introduced this</a>.
     ///
     /// @param authorList an [AuthorList]

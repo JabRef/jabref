@@ -9,9 +9,9 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.StackPane;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileUtil;
@@ -27,7 +27,7 @@ public class BackupResolverDialog extends FXDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupResolverDialog.class);
 
-    public BackupResolverDialog(Path originalPath, Path backupDir, ExternalApplicationsPreferences externalApplicationsPreferences) {
+    public BackupResolverDialog(Path originalPath, Path backupDir, NativeDesktop nativeDesktop, DialogService dialogService) {
         super(AlertType.CONFIRMATION, Localization.lang("Backup found"), true);
         setHeaderText(null);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
@@ -53,7 +53,7 @@ public class BackupResolverDialog extends FXDialog {
                 String clickedLinkText = ((Hyperlink) (e.getSource())).getText();
                 if (backupFilename.equals(clickedLinkText)) {
                     try {
-                        NativeDesktop.openFolderAndSelectFile(backupPathOpt.get(), externalApplicationsPreferences, null);
+                        nativeDesktop.openFolderAndSelectFile(backupPathOpt.get(), dialogService);
                     } catch (IOException ex) {
                         LOGGER.error("Could not open backup folder", ex);
                     }

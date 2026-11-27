@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.threewaymerge.ThreeWayMergeView;
@@ -61,17 +62,20 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
     public DuplicateResolverDialog(BibEntry one,
                                    BibEntry two,
                                    DuplicateResolverType type,
                                    StateManager stateManager,
                                    DialogService dialogService,
-                                   GuiPreferences preferences) {
+                                   GuiPreferences preferences,
+                                   NativeDesktop nativeDesktop) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.actionFactory = new ActionFactory();
         init(one, two, type);
     }
@@ -91,21 +95,21 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, preferences, stateManager);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferences, stateManager, nativeDesktop);
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
-                threeWayMerge = new ThreeWayMergeView(one, two, preferences, stateManager);
+                threeWayMerge = new ThreeWayMergeView(one, two, preferences, stateManager, nativeDesktop);
             }
             case IMPORT_CHECK -> {
                 first = new ButtonType(Localization.lang("Keep existing entry"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Existing entry"),
-                        Localization.lang("From import"), preferences, stateManager);
+                        Localization.lang("From import"), preferences, stateManager, nativeDesktop);
             }
             default ->
                     throw new IllegalStateException("Switch expression should be exhaustive");
@@ -155,7 +159,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             return null;
         });
 
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferences.getExternalApplicationsPreferences());
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, nativeDesktop);
         Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
         borderPane.setRight(helpButton);
 

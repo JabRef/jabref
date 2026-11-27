@@ -1,9 +1,11 @@
 package org.jabref.gui.linkedfile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
@@ -36,6 +38,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final List<BibEntry> linkedEntries;
     private final ImportHandler importHandler;
 
@@ -47,13 +50,15 @@ public class OcrLinkedFileAction extends SimpleCommand {
                                TaskExecutor taskExecutor,
                                FileUpdateMonitor fileUpdateMonitor,
                                UndoManager undoManager,
-                               StateManager stateManager) {
+                               StateManager stateManager,
+                               NativeDesktop nativeDesktop) {
         this.linkedFile = linkedFile;
         this.linkedEntries = bibEntries;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
@@ -61,8 +66,13 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 undoManager,
                 stateManager,
                 dialogService,
-                taskExecutor
+                taskExecutor,
+                nativeDesktop
         );
+        boolean fileExists = linkedFile.findIn(databaseContext, preferences.getFilePreferences())
+                                       .filter(Files::isRegularFile)
+                                       .isPresent();
+        this.setExecutable(fileExists);
     }
 
     @Override
@@ -88,17 +98,44 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     }
                 }
                 case OcrResult.Failure failure -> {
-                    String failureReason = failure.reason().getMessage(ocrEngine.getName(),
+                    String failureReason = failure.reason().getMessage(
+                            ocrEngine.getName(),
                             preferences.getOcrPreferences().getOcrEnginePath());
-                    dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), failureReason);
+
+                    String detailedMessage = buildFailureMessage(failureReason, failure);
+
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("OCR failed"),
+                            detailedMessage);
                 }
             }
         });
         ocrTask.onFailure(exception -> {
             LOGGER.error("Unexpected error during OCR", exception);
             dialogService.notify(Localization.lang("OCR failed. See the logs for the details"));
-        });
+        }).failureShownByCaller(true);
         taskExecutor.execute(ocrTask);
+    }
+
+    static String buildFailureMessage(String failureReason, OcrResult.Failure failure) {
+        String detailedMessage = failureReason;
+
+        if (!failure.command().isEmpty()) {
+            detailedMessage += "\n\n"
+                    + Localization.lang("Command\n%0", formatCommand(failure.command()));
+        }
+
+        if (!failure.output().isBlank()) {
+            detailedMessage += "\n\n"
+                    + Localization.lang("Output\n%0", failure.output());
+        }
+
+        return detailedMessage;
+    }
+
+    static String formatCommand(List<String> command) {
+        return command.stream()
+                      .collect(Collectors.joining(" ", "\"", "\""));
     }
 
     private class OcredFileSuccessNotification extends Notifications.FileNotification {
@@ -107,7 +144,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
 
             NotificationAction<Path> action = new NotificationAction<>(Localization.lang("Show file"), _ -> {
                 try {
-                    NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
+                    nativeDesktop.openFolderAndSelectFile(path, dialogService);
                 } catch (IOException e) {
                     LOGGER.error("Could not open OCRed file.", e);
                 }

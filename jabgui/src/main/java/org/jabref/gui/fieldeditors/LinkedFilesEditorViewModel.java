@@ -24,6 +24,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -32,6 +33,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -62,6 +64,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
     public LinkedFilesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider,
                                       DialogService dialogService,
@@ -69,7 +72,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
                                       GuiPreferences preferences,
-                                      UndoManager undoManager) {
+                                      UndoManager undoManager,
+                                      NativeDesktop nativeDesktop) {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);
 
@@ -77,6 +81,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         this.databaseContext = databaseContext;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         BindingsHelper.bindContentBidirectional(
                 files,
@@ -149,7 +154,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       databaseContext,
                                       taskExecutor,
                                       dialogService,
-                                      preferences))
+                                      preferences,
+                                      nativeDesktop))
                               .collect(Collectors.toList());
     }
 
@@ -168,7 +174,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences));
+                preferences,
+                nativeDesktop));
     }
 
     /// For the linked-file context menu, whose actions record into this library's journal.
@@ -179,6 +186,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
+        fulltextLookupInProgress.bind(EntryLookupsInProgress.FULLTEXT.inProgress(entry));
 
         if (preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
             LOGGER.debug("Auto-linking files for entry {}", entry);
@@ -212,7 +220,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                         databaseContext,
                         taskExecutor,
                         dialogService,
-                        preferences);
+                        preferences,
+                        nativeDesktop);
                 newLinkedFile.markAsAutomaticallyFound();
                 result.add(newLinkedFile);
             }
@@ -247,10 +256,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             download_success = downloadFile(urlField.get());
         }
         if (urlField.isEmpty() || !download_success) {
+            BibEntry lookedUpEntry = entry;
             BackgroundTask
-                    .wrap(() -> fetcher.findFullTextPDF(entry))
-                    .onRunning(() -> fulltextLookupInProgress.setValue(true))
-                    .onFinished(() -> fulltextLookupInProgress.setValue(false))
+                    .wrap(() -> fetcher.findFullTextPDF(lookedUpEntry))
+                    .onRunning(() -> EntryLookupsInProgress.FULLTEXT.started(lookedUpEntry))
+                    .onFinished(() -> EntryLookupsInProgress.FULLTEXT.finished(lookedUpEntry))
                     .onSuccess(result -> {
                         if (result.isPresent()) {
                             addFromURLAndDownload(result.get().source(), result.get().headers());
@@ -278,7 +288,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences);
+                preferences,
+                nativeDesktop);
         files.add(onlineFile);
         onlineFile.download(true, headers, undoManager);
     }

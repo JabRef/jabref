@@ -26,7 +26,7 @@ public class ZipFileChooser extends BaseDialog<Path> {
 
     /// New ZIP file chooser.
     ///
-    /// @param zipFile ZIP-Fle to choose from, must be readable
+    /// @param zipFile ZIP-File to choose from, must be readable
     public ZipFileChooser(FileSystem zipFile) throws IOException {
         setTitle(Localization.lang("Select file from ZIP-archive"));
 

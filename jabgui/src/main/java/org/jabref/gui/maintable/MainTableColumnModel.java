@@ -248,18 +248,18 @@ public class MainTableColumnModel {
             return new MainTableColumnModel(Type.NORMALFIELD, "");
         }
 
-        String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
+        String[] splitName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
-        Type type = Type.fromString(splittedName[0]);
+        Type type = Type.fromString(splitName[0]);
         String qualifier = "";
 
         if ((type == Type.NORMALFIELD)
                 || (type == Type.SPECIALFIELD)
                 || (type == Type.EXTRAFILE)) {
-            if (splittedName.length == 1) {
-                qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD
+            if (splitName.length == 1) {
+                qualifier = splitName[0]; // By default the rawColumnName is parsed as NORMALFIELD
             } else {
-                qualifier = splittedName[1];
+                qualifier = splitName[1];
             }
         }
 

@@ -30,9 +30,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.highlight.Highlighter;
-import org.apache.lucene.search.highlight.QueryScorer;
-import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +113,6 @@ public final class LinkedFilesSearcher {
         long startTime = System.currentTimeMillis();
 
         Map<String, List<String>> linkedFilesMap = getLinkedFilesMap();
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery));
 
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document document = storedFields.document(scoreDoc.doc);
@@ -130,7 +126,7 @@ public final class LinkedFilesSearcher {
                             getFieldContents(document, LinkedFilesConstants.CONTENT),
                             getFieldContents(document, LinkedFilesConstants.ANNOTATIONS),
                             Integer.parseInt(getFieldContents(document, LinkedFilesConstants.PAGE_NUMBER)),
-                            highlighter);
+                            searchQuery);
                     searchResults.addSearchResult(entriesWithFile, searchResult);
                 }
             }

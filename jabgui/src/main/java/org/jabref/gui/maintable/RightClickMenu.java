@@ -12,6 +12,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.CopyTo;
 import org.jabref.gui.edit.EditAction;
@@ -56,7 +57,8 @@ public class RightClickMenu {
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
                                      BibEntryTypesManager entryTypesManager,
-                                     ImportHandler importHandler) {
+                                     ImportHandler importHandler,
+                                     NativeDesktop nativeDesktop) {
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
@@ -71,12 +73,12 @@ public class RightClickMenu {
                 createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferences, nativeDesktop)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager)),
 
                 new SeparatorMenuItem(),
 
-                createSendSubMenu(factory, dialogService, stateManager, preferences, entryTypesManager, taskExecutor),
+                createSendSubMenu(factory, dialogService, stateManager, preferences, entryTypesManager, taskExecutor, nativeDesktop),
 
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, () -> libraryTab, dialogService, preferences, stateManager),
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, () -> libraryTab, dialogService, preferences, stateManager),
@@ -87,20 +89,20 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.GET_FULLTEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
-                createMoreFileOperationsSubMenu(factory, libraryTab, dialogService, stateManager, preferences, taskExecutor),
+                factory.createMenuItem(StandardActions.GET_FULLTEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor, nativeDesktop)),
+                createMoreFileOperationsSubMenu(factory, libraryTab, dialogService, stateManager, preferences, taskExecutor, nativeDesktop),
                 extractFileReferencesOnline,
                 extractFileReferencesOffline,
                 factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager, preferences)),
 
-                factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences, nativeDesktop)),
 
-                createSearchSubMenu(factory, dialogService, stateManager, preferences),
+                createSearchSubMenu(factory, dialogService, stateManager, preferences, nativeDesktop),
 
                 new SeparatorMenuItem(),
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager(), entryTypesManager).asSubMenu(),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences)),
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, nativeDesktop)),
                 factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor))
         );
 
@@ -223,11 +225,12 @@ public class RightClickMenu {
                                           StateManager stateManager,
                                           GuiPreferences preferences,
                                           BibEntryTypesManager entryTypesManager,
-                                          TaskExecutor taskExecutor) {
+                                          TaskExecutor taskExecutor,
+                                          NativeDesktop nativeDesktop) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor, nativeDesktop)),
                 new SeparatorMenuItem()
         );
 
@@ -239,13 +242,14 @@ public class RightClickMenu {
                                                         DialogService dialogService,
                                                         StateManager stateManager,
                                                         GuiPreferences preferences,
-                                                        TaskExecutor taskExecutor) {
+                                                        TaskExecutor taskExecutor,
+                                                        NativeDesktop nativeDesktop) {
         Menu moreFileOperationsMenu = factory.createMenu(StandardActions.MORE_FILE_OPERATIONS);
         moreFileOperationsMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences())),
-                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences)),
-                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor)),
-                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor))
+                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences, nativeDesktop)),
+                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor, nativeDesktop)),
+                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor, nativeDesktop))
         );
         return moreFileOperationsMenu;
     }
@@ -253,12 +257,13 @@ public class RightClickMenu {
     private static Menu createSearchSubMenu(ActionFactory factory,
                                             DialogService dialogService,
                                             StateManager stateManager,
-                                            GuiPreferences preferences) {
+                                            GuiPreferences preferences,
+                                            NativeDesktop nativeDesktop) {
         Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
         searchMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SEMANTIC_SCHOLAR, new SearchSemanticScholarAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences))
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEARCH_SEMANTIC_SCHOLAR, new SearchSemanticScholarAction(dialogService, stateManager, preferences, nativeDesktop)),
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences, nativeDesktop))
         );
         return searchMenu;
     }

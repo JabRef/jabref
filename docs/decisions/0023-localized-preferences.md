@@ -40,19 +40,19 @@ If user stores value, the value is stored as is.
 The default value is stored with `%` in front.
 A caller has to localize any stored value in the preferences if the string is 'escaped' by `%` as the first character.
 
-Code: If looked-up string starts with `%`, call `Localization.lang` of the substring (strating from 2nd character).
+Code: If looked-up string starts with `%`, call `Localization.lang` of the substring (starting from 2nd character).
 Otherwise, use string as is.
 
 * Good, because clear distinction between default value and user-supplied value.
 * Good, because on update of JabRef's defaults, the string is not modified.
-* Good, because already used in fxml files to indicate translateable strings.
+* Good, because already used in fxml files to indicate translatable strings.
 * Good, because consistent to FXML.
 
 ### Localize Defaults
 
 Example: `defaults.put(EMAIL_SUBJECT, Localization.lang("References"));` in `JabRefGuiPreferences`.
 
-* Good, because it is the current implementaton
+* Good, because it is the current implementation
 * Bad, because it does not allow for language switching
 
 ### Store the preference only when it was changed by the user

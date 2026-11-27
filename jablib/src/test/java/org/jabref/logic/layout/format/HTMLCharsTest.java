@@ -35,7 +35,7 @@ class HTMLCharsTest {
                 Arguments.of("h&aacute;llo", "h\\'allo"),
                 Arguments.of("&imath; &imath;", "\\i \\i"),
                 Arguments.of("&imath;", "\\i"),
-                Arguments.of("&imath;", "\\{i}"),
+                Arguments.of("{i", "\\{i}"),
                 Arguments.of("&imath;&imath;", "\\i\\i"),
                 Arguments.of("&auml;", "{\\\"{a}}"),
                 Arguments.of("&auml;", "{\\\"a}"),
@@ -72,7 +72,17 @@ class HTMLCharsTest {
 
                 Arguments.of("<u>hallo</u>", "\\underline{hallo}"),
                 Arguments.of("<s>hallo</s>", "\\sout{hallo}"),
-                Arguments.of("<tt>hallo</tt>", "\\texttt{hallo}")
+                Arguments.of("<tt>hallo</tt>", "\\texttt{hallo}"),
+
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "\\textsc{hallo}"),
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "{\\sc hallo}"),
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "{\\scshape hallo}"),
+                Arguments.of("<span style=\"font-variant: small-caps\">hallo</span>", "\\textsc {hallo}"),
+
+                Arguments.of("<em>L&oacute;pez</em>", "\\emph{L{\\'o}pez}"),
+                Arguments.of("<em>The TeX Book</em>", "{\\em The {\\TeX} Book}"),
+                Arguments.of("<b>a <i>b</i> c</b>", "\\textbf{a \\textit{b} c}"),
+                Arguments.of("hallo", "\\textsc\\hallo")
         );
     }
 
@@ -137,8 +147,12 @@ class HTMLCharsTest {
         return Stream.of(
                 Arguments.of("&amp;", "&"),
                 Arguments.of("&gt;", "&gt;"),
+                Arguments.of("&Omega;", "&Omega;"),
+                Arguments.of("&Alpha;", "&Alpha;"),
+                Arguments.of("&alpha;", "&alpha;"),
                 Arguments.of("&amp;HelloWorld", "&HelloWorld"),
-                Arguments.of("&amp;amp;", "\\\\&"),
+                Arguments.of("&amp;", "\\&"),
+                Arguments.of("\\&amp;", "\\\\&"),
                 Arguments.of("&lt;", "&lt;"),
                 Arguments.of("&gt;", "&gt;")
         );
@@ -166,6 +180,51 @@ class HTMLCharsTest {
     @ParameterizedTest
     @MethodSource("provideBracesKeepFormattingData")
     void bracesKeepFormatting(String expected, String input) {
+        assertEquals(expected, layoutKeep.format(input));
+    }
+
+    private static Stream<Arguments> provideNestedBracesKeepFormattingData() {
+        return Stream.of(
+                Arguments.of(
+                        "<i>{British} <b>{Journal}</b> of {Nutrition}</i>",
+                        "\\textit{{British} \\textbf{{Journal}} of {Nutrition}}"),
+                Arguments.of("{<i>{British}</i>}", "{\\textit{{British}}}"),
+                Arguments.of(
+                        "{<em>British {<b>Journal</b>} of Nutrition</em>}",
+                        "{\\em British {\\bf Journal} of Nutrition}"),
+                Arguments.of(
+                        "<span style=\"font-variant: small-caps\">{Small} <b>caps</b></span> tail",
+                        "\\textsc{{Small} \\textbf{caps}} tail"),
+                Arguments.of(
+                        "{<span style=\"font-variant: small-caps\">Small caps</span>}",
+                        "{\\scshape Small caps}"),
+                Arguments.of("<i>M{&uuml;}ller <b>caf&eacute;</b></i>", "\\textit{M{\\\"{u}}ller \\textbf{caf\\'{e}}}")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNestedBracesKeepFormattingData")
+    void nestedFormattingKeepsProtectionBraces(String expected, String input) {
+        assertEquals(expected, layoutKeep.format(input));
+    }
+
+    private static Stream<Arguments> provideEscapedLiteralBracesData() {
+        return Stream.of(
+                Arguments.of("{literal}", "\\{literal\\}"),
+                Arguments.of("{i}", "\\{i\\}"),
+                Arguments.of("{", "\\{"),
+                Arguments.of("}", "\\}"),
+                Arguments.of("<i>a {literal} z</i> tail", "\\textit{a \\{literal\\} z} tail"),
+                Arguments.of("<i>a {literal z</i> tail", "\\textit{a \\{literal z} tail"),
+                Arguments.of("<i>a }literal z</i> tail", "\\textit{a \\}literal z} tail"),
+                Arguments.of("<i>a {<b>literal</b>} z</i>", "\\textit{a \\{\\textbf{literal}\\} z}")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEscapedLiteralBracesData")
+    void escapedLiteralBracesArePreservedInBothBraceModes(String expected, String input) {
+        assertEquals(expected, layout.format(input));
         assertEquals(expected, layoutKeep.format(input));
     }
 }

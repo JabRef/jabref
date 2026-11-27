@@ -76,7 +76,7 @@ public class IsiImporter extends Importer {
         while (((str = bufferedReader.readLine()) != null) && (i < 50)) {
             /*
              * The following line gives false positives for RIS files, so it
-             * should not be uncommented. The hypen is a characteristic of the
+             * should not be uncommented. The hyphen is a characteristic of the
              * RIS format.
              *
              * str = str.replace(" - ", "")

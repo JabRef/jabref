@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -41,7 +42,7 @@ public class ComplexSearchQuery {
         ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         terms.forEach(term -> {
             String termText = term.text();
-            switch (term.field().toLowerCase()) {
+            switch (term.field().toLowerCase(Locale.ROOT)) {
                 case "author" ->
                         builder.author(termText);
                 case "title" ->
@@ -256,7 +257,7 @@ public class ComplexSearchQuery {
         public ComplexSearchQueryBuilder terms(Collection<Term> terms) {
             terms.forEach(term -> {
                 String termText = term.text();
-                switch (term.field().toLowerCase()) {
+                switch (term.field().toLowerCase(Locale.ROOT)) {
                     case "author" ->
                             this.author(termText);
                     case "title" ->

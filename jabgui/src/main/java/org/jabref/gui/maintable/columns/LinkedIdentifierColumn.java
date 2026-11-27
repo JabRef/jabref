@@ -34,24 +34,28 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
     private final CellFactory cellFactory;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
     public LinkedIdentifierColumn(MainTableColumnModel model,
                                   CellFactory cellFactory,
                                   BibDatabaseContext database,
                                   DialogService dialogService,
                                   GuiPreferences preferences,
-                                  StateManager stateManager) {
+                                  StateManager stateManager,
+                                  NativeDesktop nativeDesktop) {
         super(model);
         this.database = database;
         this.cellFactory = cellFactory;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         Node headerGraphic = IconTheme.JabRefIcons.WWW.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
         this.setGraphic(headerGraphic);
         this.getStyleClass().add(MainTableColumnFactory.STYLE_ICON_COLUMN);
         MainTableColumnFactory.setExactWidth(this, ColumnPreferences.ICON_COLUMN_WIDTH);
+        MainTableColumnFactory.bindExactWidth(this, headerGraphic);
         this.setResizable(false);
         this.setCellValueFactory(cellData -> cellData.getValue().getLinkedIdentifiers());
         new ValueTableCellFactory<BibEntryTableViewModel, Map<Field, String>>()
@@ -59,9 +63,9 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                 .withTooltip(this::createIdentifierTooltip)
                 .withMenu(this::createIdentifierMenu)
                 .withOnMouseClickedEvent((_, linkedFiles) -> event -> {
-                    // If we only have one identifer, open directly
+                    // If we only have one identifier, open directly
                     if ((linkedFiles.size() == 1) && (event.getButton() == MouseButton.PRIMARY)) {
-                        new OpenUrlAction(dialogService, stateManager, preferences).execute();
+                        new OpenUrlAction(dialogService, stateManager, preferences, nativeDesktop).execute();
                     }
                 })
                 .install(this);
@@ -96,7 +100,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                     cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {
                 try {
-                    NativeDesktop.openExternalViewer(database, preferences, values.get(field), field, dialogService, entry.getEntry());
+                    nativeDesktop.openExternalViewer(database, values.get(field), field, dialogService, entry.getEntry());
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                 }

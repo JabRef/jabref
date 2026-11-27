@@ -15,7 +15,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
@@ -45,7 +44,7 @@ public final class WhatsNewButton {
 
     private final WhatsNewViewModel viewModel;
     private final DialogService dialogService;
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final NativeDesktop nativeDesktop;
     private final Button button;
     private final Label badge = new Label();
     private @Nullable WhatsNewDialog openDialog;
@@ -53,10 +52,10 @@ public final class WhatsNewButton {
     private WhatsNewButton(WhatsNewViewModel viewModel,
                            ActionFactory factory,
                            DialogService dialogService,
-                           ExternalApplicationsPreferences externalApplicationsPreferences) {
+                           NativeDesktop nativeDesktop) {
         this.viewModel = viewModel;
         this.dialogService = dialogService;
-        this.externalApplicationsPreferences = externalApplicationsPreferences;
+        this.nativeDesktop = nativeDesktop;
         this.button = factory.createIconButton(StandardActions.WHATS_NEW, new OpenCommand());
         // The button's tooltip is the action's description plus the command's status message.
         badge.getStyleClass().add("whats-new-badge");
@@ -73,7 +72,7 @@ public final class WhatsNewButton {
     public static Optional<Button> create(ActionFactory factory,
                                           TaskExecutor taskExecutor,
                                           DialogService dialogService,
-                                          ExternalApplicationsPreferences externalApplicationsPreferences,
+                                          NativeDesktop nativeDesktop,
                                           GitHandlerRegistry gitHandlerRegistry,
                                           BooleanSupplier quit) {
         Optional<WhatsNewViewModel> viewModel = Optional.ofNullable(System.getProperty(CHECKOUT_PROPERTY))
@@ -84,7 +83,7 @@ public final class WhatsNewButton {
                                                                 taskExecutor,
                                                                 quit)));
         viewModel.ifPresent(WhatsNewViewModel::startWatching);
-        return viewModel.map(model -> new WhatsNewButton(model, factory, dialogService, externalApplicationsPreferences).button);
+        return viewModel.map(model -> new WhatsNewButton(model, factory, dialogService, nativeDesktop).button);
     }
 
     private void showGlyph(boolean updateAvailable) {
@@ -102,7 +101,7 @@ public final class WhatsNewButton {
         WhatsNewDialog dialog = new WhatsNewDialog(viewModel.getPending(),
                 viewModel.shownBeforeProperty(),
                 Boolean.getBoolean(RESTART_LOOP_PROPERTY) ? Optional.of(viewModel.updateAvailableProperty()) : Optional.empty(),
-                url -> NativeDesktop.openBrowserShowPopup(url, dialogService, externalApplicationsPreferences));
+                url -> nativeDesktop.openBrowserShowPopup(url, dialogService));
         dialog.titleProperty().bind(viewModel.titleProperty());
         openDialog = dialog;
         dialogService.showCustomDialog(dialog);
