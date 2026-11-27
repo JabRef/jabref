@@ -12,13 +12,13 @@
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
-// Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
+// Pin JavaFX to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
 // Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with
-// javafx.base:26 fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
-//DEPS org.openjfx:javafx-base:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-graphics:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-controls:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-fxml:26.0.1:${os.detected.jfxname}
+// a current javafx.base fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
+//DEPS org.openjfx:javafx-base:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-graphics:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-controls:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-fxml:27.0.1.1:${os.detected.jfxname}
 
 // from jabsrv-cli
 //DEPS info.picocli:picocli:4.7.7
@@ -27,7 +27,7 @@
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.23
 //DEPS com.github.ben-manes.caffeine:caffeine:3.3.1
 //DEPS com.google.guava:guava:33.8.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.12.0
+//DEPS com.konghq:unirest-modules-gson:4.12.4
 //DEPS de.undercouch:citeproc-java:3.5.3
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
