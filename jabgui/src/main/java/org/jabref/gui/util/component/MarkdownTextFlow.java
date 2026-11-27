@@ -30,8 +30,8 @@ import javafx.scene.text.TextAlignment;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.OpenBrowserAction;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.SelectableTextFlow;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -172,8 +172,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         new OpenBrowserAction(
                 url,
                 Injector.instantiateModelOrService(DialogService.class),
-                Injector.instantiateModelOrService(GuiPreferences.class)
-                        .getExternalApplicationsPreferences()).execute();
+                Injector.instantiateModelOrService(NativeDesktop.class)).execute();
     }
 
     private void addTextNode(@Nullable String content, @Nullable Node astNode, String... styleClasses) {

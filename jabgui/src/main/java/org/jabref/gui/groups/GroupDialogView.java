@@ -32,6 +32,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IkonliIcon;
@@ -125,6 +126,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
+    @Inject private NativeDesktop nativeDesktop;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            @Nullable GroupTreeNode parentNode,
@@ -155,7 +157,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         final Button helpButton = (Button) getDialogPane().lookupButton(helpButtonType);
 
         ActionFactory actionFactory = new ActionFactory();
-        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferences.getExternalApplicationsPreferences());
+        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, nativeDesktop);
         actionFactory.configureIconButton(
                 StandardActions.HELP_GROUPS,
                 helpAction,

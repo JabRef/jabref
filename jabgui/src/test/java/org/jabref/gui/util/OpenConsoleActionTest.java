@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.Optional;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.OpenConsoleAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -32,7 +33,7 @@ class OpenConsoleActionTest {
 
     @Test
     void newActionGetsCurrentDatabase() {
-        OpenConsoleAction action = new OpenConsoleAction(stateManager, preferences, null);
+        OpenConsoleAction action = new OpenConsoleAction(stateManager, preferences, null, mock(NativeDesktop.class));
         action.execute();
         verify(stateManager, times(1)).getActiveDatabase();
         verify(current, times(1)).getDatabasePath();
@@ -40,7 +41,7 @@ class OpenConsoleActionTest {
 
     @Test
     void newActionGetsSuppliedDatabase() {
-        OpenConsoleAction action = new OpenConsoleAction(() -> other, stateManager, preferences, null);
+        OpenConsoleAction action = new OpenConsoleAction(() -> other, stateManager, preferences, null, mock(NativeDesktop.class));
         action.execute();
         verify(stateManager, never()).getActiveDatabase();
         verify(other, times(1)).getDatabasePath();
@@ -48,7 +49,7 @@ class OpenConsoleActionTest {
 
     @Test
     void actionDefaultsToCurrentDatabase() {
-        OpenConsoleAction action = new OpenConsoleAction(() -> null, stateManager, preferences, null);
+        OpenConsoleAction action = new OpenConsoleAction(() -> null, stateManager, preferences, null, mock(NativeDesktop.class));
         action.execute();
         verify(stateManager, times(1)).getActiveDatabase();
         verify(current, times(1)).getDatabasePath();

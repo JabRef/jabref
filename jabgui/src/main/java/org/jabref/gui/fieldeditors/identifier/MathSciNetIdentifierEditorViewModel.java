@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.browserext.BrowserExtensionBridgeClient;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -33,8 +34,9 @@ public class MathSciNetIdentifierEditorViewModel extends BaseIdentifierEditorVie
                                                TaskExecutor taskExecutor,
                                                GuiPreferences preferences,
                                                UndoManager undoManager,
-                                               StateManager stateManager) {
-        super(StandardField.MR_NUMBER, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                                               StateManager stateManager,
+                                               NativeDesktop nativeDesktop) {
+        super(StandardField.MR_NUMBER, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
         configure(false, false, false, true);
     }
 
