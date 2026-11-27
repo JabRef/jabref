@@ -171,7 +171,8 @@ public class JabRefGUI extends Application {
                     new VersionWorker(buildInfo.version,
                             dialogService,
                             taskExecutor,
-                            preferences)
+                            preferences,
+                            nativeDesktop)
                             .checkForNewVersionDelayed();
                 }
             });

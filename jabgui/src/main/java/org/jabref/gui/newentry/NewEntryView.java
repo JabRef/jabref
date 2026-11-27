@@ -31,6 +31,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
@@ -95,6 +96,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private AiService aiService;
+    @Inject private NativeDesktop nativeDesktop;
 
     private final ControlsFxVisualizer visualizer;
 
@@ -230,7 +232,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     @FXML
     public void initialize() {
-        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, fileUpdateMonitor, aiService);
+        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, fileUpdateMonitor, aiService, nativeDesktop);
 
         getDialogPane().disableProperty().bind(viewModel.executingProperty());
 

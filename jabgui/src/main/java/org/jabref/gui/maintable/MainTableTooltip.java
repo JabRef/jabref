@@ -6,6 +6,7 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.logic.util.TaskExecutor;
@@ -20,9 +21,9 @@ public class MainTableTooltip extends Tooltip {
 
     private boolean resizeScheduled;
 
-    public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor, NativeDesktop nativeDesktop) {
         this.preferences = preferences;
-        this.preview = new PreviewViewer(dialogService, preferences, taskExecutor);
+        this.preview = new PreviewViewer(dialogService, preferences, taskExecutor, nativeDesktop);
 
         // Keep the tooltip open while the cursor stays on the cell, so that long abstracts can be read
         setShowDuration(Duration.INDEFINITE);
