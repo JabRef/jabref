@@ -30,6 +30,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
@@ -46,6 +47,18 @@ class ModsExporter extends Exporter {
     private static final String DOUBLE_MINUS = "--";
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final Map<StandardField, String> PERSON_NAME_ROLES = Map.ofEntries(
+        Map.entry(StandardField.AFTERWORD, "waw"),
+        Map.entry(StandardField.ANNOTATOR, "ann"),
+        Map.entry(StandardField.ASSIGNEE, "asg"),
+        Map.entry(StandardField.AUTHOR, "aut"),
+        Map.entry(StandardField.COMMENTATOR, "cwt"),
+        Map.entry(StandardField.EDITOR, "edt"),
+        Map.entry(StandardField.FOREWORD, "wfw"),
+        Map.entry(StandardField.HOLDER, "pth"),
+        Map.entry(StandardField.INTRODUCTION, "win"),
+        Map.entry(StandardField.TRANSLATOR, "trl")
+    );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModsExporter.class);
 
@@ -86,10 +99,9 @@ class ModsExporter extends Exporter {
                     Field field = entry.getKey();
                     String value = entry.getValue();
 
-                    if (StandardField.AUTHOR == field) {
-                        handleNames(writer, value, "aut");
-                    } else if (StandardField.EDITOR == field) {
-                        handleNames(writer, value, "edt");
+                    if (field.getProperties().contains(FieldProperty.PERSON_NAMES)
+                        && PERSON_NAME_ROLES.containsKey(field)) {
+                        handleNames(writer, value, PERSON_NAME_ROLES.get(field));
                     } else if (new UnknownField("affiliation").equals(field)) {
                         addAffiliation(writer, value);
                     } else if (StandardField.ABSTRACT == field) {

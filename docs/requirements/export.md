@@ -60,11 +60,11 @@ Local attachments that cannot be resolved or represented relatively are omitted.
 
 Needs: impl, utest
 
-## MODS exports must preserve author and editor names
+## MODS exports must preserve supported contributor names
 `req~export.mods.names~1`
 
-MODS exports preserve author and editor names without incorrectly splitting names containing "and".
-Authors and editors are exported with the MARC relator codes `aut` and `edt`, respectively.
+MODS exports preserve supported contributor names without incorrectly splitting names containing "and".
+Each supported contributor field is exported with its corresponding MARC relator code.
 
 See [issue 17898](https://github.com/JabRef/jabref/issues/17898).
 

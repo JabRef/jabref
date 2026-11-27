@@ -127,4 +127,64 @@ class ModsExportFormatTest {
                     family.getTextContent() + "|" + given.getTextContent() + "|" + role.getTextContent());
         }
     }
+
+    static Stream<Arguments> contributorRoles() {
+        return Stream.of(
+                Arguments.of(StandardField.AFTERWORD, "waw"),
+                Arguments.of(StandardField.ANNOTATOR, "ann"),
+                Arguments.of(StandardField.ASSIGNEE, "asg"),
+                Arguments.of(StandardField.AUTHOR, "aut"),
+                Arguments.of(StandardField.COMMENTATOR, "cwt"),
+                Arguments.of(StandardField.EDITOR, "edt"),
+                Arguments.of(StandardField.FOREWORD, "wfw"),
+                Arguments.of(StandardField.HOLDER, "pth"),
+                Arguments.of(StandardField.INTRODUCTION, "win"),
+                Arguments.of(StandardField.TRANSLATOR, "trl")
+        );
+    }
+
+    // [utest->req~export.mods.names~1]
+    @ParameterizedTest
+    @MethodSource("contributorRoles")
+    void exportNamesWithContributorRoles(
+            StandardField field,
+            String expectedRole,
+            @TempDir Path tempDir) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "Sands")
+                .withField(field, "Sandra Sanders")
+                .withField(StandardField.DATE, "2026")
+                .withField(StandardField.PUBLISHER, "Sanders Academic");
+
+        Path file = tempDir.resolve("names.xml");
+        modsExportFormat.export(databaseContext, file, List.of(entry));
+
+        var factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+
+        var document = factory.newDocumentBuilder().parse(file.toFile());
+        String namespace = "http://www.loc.gov/mods/v3";
+        var names = document.getElementsByTagNameNS(namespace, "name");
+
+        assertEquals(1, names.getLength());
+
+        Element name = (Element) names.item(0);
+        var parts = name.getElementsByTagNameNS(namespace, "namePart");
+
+        assertEquals(2, parts.getLength());
+
+        Element family = (Element) parts.item(0);
+        Element given = (Element) parts.item(1);
+        Element role = (Element) name.getElementsByTagNameNS(namespace, "roleTerm").item(0);
+
+        assertEquals("personal", name.getAttribute("type"));
+        assertEquals("family", family.getAttribute("type"));
+        assertEquals("given", given.getAttribute("type"));
+        assertEquals("code", role.getAttribute("type"));
+        assertEquals("marcrelator", role.getAttribute("authority"));
+
+        assertEquals("Sanders", family.getTextContent());
+        assertEquals("Sandra", given.getTextContent());
+        assertEquals(expectedRole, role.getTextContent());
+    }
 }
