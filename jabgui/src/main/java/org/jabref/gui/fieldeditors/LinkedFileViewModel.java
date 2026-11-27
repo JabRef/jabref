@@ -51,7 +51,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
 
-import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -73,6 +72,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final LinkedFileHandler linkedFileHandler;
 
     private ObjectBinding<Node> linkedFileIconBinding;
@@ -84,9 +84,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               GuiPreferences preferences) {
+                               GuiPreferences preferences,
+                               NativeDesktop nativeDesktop) {
         this.linkedFile = linkedFile;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
         this.databaseContext = databaseContext;
         this.entry = entry;
@@ -115,14 +117,16 @@ public class LinkedFileViewModel extends AbstractViewModel {
             BibDatabaseContext databaseContext,
             TaskExecutor taskExecutor,
             DialogService dialogService,
-            GuiPreferences preferences) {
+            GuiPreferences preferences,
+            NativeDesktop nativeDesktop) {
         return new LinkedFileViewModel(
                 linkedFile,
                 entry,
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences);
+                preferences,
+                nativeDesktop);
     }
 
     public BooleanProperty isOfflinePdfProperty() {
@@ -212,7 +216,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void open() {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getExternalApplicationsPreferences());
-            boolean successful = NativeDesktop.openExternalFileAnyFormat(databaseContext, preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), linkedFile.getLink(), type);
+            boolean successful = nativeDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
@@ -229,7 +233,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                         linkedFile.getLink(),
                         preferences.getFilePreferences());
                 if (resolvedPath.isPresent()) {
-                    NativeDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences.getExternalApplicationsPreferences(), dialogService);
+                    nativeDesktop.openFolderAndSelectFile(resolvedPath.get(), dialogService);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
                 }
@@ -453,8 +457,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     /// @return true if the linked file has been removed afterward from the entry (i.e., because it was deleted
     /// successfully, does not exist in the first place, or the user choose to remove it)
     public boolean delete() {
-        // ToDo: Looked up instead of injected via constructor (ADR 0055): this class has more than 30 construction sites
-        NativeDesktop nativeDesktop = Injector.instantiateModelOrService(NativeDesktop.class);
         DeleteFileAction deleteFileAction = new DeleteFileAction(dialogService, preferences.getFilePreferences(), databaseContext, null, List.of(this), nativeDesktop);
         deleteFileAction.execute();
         return deleteFileAction.isSuccess();

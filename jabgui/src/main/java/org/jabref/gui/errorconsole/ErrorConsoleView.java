@@ -21,6 +21,7 @@ import javafx.util.Callback;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -48,6 +49,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
     @Inject private KeyBindingRepository keyBindingRepository;
+    @Inject private NativeDesktop nativeDesktop;
 
     public ErrorConsoleView() {
         this.setTitle(Localization.lang("Event log"));
@@ -64,7 +66,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ErrorConsoleViewModel(dialogService, preferences, clipBoardManager, buildInfo);
+        viewModel = new ErrorConsoleViewModel(dialogService, preferences, clipBoardManager, buildInfo, nativeDesktop);
         messagesListView.setCellFactory(createCellFactory());
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);

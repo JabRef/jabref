@@ -104,6 +104,12 @@ public class StringUtil {
                 // end argument and leave whitespace for further processing
                 break;
             }
+            if ((c == '\\') && ((index + 1) < text.length())) {
+                // Keep escaped characters together, so that `\{` and `\}` do not count as grouping
+                part.append(c).append(text.charAt(index + 1));
+                index += 2;
+                continue;
+            }
             if ((c == '}') && (--count < 0)) {
                 break;
             } else if (c == '{') {

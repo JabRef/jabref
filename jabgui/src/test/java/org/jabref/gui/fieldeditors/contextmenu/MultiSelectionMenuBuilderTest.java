@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -43,7 +44,7 @@ class MultiSelectionMenuBuilderTest {
         @SuppressWarnings("unchecked")
         ObservableOptionalValue<BibEntry> bibEntry = (ObservableOptionalValue<BibEntry>) mock(ObservableOptionalValue.class);
 
-        builder = new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, guiPreferences, viewModel);
+        builder = new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, guiPreferences, viewModel, mock(NativeDesktop.class));
     }
 
     @Nested

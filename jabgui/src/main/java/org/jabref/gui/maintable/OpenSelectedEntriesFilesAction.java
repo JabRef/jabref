@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -19,15 +20,18 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
 
     public OpenSelectedEntriesFilesAction(DialogService dialogService,
                                           StateManager stateManager,
                                           GuiPreferences preferences,
-                                          TaskExecutor taskExecutor) {
+                                          TaskExecutor taskExecutor,
+                                          NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
 
         this.executable.bind(ActionHelper.hasLinkedFileForSelectedEntries(stateManager)
                                          .and(ActionHelper.needsEntriesSelected(stateManager)));
@@ -45,7 +49,8 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
                                                    databaseContext,
                                                    taskExecutor,
                                                    dialogService,
-                                                   preferences)))
+                                                   preferences,
+                                                   nativeDesktop)))
                     .toList();
             if (linkedFileViewModelList.size() > FILES_LIMIT) {
                 boolean continueOpening = dialogService.showConfirmationDialogAndWait(

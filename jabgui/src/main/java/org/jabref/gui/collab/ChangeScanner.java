@@ -8,6 +8,7 @@ import java.util.function.BooleanSupplier;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
@@ -30,10 +31,11 @@ public class ChangeScanner {
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
                          GuiPreferences preferences,
-                         StateManager stateManager) {
+                         StateManager stateManager,
+                         NativeDesktop nativeDesktop) {
         this.database = database;
         this.preferences = preferences;
-        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferences, stateManager);
+        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferences, stateManager, nativeDesktop);
     }
 
     public List<DatabaseChange> scanForChanges() {

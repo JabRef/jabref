@@ -32,6 +32,7 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
@@ -60,6 +61,7 @@ public class GitDiffDialogView extends BaseDialog<Void> {
     @Inject private GuiPreferences preferences;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private NativeDesktop nativeDesktop;
 
     private final List<DatabaseChange> changes;
     private final BibDatabaseContext headDatabase;
@@ -103,7 +105,7 @@ public class GitDiffDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, nativeDesktop);
 
         changeName.setText(Localization.lang("Change"));
         changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));

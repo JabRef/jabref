@@ -21,7 +21,6 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.CommandLineParser;
@@ -37,7 +36,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.LoggerFactory;
@@ -331,74 +329,6 @@ public abstract class NativeDesktop {
         dialogService.notify(couldNotOpenBrowser);
         dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
     }
-
-    // region Deprecated static helpers
-    // The passed preferences are ignored: all callers pass parts of the same GuiPreferences the instance was created with.
-
-    /// @deprecated Use [#openExternalViewer(BibDatabaseContext, String, Field, DialogService, BibEntry)] of the injected instance
-    @Deprecated
-    public static void openExternalViewer(BibDatabaseContext databaseContext,
-                                          GuiPreferences preferences,
-                                          String initialLink,
-                                          Field initialField,
-                                          DialogService dialogService,
-                                          BibEntry entry) throws IOException {
-        get().openExternalViewer(databaseContext, initialLink, initialField, dialogService, entry);
-    }
-
-    /// @deprecated Use [#openCustomDoi(String, DialogService)] of the injected instance
-    @Deprecated
-    public static void openCustomDoi(String link, GuiPreferences preferences, DialogService dialogService) {
-        get().openCustomDoi(link, dialogService);
-    }
-
-    /// @deprecated Use [#openExternalFileAnyFormat(BibDatabaseContext, String, Optional)] of the injected instance
-    @Deprecated
-    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
-                                                    ExternalApplicationsPreferences externalApplicationsPreferences,
-                                                    FilePreferences filePreferences,
-                                                    String link,
-                                                    final Optional<ExternalFileType> type) throws IOException {
-        return get().openExternalFileAnyFormat(databaseContext, link, type);
-    }
-
-    /// @deprecated Use [#openFolderAndSelectFile(Path, DialogService)] of the injected instance
-    @Deprecated
-    public static void openFolderAndSelectFile(Path fileLink,
-                                               ExternalApplicationsPreferences externalApplicationsPreferences,
-                                               DialogService dialogService) throws IOException {
-        get().openFolderAndSelectFile(fileLink, dialogService);
-    }
-
-    /// @deprecated Use [#openConsole(Path, DialogService)] of the injected instance
-    @Deprecated
-    public static void openConsole(Path file, GuiPreferences preferences, DialogService dialogService) throws IOException {
-        get().openConsole(file, dialogService);
-    }
-
-    /// @deprecated Use [#openBrowser(String)] of the injected instance
-    @Deprecated
-    public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        get().openBrowser(url);
-    }
-
-    /// @deprecated Use [#openBrowser(URI)] of the injected instance
-    @Deprecated
-    public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        get().openBrowser(url);
-    }
-
-    /// @deprecated Use [#openBrowserShowPopup(String, DialogService)] of the injected instance
-    @Deprecated
-    public static void openBrowserShowPopup(String url, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
-        get().openBrowserShowPopup(url, dialogService);
-    }
-
-    private static NativeDesktop get() {
-        return Injector.instantiateModelOrService(NativeDesktop.class);
-    }
-
-    // endregion
 
     public static NativeDesktop create(HostServices hostServices, GuiPreferences preferences, ClipBoardManager clipBoardManager) {
         if (OS.WINDOWS) {

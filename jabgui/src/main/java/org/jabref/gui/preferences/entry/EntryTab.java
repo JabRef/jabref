@@ -106,7 +106,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
         markOwnerHelp.setPrefWidth(20.0);
         new ActionFactory().configureIconButton(
                 StandardActions.HELP,
-                new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()),
+                new HelpAction(HelpFile.OWNER, dialogService, nativeDesktop),
                 markOwnerHelp);
 
         HBox row = new HBox(GAP, markOwner, markOwnerName, markOwnerOverwrite, markOwnerHelp);
