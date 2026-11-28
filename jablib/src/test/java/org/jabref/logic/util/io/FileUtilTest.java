@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -758,5 +759,13 @@ class FileUtilTest {
     @ValueSource(strings = {"/home/username/Downloads/test.bib"})
     void convertCygwinPathToWindowsShouldReturnOriginalFilePathWhenRunningOnWindows(String filePath) {
         assertEquals(Path.of(filePath), FileUtil.convertCygwinPathToWindows(filePath));
+    }
+
+    @Test
+    void getLinkedDirNameWithTraversalInAuthor() {
+        // End to end: BibTeX input producing safe directory name
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.AUTHOR, "../../../../Desktop");
+        assertEquals("Desktop", FileUtil.createDirNameFromPattern(new BibDatabase(), entry, "[author]"));
     }
 }

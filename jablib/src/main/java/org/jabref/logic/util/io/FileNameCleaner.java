@@ -1,11 +1,19 @@
 package org.jabref.logic.util.io;
 
+import java.util.regex.Pattern;
+
 /// This class is based on http://stackoverflow.com/a/5626340/873282
 /// extended with LEFT CURLY BRACE and RIGHT CURLY BRACE
 /// Replaces illegal characters in given file paths.
 ///
 /// Regarding the maximum length, see [FileUtil#getValidFileName(String)]
 public class FileNameCleaner {
+
+    /// Matches "." / ".." segments, also Windows forms like ".. " and ".. .". Keeps "..." (valid on Unix).
+    private static final Pattern DOT_SEGMENT = Pattern.compile("(?<![^/\\\\])\\.{1,2}+(?: ++[ .]*+)?+(?:[/\\\\]++|$)");
+
+    /// Matches separators at the start of the path (e.g. leading '/' or '\\').
+    private static final Pattern LEADING_SEPARATORS = Pattern.compile("^[/\\\\]+");
 
     private FileNameCleaner() {
     }
@@ -42,6 +50,9 @@ public class FileNameCleaner {
                 cleanName.append('_');
             }
         }
-        return cleanName.toString().trim();
+        // Drop "." / ".." segments and leading separators: result stays inside base directory
+        String result = cleanName.toString().trim();
+        result = DOT_SEGMENT.matcher(result).replaceAll("");
+        return LEADING_SEPARATORS.matcher(result).replaceAll("");
     }
 }

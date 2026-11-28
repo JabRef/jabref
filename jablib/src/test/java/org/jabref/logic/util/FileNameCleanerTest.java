@@ -1,11 +1,15 @@
 package org.jabref.logic.util;
 
+import java.time.Duration;
+
 import org.jabref.logic.util.io.FileNameCleaner;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class FileNameCleanerTest {
 
@@ -42,5 +46,41 @@ class FileNameCleanerTest {
     })
     void cleanDirectoryNameForWindows(String expected, String input) {
         assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            // "." and ".." segments dropped
+            "Desktop, ../../../../Desktop",
+            "Desktop, ..\\..\\..\\..\\Desktop",
+            "a/b, a/../b",
+            "a\\b, a\\..\\b",
+            // Windows resolves ".. " and ".. ." to ".."
+            "Desktop, '..  /Desktop'",
+            "a/b, 'a/.. ./b'",
+            // leading separator dropped, else resolve() ignores base directory
+            "foo/bar, /foo/bar",
+            "outside, /outside",
+            "outside, ' /outside'",
+            // only whole segments are dropped
+            "..Desktop, ../..Desktop",
+            "draft./2026, draft./2026",
+            "a/archive.../b, a/archive.../b",
+            // valid on Unix, must stay
+            "'...', '...'",
+            "a/.../b, a/.../b",
+            "a/..../b, a/..../b",
+            "'a/ /b', 'a/ /b'",
+            "'a/ ../b', 'a/ ../b'"
+    })
+    void cleanDirectoryNameRemovesTraversal(String expected, String input) {
+        assertEquals(expected, FileNameCleaner.cleanDirectoryName(input));
+    }
+
+    @Test
+    void cleanDirectoryNameHandlesLongInputQuickly() {
+        //  For backtracking regex
+        String input = "." + " ".repeat(100_000) + "x";
+        assertTimeoutPreemptively(Duration.ofSeconds(2), () -> FileNameCleaner.cleanDirectoryName(input));
     }
 }
