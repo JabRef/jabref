@@ -7,17 +7,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.transform.TransformerException;
+
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.schema.DublinCoreSchemaCustom;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.Answers;
@@ -118,5 +127,33 @@ class XmpUtilReaderTest {
     void readNoDescriptionMetadata() throws IOException, URISyntaxException {
         List<BibEntry> entries = xmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("no_description_metadata.pdf").toURI()), xmpPreferences);
         assertEquals(List.of(), entries);
+    }
+
+    @Test
+    void readXmpKeepsDublinCoreTypeWhenDocumentInformationHasMoreFields(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path dublinCorePdf = tempDir.resolve("dublin-core.pdf");
+        Path pdf = tempDir.resolve("subset.pdf");
+        try (PDDocument document = new PDDocument()) {
+            document.addPage(new PDPage());
+            document.save(dublinCorePdf.toFile());
+        }
+        // Dublin Core: type article and title "A"
+        new XmpUtilWriter(xmpPreferences).writeXmp(dublinCorePdf, new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "{A}"), null);
+        // Document information without explicit type: LaTeX title "{A}" and an additional author
+        try (PDDocument document = Loader.loadPDF(dublinCorePdf.toFile())) {
+            PDDocumentInformation documentInformation = document.getDocumentInformation();
+            documentInformation.setCustomMetadataValue("bibtex/entrytype", null);
+            documentInformation.setTitle("{A}");
+            documentInformation.setAuthor("Smith");
+            document.save(pdf.toFile());
+        }
+
+        List<BibEntry> entries = xmpUtilReader.readXmp(pdf, xmpPreferences);
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "{A}")
+                .withField(StandardField.AUTHOR, "Smith")
+                .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
+        assertEquals(List.of(expected), entries);
     }
 }

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.exporter.AtomicFileOutputStream;
-import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -44,7 +43,6 @@ public class XmpUtilWriter {
 
     private static final XmpUtilShared XMP_UTIL_SHARED = new XmpUtilShared();
 
-    private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
     private final XmpPreferences xmpPreferences;
 
     public XmpUtilWriter(XmpPreferences xmpPreferences) {
@@ -220,17 +218,17 @@ public class XmpUtilWriter {
             }
 
             // LaTeX content is removed from the string for "standard" fields in the PDF
-            String value = unprotectTermsFormatter.format(resolvedEntry.getField(field).orElse(""));
+            String value = resolvedEntry.getField(field).orElseThrow();
 
             switch (field) {
                 case StandardField.AUTHOR ->
-                        di.setAuthor(value);
+                        di.setAuthor(XmpUtilShared.toPlainText(value));
                 case StandardField.TITLE ->
-                        di.setTitle(value);
+                        di.setTitle(XmpUtilShared.toPlainText(value));
                 case StandardField.KEYWORDS ->
-                        di.setKeywords(value);
+                        di.setKeywords(XmpUtilShared.toPlainText(value));
                 case StandardField.ABSTRACT ->
-                        di.setSubject(value);
+                        di.setSubject(XmpUtilShared.toPlainText(value));
                 case StandardField.FILE -> {
                     // do not write file field
                 }
