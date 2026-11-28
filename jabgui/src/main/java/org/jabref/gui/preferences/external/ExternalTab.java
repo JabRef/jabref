@@ -1,24 +1,12 @@
 package org.jabref.gui.preferences.external;
 
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 
-import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.push.GuiPushToApplication;
-import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
@@ -29,9 +17,6 @@ import org.controlsfx.control.SearchableComboBox;
 public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel> {
 
     // Kept as fields so validation can be attached after the grids are assembled.
-    private TextField citeCommand;
-    private TextArea customTerminalCommand;
-    private TextArea customFileBrowserCommand;
 
     public ExternalTab() {
         this.viewModel = new ExternalTabViewModel(
@@ -48,6 +33,8 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     private void buildView() {
+        String commandHint = Localization.lang("Enter the application on the first line and one argument per following line. Use %DIR% for the library directory.");
+
         setContent(form()
 
                 .section(Localization.lang("Sending of emails"), emails -> emails
@@ -56,101 +43,50 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
                         .checkbox(Localization.lang("Automatically open folders of attached files"), viewModel.autoOpenAttachedFoldersProperty()))
 
                 .section(Localization.lang("Push applications"), push -> push
-                        .custom(buildPushGrid(), grid -> grid
-                                .validate(viewModel.citeCommandValidationStatus(), citeCommand)))
+                        .field(Localization.lang("Application to push entries to"), buildPushToApplicationCombo(),
+                                application -> application.attach(ControlHelper.narrowIconButton(IconTheme.JabRefIcons.PREFERENCES,
+                                        Localization.lang("Application settings"), viewModel::pushToApplicationSettings)))
+                        .stringField(Localization.lang("Cite command"), viewModel.citeCommandProperty(),
+                                cite -> cite.validate(viewModel.citeCommandValidationStatus())
+                                            .help(StandardActions.HELP_PUSH_TO_APPLICATION, HelpFile.PUSH_TO_APPLICATION)
+                                            .attach(ControlHelper.narrowIconButton(IconTheme.JabRefIcons.REFRESH,
+                                                    Localization.lang("Reset to default"), viewModel::resetCiteCommandToDefault))))
 
                 .section(Localization.lang("Custom applications"), applications -> applications
-                        .custom(buildCustomApplicationsGrid(), grid -> grid
-                                .validate(viewModel.terminalCommandValidationStatus(), customTerminalCommand)
-                                .validate(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand)))
+                        .checkbox(Localization.lang("Use custom terminal emulator"), viewModel.useCustomTerminalProperty(),
+                                terminal -> terminal.enabledWhenOn(command -> command
+                                        .field(Localization.lang("Application"), commandArea(viewModel.customTerminalCommandProperty()),
+                                                field -> field.description(commandHint)
+                                                              .validate(viewModel.terminalCommandValidationStatus())
+                                                              .grow()
+                                                              .browse(viewModel::customTerminalBrowse))))
+                        .checkbox(Localization.lang("Use custom file browser"), viewModel.useCustomFileBrowserProperty(),
+                                fileBrowser -> fileBrowser.enabledWhenOn(command -> command
+                                        .field(Localization.lang("Application"), commandArea(viewModel.customFileBrowserCommandProperty()),
+                                                field -> field.description(commandHint)
+                                                              .validate(viewModel.fileBrowserCommandValidationStatus())
+                                                              .grow()
+                                                              .browse(viewModel::customFileBrowserBrowse)))))
 
                 .build());
     }
 
-    private Node buildPushGrid() {
+    private SearchableComboBox<GuiPushToApplication> buildPushToApplicationCombo() {
         SearchableComboBox<GuiPushToApplication> pushToApplicationCombo = new SearchableComboBox<>();
         new ViewModelListCellFactory<GuiPushToApplication>()
                 .withText(GuiPushToApplication::getDisplayName)
                 .withIcon(GuiPushToApplication::getApplicationIcon)
                 .install(pushToApplicationCombo);
-        pushToApplicationCombo.setPrefWidth(200.0);
         pushToApplicationCombo.itemsProperty().bind(viewModel.pushToApplicationsListProperty());
         pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());
-
-        Button applicationSettings = ControlHelper.narrowIconButton(IconTheme.JabRefIcons.PREFERENCES, Localization.lang("Application settings"), viewModel::pushToApplicationSettings);
-
-        citeCommand = new TextField();
-        citeCommand.setPrefWidth(300.0);
-        citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
-
-        Button citeHelp = new Button();
-        citeHelp.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
-        citeHelp.setPrefSize(20.0, 20.0);
-        new ActionFactory().configureIconButton(
-                StandardActions.HELP_PUSH_TO_APPLICATION,
-                new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, nativeDesktop),
-                citeHelp);
-        Button resetCite = ControlHelper.narrowIconButton(IconTheme.JabRefIcons.REFRESH, Localization.lang("Reset to default"), viewModel::resetCiteCommandToDefault);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(4.0);
-        grid.setVgap(4.0);
-        grid.setAlignment(Pos.CENTER_LEFT);
-        grid.add(new Label(Localization.lang("Application to push entries to")), 0, 0);
-        grid.add(pushToApplicationCombo, 1, 0);
-        grid.add(applicationSettings, 2, 0);
-        grid.add(new Label(Localization.lang("Cite command")), 0, 1);
-        grid.add(citeCommand, 1, 1);
-        grid.add(citeHelp, 2, 1);
-        grid.add(resetCite, 3, 1);
-        return grid;
+        return pushToApplicationCombo;
     }
 
-    private Node buildCustomApplicationsGrid() {
-        String dirPlaceholderHint = Localization.lang("Enter the application on the first line and one argument per following line. Use %DIR% for the library directory.");
-
-        CheckBox useCustomTerminal = new CheckBox(Localization.lang("Use custom terminal emulator"));
-        useCustomTerminal.selectedProperty().bindBidirectional(viewModel.useCustomTerminalProperty());
-        customTerminalCommand = commandField(dirPlaceholderHint, viewModel.customTerminalCommandProperty(), useCustomTerminal);
-        Button terminalBrowse = browseButton(useCustomTerminal, viewModel::customTerminalBrowse);
-
-        CheckBox useCustomFileBrowser = new CheckBox(Localization.lang("Use custom file browser"));
-        useCustomFileBrowser.selectedProperty().bindBidirectional(viewModel.useCustomFileBrowserProperty());
-        customFileBrowserCommand = commandField(dirPlaceholderHint, viewModel.customFileBrowserCommandProperty(), useCustomFileBrowser);
-        Button fileBrowserBrowse = browseButton(useCustomFileBrowser, viewModel::customFileBrowserBrowse);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(4.0);
-        grid.setVgap(4.0);
-        grid.setAlignment(Pos.CENTER_LEFT);
-        ColumnConstraints checkColumn = new ColumnConstraints();
-        checkColumn.setMinWidth(50.0);
-        checkColumn.setPrefWidth(200.0);
-        ColumnConstraints commandColumn = new ColumnConstraints();
-        commandColumn.setHgrow(Priority.ALWAYS);
-        commandColumn.setMinWidth(100.0);
-        grid.getColumnConstraints().addAll(checkColumn, commandColumn, new ColumnConstraints());
-        grid.add(useCustomTerminal, 0, 0);
-        grid.add(customTerminalCommand, 1, 0);
-        grid.add(terminalBrowse, 2, 0);
-        grid.add(useCustomFileBrowser, 0, 1);
-        grid.add(customFileBrowserCommand, 1, 1);
-        grid.add(fileBrowserBrowse, 2, 1);
-        return grid;
-    }
-
-    private TextArea commandField(String tooltip, javafx.beans.property.StringProperty value, CheckBox enabler) {
-        TextArea field = new TextArea();
-        field.setPrefRowCount(3);
-        field.textProperty().bindBidirectional(value);
-        field.setTooltip(new Tooltip(tooltip));
-        field.disableProperty().bind(enabler.selectedProperty().not());
-        return field;
-    }
-
-    private Button browseButton(CheckBox enabler, Runnable action) {
-        Button button = ControlHelper.narrowIconButton(IconTheme.JabRefIcons.OPEN, Localization.lang("Browse"), action);
-        button.disableProperty().bind(enabler.selectedProperty().not());
-        return button;
+    /// A command with its arguments, one per line, as the custom application settings expect it.
+    private static TextArea commandArea(StringProperty command) {
+        TextArea area = new TextArea();
+        area.setPrefRowCount(3);
+        area.textProperty().bindBidirectional(command);
+        return area;
     }
 }
