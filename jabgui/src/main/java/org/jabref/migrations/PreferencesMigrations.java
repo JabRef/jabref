@@ -93,6 +93,7 @@ public class PreferencesMigrations {
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         upgradeBuiltinPreviewName(preferences);
+        upgradeLegacyCustomPreviewStyle(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
         // backward compatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
@@ -846,5 +847,26 @@ public class PreferencesMigrations {
         }
 
         preferences.getWorkspacePreferences().setCustomTheme(StyleSheet.create(theme));
+    }
+
+    /// The customized preview styles are stored as a numbered series (`previewStyleCustomizedId0`, ...).
+    /// Before that, a single customized style lived under `previewStyle`; it is moved into the series once.
+    /// JabRefGuiPreferences#PREVIEW_STYLE_CUSTOMIZED_MIGRATED is written once and never purged, so an
+    /// emptied list is not migrated again on a later startup.
+    public static void upgradeLegacyCustomPreviewStyle(JabRefCliPreferences prefs) {
+        if (prefs.hasKey(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0")
+                || prefs.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false)) {
+            return;
+        }
+        prefs.putBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);
+
+        String legacyText = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, "");
+        if (StringUtil.isBlank(legacyText) || TextBasedPreviewLayout.DEFAULT.equals(legacyText)) {
+            return;
+        }
+        // Legacy PREVIEW_CYCLE entries reference TextBasedPreviewLayout.NAME, so it doubles as the migrated id
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0", TextBasedPreviewLayout.NAME);
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_NAME + "0", TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME);
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_TEXT + "0", legacyText.replace("\n", "__NEWLINE__"));
     }
 }
