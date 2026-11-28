@@ -298,6 +298,23 @@ class PreferencesFormBuilderTest {
     }
 
     @Test
+    void dependentSettingsAreDisabledWhileTheirSwitchIsDisabled() {
+        SimpleBooleanProperty aiDisabled = new SimpleBooleanProperty(true);
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkbox("Generate follow-up questions", new SimpleBooleanProperty(true),
+                                followUp -> followUp.disableWhen(aiDisabled)
+                                                    .enabledWhenOn(questions -> questions
+                                                            .stringField("Number of follow-up questions", new SimpleStringProperty("3")))))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertTrue(tile.details().isDisabled());
+        aiDisabled.set(false);
+        assertFalse(tile.details().isDisabled());
+    }
+
+    @Test
     void expanderBuildsItsContentIntoTheClosedDetails() {
         Label summary = new Label("Light");
         VBox root = form()

@@ -45,9 +45,9 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
                                 viewModel.importDelimiterParsingStrategies(),
                                 viewModel.importDelimiterParsingStrategyProperty(),
                                 viewModel::getImportDelimiterParsingStrategyDisplayName)
-                        .checkbox(Localization.lang("Resolve BibTeX strings"), viewModel.resolveStringsProperty())
-                        .tagsField(Localization.lang("Affected fields"), resolvableTags,
-                                affected -> affected.disableWhen(viewModel.resolveStringsProperty().not()))
+                        .checkbox(Localization.lang("Resolve BibTeX strings"), viewModel.resolveStringsProperty(),
+                                resolve -> resolve.enabledWhenOn(strings -> strings
+                                        .tagsField(Localization.lang("Affected fields"), resolvableTags)))
                         .tagsField(Localization.lang("Do not wrap when saving"), nonWrappableTags))
 
                 .section(Localization.lang("Entry owner"), owner -> owner

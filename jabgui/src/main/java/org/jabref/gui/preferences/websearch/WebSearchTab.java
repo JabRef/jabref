@@ -99,9 +99,9 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                                 PreferencesFormBuilder.InputElement::grow))
 
                 .section(Localization.lang("Remote services"), remote -> remote
-                        .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty())
-                        .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty(),
-                                url -> url.disableWhen(viewModel.grobidEnabledProperty().not())))
+                        .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty(),
+                                grobid -> grobid.enabledWhenOn(service -> service
+                                        .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty()))))
 
                 .section(Localization.lang("Search Engine URL Templates"), searchEngines -> searchEngines
                         .custom(tableNote)

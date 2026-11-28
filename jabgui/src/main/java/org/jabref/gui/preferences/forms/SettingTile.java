@@ -109,13 +109,15 @@ final class SettingTile extends VBox {
     /// Shows the details only while the switch is on.
     void revealDetailsWhenOn(ToggleSwitch toggle) {
         details.visibleProperty().bind(toggle.selectedProperty().and(Bindings.isNotEmpty(details.getChildren())));
+        // A setting that depends on a switch cannot be changed while the switch itself cannot.
+        details.disableProperty().bind(toggle.disabledProperty());
     }
 
     /// Shows the details whether the switch is on or off, but enables them only while it is on, so
     /// that one sees what turning it on offers.
     void enableDetailsWhenOn(ToggleSwitch toggle) {
         details.visibleProperty().bind(Bindings.isNotEmpty(details.getChildren()));
-        details.disableProperty().bind(toggle.selectedProperty().not());
+        details.disableProperty().bind(toggle.selectedProperty().not().or(toggle.disabledProperty()));
     }
 
     /// Makes the row open and close the details on a click, with a chevron at the end of the row
