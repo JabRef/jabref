@@ -29,6 +29,13 @@ class ExternalTabViewModelTest {
     }
 
     @Test
+    void editingArgumentsPreservesExecutableAndArgumentBoundaries() {
+        assertEquals(List.of("C:\\Program Files\\terminal.exe", "--title=O'Brien's Library", "%DIR%"),
+                ExternalTabViewModel.toCommandArguments(ExternalTabViewModel.replaceArguments(
+                        "C:\\Program Files\\terminal.exe\n/old", "--title=O'Brien's Library\r\n%DIR%")));
+    }
+
+    @Test
     void pastedWindowsLineEndingsDoNotBecomePartOfArguments() {
         assertEquals(
                 List.of("C:\\Program Files\\ConEmu\\ConEmu64.exe", "/dir", "%DIR%"),
