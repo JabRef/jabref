@@ -320,7 +320,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                             + Localization.lang("You must restart JabRef for this to come into effect."));
         }
 
-        Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
+        // [impl->req~ux.external-library-changes.updated-entry-types~1]
+        // Open libraries and their change monitors hold the shared instance, thus it is updated instead of replaced
+        Injector.instantiateModelOrService(BibEntryTypesManager.class)
+                .replaceCustomOrModifiedTypes(preferences.getCustomEntryTypesRepository());
     }
 
     /// Inserts the preference values into the Properties of the ViewModel

@@ -12,6 +12,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -22,16 +23,19 @@ public class ChangeScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
     private final GuiPreferences preferences;
+    private final BibEntryTypesManager entryTypesManager;
 
     private final DatabaseChangeResolverFactory databaseChangeResolverFactory;
 
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
                          GuiPreferences preferences,
+                         BibEntryTypesManager entryTypesManager,
                          StateManager stateManager,
                          NativeDesktop nativeDesktop) {
         this.database = database;
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
         this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferences, stateManager, nativeDesktop);
     }
 
@@ -57,6 +61,6 @@ public class ChangeScanner {
         }
 
         BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
-        return DatabaseChangeList.compareAndGetChanges(database, databaseOnDisk, databaseChangeResolverFactory);
+        return DatabaseChangeList.compareAndGetChanges(database, databaseOnDisk, entryTypesManager, databaseChangeResolverFactory);
     }
 }

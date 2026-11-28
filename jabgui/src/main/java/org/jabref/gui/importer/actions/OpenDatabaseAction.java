@@ -270,7 +270,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, fileToLoad, preferences, fileUpdateMonitor, stateManager, nativeDesktop)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, fileToLoad, preferences, entryTypesManager, fileUpdateMonitor, stateManager, nativeDesktop)
                                           .orElse(null);
         }
 

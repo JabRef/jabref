@@ -187,7 +187,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MERGE_LIBRARY, new MergeLibraryAction(dialogService, stateManager, preferences, taskExecutor, frame, nativeDesktop)),
+                factory.createMenuItem(StandardActions.MERGE_LIBRARY, new MergeLibraryAction(dialogService, stateManager, preferences, entryTypesManager, taskExecutor, frame, nativeDesktop)),
 
                 factory.createSubMenu(StandardActions.IMPORT,
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),

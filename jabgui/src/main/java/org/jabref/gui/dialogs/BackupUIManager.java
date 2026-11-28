@@ -32,6 +32,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -54,6 +55,7 @@ public class BackupUIManager {
                                                                  LibraryTabContainer tabContainer,
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
+                                                                 BibEntryTypesManager entryTypesManager,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  StateManager stateManager,
                                                                  NativeDesktop nativeDesktop) {
@@ -93,7 +95,7 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager, nativeDesktop);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager, nativeDesktop);
             }
             return Optional.empty();
         });
@@ -152,6 +154,7 @@ public class BackupUIManager {
             LibraryTabContainer tabContainer,
             Path originalPath,
             GuiPreferences preferences,
+            BibEntryTypesManager entryTypesManager,
             FileUpdateMonitor fileUpdateMonitor,
             StateManager stateManager,
             NativeDesktop nativeDesktop) {
@@ -169,7 +172,7 @@ public class BackupUIManager {
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager, nativeDesktop);
 
             return UiTaskExecutor.runInJavaFXThread(() -> {
-                List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
+                List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, entryTypesManager, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
                         originalDatabase, Localization.lang("Review backup")
@@ -197,7 +200,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager, nativeDesktop);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager, nativeDesktop);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

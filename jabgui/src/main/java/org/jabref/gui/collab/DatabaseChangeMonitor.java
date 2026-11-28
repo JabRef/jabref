@@ -18,6 +18,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -36,6 +37,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final BibEntryTypesManager entryTypesManager;
     private final NativeDesktop nativeDesktop;
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -54,6 +56,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
                                  GuiPreferences preferences,
+                                 BibEntryTypesManager entryTypesManager,
                                  UndoManager undoManager,
                                  StateManager stateManager,
                                  LibraryTab libraryTab,
@@ -63,6 +66,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
         this.nativeDesktop = nativeDesktop;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
@@ -188,7 +192,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// Looks for notable changes of the file on disk compared to the in-memory library and notifies listeners in case
     /// there are such changes.
     private void scanForChanges() {
-        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager, nativeDesktop);
+        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, entryTypesManager, stateManager, nativeDesktop);
         BackgroundTask.wrap(scanner::scanForChanges)
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {
