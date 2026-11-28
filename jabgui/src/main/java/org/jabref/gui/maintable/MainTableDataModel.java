@@ -121,7 +121,7 @@ public class MainTableDataModel {
         // Different entries can have identical fields. Each surviving entry needs its own row and match state.
         Map<BibEntry, BibEntryTableViewModel> rowsByEntry = new IdentityHashMap<>(entries.size());
         ObservableList<BibEntryTableViewModel> rows = EasyBind.mapBacked(entries, entry -> {
-            BibEntryTableViewModel row = rowsByEntry.get(entry);
+            @Nullable BibEntryTableViewModel row = rowsByEntry.get(entry);
             return row != null ? row : new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter);
         }, false);
         rows.forEach(row -> rowsByEntry.put(row.getEntry(), row));

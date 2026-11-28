@@ -681,8 +681,8 @@ class MainTableDataModelTest {
                 context.getDatabase().removeEntries(toDelete);
 
                 assertEquals(List.of(matchesBoth), model.getEntriesFilteredAndSorted().stream()
-                                                       .map(BibEntryTableViewModel::getEntry)
-                                                       .toList());
+                                                        .map(BibEntryTableViewModel::getEntry)
+                                                        .toList());
             } finally {
                 model.unbind();
             }
