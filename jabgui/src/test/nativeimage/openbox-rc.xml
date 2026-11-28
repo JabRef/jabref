@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Window manager for the native screenshots under Xvfb: gives dialogs title bars and fills the screen with the main window -->
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+  <applications>
+    <!-- Only the main window ("<library> – JabRef"); JavaFX dialogs are "normal" windows too -->
+    <application title="* – JabRef">
+      <maximized>yes</maximized>
+    </application>
+  </applications>
+</openbox_config>
