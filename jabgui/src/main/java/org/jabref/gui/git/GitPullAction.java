@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitSyncService;
@@ -38,6 +39,7 @@ public class GitPullAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitPullAction.class);
 
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
     private final StateManager stateManager;
     private final GuiPreferences guiPreferences;
     private final TaskExecutor taskExecutor;
@@ -47,8 +49,10 @@ public class GitPullAction extends SimpleCommand {
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
                          TaskExecutor taskExecutor,
-                         GitHandlerRegistry gitHandlerRegistry) {
+                         GitHandlerRegistry gitHandlerRegistry,
+                         NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
         this.taskExecutor = taskExecutor;
@@ -106,7 +110,7 @@ public class GitPullAction extends SimpleCommand {
                     int manualResolvedCount;
                     if (!conflicts.isEmpty()) {
                         // resolve via GUI (strategy jumps to FX thread internally; safe to call from background)
-                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(new GitConflictResolverDialog(dialogService, guiPreferences, stateManager));
+                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(new GitConflictResolverDialog(dialogService, guiPreferences, stateManager, nativeDesktop));
                         List<BibEntry> resolved = resolver.resolveConflicts(conflicts);
                         if (resolved.isEmpty()) {
                             dialogService.notify(Localization.lang("Pull canceled."));

@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.welcome.DonationPreferences;
@@ -29,7 +30,7 @@ class DonationProviderTest extends JavaFxTest {
     private final DialogService dialogService = mock(DialogService.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final DonationPreferences donationPreferences = new DonationPreferences(false, -1);
-    private final DonationProvider donationProvider = new DonationProvider(preferences, dialogService);
+    private final DonationProvider donationProvider = new DonationProvider(preferences, dialogService, mock(NativeDesktop.class));
 
     @BeforeEach
     void setUp() {

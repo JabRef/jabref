@@ -49,7 +49,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                 Injector.instantiateModelOrService(UiMessageHandler.class),
                 Injector.instantiateModelOrService(OAuthSessionRegistry.class),
                 Injector.instantiateModelOrService(RemoteListenerServerManager.class),
-                Injector.instantiateModelOrService(StateManager.class));
+                Injector.instantiateModelOrService(StateManager.class),
+                nativeDesktop);
         buildView();
     }
 
@@ -88,7 +89,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                 .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser)
                                 .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
                                 .field(Localization.lang("Size"), buildFontSizeSpinner(),
-                                        size -> size.validate(viewModel.fontSizeValidationStatus())),
+                                        size -> size.validate(viewModel.fontSizeValidationStatus()))
+                                .checkbox(Localization.lang("Taller rows in lists and tables (long text wraps)"), viewModel.wrapMainTableTextProperty()),
                         appearance -> appearance.help(URLs.CUSTOM_THEME_DOC))
 
                 .section(Localization.lang("User interface"), userInterface -> userInterface

@@ -22,7 +22,7 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -55,12 +55,13 @@ public class BackupUIManager {
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
-                                                                 StateManager stateManager) {
+                                                                 StateManager stateManager,
+                                                                 NativeDesktop nativeDesktop) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
                 tabContainer,
                 stateManager,
-                preferences.getExternalApplicationsPreferences(),
+                nativeDesktop,
                 originalPath,
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
@@ -92,7 +93,7 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager, nativeDesktop);
             }
             return Optional.empty();
         });
@@ -101,11 +102,11 @@ public class BackupUIManager {
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
                                                                  LibraryTabContainer tabContainer,
                                                                  StateManager stateManager,
-                                                                 ExternalApplicationsPreferences externalApplicationsPreferences,
+                                                                 NativeDesktop nativeDesktop,
                                                                  Path originalPath,
                                                                  Path backupDir) {
         return UiTaskExecutor.runInJavaFXThread(() -> showForLibrary(tabContainer, stateManager, originalPath,
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences))));
+                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, nativeDesktop, dialogService))));
     }
 
     private static <T> T showForLibrary(LibraryTabContainer tabContainer, StateManager stateManager, Path path, Supplier<T> showDialog) {
@@ -152,7 +153,8 @@ public class BackupUIManager {
             Path originalPath,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
-            StateManager stateManager) {
+            StateManager stateManager,
+            NativeDesktop nativeDesktop) {
         try {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
 
@@ -164,7 +166,7 @@ public class BackupUIManager {
             Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
-            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager, nativeDesktop);
 
             return UiTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
@@ -177,18 +179,25 @@ public class BackupUIManager {
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
                     // The library is still being opened, so no tab exists for it yet - the active tab (if any) belongs to another
-                    // library. Its change monitor is set up when the tab is created.
+                    // library. Its change monitor is set up when the tab is created. The tab installs this very context once
+                    // loading finished, so the merge lands in the journal that drives its modified marker and undo.
+                    // [impl->req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1]
                     stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
 
                     // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                     markRecoveredIfContentRestored(originalParserResult);
+
+                    // The tab gets a new database context along with its own journal, meaning the undo step won't mark it as changed
+                    if (resolvedChanges.stream().anyMatch(DatabaseChange::isAccepted)) {
+                        originalParserResult.setChangedOnMigration(true);
+                    }
                     return Optional.of(originalParserResult);
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager, nativeDesktop);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

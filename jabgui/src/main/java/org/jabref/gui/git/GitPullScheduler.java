@@ -10,6 +10,7 @@ import java.util.function.BooleanSupplier;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -72,7 +73,8 @@ public class GitPullScheduler {
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
                              GitHandlerRegistry gitHandlerRegistry,
-                             BooleanSupplier hasUnsavedChanges) {
+                             BooleanSupplier hasUnsavedChanges,
+                             NativeDesktop nativeDesktop) {
 
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty() || GitHandler.findRepositoryRoot(databasePath.get()).isEmpty()) {
@@ -93,7 +95,8 @@ public class GitPullScheduler {
                 gitHandlerRegistry,
                 taskExecutor,
                 preferences,
-                stateManager);
+                stateManager,
+                nativeDesktop);
         RUNNING_INSTANCES.add(new GitPullScheduler(bibDatabaseContext, gitAutoSync, hasUnsavedChanges, intervalInMinutes));
     }
 

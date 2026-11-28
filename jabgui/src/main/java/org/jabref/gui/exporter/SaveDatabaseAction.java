@@ -25,6 +25,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.git.GitAutoSync;
 import org.jabref.gui.git.GitPullScheduler;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -43,7 +44,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileSnapshot;
@@ -69,6 +69,7 @@ public class SaveDatabaseAction {
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final BibEntryTypesManager entryTypesManager;
     private final StateManager stateManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -98,7 +99,8 @@ public class SaveDatabaseAction {
                 stateManager,
                 journalAbbreviationRepository,
                 Injector.instantiateModelOrService(GitHandlerRegistry.class),
-                Injector.instantiateModelOrService(TaskExecutor.class));
+                Injector.instantiateModelOrService(TaskExecutor.class),
+                Injector.instantiateModelOrService(NativeDesktop.class));
     }
 
     public SaveDatabaseAction(LibraryTab libraryTab,
@@ -108,7 +110,8 @@ public class SaveDatabaseAction {
                               StateManager stateManager,
                               JournalAbbreviationRepository journalAbbreviationRepository,
                               GitHandlerRegistry gitHandlerRegistry,
-                              TaskExecutor taskExecutor) {
+                              TaskExecutor taskExecutor,
+                              NativeDesktop nativeDesktop) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -117,6 +120,7 @@ public class SaveDatabaseAction {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
     }
 
     public SaveResult save() {
@@ -196,8 +200,12 @@ public class SaveDatabaseAction {
         // Set new location
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+            // An ID the database already has is kept: generating a new one here would orphan the settings
+            // stored under the old ID and leave them behind as a second saved connection.
+            String sharedDatabaseId = context.getDatabase().getSharedDatabaseID()
+                                             .orElseGet(() -> context.getDatabase().generateSharedDatabaseID());
+            preferences.getSharedDatabasePreferences().forConnection(sharedDatabaseId)
+                       .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
         SaveResult saveResult = save(file, mode, mayAutoCommit);
@@ -329,7 +337,8 @@ public class SaveDatabaseAction {
                 gitHandlerRegistry,
                 taskExecutor,
                 preferences,
-                stateManager);
+                stateManager,
+                nativeDesktop);
         if (databaseContext.getMetaData().isGitAutoPush()) {
             gitAutoSync.commitAndPush(targetPath, databaseContext);
         } else {

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1310" viewBox="0 0 1000 1310" role="img" aria-labelledby="title description">
+  <title id="title">Writer package layout and ownership</title>
+  <desc id="description">Within org.jabref.logic.openoffice, engine owns document actions, renderer adapters, and shared engine helpers; style contains the common OOStyle contract and family-neutral Writer paragraph-style names; csl, bst, and jstyle contain family-specific loading and formatting. Frontend, backend, UNO, and range sorting provide document infrastructure. Generic layout formatting, including OOPreFormatter, belongs to logic.layout.format. Shared citation data and output values remain in model.openoffice, without logic dependencies. Application-wide CSL loading and metadata remain in logic.citationstyle. Boxes show ownership rather than runtime calls.</desc>
+  <style>
+    text { font-family: "Segoe UI", Arial, sans-serif; fill: #172b3a; }
+    .title { font-size: 28px; font-weight: 700; }
+    .heading { font-size: 21px; font-weight: 600; }
+    .detail { font-size: 16px; }
+    .type { font-family: Consolas, "Liberation Mono", monospace; font-size: 14px; }
+    .small { font-size: 14px; }
+    .muted { fill: #475569; }
+    .box { stroke: #8094a7; stroke-width: 1.5; }
+  </style>
+  <rect width="1000" height="1310" fill="#ffffff"/>
+  <text class="title" x="20" y="42">Writer package layout</text>
+  <text class="detail muted" x="20" y="70">Responsibility-based organization · package names relative to org.jabref</text>
+
+  <rect class="box" x="20" y="94" width="960" height="790" rx="14" fill="#f8fafc"/>
+  <text class="heading" x="42" y="128">logic.openoffice</text>
+
+  <rect class="box" x="42" y="150" width="916" height="184" rx="10" fill="#edf5ff"/>
+  <text class="heading" x="64" y="180">engine - shared rendering and document actions</text>
+  <text class="type" x="64" y="208">CitationEngine · RendererFactory · CitationRenderer</text>
+  <text class="type" x="64" y="234">RenderRequest · RenderOptions · RenderResult</text>
+  <text class="type" x="64" y="260">CslRenderer · BstRenderer · JStyleRenderer</text>
+  <text class="small" x="64" y="288">Shared resolution, numbering, and package-private renderer helpers</text>
+  <text class="small" x="64" y="312">engine.storage: canonical marks, page information, and applied style</text>
+
+  <rect class="box" x="42" y="354" width="916" height="86" rx="10" fill="#edf8f0"/>
+  <text class="heading" x="64" y="384">style - common contracts and Writer style names</text>
+  <text class="detail" x="64" y="414">OOStyle · WriterParagraphStyles</text>
+
+  <rect class="box" x="42" y="462" width="292" height="252" rx="10" fill="#edf8f0"/>
+  <text class="heading" x="60" y="495">csl</text>
+  <text class="small muted" x="60" y="523">Writer-specific CSL adaptation</text>
+  <text class="type" x="60" y="552">CSLFormatUtils</text>
+  <text class="detail" x="60" y="580">Markup normalization</text>
+  <text class="detail" x="60" y="604">Bounded in-text fallbacks</text>
+
+  <rect class="box" x="354" y="462" width="292" height="252" rx="10" fill="#edf8f0"/>
+  <text class="heading" x="372" y="495">bst</text>
+  <text class="type" x="372" y="532">BstStyle · BstStyleLoader</text>
+  <text class="type" x="372" y="557">BstCitationFormat</text>
+  <text class="type" x="372" y="582">BstEntryRenderer</text>
+  <text class="type" x="372" y="607">PandocLatexConverter</text>
+  <text class="type" x="372" y="632">BSTFormatUtils</text>
+  <text class="small muted" x="372" y="681">Style loading and conversion</text>
+
+  <rect class="box" x="666" y="462" width="292" height="252" rx="10" fill="#edf8f0"/>
+  <text class="heading" x="684" y="495">jstyle</text>
+  <text class="type" x="684" y="532">JStyle · JStyleLoader</text>
+  <text class="type" x="684" y="557">JStyleCitationProcessor</text>
+  <text class="detail" x="684" y="590">Citation, marker, and</text>
+  <text class="detail" x="684" y="613">bibliography formatters</text>
+  <text class="type" x="684" y="645">JStyleBibliographyFormatter</text>
+  <text class="small muted" x="684" y="681">Family processing stays together</text>
+
+  <rect class="box" x="42" y="738" width="916" height="122" rx="10" fill="#edf5ff"/>
+  <text class="heading" x="64" y="769">Writer infrastructure</text>
+  <text class="type" x="64" y="798">frontend · backend · uno · rangesort</text>
+  <text class="detail" x="64" y="827">Live document access, reference marks, ranges, and overlap checks</text>
+
+  <rect class="box" x="20" y="910" width="960" height="100" rx="12" fill="#edf8f0"/>
+  <text class="heading" x="42" y="940">logic.layout.format - shared layout formatting</text>
+  <text class="type" x="42" y="968">OOPreFormatter · registered layout name: "OOPreFormatter"</text>
+  <text class="small muted" x="42" y="994">Shared by generic layouts and JStyle; no dependency on a citation family</text>
+
+  <rect class="box" x="20" y="1030" width="960" height="120" rx="12" fill="#f5f0ff"/>
+  <text class="heading" x="42" y="1061">model.openoffice - shared citation data and output values</text>
+  <text class="type" x="42" y="1089">style: Citation · CitationGroup · CitationGroupId · PageInfo</text>
+  <text class="type" x="42" y="1118">ootext: OOText · OOFormat   |   util: result and collection helpers</text>
+
+  <rect class="box" x="20" y="1170" width="960" height="100" rx="12" fill="#edf8f0"/>
+  <text class="heading" x="42" y="1200">logic.citationstyle - application-wide CSL support</text>
+  <text class="type" x="42" y="1228">CitationStyle · CSLStyleLoader · CSLStyleMetadata</text>
+  <text class="small muted" x="42" y="1254">Shared by Writer integration and other JabRef features</text>
+
+  <text class="small muted" x="20" y="1296">Boxes show package ownership, not runtime call order or a complete dependency graph.</text>
+</svg>

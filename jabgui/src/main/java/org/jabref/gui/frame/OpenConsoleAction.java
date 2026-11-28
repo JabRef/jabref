@@ -10,44 +10,51 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class OpenConsoleAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenConsoleAction.class);
-    private final Supplier<BibDatabaseContext> databaseContext;
+    private final Supplier<@Nullable BibDatabaseContext> databaseContext;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
+    private final NativeDesktop nativeDesktop;
 
     /// Creates a command that opens the console at the path of the supplied database,
     /// or defaults to the active database. Use
-    /// [#OpenConsoleAction(StateManager, GuiPreferences, DialogService)] if not supplying
+    /// [#OpenConsoleAction(StateManager, GuiPreferences, DialogService, NativeDesktop)] if not supplying
     /// another database.
-    public OpenConsoleAction(Supplier<BibDatabaseContext> databaseContext, StateManager stateManager, GuiPreferences preferences, DialogService dialogService) {
+    public OpenConsoleAction(Supplier<@Nullable BibDatabaseContext> databaseContext, StateManager stateManager, GuiPreferences preferences, DialogService dialogService, NativeDesktop nativeDesktop) {
         this.databaseContext = databaseContext;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.nativeDesktop = nativeDesktop;
 
         this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
     }
 
     /// Using this constructor will result in executing the command on the active database.
-    public OpenConsoleAction(StateManager stateManager, GuiPreferences preferences, DialogService dialogService) {
-        this(() -> null, stateManager, preferences, dialogService);
+    public OpenConsoleAction(StateManager stateManager, GuiPreferences preferences, DialogService dialogService, NativeDesktop nativeDesktop) {
+        this(() -> null, stateManager, preferences, dialogService, nativeDesktop);
     }
 
     @Override
     public void execute() {
         Optional.ofNullable(databaseContext.get()).or(stateManager::getActiveDatabase).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
             try {
-                NativeDesktop.openConsole(path, preferences, dialogService);
+                nativeDesktop.openConsole(path, dialogService);
             } catch (IOException e) {
                 LOGGER.info("Could not open console", e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Open terminal here"), Optional.ofNullable(e.getMessage()).orElse(""), e);
             }
         });
     }

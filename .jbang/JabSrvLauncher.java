@@ -12,32 +12,32 @@
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 
-// Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
+// Pin JavaFX to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
 // Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with
-// javafx.base:26 fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
-//DEPS org.openjfx:javafx-base:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-graphics:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-controls:26.0.1:${os.detected.jfxname}
-//DEPS org.openjfx:javafx-fxml:26.0.1:${os.detected.jfxname}
+// a current javafx.base fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
+//DEPS org.openjfx:javafx-base:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-graphics:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-controls:27.0.1.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-fxml:27.0.1.1:${os.detected.jfxname}
 
 // from jabsrv-cli
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabsrv
-//DEPS com.fasterxml.jackson.core:jackson-annotations:2.22
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.23
 //DEPS com.github.ben-manes.caffeine:caffeine:3.3.1
 //DEPS com.google.guava:guava:33.8.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.11.3
-//DEPS de.undercouch:citeproc-java:3.5.2
+//DEPS com.konghq:unirest-modules-gson:4.12.4
+//DEPS de.undercouch:citeproc-java:3.5.3
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS net.harawata:appdirs:1.5.0
-//DEPS org.apache.commons:commons-lang3:3.21.0
+//DEPS org.apache.commons:commons-lang3:3.22.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.1
-//DEPS org.bouncycastle:bcprov-jdk18on:1.86
-//DEPS org.postgresql:postgresql:42.7.14
+//DEPS org.bouncycastle:bcprov-jdk18on:1.87
+//DEPS org.postgresql:postgresql:42.7.15
 //DEPS org.slf4j:slf4j-api:2.0.20
 //DEPS org.slf4j:jul-to-slf4j:2.0.20
 //DEPS org.tinylog:slf4j-tinylog:2.8.1
@@ -50,12 +50,12 @@
 //DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.3
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.3
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.3
-//DEPS org.hibernate.validator:hibernate-validator:9.1.6.Final
+//DEPS org.hibernate.validator:hibernate-validator:9.2.0.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.2.4
-//DEPS tools.jackson.core:jackson-databind:3.2.4
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4
-//DEPS com.nimbusds:oauth2-oidc-sdk:11.38.2
+//DEPS tools.jackson.core:jackson-core:3.3.0
+//DEPS tools.jackson.core:jackson-databind:3.3.0
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.3.0
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.39
 //DEPS net.minidev:json-smart:2.6.1
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java

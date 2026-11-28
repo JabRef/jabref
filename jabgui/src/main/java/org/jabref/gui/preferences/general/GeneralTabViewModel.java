@@ -84,6 +84,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldAskForIncludingCrossReferencesProperty = new SimpleBooleanProperty();
     private final BooleanProperty hideTabBarProperty = new SimpleBooleanProperty();
+    private final BooleanProperty wrapMainTableTextProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
@@ -98,6 +99,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final WorkspacePreferences workspacePreferences;
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
@@ -133,9 +135,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                                UiMessageHandler uiMessageHandler,
                                OAuthSessionRegistry oAuthSessionRegistry,
                                RemoteListenerServerManager remoteListenerServerManager,
-                               StateManager stateManager) {
+                               StateManager stateManager,
+                               NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
@@ -234,6 +238,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
         shouldAskForIncludingCrossReferencesProperty.setValue(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences());
         hideTabBarProperty.setValue(workspacePreferences.shouldHideTabBar());
+        wrapMainTableTextProperty.setValue(workspacePreferences.shouldWrapMainTableText());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());
@@ -284,6 +289,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         preferences.getCopyToPreferences().setShouldAskForIncludingCrossReferences(shouldAskForIncludingCrossReferencesProperty.getValue());
         workspacePreferences.setHideTabBar(confirmHideTabBarProperty().getValue());
+        workspacePreferences.setWrapMainTableText(wrapMainTableTextProperty.getValue());
 
         libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
 
@@ -476,6 +482,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.hideTabBarProperty;
     }
 
+    public BooleanProperty wrapMainTableTextProperty() {
+        return this.wrapMainTableTextProperty;
+    }
+
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
         return this.bibliographyModeListProperty;
     }
@@ -542,7 +552,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public void openBrowser() {
         String url = "https://themes.jabref.org";
         try {
-            NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openBrowser(url);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }

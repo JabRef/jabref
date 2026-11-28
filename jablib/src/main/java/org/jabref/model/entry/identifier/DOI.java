@@ -86,7 +86,9 @@ public class DOI implements Identifier {
     private static final String HTTP_EXP = "https?://[^\\s]+?" + DOI_EXP;
     private static final String SHORT_DOI_HTTP_EXP = "https?://[^\\s]+?" + SHORT_DOI_EXP;
     // Pattern
-    private static final Pattern DOI_RESOLVER_PREFIX = Pattern.compile("^https?://(?:www\\.|dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DOI_RESOLVER_PREFIX = Pattern.compile("^https?://(?:www\\.|dx\\.)?doi\\.org(?::[0-9]+)?/", Pattern.CASE_INSENSITIVE);
+    // Matches doi.org links with optional scheme and port, e.g., "doi.org/", "https://dx.doi.org:443/"
+    private static final Pattern DOI_RESOLVER_LINK = Pattern.compile("^(?:https?://)?(?:www\\.|dx\\.)?doi\\.org(?::[0-9]+)?/", Pattern.CASE_INSENSITIVE);
     private static final Pattern EXACT_DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
     private static final Pattern FIND_DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_DOI_EXP, Pattern.CASE_INSENSITIVE);
     // Pattern (short DOI)
@@ -158,7 +160,7 @@ public class DOI implements Identifier {
     public static Optional<DOI> parse(String doi) {
         try {
             LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-            String cleanedDOI = doi;
+            String cleanedDOI = removeTrackingParameters(doi);
             cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);
             // needs to be handled before LatexToUnicode, because otherwise `^` will be treated as conversion superscript
             cleanedDOI = cleanedDOI.replaceAll("\\^", "");
@@ -223,6 +225,20 @@ public class DOI implements Identifier {
             LOGGER.debug("Could not decode DOI link", e);
             return Optional.empty();
         }
+    }
+
+    /// Removes the query (e.g., `?utm_source=newsletter`) and the fragment (e.g., `#section`) from a doi.org link (with or without `https://`),
+    /// because they are not part of the DOI.
+    ///
+    /// Only DOI resolver URLs (such as `https://doi.org/...`) are changed. Other URLs may carry the DOI inside the query
+    /// (e.g., `https://www.scitepress.org/Link.aspx?doi=10.5220/0010404301780189`) and are returned unchanged.
+    /// Call this before URL decoding, because an encoded `%3F` or `%23` is a valid part of a DOI.
+    private static String removeTrackingParameters(String doi) {
+        String trimmed = doi.trim();
+        if (DOI_RESOLVER_LINK.matcher(trimmed).find()) {
+            return URLUtil.removeQueryAndFragment(trimmed);
+        }
+        return doi;
     }
 
     /// Determines whether a DOI/Short DOI is valid or not

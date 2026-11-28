@@ -277,6 +277,29 @@ class DOITest {
         assertTrue(new DOI("10/abcde").isShortDoi());
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308?utm_source=newsletter&utm_medium=email",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org/10.1371/journal.pone.0000308#abstract",
+            "https://doi.org/10.1371/journal.pone.0000308, https://dx.doi.org/10.1371/journal.pone.0000308?utm_source=newsletter",
+            "https://doi.org/10.1371/journal.pone.0000308, https://doi.org:443/10.1371/journal.pone.0000308?utm_source=newsletter",
+            "https://doi.org/10/gf4gqc, https://doi.org/10/gf4gqc?utm_source=newsletter",
+            "https://doi.org/10/bfrhmx, doi.org/bfrhmx?utm_source=x",
+            "https://doi.org/10/bfrhmx, https://doi.org/bfrhmx?utm_source=x",
+            "https://doi.org/10/bfrhmx, www.doi.org/bfrhmx?utm_source=x",
+            // an encoded question mark is part of the DOI and must be kept
+            "https://doi.org/10.1006/rwei.1999%3F.0001, https://doi.org/10.1006/rwei.1999%3F.0001"
+    })
+    void parseRemovesTrackingParametersFromDoiUrl(String expected, String input) {
+        assertEquals(expected, DOI.parse(input).get().getURIAsASCIIString());
+    }
+
+    @Test
+    void parseKeepsDoiInQueryOfNonResolverUrl() {
+        assertEquals("10.5220/0010404301780189", DOI.parse("https://www.scitepress.org/Link.aspx?doi=10.5220/0010404301780189").get().asString());
+    }
+
     @Test
     void noDOIFoundInsideArbitraryText() {
         assertEquals(Optional.empty(), DOI.findInText("text without 28282 a doi"));

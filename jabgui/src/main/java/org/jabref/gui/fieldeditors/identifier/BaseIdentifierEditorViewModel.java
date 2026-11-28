@@ -46,6 +46,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     protected TaskExecutor taskExecutor;
     protected GuiPreferences preferences;
     protected final StateManager stateManager;
+    protected final NativeDesktop nativeDesktop;
 
     public BaseIdentifierEditorViewModel(Field field,
                                          SuggestionProvider<?> suggestionProvider,
@@ -54,12 +55,14 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
                                          TaskExecutor taskExecutor,
                                          GuiPreferences preferences,
                                          UndoManager undoManager,
-                                         StateManager stateManager) {
+                                         StateManager stateManager,
+                                         NativeDesktop nativeDesktop) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.stateManager = stateManager;
+        this.nativeDesktop = nativeDesktop;
     }
 
     /// Since it's not possible to perform the same actions on all identifiers, specific implementations can call the `configure`
@@ -166,7 +169,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {
         stateManager.getActiveDatabase().ifPresentOrElse(
-                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager)
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager, nativeDesktop)
                         .fetchAndMerge(entry, field),
                 () -> dialogService.notify(Localization.lang("No library selected"))
         );
@@ -179,7 +182,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     public void openExternalLink() {
         identifier.get().flatMap(Identifier::getExternalURI).ifPresent(url -> {
                     try {
-                        NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
+                        nativeDesktop.openBrowser(url);
                     } catch (IOException ex) {
                         dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
                     }

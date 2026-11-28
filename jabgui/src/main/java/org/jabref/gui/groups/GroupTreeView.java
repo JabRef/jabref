@@ -21,7 +21,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollBar;
@@ -43,6 +42,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -52,6 +52,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -97,6 +98,7 @@ public class GroupTreeView extends BorderPane {
     private final DialogService dialogService;
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
@@ -125,7 +127,8 @@ public class GroupTreeView extends BorderPane {
                          DialogService dialogService,
                          AiService aiService,
                          FileUpdateMonitor fileUpdateMonitor,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         NativeDesktop nativeDesktop) {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
@@ -133,6 +136,7 @@ public class GroupTreeView extends BorderPane {
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
         this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
@@ -390,7 +394,7 @@ public class GroupTreeView extends BorderPane {
         text.getStyleClass().setAll("text");
 
         node.getChildren().add(text);
-        node.setMaxWidth(Control.USE_PREF_SIZE);
+        node.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         return node;
     }
 
@@ -461,11 +465,11 @@ public class GroupTreeView extends BorderPane {
                     stateManager.getUndoManager(database),
                     stateManager,
                     dialogService,
-                    taskExecutor);
+                    taskExecutor,
+                    nativeDesktop);
             List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
-            importHandler.importFilesInBackground(files, event.getTransferMode())
-                         .executeWith(taskExecutor);
+            importHandler.importDroppedFiles(files, event.getTransferMode());
             success = true;
         }
         event.setDropCompleted(success);

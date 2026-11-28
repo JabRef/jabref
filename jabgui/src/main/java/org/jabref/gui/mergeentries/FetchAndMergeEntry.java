@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -47,16 +48,19 @@ public class FetchAndMergeEntry {
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
 
     public FetchAndMergeEntry(BibDatabaseContext bibDatabaseContext,
                               TaskExecutor taskExecutor,
                               GuiPreferences preferences,
                               DialogService dialogService,
                               UndoManager undoManager,
-                              StateManager stateManager) {
+                              StateManager stateManager,
+                              NativeDesktop nativeDesktop) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
@@ -105,7 +109,7 @@ public class FetchAndMergeEntry {
     }
 
     private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
-        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences, stateManager);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences, stateManager, nativeDesktop);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));

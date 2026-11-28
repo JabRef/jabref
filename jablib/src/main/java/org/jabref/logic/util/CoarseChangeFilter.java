@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 /// This asks the same question as [org.jabref.logic.undo.CoalescingPolicy] — is this change the
 /// continuation of a run of typing? — for a different consumer, and the two answers are not
 /// interchangeable. The policy decides how much one Ctrl+Z takes back, where being wrong costs a
-/// keystroke either way. Here a change marked filtered arms no backup and is held back from the
+/// keystroke either way. Here a change marked filtered is held back from the
 /// shared database until the next major change (see [org.jabref.logic.shared.DBMSSynchronizer]),
-/// so filtering too eagerly delays what other clients see, while filtering too little only writes
-/// a backup more often. That is why this stays with the conservative rule below — a change to
+/// so filtering too eagerly delays what other clients see, while filtering too little only synchronizes
+/// more often. That is why this stays with the conservative rule below — a change to
 /// another field or entry, or more than one character at once, is major — instead of the policy's
 /// contiguity and word rules.
 ///
