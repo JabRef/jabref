@@ -1,5 +1,5 @@
 ---
-nav_order: 81
+nav_order: 86
 parent: Decision Records
 ---
 
@@ -21,7 +21,7 @@ The [BIBO author list](https://dcmi.github.io/bibo/#http://purl.org/ontology/bib
 
 ## Decision Outcome
 
-Emit both relations and share the author nodes. Each creator is a member of the `rdf:Seq` referenced by `bibo:authorList`, in source order. Shared blank-node identifiers connect the two representations without relying on name matching.
+Chosen option: Emit both relations and share the author nodes, because this preserves author order while supporting consumers that read direct creator relations. Each creator is a member of the `rdf:Seq` referenced by `bibo:authorList`, in source order. Shared blank-node identifiers connect the two representations without relying on name matching.
 
 Consumers can use direct creator relations or the ordered list. Blank-node identifiers are generated for each export to avoid collisions between entries, so repeated exports can differ in their serialized identifiers even when their RDF graphs are equivalent.
 
