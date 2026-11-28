@@ -15,6 +15,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
 import com.google.common.collect.MoreCollectors;
@@ -43,7 +44,7 @@ public class FieldColumn extends MainTableColumn<String> {
                 .showTooltipRegardlessOfTruncation(tooltip::shouldAlwaysShowTooltip)
                 .install(this);
 
-        this.setComparator(isNumeric() ? new NumericFieldComparator() : TEXT_COMPARATOR);
+        this.setComparator(isNumeric() ? new NumericFieldComparator(isRomanNumeralAllowed()) : TEXT_COMPARATOR);
 
         this.setSortable(true);
     }
@@ -55,6 +56,14 @@ public class FieldColumn extends MainTableColumn<String> {
         }
         Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
         return (field instanceof UnknownField) || field.isNumeric();
+    }
+
+    private boolean isRomanNumeralAllowed() {
+        if (!fields.hasExactlyOne()) {
+            return false;
+        }
+        Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
+        return field == StandardField.VOLUME || field == StandardField.VOLUMES;
     }
 
     /// Get the table column name to be displayed in the UI

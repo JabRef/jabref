@@ -89,6 +89,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We shortened read-status and priority menu labels and made read and low-priority icons easier to distinguish. [#17691](https://github.com/JabRef/jabref/pull/17691)
 - We hide the "Move deleted files to trash" preference on platforms without a trash. [JabRef/jabref-koppor#764](https://github.com/JabRef/jabref-koppor/issues/764)
+- We changed the main table to sort Roman numerals numerically in the `volume` and `volumes` columns. [#17722](https://github.com/JabRef/jabref/issues/17722)
 - We changed inserting LibreOffice/OpenOffice citations to refresh existing citations, follow bibliography synchronization settings, and avoid duplicate spaces around citations. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice warnings after inserting or refreshing citations to list all missing citation keys and suggest opening corresponding libraries. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We changed LibreOffice/OpenOffice JabRef/Zotero citation conversion to retain only target-format data; converting back does not restore discarded information. [#17673](https://github.com/JabRef/jabref/pull/17673)

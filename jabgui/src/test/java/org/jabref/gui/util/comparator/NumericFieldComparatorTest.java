@@ -12,7 +12,7 @@ class NumericFieldComparatorTest {
 
     @Test
     void compareTwoNumericInputs() {
-        assertEquals(2, comparator.compare("4", "2"));
+        assertEquals(1, comparator.compare("4", "2"));
     }
 
     @Test
