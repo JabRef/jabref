@@ -1837,3 +1837,18 @@ We want to have a look that matches our icons in the tool-bar */
 .side-pane-scroll > .scroll-bar:vertical {
     -fx-padding: 0 4 0 4;
 }
+
+/* Citations tab: add/review split button */
+.citation-import-button:focused,
+.citation-import-button:focused > .label,
+.citation-import-button:focused > .arrow-button {
+    -fx-background-insets: 0,1;
+}
+
+.citation-import-menu {
+    -fx-padding: 0;
+}
+
+.citation-import-menu .menu-item:focused {
+    -fx-background-insets: 0;
+}

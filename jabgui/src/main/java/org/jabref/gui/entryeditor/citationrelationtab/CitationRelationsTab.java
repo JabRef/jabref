@@ -46,6 +46,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -186,6 +187,21 @@ public class CitationRelationsTab extends EntryEditorTab {
         importButton.setDisable(true);
         importButton.setOnAction(_ -> importCheckedEntries());
         reviewMenuItem.setOnAction(_ -> reviewCheckedEntries());
+        importButton.getStyleClass().add("citation-import-button");
+        // Give the button and its dropdown the same width so they line up
+        importButton.setOnShown(_ -> {
+            ContextMenu popup = reviewMenuItem.getParentPopup();
+            if (popup == null || !(popup.getSkin().getNode() instanceof Region menuContent)) {
+                return;
+            }
+            if (!popup.getStyleClass().contains("citation-import-menu")) {
+                popup.getStyleClass().add("citation-import-menu");
+            }
+            // Use the visible menu box (not the popup window, which includes the shadow)
+            double width = Math.max(importButton.getWidth(), menuContent.prefWidth(-1));
+            importButton.setMinWidth(width);
+            menuContent.setMinWidth(width);
+        });
 
         initFetcherCombo();
     }
