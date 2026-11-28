@@ -60,5 +60,15 @@ Local attachments that cannot be resolved or represented relatively are omitted.
 
 Needs: impl, utest
 
+## MODS exports must preserve supported contributor names
+`req~export.mods.names~1`
+
+MODS exports preserve supported contributor names without incorrectly splitting names containing "and".
+Each supported contributor field is exported with its corresponding MARC relator code.
+
+See [issue 17898](https://github.com/JabRef/jabref/issues/17898).
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD013 MD033 MD041 -->
 <!-- markdownlint-disable-file MD022 -->

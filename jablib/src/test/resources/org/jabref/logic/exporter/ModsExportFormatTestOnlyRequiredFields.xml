@@ -7,13 +7,22 @@
             <mods:namePart type="family">Shruthi</mods:namePart>
             <mods:namePart type="given">Basavaradhya</mods:namePart>
             <mods:namePart type="given">Sahukar</mods:namePart>
+            <mods:role>
+                <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+            </mods:role>
         </mods:name>
         <mods:name type="personal">
-            <mods:namePart type="family"> Vinodhkumar</mods:namePart>
+            <mods:namePart type="family">Vinodhkumar</mods:namePart>
             <mods:namePart type="given">Palani</mods:namePart>
+            <mods:role>
+                <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+            </mods:role>
         </mods:name>
         <mods:name type="personal">
-            <mods:namePart type="family"> Selvamani</mods:namePart>
+            <mods:namePart type="family">Selvamani</mods:namePart>
+            <mods:role>
+                <mods:roleTerm type="code" authority="marcrelator">aut</mods:roleTerm>
+            </mods:role>
         </mods:name>
         <mods:titleInfo>
             <mods:title>Proteomics: A new perspective for cancer.</mods:title>
