@@ -215,6 +215,34 @@ public class LinkedFilesIndexerTest {
     }
 
     @Test
+    void closePersistsIndexedPagesWithoutForcingSegmentsToMerge() throws IOException {
+        // [utest->req~search.fulltext.close-without-forced-merge~1]
+        BibEntry thesis = new BibEntry(StandardEntryType.PhdThesis)
+                .withFiles(List.of(new LinkedFile("Example thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withFiles(List.of(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
+        BackgroundTask<Void> task = BackgroundTask.wrap(() -> {
+        });
+
+        indexer.addToIndex(List.of(thesis), task);
+        indexer.getSearcherManager().maybeRefreshBlocking();
+        indexer.addToIndex(List.of(article), task);
+        indexer.closeAndWait();
+        indexer = new ReadOnlyLinkedFilesIndexer(context);
+
+        var searcherManager = indexer.getSearcherManager();
+        var searcher = searcherManager.acquire();
+        try {
+            assertEquals(List.of(1, 33), searcher.getIndexReader().leaves().stream()
+                                                 .map(leaf -> leaf.reader().numDocs())
+                                                 .sorted()
+                                                 .toList());
+        } finally {
+            searcherManager.release(searcher);
+        }
+    }
+
+    @Test
     public void flushIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
