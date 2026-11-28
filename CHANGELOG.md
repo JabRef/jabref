@@ -11,10 +11,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added an option to automatically merge changes made to the library file outside JabRef into the open library. [#8431](https://github.com/JabRef/jabref/issues/8431)
+
 ### Changed
 
 ### Fixed
 
+- We fixed an issue where accepting an external change to an entry lost its table position, selection, and open entry editor. [#16813](https://github.com/JabRef/jabref/pull/16813)
 - We fixed an issue where BST entry previews showed italic and bold text as Unicode mathematical letters. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed an issue where the customized entry preview ignored small caps and showed LaTeX commands inside emphasized text. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed nested LaTeX formatting, spacing, and ampersand escaping in HTML output and JStyle bibliographies. [#17921](https://github.com/JabRef/jabref/pull/17921)

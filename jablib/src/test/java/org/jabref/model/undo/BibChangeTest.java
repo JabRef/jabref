@@ -46,6 +46,7 @@ class BibChangeTest {
                 new UndoableFieldChange(entry, StandardField.YEAR, null, "1905"),
                 new UndoableFieldChange(entry, StandardField.YEAR, "1905", null),
                 new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book),
+                new UndoableCommentsChange(entry, "", "% comment"),
                 new UndoableInsertEntries(database, entry),
                 new UndoableRemoveEntries(database, entry),
                 new UndoablePreambleChange(database, null, "preamble"),
