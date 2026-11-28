@@ -38,6 +38,7 @@ public final class BstPreviewLayout implements PreviewLayout {
 
     private static final Pattern COMMENT_PATTERN = Pattern.compile("%.*");
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem[{].*[}]");
+    private static final Pattern BIBITEM_LINE_START_PATTERN = Pattern.compile("(?m)^\\\\bibitem");
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
 
@@ -132,9 +133,9 @@ public final class BstPreviewLayout implements PreviewLayout {
         String result = bstVM.renderWithoutPreamble(List.of(entry), databaseContext.getDatabase());
         // Exactly one entry is rendered, so everything before its \bibitem is style preamble
         // (e.g., multi-line \providecommand definitions of amsalpha.bst or IEEEtran.bst)
-        int bibitemStart = result.lastIndexOf("\\bibitem");
-        if (bibitemStart >= 0) {
-            result = result.substring(bibitemStart);
+        Matcher bibitemStart = BIBITEM_LINE_START_PATTERN.matcher(result);
+        if (bibitemStart.find()) {
+            result = result.substring(bibitemStart.start());
         }
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");

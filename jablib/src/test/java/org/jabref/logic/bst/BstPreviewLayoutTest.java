@@ -166,6 +166,14 @@ class BstPreviewLayoutTest {
     }
 
     @Test
+    void bibitemInFieldContentKeepsAuthorInPreview() throws URISyntaxException {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
+                                       .withField(StandardField.TITLE, "Using \\bibitem{key} in LaTeX");
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
+        assertEquals("O.&nbsp;Kopp. Using in latex.", preview);
+    }
+
     void unparsableBstShowsPreviewError(@TempDir Path tempDir) throws IOException {
         Path invalidBst = tempDir.resolve("invalid.bst");
         Files.writeString(invalidBst, "}");
