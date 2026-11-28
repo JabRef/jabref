@@ -15,6 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed issue where last character and caret not visible when editing long text in entry editor fields. [#14318](https://github.com/JabRef/jabref/issues/14318)
 - We fixed an issue where BST entry previews showed italic and bold text as Unicode mathematical letters. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed an issue where the customized entry preview ignored small caps and showed LaTeX commands inside emphasized text. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed nested LaTeX formatting, spacing, and ampersand escaping in HTML output and JStyle bibliographies. [#17921](https://github.com/JabRef/jabref/pull/17921)
@@ -212,7 +213,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where confirming the main file directory quick setting without a path saved an invalid directory. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where exporting linked files with a custom layout failed when no file directory was set. [#17752](https://github.com/JabRef/jabref/pull/17752)
 - We fixed an issue where the RIS importer overwrote the journal issue number (`IS`) with the accession number (`AN`). [#17817](https://github.com/JabRef/jabref/issues/17817)
-- We fixed issue where last character and caret not visible when editing long text in entry editor fields. [#14318](https://github.com/JabRef/jabref/issues/14318)
 - We fixed LibreOffice/OpenOffice citations losing their normal, in-text, or invisible form when refreshed using CSL styles outside Zotero compatibility mode. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed citation page information being lost, misplaced, or not cleared when editing LibreOffice/OpenOffice citations or undoing citation edits. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We fixed CSL in-text citations with missing dates or authors and protected formatted citations from malformed markup in LibreOffice/OpenOffice. [#17673](https://github.com/JabRef/jabref/pull/17673)
