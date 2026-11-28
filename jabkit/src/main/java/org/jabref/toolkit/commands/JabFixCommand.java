@@ -1,0 +1,381 @@
+package org.jabref.toolkit.commands;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.StringWriter;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.SequencedMap;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+
+import org.jabref.logic.exporter.AtomicFileOutputStream;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.lint.JabFixConfiguration;
+import org.jabref.logic.lint.JabFixMode;
+import org.jabref.logic.lint.rule.Finding;
+import org.jabref.logic.lint.rule.RuleSet;
+import org.jabref.logic.lint.rule.UnknownRuleException;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.LintSettings;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.RuleMode;
+import org.jabref.model.metadata.RuleSelector;
+import org.jabref.model.metadata.RuleSettings;
+import org.jabref.toolkit.converter.JabFixModeConverter;
+import org.jabref.toolkit.exception.CliException;
+import org.jabref.toolkit.service.ImportService;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+
+import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
+import static picocli.CommandLine.Option;
+import static picocli.CommandLine.ParentCommand;
+
+/// Thin CLI wrapper around JabFix; the rules and the formatting live in the `org.jabref.logic.lint` package.
+@NullMarked
+@Command(name = "fix", description = "Lint and format a BibTeX library.",
+        exitCodeOnExecutionException = JabFixCommand.SOFTWARE_ERROR,
+        exitCodeListHeading = "%nExit codes:%n",
+        exitCodeList = {"0:Done; with --check, the library is clean.",
+                "1:With --check, the library is not clean.",
+                "2:Usage error, such as an unknown rule or mode.",
+                "3:Any other error, such as a failed download or write."})
+class JabFixCommand implements Callable<Integer> {
+    /// What `--check` exits with when the library is not clean.
+    static final int NOT_CLEAN = 1;
+
+    /// Not picocli's [CommandLine.ExitCode#SOFTWARE], which is 1 as well, so that a run that failed
+    /// does not pass for one that found something. [org.jabref.toolkit.exception.CliExceptionHandler]
+    /// exits with it for a software error raised anywhere in the run, such as a failed download.
+    static final int SOFTWARE_ERROR = 3;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabFixCommand.class);
+
+    @ParentCommand
+    private JabKit jabKit;
+
+    @Mixin
+    private JabKit.SharedOptions sharedOptions;
+
+    @Mixin
+    private InputOption inputOption = new InputOption();
+
+    @Option(names = {"--in-place"}, description = "Write the formatted library back to the input file instead of to standard output.")
+    private boolean inPlace;
+
+    @Option(names = {"--check"}, description = "Report what is wrong without writing anything.")
+    private boolean checkOnly;
+
+    @Option(names = {"--mode"}, paramLabel = "MODE", converter = JabFixModeConverter.class,
+            description = "Mode to apply instead of the library's: a set of rules JabFix ships. Rules the library or --rule name still outrank it. The available modes are listed below.")
+    private @Nullable JabFixMode mode;
+
+    @Option(names = {"--rule"}, split = ",", paramLabel = "RULE=MODE[:NAME=VALUE]",
+            description = "How far a rule goes, outranking what the library says about it: off, check (report only) or fix (report and repair). "
+                    + "A rule that takes values is given them after its mode, as in 'entry-brackets=fix:bracket=parentheses'. "
+                    + "'field:rule' narrows a rule to one field. Repeatable, and accepts a comma-separated list. The available rules are listed below.")
+    private Map<String, String> rules = new LinkedHashMap<>();
+
+    @Option(names = {"--save-config"},
+            description = "Store --mode and --rule in the library, moving its save actions there as well, so that later runs and JabRef's saves apply them without options. "
+                    + "Together with --in-place this rewrites the library; without it, the result only goes to standard output.")
+    private boolean saveConfig;
+
+    // [impl->req~jabkit.cli.jabfix~1]
+    @Override
+    public Integer call() throws CliException {
+        if (inPlace && checkOnly) {
+            throw new CliException("--in-place and --check are mutually exclusive",
+                    Localization.lang("Only one of --in-place and --check can be given."),
+                    CommandLine.ExitCode.USAGE);
+        }
+
+        Path inputFile = inputOption.getInputFile(jabKit.cliPreferences);
+
+        // Without --in-place or --check the formatted library itself goes to stdout, so the
+        // importer's progress chatter has to be suppressed there to keep the output pipeable.
+        boolean quiet = sharedOptions.porcelain || !(inPlace || checkOnly);
+        ParserResult parserResult = ImportService.importBibTexFile(inputFile, jabKit.cliPreferences, quiet);
+
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
+        MetaData metaData = databaseContext.getMetaData();
+        // These are the rules of this run and not of the library, so they are laid over what it
+        // says rather than becoming what it says -- unless --save-config makes them what it says.
+        LintSettings runSettings = runSettings();
+        if (saveConfig) {
+            // Storing them leaves what the run applies unchanged, since the run lays them over the
+            // library either way, so it does not matter that this happens before the run.
+            JabFixConfiguration.configure(metaData, metaData.getFormatting().orElse(LintSettings.NONE).overriddenBy(runSettings));
+        }
+        warnIfNothingIsEnabled(JabFixConfiguration.applied(metaData, runSettings), metaData);
+
+        try {
+            // Only the parsed library in memory is changed here; nothing reaches disk unless
+            // --in-place says so, which is what lets --check reuse the very same run.
+            SerializedLibrary library = serialize(databaseContext, runSettings);
+
+            if (checkOnly) {
+                return check(inputFile, library, parserResult);
+            }
+
+            // A rule that found something it cannot repair has to be said out loud, since it will
+            // not show up in the output the way an applied fix does.
+            report(inputFile, library.findings().stream().filter(finding -> !finding.isFixable()).toList(), parserResult, System.err);
+
+            if (inPlace) {
+                return write(inputFile, library.bytes());
+            }
+
+            // In the library's encoding rather than the console's, so that redirecting the output
+            // gives the file --in-place would write.
+            System.out.writeBytes(library.bytes());
+            System.out.flush();
+            return CommandLine.ExitCode.OK;
+        } catch (IOException e) {
+            LOGGER.error("Unable to write the formatted library", e);
+            System.err.println(Localization.lang("Unable to write to %0.", inPlace ? inputFile : "stdout"));
+            return SOFTWARE_ERROR;
+        }
+    }
+
+    /// What this run asks for, which the writer lays over what the library asks for -- see
+    /// [JabFixConfiguration#applied]: `--mode` takes the place of the library's mode, and each rule
+    /// `--rule` names outranks what the library says about that rule. A rule `--rule` does not name
+    /// goes on doing what the library says. `--rule` is spelled the way the stored configuration is,
+    /// so a rule named twice takes what it was named with later, like a repeated key there.
+    ///
+    /// A misspelled id is a usage error, not something to pass over: leaving it unreported would let
+    /// the user believe a rule had been switched off while it kept running. A library's own settings
+    /// are treated more leniently -- see [RuleSet#asConfiguredBy].
+    private LintSettings runSettings() throws CliException {
+        LintSettings run = Optional.ofNullable(mode)
+                                   .map(chosen -> LintSettings.NONE.withMode(chosen.getKey()))
+                                   .orElse(LintSettings.NONE);
+        rejectUnknownRules(rules.keySet());
+        for (Map.Entry<String, String> rule : rules.entrySet()) {
+            // Readable: a key that is not names no rule, and was rejected above.
+            RuleSelector selector = RuleSelector.parse(rule.getKey()).orElseThrow();
+            run = run.and(selector, ruleSettings(selector, rule.getValue()));
+        }
+        return run;
+    }
+
+    /// What `--rule` says about one selector: a mode and, after it, the values the rule takes, each
+    /// as `:name=value`. They are not separated by a comma, which separates the rules of a list.
+    private RuleSettings ruleSettings(RuleSelector selector, String stated) throws CliException {
+        List<String> parts = List.of(stated.split(":", -1));
+        RuleMode ruleMode = knownRuleMode(parts.getFirst());
+        SequencedMap<String, String> values = new LinkedHashMap<>();
+        for (String value : parts.subList(1, parts.size())) {
+            int separator = value.indexOf('=');
+            if (separator < 1) {
+                throw new CliException("Not a rule value: " + value,
+                        Localization.lang("Expected NAME=VALUE after the mode of the rule %0, but found '%1'.", selector.asKey(), value),
+                        CommandLine.ExitCode.USAGE);
+            }
+            values.put(value.substring(0, separator), value.substring(separator + 1));
+        }
+        rejectUnreadableValues(selector, values);
+        return new RuleSettings(ruleMode, values);
+    }
+
+    /// Holds the values the user typed against the rule, like a misspelled id. A rule goes by one set
+    /// of values for a whole run, so it cannot be given any for a single field either, which a
+    /// library's own settings do not read for the same reason.
+    private void rejectUnreadableValues(RuleSelector selector, Map<String, String> values) throws CliException {
+        if (values.isEmpty()) {
+            return;
+        }
+        if (selector.field().isPresent()) {
+            throw new CliException("Rule values on one field: " + selector.asKey(),
+                    Localization.lang("The rule %0 names a field, so it cannot be given values.", selector.asKey()),
+                    CommandLine.ExitCode.USAGE);
+        }
+        boolean readable = RuleSet.known(jabKit.cliPreferences.getFieldPreferences()).rules().stream()
+                                  .filter(rule -> rule.id().equals(selector.ruleId()))
+                                  .anyMatch(rule -> rule.configuredWith(values).isPresent());
+        if (!readable) {
+            throw new CliException("Unreadable rule values: " + selector.ruleId() + " " + values,
+                    Localization.lang("The rule %0 cannot read the values %1.", selector.ruleId(), values.toString()),
+                    CommandLine.ExitCode.USAGE);
+        }
+    }
+
+    /// Holds the keys the user typed against the rules JabFix knows. One that cannot be read as a
+    /// selector names no rule either, and is reported the same way.
+    private void rejectUnknownRules(Collection<String> keys) throws CliException {
+        try {
+            RuleSet.known(jabKit.cliPreferences.getFieldPreferences())
+                   .rejectUnknown(keys.stream()
+                                      .map(key -> RuleSelector.parse(key).map(RuleSelector::ruleId).orElse(key))
+                                      .toList());
+        } catch (UnknownRuleException e) {
+            LOGGER.debug("Rejecting unknown rule id", e);
+            throw new CliException(e.getMessage(),
+                    Localization.lang("Unknown rule: %0. Available rules: %1",
+                            String.join(", ", e.getUnknownIds()),
+                            String.join(", ", e.getKnownIds())),
+                    CommandLine.ExitCode.USAGE);
+        }
+    }
+
+    private static RuleMode knownRuleMode(String key) throws CliException {
+        return RuleMode.fromKey(key).orElseThrow(() -> new CliException("Unknown rule mode: " + key,
+                Localization.lang("Unknown rule mode: %0. Available rule modes: %1", key,
+                        Arrays.stream(RuleMode.values()).map(RuleMode::asKey).collect(Collectors.joining(", "))),
+                CommandLine.ExitCode.USAGE));
+    }
+
+    /// Nothing runs unless a mode or a rule is enabled, which is easy to miss: the library is still
+    /// written, and only its layout changes. The way out is one option, so the warning names it.
+    private void warnIfNothingIsEnabled(LintSettings applied, MetaData metaData) {
+        if (RuleSet.configuredBy(applied, metaData, jabKit.cliPreferences.getFieldPreferences()).rules().isEmpty()) {
+            LOGGER.warn("No JabFix mode or rule is enabled, so no rule runs");
+            System.err.println(Localization.lang("No mode or rule is enabled, so nothing is checked or fixed. Choose a mode with --mode (%0), and add --save-config to keep it.",
+                    JabFixModeConverter.availableModes()));
+        }
+    }
+
+    /// What a save of the library produces: the text, the encoding it is saved in, and what the rules
+    /// reported while producing it.
+    private record SerializedLibrary(String formatted, Charset encoding, List<Finding> findings) {
+        /// The library as it is saved: in its own encoding, as JabRef saves it, so that its
+        /// `% Encoding` line stays true. A character the encoding cannot hold, such as one a rule
+        /// converted from LaTeX, is an error, since replacing it would lose it.
+        byte[] bytes() throws CliException {
+            try {
+                ByteBuffer encoded = encoding.newEncoder().encode(CharBuffer.wrap(formatted));
+                byte[] bytes = new byte[encoded.remaining()];
+                encoded.get(bytes);
+                return bytes;
+            } catch (CharacterCodingException e) {
+                LOGGER.debug("Unable to encode the formatted library in {}", encoding, e);
+                throw new CliException("Unable to encode the formatted library in " + encoding,
+                        Localization.lang("The encoding %0 of the library cannot hold the characters %1.", encoding.displayName(), unencodableCharacters()),
+                        SOFTWARE_ERROR);
+            }
+        }
+
+        private String unencodableCharacters() {
+            CharsetEncoder encoder = encoding.newEncoder();
+            return formatted.codePoints()
+                            .mapToObj(Character::toString)
+                            .filter(character -> !encoder.canEncode(character))
+                            .distinct()
+                            .collect(Collectors.joining(", "));
+        }
+    }
+
+    /// Writes the library, which applies the rules it asks for on the way, since that is what a save
+    /// of it does.
+    ///
+    /// Reformatting on save rewrites every entry; without it the writer would keep the serialization
+    /// each entry had in the input file, which is exactly what is to be replaced.
+    private SerializedLibrary serialize(BibDatabaseContext databaseContext, LintSettings runSettings) throws IOException {
+        StringWriter stringWriter = new StringWriter();
+        SelfContainedSaveConfiguration saveConfiguration =
+                (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration().withReformatOnSave(true);
+
+        BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
+                new BibWriter(stringWriter, databaseContext.getDatabase().getNewLineSeparator()),
+                saveConfiguration,
+                jabKit.cliPreferences.getFieldPreferences(),
+                jabKit.cliPreferences.getCitationKeyPatternPreferences(),
+                jabKit.entryTypesManager)
+                .asFormatterRun(runSettings);
+        databaseWriter.writeDatabase(databaseContext);
+
+        return new SerializedLibrary(stringWriter.toString(),
+                databaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8),
+                databaseWriter.getFindings());
+    }
+
+    private int check(Path inputFile, SerializedLibrary library, ParserResult parserResult) throws CliException {
+        report(inputFile, library.findings(), parserResult, System.out);
+
+        // Findings alone are not the whole story: reformatting alters things no rule reports on,
+        // such as entry type capitalization, so the serialized result has to be compared as well.
+        // As bytes, since --in-place would also change a file that is in another encoding.
+        boolean formattingDiffers = !Arrays.equals(library.bytes(), bytesOf(inputFile));
+
+        if (library.findings().isEmpty() && !formattingDiffers) {
+            if (!sharedOptions.porcelain) {
+                System.out.println(Localization.lang("'%0' is already formatted.", inputFile));
+            }
+            return CommandLine.ExitCode.OK;
+        }
+        System.out.println(Localization.lang("'%0' would be reformatted.", inputFile));
+        return NOT_CLEAN;
+    }
+
+    /// `--check` only reads the file, so that is what it reports as failed.
+    private static byte[] bytesOf(Path inputFile) throws CliException {
+        try {
+            return Files.readAllBytes(inputFile);
+        } catch (IOException e) {
+            LOGGER.debug("Unable to read {}", inputFile, e);
+            throw new CliException("Unable to read " + inputFile, Localization.lang("Unable to open file '%0'.", inputFile), e, SOFTWARE_ERROR);
+        }
+    }
+
+    /// Atomically, so that a write that fails leaves the library as it was rather than cut short.
+    private int write(Path inputFile, byte[] library) throws IOException {
+        try (AtomicFileOutputStream outputStream = new AtomicFileOutputStream(inputFile)) {
+            outputStream.write(library);
+        }
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Saved %0.", inputFile));
+        }
+        return CommandLine.ExitCode.OK;
+    }
+
+    /// Writes one line per finding, in the same `file:line:column:citationKey[:field]: message`
+    /// format the `check` commands use, with the rule id appended so that a reader knows what to
+    /// switch off.
+    // [impl->req~jabkit.cli.check-errorformat-output~1]
+    private void report(Path inputFile, List<Finding> findings, ParserResult parserResult, PrintStream target) {
+        for (Finding finding : findings) {
+            ParserResult.Range range = rangeOf(finding, parserResult);
+            String location = finding.field()
+                                     .map(field -> finding.citationKey() + ":" + field.getName())
+                                     .orElse(finding.citationKey());
+            target.printf(
+                    "%s:%d:%d:%s: %s [%s]%n", inputFile,
+                    range.startLine(),
+                    range.startColumn(),
+                    location,
+                    finding.message(),
+                    finding.rule().id());
+        }
+    }
+
+    /// Where the finding is in the file the library was read from: the field it is about, or the
+    /// entry as a whole for a finding that names no field.
+    private static ParserResult.Range rangeOf(Finding finding, ParserResult parserResult) {
+        return finding.field()
+                      .map(field -> parserResult.getFieldRange(finding.entry(), field))
+                      .orElseGet(() -> parserResult.getCompleteEntryIndicator(finding.entry()));
+    }
+}

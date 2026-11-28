@@ -20,6 +20,7 @@ import static picocli.CommandLine.Option;
                 Convert.class,
                 DoiToBibtex.class,
                 Fetch.class,
+                JabFixCommand.class,
                 GenerateBibFromAux.class,
                 GetCitedWorks.class,
                 GetCitingWorks.class,

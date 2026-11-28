@@ -3,8 +3,11 @@ package org.jabref.logic.l10n;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LocalizationKeyParams {
+
+    private static final Pattern PLACEHOLDER = Pattern.compile("%(\\d)");
 
     private final LocalizationKey key;
     private final List<String> params;
@@ -17,14 +20,12 @@ public class LocalizationKeyParams {
         }
     }
 
+    /// Goes through the key once, so that what a parameter holds is not taken for a placeholder: a
+    /// file name or a URL may well contain `%1` or `%20`.
     public String replacePlaceholders() {
-        String translation = key.getKey();
-
-        for (int i = 0; i < params.size(); i++) {
-            String param = params.get(i);
-            translation = translation.replaceAll("%" + i, Matcher.quoteReplacement(param));
-        }
-
-        return translation;
+        return PLACEHOLDER.matcher(key.getKey()).replaceAll(match -> {
+            int index = Integer.parseInt(match.group(1));
+            return Matcher.quoteReplacement(index < params.size() ? params.get(index) : match.group());
+        });
     }
 }

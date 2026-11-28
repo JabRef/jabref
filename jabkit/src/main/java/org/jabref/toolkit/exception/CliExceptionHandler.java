@@ -19,16 +19,25 @@ public class CliExceptionHandler implements CommandLine.IExecutionExceptionHandl
         switch (ex) {
             case CliException cliException -> {
                 printErrorMessage(cliException, true);
-                return cliException.getExitCode();
+                return (cliException.getExitCode() == CommandLine.ExitCode.SOFTWARE)
+                       ? softwareErrorExitCode(commandLine)
+                       : cliException.getExitCode();
             }
             case JabRefException jabRefException -> {
                 printErrorMessage(jabRefException, true);
-                return CommandLine.ExitCode.SOFTWARE;
+                return softwareErrorExitCode(commandLine);
             }
             default -> {
                 return delegate.handleExecutionException(ex, commandLine, parseResult);
             }
         }
+    }
+
+    /// What the failed command exits with on a software error: [CommandLine.ExitCode#SOFTWARE], unless
+    /// the command declares another `exitCodeOnExecutionException` because it uses that code for
+    /// something else. Picocli exits with the same code for an exception that no handler catches.
+    private static int softwareErrorExitCode(CommandLine commandLine) {
+        return commandLine.getCommandSpec().exitCodeOnExecutionException();
     }
 
     private static void printErrorMessage(Exception ex, boolean withCauseIfPresent) {

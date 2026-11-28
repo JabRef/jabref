@@ -140,6 +140,9 @@ open module org.jabref.jablib {
     exports org.jabref.logic.bibtex.comparator.plausibility;
     exports org.jabref.logic.citedrive;
     exports org.jabref.logic.ocr;
+    exports org.jabref.logic.lint;
+    exports org.jabref.logic.lint.rule;
+    exports org.jabref.logic.lint.rules;
 
     // region: AI
     exports org.jabref.logic.ai;

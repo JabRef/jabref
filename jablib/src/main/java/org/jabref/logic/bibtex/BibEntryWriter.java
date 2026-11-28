@@ -40,10 +40,17 @@ public class BibEntryWriter {
     private final Map<Field, Range> fieldPositions = new HashMap<>();
     private final BibEntryTypesManager entryTypesManager;
     private final FieldWriter fieldWriter;
+    private final EntryBracket bracket;
 
     public BibEntryWriter(FieldWriter fieldWriter, BibEntryTypesManager entryTypesManager) {
+        this(fieldWriter, entryTypesManager, EntryBracket.BRACES);
+    }
+
+    /// @param bracket what encloses an entry written anew; one written back as it was read keeps its own
+    public BibEntryWriter(FieldWriter fieldWriter, BibEntryTypesManager entryTypesManager, EntryBracket bracket) {
         this.fieldWriter = fieldWriter;
         this.entryTypesManager = entryTypesManager;
+        this.bracket = bracket;
     }
 
     public String write(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
@@ -136,7 +143,7 @@ public class BibEntryWriter {
         }
 
         // Finally, end the entry.
-        out.writeLine("}");
+        out.writeLine(bracket.getClosing());
     }
 
     private void writeEntryType(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode) throws IOException {
@@ -144,7 +151,7 @@ public class BibEntryWriter {
         out.write('@' + entry.getType().getDisplayName());
         int end = out.getCurrentPosition();
         fieldPositions.put(InternalField.TYPE_HEADER, new Range(start, end));
-        out.write("{");
+        out.write(bracket.getOpening());
     }
 
     private void writeKeyField(BibEntry entry, BibWriter out) throws IOException {

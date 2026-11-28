@@ -59,10 +59,10 @@ Rationale: Suppressing decorative banners during normal command invocations prev
 
 Needs: impl
 
-## JabKit check commands must emit findings in machine-readable format
+## JabKit checking commands must emit findings in machine-readable format
 `req~jabkit.cli.check-errorformat-output~1`
 
-The `jabkit check` subcommands emit their findings in a line-oriented
+The `jabkit check` subcommands and `jabkit fix` emit their findings in a line-oriented
 `file:line:column:citationKey[:field]: message` format, suitable for editors and CI tooling.
 
 Entry-level findings (for example, on the citation key itself) carry only the citation key.
@@ -100,6 +100,21 @@ of the shape `::error file=<file>,line=<line>,col=<col>,title=<title>::<message>
 The `file`, `line`, `col`, and `title` property values are URL-encoded so that
 Windows-style paths (containing `:`) and titles (containing `:` between citation key and field name)
 are parsed correctly by the GitHub Actions runner.
+
+Needs: impl
+
+## JabKit fix must apply the lint rules enabled for a library
+`req~jabkit.cli.jabfix~1`
+
+`jabkit fix` reports what the enabled rules find and repairs it where a rule is set to `fix`.
+With `--check`, it writes nothing and exits with 1 unless the library is clean.
+A usage error exits with 2 and any other error with 3, so that neither is taken for an unclean library.
+The library is written in the encoding it states; a character that encoding cannot hold is an error that leaves the library as it was.
+Formatting applies exactly the repairs that `--check` reports, and each finding names the rule that reported it.
+Rules are enabled in the library's metadata, by a mode or per rule; when no rule is enabled, the command warns.
+`--mode` and `--rule RULE=MODE[:NAME=VALUE]` override the library's configuration for one run.
+`--save-config` stores them in the library instead, and moves the library's save actions into the same configuration.
+An unknown rule, mode, or rule value is a usage error.
 
 Needs: impl
 

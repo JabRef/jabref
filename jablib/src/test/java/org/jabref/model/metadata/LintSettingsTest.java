@@ -1,0 +1,247 @@
+package org.jabref.model.metadata;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.SequencedMap;
+
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class LintSettingsTest {
+
+    @Test
+    void aRuleNoSelectorNamesDoesNotRun() {
+        LintSettings settings = new LintSettings(new LinkedHashMap<>());
+
+        assertEquals(RuleMode.OFF, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+    }
+
+    @Test
+    void aSelectorNamingNoFieldCoversEveryField() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX);
+
+        assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+    }
+
+    /// The point of naming a field: repair everywhere, report on one field alone.
+    @Test
+    void aSelectorNamingTheFieldBeatsOneNamingNone() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
+
+        assertEquals(RuleMode.CHECK, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+        assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    /// Order does not decide it: the field is named either way round.
+    @Test
+    void theFieldWinsWhereverItStands() {
+        LintSettings settings = LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
+                                            .and(RuleSelector.of("lower-case"), RuleMode.FIX);
+
+        assertEquals(RuleMode.CHECK, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+    }
+
+    @Test
+    void aRuleNamedOnOneFieldRunsOnNoOther() {
+        LintSettings settings = LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.FIX);
+
+        assertEquals(RuleMode.OFF, settings.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    /// A finding about the entry as a whole names no field, so only a selector naming none is about it.
+    @Test
+    void aFindingAboutNoFieldTakesTheSelectorNamingNoField() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.FIX);
+
+        assertEquals(RuleMode.CHECK, settings.modeOf("lower-case", Optional.empty()));
+    }
+
+    @Test
+    void namingASelectorTwiceTakesTheLastMode() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.of("lower-case"), RuleMode.OFF);
+
+        assertEquals(RuleMode.OFF, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+    }
+
+    /// A rule let loose on one field only still takes part in the run, on that field.
+    @Test
+    void aRuleNamedOnAFieldOnlyStillRuns() {
+        LintSettings settings = LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.FIX);
+
+        assertTrue(settings.runs("lower-case"));
+        assertFalse(settings.runs("upper-case"));
+    }
+
+    /// Switching a rule off everywhere leaves it out of the run, rather than running it and
+    /// reporting it on no field.
+    @Test
+    void aRuleSwitchedOffEverywhereDoesNotRun() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF);
+
+        assertFalse(settings.runs("lower-case"));
+    }
+
+    /// One field switched off is not the whole rule switched off.
+    @Test
+    void aRuleSwitchedOffOnOneFieldStillRuns() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
+
+        assertTrue(settings.runs("lower-case"));
+    }
+
+    /// A Save Action may be configured for a whole class of fields, and then its findings are about
+    /// the concrete fields it visited. Such a selector is about all of them, or the rule would be
+    /// named by nothing its findings ever match and would quietly stop running.
+    @Test
+    void aSelectorNamingAWholeClassOfFieldsIsAboutEveryFieldTheRuleVisits() {
+        LintSettings settings = LintSettings.of(
+                RuleSelector.on(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, "latex-to-unicode"), RuleMode.FIX);
+
+        assertEquals(RuleMode.FIX, settings.modeOf("latex-to-unicode", Optional.of(StandardField.TITLE)));
+    }
+
+    @Test
+    void namingAFieldBeatsNamingAWholeClassOfThem() {
+        LintSettings settings = LintSettings.of(
+                                                    RuleSelector.on(InternalField.INTERNAL_ALL_FIELD, "lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
+
+        assertEquals(RuleMode.OFF, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+        assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    /// Otherwise the field-scoped entry would win, being the more specific, and an option given for
+    /// one run would not reach the field the library named.
+    @Test
+    void anOverrideAlsoGivesWayFromAFieldScopedEntry() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
+
+        LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
+
+        assertEquals(RuleMode.OFF, overridden.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+        assertEquals(RuleMode.OFF, overridden.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    @Test
+    void anOverrideLeavesEveryOtherRuleAlone() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.of("upper-case"), RuleMode.CHECK);
+
+        LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
+
+        assertEquals(RuleMode.CHECK, overridden.modeOf("upper-case", Optional.of(StandardField.TITLE)));
+    }
+
+    /// An override about one field leaves the rest of the rule to what it overrides.
+    @Test
+    void aFieldScopedOverrideOnlyReplacesThatField() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX);
+
+        LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK));
+
+        assertEquals(RuleMode.CHECK, overridden.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+        assertEquals(RuleMode.FIX, overridden.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    @Test
+    void anOverrideNamingAModeReplacesTheMode() {
+        LintSettings overridden = LintSettings.NONE.withMode("whitespace").overriddenBy(LintSettings.NONE.withMode("report"));
+
+        assertEquals(Optional.of("report"), overridden.mode());
+    }
+
+    @Test
+    void anOverrideNamingNoModeKeepsTheMode() {
+        LintSettings overridden = LintSettings.NONE.withMode("whitespace")
+                                                   .overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
+
+        assertEquals(Optional.of("whitespace"), overridden.mode());
+    }
+
+    /// What a newer JabFix wrote has to survive being laid under or over something.
+    @Test
+    void anOverrideKeepsWhatNeitherSideCouldRead() {
+        LintSettings underneath = new LintSettings(Optional.empty(), new LinkedHashMap<>(),
+                new LinkedHashMap<>(Map.of("a,b:rule", "\"fix\"")), new LinkedHashMap<>());
+
+        LintSettings overridden = underneath.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
+
+        assertEquals(Map.of("a,b:rule", "\"fix\""), overridden.unreadRules());
+    }
+
+    /// So that saving does not reshuffle a configuration somebody edited by hand.
+    @Test
+    void theOrderTheSelectorsWereNamedInIsKept() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("upper-case"), RuleMode.FIX)
+                                            .and(RuleSelector.of("lower-case"), RuleMode.CHECK)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
+
+        assertEquals(List.of(
+                        RuleSelector.of("upper-case"),
+                        RuleSelector.of("lower-case"),
+                        RuleSelector.on(StandardField.TITLE, "lower-case")),
+                List.copyOf(settings.rules().keySet()));
+    }
+
+    /// A layer saying how far a rule goes has not said anything about what the rule takes, so a run
+    /// that only reports goes by the bracket the library chose.
+    @Test
+    void anOverrideStatingOnlyAModeKeepsTheValues() {
+        LintSettings library = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, inParentheses()));
+
+        LintSettings overridden = library.overriddenBy(LintSettings.of(RuleSelector.of("entry-brackets"), RuleMode.CHECK));
+
+        assertEquals(new RuleSettings(RuleMode.CHECK, inParentheses()), overridden.rules().get(RuleSelector.of("entry-brackets")));
+    }
+
+    @Test
+    void anOverrideStatingAValueReplacesThatValueAlone() {
+        SequencedMap<String, String> underneath = inParentheses();
+        underneath.put("other", "kept");
+        LintSettings library = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, underneath));
+        SequencedMap<String, String> over = new LinkedHashMap<>(Map.of("bracket", "braces"));
+
+        LintSettings overridden = library.overriddenBy(LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, over)));
+
+        assertEquals(Map.of("bracket", "braces", "other", "kept"), overridden.valuesOf("entry-brackets"));
+    }
+
+    /// The rule is built once for a run, so what it takes cannot differ from field to field.
+    @Test
+    void aFieldScopedOverrideLeavesTheValuesOfTheRuleAlone() {
+        LintSettings library = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.FIX, inParentheses()));
+
+        LintSettings overridden = library.overriddenBy(LintSettings.of(RuleSelector.on(StandardField.TITLE, "entry-brackets"), RuleMode.CHECK));
+
+        assertEquals(inParentheses(), overridden.valuesOf("entry-brackets"));
+    }
+
+    @Test
+    void aRuleNobodyNamesHasNoValues() {
+        assertEquals(Map.of(), LintSettings.NONE.valuesOf("entry-brackets"));
+    }
+
+    @Test
+    void theValuesDoNotChangeHowFarTheRuleGoes() {
+        LintSettings settings = LintSettings.NONE.and(RuleSelector.of("entry-brackets"), new RuleSettings(RuleMode.CHECK, inParentheses()));
+
+        assertEquals(RuleMode.CHECK, settings.modeOf("entry-brackets", Optional.empty()));
+    }
+
+    private static SequencedMap<String, String> inParentheses() {
+        return new LinkedHashMap<>(Map.of("bracket", "parentheses"));
+    }
+}

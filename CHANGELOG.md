@@ -11,10 +11,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added `jabkit fix`, which checks and repairs a library's formatting by the rules it configures; saving applies them too. [#17948](https://github.com/JabRef/jabref/pull/17948)
+
 ### Changed
 
 ### Fixed
 
+- We fixed an issue where messages garbled file names and URLs containing a percent sign followed by a digit. [#17948](https://github.com/JabRef/jabref/pull/17948)
 - We fixed an issue where BST entry previews showed italic and bold text as Unicode mathematical letters. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed an issue where the customized entry preview ignored small caps and showed LaTeX commands inside emphasized text. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed nested LaTeX formatting, spacing, and ampersand escaping in HTML output and JStyle bibliographies. [#17921](https://github.com/JabRef/jabref/pull/17921)

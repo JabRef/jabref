@@ -104,6 +104,29 @@ class FieldFormatterCleanupTest {
     }
 
     @Test
+    void aCleanupOfOneFieldVisitsThatFieldAlone() {
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(StandardField.TITLE, new UpperCaseFormatter());
+
+        assertEquals(List.of(true, false), List.of(cleanup.visits(StandardField.TITLE), cleanup.visits(StandardField.BOOKTITLE)));
+    }
+
+    @Test
+    void aCleanupOfAllFieldsVisitsEveryFieldButTheKey() {
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UpperCaseFormatter());
+
+        assertEquals(List.of(true, true, false),
+                List.of(cleanup.visits(StandardField.TITLE), cleanup.visits(StandardField.DOI), cleanup.visits(InternalField.KEY_FIELD)));
+    }
+
+    @Test
+    void aCleanupOfAllTextFieldsVisitsNeitherTheKeyNorAFieldThatHoldsNoText() {
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UpperCaseFormatter());
+
+        assertEquals(List.of(true, false, false),
+                List.of(cleanup.visits(StandardField.TITLE), cleanup.visits(StandardField.DOI), cleanup.visits(InternalField.KEY_FIELD)));
+    }
+
+    @Test
     void cleanupDoesNotOverwriteConcurrentModification() {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(StandardField.TITLE, new UpperCaseFormatter());
         entry.setField(StandardField.TITLE, "initial");

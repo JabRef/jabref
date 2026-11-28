@@ -115,6 +115,18 @@ public class FieldFormatterCleanup implements CleanupJob {
         return fieldChanges;
     }
 
+    /// Whether this cleanup formats `candidate` wherever an entry has it -- the choice [#cleanup]
+    /// makes, asked about one field ahead of any entry.
+    public boolean visits(Field candidate) {
+        if (InternalField.INTERNAL_ALL_FIELD == field) {
+            return InternalField.KEY_FIELD != candidate;
+        } else if (InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD == field) {
+            return InternalField.KEY_FIELD != candidate && !FieldFactory.getNotTextFields().contains(candidate);
+        } else {
+            return field.equals(candidate);
+        }
+    }
+
     public Field getField() {
         return field;
     }

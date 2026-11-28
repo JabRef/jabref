@@ -93,6 +93,28 @@ When the autosave manager is shut down, its periodic task must stop and pending 
 
 Needs: impl, utest
 
+## Library save must apply the library's lint rules instead of its own cleanups
+`req~logic.exporter.lint-on-save~1`
+
+When a library's metadata enables lint rules, saving the library applies them to its entries and reports what each rule found, instead of applying the save actions and the whitespace cleanup itself.
+Each rule only reports, or reports and repairs, as the library configures it; a rule that is not enabled does not run.
+While the library still has its `saveActions` metadata item, its save actions are applied as rules as well.
+A rule id that this version does not know is skipped, so that a library configured by a newer version still saves.
+Repairs are recorded as field changes, so that they can be undone.
+Citation keys are still generated and journals abbreviated, except in a formatter run such as `jabkit fix`.
+A library that enables no rules is saved as before.
+
+Needs: impl, utest
+
+## Library save must enclose entries in the bracket the library configures
+`req~logic.exporter.entry-bracket~1`
+
+The `entry-brackets` rule configures whether entries are enclosed in braces or in parentheses.
+While that rule runs, a save encloses every entry it writes anew in that bracket, so that a library following its configuration is left unchanged by a save and by `jabkit fix`.
+Otherwise, entries are written in braces, as before.
+
+Needs: impl, utest
+
 ## Library cleanup must normalize keyword delimiters using library separator
 `req~save.keywords.normalize-delimiters~1`
 
