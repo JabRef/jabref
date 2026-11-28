@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
@@ -22,11 +23,11 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.style.BstCitationFormat;
-import org.jabref.logic.openoffice.style.BstStyle;
-import org.jabref.logic.openoffice.style.BstStyleLoader;
-import org.jabref.logic.openoffice.style.JStyle;
-import org.jabref.logic.openoffice.style.JStyleLoader;
+import org.jabref.logic.openoffice.bst.BstCitationFormat;
+import org.jabref.logic.openoffice.bst.BstStyle;
+import org.jabref.logic.openoffice.bst.BstStyleLoader;
+import org.jabref.logic.openoffice.jstyle.JStyle;
+import org.jabref.logic.openoffice.jstyle.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
@@ -106,6 +107,7 @@ class StyleSelectDialogViewTest {
             when(preferences.getWorkspacePreferences()).thenReturn(WorkspacePreferences.getDefault());
             when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
             Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+            Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
             Injector.setModelOrService(GuiPreferences.class, preferences);
             Injector.setModelOrService(DialogService.class, mock(DialogService.class));
             Injector.setModelOrService(TaskExecutor.class, new CurrentThreadTaskExecutor());
@@ -242,8 +244,8 @@ class StyleSelectDialogViewTest {
     private StyleSelectDialogView dialog(int family, int row) {
         when(openOfficePreferences.getCurrentStyle()).thenReturn(style(family, row));
         return new StyleSelectDialogView(cslStyleLoader, jStyleLoader, bstStyleLoader, journalAbbreviationRepository,
-                (dialogService, preferences, taskExecutor) -> {
-                    PreviewViewer viewer = spy(new PreviewViewer(dialogService, preferences, taskExecutor));
+                (dialogService, preferences, taskExecutor, nativeDesktop) -> {
+                    PreviewViewer viewer = spy(new PreviewViewer(dialogService, preferences, taskExecutor, nativeDesktop));
                     doNothing().when(viewer).setDatabaseContext(any());
                     doNothing().when(viewer).setEntry(any());
                     doNothing().when(viewer).setLayout(any());

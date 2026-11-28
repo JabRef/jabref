@@ -25,10 +25,6 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -36,6 +32,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IkonliIcon;
@@ -129,6 +126,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
+    @Inject private NativeDesktop nativeDesktop;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            @Nullable GroupTreeNode parentNode,
@@ -159,7 +157,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         final Button helpButton = (Button) getDialogPane().lookupButton(helpButtonType);
 
         ActionFactory actionFactory = new ActionFactory();
-        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferences.getExternalApplicationsPreferences());
+        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, nativeDesktop);
         actionFactory.configureIconButton(
                 StandardActions.HELP_GROUPS,
                 helpAction,
@@ -318,6 +316,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         Platform.runLater(() -> ikonGridView.setItems(filteredList));
 
         PopOver popOver = new PopOver(vBox);
+        popOver.getStyleClass().add("group-icon-picker");
         popOver.setDetachable(false);
         popOver.setArrowSize(0);
         popOver.setCornerRadius(0);
@@ -363,7 +362,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 setGraphic(ikon.icon().withSize(22).getGraphicNode());
                 setAlignment(Pos.BASELINE_CENTER);
                 setPadding(new Insets(1));
-                setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
                 setOnMouseClicked(_ -> {
                     iconField.textProperty().setValue(ikon.persistedIdentifier());

@@ -4,6 +4,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -18,16 +19,19 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final TaskExecutor taskExecutor;
 
     public MergeWithFetchedEntryAction(DialogService dialogService,
                                        StateManager stateManager,
                                        TaskExecutor taskExecutor,
-                                       GuiPreferences preferences) {
+                                       GuiPreferences preferences,
+                                       NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager)
                                          .and(ActionHelper.isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS, stateManager)));
@@ -46,6 +50,6 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         }
 
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
-        new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, stateManager.getUndoManager(databaseContext), stateManager).fetchAndMerge(originalEntry);
+        new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, stateManager.getUndoManager(databaseContext), stateManager, nativeDesktop).fetchAndMerge(originalEntry);
     }
 }

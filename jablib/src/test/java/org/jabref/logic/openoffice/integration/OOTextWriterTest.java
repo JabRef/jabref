@@ -9,11 +9,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
+import org.jabref.logic.layout.format.OOPreFormatter;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.bst.BstCitationFormat;
+import org.jabref.logic.openoffice.bst.BstStyle;
 import org.jabref.logic.openoffice.engine.CitationEngine;
 import org.jabref.logic.openoffice.engine.JabRefMarkCodec;
-import org.jabref.logic.openoffice.style.BstCitationFormat;
-import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.uno.OOTextWriter;
 import org.jabref.logic.openoffice.uno.UnoTextSection;
@@ -114,6 +115,34 @@ class OOTextWriterTest {
         XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("trailing-entities.odt"));
         assertEquals("Bold" + trailing, reopened.getText().getString());
         assertCharacterFormatting(select(reopened, trailing), FontWeight.NORMAL, FontSlant.NONE);
+    }
+
+    @Test
+    void preformattedAmpersandsAndSpacingSurviveWriterInsertionAndReopen() throws Exception {
+        XTextDocument document = office.newDocument();
+        String input = "\\textit{A\\&copy;\\,B\\:C\\;D\\!E} tail \\&amp; \\&{copy;} \\\\&";
+        String formattedText = "A&copy;\u2009B\u205FC\u2005DE";
+        String expected = formattedText + " tail &amp; &copy; \\&";
+        OOTextWriter.write(document, document.getText().createTextCursor(),
+                OOText.fromString(new OOPreFormatter().format(input)));
+
+        assertEquals(expected, document.getText().getString());
+        assertCharacterFormatting(select(document, formattedText), FontWeight.NORMAL, FontSlant.ITALIC);
+        XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("preformatted-ampersands-spacing.odt"));
+        assertEquals(expected, reopened.getText().getString());
+        assertCharacterFormatting(select(reopened, formattedText), FontWeight.NORMAL, FontSlant.ITALIC);
+    }
+
+    @Test
+    void preformattedSpacingAfterLastTagSurvivesWriterInsertionAndReopen() throws Exception {
+        XTextDocument document = office.newDocument();
+        String expected = "Bold a\u2009b\u205Fc\u2005de";
+        OOTextWriter.write(document, document.getText().createTextCursor(),
+                OOText.fromString(new OOPreFormatter().format("<b>Bold</b> a\\,b\\:c\\;d\\!e")));
+
+        assertEquals(expected, document.getText().getString());
+        XTextDocument reopened = office.saveAndReload(document, temporaryDirectory.resolve("preformatted-trailing-spacing.odt"));
+        assertEquals(expected, reopened.getText().getString());
     }
 
     @ParameterizedTest

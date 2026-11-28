@@ -199,7 +199,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         HelpButton helpButton = new HelpButton();
         Optional<HelpFile> helpFile = item.getFetcher().getHelpPage();
         if (helpFile.isPresent() && !helpFile.get().getPageName().isEmpty()) {
-            helpButton.setHelpFile(helpFile.get(), dialogService, preferences.getExternalApplicationsPreferences());
+            helpButton.setHelpFile(helpFile.get(), dialogService, nativeDesktop);
             helpButton.setVisible(true);
         } else {
             helpButton.setVisible(false);

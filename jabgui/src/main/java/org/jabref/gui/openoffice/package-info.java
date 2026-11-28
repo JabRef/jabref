@@ -4,7 +4,7 @@
 /// Cited-entry import collects embedded Zotero data read-only, then uses the captured library tab's
 /// [org.jabref.gui.externalfiles.ImportHandler] for duplicate handling and library insertion.
 /// [StyleSelectDialogViewModel] manages style selection and delegates external-style mutations to
-/// [org.jabref.logic.openoffice.style.JStyleLoader], [org.jabref.logic.openoffice.style.BstStyleLoader], and
+/// [org.jabref.logic.openoffice.jstyle.JStyleLoader], [org.jabref.logic.openoffice.bst.BstStyleLoader], and
 /// [org.jabref.logic.citationstyle.CSLStyleLoader]. The loaders alone persist their families' external paths.
 /// [StyleSelectDialogView] loads each non-null family selection's preview on opening and on selection changes,
 /// regardless of the active tab. Preview layouts live in [org.jabref.logic.preview]; JStyle templates use

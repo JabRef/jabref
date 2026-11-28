@@ -84,6 +84,15 @@ class LayoutEntryTest {
     }
 
     @Test
+    void persistedOOPreFormatterNameConvertsLatexToHtml() throws IOException {
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "\\textit{Formatted title}");
+        Layout layout = new LayoutHelper(Reader.of("\\format[OOPreFormatter]{\\title}"),
+                LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository()).getLayoutFromText();
+
+        assertEquals("<i>Formatted title</i>", layout.doLayout(entry, new BibDatabase(List.of(entry))));
+    }
+
+    @Test
     void parseTwoMethodsWithoutArguments() {
         String input = "bla,foo";
         List<List<String>> result = LayoutEntry.parseMethodsCalls(input);

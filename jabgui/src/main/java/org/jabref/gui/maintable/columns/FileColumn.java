@@ -10,6 +10,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -35,18 +36,21 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     private final BibDatabaseContext database;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
+    private final NativeDesktop nativeDesktop;
 
     /// Creates a joined column for all the linked files.
     public FileColumn(MainTableColumnModel model,
                       @NonNull BibDatabaseContext database,
                       DialogService dialogService,
                       GuiPreferences preferences,
-                      TaskExecutor taskExecutor) {
+                      TaskExecutor taskExecutor,
+                      NativeDesktop nativeDesktop) {
         super(model);
         this.database = database;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
 
         setCommonSettings();
 
@@ -67,7 +71,8 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                 database,
                                 taskExecutor,
                                 dialogService,
-                                preferences);
+                                preferences,
+                                nativeDesktop);
                         linkedFileViewModel.open();
                     }
                 })
@@ -80,12 +85,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       DialogService dialogService,
                       GuiPreferences preferences,
                       String fileType,
-                      TaskExecutor taskExecutor) {
+                      TaskExecutor taskExecutor,
+                      NativeDesktop nativeDesktop) {
         super(model);
         this.database = database;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.nativeDesktop = nativeDesktop;
 
         setCommonSettings();
 
@@ -108,14 +115,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                         if (filteredFiles.size() == 1) {
                             // Only one file - open directly
                             LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(filteredFiles.getFirst(),
-                                    entry.getEntry(), database, taskExecutor, dialogService, preferences);
+                                    entry.getEntry(), database, taskExecutor, dialogService, preferences, nativeDesktop);
                             linkedFileViewModel.open();
                         } else if (filteredFiles.size() > 1) {
                             // Multiple files - show context menu to choose file
                             ContextMenu contextMenu = new ContextMenu();
                             for (LinkedFile linkedFile : filteredFiles) {
                                 LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile,
-                                        entry.getEntry(), database, taskExecutor, dialogService, preferences);
+                                        entry.getEntry(), database, taskExecutor, dialogService, preferences, nativeDesktop);
                                 MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                                         linkedFileViewModel.getTypeIcon().getGraphicNode());
                                 menuItem.setOnAction(_ -> linkedFileViewModel.open());
@@ -163,7 +170,8 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                     database,
                     taskExecutor,
                     dialogService,
-                    preferences);
+                    preferences,
+                    nativeDesktop);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                     linkedFileViewModel.getTypeIcon().getGraphicNode());

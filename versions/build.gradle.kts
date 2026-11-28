@@ -28,7 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.40.0"))
-    api(platform("com.konghq:unirest-java-bom:4.11.11"))
+    api(platform("com.konghq:unirest-java-bom:4.12.0"))
     api(platform("com.squareup.okhttp3:okhttp-bom:5.5.1"))
     api(platform("dev.langchain4j:langchain4j-bom:1.24.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:19.0.0"))
@@ -68,7 +68,7 @@ dependencies.constraints {
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.google.errorprone:error_prone_core:2.53.0")
     api("com.google.guava:guava:33.8.0-jre")
-    api("com.googlecode.plist:dd-plist:1.30")
+    api("com.googlecode.plist:dd-plist:1.31")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
     api("com.nimbusds:oauth2-oidc-sdk:11.39")
@@ -137,7 +137,7 @@ dependencies.constraints {
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
-    api("org.graalvm.sdk:nativeimage:25.5.5.0.3")
+    api("org.graalvm.sdk:nativeimage:25.6.5.1")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.2.0.Final")
     api("org.hisp.dhis:json-tree:1.14.0")
@@ -155,7 +155,7 @@ dependencies.constraints {
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.24.0")
     api("org.ow2.asm:asm:9.11.1")
-    api("org.postgresql:postgresql:42.7.14")
+    api("org.postgresql:postgresql:42.7.15")
     api("org.tinylog:slf4j-tinylog:2.8.1")
     api("org.tinylog:tinylog-api:2.8.1")
     api("org.tinylog:tinylog-impl:2.8.1")

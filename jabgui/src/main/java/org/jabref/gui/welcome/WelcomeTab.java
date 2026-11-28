@@ -29,6 +29,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
@@ -64,6 +65,7 @@ public class WelcomeTab extends Tab {
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final AiService aiService;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -95,7 +97,8 @@ public class WelcomeTab extends Tab {
                       GitHandlerRegistry gitHandlerRegistry,
                       FileHistoryMenu fileHistoryMenu,
                       BuildInfo buildInfo,
-                      WorkspacePreferences workspacePreferences) {
+                      WorkspacePreferences workspacePreferences,
+                      NativeDesktop nativeDesktop) {
         super(Localization.lang("Welcome"));
         setClosable(true);
         Node tabIcon = IconTheme.JabRefIcons.WELCOME.getGraphicNode();
@@ -103,6 +106,7 @@ public class WelcomeTab extends Tab {
         setGraphic(tabIcon);
         this.tabContainer = tabContainer;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.aiService = aiService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -133,7 +137,7 @@ public class WelcomeTab extends Tab {
         rootScrollPane.getStyleClass().add("bg-transparent");
         setContent(rootScrollPane);
 
-        donationProvider = new DonationProvider(preferences, dialogService);
+        donationProvider = new DonationProvider(preferences, dialogService, nativeDesktop);
         donationProvider.showIfNeeded();
 
         setOnClosed(_ -> donationProvider.cleanUp());
@@ -254,7 +258,7 @@ public class WelcomeTab extends Tab {
         Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library..."),
                 () -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
                         stateManager, fileUpdateMonitor, entryTypesManager, clipBoardManager,
-                        taskExecutor, gitHandlerRegistry).execute());
+                        taskExecutor, gitHandlerRegistry, nativeDesktop).execute());
 
         Hyperlink openExampleLibraryLink = createActionLink(Localization.lang("New example library"),
                 this::openExampleLibrary);
@@ -404,7 +408,7 @@ public class WelcomeTab extends Tab {
                     null;
         };
         if (url != null) {
-            link.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
+            link.setOnAction(_ -> new OpenBrowserAction(url, dialogService, nativeDesktop).execute());
         }
         if (icon != null) {
             link.setGraphic(icon.getGraphicNode());

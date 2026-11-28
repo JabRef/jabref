@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -60,6 +61,7 @@ class GitPullSchedulerTest {
                 mock(StateManager.class),
                 new CurrentThreadTaskExecutor(),
                 new GitHandlerRegistry(mock(GitPreferences.class)),
-                () -> false);
+                () -> false,
+                mock(NativeDesktop.class));
     }
 }

@@ -3,7 +3,6 @@ package org.jabref.gui.help;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.help.HelpFile;
 
 /// This Action keeps a reference to a URL. When activated, it shows the help
@@ -12,16 +11,16 @@ public class HelpAction extends SimpleCommand {
 
     private final HelpFile helpPage;
     private final DialogService dialogService;
-    private final ExternalApplicationsPreferences externalApplicationPreferences;
+    private final NativeDesktop nativeDesktop;
 
-    public HelpAction(HelpFile helpPage, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
+    public HelpAction(HelpFile helpPage, DialogService dialogService, NativeDesktop nativeDesktop) {
         this.helpPage = helpPage;
         this.dialogService = dialogService;
-        this.externalApplicationPreferences = externalApplicationsPreferences;
+        this.nativeDesktop = nativeDesktop;
     }
 
     void openHelpPage(HelpFile helpPage) {
-        NativeDesktop.openBrowserShowPopup("https://docs.jabref.org/" + helpPage.getPageName(), dialogService, externalApplicationPreferences);
+        nativeDesktop.openBrowserShowPopup("https://docs.jabref.org/" + helpPage.getPageName(), dialogService);
     }
 
     @Override

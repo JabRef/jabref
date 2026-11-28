@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors.identifier;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.undo.UndoManager;
@@ -17,8 +18,9 @@ public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel
                                          TaskExecutor taskExecutor,
                                          GuiPreferences preferences,
                                          UndoManager undoManager,
-                                         StateManager stateManager) {
-        super(StandardField.ISBN, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                                         StateManager stateManager,
+                                         NativeDesktop nativeDesktop) {
+        super(StandardField.ISBN, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
         configure(true, false, false);
     }
 }

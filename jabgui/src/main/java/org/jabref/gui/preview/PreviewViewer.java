@@ -58,6 +58,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final RichHtmlView previewView;
     private final OptionalObjectProperty<SearchQuery> activeSearchQueryProperty;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final WorkspacePreferences workspacePreferences;
 
     private final BookCoverFetcher bookCoverFetcher;
@@ -70,18 +71,21 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
-                         TaskExecutor taskExecutor) {
-        this(dialogService, preferences, taskExecutor, OptionalObjectProperty.empty());
+                         TaskExecutor taskExecutor,
+                         NativeDesktop nativeDesktop) {
+        this(dialogService, preferences, taskExecutor, OptionalObjectProperty.empty(), nativeDesktop);
     }
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
                          TaskExecutor taskExecutor,
-                         OptionalObjectProperty<SearchQuery> activeSearchQueryProperty) {
+                         OptionalObjectProperty<SearchQuery> activeSearchQueryProperty,
+                         NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.activeSearchQueryProperty = activeSearchQueryProperty;
         this.activeSearchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
@@ -130,7 +134,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void openLink(String href) {
         try {
-            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
+            nativeDesktop.openBrowser(href);
         } catch (MalformedURLException exception) {
             LOGGER.error("Invalid URL", exception);
         } catch (IOException e) {

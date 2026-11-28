@@ -41,6 +41,7 @@ public class ExportCommand extends SimpleCommand {
     private final ExportMethod exportMethod;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
@@ -50,10 +51,12 @@ public class ExportCommand extends SimpleCommand {
                          DialogService dialogService,
                          GuiPreferences preferences,
                          JournalAbbreviationRepository abbreviationRepository,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         NativeDesktop nativeDesktop) {
         this.exportMethod = exportMethod;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
@@ -137,7 +140,7 @@ public class ExportCommand extends SimpleCommand {
 
             NotificationAction<Path> action = new NotificationAction<>(Localization.lang("Reveal"), _ -> {
                 try {
-                    NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
+                    nativeDesktop.openFolderAndSelectFile(path, dialogService);
                 } catch (IOException e) {
                     LOGGER.error("Could not open export folder.", e);
                 }
