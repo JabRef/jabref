@@ -13,6 +13,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed citation parsing to import the DOI's metadata when a pasted or pushed citation contains a DOI. [#17900](https://github.com/JabRef/jabref/pull/17900)
+
 ### Fixed
 
 - We fixed an issue where BST entry previews showed italic and bold text as Unicode mathematical letters. [#17902](https://github.com/JabRef/jabref/pull/17902)

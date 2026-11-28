@@ -52,7 +52,7 @@ public class DOI implements Identifier {
             + "10"                                          // directory indicator
             + "(?:\\.[0-9]+)+"                              // registrant codes
             + "[/:]"                                        // divider
-            + "(?:[^\\s,]+[^,;(\\.\\s)])"                   // suffix alphanumeric without " "/"," and not ending on "."/","/";"
+            + "(?:[^\\s,]+[^,;(\\.\\s])"                    // suffix alphanumeric without " "/"," and not ending on "."/","/";"
             + ")";                                          // end named group
 
     // Regex (Short DOI)
@@ -301,7 +301,24 @@ public class DOI implements Identifier {
     private static Optional<DoiTextMatch> firstMatch(Pattern pattern, String text, Function<Matcher, String> doiExtractor) {
         Matcher matcher = pattern.matcher(text);
         if (matcher.find()) {
-            return Optional.of(new DoiTextMatch(doiExtractor.apply(matcher), matcher.start(), matcher.end()));
+            String doi = doiExtractor.apply(matcher);
+            int end = matcher.end();
+            if (DOI_RESOLVER_LINK.matcher(matcher.group()).find()) {
+                int queryStart = doi.indexOf('?');
+                if (queryStart >= 0) {
+                    doi = doi.substring(0, queryStart);
+                }
+            }
+            long opening = doi.chars().filter(character -> character == '(').count();
+            long closing = doi.chars().filter(character -> character == ')').count();
+            while (doi.endsWith(")") && closing > opening) {
+                doi = doi.substring(0, doi.length() - 1);
+                closing--;
+                if (end > matcher.start() && text.charAt(end - 1) == ')') {
+                    end--;
+                }
+            }
+            return Optional.of(new DoiTextMatch(doi, matcher.start(), end));
         }
         return Optional.empty();
     }

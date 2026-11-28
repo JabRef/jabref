@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-final class FetcherRetry {
+public final class FetcherRetry {
 
     static final int MAX_RATE_LIMIT_RETRIES = 2;
     static final int HTTP_TOO_MANY_REQUESTS = 429;
@@ -19,7 +19,7 @@ final class FetcherRetry {
     }
 
     // [impl->req~fetchers.identifier-rate-limit-retries~1]
-    static <T> T executeWithRateLimitRetry(FetcherOperation<T> operation) throws FetcherException {
+    public static <T> T executeWithRateLimitRetry(FetcherOperation<T> operation) throws FetcherException {
         return executeWithRateLimitRetry(operation, Thread::sleep);
     }
 
@@ -51,7 +51,7 @@ final class FetcherRetry {
     }
 
     @FunctionalInterface
-    interface FetcherOperation<T> {
+    public interface FetcherOperation<T> {
         T execute() throws FetcherException;
     }
 

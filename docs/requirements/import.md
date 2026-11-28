@@ -230,4 +230,13 @@ see: [JabRef issue #17549](https://github.com/JabRef/jabref/issues/17549)
 
 Needs: impl, utest
 
+## Plain citations with a DOI must be imported from the DOI's metadata
+`req~import.plain-citation.doi-first~2`
+
+For a single plain-text citation or a standalone DOI submitted for batch import, JabRef looks up the DOI before invoking the citation parser.
+For other batch input, JabRef looks up DOIs present in the entries produced by the parser.
+When a lookup succeeds, JabRef imports the registered metadata; when it fails, JabRef retains the parsed entry.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
