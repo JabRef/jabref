@@ -23,15 +23,14 @@ public class ExternalStoragesTab extends AbstractPreferenceTabView<ExternalStora
     private void buildView() {
         setContent(form()
                 .section(Localization.lang("CiteDrive"), citeDrive -> citeDrive
-                        .checkbox(Localization.lang("Enable CiteDrive"), viewModel.citeDriveEnabledProperty())
-                        .group(settings -> settings
+                        .checkbox(Localization.lang("Enable CiteDrive"), viewModel.citeDriveEnabledProperty(),
+                                enable -> enable.enabledWhenOn(settings -> settings
                                         .checkbox(Localization.lang("Remember the login between sessions"), viewModel.rememberCiteDriveLoginProperty())
                                         .stringField(Localization.lang("Server address"), viewModel.citeDriveApiBaseUrlProperty(),
                                                 field -> field.validate(viewModel.apiBaseUrlValidationStatus()))
                                         .stringField(Localization.lang("Web address"), viewModel.citeDriveAppBaseUrlProperty(),
                                                 field -> field.validate(viewModel.appBaseUrlValidationStatus()))
-                                        .button(Localization.lang("Reset to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetCiteDriveAddresses),
-                                settingsGroup -> settingsGroup.disableWhen(viewModel.citeDriveEnabledProperty().not())))
+                                        .button(Localization.lang("Reset to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetCiteDriveAddresses))))
                 .build());
     }
 }

@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.forms;
 
 import java.util.List;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -10,6 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -19,10 +21,13 @@ import org.jabref.gui.preferences.SearchableElement;
 import org.jabref.gui.testutils.JavaFxExtension;
 
 import com.dlsc.unitfx.IntegerInputField;
+import org.controlsfx.control.ToggleSwitch;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -126,7 +131,7 @@ class PreferencesFormBuilderTest {
 
         Node group = root.getChildren().getFirst();
         Node columns = childrenOf(group).stream()
-                                        .filter(HBox.class::isInstance)
+                                        .filter(node -> node instanceof HBox && !(node instanceof SettingTile))
                                         .findFirst()
                                         .orElseThrow(() -> new AssertionError("the columns block is missing from the group"));
         assertEquals(2, childrenOf(columns).size(), "both column groups are present");
@@ -177,6 +182,246 @@ class PreferencesFormBuilderTest {
 
         assertEquals(List.of("Cite command", "LaTeX"), textsOf(form));
         assertSame(field, form.getSearchableElements().getFirst().node());
+    }
+
+    /// The section's tile group comes right after its header row.
+    private static Node sectionGroup(VBox root) {
+        return root.getChildren().get(1);
+    }
+
+    /// The tiles among the children of `container`, without the dividers between them.
+    private static List<SettingTile> tilesIn(Node container) {
+        return childrenOf(container).stream()
+                                    .filter(SettingTile.class::isInstance)
+                                    .map(SettingTile.class::cast)
+                                    .toList();
+    }
+
+    private static SettingTile onlyTileIn(Node container) {
+        List<SettingTile> tiles = tilesIn(container);
+        assertEquals(1, tiles.size());
+        return tiles.getFirst();
+    }
+
+    @Test
+    void checkboxInSectionIsTileWithSwitch() {
+        SimpleBooleanProperty enabled = new SimpleBooleanProperty(true);
+        VBox root = form()
+                .section("Section", section -> section.checkbox("Autosave", enabled))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertEquals("Autosave", tile.title().getText());
+        ToggleSwitch toggle = assertInstanceOf(ToggleSwitch.class, tile.control());
+        toggle.setSelected(false);
+        assertFalse(enabled.get());
+    }
+
+    @Test
+    void attachedFieldStartsTheControlsAndFollowsTheSwitch() {
+        SimpleBooleanProperty enabled = new SimpleBooleanProperty(false);
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkWithField("Enable server on port", enabled, new SimpleStringProperty("6050")))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertSame(tile.control(), childrenOf(tile.control().getParent()).getLast(), "the switch ends the row");
+        TextField port = assertInstanceOf(TextField.class, tile.controls().getFirst());
+        assertTrue(port.isDisabled());
+        enabled.set(true);
+        assertFalse(port.isDisabled());
+    }
+
+    @Test
+    void attachmentsFollowInTheOrderTheyWereAttached() {
+        Label first = new Label("first");
+        Label second = new Label("second");
+        VBox root = form()
+                .section("Section", section -> section
+                        .stringField("Engine path", new SimpleStringProperty(""),
+                                path -> path.attach(first).attach(second)))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertEquals(List.of(tile.control(), first, second), tile.controls());
+    }
+
+    @Test
+    void grownFieldOfSwitchFillsTheRowBeforeItsBrowseButton() {
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkWithField("Custom theme", new SimpleBooleanProperty(true), new SimpleStringProperty(""),
+                                path -> path.browse(() -> {
+                                            })
+                                            .grow()))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertEquals(2, tile.controls().size(), "the path field and its browse button");
+        TextField path = assertInstanceOf(TextField.class, tile.controls().getFirst());
+        assertEquals(Priority.ALWAYS, HBox.getHgrow(path));
+    }
+
+    @Test
+    void whenOnShowsDependentSettingsOnlyWhileSwitchIsOn() {
+        SimpleBooleanProperty overwrite = new SimpleBooleanProperty(false);
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkbox("Overwrite existing keys", overwrite,
+                                keys -> keys.whenOn(dependent -> dependent
+                                        .checkbox("Warn before overwriting", new SimpleBooleanProperty()))))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertEquals("Warn before overwriting", onlyTileIn(tile.details()).title().getText());
+        assertFalse(tile.details().isVisible());
+        overwrite.set(true);
+        assertTrue(tile.details().isVisible());
+    }
+
+    @Test
+    void enabledWhenOnKeepsDependentSettingsInSightButDisabledWhileSwitchIsOff() {
+        SimpleBooleanProperty overwrite = new SimpleBooleanProperty(false);
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkbox("Overwrite existing keys", overwrite,
+                                keys -> keys.enabledWhenOn(dependent -> dependent
+                                        .checkbox("Warn before overwriting", new SimpleBooleanProperty()))))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertTrue(tile.details().isVisible());
+        assertTrue(tile.details().isDisabled());
+        overwrite.set(true);
+        assertFalse(tile.details().isDisabled());
+    }
+
+    @Test
+    void dependentSettingsAreDisabledWhileTheirSwitchIsDisabled() {
+        SimpleBooleanProperty aiDisabled = new SimpleBooleanProperty(true);
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkbox("Generate follow-up questions", new SimpleBooleanProperty(true),
+                                followUp -> followUp.disableWhen(aiDisabled)
+                                                    .enabledWhenOn(questions -> questions
+                                                            .stringField("Number of follow-up questions", new SimpleStringProperty("3")))))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertTrue(tile.details().isDisabled());
+        aiDisabled.set(false);
+        assertFalse(tile.details().isDisabled());
+    }
+
+    @Test
+    void expanderBuildsItsContentIntoTheClosedDetails() {
+        Label summary = new Label("Light");
+        VBox root = form()
+                .section("Section", section -> section
+                        .expander("Theme", summary, theme -> theme.label("Gallery")))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertEquals(List.of(summary), tile.controls());
+        assertFalse(tile.details().isVisible());
+        assertEquals(1, tile.details().getChildren().size());
+    }
+
+    @Test
+    void descriptionAddsALineBelowTheCaption() {
+        PreferencesFormBuilder form = form();
+        form.section("Section", section -> section
+                .checkbox("Enable AI functionality", new SimpleBooleanProperty(),
+                        ai -> ai.description("Chatting with entries.")));
+        VBox root = form.build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        List<Node> captions = childrenOf(tile.title().getParent());
+        assertEquals("Chatting with entries.", ((Label) captions.get(1)).getText());
+        assertEquals(List.of("Section", "Enable AI functionality", "Chatting with entries."), textsOf(form));
+    }
+
+    @Test
+    void consecutiveNonTileElementsInSectionShareOneCard() {
+        VBox root = form()
+                .section("Section", section -> section
+                        .label("Order")
+                        .radioGroup(order -> order
+                                .radio("Ascending", new SimpleBooleanProperty(true))
+                                .radio("Descending", new SimpleBooleanProperty(false)))
+                        .checkbox("Autosave", new SimpleBooleanProperty()))
+                .build();
+
+        List<Node> contents = childrenOf(sectionGroup(root));
+        VBox card = assertInstanceOf(VBox.class, contents.getFirst());
+        assertEquals(List.of("setting-card"), card.getStyleClass());
+        assertEquals(3, card.getChildren().size(), "the label and both radios");
+        assertEquals(1, tilesIn(sectionGroup(root)).size());
+    }
+
+    @Test
+    void neighboringRowsAreDividedByALine() {
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkbox("Autosave", new SimpleBooleanProperty())
+                        .checkbox("Backup", new SimpleBooleanProperty()))
+                .build();
+
+        List<Node> contents = childrenOf(sectionGroup(root));
+        assertEquals(3, contents.size());
+        assertEquals(List.of("setting-row-divider"), contents.get(1).getStyleClass());
+    }
+
+    @Test
+    void consecutiveTilesOutsideASectionShareOneBlock() {
+        VBox root = form()
+                .checkbox("Open editor", new SimpleBooleanProperty())
+                .checkbox("Show validation messages", new SimpleBooleanProperty())
+                .label("Interruption")
+                .checkbox("Show source", new SimpleBooleanProperty())
+                .build();
+
+        assertEquals(3, root.getChildren().size(), "a block, the label, a second block");
+        assertEquals(2, tilesIn(root.getChildren().getFirst()).size());
+        assertEquals(1, tilesIn(root.getChildren().get(2)).size());
+    }
+
+    @Test
+    void hidingCheckboxHidesItsWholeTile() {
+        SimpleBooleanProperty supported = new SimpleBooleanProperty(false);
+        VBox root = form()
+                .section("Section", section -> section
+                        .checkbox("Move to trash", new SimpleBooleanProperty(), trash -> trash.visibleWhen(supported)))
+                .build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        assertFalse(tile.isVisible());
+        assertFalse(tile.isManaged());
+    }
+
+    @Test
+    void groupInSectionKeepsItsTilesOutOfCards() {
+        VBox root = form()
+                .section("Section", section -> section
+                        .group(group -> group
+                                .checkbox("Autosave", new SimpleBooleanProperty())
+                                .stringField("Name", new SimpleStringProperty(""))))
+                .build();
+
+        assertEquals(2, tilesIn(childrenOf(sectionGroup(root)).getFirst()).size());
+    }
+
+    @Test
+    void searchHighlightsTileCaptionOfCheckbox() {
+        PreferencesFormBuilder form = form();
+        form.section("Section", section -> section.checkbox("Autosave", new SimpleBooleanProperty()));
+        VBox root = form.build();
+
+        SettingTile tile = onlyTileIn(sectionGroup(root));
+        SearchableElement autosave = form.getSearchableElements().get(1);
+        assertEquals("Autosave", autosave.text());
+        assertSame(tile.title(), autosave.node());
     }
 
     private static List<String> textsOf(PreferencesFormBuilder form) {

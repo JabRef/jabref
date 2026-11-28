@@ -169,6 +169,7 @@ public class IconTheme {
         CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         EDIT_ENTRY(MaterialDesignT.TOOLTIP_EDIT),
         EDIT_STRINGS(MaterialDesignT.TOOLTIP_TEXT),
+        EXPAND(MaterialDesignC.CHEVRON_DOWN),
         FOLDER(MaterialDesignF.FOLDER_OUTLINE),
         REMOVE(MaterialDesignM.MINUS_BOX),
         REMOVE_NOBOX(MaterialDesignM.MINUS),

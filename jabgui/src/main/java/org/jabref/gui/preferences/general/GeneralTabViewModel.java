@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -75,6 +77,16 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty customThemeEnabled = new SimpleBooleanProperty(false);
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty("");
+
+    /// What the collapsed theme setting shows: the selected theme's name, or that a custom theme is
+    /// in use. Themes that pair a dark and a light hue are named after the hue of the color scheme.
+    private final StringBinding themeSummary = Bindings.createStringBinding(
+            () -> customThemeEnabled.get()
+                  ? Localization.lang("Custom theme")
+                  : Optional.ofNullable(selectedThemeProperty.get())
+                            .map(theme -> theme.getLocalizedName(selectedThemeColorSchemeProperty.get()))
+                            .orElse(""),
+            selectedThemeProperty, selectedThemeColorSchemeProperty, customThemeEnabled);
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
@@ -151,9 +163,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.oAuthSessionRegistry = oAuthSessionRegistry;
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
-
-        // Registered once: setValues() runs again on every import or reset of the preferences.
-        selectedThemeColorSchemeProperty.addListener(_ -> refreshThemeNames());
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -410,11 +419,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.selectedLanguageProperty;
     }
 
-    /// Paired themes are named after the hue of the current color scheme, and the combo box re-reads the
-    /// names of its entries when the item list changes. The selection is left alone: its own cell is
-    /// refreshed by the view, so that the theme never passes through an invalid null in between.
-    private void refreshThemeNames() {
-        themesListProperty.setAll(ThemePreset.values());
+    public StringBinding themeSummaryProperty() {
+        return themeSummary;
     }
 
     public ReadOnlyListProperty<ThemePreset> themesListProperty() {

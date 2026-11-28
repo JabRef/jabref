@@ -14,7 +14,16 @@ public final class FormMetrics {
     /// Width of a labelled button in a button row, so that the buttons in one row are uniform.
     public static final double BUTTON_WIDTH = 100.0;
     static final double SHORT_FIELD_WIDTH = 100.0;
-    static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
+
+    /// Gap between a tile's caption and its control.
+    static final double TILE_HEADER_GAP = 16.0;
+
+    /// Width of a combo box in a tile, so that the drop-downs of the dialog are alike.
+    static final double TILE_CONTROL_WIDTH = 240.0;
+
+    /// Width of a tile's caption column: the controls of all tiles start where it ends. Longer
+    /// captions wrap.
+    static final double TILE_CAPTION_COLUMN_WIDTH = 240.0;
 
     static final double INFO_LABEL_INDENT = 20.0;
 

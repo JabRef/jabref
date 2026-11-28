@@ -3,13 +3,6 @@ package org.jabref.gui.preferences.ocr;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
@@ -39,10 +32,16 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
                 .section(Localization.lang("OCR engine"), engine -> engine
                         .combo(Localization.lang("Engine selection"),
                                 viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName)
-                        .custom(buildEnginePathRow()))
+                        .stringField(Localization.lang("Engine path"), viewModel.ocrEnginePathProperty(),
+                                path -> path.grow()
+                                            .configure(field -> field.setPromptText(Localization.lang("Type the engine's path")))
+                                            .attach(ControlHelper.narrowIconButton(
+                                                    IconTheme.JabRefIcons.FOLDER, Localization.lang("Browse engine path"), viewModel::browseEnginePath))
+                                            .attach(ControlHelper.narrowIconButton(
+                                                    IconTheme.JabRefIcons.SEARCH, Localization.lang("Auto-detect the engine's path"), viewModel::autoDetectEnginePath))))
 
                 .section(Localization.lang("OCR languages"), languages -> languages
-                        .custom(buildLanguagesRow()))
+                        .field(Localization.lang("OCR languages"), buildLanguagesCombo()))
 
                 .section(Localization.lang("Handling of pre-existing text"), scanned -> scanned
                         .combo(Localization.lang("OCR for pre-existing text"),
@@ -51,23 +50,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
                 .build());
     }
 
-    private Node buildEnginePathRow() {
-        TextField ocrEnginePath = new TextField();
-        ocrEnginePath.setPromptText(Localization.lang("Type the engine's path"));
-        ocrEnginePath.textProperty().bindBidirectional(viewModel.ocrEnginePathProperty());
-        HBox.setHgrow(ocrEnginePath, Priority.ALWAYS);
-
-        Button autoDetectButton = ControlHelper.narrowIconButton(
-                IconTheme.JabRefIcons.SEARCH, Localization.lang("Auto-detect the engine's path"), viewModel::autoDetectEnginePath);
-        Button browseButton = ControlHelper.narrowIconButton(
-                IconTheme.JabRefIcons.FOLDER, Localization.lang("Browse engine path"), viewModel::browseEnginePath);
-
-        HBox row = new HBox(8.0, new Label(Localization.lang("Engine path")), ocrEnginePath, browseButton, autoDetectButton);
-        row.setAlignment(Pos.CENTER_LEFT);
-        return row;
-    }
-
-    private Node buildLanguagesRow() {
+    private CheckComboBox<OcrLanguage> buildLanguagesCombo() {
         ObservableList<OcrLanguage> items = FXCollections.observableArrayList(OcrLanguage.values());
         CheckComboBox<OcrLanguage> languagesCombo = new CheckComboBox<>(items);
 
@@ -91,9 +74,6 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
             viewModel.selectedOcrLanguagesProperty().setAll(languagesCombo.getCheckModel().getCheckedItems());
         });
 
-        HBox.setHgrow(languagesCombo, Priority.ALWAYS);
-        HBox row = new HBox(8.0, new Label(Localization.lang("OCR languages")), languagesCombo);
-        row.setAlignment(Pos.CENTER_LEFT);
-        return row;
+        return languagesCombo;
     }
 }

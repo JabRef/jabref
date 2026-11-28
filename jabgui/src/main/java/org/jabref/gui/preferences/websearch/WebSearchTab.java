@@ -85,12 +85,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         setContent(form()
 
                 .section(Localization.lang("General"), general -> general
-                        .flow(toggles -> toggles
-                                        .checkbox(Localization.lang("Enable web search"), viewModel.enableWebSearchProperty())
-                                        .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
-                                        .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
-                                        .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()),
-                                toggleRow -> toggleRow.styleClass("gap-4"))
+                        .checkbox(Localization.lang("Enable web search"), viewModel.enableWebSearchProperty())
+                        .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
+                        .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
+                        .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl())
                         .checkWithField(Localization.lang("Add imported entries to group"), viewModel.getAddImportedEntries(), viewModel.getAddImportedEntriesGroupName(),
                                 PreferencesFormBuilder.InputElement::grow)
                         .combo(Localization.lang("Default plain citation parser"), viewModel.plainCitationParsers(), viewModel.defaultPlainCitationParserProperty(), PlainCitationParserChoice::getLocalizedName)
@@ -101,9 +99,9 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                                 PreferencesFormBuilder.InputElement::grow))
 
                 .section(Localization.lang("Remote services"), remote -> remote
-                        .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty())
-                        .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty(),
-                                url -> url.disableWhen(viewModel.grobidEnabledProperty().not())))
+                        .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty(),
+                                grobid -> grobid.enabledWhenOn(service -> service
+                                        .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty()))))
 
                 .section(Localization.lang("Search Engine URL Templates"), searchEngines -> searchEngines
                         .custom(tableNote)

@@ -12,15 +12,14 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -28,12 +27,11 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -61,7 +59,9 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.dlsc.gemsfx.TagsField;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.SearchableComboBox;
+import org.controlsfx.control.ToggleSwitch;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -116,8 +116,15 @@ import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 /// control. Both take either a [HelpFile] — a page of the JabRef user documentation — or a URL for
 /// anything outside it.
 ///
-/// Consecutive labelled fields share an aligned two-column [GridPane]. Validation decoration is
-/// applied per control once that control reaches a scene, which is when ControlsFX can position it.
+/// Inside a [#section] the form is laid out as setting tiles, in the style of the Windows 11
+/// settings: every checkbox, labelled field and combo box is a [SettingTile] of its own, with its
+/// caption on the left and its control on the right; a checkbox is drawn as a switch. Elements that
+/// are no setting of their own (labels, radios, tables, custom nodes) share a card per run. All rows
+/// of a section share one surface, divided by thin lines; consecutive tiles outside a section share
+/// such a surface too (see [TileGroup]).
+///
+/// Validation decoration is applied per control once that control reaches a scene, which is when
+/// ControlsFX can position it.
 @NullMarked
 public class PreferencesFormBuilder {
 
@@ -134,10 +141,10 @@ public class PreferencesFormBuilder {
     /// preferences search matches against these and highlights the node without reflection.
     private final List<SearchableElement> searchableElements = new ArrayList<>();
 
-    /// Element grid spanning multiple input elements to ensure correct alignment. Its next free row
-    /// is the grid's own row count, so the builder keeps no row counter of its own.
+    /// The card collecting the current run of non-tile elements inside a [TileGroup]. Cleared by
+    /// [#flushCard] whenever a tile or a region interrupts the run, so the next run gets a card of its own.
     @Nullable
-    private GridPane currentGrid;
+    private VBox currentCard;
 
     private boolean built;
 
@@ -171,7 +178,8 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, label), config);
     }
 
-    /// An indented, italic explanatory line below the control it comments on.
+    /// An indented, italic explanatory line below the control it comments on. To describe a setting
+    /// tile, use [InputElement#description] instead.
     public PreferencesFormBuilder info(String text) {
         return info(text, noConfig());
     }
@@ -192,20 +200,25 @@ public class PreferencesFormBuilder {
         return checkbox(text, value, noConfig());
     }
 
-    public PreferencesFormBuilder checkbox(String text, Property<Boolean> value, Consumer<InputElement<CheckBox>> config) {
-        CheckBox checkBox = new CheckBox(text);
-        searchable(text, checkBox);
-        checkBox.setMaxWidth(Double.MAX_VALUE);
-        // Consent and explanation labels run long; wrapping is never wrong for a short one.
-        checkBox.setWrapText(true);
-        checkBox.selectedProperty().bindBidirectional(value);
-        addNode(row(checkBox));
-        return configured(new InputElement<>(this, checkBox), config);
+    /// A boolean setting: a tile captioned `text` with a switch on its right. Settings that only
+    /// apply while it is on go into [InputElement#whenOn], below it.
+    public PreferencesFormBuilder checkbox(String text, Property<Boolean> value, Consumer<InputElement<ToggleSwitch>> config) {
+        ToggleSwitch toggle = new ToggleSwitch();
+        toggle.selectedProperty().bindBidirectional(value);
+        // The tile's caption names the switch; the switch itself shows no text.
+        toggle.setAccessibleText(text);
+
+        SettingTile tile = new SettingTile(text, toggle);
+        tile.title().setLabelFor(toggle);
+        searchable(text, tile.title());
+        addTile(tile);
+        return configured(new InputElement<>(this, toggle, tile), config);
     }
 
-    /// A checkbox with an inline value field that is enabled only while the box is ticked (the
-    /// recurring "Enable ... on port [....]" pattern). The configured element is the **value field**;
-    /// its disable binding to the checkbox is preserved even if you add one of your own.
+    /// A checkbox with an inline value field, left of the switch, that is enabled only while the
+    /// switch is on (the recurring "Enable ... on port [....]" pattern). The configured element is
+    /// the **value field**; its disable binding to the switch is preserved even if you add one of
+    /// your own.
     public PreferencesFormBuilder checkWithField(String text, Property<Boolean> enabled, StringProperty fieldValue) {
         return checkWithField(text, enabled, fieldValue, noConfig());
     }
@@ -228,8 +241,8 @@ public class PreferencesFormBuilder {
         TextField field = new TextField();
         field.setMaxWidth(Double.MAX_VALUE);
         field.textProperty().bindBidirectional(value);
-        addField(label, field);
-        return configured(new InputElement<>(this, field), config);
+        SettingTile tile = addField(label, field);
+        return configured(new InputElement<>(this, field, tile), config);
     }
 
     public PreferencesFormBuilder button(String text, Runnable action) {
@@ -310,8 +323,8 @@ public class PreferencesFormBuilder {
         new ViewModelListCellFactory<X>().withText(display).install(combo);
         combo.setMaxWidth(Double.MAX_VALUE);
         combo.valueProperty().bindBidirectional(value);
-        addField(label, combo);
-        return configured(new InputElement<>(this, combo), config);
+        SettingTile tile = addField(label, combo);
+        return configured(new InputElement<>(this, combo, tile), config);
     }
 
     /// A pre-built, pre-bound [TagsField] (see [TagsFieldEditor]).
@@ -322,9 +335,11 @@ public class PreferencesFormBuilder {
     public <X> PreferencesFormBuilder tagsField(String label,
                                                 TagsField<X> tagsField,
                                                 Consumer<InputElement<TagsField<X>>> config) {
+        // A list of tags needs all the room the caption leaves.
+        tagsField.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(tagsField, Priority.ALWAYS);
-        addField(label, tagsField);
-        return configured(new InputElement<>(this, tagsField), config);
+        SettingTile tile = addField(label, tagsField);
+        return configured(new InputElement<>(this, tagsField, tile), config);
     }
 
     // endregion
@@ -364,15 +379,27 @@ public class PreferencesFormBuilder {
 
     // endregion
 
-    // region grid fields
+    // region labelled fields
+
+    /// A setting whose options need more room than fits beside its caption, e.g. a gallery to pick
+    /// from: a tile that shows `summary` (the current value) and opens on a click to show
+    /// `content` below its row.
+    public PreferencesFormBuilder expander(String title, Node summary, Consumer<PreferencesFormBuilder> content) {
+        SettingTile tile = new SettingTile(title, summary);
+        tile.expandOnClick();
+        searchable(title, tile.title());
+        addTile(tile);
+        nest(tile, content);
+        return this;
+    }
 
     public <T extends Control> PreferencesFormBuilder field(String label, T control) {
         return field(label, control, noConfig());
     }
 
     public <T extends Control> PreferencesFormBuilder field(String label, T control, Consumer<InputElement<T>> config) {
-        addField(label, control);
-        return configured(new InputElement<>(this, control), config);
+        SettingTile tile = addField(label, control);
+        return configured(new InputElement<>(this, control, tile), config);
     }
 
     /// A labeled row whose value is not a control, e.g. an image; nothing to validate or focus.
@@ -381,19 +408,23 @@ public class PreferencesFormBuilder {
         return this;
     }
 
-    private void addField(String label, Node control) {
-        GridPane grid = ensureGrid();
-        int row = grid.getRowCount();
-        HBox controlRow = row(control);
-        HBox.setHgrow(control, Priority.ALWAYS);
-        GridPane.setHgrow(controlRow, Priority.ALWAYS);
-
+    /// A tile captioned `label` with `control` beside the caption. Combo boxes and text fields get a
+    /// common width, so that the inputs of the dialog are alike; other controls (spinners, previews)
+    /// take the width they need, as does a field whose width the tab set.
+    private SettingTile addField(String label, Node control) {
+        if ((control instanceof ComboBoxBase<?> || control instanceof CheckComboBox<?> || control instanceof TextInputControl)
+                && control instanceof Region region
+                && region.getPrefWidth() == Region.USE_COMPUTED_SIZE) {
+            region.setPrefWidth(FormMetrics.TILE_CONTROL_WIDTH);
+        }
+        SettingTile tile = new SettingTile(label, control);
+        tile.title().setLabelFor(control);
         searchable(label, control);
-        grid.add(new Label(label), 0, row);
-        grid.add(controlRow, 1, row);
+        addTile(tile);
+        return tile;
     }
 
-    /// A field with the label **above**. No grid alignment allowed.
+    /// A field with the label **above**, for controls that need the tile's full width.
     public <T extends Control> PreferencesFormBuilder stackedField(String label, T control) {
         return stackedField(label, control, noConfig());
     }
@@ -447,7 +478,7 @@ public class PreferencesFormBuilder {
     // region escape hatches
 
     /// Adds a fully custom node spanning the form. Ensure that [#field(String,Control)] with
-    /// [attachments][InputElement#attach] is not the better fit for new elements (keeps grid alignment).
+    /// [attachments][InputElement#attach] is not the better fit for new elements (keeps the tile layout).
     public <T extends Node> PreferencesFormBuilder custom(T node) {
         return custom(node, noConfig());
     }
@@ -483,17 +514,21 @@ public class PreferencesFormBuilder {
         HBox headerRow = row(header);
         // Unlike an element row, a heading and the help button beside it align on their baseline.
         headerRow.setAlignment(Pos.BASELINE_CENTER);
-        addNode(headerRow);
+        addDirectly(headerRow);
 
-        return configured(new SectionRegion(this, region(new VBox(GAP), content), header), config);
+        return configured(new SectionRegion(this, region(TileGroup.section(), content), header), config);
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content) {
         return group(content, noConfig());
     }
 
+    /// Inside a section a group is transparent to the tile layout: its elements become tiles and
+    /// cards as if they stood in the section itself, so that a group can be disabled or hidden as one
+    /// without changing how its contents look.
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
-        return configured(new FormRegion<>(region(new VBox(GAP), content)), config);
+        VBox group = container() instanceof TileGroup ? TileGroup.nested() : new VBox(GAP);
+        return configured(new FormRegion<>(region(group, content)), config);
     }
 
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
@@ -521,13 +556,16 @@ public class PreferencesFormBuilder {
     /// configuration lambda expects — `group(content, g -> g.disableWhen(off))` disables all of
     /// its contents.
     private <T extends Pane> T region(T region, Consumer<PreferencesFormBuilder> content) {
-        flushGrid();
-        addToContainer(region);
+        if (region instanceof TileGroup) {
+            addDirectly(region);
+        } else {
+            addNode(region);
+        }
         containers.push(region);
         try {
             content.accept(this);
         } finally {
-            flushGrid();
+            flushCard();
             containers.pop();
         }
         return region;
@@ -540,7 +578,7 @@ public class PreferencesFormBuilder {
             throw new IllegalStateException("build() was already called; a form builder assembles one tree");
         }
         built = true;
-        flushGrid();
+        flushCard();
         return root;
     }
 
@@ -608,27 +646,9 @@ public class PreferencesFormBuilder {
                 first, second);
     }
 
-    /// The two-column grid consecutive labeled fields share, created on first use. Cleared by
-    /// [#flushGrid] whenever something that is not a field interrupts the run, so the next
-    /// field starts a fresh grid rather than aligning across the interruption.
-    private GridPane ensureGrid() {
-        if (currentGrid == null) {
-            currentGrid = new GridPane();
-            currentGrid.setHgap(GAP);
-            currentGrid.setVgap(GAP);
-            ColumnConstraints labelColumn = new ColumnConstraints();
-            labelColumn.setMinWidth(FormMetrics.LABEL_COLUMN_MIN_WIDTH);
-            labelColumn.setHalignment(HPos.LEFT);
-            ColumnConstraints controlColumn = new ColumnConstraints();
-            controlColumn.setHgrow(Priority.ALWAYS);
-            currentGrid.getColumnConstraints().addAll(labelColumn, controlColumn);
-            addToContainer(currentGrid);
-        }
-        return currentGrid;
-    }
-
-    private void flushGrid() {
-        currentGrid = null;
+    /// Ends the current run of non-tile elements, so the next one gets a card of its own.
+    private void flushCard() {
+        currentCard = null;
     }
 
     /// The row an element lives in, and the guarantee [#attachTo] reads back out: an element
@@ -646,20 +666,75 @@ public class PreferencesFormBuilder {
         return containers.element();
     }
 
+    /// Adds an element that is no setting tile. In a tile container or a tile's details it joins the
+    /// current card, so that consecutive labels, radios or custom nodes share one surface between
+    /// the tiles, indented like them.
     private void addNode(Node node) {
-        flushGrid();
-        addToContainer(node);
+        Pane container = container();
+        if (!(container instanceof TileGroup || container.getParent() instanceof SettingTile)) {
+            addToContainer(container, node);
+            return;
+        }
+        if (currentCard == null) {
+            currentCard = new VBox(GAP);
+            currentCard.getStyleClass().add("setting-card");
+            addToContainer(container, currentCard);
+        }
+        addToContainer(currentCard, node);
     }
 
-    /// Appends to the open container. Inside a [#columns] region every child becomes a column
+    /// Builds `content` into the details of `tile`, below its row.
+    private void nest(SettingTile tile, Consumer<PreferencesFormBuilder> content) {
+        flushCard();
+        containers.push(tile.details());
+        try {
+            content.accept(this);
+        } finally {
+            flushCard();
+            containers.pop();
+        }
+    }
+
+    /// Adds a tile. Consecutive tiles outside a section share one block, as they would in a section
+    /// without a heading; inside a tile's details they stay plain rows of that tile.
+    private void addTile(SettingTile tile) {
+        Pane container = container();
+        boolean inDetails = containers.stream().anyMatch(open -> open.getParent() instanceof SettingTile);
+        if (container instanceof TileGroup || inDetails) {
+            addDirectly(tile);
+            return;
+        }
+        @Nullable Node last = container.getChildren().isEmpty() ? null : container.getChildren().getLast();
+        if (!(last instanceof TileGroup block && block.isImplicit())) {
+            addDirectly(TileGroup.block());
+        }
+        addToContainer((Pane) container.getChildren().getLast(), tile);
+    }
+
+    /// Adds `node` to the open container itself, never to a card: a tile, a section header, or a
+    /// region that is laid out as tiles in its own right.
+    private void addDirectly(Node node) {
+        flushCard();
+        addToContainer(container(), node);
+    }
+
+    /// Appends to `container`. Inside a [#columns] region every child becomes a column
     /// of equal width, so callers never repeat the hgrow boilerplate: with no preferred width of
     /// its own, a column claims nothing up front and the row's whole width is shared out evenly —
     /// column widths therefore do not depend on how long the captions inside them happen to be.
-    private void addToContainer(Node node) {
+    private void addToContainer(Pane container, Node node) {
         if (built) {
             throw new IllegalStateException("build() was already called; the form is finished and cannot take more elements");
         }
-        Pane container = container();
+        // The rows of a section share one surface, divided by a thin line between neighbors. The line
+        // is a node of its own rather than a border of the row: a border's insets would narrow the row.
+        if (container instanceof TileGroup && !container.getChildren().isEmpty()) {
+            Region divider = new Region();
+            divider.getStyleClass().add("setting-row-divider");
+            divider.visibleProperty().bind(node.visibleProperty());
+            divider.managedProperty().bind(node.managedProperty());
+            container.getChildren().add(divider);
+        }
         container.getChildren().add(node);
         if (container instanceof HBox) {
             HBox.setHgrow(node, Priority.ALWAYS);
@@ -672,17 +747,20 @@ public class PreferencesFormBuilder {
 
     /// Places `attachment` directly after `primary` in its row: the same append
     /// [#addToContainer] does for top-level nodes, only targeting the primary's row rather
-    /// than the open container.
+    /// than the open container. In a [SettingTile] the attachment joins the controls beside the
+    /// caption, so that a switch stays at the end of the row.
     ///
-    /// This works because the placements that can take attachments wrap eagerly in an [HBox]
-    /// row of their own — [#field]/[#stringField]/the combos/[#tagsField] (via
-    /// [#addField]), [#checkbox], [#radio], [#stackedField] and a
-    /// [#section] header. [#label], [#info], [#button] and
-    /// [#hyperlink] do *not*: they go straight into the surrounding container, so attaching
-    /// to one is unsupported and reports itself here rather than failing as a cast.
+    /// This works because the placements that can take attachments sit in an [HBox] row of their
+    /// own — a tile ([#field]/[#stringField]/the combos/[#tagsField] via [#addField], and
+    /// [#checkbox]), or a row ([#radio], [#stackedField] and a [#section] header). [#label],
+    /// [#info], [#button] and [#hyperlink] do *not*: they go straight into the surrounding
+    /// container, so attaching to one is unsupported and reports itself here rather than failing
+    /// as a cast.
     private void attachTo(Node primary, Node attachment) {
         if (primary.getParent() instanceof HBox row) {
-            row.getChildren().add(attachment);
+            SettingTile.holding(primary).ifPresentOrElse(
+                    tile -> tile.attach(attachment),
+                    () -> row.getChildren().add(attachment));
             // An attachment the caller brought is as opaque to the builder as a custom node, so its
             // text is read back the same way. The builder's own attachments carry none.
             collectSearchable(attachment);
@@ -836,6 +914,10 @@ public class PreferencesFormBuilder {
         final PreferencesFormBuilder form;
         final N node;
 
+        /// What shows and hides together with the element: the node itself, or the tile it is the
+        /// control of — hiding only the switch of a setting would leave its caption standing.
+        private final Node layoutRoot;
+
         /// Every disable condition installed on this element so far, OR-combined — the element is
         /// disabled while *any* of them holds — whether it
         /// came from the builder itself (the value field of an
@@ -846,9 +928,10 @@ public class PreferencesFormBuilder {
         @Nullable
         private ObservableValue<? extends Boolean> combinedDisable;
 
-        ElementBase(PreferencesFormBuilder form, N node) {
+        ElementBase(PreferencesFormBuilder form, N node, Node layoutRoot) {
             this.form = form;
             this.node = node;
+            this.layoutRoot = layoutRoot;
         }
 
         /// The control itself, for the rare caller that has to reach past the builder.
@@ -895,8 +978,8 @@ public class PreferencesFormBuilder {
         }
 
         public S visibleWhen(ObservableValue<? extends Boolean> condition) {
-            node.visibleProperty().bind(condition);
-            node.managedProperty().bind(condition);
+            layoutRoot.visibleProperty().bind(condition);
+            layoutRoot.managedProperty().bind(condition);
             return self();
         }
 
@@ -928,7 +1011,7 @@ public class PreferencesFormBuilder {
     public static final class NodeElement<N extends Node> extends ElementBase<NodeElement<N>, N> {
 
         NodeElement(PreferencesFormBuilder form, N node) {
-            super(form, node);
+            super(form, node, node);
         }
 
         /// Decorates a control the builder did not create — one the [#custom] node brought
@@ -947,7 +1030,12 @@ public class PreferencesFormBuilder {
     public static final class InputElement<N extends Control> extends ElementBase<InputElement<N>, N> {
 
         InputElement(PreferencesFormBuilder form, N control) {
-            super(form, control);
+            super(form, control, control);
+        }
+
+        /// A control that is the control of `tile`: the tile shows and hides with it.
+        InputElement(PreferencesFormBuilder form, N control, SettingTile tile) {
+            super(form, control, tile);
         }
 
         public InputElement<N> tooltip(String text) {
@@ -963,11 +1051,52 @@ public class PreferencesFormBuilder {
 
         /// Lets the control take all remaining horizontal space in its row. Use where a builder
         /// default is too narrow, e.g. the value field of [#checkWithField] when it holds a
-        /// name rather than a port number.
+        /// path or a name rather than a port number.
         public InputElement<N> grow() {
             node.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(node, Priority.ALWAYS);
             return this;
+        }
+
+        /// Settings that only apply while this checkbox is on. They show below its tile while it
+        /// is on, and are hidden while it is off; see [#enabledWhenOn] for keeping them in sight.
+        public InputElement<N> whenOn(Consumer<PreferencesFormBuilder> content) {
+            SettingTile tile = tile("whenOn()");
+            tile.revealDetailsWhenOn(toggle("whenOn()"));
+            form.nest(tile, content);
+            return this;
+        }
+
+        /// Settings that only apply while this checkbox is on. They always show below its tile, and
+        /// are disabled while it is off, so one sees what turning it on offers.
+        public InputElement<N> enabledWhenOn(Consumer<PreferencesFormBuilder> content) {
+            SettingTile tile = tile("enabledWhenOn()");
+            tile.enableDetailsWhenOn(toggle("enabledWhenOn()"));
+            form.nest(tile, content);
+            return this;
+        }
+
+        /// A line below the caption of this control's tile, describing the setting more closely.
+        /// Like the caption, it follows the control's disabled state and is found by the search.
+        public InputElement<N> description(String text) {
+            Label description = new Label(text);
+            form.searchable(text, description);
+            tile("description()").addDescription(description);
+            return this;
+        }
+
+        /// The tile this control is the control of.
+        private SettingTile tile(String method) {
+            return SettingTile.holding(node)
+                              .filter(holder -> holder.control() == node)
+                              .orElseThrow(() -> new IllegalStateException(method + " applies to the control of a setting tile only"));
+        }
+
+        private ToggleSwitch toggle(String method) {
+            if (node instanceof ToggleSwitch toggle) {
+                return toggle;
+            }
+            throw new IllegalStateException(method + " applies to a checkbox only");
         }
 
         // region attachments
@@ -987,7 +1116,7 @@ public class PreferencesFormBuilder {
         }
 
         /// Attaches a text field bound to `value`. Like every attachment it follows the control's
-        /// disabled state; on a checkbox or radio it is additionally disabled while the toggle is
+        /// disabled state; on a switch or radio it is additionally disabled while the toggle is
         /// unselected (the recurring "option with inline value" pattern). The config lambda
         /// addresses the new field.
         public InputElement<N> attachField(StringProperty value) {
@@ -1001,8 +1130,8 @@ public class PreferencesFormBuilder {
             HBox.setHgrow(field, Priority.ALWAYS);
             InputElement<TextField> element = new InputElement<>(form, field);
             element.followDisable(node);
-            if (node instanceof CheckBox box) {
-                element.addDisableCondition(box.selectedProperty().not());
+            if (node instanceof ToggleSwitch toggleSwitch) {
+                element.addDisableCondition(toggleSwitch.selectedProperty().not());
             } else if (node instanceof ToggleButton toggle) {
                 element.addDisableCondition(toggle.selectedProperty().not());
             }

@@ -70,11 +70,10 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
                         .checkbox(Localization.lang("Move deleted files to trash (instead of deleting them)"), viewModel.moveToTrashProperty(),
                                 // Hidden instead of disabled: a disabled checkbox would still show the preference's default "checked"
                                 trash -> trash.visibleWhen(new SimpleBooleanProperty(nativeDesktop.moveToTrashSupported())))
-                        .checkbox(Localization.lang("Update linked file paths during entry transfer if the files are accessible"), viewModel.adjustLinkedFilesOnTransferProperty())
-                        .checkbox(Localization.lang("Copy linked files on entry transfer when they would otherwise be inaccessible"), viewModel.copyLinkedFilesOnTransferProperty(),
-                                copy -> copy.disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not()))
-                        .checkbox(Localization.lang("Move linked files on entry transfer when they would otherwise be inaccessible"), viewModel.moveFilesOnTransferProperty(),
-                                move -> move.disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not())))
+                        .checkbox(Localization.lang("Update linked file paths during entry transfer if the files are accessible"), viewModel.adjustLinkedFilesOnTransferProperty(),
+                                adjust -> adjust.enabledWhenOn(transfer -> transfer
+                                        .checkbox(Localization.lang("Copy linked files on entry transfer when they would otherwise be inaccessible"), viewModel.copyLinkedFilesOnTransferProperty())
+                                        .checkbox(Localization.lang("Move linked files on entry transfer when they would otherwise be inaccessible"), viewModel.moveFilesOnTransferProperty()))))
 
                 .build());
     }

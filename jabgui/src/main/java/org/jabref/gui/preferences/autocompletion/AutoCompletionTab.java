@@ -4,7 +4,7 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.TagsFieldEditor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldTextMapper;
+import org.jabref.model.entry.field.FieldFactory;
 
 import com.dlsc.gemsfx.TagsField;
 
@@ -21,13 +21,11 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
     }
 
     private void buildView() {
-        TagsField<Field> autoCompleteFields = TagsFieldEditor.create(
-                FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter(), viewModel.autoCompleteFieldsProperty());
+        TagsField<Field> autoCompleteFields = TagsFieldEditor.createForFields(FieldFactory.getAllFieldsWithOutInternal(), viewModel.autoCompleteFieldsProperty());
 
         setContent(form()
-                .checkbox(Localization.lang("Use autocompletion"), viewModel.enableAutoCompleteProperty())
-
-                .group(autoComplete -> autoComplete
+                .checkbox(Localization.lang("Use autocompletion"), viewModel.enableAutoCompleteProperty(),
+                        useAutoCompletion -> useAutoCompletion.enabledWhenOn(autoComplete -> autoComplete
                                 .tagsField(Localization.lang("Affected fields"), autoCompleteFields)
 
                                 .label(Localization.lang("Name format"))
@@ -40,8 +38,7 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
                                 .radioGroup(firstNames -> firstNames
                                         .radio(Localization.lang("Use abbreviated firstname whenever possible"), viewModel.firstNameModeAbbreviatedProperty())
                                         .radio(Localization.lang("Use full firstname whenever possible"), viewModel.firstNameModeFullProperty())
-                                        .radio(Localization.lang("Use abbreviated and full firstname"), viewModel.firstNameModeBothProperty())),
-                        settings -> settings.disableWhen(viewModel.enableAutoCompleteProperty().not()))
+                                        .radio(Localization.lang("Use abbreviated and full firstname"), viewModel.firstNameModeBothProperty()))))
 
                 .build());
     }

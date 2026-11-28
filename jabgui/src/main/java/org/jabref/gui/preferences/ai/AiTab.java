@@ -80,11 +80,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
                 .section(Localization.lang("General"), general -> general
                                 // [impl->feat~ai.llms.providers~1]
-                                .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
-                                .info(Localization.lang("AI functionality in Jabref includes:"))
-                                .info(Localization.lang("• Chatting with entries."))
-                                .info(Localization.lang("• Summarizing entries."))
-                                .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")),
+                                .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi(),
+                                        enableAi -> enableAi
+                                                .description(Localization.lang("AI functionality in Jabref includes:"))
+                                                .description(Localization.lang("• Chatting with entries."))
+                                                .description(Localization.lang("• Summarizing entries."))
+                                                .description(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry."))),
                         generalSection -> generalSection.help(HelpFile.AI_GENERAL_SETTINGS))
 
                 .section(Localization.lang("Connection"), connection -> connection
@@ -165,8 +166,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                         .checkbox(Localization.lang("Automatically generate summaries for new entries"), viewModel.autoGenerateSummaries(),
                                 summaries -> summaries.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateSummaries())))
                         .checkbox(Localization.lang("Generate follow-up questions after AI response"), viewModel.generateFollowUpQuestionsProperty(),
-                                followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty()))
-                        .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())
+                                followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty())
+                                                    .enabledWhenOn(questions -> questions
+                                                            .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())))
                         // [impl->feat~ai.response-engines.default~1]
                         .combo(Localization.lang("Default response engine"),
                                 viewModel.responseEngineKindsProperty(),
@@ -260,7 +262,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         spinner.setMaxWidth(100.0);
         spinner.setValueFactory(AiTabViewModel.followUpQuestionsCountValueFactory);
         spinner.getValueFactory().valueProperty().bindBidirectional(viewModel.followUpQuestionsCountProperty().asObject());
-        spinner.disableProperty().bind(viewModel.generateFollowUpQuestionsProperty().not());
         return spinner;
     }
 

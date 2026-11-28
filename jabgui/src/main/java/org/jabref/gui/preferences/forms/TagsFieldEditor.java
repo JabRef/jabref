@@ -1,6 +1,10 @@
 package org.jabref.gui.preferences.forms;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 import javafx.beans.property.ListProperty;
@@ -13,7 +17,11 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.dlsc.gemsfx.TagsField;
 import org.jspecify.annotations.NullMarked;
@@ -53,6 +61,25 @@ public final class TagsFieldEditor {
             }
         });
         return tagsField;
+    }
+
+    /// A tags field of entry fields: it suggests the fields among `candidates` whose name contains
+    /// the typed text, and offers the typed text itself as a field, so that any field can be added.
+    public static TagsField<Field> createForFields(Collection<Field> candidates, ListProperty<Field> value) {
+        return create(FieldTextMapper::getDisplayName, request -> fieldSuggestions(candidates, request), FieldsUtil.FIELD_STRING_CONVERTER, value);
+    }
+
+    static List<Field> fieldSuggestions(Collection<Field> candidates, String request) {
+        String typed = request.toLowerCase(Locale.ROOT);
+        List<Field> suggestions = new ArrayList<>(candidates.stream()
+                                                            .filter(field -> FieldTextMapper.getDisplayName(field).toLowerCase(Locale.ROOT).contains(typed))
+                                                            .sorted(Comparator.comparing(FieldTextMapper::getDisplayName))
+                                                            .toList());
+        Field requested = FieldFactory.parseField(request.trim());
+        if (!request.isBlank() && !suggestions.contains(requested)) {
+            suggestions.addFirst(requested);
+        }
+        return suggestions;
     }
 
     private static <T> Node createTag(TagsField<T> tagsField, T item, Callback<T, String> displayName) {

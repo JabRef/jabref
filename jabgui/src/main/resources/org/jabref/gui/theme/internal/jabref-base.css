@@ -1307,6 +1307,105 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-color: -color-bg-primary;
 }
 
+/* A setting tile: one setting per row, caption left, control right, settings that depend on its
+   switch below (see SettingTile). A card holds the elements of a section that are no setting of
+   their own. Tiles and cards are transparent: the tile group they sit in draws the surface. The
+   overlay tokens tint whatever lies beneath, so this works in light and dark color schemes alike. */
+.preferences-dialog .setting-tile-header {
+    -fx-min-height: 34;
+    -fx-padding: 3 12 3 16;
+    -fx-background-radius: 6;
+}
+
+.preferences-dialog .setting-tile-header:hover {
+    -fx-background-color: -color-overlay-armed;
+}
+
+/* The settings that depend on a tile's switch sit on a shaded band below its row, so they read as
+   sub-options of that setting wherever they occur. */
+.preferences-dialog .setting-tile-details {
+    -fx-padding: 0;
+    -fx-background-color: -color-overlay-hover;
+    -fx-background-radius: 0 0 6 6;
+}
+
+.preferences-dialog .setting-card {
+    -fx-padding: 12 16 12 16;
+}
+
+/* All rows of a tile group share one surface, divided by a thin line between neighbors. */
+.preferences-dialog .setting-tile-group {
+    -fx-background-color: -color-overlay-hover;
+    -fx-background-radius: 8;
+}
+
+.preferences-dialog .setting-row-divider {
+    -fx-min-height: 1;
+    -fx-pref-height: 1;
+    -fx-max-height: 1;
+    -fx-background-color: -color-border-muted;
+    -fx-background-insets: 0 16 0 16;
+}
+
+/* A tile inside a card is a plain row of it. */
+.preferences-dialog .setting-card .setting-tile-header {
+    -fx-min-height: 0;
+    -fx-padding: 4 12 4 16;
+}
+
+/* The rows of a tile's details carry the band's indent themselves (the band has no padding), so
+   that a row's hover covers the band edge to edge, as for every other setting row. */
+.preferences-dialog .setting-tile-details .setting-tile-header {
+    -fx-min-height: 0;
+    -fx-padding: 4 12 4 32;
+    -fx-background-radius: 0;
+}
+
+.preferences-dialog .setting-tile-details .setting-card {
+    -fx-padding: 6 12 6 32;
+}
+
+/* A searchable combo box wraps a second combo box; its own padding around that makes it taller
+   than its neighbors. */
+.preferences-dialog .setting-tile .searchable-combo-box {
+    -fx-padding: 0;
+}
+
+.preferences-dialog .setting-tile-description {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: 0.9em;
+}
+
+.preferences-dialog .setting-tile .toggle-switch:selected .thumb-area {
+    -fx-background-color: -color-accent;
+}
+
+/* ThemeGalleryView: one card per theme, the selected one framed in the accent color. */
+.theme-gallery .theme-card {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+    -fx-border-width: 2;
+    -fx-padding: 6;
+    -fx-graphic-text-gap: 6;
+    -fx-text-fill: -color-fg-default;
+}
+
+.theme-gallery .theme-card-custom {
+    -fx-background-color: -color-overlay-hover;
+    -fx-background-radius: 4;
+}
+
+.theme-gallery .theme-card:hover {
+    -fx-background-color: -color-overlay-hover;
+}
+
+.theme-gallery .theme-card:selected {
+    -fx-background-color: -color-overlay-hover;
+    -fx-border-color: -color-accent;
+}
+
 .preferences-dialog *:search-highlight {
     -fx-background-color: -color-danger;
 }

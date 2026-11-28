@@ -2,22 +2,18 @@ package org.jabref.gui.preferences.autocompletion;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.FieldTextMapper;
 
 public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
@@ -127,25 +123,5 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty firstNameModeBothProperty() {
         return firstNameModeBothProperty;
-    }
-
-    public StringConverter<Field> getFieldStringConverter() {
-        return new StringConverter<>() {
-            @Override
-            public String toString(Field field) {
-                return FieldTextMapper.getDisplayName(field);
-            }
-
-            @Override
-            public Field fromString(String string) {
-                return FieldFactory.parseField(string);
-            }
-        };
-    }
-
-    public List<Field> getSuggestions(String request) {
-        return FieldFactory.getAllFieldsWithOutInternal().stream()
-                           .filter(field -> FieldTextMapper.getDisplayName(field).toLowerCase().contains(request.toLowerCase()))
-                           .collect(Collectors.toList());
     }
 }
