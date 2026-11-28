@@ -1,8 +1,12 @@
 package org.jabref.logic.database;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -11,6 +15,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
@@ -25,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class DatabaseMerger {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMerger.class);
+    // Matches a string reference such as "#venue#" in a field value
+    private static final Pattern STRING_REFERENCE = Pattern.compile("#([^#]+)#");
     private final char keywordDelimiter;
 
     public DatabaseMerger(char keywordDelimiter) {
@@ -83,6 +90,7 @@ public class DatabaseMerger {
     }
 
     public void mergeStrings(BibDatabase target, BibDatabase other) {
+        Map<String, String> renamedStrings = new HashMap<>();
         for (BibtexString bibtexString : other.getStringValues()) {
             String bibtexStringName = bibtexString.getName();
             if (target.hasStringByName(bibtexStringName)) {
@@ -99,11 +107,33 @@ public class DatabaseMerger {
                     BibtexString newBibtexString = new BibtexString(newName, importedContent);
                     // TODO undo/redo
                     target.addString(newBibtexString);
+                    renamedStrings.put(bibtexStringName, newName);
                     LOGGER.info("New string added: {} = {}", newBibtexString.getName(), newBibtexString.getContent());
                 }
             } else {
                 // TODO undo/redo
                 target.addString(bibtexString);
+            }
+        }
+        updateStringReferences(other.getEntries(), renamedStrings);
+    }
+
+    /// Updates string references such as `#venue#` in the given entries to renamed strings (e.g., `#venue_1#`),
+    /// so that imported entries keep referring to the string definition from their own library.
+    private static void updateStringReferences(List<BibEntry> entries, Map<String, String> renamedStrings) {
+        if (renamedStrings.isEmpty()) {
+            return;
+        }
+        for (BibEntry entry : entries) {
+            for (Field field : new ArrayList<>(entry.getFields())) {
+                String value = entry.getField(field).orElse("");
+                String updatedValue = STRING_REFERENCE.matcher(value).replaceAll(match -> {
+                    String name = match.group(1);
+                    return Matcher.quoteReplacement("#" + renamedStrings.getOrDefault(name, name) + "#");
+                });
+                if (!updatedValue.equals(value)) {
+                    entry.setField(field, updatedValue);
+                }
             }
         }
     }

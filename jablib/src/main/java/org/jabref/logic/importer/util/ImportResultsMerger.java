@@ -39,7 +39,11 @@ public class ImportResultsMerger {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format())) {
                 // additional treatment of BibTeX
-                new DatabaseMerger(keyWordSeparator).mergeMetaData(
+                DatabaseMerger databaseMerger = new DatabaseMerger(keyWordSeparator);
+                // Keep the string constants of the imported file, otherwise references such as "#venue#"
+                // would later resolve to a different definition in the target library
+                databaseMerger.mergeStrings(resultDatabase, parserResult.getDatabase());
+                databaseMerger.mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult().getPath().map(path -> path.getFileName().toString()).orElse("unknown"),

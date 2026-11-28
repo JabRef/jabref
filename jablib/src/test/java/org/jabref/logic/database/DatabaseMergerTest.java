@@ -1,6 +1,7 @@
 package org.jabref.logic.database;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
@@ -139,6 +140,36 @@ class DatabaseMergerTest {
                                                        .collect(Collectors.toList());
 
         assertEquals(List.of(targetString1, targetString2), resultStringsSorted);
+    }
+
+    @Test
+    void mergeStringsUpdatesReferencesInImportedEntriesWhenStringIsRenamed() {
+        BibDatabase target = new BibDatabase();
+        target.addString(new BibtexString("venue", "Journal of Biology"));
+
+        BibEntry incoming = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "#venue#");
+        BibDatabase other = new BibDatabase(List.of(incoming));
+        other.addString(new BibtexString("venue", "Journal of Computer Science"));
+
+        new DatabaseMerger(',').mergeStrings(target, other);
+
+        assertEquals(Optional.of("#venue_1#"), incoming.getField(StandardField.JOURNAL));
+    }
+
+    @Test
+    void mergeStringsKeepsReferencesWhenStringContentIsEqual() {
+        BibDatabase target = new BibDatabase();
+        target.addString(new BibtexString("venue", "Journal of Biology"));
+
+        BibEntry incoming = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "#venue#");
+        BibDatabase other = new BibDatabase(List.of(incoming));
+        other.addString(new BibtexString("venue", "Journal of Biology"));
+
+        new DatabaseMerger(',').mergeStrings(target, other);
+
+        assertEquals(Optional.of("#venue#"), incoming.getField(StandardField.JOURNAL));
     }
 
     @Test
