@@ -17,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.openoffice.bst.BSTFormatUtils;
 import org.jabref.logic.openoffice.bst.BstStyle;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -129,20 +130,22 @@ public final class BstPreviewLayout implements PreviewLayout {
         new ConvertToBibtexCleanup().cleanup(entry);
         convertBracedMathToUnicode(entry);
         String result = bstVM.renderWithoutPreamble(List.of(entry), databaseContext.getDatabase());
+        // Exactly one entry is rendered, so everything before its \bibitem is style preamble
+        // (e.g., multi-line \providecommand definitions of amsalpha.bst or IEEEtran.bst)
+        int bibitemStart = result.lastIndexOf("\\bibitem");
+        if (bibitemStart >= 0) {
+            result = result.substring(bibitemStart);
+        }
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
-        // Remove all LaTeX comments
         // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
-        result = result.replace("\\begin{thebibliography}{1}", "");
-        result = result.replace("\\end{thebibliography}", "");
+        result = BSTFormatUtils.stripBibliographyStructure(result);
         // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
         result = BIBITEM_PATTERN.matcher(result).replaceAll("");
         // We want to replace \\newblock by a space instead of completely removing it
         result = result.replace("\\newblock", " ");
         // Remove all latex commands statements - assumption: command in a separate line
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
-        // Remove some IEEEtran.bst output (resulting from a multiline \\providecommand)
-        result = result.replace("#2}}", "");
         // HTMLChars would turn line breaks into <br>
         result = new RemoveNewlinesFormatter().format(result);
         // Before LatexToUnicodeFormatter, which would turn italic and bold into Unicode mathematical letters

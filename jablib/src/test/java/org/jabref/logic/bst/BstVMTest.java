@@ -40,6 +40,12 @@ public class BstVMTest {
     }
 
     @Test
+    void entryFieldsMayContainHyphens() {
+        BstVM vm = new BstVM("ENTRY { ctrl-article-title } {} {}");
+        assertEquals(Set.of("ctrl-article-title"), vm.getEntryFields());
+    }
+
+    @Test
     void fieldSelectionIncludesAliasesAndDateParts() {
         var selection = new BstVM("ENTRY { journal date } {} {}").getFieldSelection().orElseThrow();
 

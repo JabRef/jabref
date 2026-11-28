@@ -141,6 +141,31 @@ class BstPreviewLayoutTest {
     }
 
     @Test
+    void multiLineStylePreambleIsNotShownInPreview(@TempDir Path tempDir) throws IOException {
+        Path bst = tempDir.resolve("multiline-preamble.bst");
+        Files.writeString(bst, """
+                ENTRY { title } {} {}
+                FUNCTION { begin.bib } {
+                  "\\providecommand{\\MRhref}[2]{%" write$ newline$
+                  "  \\href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}" write$ newline$
+                  "}" write$ newline$
+                }
+                FUNCTION { output.entry } {
+                  "\\bibitem{" cite$ * "}" * write$ newline$
+                  title write$ newline$
+                }
+                READ
+                EXECUTE { begin.bib }
+                ITERATE { output.entry }
+                """);
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bst);
+        BibEntry entry = new BibEntry().withCitationKey("key")
+                                       .withField(StandardField.TITLE, "Thoughts on Development");
+
+        assertEquals("Thoughts on Development", bstPreviewLayout.generatePreview(entry, bibDatabaseContext));
+    }
+
+    @Test
     void unparsableBstShowsPreviewError(@TempDir Path tempDir) throws IOException {
         Path invalidBst = tempDir.resolve("invalid.bst");
         Files.writeString(invalidBst, "}");

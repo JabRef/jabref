@@ -25,6 +25,14 @@ public final class BSTFormatUtils {
     private static final Pattern LEADING_EMPTY_PARAGRAPH_MARKER = Pattern.compile("^\\s*<p>\\s*</p>");
     private static final Pattern TRAILING_EMPTY_PARAGRAPH_MARKERS = Pattern.compile("(?:<p>\\s*</p>\\s*){2,}$");
 
+    private static final Pattern BIBLIOGRAPHY_END = Pattern.compile("\\\\end\\{(?:mcite)?thebibliography}");
+    /// The end-of-entry block of mciteplus-compatible styles such as achemso.bst, e.g.
+    /// `\relax \mciteBstWouldAddEndPuncttrue \mciteSetBstMidEndSepPunct{..}{..}{..}\relax \EndOfBibitem`.
+    /// With `true`, `\EndOfBibitem` appends a period to the entry, otherwise nothing.
+    private static final Pattern MCITE_END_OF_BIBITEM = Pattern.compile(
+            "\\s*(?:\\\\relax\\s*)?\\\\mciteBstWouldAddEndPunct(?<addPeriod>true|false)\\s*"
+                    + "\\\\mciteSetBstMidEndSepPunct\\s*(?:\\{[^}]*}\\s*){3}(?:\\\\relax\\s*)?\\\\EndOfBibitem");
+
     private BSTFormatUtils() {
     }
 
@@ -80,6 +88,13 @@ public final class BSTFormatUtils {
     public static String normalizeBibItemLabel(String label) {
         String normalized = BRACED_ETALCHAR_PATTERN.matcher(label).replaceAll("$1");
         return ETALCHAR_PATTERN.matcher(normalized).replaceAll("$1");
+    }
+
+    /// Removes the bibliography environment end from the LaTeX of a single `\bibitem` and
+    /// replaces the mciteplus end-of-entry block by the punctuation it stands for.
+    public static String stripBibliographyStructure(String bibItemLatex) {
+        String stripped = BIBLIOGRAPHY_END.matcher(bibItemLatex).replaceAll("");
+        return MCITE_END_OF_BIBITEM.matcher(stripped).replaceAll(result -> "true".equals(result.group("addPeriod")) ? "." : "");
     }
 
     private static String replaceLegacySwitch(String input, String legacy, String modern) {

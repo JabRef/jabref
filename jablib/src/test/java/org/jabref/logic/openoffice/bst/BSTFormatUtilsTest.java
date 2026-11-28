@@ -46,6 +46,30 @@ class BSTFormatUtilsTest {
 
     @ParameterizedTest
     @MethodSource
+    void stripBibliographyStructure(String bibItemLatex, String expected) {
+        assertEquals(expected, BSTFormatUtils.stripBibliographyStructure(bibItemLatex));
+    }
+
+    static Stream<Arguments> stripBibliographyStructure() {
+        return Stream.of(
+                Arguments.of("Text.\n\\end{thebibliography}", "Text.\n"),
+                Arguments.of("""
+                        1--11\\relax
+                        \\mciteBstWouldAddEndPuncttrue
+                        \\mciteSetBstMidEndSepPunct{\\mcitedefaultmidpunct}
+                        {\\mcitedefaultendpunct}{\\mcitedefaultseppunct}\\relax
+                        \\EndOfBibitem
+                        \\end{mcitethebibliography}""", "1--11.\n"),
+                Arguments.of("""
+                        1--11\\relax
+                        \\mciteBstWouldAddEndPunctfalse
+                        \\mciteSetBstMidEndSepPunct{\\mcitedefaultmidpunct}
+                        {}{\\mcitedefaultseppunct}\\relax
+                        \\EndOfBibitem""", "1--11"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
     void normalizeBibItemLabelPreservesDisambiguationAndUnsupportedCommands(String label, String expected) {
         assertEquals(expected, BSTFormatUtils.normalizeBibItemLabel(label));
     }
