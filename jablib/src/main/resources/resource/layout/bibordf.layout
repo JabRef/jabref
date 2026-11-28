@@ -5,7 +5,7 @@
 \begin{doi}    <bibo:doi>\format[DOIStrip,XMLChars]{\doi}</bibo:doi>\end{doi}
 
 \begin{author}
-   \format[XMLChars,CreateBibORDFAuthors]{\author}
+   \format[CreateBibORDFAuthors]{\author}
 \end{author}
 
 </bibo:Document>
