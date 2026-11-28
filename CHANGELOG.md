@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the customized entry preview ignored small caps and showed LaTeX commands inside emphasized text. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed nested LaTeX formatting, spacing, and ampersand escaping in HTML output and JStyle bibliographies. [#17921](https://github.com/JabRef/jabref/pull/17921)
 - We fixed an issue where RIS import stored a book's ISBN in the ISSN field. [#17889](https://github.com/JabRef/jabref/issues/17889)
+- We fixed an issue with wrong text shown for preferences menu item and the preferences dialog shortcut opening directly LibreOffice panel in preferences. [#17966](https://github.com/JabRef/jabref/issues/17966)
 - We fixed incorrect name splitting and added missing contributor names and roles in MODS exports. [#17898](https://github.com/JabRef/jabref/issues/17898)
 
 ### Removed
@@ -194,6 +195,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the side panels were not reachable in small windows. [#17470](https://github.com/JabRef/jabref/issues/17470)
 - We fixed an issue where the consistency check reported missing linked files as an inconsistency. [#17309](https://github.com/JabRef/jabref/issues/17309)
 - We fixed an issue where disabling linked-file full-text indexing did not stop ongoing indexing. [#17577](https://github.com/JabRef/jabref/issues/17577)
+- We fixed a shutdown delay for libraries with large full-text search indexes. [#17958](https://github.com/JabRef/jabref/issues/17958)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
 - We fixed the issue where a missing comma after a BibTeX citation key led to a wrong key. [#17549](https://github.com/JabRef/jabref/issues/17549)
 - We fixed an issue where dropping an invalid file onto JabRef showed no error message. [#8625](https://github.com/JabRef/jabref/issues/8625)

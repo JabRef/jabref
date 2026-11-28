@@ -13,7 +13,7 @@
       ],
       "matchStrings": [
         "//DEPS (?<depName>\\S+):(\\${\\S+:(?<currentValue>[^ }]+)})",
-        "//DEPS ((?<depName>\\S+:\\S+):(?<currentValue>[^$]\\S+))(\\@\\w+)?"
+        "//DEPS ((?<depName>\\S+:\\S+):(?<currentValue>[^$:\\s]+))(:\\S+)?(\\@\\w+)?"
       ],
       "datasourceTemplate": "maven"
     },

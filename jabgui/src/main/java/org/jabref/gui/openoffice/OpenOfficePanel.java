@@ -672,7 +672,7 @@ public class OpenOfficePanel {
         MenuItem clearConnectionSettings = new MenuItem(Localization.lang("Clear connection settings"));
         // [impl->req~openoffice.preferences-shortcut~1]
         MenuItem moreSettings = new ActionFactory().createMenuItem(
-                StandardActions.SHOW_PREFS.withText(Localization.lang("More settings")),
+                StandardActions.PREFERENCES_CONTEXT,
                 new ShowPreferencesAction(tabContainer, OpenOfficeTab.class, dialogService));
 
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
