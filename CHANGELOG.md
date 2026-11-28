@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added an integrity check for unescaped `%` characters in LaTeX fields. [#8712](https://github.com/JabRef/jabref/issues/8712)
+
 ### Changed
 
 ### Fixed
