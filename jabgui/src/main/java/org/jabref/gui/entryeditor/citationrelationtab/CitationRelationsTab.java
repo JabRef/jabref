@@ -126,6 +126,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final MenuItem reviewMenuItem;
     private @Nullable CitationComponents currentCitingComponents;
     private @Nullable CitationComponents currentCitedByComponents;
+    private Optional<DOI> lastSearchedDoi = Optional.empty();
 
     private boolean shouldClearSelectionOnDrop = false;
 
@@ -297,12 +298,21 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         citationsRelationsTabViewModel.lookUpDoi(entry, () -> {
             if (getCurrentEntry() == entry) {
-                refreshCurrentEntryAfterDoiLookup(entry);
+                refreshForDoiChange(entry, true);
             }
         });
     }
 
-    private void refreshCurrentEntryAfterDoiLookup(BibEntry entry) {
+    private void refreshIfDoiChanged(BibEntry entry) {
+        Optional<DOI> currentDoi = entry.getDOI();
+        if (currentDoi.equals(lastSearchedDoi)) {
+            return;
+        }
+        refreshForDoiChange(entry, false);
+    }
+
+    private void refreshForDoiChange(BibEntry entry, boolean bypassCache) {
+        lastSearchedDoi = entry.getDOI();
         if (currentCitingComponents == null
                 || currentCitedByComponents == null
                 || currentCitingComponents.entry() != entry
@@ -312,8 +322,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         citationsRelationsTabViewModel.updateForEntry(entry);
-        searchForRelations(currentCitingComponents, currentCitedByComponents, true);
-        searchForRelations(currentCitedByComponents, currentCitingComponents, true);
+        searchForRelations(currentCitingComponents, currentCitedByComponents, bypassCache);
+        searchForRelations(currentCitedByComponents, currentCitingComponents, bypassCache);
     }
 
     private void resetEmptyPanels() {
@@ -832,6 +842,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        lastSearchedDoi = entry.getDOI();
+
         citationsRelationsTabViewModel.updateForEntry(entry);
 
         SplitPane splitPane = getPaneAndStartSearch(entry);
@@ -845,6 +857,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         setContent(root);
+    }
+
+    @Override
+    protected void handleFocus() {
+        Optional.ofNullable(getCurrentEntry()).ifPresent(this::refreshIfDoiChanged);
     }
 
     private void searchForRelations(CitationComponents citationComponents,
@@ -911,7 +928,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setLoadingPlaceholder(citationComponents.listView());
 
         BackgroundTask<List<CitationRelationItem>> task = this.createCitationSearchTask(
-                citationComponents.entry(),
+                new BibEntry(citationComponents.entry()),
                 citationComponents.searchType(),
                 bypassCache,
                 librarySnapshot.entries(),
