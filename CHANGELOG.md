@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added restoring of the library tab and entry that were selected when JabRef was closed. [#16911](https://github.com/JabRef/jabref/pull/16911)
+
 ### Changed
 
 ### Fixed
@@ -20,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed nested LaTeX formatting, spacing, and ampersand escaping in HTML output and JStyle bibliographies. [#17921](https://github.com/JabRef/jabref/pull/17921)
 - We fixed an issue where RIS import stored a book's ISBN in the ISSN field. [#17889](https://github.com/JabRef/jabref/issues/17889)
 - We fixed an issue with wrong text shown for preferences menu item and the preferences dialog shortcut opening directly LibreOffice panel in preferences. [#17966](https://github.com/JabRef/jabref/issues/17966)
+- We fixed an issue where libraries opened or saved shortly before JabRef was killed were missing from recent libraries. [#16911](https://github.com/JabRef/jabref/pull/16911)
 
 ### Removed
 
