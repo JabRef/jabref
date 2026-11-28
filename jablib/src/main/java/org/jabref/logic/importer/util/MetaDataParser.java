@@ -166,6 +166,11 @@ public class MetaDataParser {
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
                 // groups are processed last (see above), so a keyword separator declared in the library is already known here
                 metaData.setGroups(GroupsParser.importGroups(values, metaData.getKeywordSeparator().orElse(keywordSeparator), fileMonitor, metaData, userAndHost));
+                if (MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
+                    metaData.markGroupsAsLegacy();
+                } else {
+                    metaData.markGroupsAsCurrent();
+                }
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);
@@ -173,6 +178,8 @@ public class MetaDataParser {
                 metaData.setVersionDBStructure(getSingleItem(values));
             } else if (MetaData.AI_LIBRARY_ID.equals(entry.getKey())) {
                 metaData.setAiLibraryId(getSingleItem(values));
+            } else if (MetaData.SKIPPED_MIGRATIONS.equals(entry.getKey())) {
+                metaData.setSkippedMigrations(values);
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), values);

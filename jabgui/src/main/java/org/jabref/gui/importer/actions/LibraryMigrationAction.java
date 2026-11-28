@@ -1,0 +1,190 @@
+package org.jabref.gui.importer.actions;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
+
+import javafx.geometry.HPos;
+import javafx.scene.Node;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.migrations.ConvertLegacyExplicitGroups;
+import org.jabref.migrations.ConvertMarkingToGroups;
+import org.jabref.migrations.ConvertSearchGroupSyntax;
+import org.jabref.migrations.PerformLoadDatabaseMigrations;
+import org.jabref.migrations.PostOpenMigration;
+import org.jabref.migrations.SpecialFieldsToSeparateFields;
+
+import org.jspecify.annotations.NullMarked;
+
+/// Offers the conversion of libraries written by older JabRef versions to the current data format.
+///
+/// The [PostOpenMigration]s are listed in a table, so the user sees what JabRef is about to rewrite.
+/// Conversions whose old format is still written get a check box to keep the old data.
+@NullMarked
+public class LibraryMigrationAction {
+
+    /// [impl->req~import.legacy-library-migration~1]
+    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences)
+            throws ExecutionException, InterruptedException {
+        if (parserResult.getMetaData().getGroupSearchSyntaxVersion().filter(ConvertSearchGroupSyntax.VERSION_6_0_ALPHA::equals).isPresent()) {
+            UiTaskExecutor.callAndWaitInJavaFXThread(() -> {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Migration of %0", parserResult.getPath().map(Path::toString).orElse("")),
+                        Localization.lang("To recover the search groups in this library, use the backup you made before opening it with JabRef 6.0-alpha."));
+                return Optional.empty();
+            });
+        }
+        Map<PostOpenMigration, Boolean> applicability = determineApplicability(parserResult, dialogService, preferences);
+        if (!applicability.containsValue(true)) {
+            return;
+        }
+
+        MigrationChoices choices = UiTaskExecutor.callAndWaitInJavaFXThread(() -> chooseMigrations(parserResult, dialogService, applicability));
+        applyChoices(parserResult, choices);
+    }
+
+    private static Map<PostOpenMigration, Boolean> determineApplicability(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+        Map<PostOpenMigration, Boolean> applicability = new LinkedHashMap<>();
+        getOfferedMigrations(parserResult, dialogService, preferences).stream()
+                                                                      .sorted(Comparator.comparing(migration -> !migration.isOptional()))
+                                                                      .forEach(migration -> applicability.put(migration, migration.isMigrationNecessary(parserResult)));
+        return applicability;
+    }
+
+    private record MigrationChoices(List<PostOpenMigration> selected, List<String> skipped) {
+    }
+
+    private MigrationChoices chooseMigrations(ParserResult parserResult, DialogService dialogService,
+                                              Map<PostOpenMigration, Boolean> applicability) {
+        List<PostOpenMigration> mandatoryMigrations = new ArrayList<>();
+        Map<PostOpenMigration, CheckBox> checkBoxes = new LinkedHashMap<>();
+
+        GridPane table = new GridPane(10, 10);
+        ColumnConstraints descriptionColumn = new ColumnConstraints();
+        descriptionColumn.setHgrow(Priority.ALWAYS);
+        ColumnConstraints performColumn = new ColumnConstraints();
+        performColumn.setHalignment(HPos.CENTER);
+        // Otherwise the long descriptions squeeze the column and its header wraps letter by letter
+        performColumn.setMinWidth(Region.USE_PREF_SIZE);
+        table.getColumnConstraints().addAll(descriptionColumn, performColumn);
+        table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
+        for (Map.Entry<PostOpenMigration, Boolean> row : applicability.entrySet()) {
+            PostOpenMigration migration = row.getKey();
+            Label description = wrappingLabel(migration.getDescription());
+            Node perform;
+            if (!row.getValue()) {
+                // Listed nevertheless, so the user sees that the library was checked for this format
+                perform = new Label(Localization.lang("(n/a)"));
+                description.getStyleClass().add("text-muted");
+                perform.getStyleClass().add("text-muted");
+            } else if (migration.isOptional()) {
+                CheckBox checkBox = new CheckBox();
+                checkBox.setSelected(true);
+                checkBox.setAccessibleText(migration.getDescription());
+                checkBoxes.put(migration, checkBox);
+                perform = checkBox;
+            } else {
+                mandatoryMigrations.add(migration);
+                perform = new Label(Localization.lang("always"));
+            }
+            table.addRow(table.getRowCount(), description, perform);
+        }
+
+        VBox content = new VBox(10);
+        content.setPrefWidth(600);
+        content.getChildren().add(wrappingLabel(Localization.lang("This library uses data formats of older JabRef versions.")));
+        content.getChildren().add(table);
+        if (!mandatoryMigrations.isEmpty()) {
+            content.getChildren().add(wrappingLabel(Localization.lang("Conversions marked with 'always' cannot be skipped, because JabRef no longer writes the old format.")));
+        }
+        if (!checkBoxes.isEmpty()) {
+            content.getChildren().add(wrappingLabel(Localization.lang("Deselected conversions are remembered in the library and not offered again.")));
+        }
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setContent(content);
+
+        ButtonType migrate = new ButtonType(Localization.lang("Migrate"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType keepAsIs = new ButtonType(Localization.lang("Keep as is"), ButtonBar.ButtonData.OTHER);
+        // Without an optional conversion there is nothing to keep
+        ButtonType[] buttons = checkBoxes.isEmpty() ? new ButtonType[] {migrate} : new ButtonType[] {migrate, keepAsIs, ButtonType.CANCEL};
+        String title = Localization.lang("Migration of %0", parserResult.getPath().map(Path::toString).orElse(""));
+        Optional<ButtonType> response = dialogService.showCustomDialogAndWait(title, dialogPane, buttons);
+        boolean migrateSelected = response.filter(migrate::equals).isPresent();
+        boolean keepSelected = response.filter(keepAsIs::equals).isPresent();
+
+        List<PostOpenMigration> selectedMigrations = new ArrayList<>(mandatoryMigrations);
+        List<String> skippedMigrations = new ArrayList<>(parserResult.getMetaData().getSkippedMigrations());
+        for (Map.Entry<PostOpenMigration, CheckBox> entry : checkBoxes.entrySet()) {
+            PostOpenMigration migration = entry.getKey();
+            if (migrateSelected && entry.getValue().isSelected()) {
+                selectedMigrations.add(migration);
+            } else if (migrateSelected || keepSelected) {
+                skippedMigrations.add(migration.getId());
+            }
+        }
+        return new MigrationChoices(selectedMigrations, skippedMigrations);
+    }
+
+    private void applyChoices(ParserResult parserResult, MigrationChoices choices) {
+        PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(parserResult, choices.selected());
+        // The declined conversions are part of the library, so the choice survives a reopen
+        if (!parserResult.getMetaData().getSkippedMigrations().equals(choices.skipped())) {
+            parserResult.getMetaData().setSkippedMigrations(choices.skipped());
+            parserResult.setChangedOnMigration(true);
+        }
+    }
+
+    static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+        return determineApplicability(parserResult, dialogService, preferences).entrySet().stream()
+                                                                               .filter(Map.Entry::getValue)
+                                                                               .map(Map.Entry::getKey)
+                                                                               .toList();
+    }
+
+    /// All migrations except the ones the user declined for this library
+    private static List<PostOpenMigration> getOfferedMigrations(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+        Character keywordSeparator = parserResult.getDatabaseContext().getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator());
+        List<String> skippedMigrations = parserResult.getMetaData().getSkippedMigrations();
+        return Stream.of(
+                             new ConvertLegacyExplicitGroups(),
+                             new ConvertMarkingToGroups(keywordSeparator),
+                             new SpecialFieldsToSeparateFields(keywordSeparator),
+                             new ConvertSearchGroupSyntax(dialogService))
+                     // A stored skip never silences a mandatory conversion: without it, saving would lose data
+                     .filter(migration -> !migration.isOptional() || !skippedMigrations.contains(migration.getId()))
+                     .toList();
+    }
+
+    private static Label wrappingLabel(String text) {
+        Label label = new Label(text);
+        label.setWrapText(true);
+        return label;
+    }
+
+    private static Label headerLabel(String text) {
+        Label label = wrappingLabel(text);
+        label.getStyleClass().add("bold");
+        return label;
+    }
+}

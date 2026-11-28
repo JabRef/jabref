@@ -636,6 +636,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         try {
             metaData.setEventPropagation(false);
             new MetaDataParser(fileMonitor).parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
+            if (!sharedMetaData.containsKey(MetaData.SKIPPED_MIGRATIONS) && !metaData.getSkippedMigrations().isEmpty()) {
+                metaData.setSkippedMigrations(List.of());
+            }
             // Groups that never reached the shared database (e.g., their write failed) are not a remote deletion
             if (containsGroupTree(lastSharedMetaData)
                     && !containsGroupTree(sharedMetaData)

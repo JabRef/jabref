@@ -826,11 +826,12 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void remoteGroupDeletionBeforeRestartIsAppliedLocally() throws Exception {
+    void remoteGroupAndMigrationChoiceDeletionBeforeRestartIsAppliedLocally() throws Exception {
         GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
         groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
         MetaData groupedMetaData = new MetaData();
         groupedMetaData.setGroups(groupRoot);
+        groupedMetaData.setSkippedMigrations(List.of("markings"));
         Map<String, String> groupedSnapshot = MetaDataSerializer.getSerializedStringMap(groupedMetaData, pattern);
         dbmsProcessor.setSharedMetaData(groupedSnapshot);
 
@@ -843,6 +844,7 @@ class DBMSSynchronizerTest {
 
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
         context.getMetaData().setGroups(groupRoot);
+        context.getMetaData().setSkippedMigrations(List.of("markings"));
         // Another client deletes the groups while this library is closed.
         dbmsProcessor.setSharedMetaData(Map.of("databaseType", "bibtex;"));
 
@@ -851,6 +853,7 @@ class DBMSSynchronizerTest {
         synchronizer.openSharedDatabase(connection);
         try {
             assertEquals(Optional.empty(), context.getMetaData().getGroups());
+            assertEquals(List.of(), context.getMetaData().getSkippedMigrations());
         } finally {
             synchronizer.closeSharedDatabase();
         }

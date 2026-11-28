@@ -75,7 +75,9 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
     public void start(Stage stage) {
         Localization.setLanguage(Language.ENGLISH);
 
-        preferences = mock(CliPreferences.class);
+        preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        // The migration dialog asks for the keyword separator when a library is opened
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         entryTypesManager = new BibEntryTypesManager();
         Injector.setModelOrService(CliPreferences.class, preferences);
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);

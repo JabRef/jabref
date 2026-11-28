@@ -43,7 +43,7 @@ public class DBMSProcessor {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
-    private static final Set<String> GROUP_TREE_METADATA_KEYS = Set.of(MetaData.GROUPSTREE, MetaData.GROUPSTREE_LEGACY);
+    private static final Set<String> REMOVABLE_METADATA_KEYS = Set.of(MetaData.GROUPSTREE, MetaData.GROUPSTREE_LEGACY, MetaData.SKIPPED_MIGRATIONS);
 
     // Arbitrary application-wide id serializing the one-time data migration across clients
     private static final long MIGRATION_ADVISORY_LOCK_ID = 11_879L;
@@ -644,20 +644,20 @@ public class DBMSProcessor {
                     statement.execute();
                 }
             }
-            removeObsoleteGroupTreeMetaData(data.keySet());
+            removeOmittedMetaData(data.keySet());
         });
     }
 
-    /// Removes group tree formats which are no longer present after a group update.
-    private void removeObsoleteGroupTreeMetaData(Set<String> currentMetaDataKeys) throws SQLException {
+    /// Deletes snapshot keys whose absence represents a deliberate clear.
+    private void removeOmittedMetaData(Set<String> currentMetaDataKeys) throws SQLException {
         try (PreparedStatement deleteStatement = connection.prepareStatement("DELETE FROM metadata WHERE key = ?");
              PreparedStatement notifyStatement = connection.prepareStatement("SELECT pg_notify(?, ?)")) {
-            for (String groupTreeKey : GROUP_TREE_METADATA_KEYS) {
-                if (!currentMetaDataKeys.contains(groupTreeKey)) {
-                    deleteStatement.setString(1, groupTreeKey);
+            for (String key : REMOVABLE_METADATA_KEYS) {
+                if (!currentMetaDataKeys.contains(key)) {
+                    deleteStatement.setString(1, key);
                     if (deleteStatement.executeUpdate() > 0) {
                         notifyStatement.setString(1, Notifier.METADATA_CHANNEL);
-                        notifyStatement.setString(2, groupTreeKey);
+                        notifyStatement.setString(2, key);
                         notifyStatement.execute();
                     }
                 }
