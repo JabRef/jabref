@@ -56,12 +56,7 @@ public class FieldEditors {
 
         final SuggestionProvider<?> suggestionProvider = getSuggestionProvider(field, suggestionProviders, databaseContext.getMetaData());
 
-        final FieldCheckers fieldCheckers = new FieldCheckers(
-                databaseContext,
-                preferences.getFilePreferences(),
-                journalAbbreviationRepository,
-                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex(),
-                preferences.getCitationKeyPatternPreferences().getUnwantedCharacters());
+        final FieldCheckers fieldCheckers = createFieldCheckers(databaseContext, journalAbbreviationRepository, preferences);
 
         boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
 
@@ -132,7 +127,18 @@ public class FieldEditors {
         }
     }
 
-    private static SuggestionProvider<?> getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {
+    public static FieldCheckers createFieldCheckers(BibDatabaseContext databaseContext,
+                                                    JournalAbbreviationRepository journalAbbreviationRepository,
+                                                    GuiPreferences preferences) {
+        return new FieldCheckers(
+                databaseContext,
+                preferences.getFilePreferences(),
+                journalAbbreviationRepository,
+                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex(),
+                preferences.getCitationKeyPatternPreferences().getUnwantedCharacters());
+    }
+
+    public static SuggestionProvider<?> getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {
         SuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(field);
 
         List<String> contentSelectorValues = metaData.getContentSelectorValuesForField(field);
