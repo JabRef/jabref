@@ -30,7 +30,8 @@ RBRACE : '}';
 fragment LETTER : ('a'..'z'|'A'..'Z'|'.'|'$');
 fragment NUMERAL : ('0'..'9');
 
-IDENTIFIER : LETTER (LETTER|NUMERAL|'_')*;
+// BibTeX allows '-' inside identifiers, e.g., the field `ctrl-article-title` of achemso.bst
+IDENTIFIER : LETTER (LETTER|NUMERAL|'_'|'-')*;
 INTEGER : '#' ('+'|'-')? NUMERAL+;
 QUOTED : '\'' IDENTIFIER;
 STRING : '"' (~('"'))* '"';

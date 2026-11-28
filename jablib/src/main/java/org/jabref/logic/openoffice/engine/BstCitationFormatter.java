@@ -26,7 +26,6 @@ import org.jspecify.annotations.NullMarked;
 final class BstCitationFormatter {
 
     private static final Pattern BIBITEM = Pattern.compile("\\\\bibitem(?:\\[(?<label>[^\\]]*)\\])?\\{(?<key>[^}]+)}");
-    private static final Pattern BIBLIOGRAPHY_END = Pattern.compile("\\\\end\\{thebibliography}");
 
     private BstCitationFormatter() {
     }
@@ -118,7 +117,7 @@ final class BstCitationFormatter {
         Map<String, BibItem> items = new LinkedHashMap<>();
         for (int i = 0; i < keys.size(); i++) {
             int end = i + 1 == keys.size() ? bibliography.length() : starts.get(i + 1);
-            String body = BIBLIOGRAPHY_END.matcher(bibliography.substring(ends.get(i), end)).replaceAll("").replace("\\newblock", " ").strip();
+            String body = BSTFormatUtils.stripBibliographyStructure(bibliography.substring(ends.get(i), end)).replace("\\newblock", " ").strip();
             String key = keys.get(i);
             items.putIfAbsent(key, new BibItem(key, Optional.ofNullable(labels.get(key)), body));
         }
