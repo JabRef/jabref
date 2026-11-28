@@ -104,6 +104,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where importing an invalid library file through the menu failed silently without showing error details. [#8625](https://github.com/JabRef/jabref/issues/8625)
 - We fixed an issue where filled and empty rating stars were hard to distinguish in dark and colored themes. [#17819](https://github.com/JabRef/jabref/issues/17819)
 - We fixed the `IfPlural` export formatter treating organizations containing “and” as multiple editors. [#17780](https://github.com/JabRef/jabref/issues/17780)
 - We fixed an issue where the DocBook export wrote invalid XML for emoji and some math symbols. [#17747](https://github.com/JabRef/jabref/issues/17747)
