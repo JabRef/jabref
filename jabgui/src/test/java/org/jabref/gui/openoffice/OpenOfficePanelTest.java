@@ -294,7 +294,7 @@ class OpenOfficePanelTest {
                 try (MockedConstruction<PreferencesDialogView> views = mockConstruction(PreferencesDialogView.class, (_, context) ->
                         assertEquals(List.of(OpenOfficeTab.class), context.arguments()))) {
                     MenuItem moreSettings = settings.getContextMenu().getItems().stream()
-                                                    .filter(item -> lang("More settings").equals(item.getText())).findFirst().orElseThrow();
+                                                    .filter(item -> lang("More options...").equals(item.getText())).findFirst().orElseThrow();
                     assertFalse(moreSettings.isDisable());
 
                     moreSettings.fire();
