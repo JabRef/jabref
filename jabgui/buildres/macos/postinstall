@@ -16,5 +16,10 @@ install -d /Library/Google/Chrome/NativeMessagingHosts/
 install -m0755 /Applications/JabRef.app/Contents/Resources/chromium/org.jabref.jabref.json /Library/Google/Chrome/NativeMessagingHosts/org.jabref.jabref.json
 install -d /Library/Microsoft/Edge/NativeMessagingHosts/
 install -m0755 /Applications/JabRef.app/Contents/Resources/chromium/org.jabref.jabref.json /Library/Microsoft/Edge/NativeMessagingHosts/org.jabref.jabref.json
+# Install the fulltext native-messaging host (jabext_bridge, launches jabext_host.py)
+install -m0755 /Applications/JabRef.app/Contents/Resources/native-messaging-host/firefox/jabext_bridge.json /Library/Application\ Support/Mozilla/NativeMessagingHosts/jabext_bridge.json
+install -m0755 /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/jabext_bridge.json /Library/Application\ Support/Chromium/NativeMessagingHosts/jabext_bridge.json
+install -m0755 /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/jabext_bridge.json /Library/Google/Chrome/NativeMessagingHosts/jabext_bridge.json
+install -m0755 /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/jabext_bridge.json /Library/Microsoft/Edge/NativeMessagingHosts/jabext_bridge.json
 
 exit 0
