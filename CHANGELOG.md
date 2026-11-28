@@ -15,6 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- The main table now keeps the selected group and search filters when deleting multiple entries at once. [#15587](https://github.com/JabRef/jabref/issues/15587)
 - We fixed an issue where BST entry previews showed italic and bold text as Unicode mathematical letters. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed an issue where the customized entry preview ignored small caps and showed LaTeX commands inside emphasized text. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed nested LaTeX formatting, spacing, and ampersand escaping in HTML output and JStyle bibliographies. [#17921](https://github.com/JabRef/jabref/pull/17921)
