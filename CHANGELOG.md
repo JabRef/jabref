@@ -15,6 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the ISO 690 author formatter corrupted author names and organization names. [#17782](https://github.com/JabRef/jabref/issues/17782)
 - We fixed an issue where BST entry previews showed italic and bold text as Unicode mathematical letters. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed an issue where the customized entry preview ignored small caps and showed LaTeX commands inside emphasized text. [#17902](https://github.com/JabRef/jabref/pull/17902)
 - We fixed nested LaTeX formatting, spacing, and ampersand escaping in HTML output and JStyle bibliographies. [#17921](https://github.com/JabRef/jabref/pull/17921)
