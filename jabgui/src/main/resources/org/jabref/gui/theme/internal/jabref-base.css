@@ -1324,7 +1324,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* The settings that depend on a tile's switch sit on a shaded band below its row, so they read as
    sub-options of that setting wherever they occur. */
 .preferences-dialog .setting-tile-details {
-    -fx-padding: 6 12 6 32;
+    -fx-padding: 0;
     -fx-background-color: -color-overlay-hover;
     -fx-background-radius: 0 0 6 6;
 }
@@ -1347,16 +1347,22 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0 16 0 16;
 }
 
-/* A tile inside a card or inside another tile's details is a plain row of it. */
-.preferences-dialog .setting-card .setting-tile-header,
-.preferences-dialog .setting-tile-details .setting-tile-header {
+/* A tile inside a card is a plain row of it. */
+.preferences-dialog .setting-card .setting-tile-header {
     -fx-min-height: 0;
-    -fx-padding: 4 0 4 0;
+    -fx-padding: 4 12 4 16;
 }
 
-.preferences-dialog .setting-card .setting-tile-header:hover,
-.preferences-dialog .setting-tile-details .setting-tile-header:hover {
-    -fx-background-color: transparent;
+/* The rows of a tile's details carry the band's indent themselves (the band has no padding), so
+   that a row's hover covers the band edge to edge, as for every other setting row. */
+.preferences-dialog .setting-tile-details .setting-tile-header {
+    -fx-min-height: 0;
+    -fx-padding: 4 12 4 32;
+    -fx-background-radius: 0;
+}
+
+.preferences-dialog .setting-tile-details .setting-card {
+    -fx-padding: 6 12 6 32;
 }
 
 /* A searchable combo box wraps a second combo box; its own padding around that makes it taller

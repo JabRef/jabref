@@ -666,11 +666,12 @@ public class PreferencesFormBuilder {
         return containers.element();
     }
 
-    /// Adds an element that is no setting tile. In a tile container it joins the current card, so
-    /// that consecutive labels, radios or custom nodes share one surface between the tiles.
+    /// Adds an element that is no setting tile. In a tile container or a tile's details it joins the
+    /// current card, so that consecutive labels, radios or custom nodes share one surface between
+    /// the tiles, indented like them.
     private void addNode(Node node) {
         Pane container = container();
-        if (!(container instanceof TileGroup)) {
+        if (!(container instanceof TileGroup || container.getParent() instanceof SettingTile)) {
             addToContainer(container, node);
             return;
         }

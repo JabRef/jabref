@@ -45,7 +45,8 @@ final class SettingTile extends VBox {
     private final VBox captions;
     private final HBox controls = new HBox(FormMetrics.GAP);
     private final HBox header;
-    private final VBox details = new VBox(FormMetrics.GAP);
+    /// No spacing: its rows touch, so that each row's hover covers the band edge to edge.
+    private final VBox details = new VBox();
     private final Node control;
 
     SettingTile(String titleText, Node control) {
