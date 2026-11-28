@@ -1,7 +1,5 @@
 package org.jabref.gui.frame;
 
-import java.util.function.BooleanSupplier;
-
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
@@ -31,7 +29,6 @@ import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.whatsnew.WhatsNewButton;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -61,7 +58,6 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand forwardCommand;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private final BooleanSupplier quit;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -80,8 +76,7 @@ public class MainToolBar extends ToolBar {
                        ClipBoardManager clipBoardManager,
                        JournalAbbreviationRepository journalAbbreviationRepository,
                        GitHandlerRegistry gitHandlerRegistry,
-                       NativeDesktop nativeDesktop,
-                       BooleanSupplier quit) {
+                       NativeDesktop nativeDesktop) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -96,7 +91,6 @@ public class MainToolBar extends ToolBar {
         this.clipBoardManager = clipBoardManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.gitHandlerRegistry = gitHandlerRegistry;
-        this.quit = quit;
 
         createToolBar();
     }
@@ -166,7 +160,8 @@ public class MainToolBar extends ToolBar {
 
                 new Separator(Orientation.VERTICAL),
 
-                projectLinks(factory));
+                new HBox(
+                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, nativeDesktop))));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
@@ -175,15 +170,6 @@ public class MainToolBar extends ToolBar {
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
 
         getStyleClass().add("mainToolbar");
-    }
-
-    /// The GitHub link and, only while JabRef runs out of a git checkout, the "What's new" button before it.
-    private HBox projectLinks(ActionFactory factory) {
-        HBox links = new HBox(
-                factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, nativeDesktop)));
-        WhatsNewButton.create(factory, taskExecutor, dialogService, nativeDesktop, gitHandlerRegistry, quit)
-                      .ifPresent(links.getChildren()::addFirst);
-        return links;
     }
 
     private void initNavigationCommands() {
