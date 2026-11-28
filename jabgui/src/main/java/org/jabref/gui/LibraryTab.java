@@ -424,10 +424,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         text.append(Localization.lang("The library has been modified."));
     }
 
-    private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+    /// Appends the library name, mode, and description (if set) to the tooltip.
+    private static void addLibraryNameAndDescription(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         String mode = bibDatabaseContext.getMode().getFormattedName();
-        String modeInfo = "\n%s".formatted(Localization.lang("%0 mode", mode));
-        text.append(modeInfo);
+
+        bibDatabaseContext.getMetaData().getLibraryName()
+                          .filter(name -> !name.isBlank())
+                          .ifPresentOrElse(
+                                  name -> text.append(name).append(" (").append(mode).append(')'),
+                                  () -> text.append(Localization.lang("%0 mode", mode))
+                          );
+
+        bibDatabaseContext.getMetaData().getLibraryDescription().ifPresent(description ->
+                text.append('\n').append(description));
     }
 
     /// Returns an index for a new untitled library to generate names like "untitled (1)", "untitled (2)", etc.
@@ -605,6 +614,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
     ///
     /// Example: *jabref-authors.bib – testbib
+    // [impl->req~ux.library-name.tab-label~1]
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();
 
@@ -621,21 +631,36 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
 
             Path databasePath = file.get();
-            tabTitle.append(databasePath.getFileName().toString());
-            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
-            // Unicode codepoint deliberately chosen to avoid semantical confusion
-            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
-            toolTipText.append(databasePath.toAbsolutePath());
 
+            Optional<String> libraryName = bibDatabaseContext.getMetaData().getLibraryName()
+                                                             .filter(name -> !name.isBlank());
+
+            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(
+                    stateManager.getAllDatabasePaths(), databasePath);
+
+            StringBuilder fileTitle = new StringBuilder(databasePath.getFileName().toString());
+            uniquePathPart.ifPresent(part -> fileTitle.append(" \u2013 ").append(part));
+
+            libraryName.ifPresentOrElse(
+                    name -> tabTitle.append(name).append(" (").append(fileTitle).append(')'),
+                    () -> tabTitle.append(fileTitle)
+            );
+
+            // Tooltip: library name, mode and description
+            addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
+
+            // Tooltip: absolute file path
+            toolTipText.append('\n')
+                       .append(Localization.lang("Path: %0", databasePath.toAbsolutePath()));
+
+            // Preserve shared database information
             if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
+
                 toolTipText.append(' ');
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
-
-            // Database mode
-            addModeInfo(toolTipText, bibDatabaseContext);
 
             // Changed information (tooltip)
             if (isChanged && !isAutosaveEnabled) {
@@ -645,16 +670,25 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append('*');
                 int untitledNumber = getUntitledLibraryNumber();
-                if (untitledNumber > 0) {
-                    tabTitle.append(Localization.lang("untitled (%0)", Integer.toString(untitledNumber)));
-                } else {
-                    tabTitle.append(Localization.lang("untitled"));
-                }
+
+                bibDatabaseContext.getMetaData().getLibraryName()
+                                  .filter(name -> !name.isBlank())
+                                  .ifPresentOrElse(
+                                          tabTitle::append,
+                                          () -> {
+                                              if (untitledNumber > 0) {
+                                                  tabTitle.append(Localization.lang("untitled (%0)", Integer.toString(untitledNumber)));
+                                              } else {
+                                                  tabTitle.append(Localization.lang("untitled"));
+                                              }
+                                          }
+                                  );
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
-            addModeInfo(toolTipText, bibDatabaseContext);
+
+            addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
             if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText);
             }

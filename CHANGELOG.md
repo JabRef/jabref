@@ -68,6 +68,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Settings → More settings" in the LibreOffice/OpenOffice panel to open JabRef's integration preferences without connecting a document. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added citation refresh in LibreOffice/OpenOffice for CSL styles that do not generate bibliographies. [#17673](https://github.com/JabRef/jabref/pull/17673)
 - We added entry details on hover to the JabRef language server, which now also reads `bibliography:` from Markdown front matter. [#17302](https://github.com/JabRef/jabref/pull/17302)
+- We added an optional library name and description, shown in the library tab title and tooltip. [#17473](https://github.com/JabRef/jabref/issues/17473)
 
 ### Changed
 

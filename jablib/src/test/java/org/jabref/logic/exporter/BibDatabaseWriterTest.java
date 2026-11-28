@@ -1069,6 +1069,19 @@ class BibDatabaseWriterTest {
     }
 
     @Test
+    void roundtripPreservesLibraryNameAndDescriptionWithBraces() throws IOException {
+        metaData.setLibraryName("Draft {v2");
+        metaData.setLibraryDescription("Notes}; with semicolon");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+
+        assertEquals("Draft {v2", parsed.getMetaData().getLibraryName().orElseThrow());
+        assertEquals("Notes}; with semicolon", parsed.getMetaData().getLibraryDescription().orElseThrow());
+    }
+
+    @Test
     void saveAlsoSavesSecondModification() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
