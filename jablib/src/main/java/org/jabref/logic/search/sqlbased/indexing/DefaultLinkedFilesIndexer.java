@@ -43,7 +43,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.ThreadInterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -322,30 +321,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
     }
 
-    private void optimizeIndex() {
-        LOGGER.debug("Optimizing index");
-        if (indexWriter.hasDeletions()) {
-            try {
-                LOGGER.debug("Forcing merge deletes");
-                indexWriter.forceMergeDeletes(true);
-            } catch (IOException e) {
-                LOGGER.warn("Could not force merge deletes.", e);
-            } catch (ThreadInterruptedException _) {
-                LOGGER.debug("Interrupted optimization of index while forcing merge.");
-                Thread.currentThread().interrupt();
-            }
-        }
-        try {
-            LOGGER.debug("Forcing merge segments to 1 segment");
-            indexWriter.forceMerge(1, true);
-        } catch (IOException e) {
-            LOGGER.warn("Could not force merge segments.", e);
-        } catch (ThreadInterruptedException _) {
-            LOGGER.debug("Interrupted optimization of index.");
-            Thread.currentThread().interrupt();
-        }
-    }
-
     @Override
     public SearcherManager getSearcherManager() {
         return searcherManager;
@@ -361,11 +336,11 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
     }
 
+    // [impl->req~search.fulltext.close-without-forced-merge~1]
     private void closeIndex() {
         try {
             LOGGER.debug("Closing linked files index");
             searcherManager.close();
-            optimizeIndex();
             indexWriter.close();
             indexDirectory.close();
             LOGGER.debug("Linked files index closed");

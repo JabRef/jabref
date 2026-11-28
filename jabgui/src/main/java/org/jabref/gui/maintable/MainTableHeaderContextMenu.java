@@ -19,7 +19,6 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preferences.table.TableTab;
-import org.jabref.logic.l10n.Localization;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
 
@@ -99,7 +98,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         this.getItems().add(new SeparatorMenuItem());
         ActionFactory actionfactory = new ActionFactory();
         MenuItem showMoreItem = actionfactory.createMenuItem(
-                StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
+                StandardActions.PREFERENCES_CONTEXT,
                 new ShowPreferencesAction(tabContainer, TableTab.class, dialogService));
         this.getItems().add(showMoreItem);
     }

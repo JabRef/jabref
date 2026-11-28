@@ -215,7 +215,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame, dialogService)),
+                factory.createMenuItem(StandardActions.PREFERENCES_SHOW, new ShowPreferencesAction(frame, dialogService)),
 
                 new SeparatorMenuItem(),
 

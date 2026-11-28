@@ -7,8 +7,6 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
-import org.jspecify.annotations.NonNull;
-
 public enum StandardActions implements Action {
 
     COPY_TO(Localization.lang("Copy to")),
@@ -138,7 +136,8 @@ public enum StandardActions implements Action {
     SETUP_GENERAL_FIELDS(Localization.lang("Set up general fields")),
     MANAGE_PROTECTED_TERMS(Localization.lang("Manage protected terms")),
     CITATION_KEY_PATTERN(Localization.lang("Citation key patterns")),
-    SHOW_PREFS(Localization.lang("Preferences"), IconTheme.JabRefIcons.PREFERENCES, KeyBinding.SHOW_PREFS),
+    PREFERENCES_SHOW(Localization.lang("Preferences"), IconTheme.JabRefIcons.PREFERENCES, KeyBinding.SHOW_PREFS),
+    PREFERENCES_CONTEXT(Localization.lang("More options..."), IconTheme.JabRefIcons.PREFERENCES),
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize keyboard shortcuts"), IconTheme.JabRefIcons.KEY_BINDINGS),
     EDIT_ENTRY(Localization.lang("Open entry editor"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.OPEN_CLOSE_ENTRY_EDITOR),
     SHOW_PDF_VIEWER(Localization.lang("Open document viewer"), IconTheme.JabRefIcons.PDF_FILE),
@@ -246,7 +245,7 @@ public enum StandardActions implements Action {
     CITE_DRIVE_LOGIN(Localization.lang("Login...")), // "Authorize" would be the more technical term here.
     CITE_DRIVE_PUSH(Localization.lang("Push to CiteDrive"));
 
-    private String text;
+    private final String text;
     private final String description;
     private final Optional<JabRefIcon> icon;
     private final Optional<KeyBinding> keyBinding;
@@ -322,10 +321,5 @@ public enum StandardActions implements Action {
     @Override
     public String getDescription() {
         return description;
-    }
-
-    public Action withText(@NonNull String text) {
-        this.text = text;
-        return this;
     }
 }
