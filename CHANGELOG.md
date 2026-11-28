@@ -13,6 +13,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed the main table to keep the entry shown in the entry editor visible when enlarging the entry editor. [#17167](https://github.com/JabRef/jabref/pull/17167)
+
 ### Fixed
 
 - We fixed an issue where BST entry previews showed italic and bold text as Unicode mathematical letters. [#17902](https://github.com/JabRef/jabref/pull/17902)
