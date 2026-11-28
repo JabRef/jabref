@@ -1,4 +1,4 @@
-package org.jabref.logic.journals.ltwa;
+package org.jabref.logic.util.strings;
 
 import java.text.Normalizer;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
-import org.jabref.logic.journals.ltwa.NormalizeUtils;
+import org.jabref.logic.util.strings.NormalizeUtils;
 import org.jabref.logic.layout.LayoutFormatter;
 
 /// Formatter that returns the first page from the "pages" field, if set.

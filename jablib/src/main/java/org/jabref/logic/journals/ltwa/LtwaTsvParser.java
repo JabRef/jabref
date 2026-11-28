@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.util.strings.NormalizeUtils;
+
 import static java.util.function.Predicate.not;
 
 /// Parser for the LTWA (List of Title Word Abbreviations) CSV file.

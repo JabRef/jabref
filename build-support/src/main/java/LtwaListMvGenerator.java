@@ -26,6 +26,7 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/FallbackExceptionHandler.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/HeadlessExecutorService.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/TaskExecutor.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/NormalizeUtils.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
 
 //SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
@@ -39,8 +40,8 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.journals.ltwa.LtwaEntry;
 import org.jabref.logic.journals.ltwa.LtwaTsvParser;
-import org.jabref.logic.journals.ltwa.NormalizeUtils;
 import org.jabref.logic.journals.ltwa.PrefixTree;
+import org.jabref.logic.util.strings.NormalizeUtils;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
