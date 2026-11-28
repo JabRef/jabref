@@ -11,6 +11,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -95,6 +96,19 @@ public class MetaDataParserTest {
         MetaData expected = new MetaData();
         FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         expected.setSaveActions(fieldFormatterCleanupActions);
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    void saveActionsWithProtectTerms() throws ParseException {
+        Map<String, String> data = Map.of("saveActions", "enabled;title[protect_terms]");
+        MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
+
+        MetaData expected = new MetaData();
+        expected.setSaveActions(new FieldFormatterCleanupActions(
+                true,
+                List.of(new FieldFormatterCleanup(StandardField.TITLE, new ProtectTermsFormatter()))));
         assertEquals(expected, parsed);
     }
 

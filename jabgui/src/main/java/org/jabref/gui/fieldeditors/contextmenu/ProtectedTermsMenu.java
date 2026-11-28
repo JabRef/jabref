@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors.contextmenu;
 import java.util.Optional;
 
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputControl;
 
@@ -24,7 +23,7 @@ import org.jspecify.annotations.NonNull;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static Formatter FORMATTER;
+    private final Formatter formatter;
     private final TextInputControl textInputControl;
     private final ActionFactory factory = new ActionFactory();
 
@@ -99,7 +98,7 @@ class ProtectedTermsMenu extends Menu {
 
         @Override
         public void execute() {
-            textInputControl.setText(FORMATTER.format(textInputControl.getText()));
+            textInputControl.setText(formatter.format(textInputControl.getText()));
         }
     }
 
@@ -134,30 +133,50 @@ class ProtectedTermsMenu extends Menu {
         }
     }
 
+    private static final class DisabledCommand extends SimpleCommand {
+        DisabledCommand() {
+            this.executable.set(false);
+        }
+
+        @Override
+        public void execute() {
+            // Disabled placeholder item
+        }
+    }
+
     public ProtectedTermsMenu(final TextInputControl textInputControl) {
         super(Localization.lang("Protect terms"));
         this.textInputControl = textInputControl;
-        FORMATTER = new ProtectTermsFormatter(Injector.instantiateModelOrService(ProtectedTermsLoader.class));
+        ProtectedTermsLoader loader = Injector.instantiateModelOrService(ProtectedTermsLoader.class);
+        this.formatter = new ProtectTermsFormatter(loader);
 
         getItems().addAll(factory.createMenuItem(protectSelectionActionInformation, new ProtectSelectionAction()),
-                getExternalFilesMenu(),
+                getExternalFilesMenu(loader),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(() -> Localization.lang("Format field"), new FormatFieldAction()),
                 factory.createMenuItem(unprotectSelectionActionInformation, new UnprotectSelectionAction()));
     }
 
-    private Menu getExternalFilesMenu() {
+    private Menu getExternalFilesMenu(ProtectedTermsLoader loader) {
         Menu protectedTermsMenu = factory.createSubMenu(() -> Localization.lang("Add selected text to list"));
-        ProtectedTermsLoader loader = Injector.instantiateModelOrService(ProtectedTermsLoader.class);
         loader.getProtectedTermsLists().stream()
               .filter(list -> !list.isInternalList())
               .forEach(list -> protectedTermsMenu.getItems().add(
                       factory.createMenuItem(list::getDescription, new AddToProtectedTermsAction(list))));
 
         if (protectedTermsMenu.getItems().isEmpty()) {
-            MenuItem emptyItem = new MenuItem(Localization.lang("No list enabled"));
-            emptyItem.setDisable(true);
-            protectedTermsMenu.getItems().add(emptyItem);
+            Action noListEnabledAction = new Action() {
+                @Override
+                public String getText() {
+                    return Localization.lang("No list enabled");
+                }
+
+                @Override
+                public String getDescription() {
+                    return Localization.lang("Please create a user-defined list (Preferences > Protected Terms Files)");
+                }
+            };
+            protectedTermsMenu.getItems().add(factory.createMenuItem(noListEnabledAction, new DisabledCommand()));
         }
 
         return protectedTermsMenu;

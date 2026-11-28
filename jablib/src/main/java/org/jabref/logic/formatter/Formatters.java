@@ -39,6 +39,7 @@ import org.jabref.logic.formatter.casechanger.CamelFormatter;
 import org.jabref.logic.formatter.casechanger.CamelNFormatter;
 import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.formatter.casechanger.ShortTitleFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
@@ -110,6 +111,7 @@ public class Formatters {
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
                 new ReplaceUnicodeLigaturesFormatter(),
+                new ProtectTermsFormatter(),
                 new UnprotectTermsFormatter()
         );
     }

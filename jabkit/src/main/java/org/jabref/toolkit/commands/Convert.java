@@ -1,11 +1,13 @@
 package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jabref.toolkit.exception.ExportServiceException;
 import org.jabref.toolkit.exception.ImportServiceException;
@@ -49,7 +51,11 @@ class Convert implements Callable<Integer> {
         boolean writeToStdOut = outputFile == null;
         ParserResult parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain || writeToStdOut);
 
-        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.getDatabase().getEntries());
+        ProtectedTermsLoader protectedTermsLoader = Optional
+                .ofNullable(jabKit.cliPreferences.getProtectedTermsPreferences())
+                .map(ProtectedTermsLoader::new)
+                .orElse(null);
+        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.getDatabase().getEntries(), protectedTermsLoader);
 
         ExportService exportService = ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain || writeToStdOut);
 

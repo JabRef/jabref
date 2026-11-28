@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,9 +33,11 @@ import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
+import org.jabref.logic.cleanup.ProtectedTermsLoaderAware;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -77,6 +80,7 @@ public class BibDatabaseWriter {
     protected final FieldPreferences fieldPreferences;
 
     @Nullable private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Nullable private Supplier<ProtectedTermsLoader> protectedTermsLoaderSupplier;
     private boolean useFJournalField;
     private Consumer<Runnable> mutationScheduler = Runnable::run;
 
@@ -106,19 +110,26 @@ public class BibDatabaseWriter {
                 preferences.getFieldPreferences(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getCustomEntryTypesRepository());
+        Optional.ofNullable(preferences.getProtectedTermsPreferences())
+                .ifPresent(terms -> withProtectedTermsLoader(() -> new ProtectedTermsLoader(terms)));
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange,
                                                       MetaData metaData,
                                                       FieldPreferences fieldPreferences,
+                                                      @Nullable Supplier<ProtectedTermsLoader> protectedTermsLoaderSupplier,
                                                       Consumer<Runnable> mutationScheduler) {
         List<FieldChange> changes = new ArrayList<>();
 
         Optional<FieldFormatterCleanupActions> saveActions = metaData.getSaveActions();
         saveActions.ifPresent(actions -> {
-            // save actions defined -> apply for every entry
-            for (BibEntry entry : toChange) {
-                changes.addAll(actions.applySaveActions(entry, metaData.getKeywordSeparator().orElse(null), mutationScheduler));
+            if (actions.isEnabled() && !toChange.isEmpty()) {
+                ProtectedTermsLoader protectedTermsLoader = resolveProtectedTermsLoader(actions, protectedTermsLoaderSupplier);
+                Character keywordSeparator = metaData.getKeywordSeparator().orElse(null);
+                // save actions defined -> apply for every entry
+                for (BibEntry entry : toChange) {
+                    changes.addAll(actions.applySaveActions(entry, keywordSeparator, protectedTermsLoader, mutationScheduler));
+                }
             }
         });
 
@@ -137,7 +148,16 @@ public class BibDatabaseWriter {
     }
 
     public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData, FieldPreferences fieldPreferences) {
-        return applySaveActions(List.of(entry), metaData, fieldPreferences, Runnable::run);
+        return applySaveActions(List.of(entry), metaData, fieldPreferences, null, Runnable::run);
+    }
+
+    private static @Nullable ProtectedTermsLoader resolveProtectedTermsLoader(FieldFormatterCleanupActions actions,
+                                                                              @Nullable Supplier<ProtectedTermsLoader> protectedTermsLoaderSupplier) {
+        boolean needsProtectedTerms = actions.getConfiguredActions().stream().anyMatch(action -> action.getFormatter() instanceof ProtectedTermsLoaderAware);
+        if (!needsProtectedTerms) {
+            return null;
+        }
+        return Optional.ofNullable(protectedTermsLoaderSupplier).map(Supplier::get).orElse(null);
     }
 
     private static List<Comparator<BibEntry>> getSaveComparators(SaveOrder saveOrder) {
@@ -185,6 +205,16 @@ public class BibDatabaseWriter {
         return this;
     }
 
+    public BibDatabaseWriter withProtectedTermsLoader(@NonNull ProtectedTermsLoader protectedTermsLoader) {
+        this.protectedTermsLoaderSupplier = () -> protectedTermsLoader;
+        return this;
+    }
+
+    public BibDatabaseWriter withProtectedTermsLoader(@NonNull Supplier<ProtectedTermsLoader> protectedTermsLoaderSupplier) {
+        this.protectedTermsLoaderSupplier = protectedTermsLoaderSupplier;
+        return this;
+    }
+
     /// Routes [BibEntry] field mutations performed while saving to the correct thread.
     /// The scheduler must execute each mutation synchronously so the written file contains it.
     public BibDatabaseWriter withMutationScheduler(Consumer<Runnable> mutationScheduler) {
@@ -227,7 +257,7 @@ public class BibDatabaseWriter {
 
         // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
         //        The cleanup should be done before the write operation
-        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences, mutationScheduler);
+        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences, protectedTermsLoaderSupplier, mutationScheduler);
         saveActionsFieldChanges.addAll(saveActionChanges);
 
         if (journalAbbreviationRepository != null && saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {

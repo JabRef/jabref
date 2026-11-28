@@ -28,6 +28,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -163,6 +164,8 @@ public class ExportService {
                     }
                 }
             };
+            Optional.ofNullable(cliPreferences.getProtectedTermsPreferences())
+                    .ifPresent(terms -> databaseWriter.withProtectedTermsLoader(() -> new ProtectedTermsLoader(terms)));
             databaseWriter.writePartOfDatabase(bibDatabaseContext, entries.stream().filter(entry -> !entry.isEmpty()).toList());
 
             // Show just a warning message if encoding did not work for all characters:

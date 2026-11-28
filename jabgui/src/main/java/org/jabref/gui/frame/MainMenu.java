@@ -94,6 +94,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -202,7 +203,7 @@ public class MainMenu extends MenuBar {
 
                 // region: Sharing of the library
                 factory.createSubMenu(StandardActions.GIT,
-                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, journalAbbreviationRepository, taskExecutor, gitHandlerRegistry, nativeDesktop)),
+                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, journalAbbreviationRepository, taskExecutor, gitHandlerRegistry, nativeDesktop, Injector.instantiateModelOrService(ProtectedTermsLoader.class))),
                         factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry, nativeDesktop)),
                         factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),
                         new SeparatorMenuItem(),

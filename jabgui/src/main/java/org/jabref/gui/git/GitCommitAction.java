@@ -24,6 +24,7 @@ import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -48,6 +49,7 @@ public class GitCommitAction extends SimpleCommand {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final @Nullable ProtectedTermsLoader protectedTermsLoader;
 
     public GitCommitAction(Supplier<@Nullable LibraryTab> tabSupplier,
                            DialogService dialogService,
@@ -58,6 +60,28 @@ public class GitCommitAction extends SimpleCommand {
                            TaskExecutor taskExecutor,
                            GitHandlerRegistry gitHandlerRegistry,
                            NativeDesktop nativeDesktop) {
+        this(tabSupplier,
+                dialogService,
+                stateManager,
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository,
+                taskExecutor,
+                gitHandlerRegistry,
+                nativeDesktop,
+                null);
+    }
+
+    public GitCommitAction(Supplier<@Nullable LibraryTab> tabSupplier,
+                           DialogService dialogService,
+                           StateManager stateManager,
+                           GuiPreferences preferences,
+                           BibEntryTypesManager entryTypesManager,
+                           JournalAbbreviationRepository journalAbbreviationRepository,
+                           TaskExecutor taskExecutor,
+                           GitHandlerRegistry gitHandlerRegistry,
+                           NativeDesktop nativeDesktop,
+                           @Nullable ProtectedTermsLoader protectedTermsLoader) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -67,6 +91,7 @@ public class GitCommitAction extends SimpleCommand {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.protectedTermsLoader = protectedTermsLoader;
 
         this.executable.bind(ActionHelper.needsSavedLocalDatabase(stateManager));
     }
@@ -183,7 +208,8 @@ public class GitCommitAction extends SimpleCommand {
                 journalAbbreviationRepository,
                 gitHandlerRegistry,
                 taskExecutor,
-                nativeDesktop).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
+                nativeDesktop,
+                protectedTermsLoader).saveWithoutGitAutoCommit(SaveDatabaseMode.NORMAL);
         if (saveResult == SaveResult.ALREADY_SAVING) {
             // A save is still running (e.g. autosave), so the file on disk is not yet what the user sees.
             dialogService.notify(Localization.lang("The library is currently being saved. Please try again."));

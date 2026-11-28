@@ -24,6 +24,7 @@ import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -32,6 +33,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.undo.CompoundEdit;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -55,6 +57,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
+    @Nullable
+    private final ProtectedTermsLoader protectedTermsLoader;
+
     private final ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
 
@@ -69,6 +74,30 @@ public class CleanupDialogViewModel extends AbstractViewModel {
             @Nullable TaskExecutor taskExecutor,
             JournalAbbreviationRepository journalAbbreviationRepository
     ) {
+        this(
+                databaseContext,
+                preferences,
+                dialogService,
+                stateManager,
+                undoManager,
+                tabSupplier,
+                taskExecutor,
+                journalAbbreviationRepository,
+                Injector.instantiateModelOrService(ProtectedTermsLoader.class)
+        );
+    }
+
+    public CleanupDialogViewModel(
+            BibDatabaseContext databaseContext,
+            CliPreferences preferences,
+            DialogService dialogService,
+            StateManager stateManager,
+            UndoManager undoManager,
+            @Nullable Supplier<LibraryTab> tabSupplier,
+            @Nullable TaskExecutor taskExecutor,
+            JournalAbbreviationRepository journalAbbreviationRepository,
+            @Nullable ProtectedTermsLoader protectedTermsLoader
+    ) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -77,6 +106,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         this.tabSupplier = tabSupplier;
         this.taskExecutor = taskExecutor;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.protectedTermsLoader = protectedTermsLoader;
     }
 
     public void setTargetEntries(List<BibEntry> entries) {
@@ -167,7 +197,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
                 preferences.getAbbreviationPreferences().shouldUseFJournalField(),
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                protectedTermsLoader
         );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);

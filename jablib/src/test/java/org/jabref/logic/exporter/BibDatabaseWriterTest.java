@@ -29,7 +29,11 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.protectedterms.ProtectedTermsList;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -1185,5 +1189,78 @@ class BibDatabaseWriterTest {
 
         // returns tu original entry, not to the last saved one
         assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void writeDatabaseAppliesProtectTermsSaveActionWithBoundLoader(@TempDir Path tempDir) throws IOException {
+        ProtectedTermsLoader liveLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(List.of(), List.of(), ProtectedTermsLoader.getInternalLists(), List.of()));
+        ProtectedTermsList customList = liveLoader.addNewProtectedTermsList(
+                "CustomSave", tempDir.resolve("save.terms").toString(), true);
+        customList.addProtectedTerm("CustomSaveTerm");
+
+        metaData.setSaveActions(MetaDataParser.fieldFormatterCleanupsParse(List.of("enabled", "title[protect_terms]")));
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, "In CustomSaveTerm");
+        database.insertEntry(entry);
+
+        databaseWriter.withProtectedTermsLoader(liveLoader);
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("In {CustomSaveTerm}", entry.getField(StandardField.TITLE).orElseThrow());
+    }
+
+    @Test
+    void writeDatabaseResolvesProtectedTermsSupplierLazily(@TempDir Path tempDir) throws IOException {
+        ProtectedTermsLoader liveLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(List.of(), List.of(), ProtectedTermsLoader.getInternalLists(), List.of()));
+        ProtectedTermsList customList = liveLoader.addNewProtectedTermsList(
+                "CustomLazy", tempDir.resolve("lazy.terms").toString(), true);
+        customList.addProtectedTerm("CustomLazyTerm");
+
+        AtomicInteger loaderInvocations = new AtomicInteger();
+        databaseWriter.withProtectedTermsLoader(() -> {
+            loaderInvocations.incrementAndGet();
+            return liveLoader;
+        });
+
+        metaData.setSaveActions(MetaDataParser.fieldFormatterCleanupsParse(List.of("enabled", "title[lower_case]")));
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("lazy1")
+                .withField(StandardField.TITLE, "In CustomLazyTerm");
+        database.insertEntry(entry);
+
+        databaseWriter.writeDatabase(bibtexContext);
+        assertEquals(0, loaderInvocations.get());
+
+        BibDatabase secondDatabase = new BibDatabase();
+        MetaData secondMetaData = new MetaData();
+        secondMetaData.setSaveActions(MetaDataParser.fieldFormatterCleanupsParse(List.of("enabled", "title[protect_terms]")));
+        BibDatabaseContext secondContext = new BibDatabaseContext(secondDatabase, secondMetaData);
+        BibEntry firstProtected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("lazy2")
+                .withField(StandardField.TITLE, "First CustomLazyTerm");
+        BibEntry secondProtected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("lazy3")
+                .withField(StandardField.TITLE, "Second CustomLazyTerm");
+        secondDatabase.insertEntry(firstProtected);
+        secondDatabase.insertEntry(secondProtected);
+
+        BibDatabaseWriter secondWriter = new BibDatabaseWriter(
+                new BibWriter(new StringWriter(), OS.NEWLINE),
+                saveConfiguration,
+                fieldPreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager)
+                .withProtectedTermsLoader(() -> {
+                    loaderInvocations.incrementAndGet();
+                    return liveLoader;
+                });
+        secondWriter.writeDatabase(secondContext);
+
+        assertEquals(1, loaderInvocations.get());
+        assertEquals("First {CustomLazyTerm}", firstProtected.getField(StandardField.TITLE).orElseThrow());
+        assertEquals("Second {CustomLazyTerm}", secondProtected.getField(StandardField.TITLE).orElseThrow());
     }
 }

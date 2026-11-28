@@ -16,6 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import javafx.scene.control.TableColumn;
 
@@ -27,6 +28,8 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -41,6 +44,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +82,7 @@ public class BackupManager {
     private final ScheduledThreadPoolExecutor executor;
     private final BibEntryTypesManager entryTypesManager;
     private final LibraryTab libraryTab;
+    private final Optional<Supplier<ProtectedTermsLoader>> protectedTermsLoaderSupplier;
 
     // Contains a list of all backup paths
     // During writing, the less recent backup file is deleted
@@ -86,12 +91,29 @@ public class BackupManager {
     private final AtomicLong changeGeneration = new AtomicLong();
 
     BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
+        this(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences, null);
+    }
+
+    BackupManager(LibraryTab libraryTab,
+                  BibDatabaseContext bibDatabaseContext,
+                  CoarseChangeFilter coarseChangeFilter,
+                  BibEntryTypesManager entryTypesManager,
+                  CliPreferences preferences,
+                  @Nullable ProtectedTermsLoader protectedTermsLoader) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.coarseChangeFilter = coarseChangeFilter;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.executor = new ScheduledThreadPoolExecutor(2);
         this.libraryTab = libraryTab;
+        this.protectedTermsLoaderSupplier = createProtectedTermsLoaderSupplier(preferences, protectedTermsLoader);
+    }
+
+    private static Optional<Supplier<ProtectedTermsLoader>> createProtectedTermsLoaderSupplier(CliPreferences preferences,
+                                                                                               @Nullable ProtectedTermsLoader loader) {
+        Optional<ProtectedTermsPreferences> termsPreferences = Optional.ofNullable(preferences.getProtectedTermsPreferences());
+        Optional<Supplier<ProtectedTermsLoader>> direct = Optional.ofNullable(loader).map(value -> () -> value);
+        return direct.or(() -> termsPreferences.map(terms -> () -> new ProtectedTermsLoader(terms)));
     }
 
     /// Determines the most recent backup file name
@@ -111,7 +133,16 @@ public class BackupManager {
     ///
     /// @param bibDatabaseContext Associated [BibDatabaseContext]
     public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
-        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences);
+        return start(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences, null);
+    }
+
+    public static BackupManager start(LibraryTab libraryTab,
+                                      BibDatabaseContext bibDatabaseContext,
+                                      CoarseChangeFilter coarseChangeFilter,
+                                      BibEntryTypesManager entryTypesManager,
+                                      CliPreferences preferences,
+                                      @Nullable ProtectedTermsLoader protectedTermsLoader) {
+        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences, protectedTermsLoader);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         coarseChangeFilter.registerListener(backupManager);
         RUNNING_INSTANCES.add(backupManager);
@@ -286,14 +317,15 @@ public class BackupManager {
         try (AtomicFileWriter writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             try {
-                new BibDatabaseWriter(
+                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
                         preferences.getFieldPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager)
-                        // we save the clone to prevent the original database (and thus the UI) from being changed
-                        .writeDatabase(bibDatabaseContextClone);
+                        entryTypesManager);
+                protectedTermsLoaderSupplier.ifPresent(databaseWriter::withProtectedTermsLoader);
+                // we save the clone to prevent the original database (and thus the UI) from being changed
+                databaseWriter.writeDatabase(bibDatabaseContextClone);
                 // [impl->req~jabgui.autosaveandbackup.complete-backup~1]
             } catch (IOException e) {
                 writer.abort();

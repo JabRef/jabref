@@ -21,6 +21,7 @@ import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -395,5 +396,36 @@ class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         assertEquals(Optional.of("01"), entry.getField(StandardField.MONTH));
+    }
+
+    @Test
+    void cleanupWithParsedProtectTermsActionUsesBoundLoader(@TempDir Path tempDir) throws IOException {
+        MetaData metaData = new MetaData();
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
+        Path bibPath = tempDir.resolve("live-cleanup.bib");
+        Files.createFile(bibPath);
+        context.setDatabasePath(bibPath);
+
+        ProtectedTermsLoader liveLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(List.of(), List.of(), ProtectedTermsLoader.getInternalLists(), List.of()));
+        ProtectedTermsList customList = liveLoader.addNewProtectedTermsList(
+                "Live", tempDir.resolve("live.terms").toString(), true);
+
+        CleanupWorker liveWorker = new CleanupWorker(
+                context,
+                mock(FilePreferences.class, Answers.RETURNS_SMART_NULLS),
+                mock(TimestampPreferences.class),
+                false,
+                mock(JournalAbbreviationRepository.class),
+                liveLoader);
+
+        // Mutate the loader after CleanupWorker is constructed to verify live updates are reflected
+        customList.addProtectedTerm("LiveCleanupTerm");
+        CleanupPreferences preset = new CleanupPreferences(
+                new FieldFormatterCleanupActions(true, FieldFormatterCleanupMapper.parseActions("title[protect_terms]")));
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Testing LiveCleanupTerm");
+
+        liveWorker.cleanup(preset, entry);
+        assertEquals(Optional.of("Testing {LiveCleanupTerm}"), entry.getField(StandardField.TITLE));
     }
 }
