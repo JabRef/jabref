@@ -1,6 +1,6 @@
 TY  - PAT
-\begin{author}\format[FormatChars,RisAuthors(AU)]{\author}\end{author}
-\begin{assignee}\format[FormatChars,RisAuthors(A2)]{\assignee}\end{assignee}
+\begin{author}\format[RisAuthors(AU)]{\author}\end{author}
+\begin{assignee}\format[RisAuthors(A2)]{\assignee}\end{assignee}
 \begin{title}T1  - \format[FormatChars]{\title}\end{title}
 \begin{year}Y1  - \format[FormatChars]{\year}\end{year}\begin{month}/\format[FormatChars,RisMonth]{\month}\end{month}
 \begin{number}IS  - \format[FormatChars]{\number}\end{number}
