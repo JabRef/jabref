@@ -31,6 +31,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
@@ -836,7 +837,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         SplitPane splitPane = getPaneAndStartSearch(entry);
         splitPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        splitPane.setMinSize(0, 0);
+        splitPane.setMinHeight(0);
 
         BorderPane root = new BorderPane();
         root.setTop(getTopBar());
@@ -844,7 +845,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         root.setBottom(sciteResultsPane);
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        setContent(root);
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        setContent(scrollPane);
     }
 
     private void searchForRelations(CitationComponents citationComponents,
