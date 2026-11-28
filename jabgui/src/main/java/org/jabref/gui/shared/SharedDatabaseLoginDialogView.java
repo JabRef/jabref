@@ -19,6 +19,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -71,6 +72,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
     @Inject private GitHandlerRegistry gitHandlerRegistry;
+    @Inject private NativeDesktop nativeDesktop;
 
     private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
@@ -124,7 +126,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 clipBoardManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                nativeDesktop);
         new ViewModelListCellFactory<SharedDatabaseLoginDialogViewModel.SavedConnection>()
                 .withText(SharedDatabaseLoginDialogViewModel.SavedConnection::label)
                 .install(savedConnections);

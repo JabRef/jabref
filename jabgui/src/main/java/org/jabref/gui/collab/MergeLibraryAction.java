@@ -10,6 +10,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -30,6 +31,7 @@ public class MergeLibraryAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
+    private final NativeDesktop nativeDesktop;
     private final TaskExecutor taskExecutor;
     private final LibraryTabContainer libraryTabContainer;
 
@@ -38,11 +40,13 @@ public class MergeLibraryAction extends SimpleCommand {
                               GuiPreferences preferences,
                               BibEntryTypesManager entryTypesManager,
                               TaskExecutor taskExecutor,
-                              LibraryTabContainer libraryTabContainer) {
+                              LibraryTabContainer libraryTabContainer,
+                              NativeDesktop nativeDesktop) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
+        this.nativeDesktop = nativeDesktop;
         this.taskExecutor = taskExecutor;
         this.libraryTabContainer = libraryTabContainer;
 
@@ -70,7 +74,7 @@ public class MergeLibraryAction extends SimpleCommand {
                     return;
                 }
 
-                ChangeScanner changeScanner = new ChangeScanner(activeDatabase, dialogService, preferences, entryTypesManager, stateManager);
+                ChangeScanner changeScanner = new ChangeScanner(activeDatabase, dialogService, preferences, entryTypesManager, stateManager, nativeDesktop);
                 BackgroundTask.wrap(() -> changeScanner.getDatabaseChanges(mergeFile))
                               .onSuccess(changes -> showMergeDialog(activeDatabase, changes))
                               .onFailure(exception -> {

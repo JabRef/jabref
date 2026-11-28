@@ -21,8 +21,8 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
@@ -45,7 +45,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
 
-    private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final StateManager stateManager;
 
     private final ActionFactory factory;
@@ -58,10 +58,10 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     private final HBox actionsContainer = new HBox();
     private final FieldValueCellViewModel viewModel;
 
-    public FieldValueCell(String text, int rowIndex, GuiPreferences preferences, StateManager stateManager) {
+    public FieldValueCell(String text, int rowIndex, NativeDesktop nativeDesktop, StateManager stateManager) {
         super(text, rowIndex);
 
-        this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.stateManager = stateManager;
         this.factory = new ActionFactory();
         this.viewModel = new FieldValueCellViewModel(text);
@@ -144,7 +144,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         Node openLinkIcon = IconTheme.JabRefIcons.OPEN_LINK.getGraphicNode();
         openLinkIcon.getStyleClass().add("action-icon");
 
-        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText(), preferences.getExternalApplicationsPreferences()));
+        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText(), nativeDesktop));
         openLinkButton.setGraphic(openLinkIcon);
         openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         openLinkButton.setMaxHeight(Double.MAX_VALUE);

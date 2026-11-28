@@ -10,6 +10,7 @@ import javafx.scene.control.Tab;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -735,7 +736,7 @@ class StyleSelectDialogViewModelTest {
             when(preferences.getFilePreferences()).thenReturn(filePreferences);
             when(preferences.getOpenOfficePreferences(journalAbbreviationRepository)).thenReturn(openOfficePreferences);
             return new StyleSelectDialogViewModel(dialogService, loader, jStyles, bstStyles,
-                    preferences, journalAbbreviationRepository, new CurrentThreadTaskExecutor(), bibEntryTypesManager);
+                    preferences, journalAbbreviationRepository, new CurrentThreadTaskExecutor(), bibEntryTypesManager, mock(NativeDesktop.class));
         }
 
         private Path writeCslStyle(String filename, String title, String shortTitle) throws IOException {
@@ -804,6 +805,6 @@ class StyleSelectDialogViewModelTest {
         openOfficePreferences.setCurrentStyle(currentStyle);
         return new StyleSelectDialogViewModel(dialogService, mock(CSLStyleLoader.class), jStyleLoader,
                 mock(BstStyleLoader.class), preferences, journalAbbreviationRepository,
-                mock(TaskExecutor.class), mock(BibEntryTypesManager.class));
+                mock(TaskExecutor.class), mock(BibEntryTypesManager.class), mock(NativeDesktop.class));
     }
 }

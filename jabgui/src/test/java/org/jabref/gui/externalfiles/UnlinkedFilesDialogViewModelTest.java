@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.TreeItem;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
@@ -81,7 +82,8 @@ public class UnlinkedFilesDialogViewModelTest {
                 null,
                 guiPreferences,
                 stateManager,
-                taskExecutor
+                taskExecutor,
+                mock(NativeDesktop.class)
         );
     }
 

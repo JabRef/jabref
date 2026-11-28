@@ -17,6 +17,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTable;
@@ -103,6 +104,7 @@ class GlobalSearchResultDialogTest {
         when(libraryTabContainer.getCurrentLibraryTab()).thenReturn(libraryTab);
 
         Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(NativeDesktop.class, mock(NativeDesktop.class));
         Injector.setModelOrService(StateManager.class, stateManager);
         Injector.setModelOrService(DialogService.class, dialogService);
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);

@@ -6,6 +6,7 @@ import javafx.collections.WeakMapChangeListener;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.undo.UndoManager;
@@ -40,8 +41,9 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
                                            TaskExecutor taskExecutor,
                                            GuiPreferences preferences,
                                            UndoManager undoManager,
-                                           StateManager stateManager) {
-        super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+                                           StateManager stateManager,
+                                           NativeDesktop nativeDesktop) {
+        super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, nativeDesktop);
         EasyBind.subscribe(identifier, newIdentifier -> newIdentifier.ifPresent(id -> {
             // TODO: We already have a common superclass between ArXivIdentifier and ARK. This could be refactored further.
             if (id instanceof ArXivIdentifier) {

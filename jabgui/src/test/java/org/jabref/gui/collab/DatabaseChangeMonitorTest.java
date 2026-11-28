@@ -12,6 +12,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.undo.UndoManager;
@@ -64,7 +65,8 @@ class DatabaseChangeMonitorTest {
                 mock(BibEntryTypesManager.class),
                 mock(UndoManager.class),
                 mock(StateManager.class),
-                mock(LibraryTab.class));
+                mock(LibraryTab.class),
+                mock(NativeDesktop.class));
 
         ArgumentCaptor<FileUpdateListener> listenerCaptor = ArgumentCaptor.forClass(FileUpdateListener.class);
         verify(fileUpdateMonitor).addListenerForFile(eq(originalPath), listenerCaptor.capture());
@@ -86,7 +88,8 @@ class DatabaseChangeMonitorTest {
                 mock(BibEntryTypesManager.class),
                 mock(UndoManager.class),
                 mock(StateManager.class),
-                mock(LibraryTab.class));
+                mock(LibraryTab.class),
+                mock(NativeDesktop.class));
     }
 
     @Test
@@ -210,7 +213,8 @@ class DatabaseChangeMonitorTest {
                 mock(BibEntryTypesManager.class),
                 undoManager,
                 mock(StateManager.class),
-                libraryTab);
+                libraryTab,
+                mock(NativeDesktop.class));
 
         monitor.applyResolvedChanges(List.of(mergedChange), false);
 
@@ -243,7 +247,8 @@ class DatabaseChangeMonitorTest {
                 mock(BibEntryTypesManager.class),
                 undoManager,
                 mock(StateManager.class),
-                libraryTab);
+                libraryTab,
+                mock(NativeDesktop.class));
 
         monitor.applyResolvedChanges(List.of(deniedChange), false);
 
@@ -275,7 +280,8 @@ class DatabaseChangeMonitorTest {
                 mock(BibEntryTypesManager.class),
                 undoManager,
                 mock(StateManager.class),
-                libraryTab);
+                libraryTab,
+                mock(NativeDesktop.class));
 
         monitor.applyResolvedChanges(List.of(diskChange), true);
 
@@ -311,7 +317,8 @@ class DatabaseChangeMonitorTest {
                 mock(BibEntryTypesManager.class),
                 mock(UndoManager.class),
                 mock(StateManager.class),
-                mock(LibraryTab.class));
+                mock(LibraryTab.class),
+                mock(NativeDesktop.class));
 
         DatabaseChange firstChange = new EntryAdd(new BibEntry().withCitationKey("first"), new BibDatabaseContext(), null);
         DatabaseChange secondChange = new EntryAdd(new BibEntry().withCitationKey("second"), new BibDatabaseContext(), null);

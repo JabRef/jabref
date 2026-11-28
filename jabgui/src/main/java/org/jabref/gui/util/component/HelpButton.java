@@ -5,11 +5,10 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.OpenBrowserAction;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.help.HelpFile;
 
@@ -36,7 +35,7 @@ public class HelpButton extends Button {
             setOnAction(_ -> new OpenBrowserAction(
                     helpUrl.get(),
                     Injector.instantiateModelOrService(DialogService.class),
-                    Injector.instantiateModelOrService(GuiPreferences.class).getExternalApplicationsPreferences()
+                    Injector.instantiateModelOrService(NativeDesktop.class)
             ).execute());
         });
     }
@@ -48,7 +47,7 @@ public class HelpButton extends Button {
 
     public void setHelpFile(@NonNull HelpFile helpFile,
                             @NonNull DialogService dialogService,
-                            @NonNull ExternalApplicationsPreferences externalApplicationsPreferences) {
+                            @NonNull NativeDesktop nativeDesktop) {
         if (isHelpFileSet) {
             throw new IllegalStateException("Help file has already been set");
         }
@@ -56,7 +55,7 @@ public class HelpButton extends Button {
         if (!helpUrl.get().isBlank()) {
             throw new IllegalArgumentException("You cannot set both a help URL and a help file");
         }
-        setOnAction(_ -> new HelpAction(helpFile, dialogService, externalApplicationsPreferences).execute());
+        setOnAction(_ -> new HelpAction(helpFile, dialogService, nativeDesktop).execute());
     }
 
     /// This method is not used by JabRef, but provided for FXML usage.

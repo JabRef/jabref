@@ -7,6 +7,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DelayedExecution;
@@ -26,12 +27,14 @@ public class DonationProvider {
     private static final int DONATION_INTERVAL_MONTHS = 6;
 
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final DialogService dialogService;
 
     private @Nullable DelayedExecution scheduledShow;
 
-    public DonationProvider(GuiPreferences preferences, DialogService dialogService) {
+    public DonationProvider(GuiPreferences preferences, DialogService dialogService, NativeDesktop nativeDesktop) {
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.dialogService = dialogService;
     }
 
@@ -65,7 +68,7 @@ public class DonationProvider {
         }));
 
         notification.getActions().add(new NotificationAction<>(Localization.lang("Donate"), _ -> {
-            new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();
+            new OpenBrowserAction(URLs.DONATE_URL, dialogService, nativeDesktop).execute();
             return OnClickBehaviour.HIDE_AND_REMOVE;
         }));
 

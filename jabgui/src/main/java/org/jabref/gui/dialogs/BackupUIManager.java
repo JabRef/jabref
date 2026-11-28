@@ -22,7 +22,7 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -57,12 +57,13 @@ public class BackupUIManager {
                                                                  GuiPreferences preferences,
                                                                  BibEntryTypesManager entryTypesManager,
                                                                  FileUpdateMonitor fileUpdateMonitor,
-                                                                 StateManager stateManager) {
+                                                                 StateManager stateManager,
+                                                                 NativeDesktop nativeDesktop) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
                 tabContainer,
                 stateManager,
-                preferences.getExternalApplicationsPreferences(),
+                nativeDesktop,
                 originalPath,
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
@@ -94,7 +95,7 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager, nativeDesktop);
             }
             return Optional.empty();
         });
@@ -103,11 +104,11 @@ public class BackupUIManager {
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
                                                                  LibraryTabContainer tabContainer,
                                                                  StateManager stateManager,
-                                                                 ExternalApplicationsPreferences externalApplicationsPreferences,
+                                                                 NativeDesktop nativeDesktop,
                                                                  Path originalPath,
                                                                  Path backupDir) {
         return UiTaskExecutor.runInJavaFXThread(() -> showForLibrary(tabContainer, stateManager, originalPath,
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences, dialogService))));
+                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, nativeDesktop, dialogService))));
     }
 
     private static <T> T showForLibrary(LibraryTabContainer tabContainer, StateManager stateManager, Path path, Supplier<T> showDialog) {
@@ -155,7 +156,8 @@ public class BackupUIManager {
             GuiPreferences preferences,
             BibEntryTypesManager entryTypesManager,
             FileUpdateMonitor fileUpdateMonitor,
-            StateManager stateManager) {
+            StateManager stateManager,
+            NativeDesktop nativeDesktop) {
         try {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
 
@@ -167,7 +169,7 @@ public class BackupUIManager {
             Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
-            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager, nativeDesktop);
 
             return UiTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, entryTypesManager, changeResolverFactory);
@@ -198,7 +200,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, entryTypesManager, fileUpdateMonitor, stateManager, nativeDesktop);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

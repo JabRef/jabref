@@ -6,7 +6,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 class ConstantsPropertiesViewModelTest {
 
     private final DialogService service = mock(DialogService.class);
-    private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
     /// Check that the list of strings is sorted according to their keys
     @Test
@@ -32,7 +31,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of(string2.getName(), string1.getName()); // ICSE before TSE
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, mock(NativeDesktop.class), new HeadlessGuiUndoManager());
         model.setValues(context.getMetaData());
 
         List<String> actual = model.stringsListProperty().stream()
@@ -50,7 +49,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of("ICSE", "TSE");
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, mock(NativeDesktop.class), new HeadlessGuiUndoManager());
         ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("TSE", "Transactions on Software Engineering"));
         stringsList.add(new ConstantsItemModel("ICSE", "International Conference on Software Engineering"));
@@ -70,7 +69,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabase db = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(db);
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, mock(NativeDesktop.class), new HeadlessGuiUndoManager());
 
         ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));

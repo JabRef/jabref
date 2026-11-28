@@ -23,6 +23,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
@@ -112,6 +113,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
+    @Inject private NativeDesktop nativeDesktop;
 
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer bstPreviewViewer;
@@ -153,7 +155,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void initialize() {
-        viewModel = new StyleSelectDialogViewModel(dialogService, cslStyleLoader, jStyleLoader, bstStyleLoader, preferences, journalAbbreviationRepository, taskExecutor, bibEntryTypesManager);
+        viewModel = new StyleSelectDialogViewModel(dialogService, cslStyleLoader, jStyleLoader, bstStyleLoader, preferences, journalAbbreviationRepository, taskExecutor, bibEntryTypesManager, nativeDesktop);
 
         setupCslStylesTab();
         setupJStylesTab();
@@ -307,7 +309,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     private PreviewViewer initializePreviewViewer(BibEntry entry) {
-        PreviewViewer viewer = previewViewerFactory.create(dialogService, preferences, taskExecutor);
+        PreviewViewer viewer = previewViewerFactory.create(dialogService, preferences, taskExecutor, nativeDesktop);
         viewer.setDatabaseContext(new BibDatabaseContext());
         viewer.setEntry(entry);
         return viewer;
@@ -445,7 +447,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @NullMarked
     @FunctionalInterface
     interface PreviewViewerFactory {
-        PreviewViewer create(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor);
+        PreviewViewer create(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor, NativeDesktop nativeDesktop);
     }
 
     /// When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.

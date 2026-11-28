@@ -30,6 +30,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -89,6 +90,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final NativeDesktop nativeDesktop;
     private final AiService aiService;
     /// The connection used last; the other stored connections are reached through it
     private final SharedDatabasePreferences sharedDatabasePreferences;
@@ -126,10 +128,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor,
                                               JournalAbbreviationRepository journalAbbreviationRepository,
-                                              GitHandlerRegistry gitHandlerRegistry) {
+                                              GitHandlerRegistry gitHandlerRegistry,
+                                              NativeDesktop nativeDesktop) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.nativeDesktop = nativeDesktop;
         this.sharedDatabasePreferences = sharedDatabasePreferences;
         this.keyringAvailable = keyringAvailability.getAsBoolean();
         this.aiService = aiService;
@@ -258,7 +262,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 fileUpdateMonitor,
                 clipBoardManager,
                 taskExecutor,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                nativeDesktop);
         SharedDatabaseUIManager.findOpenTab(tabContainer, connectionProperties).ifPresentOrElse(alreadyOpen -> {
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                     Localization.lang("You are already connected to a database using entered connection details."));
@@ -361,7 +366,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             Localization.lang("However, a new database was created alongside the pre-3.6 one."),
                     ButtonType.OK, openHelp);
 
-            result.filter(btn -> btn.equals(openHelp)).ifPresent(_ -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
+            result.filter(btn -> btn.equals(openHelp)).ifPresent(_ -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, nativeDesktop).execute());
             result.filter(ButtonType.OK::equals).ifPresent(_ -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected, sharedDatabaseId));
             return;
         }
