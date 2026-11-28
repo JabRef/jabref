@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added an option to automatically merge changes made to the library file outside JabRef into the open library. [#8431](https://github.com/JabRef/jabref/issues/8431)
+- We added merging of conflicted copies left by sync clients, per library or as a global default (off by default). [#16827](https://github.com/JabRef/jabref/pull/16827)
 
 ### Changed
 
