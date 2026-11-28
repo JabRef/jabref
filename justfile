@@ -2,7 +2,7 @@ set windows-shell := ["powershell"]
 
 [unix]
 ensure-gg-cmd:
-    [ ! -f gg.cmd ] && ( echo "gg.cmd not found — downloading..."; ( command -v wget >/dev/null 2>&1 && wget -O gg.cmd https://ggcmd.io/gg.cmd ) || ( command -v curl >/dev/null 2>&1 && curl -L https://ggcmd.io/gg.cmd -o gg.cmd ) || { echo "Error: neither wget nor curl is installed." >&2; exit 1; } )
+    [ -f gg.cmd ] || ( echo "gg.cmd not found — downloading..."; ( command -v wget >/dev/null 2>&1 && wget -O gg.cmd https://ggcmd.io/gg.cmd ) || ( command -v curl >/dev/null 2>&1 && curl -L https://ggcmd.io/gg.cmd -o gg.cmd ) || { echo "Error: neither wget nor curl is installed." >&2; exit 1; } )
 
 [unix]
 checkout-pr pr-id: ensure-gg-cmd
@@ -26,6 +26,11 @@ run-jabkit *FLAGS: ensure-gg-cmd
 [unix]
 run-jabsrv *FLAGS: ensure-gg-cmd
     sh ./gg.cmd gradle :jabsrv-cli:run --args="{{FLAGS}}"
+
+# Show the CHANGELOG.md entries that are new since the last time, by others and by me.
+[unix]
+whats-new *FLAGS: ensure-gg-cmd
+    sh ./gg.cmd jbang changelog-news@koppor/changelog-news {{FLAGS}}
 
 [windows]
 ensure-gg-cmd:
@@ -54,8 +59,19 @@ run-jabkit *FLAGS: ensure-gg-cmd
 run-jabsrv *FLAGS: ensure-gg-cmd
     .\gg.cmd gradle :jabsrv-cli:run --args="{{FLAGS}}"
 
+[windows]
+whats-new *FLAGS: ensure-gg-cmd
+    .\gg.cmd jbang changelog-news@koppor/changelog-news {{FLAGS}}
+
 run-main:
     just run-branch main
+
+# Pull, show what is new ("Cancel" there stops), then run JabRef.
+run-latest:
+    git pull --no-rebase
+    git submodule update --init
+    just whats-new
+    just run
 
 run-pr pr-id:
     just checkout-pr {{pr-id}}

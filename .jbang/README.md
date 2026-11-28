@@ -146,3 +146,16 @@ JBang installed: <https://www.jbang.dev/download/>
 ## Try out any pull request
 
 See <https://blog.jabref.org/2025/05/31/run-pr/> for a howto.
+
+## What's new since my last run
+
+`just run-latest` pulls and, before starting JabRef, opens a window with the `CHANGELOG.md` entries not shown yet, split into *changes by others* and *changes by me*.
+"Continue" starts JabRef, "Cancel" stops the recipe.
+
+```bash
+just whats-new            # the window on its own
+just whats-new --stdout   # plain text instead
+```
+
+The first run only records the current changelog and shows nothing.
+The window is [changelog-news](https://github.com/koppor/changelog-news); jbang asks once whether to trust it.
