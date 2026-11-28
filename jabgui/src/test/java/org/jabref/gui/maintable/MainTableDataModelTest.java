@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -55,6 +56,8 @@ import org.jabref.model.search.query.SearchResults;
 import com.tobiasdiez.easybind.EasyBind;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -640,6 +643,50 @@ class MainTableDataModelTest {
         JavaFxExtension.awaitEvents();
 
         assertEquals(List.of(), visibleEntries);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {10, 11})
+    void deletingEntriesKeepsSearchAndGroupFilters(int numberToDelete) {
+        JavaFxExtension.invokeAndWait(() -> {
+            BibDatabaseContext context = new BibDatabaseContext();
+            BibEntry matchesBoth = new BibEntry().withField(StandardField.AUTHOR, "Alice").withField(StandardField.TITLE, "Reviewed");
+            BibEntry matchesGroupOnly = new BibEntry().withField(StandardField.AUTHOR, "Bob").withField(StandardField.TITLE, "Reviewed");
+            BibEntry matchesSearchOnly = new BibEntry().withField(StandardField.AUTHOR, "Alice").withField(StandardField.TITLE, "Unread");
+            List<BibEntry> toDelete = IntStream.range(0, numberToDelete)
+                                               .mapToObj(i -> new BibEntry().withCitationKey("delete" + i)
+                                                                            .withField(StandardField.AUTHOR, "Alice")
+                                                                            .withField(StandardField.TITLE, "Reviewed"))
+                                               .toList();
+            context.getDatabase().insertEntries(matchesBoth, matchesGroupOnly, matchesSearchOnly);
+            context.getDatabase().insertEntries(toDelete);
+
+            GuiPreferences preferences = mock(GuiPreferences.class);
+            when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+            when(preferences.getSearchPreferences()).thenReturn(SearchPreferences.getDefault());
+            when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+            SearchContext search = new SearchContext(
+                    new SimpleBooleanProperty(false),
+                    () -> new InMemorySearchBackend(context, new BibEntryPreferences(',')),
+                    () -> new InMemorySearchBackend(context, new BibEntryPreferences(',')));
+            SimpleListProperty<GroupTreeNode> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
+            OptionalObjectProperty<SearchQuery> query = OptionalObjectProperty.empty();
+            MainTableDataModel model = new MainTableDataModel(context, preferences, new CurrentThreadTaskExecutor(),
+                    search, selectedGroups, query, new SimpleIntegerProperty());
+            try {
+                selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.TITLE, "Reviewed")));
+                query.setValue(Optional.of(new SearchQuery("author=Alice")));
+                assertEquals(numberToDelete + 1, model.getEntriesFilteredAndSorted().size());
+
+                context.getDatabase().removeEntries(toDelete);
+
+                assertEquals(List.of(matchesBoth), model.getEntriesFilteredAndSorted().stream()
+                                                        .map(BibEntryTableViewModel::getEntry)
+                                                        .toList());
+            } finally {
+                model.unbind();
+            }
+        });
     }
 
     private static GroupTreeNode getKeywordGroup(Field field, String searchExpression) {

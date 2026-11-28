@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -102,7 +104,7 @@ public class MainTableDataModel {
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
+        entriesViewModel = createEntryViewModels(allEntries);
         entriesFiltered = new FilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
 
         searchQuerySubscription = EasyBind.listen(searchQueryProperty, (_, _, newValue) -> updateSearchMatches(newValue));
@@ -113,6 +115,22 @@ public class MainTableDataModel {
         resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().get() == MatchCategory.MATCHING_SEARCH_AND_GROUPS)));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
+    }
+
+    private ObservableList<BibEntryTableViewModel> createEntryViewModels(ObservableList<BibEntry> entries) {
+        // Different entries can have identical fields. Each surviving entry needs its own row and match state.
+        Map<BibEntry, BibEntryTableViewModel> rowsByEntry = new IdentityHashMap<>(entries.size());
+        ObservableList<BibEntryTableViewModel> rows = EasyBind.mapBacked(entries,
+                entry -> rowsByEntry.computeIfAbsent(entry, newEntry -> new BibEntryTableViewModel(newEntry, bibDatabaseContext, fieldValueFormatter)),
+                false);
+        rows.addListener((ListChangeListener<BibEntryTableViewModel>) change -> {
+            while (change.next()) {
+                // A bulk replacement reports surviving rows as both removed and added.
+                change.getRemoved().forEach(row -> rowsByEntry.remove(row.getEntry()));
+                change.getAddedSubList().forEach(row -> rowsByEntry.put(row.getEntry(), row));
+            }
+        });
+        return rows;
     }
 
     // [impl->req~jabgui.search.fulltext.entry-editor-results~1]
