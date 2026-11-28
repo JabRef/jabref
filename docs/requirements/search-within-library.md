@@ -66,6 +66,14 @@ When automatic linked-file indexing is disabled, queued work must not start, and
 
 Needs: impl, utest
 
+## Closing a library must save its full-text index without forcing a segment merge
+`req~search.fulltext.close-without-forced-merge~1`
+
+Completed indexing work must be available when the library is reopened.
+Lucene's normal merge policy manages segment compaction. [#17958](https://github.com/JabRef/jabref/issues/17958)
+
+Needs: impl, utest
+
 ## Full-text search results must reflect the active library in the entry editor
 `req~jabgui.search.fulltext.entry-editor-results~1`
 
